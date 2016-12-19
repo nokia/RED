@@ -19,6 +19,11 @@ class RedSettingProposal extends BaseAssistProposal {
     }
 
     @Override
+    public ImageDescriptor getImage() {
+        return RedImages.getRobotSettingImage();
+    }
+
+    @Override
     public boolean hasDescription() {
         return true;
     }
@@ -26,10 +31,5 @@ class RedSettingProposal extends BaseAssistProposal {
     @Override
     public String getDescription() {
         return RedSettingProposals.getSettingDescription(target, content, "");
-    }
-
-    @Override
-    public ImageDescriptor getImage() {
-        return RedImages.getRobotSettingImage();
     }
 }

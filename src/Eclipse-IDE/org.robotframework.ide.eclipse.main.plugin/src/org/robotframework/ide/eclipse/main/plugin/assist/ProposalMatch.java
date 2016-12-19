@@ -35,7 +35,7 @@ public final class ProposalMatch implements Iterable<Range<Integer>> {
     }
 
     // limits current matches only to given range and transforms them into given domain
-    public Optional<ProposalMatch> mapToFragment(final int startIndex, final int length) {
+    Optional<ProposalMatch> mapAndShiftToFragment(final int startIndex, final int length) {
         final List<Range<Integer>> rangesInDomain = new ArrayList<>();
 
         final Range<Integer> targetDomain = Range.closedOpen(startIndex, startIndex + length);
@@ -66,7 +66,7 @@ public final class ProposalMatch implements Iterable<Range<Integer>> {
             final ProposalMatch that = (ProposalMatch) obj;
             return this.matches.equals(that.matches);
         }
-        return super.equals(obj);
+        return false;
     }
 
     @Override
