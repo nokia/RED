@@ -1,0 +1,33 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _KaLdEIkmEeWHhtZu19MBKw,_cBDNYMN4Eeat3OoBX2X2jQ,_wdMmkIk5EeWHhtZu19MBKw
+Element-Name: ContentAssistInResources
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _rl1AUMXdEeaVRsIP7EWHyA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/19/16 1:31 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/res.robot" | double-click
+    select "RobotProject/res_tsv.tsv" | double-click
+}
+
+add-resource-content -file_name "res.robot" 
+add-resource-content -file_name "res_tsv.tsv" 
+
+
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/test.robot" | select "RobotProject/test.robot" | double-click
+    select "RobotProject/test.tsv" | double-click
+}
+
+add-content-to-test -file_name "test.robot" 
+add-content-to-test -file_name "test.tsv"
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
