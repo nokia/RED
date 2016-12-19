@@ -129,12 +129,15 @@ public class RedVariableProposalTest {
         final RedVariableProposal proposal = new RedVariableProposal("name", "source", "value", "comment",
                 VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
 
+        assertThat(proposal.equals(null)).isFalse();
+        assertThat(proposal.equals(new Object())).isFalse();
         assertThat(proposal.equals(new RedVariableProposal("other_name", "source", "value", "comment",
                 VariableOrigin.BUILTIN, ProposalMatch.EMPTY))).isFalse();
         assertThat(proposal.equals(new RedVariableProposal("name", "other_source", "value", "comment",
                 VariableOrigin.BUILTIN, ProposalMatch.EMPTY))).isFalse();
         assertThat(proposal.equals(new RedVariableProposal("name", "source", "value", "comment",
                 VariableOrigin.IMPORTED, ProposalMatch.EMPTY))).isFalse();
+
         assertThat(proposal.equals(new RedVariableProposal("name", "source", "value", "comment", VariableOrigin.BUILTIN,
                 ProposalMatch.EMPTY))).isTrue();
         assertThat(proposal.equals(new RedVariableProposal("name", "source", "other_value", "comment",
