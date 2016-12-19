@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/14/16 12:13 PM
+Save-Time: 12/19/16 10:43 AM
 Testcase-Type: ecl
 Verifications: _qtiWAI7UEeWetPU-dn-gxQ
 
@@ -132,19 +132,19 @@ try -times 3 -delay 1000 -command{
 //-----------------------------------------------------------------------------------------------------------
 open-quick-fix -errorText "Errors (11 items)/Resource import '..\\/SecondProject2\\/res2\\/res.robot' is invalid: file does not exist"
 
-get-window "Quick Fix" | get-table | select "Change to \\/SecondProject\\/res2\\/res.robot"
+get-window "Quick Fix" | get-table | select "Change to SecondProject\\/res2\\/res.robot"
 with [get-window "Quick Fix"] {
     with [get-table] {
         get-property itemCount | equals 5 | verify-true
-        get-property "getItems().TableItem[0].getText()" | equals "Change to /MediumRobotTest/res1/res.robot" 
+        get-property "getItems().TableItem[0].getText()" | equals "Change to MediumRobotTest/res1/res.robot" 
             | verify-true
-        get-property "getItems().TableItem[1].getText()" | equals "Change to /MediumRobotTest/res1/res3/res.robot" 
+        get-property "getItems().TableItem[1].getText()" | equals "Change to MediumRobotTest/res1/res3/res.robot" 
             | verify-true
-        get-property "getItems().TableItem[2].getText()" | equals "Change to /MediumRobotTest/res2/res.robot" 
+        get-property "getItems().TableItem[2].getText()" | equals "Change to MediumRobotTest/res2/res.robot" 
             | verify-true
-        get-property "getItems().TableItem[3].getText()" | equals "Change to /SecondProject/res1/res.robot" 
+        get-property "getItems().TableItem[3].getText()" | equals "Change to SecondProject/res1/res.robot" 
             | verify-true
-        get-property "getItems().TableItem[4].getText()" | equals "Change to /SecondProject/res2/res.robot" 
+        get-property "getItems().TableItem[4].getText()" | equals "Change to SecondProject/res2/res.robot" 
             | verify-true
     }
     with [get-table -after [get-label "Problems:"]] {
@@ -163,7 +163,7 @@ open-quick-fix -errorText "Errors (10 items)/Resource import '..\\/text_file.txt
 with [get-window "Quick Fix"] {
     with [get-table] {
         get-property itemCount | equals 1 | verify-true
-        get-property "getItems().TableItem[0].getText()" | equals "Change to /MediumRobotTest/text_file.txt" 
+        get-property "getItems().TableItem[0].getText()" | equals "Change to MediumRobotTest/text_file.txt" 
             | verify-true
     }
     with [get-table -after [get-label "Problems:"]] {
@@ -182,7 +182,7 @@ open-quick-fix -errorText "Errors (9 items)/Resource import 'abc.tsv' is invalid
 with [get-window "Quick Fix"] {
     with [get-table] {
         get-property itemCount | equals 1 | verify-true
-        get-property "getItems().TableItem[0].getText()" | equals "Change to /SecondProject/abc.tsv" | verify-true
+        get-property "getItems().TableItem[0].getText()" | equals "Change to SecondProject/abc.tsv" | verify-true
     }
     with [get-table -after [get-label "Problems:"]] {
         get-property itemCount | equals 1 | verify-true
@@ -200,7 +200,7 @@ open-quick-fix -errorText "Errors (8 items)/Resource import 'res1\\/deep_res.rob
 with [get-window "Quick Fix"] {
     with [get-table] {
         get-property itemCount | equals 1 | verify-true
-        get-property "getItems().TableItem[0].getText()" | equals "Change to /MediumRobotTest/res1/res3/deep_res.robot" 
+        get-property "getItems().TableItem[0].getText()" | equals "Change to MediumRobotTest/res1/res3/deep_res.robot" 
             | verify-true
     }
     with [get-table -after [get-label "Problems:"]] {
@@ -229,7 +229,7 @@ open-quick-fix -errorText "Errors (7 items)/Resource import 'res1\\/res3\\/..\\/
 with [get-window "Quick Fix"] {
     with [get-table] {
         get-property itemCount | equals 1 | verify-true
-        get-property "getItems().TableItem[0].getText()" | equals "Change to /MediumRobotTest/res1/simple_res.robot" 
+        get-property "getItems().TableItem[0].getText()" | equals "Change to MediumRobotTest/res1/simple_res.robot" 
             | verify-true
     }
     with [get-table -after [get-label "Problems:"]] {
