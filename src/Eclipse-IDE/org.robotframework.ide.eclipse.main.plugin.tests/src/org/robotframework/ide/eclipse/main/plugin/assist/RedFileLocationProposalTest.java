@@ -34,7 +34,7 @@ public class RedFileLocationProposalTest {
     @Test
     public void testProposalWithEmptyContentAndEmptyMatch() {
         final IFile file = projectProvider.getFile("file.txt");
-        final BaseAssistProposal proposal = new RedFileLocationProposal("", "label", file, ProposalMatch.EMPTY);
+        final RedFileLocationProposal proposal = new RedFileLocationProposal("", "label", file, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEmpty();
         assertThat(proposal.getArguments()).isEmpty();
@@ -48,7 +48,8 @@ public class RedFileLocationProposalTest {
     @Test
     public void testProposalWithNonEmptyContentAndEmptyMatch() {
         final IFile file = projectProvider.getFile("file.txt");
-        final BaseAssistProposal proposal = new RedFileLocationProposal("content", "label", file, ProposalMatch.EMPTY);
+        final RedFileLocationProposal proposal = new RedFileLocationProposal("content", "label", file,
+                ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("content");
         assertThat(proposal.getArguments()).isEmpty();
@@ -63,7 +64,7 @@ public class RedFileLocationProposalTest {
     @Test
     public void testProposalWithNonEmptyContentAndNonEmptyMatch() {
         final IFile file = projectProvider.getFile("file.txt");
-        final BaseAssistProposal proposal = new RedFileLocationProposal("content", "label", file,
+        final RedFileLocationProposal proposal = new RedFileLocationProposal("content", "label", file,
                 new ProposalMatch(Range.closedOpen(1, 3), Range.closedOpen(4, 6)));
 
         assertThat(proposal.getContent()).isEqualTo("content");
