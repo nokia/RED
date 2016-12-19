@@ -197,7 +197,7 @@ public class RedKeywordProposals {
                             if (qualifiedKeywordMatch.getMatch().isPresent()) {
                                 final ProposalMatch match = qualifiedKeywordMatch.getMatch().get();
                                 final Optional<ProposalMatch> inLabelMatch = match
-                                        .mapToFragment(aliasToUse.length() + 1, keywordName.length());
+                                        .mapAndShiftToFragment(aliasToUse.length() + 1, keywordName.length());
 
                                 if (inLabelMatch.isPresent()) {
                                     final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(
@@ -236,7 +236,7 @@ public class RedKeywordProposals {
                                 .findBddAwareMatch(userContent, qualifiedName);
                         if (qualifiedKeywordMatch.getMatch().isPresent()) {
                             final ProposalMatch match = qualifiedKeywordMatch.getMatch().get();
-                            final Optional<ProposalMatch> inLabelMatch = match.mapToFragment(alias.length() + 1,
+                            final Optional<ProposalMatch> inLabelMatch = match.mapAndShiftToFragment(alias.length() + 1,
                                     keywordName.length());
                             
                             if (inLabelMatch.isPresent()) {

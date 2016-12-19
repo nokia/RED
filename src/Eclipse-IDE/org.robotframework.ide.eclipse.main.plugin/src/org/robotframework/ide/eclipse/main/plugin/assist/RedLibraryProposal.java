@@ -21,7 +21,7 @@ class RedLibraryProposal extends BaseAssistProposal {
 
     private final String description;
 
-    public RedLibraryProposal(final String content, final List<String> arguments, final boolean isImported,
+    RedLibraryProposal(final String content, final List<String> arguments, final boolean isImported,
             final String description, final ProposalMatch match) {
         super(content, match);
         this.arguments = arguments;
@@ -55,6 +55,11 @@ class RedLibraryProposal extends BaseAssistProposal {
             label.append(" (already imported)", StyledString.DECORATIONS_STYLER);
         }
         return label;
+    }
+
+    @Override
+    public boolean hasDescription() {
+        return true;
     }
 
     @Override
