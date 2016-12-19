@@ -1,23 +1,28 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _KaLdEIkmEeWHhtZu19MBKw,_PMiY0IkmEeWHhtZu19MBKw,_wdMmkIk5EeWHhtZu19MBKw
+Contexts: _KaLdEIkmEeWHhtZu19MBKw,_cBDNYMN4Eeat3OoBX2X2jQ,_wdMmkIk5EeWHhtZu19MBKw
 Element-Name: ContentAssistInAllFilesTypes
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _TgaBwIkmEeWHhtZu19MBKw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/12/15 2:47 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/19/16 1:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/tsv_init_file/__init__.tsv" | double-click
+    select "RobotProject/robot_init_file/__init__.robot" | double-click
+}
+
 add-init-content -file_name "__init__.tsv" -is_tsv true
 add-init-content -file_name "__init__.robot" -is_tsv false 
-add-resource-content -file_name "res.robot" 
-add-resource-content -file_name "res_tsv.tsv"  
-add-content-to-test -file_name "test.robot" 
-add-content-to-test -file_name "test.tsv" 
+//add-resource-content -file_name "res.robot" 
+//add-resource-content -file_name "res_tsv.tsv"  
+//add-content-to-test -file_name "test.robot" 
+//add-content-to-test -file_name "test.tsv" 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
