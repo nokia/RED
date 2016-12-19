@@ -53,7 +53,7 @@ public class RedImportProposals {
 
                 if (match.getMatch().isPresent()) {
                     proposals.add(AssistProposals.createLibraryImportInCodeProposal(nameToUse, match.getBddPrefix(),
-                            match.getMatch()));
+                            match.getMatch().get()));
                 }
             }
         }
@@ -67,7 +67,7 @@ public class RedImportProposals {
 
             if (match.getMatch().isPresent()) {
                 resProposals.add(AssistProposals.createResourceImportInCodeProposal(nameToUse, match.getBddPrefix(),
-                        match.getMatch()));
+                        match.getMatch().get()));
             }
         }
         proposals.sort(comparator);

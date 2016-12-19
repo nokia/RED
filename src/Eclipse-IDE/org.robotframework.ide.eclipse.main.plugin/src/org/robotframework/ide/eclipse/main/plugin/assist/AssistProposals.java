@@ -26,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescr
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.io.Files;
 
@@ -86,13 +85,13 @@ public class AssistProposals {
     }
 
     static RedImportProposal createResourceImportInCodeProposal(final String nameToUse, final String bddPrefix,
-            final Optional<ProposalMatch> match) {
-        return new RedImportProposal(nameToUse, bddPrefix, ModelType.RESOURCE_IMPORT_SETTING, match.get());
+            final ProposalMatch match) {
+        return new RedImportProposal(nameToUse, bddPrefix, ModelType.RESOURCE_IMPORT_SETTING, match);
     }
 
     static RedImportProposal createLibraryImportInCodeProposal(final String nameToUse, final String bddPrefix,
-            final Optional<ProposalMatch> match) {
-        return new RedImportProposal(nameToUse, bddPrefix, ModelType.LIBRARY_IMPORT_SETTING, match.get());
+            final ProposalMatch match) {
+        return new RedImportProposal(nameToUse, bddPrefix, ModelType.LIBRARY_IMPORT_SETTING, match);
     }
 
     static RedSettingProposal createSettingProposal(final String settingName, final SettingTarget target,
