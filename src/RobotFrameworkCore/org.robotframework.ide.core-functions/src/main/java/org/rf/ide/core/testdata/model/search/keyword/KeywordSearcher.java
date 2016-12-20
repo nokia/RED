@@ -34,7 +34,7 @@ public class KeywordSearcher {
 
     public <T> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords, final Extractor<T> extractor,
             final String keywordName) {
-        Set<T> keywords = new LinkedHashSet<T>(0);
+        Set<T> keywords = new LinkedHashSet<>(0);
         final List<String> namesToCheck = getNamesToCheck(keywordName);
         for (final String name : namesToCheck) {
             keywords.addAll(foundKeywords.get(name.toLowerCase()));
@@ -43,7 +43,7 @@ public class KeywordSearcher {
 
             if (!keywords.isEmpty()) {
                 final Set<T> matchNameWhole = new LinkedHashSet<>(0);
-                Iterator<T> iterator = keywords.iterator();
+                final Iterator<T> iterator = keywords.iterator();
                 for (int i = 0; i < keywords.size() && iterator.hasNext(); i++) {
                     final T keyword = iterator.next();
                     final String keywordNameFromKeywordDefinition = extractor.keywordName(keyword);
@@ -65,11 +65,11 @@ public class KeywordSearcher {
 
     public <T> ListMultimap<String, T> findKeywords(final Map<String, Collection<T>> accessibleKeywords,
             final Collection<T> keywords, final Extractor<T> extractor, final String usageName,
-            boolean stopIfOneWasMatching) {
+            final boolean stopIfOneWasMatching) {
         final ListMultimap<String, T> foundByMatch = ArrayListMultimap.create();
 
         if (stopIfOneWasMatching) {
-            Collection<T> collection = accessibleKeywords.get(QualifiedKeywordName.unifyDefinition(usageName));
+            final Collection<T> collection = accessibleKeywords.get(QualifiedKeywordName.unifyDefinition(usageName));
             if (collection != null && collection.size() == 1) {
                 foundByMatch.putAll(QualifiedKeywordName.unifyDefinition(usageName), collection);
 
@@ -100,8 +100,8 @@ public class KeywordSearcher {
                     }
                 }
 
-                KeywordScope scope = extractor.scope(keyword);
-                boolean isLibraryWithAlias = (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.STD_LIBRARY)
+                final KeywordScope scope = extractor.scope(keyword);
+                final boolean isLibraryWithAlias = (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.STD_LIBRARY)
                         && !alias.isEmpty();
                 if (!alias.isEmpty()) {
                     if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, alias,
@@ -143,26 +143,18 @@ public class KeywordSearcher {
     }
 
     private <T> boolean matchNameDirectlyOrAsEmbeddedName(final ListMultimap<String, T> foundByMatch, final T keyword,
-            final String keywordName, final String prefixName, boolean isEmbeddedKeywordName,
+            final String keywordName, final String prefixName, final boolean isEmbeddedKeywordName,
             final String nameCombination) {
-        String withPrefix;
-        if (prefixName != null) {
-            withPrefix = prefixName + "." + keywordName;
-        } else {
-            withPrefix = keywordName;
-        }
+
+        String prefixedKeywordName = prefixName != null ? prefixName + "." + keywordName : keywordName;
         if (!isEmbeddedKeywordName) {
-            withPrefix = QualifiedKeywordName.unifyDefinition(withPrefix);
-        }
-        if (nameCombination.equalsIgnoreCase(withPrefix)) {
-            foundByMatch.put(nameCombination, keyword);
-            return true;
-        } else if (EmbeddedKeywordNamesSupport.matchesWithLowerCase(withPrefix, nameCombination,
-                nameCombination.toLowerCase())) {
-            foundByMatch.put(nameCombination, keyword);
-            return true;
+            prefixedKeywordName = QualifiedKeywordName.unifyDefinition(prefixedKeywordName);
         }
 
+        if (EmbeddedKeywordNamesSupport.matchesIgnoreCase(prefixedKeywordName, nameCombination)) {
+            foundByMatch.put(nameCombination, keyword);
+            return true;
+        }
         return false;
     }
 
@@ -171,36 +163,11 @@ public class KeywordSearcher {
         return Files.getNameWithoutExtension(fullFileName);
     }
 
-    public static interface Extractor<T> {
-
-        KeywordScope scope(final T keyword);
-
-        Path path(final T keyword);
-
-        String alias(final T keyword);
-
-        String keywordName(final T keyword);
-
-        String sourceName(final T keyword);
-
-    }
-
     private List<String> getNamesToCheck(final String usageName) {
         final List<String> possibleNameCombination = new ArrayList<>(possibleNameCombination(usageName));
         Collections.sort(possibleNameCombination, new FromLongestLengthComparator());
 
         return possibleNameCombination;
-    }
-
-    private class FromLongestLengthComparator implements Comparator<String> {
-
-        @Override
-        public int compare(final String o1, final String o2) {
-            int o1Length = (o1 != null) ? o1.length() : 0;
-            int o2Length = (o2 != null) ? o2.length() : 0;
-
-            return -(Integer.compare(o1Length, o2Length)); // desc order
-        }
     }
 
     private Set<String> possibleNameCombination(final String usageName) {
@@ -238,7 +205,7 @@ public class KeywordSearcher {
         boolean shouldExtract = true;
         String currentName = usageName;
         while (shouldExtract) {
-            String newName = GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(currentName);
+            final String newName = GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(currentName);
             if (newName.equals(currentName)) {
                 shouldExtract = false;
             } else {
@@ -248,5 +215,30 @@ public class KeywordSearcher {
         }
 
         return currentName;
+    }
+
+    public static interface Extractor<T> {
+
+        KeywordScope scope(final T keyword);
+
+        Path path(final T keyword);
+
+        String alias(final T keyword);
+
+        String keywordName(final T keyword);
+
+        String sourceName(final T keyword);
+
+    }
+
+    private class FromLongestLengthComparator implements Comparator<String> {
+
+        @Override
+        public int compare(final String o1, final String o2) {
+            final int o1Length = (o1 != null) ? o1.length() : 0;
+            final int o2Length = (o2 != null) ? o2.length() : 0;
+
+            return -(Integer.compare(o1Length, o2Length)); // desc order
+        }
     }
 }
