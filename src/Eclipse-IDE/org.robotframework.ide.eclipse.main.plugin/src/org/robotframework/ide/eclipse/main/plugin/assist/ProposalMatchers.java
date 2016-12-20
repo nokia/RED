@@ -45,8 +45,9 @@ public class ProposalMatchers {
 
             @Override
             public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
-                if (EmbeddedKeywordNamesSupport.startsWith(proposalContent, userContent)) {
-                    return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
+                final int index = EmbeddedKeywordNamesSupport.startsWithIgnoreCase(proposalContent, userContent);
+                if (index >= 0) {
+                    return Optional.of(new ProposalMatch(Range.closedOpen(0, index)));
                 } else {
                     return Optional.absent();
                 }
