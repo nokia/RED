@@ -5,11 +5,18 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _rKHzEC1_EeanG46zhUFEYg
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/9/16 2:03 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/20/16 12:54 PM
 Tags: Bugs
 Testcase-Type: ecl
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+main: RED-351
+linked: RED-337
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
@@ -71,36 +78,36 @@ with [get-window "New Robot project"] {
     get-editbox -after [get-label "Project name:"] | set-text a
     get-button Finish | click
 }
-
-//add the same python file
-get-view "Project Explorer" | get-tree | select a | get-menu "New/Robot python file" | click
-with [get-window "New Robot python file"] {
-    get-editbox -after [get-label "File name:"] | set-text "b.py"
-    get-button Finish | click
-}
-
-//add different content fo python file
-with [get-editor "b.py" | get-text-viewer] {
-    type-text "def lol():"
-    key-type Enter
-    key-type Tab
-    type-text "return 9"
-    key-type "M1+s"
-}
-
-//add to red.xml
-get-view "Project Explorer" | get-tree | select "a/red.xml" | double-click
-set-dialog-result File "platform:/resource/a/b.py"
-with [get-editor "a/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
-    click
-    key-type "M1+s"
-}
-
-//check if new libspec was generated
-wait 3000
-get-view "Project Explorer" | get-tree | get-item "a/Robot Referenced libraries/b a \\(1\\)/Lol" 
-    | get-property caption | equals Test | verify-true
-get-tab-folder -index 1 | get-tab-item "b.py" | click
+//
+////add the same python file
+//get-view "Project Explorer" | get-tree | select a | get-menu "New/Robot python file" | click
+//with [get-window "New Robot python file"] {
+//    get-editbox -after [get-label "File name:"] | set-text "b.py"
+//    get-button Finish | click
+//}
+//
+////add different content fo python file
+//with [get-editor "b.py" | get-text-viewer] {
+//    type-text "def lol():"
+//    key-type Enter
+//    key-type Tab
+//    type-text "return 9"
+//    key-type "M1+s"
+//}
+//
+////add to red.xml
+//get-view "Project Explorer" | get-tree | select "a/red.xml" | double-click
+//set-dialog-result File "platform:/resource/a/b.py"
+//with [get-editor "a/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+//    click
+//    key-type "M1+s"
+//}
+//
+////check if new libspec was generated
+//wait 3000
+//get-view "Project Explorer" | get-tree | get-item "a/Robot Referenced libraries/b a \\(1\\)/Lol" 
+//    | get-property caption | equals Test | verify-true
+//get-tab-folder -index 1 | get-tab-item "b.py" | click
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
