@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
+import com.google.common.annotations.VisibleForTesting;
+
 class ImportedFiles {
 
     static List<IFile> getPythonFiles() {
@@ -66,12 +68,22 @@ class ImportedFiles {
     }
 
     static Comparator<IFile> createComparator(final String projectFolderName) {
+        final Comparator<IPath> pathsComparator = createPathsComparator(projectFolderName);
         return new Comparator<IFile>() {
 
             @Override
             public int compare(final IFile file1, final IFile file2) {
-                final IPath path1 = file1.getFullPath();
-                final IPath path2 = file2.getFullPath();
+                return pathsComparator.compare(file1.getFullPath(), file2.getFullPath());
+            }
+        };
+    }
+
+    @VisibleForTesting
+    static Comparator<IPath> createPathsComparator(final String projectFolderName) {
+        return new Comparator<IPath>() {
+
+            @Override
+            public int compare(final IPath path1, final IPath path2) {
 
                 if (path1.segment(0).equals(projectFolderName) && !path2.segment(0).equals(projectFolderName)) {
                     return -1;
