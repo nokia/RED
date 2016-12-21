@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xe9eMMbZEeaVRsIP7EWHyA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/21/16 12:14 PM
+Save-Time: 12/21/16 1:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -162,15 +162,70 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     key-type Enter
 }
 
+//add resource file
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 4 35
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text Res
+    key-type "M1+SPACE"
+    wait 300
+    key-type Enter
+    wait 200
+    key-type Enter -times 2
+    type-text res
+    key-type "M1+SPACE"
+    wait 300
+    key-type Enter
+    key-type Down
+    key-type Enter
+    
+    //open content assint in test
+    set-caret-pos 12 30
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text res
+    key-type "M1+SPACE"
+}
+
+//check if prefixes from resource are visible
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "res from res 2 - res 2.tsv" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals Reserved | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "res 2" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals resource1 | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
+}
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    key-type Esc
+    
+    //open again assist and add res from res 2
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Right
+    key-type Enter -times 2
+    
+    //add resource with args
+    type-text res
+    key-type "M1+SPACE"
+    key-type Down -times 3
+    key-type Enter
+    key-type Down
+    key-type Enter
+
+} 
+
+
 get-editor "lib_with_variable.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Library    add    \n"
     + "Library    DateTime    \n"
-    + "Library    many_classes.Geography    \n"
+    + "Library    many_classes.Geography \n"
+    + "Resource    res/res 2.tsv\n"
+    + "Resource    res/resource1.robot   \n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    add.Add 2    x    y\n"
     + "    DateTime.Convert Date    date\n"
     + "    many_classes.Geography.Geo    param2\n"
-    + "    BuiltIn.Catenate    text" | verify-true
-    
+    + "    BuiltIn.Catenate    text \n"
+    + "    res from res 2    arg1\n"
+    + "    resource1.second res    a1    a2    a3    a4    a5" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

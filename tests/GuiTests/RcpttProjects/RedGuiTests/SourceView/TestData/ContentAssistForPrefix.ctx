@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: __pUKYMdqEeaVRsIP7EWHyA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/21/16 12:02 PM
+Save-Time: 12/21/16 12:27 PM
 
 ------=_contents/PrefixProject/libs/lib_with_args.py-fc63e9e2-cfad-3ec5-9d4d-f1f024411ea3
 Content-Type: q7/binary
@@ -408,6 +408,16 @@ P0AGL7MFo39VMoNyI4qud0fZM1pUsjNLS98FMWNg9C7TnXZK7Jz6HtBGGRMnzyIRQyRLFtK2JUbbrhjN
 CAAAACEANOxdROMAAABkAQAACAAJAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRVVAUAAQAAAABQSwUGAAAA
 AAEAAQA/AAAAIgEAAAAA
 ------=_contents/PrefixProject/libspecs/divide.libspec-e18363db-9403-352d-97e9-25b76a66319e--
+------=_contents/PrefixProject/res/resource1.robot-94f1b379-33ba-3b92-bfb7-ae04674d530a
+Content-Type: q7/binary
+Entry-Name: contents/PrefixProject/res/resource1.robot
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAkALmNvbnRlbnRVVAUAAQAAAABFjLsOwjAMRfdI+QcP
+TN7KY2AEiYkNxoqhakxANDFyElUV6r9D6gEPPrpHVxcR4UzTyOISIKI1rxHuwgGEEhfpCRpr4HcDe4DI
+0IlXYU2inqOrTTXtQXwJFHO61bj6dM28YK3YKLaK3awr9V8fXAYHR4JTeOepqmem8C+0F8pF4rK7/wJQ
+SwcImVtzZ4QAAAC1AAAAUEsBAhQAFAAICAgAAAAhAJlbc2eEAAAAtQAAAAgACQAAAAAAAAAAAAAAAAAA
+AC5jb250ZW50VVQFAAEAAAAAUEsFBgAAAAABAAEAPwAAAMMAAAAAAA==
+------=_contents/PrefixProject/res/resource1.robot-94f1b379-33ba-3b92-bfb7-ae04674d530a--
 ------=_contents/PrefixProject/Tests_wit_lib/discover_lib.py-951ce0cd-46a3-3926-a76a-17d15f6fce12
 Content-Type: q7/binary
 Entry-Name: contents/PrefixProject/Tests_wit_lib/discover_lib.py
@@ -861,6 +871,15 @@ NG/ktw1zy4+lZXYT9oq6suk/lfdu21FO8fQ2nIfpuH9Z0n9QSwcIENlsYOQAAABqAQAAUEsBAhQAFAAI
 CAgAAAAhABDZbGDkAAAAagEAAAgACQAAAAAAAAAAAAAAAAAAAC5jb250ZW50VVQFAAEAAAAAUEsFBgAA
 AAABAAEAPwAAACMBAAAAAA==
 ------=_contents/PrefixProject/libspecs/multiply.libspec-3d7d4b7c-f5c1-3b55-aea8-a2962c2191e7--
+------=_contents/PrefixProject/res/res 2.tsv-ad701e2c-6129-343b-98cc-1a9e954cc38f
+Content-Type: q7/binary
+Entry-Name: contents/PrefixProject/res/res 2.tsv
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAkALmNvbnRlbnRVVAUAAQAAAADT0tJS8E6tLM8vSilW
+0NLS4uUqSi1WSCvKz1UAMYx4uTijHYvSS3NT80qKYzlVqhOL0g1rOR1AtFEtUDYnP53TDABQSwcIQ8dh
+IEIAAABGAAAAUEsBAhQAFAAICAgAAAAhAEPHYSBCAAAARgAAAAgACQAAAAAAAAAAAAAAAAAAAC5jb250
+ZW50VVQFAAEAAAAAUEsFBgAAAAABAAEAPwAAAIEAAAAAAA==
+------=_contents/PrefixProject/res/res 2.tsv-ad701e2c-6129-343b-98cc-1a9e954cc38f--
 ------=_contents/PrefixProject/libs/for_resource/res1.pyc-f10cb281-b767-33b7-81a7-53c052033244
 Content-Type: q7/binary
 Entry-Name: contents/PrefixProject/libs/for_resource/res1.pyc
@@ -1294,19 +1313,19 @@ AQA/AAAAWwEAAAAA
 Content-Type: q7/binary
 Entry-Name: .q7.content
 
-UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAkALmNvbnRlbnRVVAUAAQAAAACtlk2P0zAQhu9I/Ico
-dxyWC6hqWS3dAhVUVN0uu5wi15mmBicOttMm/57JV5e22yYx3BLrfV7PjO2xh9dZJJwtKM1lPHKvyGvX
-gZjJgMfhyE3N+tU79/r9yxdDqUICTPBEA1EsMYYwk5GdVL90QhkMHpqvsYwNZMbJIj7Y+74pfHGmWA9w
-fORujEkGnrfb7YiMQoLm3uNs2kha5trjjabAS52HOm+vc52YRqguI4rNjdZcm49SzRWseeY6PBi5vp/c
-f/kxC35PgH5f6On87eThc37jYsqOM2QVWf7gb6LkT2BG176Vz7wadGsRytZcQKMhNYNVzYClhq4EjhqV
-gus9Twi+8nfcbPwtVbyQEyVXsodBlArDE5GTJO8OKQgIFr8FkCLAFa2RJWiji1B9DPkp/SNj3+cxSvwO
-WRyRAddM4g5qy+MMVkT1byjrw+6XbXy/uJ0uiMlalsyrq3muvGioz1aVBkHP3CqiV0qglOxbfYzaKcrg
-lCewP1zVkKpQd2EPCraWylegZarw6P8lO9np+qrd+3motXwni3oSpU5X1cCFECMa5z4TVGvoUIbL8H8I
-2VwINeBbHnRZ59Pt3uUAJMDOH4IPKRdmGpNa2GenjaUQ2JXxbtI2+C01sOQRWLGcChlaTTuh2mA/tCC/
-JaCowTv9LkeLyMYC7zkG2iruBWhQW7xhLNg7pgBivZHGijYKk7YhlyBisJrzcfbVBisatAV2cGdZ8eUB
-tiAPGs0nkKGiySa3cmpeLBZs2Zm7cMf9Zug1z7nqrec9PfaGXt/XLkJ/AFBLBwg2JBelVAIAAEoLAABQ
-SwECFAAUAAgICAAAACEANiQXpVQCAABKCwAACAAJAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRVVAUAAQAA
-AABQSwUGAAAAAAEAAQA/AAAAkwIAAAAA
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAkALmNvbnRlbnRVVAUAAQAAAACtlsFy0zAQhu/M8A4e
+35FpLzCZhE4pBTLQoZO2tJw8irxJBLJltOvEeXvWdpLSpqltwS1W/u/X7kpaaXhSpiZYgkNts1F4JF6H
+AWTKJjqbj8KCZq/ehifvXr4YWjcXoIzOEYRTOZFQVIqVdb8wlwoGt9tfZzYjKCkoUz3Y+R5XvjxThgMe
+H4ULonwQRavVSth0Ltg8ursYbyUtc+3wrabCa13EuminC4NMpqyuI8roFFEjfbTu0sFMl2Ggk1EYx/nN
+lx8Xye9zkN8nOL58c377eX0acspBMFQNWX/wZ+7sT1CEG9/G57IZDDcils20ga1GbBiuagmqIDk1PEqu
+gDB6mjB6Gq80LeKldLqSC2entodBWhjSuVmLfN0dcpAILn4LYE3CK7pBrgEJq1BjDvk+/UfGcawzlsQd
+snhEJhqV5R3UlscBrIrq31DVh90t29nN5MN4IqhsWbJoU81D5WVDPFhVmSQ9c2uIXimBc7Zv9TnqoCpD
+UJ/A/nBTQ+nm2IV9ULCZdbEDtIXjo/+XbG+n41G799NQa/n2FnUvSiymzcAzIaYyW8fKSEToUIbn4f8Q
+Mj0TaqKXOumyzvvbvcsByEEdPgTvC21onImNsM9OO7PGcFfmuwl98A+S4Fqn4MVqaezca9pzicT90IP8
+loOTxHf61ZotUh8LvucUoFfcE0BwS75hPNgr5QAyXFjyoslx0j7kNZgMvOa8u/jqg1UN2gN7cGd58fUB
+9iAfNJpPYOdO5ou1l9P2xeLB1p25C9fab9jpYKvh/4JjQbjsGVp9GR11ecE9im4YbR+bzUs0un+KDqO+
+b3GG/gBQSwcIuLrYyGoCAADoCwAAUEsBAhQAFAAICAgAAAAhALi62MhqAgAA6AsAAAgACQAAAAAAAAAA
+AAAAAAAAAC5jb250ZW50VVQFAAEAAAAAUEsFBgAAAAABAAEAPwAAAKkCAAAAAA==
 ------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf--
 ------=_contents/PrefixProject/Tests_wit_lib/lib_with_CURDIR.txt-9ba3048d-e436-3def-bfdf-d109f1d39b52
 Content-Type: q7/binary
