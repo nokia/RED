@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -38,7 +39,14 @@ public class AssistProposals {
     static RedFileLocationProposal createFileLocationProposal(final IFile fromFile, final IFile toFile,
             final ProposalMatch match) {
         final String label = toFile.getFullPath().makeRelative().toString();
-        final String content = createCurrentFileRelativePath(fromFile, toFile);
+        
+        final String content;
+        if (RedSystemProperties.isWindowsPlatform()
+                && !fromFile.getLocation().getDevice().equals(toFile.getLocation().getDevice())) {
+            content = toFile.getLocation().toString();
+        } else {
+            content = createCurrentFileRelativePath(fromFile, toFile);
+        }
         return new RedFileLocationProposal(content, label, toFile, match);
     }
 
