@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +61,7 @@ class SimilaritiesAnalyst {
     }
 
     private Collection<String> getAccessibleKeywords(final IFile suiteFile) {
-        final List<String> names = new ArrayList<>();
+        final Set<String> names = new LinkedHashSet<>();
         new KeywordDefinitionLocator(suiteFile).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
