@@ -24,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -126,7 +125,7 @@ public class SectionsAssistProcessorTest {
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
-                new Document("*** Test Cases ***", "*** Settings ***", ""));
+                new Document("*** Test Cases ***", "*** Settings ***"));
     }
 
     private static SuiteSourceAssistantContext createAssitant() {
@@ -140,6 +139,6 @@ public class SectionsAssistProcessorTest {
             public RobotSuiteFile get() {
                 return model;
             }
-        }, new AssistPreferences(AcceptanceMode.SUBSTITUTE, true, "  "));
+        }, new AssistPreferences(true, "  "));
     }
 }

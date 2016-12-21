@@ -22,7 +22,6 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 
 import com.google.common.base.Supplier;
@@ -34,7 +33,7 @@ public class RedContentAssistProcessorTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
         final Supplier<RobotSuiteFile> modelSupplier = createSupplier(model);
         final SuiteSourceAssistantContext context = new SuiteSourceAssistantContext(modelSupplier,
-                new AssistPreferences(AcceptanceMode.INSERT, false, "  "));
+                new AssistPreferences(false, "  "));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -49,7 +48,7 @@ public class RedContentAssistProcessorTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
         final Supplier<RobotSuiteFile> modelSupplier = createSupplier(model);
         final SuiteSourceAssistantContext context = new SuiteSourceAssistantContext(modelSupplier,
-                new AssistPreferences(AcceptanceMode.INSERT, false, "  "));
+                new AssistPreferences(false, "  "));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -65,7 +64,7 @@ public class RedContentAssistProcessorTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
         final Supplier<RobotSuiteFile> modelSupplier = createSupplier(model);
         final SuiteSourceAssistantContext context = new SuiteSourceAssistantContext(modelSupplier,
-                new AssistPreferences(AcceptanceMode.INSERT, false, "  "));
+                new AssistPreferences(false, "  "));
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
