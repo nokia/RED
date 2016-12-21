@@ -134,18 +134,42 @@ public class EmbeddedKeywordNamesSupport {
         }
         int varStart = -1;
         int currentIndex = 0;
-        EmbeddedKeywordDfaState state = EmbeddedKeywordDfaState.START_STATE;
+        int currentState = 0;
 
         while (currentIndex < definitionName.length()) {
-            final EmbeddedKeywordDfaState oldState = state;
-            state = state.transition(definitionName.charAt(currentIndex));
+            final char character = definitionName.charAt(currentIndex);
+            
+            if (currentState == KeywordDfaState.START_STATE) {
+                currentState = character == '$' ? KeywordDfaState.VAR_DOLLAR_DETECTED : KeywordDfaState.START_STATE;
 
-            if (oldState == EmbeddedKeywordDfaState.IN_VAR_NO_ESCAPE_CURRENTLY
-                    && state == EmbeddedKeywordDfaState.START_STATE) {
-                varRanges.add(Range.closed(varStart, currentIndex));
-            }
-            if (state == EmbeddedKeywordDfaState.VAR_START_DETECTED) {
-                varStart = currentIndex - 1;
+            } else if (currentState == KeywordDfaState.VAR_DOLLAR_DETECTED) {
+                currentState = character == '{' ? KeywordDfaState.VAR_START_DETECTED : KeywordDfaState.START_STATE;
+
+            } else if (currentState == KeywordDfaState.VAR_START_DETECTED) {
+                varStart = currentIndex - 2;
+                if (character == '}') {
+                    currentState = KeywordDfaState.START_STATE;
+                } else if (character == '\\') {
+                    currentState = KeywordDfaState.IN_VAR_ESCAPING;
+                } else {
+                    currentState = KeywordDfaState.IN_VAR_NO_ESCAPE_CURRENTLY;
+                }
+
+            } else if (currentState == KeywordDfaState.IN_VAR_ESCAPING) {
+                currentState = KeywordDfaState.IN_VAR_NO_ESCAPE_CURRENTLY;
+
+            } else if (currentState == KeywordDfaState.IN_VAR_NO_ESCAPE_CURRENTLY) {
+                if (character == '}') {
+                    varRanges.add(Range.closed(varStart, currentIndex));
+                    currentState = KeywordDfaState.START_STATE;
+                } else if (character == '\\') {
+                    currentState = KeywordDfaState.IN_VAR_ESCAPING;
+                } else {
+                    currentState = KeywordDfaState.IN_VAR_NO_ESCAPE_CURRENTLY;
+                }
+
+            } else {
+                throw new IllegalStateException("Unrecognized state");
             }
             currentIndex++;
         }
@@ -166,56 +190,12 @@ public class EmbeddedKeywordNamesSupport {
         return variable.indexOf(':') != -1 ? variable.substring(0, variable.indexOf(':')) + "}" : variable;
     }
 
-    private static enum EmbeddedKeywordDfaState {
-        // Simple DFA for embedded keywords parsing
-        START_STATE {
+    private interface KeywordDfaState {
 
-            @Override
-            EmbeddedKeywordDfaState transition(final char character) {
-                return character == '$' ? VAR_DOLLAR_DETECTED : START_STATE;
-            }
-        },
-        VAR_DOLLAR_DETECTED {
-
-            @Override
-            EmbeddedKeywordDfaState transition(final char character) {
-                return character == '{' ? VAR_START_DETECTED : START_STATE;
-            }
-        },
-        VAR_START_DETECTED {
-
-            @Override
-            EmbeddedKeywordDfaState transition(final char character) {
-                if (character == '}') {
-                    return START_STATE;
-                } else if (character == '\\') {
-                    return IN_VAR_ESCAPING;
-                } else {
-                    return IN_VAR_NO_ESCAPE_CURRENTLY;
-                }
-            }
-        },
-        IN_VAR_ESCAPING {
-
-            @Override
-            EmbeddedKeywordDfaState transition(final char character) {
-                return IN_VAR_NO_ESCAPE_CURRENTLY;
-            }
-        },
-        IN_VAR_NO_ESCAPE_CURRENTLY {
-
-            @Override
-            EmbeddedKeywordDfaState transition(final char character) {
-                if (character == '}') {
-                    return START_STATE;
-                } else if (character == '\\') {
-                    return IN_VAR_ESCAPING;
-                } else {
-                    return IN_VAR_NO_ESCAPE_CURRENTLY;
-                }
-            }
-        };
-
-        abstract EmbeddedKeywordDfaState transition(char character);
+        static final int START_STATE = 0;
+        static final int VAR_DOLLAR_DETECTED = 1;
+        static final int VAR_START_DETECTED = 2;
+        static final int IN_VAR_ESCAPING = 3;
+        static final int IN_VAR_NO_ESCAPE_CURRENTLY = 4;
     }
 }
