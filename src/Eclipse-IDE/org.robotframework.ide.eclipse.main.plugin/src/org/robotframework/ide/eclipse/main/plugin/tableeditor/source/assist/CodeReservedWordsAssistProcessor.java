@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -59,6 +61,8 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         final int line = DocumentUtilities.getLine(document, offset);
+        final IRegion lineRegion = document.getLineInformation(line);
+        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
 
         final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent, line);
         final List<? extends AssistProposal> wordsProposals = new RedCodeReservedWordProposals(wordsPredicate)
@@ -66,14 +70,24 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : wordsProposals) {
-            final String additional = RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel()) ? " "
-                    : assist.getSeparatorToFollow();
+            final String additional = getAdditionalContent(atTheEndOfLine, proposal);
+
             final DocumentationModification modification = new DocumentationModification(additional,
-                    assist.getAcceptanceMode().positionToReplace(offset, prefix.length(), cellLength));
+                    new Position(offset - prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
         }
         return proposals;
+    }
+
+    private String getAdditionalContent(final boolean atTheEndOfLine, final AssistProposal proposal) {
+        if (!atTheEndOfLine) {
+            return "";
+        } else if (RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())) {
+            return " ";
+        } else {
+            return assist.getSeparatorToFollow();
+        }
     }
 
     private AssistProposalPredicate<String> createPredicate(final String lineContentTillOfsset, final int line) {

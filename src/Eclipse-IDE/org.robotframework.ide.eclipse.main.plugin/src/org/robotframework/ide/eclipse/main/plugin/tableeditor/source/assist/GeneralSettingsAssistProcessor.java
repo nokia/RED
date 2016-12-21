@@ -64,16 +64,18 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix) throws BadLocationException {
 
+        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
+        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
+
+        final String additionalContent = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
+
         final List<? extends AssistProposal> settingsProposals = RedSettingProposals.create(SettingTarget.GENERAL)
                 .getSettingsProposals(prefix);
-        final String separator = assist.getSeparatorToFollow();
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal settingProposal : settingsProposals) {
-            final Position positionToReplace = assist.getAcceptanceMode().positionToReplace(offset, prefix.length(),
-                    cellLength);
-            final DocumentationModification modification = new DocumentationModification(separator, positionToReplace,
-                    shouldActivate(settingProposal.getContent()));
+            final DocumentationModification modification = new DocumentationModification(additionalContent,
+                    new Position(offset - prefix.length(), cellLength), shouldActivate(settingProposal.getContent()));
 
             proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));
         }

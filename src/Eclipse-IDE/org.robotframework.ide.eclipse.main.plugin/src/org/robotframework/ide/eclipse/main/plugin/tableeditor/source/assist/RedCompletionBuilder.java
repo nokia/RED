@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -18,25 +18,20 @@ import org.eclipse.swt.graphics.Image;
 @SuppressWarnings("PMD.TooManyMethods")
 public class RedCompletionBuilder {
 
-    public static interface ProposalAcceptanceModeStep {
-        ProposalContentStep will(AcceptanceMode insert);
-    }
-
     public static interface ProposalContentStep {
-        LocationStep theText(String string);
+        LocationStep willPut(String string);
     }
 
     public static interface LocationStep {
-        CurrentPrefixStep atOffset(int offset);
-    }
 
-    public static interface CurrentPrefixStep {
-        OptionalSettingsStep givenThatCurrentPrefixIs(String string);
+        OptionalSettingsStep byInsertingAt(int offset);
+
+        OptionalSettingsStep byReplacingRegion(IRegion region);
+
+        OptionalSettingsStep byReplacingRegion(int offset, int length);
     }
 
     public static interface OptionalSettingsStep {
-
-        OptionalSettingsStep andWholeContentIs(String string);
 
         OptionalSettingsStep secondaryPopupShouldBeDisplayedUsingHtml(String additionalInfo);
 
@@ -62,18 +57,14 @@ public class RedCompletionBuilder {
         RedCompletionProposal create();
     }
 
-    private static class BuildingSteps implements ProposalAcceptanceModeStep, ProposalContentStep, LocationStep,
-            CurrentPrefixStep, OptionalSettingsStep, DecorationsStep {
-
-        private AcceptanceMode mode;
+    private static class BuildingSteps
+            implements ProposalContentStep, LocationStep, OptionalSettingsStep, DecorationsStep {
 
         private String contentToInsert;
 
         private int offset;
 
-        private String currentPrefix;
-
-        private String wholeContent;
+        private int length;
 
         private String additionalInfo;
 
@@ -96,33 +87,26 @@ public class RedCompletionBuilder {
         private final Collection<Runnable> operationsAfterAccept = new ArrayList<>();
 
         @Override
-        public ProposalContentStep will(final AcceptanceMode mode) {
-            this.mode = mode;
-            return this;
-        }
-
-        @Override
-        public LocationStep theText(final String contentToInsert) {
+        public LocationStep willPut(final String contentToInsert) {
             this.contentToInsert = contentToInsert;
             this.labelToDisplay = contentToInsert;
             return this;
         }
 
         @Override
-        public CurrentPrefixStep atOffset(final int offset) {
+        public OptionalSettingsStep byInsertingAt(final int offset) {
+            return byReplacingRegion(offset, 0);
+        }
+
+        @Override
+        public OptionalSettingsStep byReplacingRegion(final IRegion region) {
+            return byReplacingRegion(region.getOffset(), region.getLength());
+        }
+
+        @Override
+        public OptionalSettingsStep byReplacingRegion(final int offset, final int length) {
             this.offset = offset;
-            return this;
-        }
-
-        @Override
-        public OptionalSettingsStep givenThatCurrentPrefixIs(final String prefix) {
-            this.currentPrefix = prefix;
-            return this;
-        }
-
-        @Override
-        public OptionalSettingsStep andWholeContentIs(final String wholeContent) {
-            this.wholeContent = wholeContent;
+            this.length = length;
             return this;
         }
 
@@ -188,42 +172,13 @@ public class RedCompletionBuilder {
         @Override
         public RedCompletionProposal create() {
             final int cursorPos = cursorPosition == -1 ? (contentToInsert.length() - cursorBackShift) : cursorPosition;
-            if (mode == AcceptanceMode.INSERT) {
-                return new RedCompletionProposal(contentToInsert, offset, currentPrefix.length(),
-                        currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
-                        activateAssitant, operationsAfterAccept, additionalInfo, additionalInfoAsHtml);
-            } else if (mode == AcceptanceMode.SUBSTITUTE) {
-                if (wholeContent == null) {
-                    throw new IllegalStateException("Unable to create proposal in substitution mode if there is no "
-                            + "content to substitute specified");
-                }
-                return new RedCompletionProposal(contentToInsert, offset, wholeContent.length(), currentPrefix.length(),
-                        cursorPos, selectionLength, image, decoratePrefix, labelToDisplay, activateAssitant,
-                        operationsAfterAccept, additionalInfo, additionalInfoAsHtml);
-            } else {
-                throw new IllegalStateException("Unknown acceptance mode: " + mode.toString());
-            }
+            return new RedCompletionProposal(contentToInsert, offset, length, 0, cursorPos, selectionLength, image,
+                    decoratePrefix, labelToDisplay, activateAssitant, operationsAfterAccept, additionalInfo,
+                    additionalInfoAsHtml);
         }
     }
 
-    public static ProposalAcceptanceModeStep newProposal() {
+    public static ProposalContentStep newProposal() {
         return new BuildingSteps();
-    }
-
-    public enum AcceptanceMode {
-        INSERT {
-            @Override
-            public Position positionToReplace(final int offset, final int prefixLength, final int wholeLength) {
-                return new Position(offset - prefixLength, prefixLength);
-            }
-        },
-        SUBSTITUTE {
-            @Override
-            public Position positionToReplace(final int offset, final int prefixLength, final int wholeLength) {
-                return new Position(offset - prefixLength, wholeLength);
-            }
-        };
-
-        public abstract Position positionToReplace(final int offset, final int prefixLength, final int wholeLength);
     }
 }

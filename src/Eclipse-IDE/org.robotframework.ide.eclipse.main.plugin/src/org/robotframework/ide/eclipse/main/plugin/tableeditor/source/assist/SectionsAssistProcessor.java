@@ -12,6 +12,7 @@ import java.util.List;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSectionProposals;
@@ -59,15 +60,18 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix) {
+            final int cellLength, final String prefix) throws BadLocationException {
+
+        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
+        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
+        final String additionalContent = atTheEndOfLine ? DocumentUtilities.getDelimiter(document) : "";
 
         final List<? extends AssistProposal> sectionProposals = new RedSectionProposals().getSectionsProposals(prefix);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal settingProposal : sectionProposals) {
-            final DocumentationModification modification = new DocumentationModification(
-                    DocumentUtilities.getDelimiter(document),
-                    assist.getAcceptanceMode().positionToReplace(offset, prefix.length(), cellLength));
+            final DocumentationModification modification = new DocumentationModification(additionalContent,
+                    new Position(offset - prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));
         }

@@ -24,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -104,10 +103,8 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
         final IRegion regionOfChange = new Region(offset, 0);
         final String info = Snippets.createSnippetInfo(document, regionOfChange, toInsert);
         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                .will(AcceptanceMode.INSERT)
-                .theText(toInsert)
-                .atOffset(regionOfChange.getOffset())
-                .givenThatCurrentPrefixIs("")
+                .willPut(toInsert)
+                .byInsertingAt(regionOfChange.getOffset())
                 .secondaryPopupShouldBeDisplayedUsingHtml(info)
                 .thenCursorWillStopBeforeEnd(cursorShift)
                 .displayedLabelShouldBe(getLabel())

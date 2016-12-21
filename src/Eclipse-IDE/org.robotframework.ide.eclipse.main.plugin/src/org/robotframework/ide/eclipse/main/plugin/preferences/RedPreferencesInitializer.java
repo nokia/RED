@@ -19,7 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehav
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -77,7 +76,6 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
-        preferences.put(RedPreferences.ASSISTANT_COMPLETION_MODE, AcceptanceMode.INSERT.name());
         preferences.putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
         preferences.putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
         preferences.put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");
@@ -99,7 +97,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
     }
 
-    private void initializeProblemSeverityPreferences(IEclipsePreferences preferences) {
+    private void initializeProblemSeverityPreferences(final IEclipsePreferences preferences) {
         for (final ProblemCategory category : EnumSet.allOf(ProblemCategory.class)) {
             preferences.put(category.getId(), category.getDefaultSeverity().name());
         }

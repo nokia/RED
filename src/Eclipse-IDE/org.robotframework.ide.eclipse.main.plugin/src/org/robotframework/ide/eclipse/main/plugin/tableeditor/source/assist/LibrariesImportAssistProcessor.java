@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
@@ -53,18 +54,21 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix) throws BadLocationException {
 
-        final List<? extends AssistProposal> librariesProposals = new RedLibraryProposals(assist.getModel())
-                .getLibrariesProposals(prefix);
+        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
+        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
+
         final String separator = assist.getSeparatorToFollow();
 
+        final List<? extends AssistProposal> librariesProposals = new RedLibraryProposals(assist.getModel())
+                .getLibrariesProposals(prefix);
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal libProposal : librariesProposals) {
-            final Position positionToReplace = assist.getAcceptanceMode().positionToReplace(offset, prefix.length(),
-                    cellLength);
+            final Position positionToReplace = new Position(offset - prefix.length(), cellLength);
 
             final List<String> args = libProposal.getArguments();
-            final String contentSuffix = separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args));
-            final DocumentationModification modification = new DocumentationModification(contentSuffix,
+            final String additionalContent = atTheEndOfLine
+                    ? separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args)) : "";
+            final DocumentationModification modification = new DocumentationModification(additionalContent,
                     positionToReplace);
 
             proposals.add(new RedCompletionProposalAdapter(libProposal, modification));

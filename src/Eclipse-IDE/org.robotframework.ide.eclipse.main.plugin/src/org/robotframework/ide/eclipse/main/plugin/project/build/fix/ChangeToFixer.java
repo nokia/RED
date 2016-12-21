@@ -10,14 +10,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -57,22 +55,15 @@ public class ChangeToFixer extends RedSuiteMarkerResolution {
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
         final String info = Snippets.createSnippetInfo(document, toChange, replacement);
-        try {
-            final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                    .will(AcceptanceMode.SUBSTITUTE)
-                    .theText(replacement)
-                    .atOffset(toChange.getOffset())
-                    .givenThatCurrentPrefixIs("")
-                    .andWholeContentIs(document.get(toChange.getOffset(), toChange.getLength()))
-                    .secondaryPopupShouldBeDisplayedUsingHtml(info)
-                    .thenCursorWillStopAtTheEndOfInsertion()
-                    .displayedLabelShouldBe(getLabel())
-                    .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getChangeImage()))
-                    .create();
-            return Optional.<ICompletionProposal> of(proposal);
-        } catch (final BadLocationException e) {
-            return Optional.<ICompletionProposal> absent();
-        }
+        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
+                .willPut(replacement)
+                .byReplacingRegion(toChange)
+                .secondaryPopupShouldBeDisplayedUsingHtml(info)
+                .thenCursorWillStopAtTheEndOfInsertion()
+                .displayedLabelShouldBe(getLabel())
+                .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getChangeImage()))
+                .create();
+        return Optional.<ICompletionProposal> of(proposal);
     }
 
 }
