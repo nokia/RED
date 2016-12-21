@@ -1,0 +1,176 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: __pUKYMdqEeaVRsIP7EWHyA
+Element-Name: ContentAssistForLibsWithPrefixes
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Xe9eMMbZEeaVRsIP7EWHyA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/21/16 12:14 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "PrefixProject/lib_with_variable.robot" | double-click
+
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 2 1
+    key-type "M1+SPACE"
+    type-text li
+    key-type Enter
+}
+
+//check all libs in CA
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals add | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals Collections | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals DateTime | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals Dialogs | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "discover_lib" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals divide | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "many_classes.Geography" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals multiply | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals OperatingSystem | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals Process | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals res1 | verify-true
+    get-property "getItems().TableItem[11].getText()" | equals Screenshot | verify-true
+    get-property "getItems().TableItem[12].getText()" | equals String | verify-true
+    get-property "getItems().TableItem[13].getText()" | equals Telnet | verify-true
+    get-property "getItems().TableItem[14].getText()" | equals XML | verify-true
+    get-property "getItems().TableItem[15].getText()" | equals "BuiltIn (already imported)" | verify-true
+    get-property "getItems().TableItem[16].getText()" | equals "Easter (already imported)" | verify-true
+    get-property "getItems().TableItem[17].getText()" | equals "Reserved (already imported)" | verify-true
+    get-property "getItems().TableItem[18].getText()" | equals "${/}" | verify-true
+}
+
+//select Add
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select add | click -default
+
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 2 19
+    key-type "NUMPAD_ENTER" "\\u000D"
+	//add DateTime
+    type-text li
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Down
+    key-type Enter -times 2
+    
+    //add "many_classes.Geography"
+    type-text li
+    key-type "M1+SPACE"
+    key-type Enter
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "many_classes.Geography"  | click -default
+
+//go to test cases and add KW from add lib
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 6 5
+    key-type Enter
+    type-text "add."
+    key-type "M1+SPACE"
+}
+
+//check that are 2
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "Add - add" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Add 2 - add" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${/}" | verify-true
+}
+
+//select second KW
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Add 2 - add" | click -default
+
+with [get-editor "lib_with_variable.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        key-type End
+      
+    }
+}
+
+//type datetime without dots and select prefix name 
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 7 24
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text datetime
+    key-type "M1+SPACE"
+    key-type Enter
+}
+
+//check if all KW from datetime were filtered
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "Add Time To Date - DateTime" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Add Time To Time - DateTime" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "Convert Date - DateTime" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "Convert Time - DateTime" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "Get Current Date - DateTime" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "Subtract Date From Date - DateTime" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "Subtract Time From Date - DateTime" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "Subtract Time From Time - DateTime" | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals "${/}" | verify-true
+}
+
+
+//select Convert Date
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    select "Add Time To Date - DateTime" | key-type Down
+    select "Add Time To Time - DateTime" | key-type Down
+    select "Convert Date - DateTime" | key-type Enter
+    click -default
+}
+
+//go dowan and add lib with class name
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    key-type Right
+    key-type Enter
+    wait 200
+    key-type Enter
+    type-text many
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "many_classes.Geography" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+}
+//add  many_classes.Geography.Geo    param2
+with [get-editor "lib_with_variable.robot"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        key-type "M1+SPACE"
+	    key-type Enter 
+	    wait 300
+	    key-type Enter
+	    key-type Right
+    	key-type Enter -times 2
+	 }
+}
+
+//add built in Catenate
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    type-text buil
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Down
+    key-type Enter
+    type-text text
+    key-type Enter
+}
+
+get-editor "lib_with_variable.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library    add    \n"
+    + "Library    DateTime    \n"
+    + "Library    many_classes.Geography    \n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    add.Add 2    x    y\n"
+    + "    DateTime.Convert Date    date\n"
+    + "    many_classes.Geography.Geo    param2\n"
+    + "    BuiltIn.Catenate    text" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
