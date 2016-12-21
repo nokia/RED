@@ -18,7 +18,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -62,10 +61,8 @@ public class CreateLocalVariableFixer extends RedSuiteMarkerResolution {
 
             final String info = Snippets.createSnippetInfo(document, regionToChange, toInsert);
             final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                    .will(AcceptanceMode.INSERT)
-                    .theText(toInsert)
-                    .atOffset(regionToChange.getOffset())
-                    .givenThatCurrentPrefixIs("")
+                    .willPut(toInsert)
+                    .byInsertingAt(regionToChange.getOffset())
                     .secondaryPopupShouldBeDisplayedUsingHtml(info)
                     .activateAssistantAfterAccepting(true)
                     .thenCursorWillStopAt(cursorOffset)

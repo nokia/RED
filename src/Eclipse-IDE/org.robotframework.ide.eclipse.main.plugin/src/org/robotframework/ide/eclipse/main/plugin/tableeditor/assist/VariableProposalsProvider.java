@@ -104,10 +104,20 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
             String toInsert = currentTextBeforeSelection.substring(0, currentTextBeforeSelection.length() - maxCommon)
                     + content;
             final int newSelection = toInsert.length();
-            toInsert += currentTextAfterSelection;
+            toInsert += findSuffix(currentTextAfterSelection);
 
             text.setText(toInsert);
             text.setSelection(newSelection);
+        }
+
+        private String findSuffix(final String currentTextAfterSelection) {
+            for (int i = 0; i < currentTextAfterSelection.length(); i++) {
+                if (currentTextAfterSelection.charAt(i) == '}') {
+                    return i == currentTextAfterSelection.length() - 1 ? ""
+                            : currentTextAfterSelection.substring(i + 1);
+                }
+            }
+            return currentTextAfterSelection;
         }
     }
 }

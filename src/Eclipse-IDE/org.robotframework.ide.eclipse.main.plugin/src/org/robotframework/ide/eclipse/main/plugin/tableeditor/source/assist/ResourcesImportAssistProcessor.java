@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposals;
@@ -57,7 +58,7 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : varFilesProposals) {
             final DocumentationModification modification = new DocumentationModification("",
-                    assist.getAcceptanceMode().positionToReplace(offset, prefix.length(), cellLength));
+                    new Position(offset - prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
         }

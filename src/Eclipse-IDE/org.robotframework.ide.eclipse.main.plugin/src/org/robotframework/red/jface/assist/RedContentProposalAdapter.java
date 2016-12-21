@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
@@ -119,11 +118,10 @@ public class RedContentProposalAdapter {
         final KeyStroke activationStroke = KeyStroke.getInstance(SWT.CTRL, ' ');
         final char[] activationChars = preferences.getAssistantAutoActivationChars();
         final int autoActivationDelay = preferences.getAssistantAutoActivationDelay();
-        final int acceptanceStyle = preferences.getAssistantAcceptanceMode() == AcceptanceMode.INSERT
-                ? RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT : RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE;
 
         final RedContentProposalAdapter adapter = new RedContentProposalAdapter(text, context, controlAdapter,
-                proposalsProvider, activationStroke, activationChars, autoActivationDelay, acceptanceStyle);
+                proposalsProvider, activationStroke, activationChars, autoActivationDelay,
+                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         if (listener.isPresent()) {
             adapter.addContentProposalListener(listener.get());
         }

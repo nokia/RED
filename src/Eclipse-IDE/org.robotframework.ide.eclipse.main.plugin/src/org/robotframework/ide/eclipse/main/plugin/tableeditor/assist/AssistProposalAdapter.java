@@ -19,19 +19,27 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     private final Optional<ModificationStrategy> modificationStrategy;
 
+    private final String additionalSuffix;
+
     public AssistProposalAdapter(final AssistProposal wrappedProposal) {
-        this(wrappedProposal, Optional.<ModificationStrategy> absent());
+        this(wrappedProposal, Optional.<ModificationStrategy> absent(), "");
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal,
             final Optional<ModificationStrategy> modificationStrategy) {
+        this(wrappedProposal, modificationStrategy, "");
+    }
+
+    public AssistProposalAdapter(final AssistProposal wrappedProposal,
+            final Optional<ModificationStrategy> modificationStrategy, final String additionalSuffix) {
         this.wrappedProposal = wrappedProposal;
         this.modificationStrategy = modificationStrategy;
+        this.additionalSuffix = additionalSuffix;
     }
 
     @Override
     public String getContent() {
-        return wrappedProposal.getContent();
+        return wrappedProposal.getContent() + additionalSuffix;
     }
 
     @Override

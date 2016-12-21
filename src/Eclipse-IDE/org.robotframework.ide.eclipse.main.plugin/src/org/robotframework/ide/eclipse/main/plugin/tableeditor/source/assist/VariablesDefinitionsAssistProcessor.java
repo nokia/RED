@@ -15,6 +15,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Point;
@@ -72,22 +73,26 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix) throws BadLocationException {
 
+        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
+        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
+
         final String separator = assist.getSeparatorToFollow();
         final List<ICompletionProposal> proposals = newArrayList();
 
         for (final AssistProposal newVarProposal : new RedNewVariableProposals().getNewVariableProposals()) {
             final List<String> args = newVarProposal.getArguments();
-            final String contentSuffix = separator
-                    + (args.isEmpty() ? "" : Joiner.on(separator).join(args) + separator);
+            final String additionalContent = atTheEndOfLine
+                    ? separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args) + separator) : "";
 
             final Point toSelect = new Point(offset - prefix.length() + 2, newVarProposal.getContent().length() - 3);
 
             final IRegion lineInfo = document.getLineInformationOfOffset(offset);
-            final Collection<IRegion> regions = getLinkedModeRegions(lineInfo, (RedNewVariableProposal) newVarProposal);
+            final Collection<IRegion> regions = atTheEndOfLine
+                    ? getLinkedModeRegions(lineInfo, (RedNewVariableProposal) newVarProposal)
+                    : new ArrayList<IRegion>();
             final Collection<Runnable> operations = createOperationsToPerformAfterAccepting(viewer, regions);
-            final DocumentationModification modification = new DocumentationModification(contentSuffix,
-                    assist.getAcceptanceMode().positionToReplace(offset, prefix.length(), cellLength), toSelect,
-                    operations);
+            final DocumentationModification modification = new DocumentationModification(additionalContent,
+                    new Position(offset - prefix.length(), cellLength), toSelect, operations);
             proposals.add(new RedCompletionProposalAdapter(newVarProposal, modification));
         }
         return proposals;
