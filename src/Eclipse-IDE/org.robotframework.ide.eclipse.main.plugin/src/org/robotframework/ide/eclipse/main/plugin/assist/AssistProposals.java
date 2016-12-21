@@ -18,6 +18,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedLibraryKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedUserKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableOrigin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -72,7 +74,7 @@ public class AssistProposals {
             final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
-        return new RedKeywordProposal(spec.getName(), sourcePrefix, scope, bddPrefix, keyword.getName(),
+        return new RedLibraryKeywordProposal(spec.getName(), sourcePrefix, scope, bddPrefix, keyword.getName(),
                 argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
                 shouldUseQualified, match);
     }
@@ -83,7 +85,7 @@ public class AssistProposals {
 
         final RobotSuiteFile file = userKeyword.getSuiteFile();
         final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
-        return new RedKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()), sourcePrefix, scope,
+        return new RedUserKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()), sourcePrefix, scope,
                 bddPrefix, userKeyword.getName(), argsDescriptor, userKeyword.getDocumentation(),
                 userKeyword.isDeprecated(), file.getFile().getFullPath(), shouldUseQualified, match);
     }
