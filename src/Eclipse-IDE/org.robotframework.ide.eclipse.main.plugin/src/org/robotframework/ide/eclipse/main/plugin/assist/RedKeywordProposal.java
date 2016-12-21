@@ -28,7 +28,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Range;
 
-public class RedKeywordProposal extends KeywordEntity implements AssistProposal {
+public abstract class RedKeywordProposal extends KeywordEntity implements AssistProposal {
 
     private final String bddPrefix;
 
@@ -97,20 +97,6 @@ public class RedKeywordProposal extends KeywordEntity implements AssistProposal 
     }
 
     @Override
-    public ImageDescriptor getImage() {
-        return isUserKeyword() ? RedImages.getUserKeywordImage() : RedImages.getKeywordImage();
-    }
-
-    @Override
-    public String getLabel() {
-        if (isUserKeyword()) {
-            return getNameFromDefinition() + " - " + getExposingFilepath().lastSegment();
-        } else {
-            return getNameFromDefinition() + " - " + getAlias();
-        }
-    }
-
-    @Override
     public StyledString getStyledLabel() {
         final StyledString label = new StyledString(getNameFromDefinition(),
                 isDeprecated() ? Stylers.Common.STRIKEOUT_STYLER : Stylers.Common.EMPTY_STYLER);
@@ -121,11 +107,6 @@ public class RedKeywordProposal extends KeywordEntity implements AssistProposal 
                 label.setStyle(matchingRange.lowerEndpoint(), length,
                         Stylers.mixingStyler(styleRange, Stylers.Common.MARKED_PREFIX_STYLER));
             }
-        }
-        if (isUserKeyword()) {
-            label.append(" - " + getExposingFilepath().lastSegment(), Stylers.Common.ECLIPSE_DECORATION_STYLER);
-        } else {
-            label.append(" - " + getAlias(), Stylers.Common.ECLIPSE_DECORATION_STYLER);
         }
         return label;
     }
@@ -139,23 +120,79 @@ public class RedKeywordProposal extends KeywordEntity implements AssistProposal 
     public String getDescription() {
         final StringBuilder builder = new StringBuilder();
         builder.append("Name: ").append(getNameFromDefinition()).append("\n");
-        final String source;
-        if (isUserKeyword()) {
-            source = "User defined (" + getExposingFilepath().toString() + ")";
-        } else if (getAlias().equals(getSourceName())) {
-            source = "Library (" + getSourceName() + ")";
-        } else {
-            source = "Library (" + getAlias() + " - alias for " + getSourceName() + ")";
-        }
-        builder.append("Source: ").append(source).append("\n");
+        builder.append("Source: ").append(getSourceDescription()).append("\n");
         builder.append("Arguments: ").append(getArgumentsDescriptor().getDescription()).append("\n\n");
         builder.append(documentation);
 
         return builder.toString();
     }
 
-    private boolean isUserKeyword() {
-        final KeywordScope scope = getScope(getExposingFilepath());
-        return scope == KeywordScope.LOCAL || scope == KeywordScope.RESOURCE;
+    protected abstract String getSourceDescription();
+
+    static class RedUserKeywordProposal extends RedKeywordProposal {
+
+        RedUserKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+                final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
+                final String documentation, final boolean isDeprecated, final IPath exposingFilePath,
+                final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
+            super(sourceName, sourceAlias, scope, bddPrefix, name, argumentsDescriptor, documentation, isDeprecated,
+                    exposingFilePath, shouldUseQualifiedName, match);
+        }
+
+        @Override
+        public ImageDescriptor getImage() {
+            return RedImages.getUserKeywordImage();
+        }
+
+        @Override
+        public String getLabel() {
+            return getNameFromDefinition() + " - " + getExposingFilepath().lastSegment();
+        }
+
+        @Override
+        public StyledString getStyledLabel() {
+            return super.getStyledLabel().append(" - " + getExposingFilepath().lastSegment(),
+                    Stylers.Common.ECLIPSE_DECORATION_STYLER);
+        }
+
+        @Override
+        protected String getSourceDescription() {
+            return "User defined (" + getExposingFilepath().toString() + ")";
+        }
+    }
+
+    static class RedLibraryKeywordProposal extends RedKeywordProposal {
+
+        RedLibraryKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+                final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
+                final String documentation, final boolean isDeprecated, final IPath exposingFilePath,
+                final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
+            super(sourceName, sourceAlias, scope, bddPrefix, name, argumentsDescriptor, documentation, isDeprecated,
+                    exposingFilePath, shouldUseQualifiedName, match);
+        }
+
+        @Override
+        public ImageDescriptor getImage() {
+            return RedImages.getKeywordImage();
+        }
+
+        @Override
+        public String getLabel() {
+            return getNameFromDefinition() + " - " + getAlias();
+        }
+
+        @Override
+        public StyledString getStyledLabel() {
+            return super.getStyledLabel().append(" - " + getAlias(), Stylers.Common.ECLIPSE_DECORATION_STYLER);
+        }
+
+        @Override
+        protected String getSourceDescription() {
+            if (getAlias().equals(getSourceName())) {
+                return "Library (" + getSourceName() + ")";
+            } else {
+                return "Library (" + getAlias() + " - alias for " + getSourceName() + ")";
+            }
+        }
     }
 }
