@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 
 import com.google.common.base.Supplier;
@@ -75,7 +74,7 @@ public class VariablesDefinitionsAssistProcessorTest {
             public RobotSuiteFile get() {
                 return file;
             }
-        }, new AssistPreferences(AcceptanceMode.INSERT, true, "  "));
+        }, new AssistPreferences(true, "  "));
     }
 
 }
