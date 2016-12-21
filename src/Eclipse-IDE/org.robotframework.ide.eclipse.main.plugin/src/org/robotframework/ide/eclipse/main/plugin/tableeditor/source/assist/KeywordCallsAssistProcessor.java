@@ -93,6 +93,9 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix) throws BadLocationException {
 
+        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
+        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
+
         final List<RedKeywordProposal> kwProposals = new RedKeywordProposals(assist.getModel())
                 .getKeywordProposals(prefix);
 
@@ -101,13 +104,12 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         for (final AssistProposal kwProposal : kwProposals) {
-            final List<String> args = getArguments(kwProposal, lineContent);
+            final List<String> args = atTheEndOfLine ? getArguments(kwProposal, lineContent) : new ArrayList<String>();
             final String contentSuffix = args.isEmpty() ? "" : (separator + Joiner.on(separator).join(args));
 
-            final Position positionToReplace = assist.getAcceptanceMode().positionToReplace(offset, prefix.length(),
-                    cellLength);
-            final Collection<Runnable> operations = createOperationsToPerformAfterAccepting(viewer,
-                    (KeywordEntity) kwProposal, positionToReplace.getOffset(), lineContent);
+            final Position positionToReplace = new Position(offset - prefix.length(), cellLength);
+            final Collection<Runnable> operations = atTheEndOfLine ? createOperationsToPerformAfterAccepting(viewer,
+                    (KeywordEntity) kwProposal, positionToReplace.getOffset(), lineContent) : new ArrayList<Runnable>();
             final DocumentationModification modification = new DocumentationModification(contentSuffix,
                     positionToReplace, operations);
             final IContextInformation contextInfo = new ContextInformation(null,

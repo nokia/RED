@@ -13,7 +13,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.red.graphics.ColorsManager;
 
 public class RedPreferences {
@@ -38,7 +37,6 @@ public class RedPreferences {
     public static final String FOLDABLE_DOCUMENTATION = "foldableDocumentation";
     public static final String FOLDING_LINE_LIMIT = "foldingLineLimit";
 
-    public static final String ASSISTANT_COMPLETION_MODE = "assistantCompletionMode";
     public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "assistantAutoActivationEnabled";
     public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "assistantAutoActivationDelay";
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
@@ -84,10 +82,6 @@ public class RedPreferences {
 
     public CellCommitBehavior getCellCommitBehavior() {
         return CellCommitBehavior.valueOf(store.getString(BEHAVIOR_ON_CELL_COMMIT));
-    }
-
-    public AcceptanceMode getAssistantAcceptanceMode() {
-        return AcceptanceMode.valueOf(store.getString(ASSISTANT_COMPLETION_MODE));
     }
 
     public boolean isAssistantAutoActivationEnabled() {
@@ -139,7 +133,7 @@ public class RedPreferences {
         return new ColoringPreference(new RGB(red, green, blue), fontStyle);
     }
 
-    public Severity getProblemCategorySeverity(ProblemCategory category) {
+    public Severity getProblemCategorySeverity(final ProblemCategory category) {
         return Severity.valueOf(store.getString(category.getId()));
     }
 

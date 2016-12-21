@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
@@ -54,17 +53,12 @@ public class SuiteSourceAssistantContext {
         return assistPreferences.getSeparatorToFollow(isTsvFile());
     }
 
-    public AcceptanceMode getAcceptanceMode() {
-        return assistPreferences.getAcceptanceMode();
-    }
-    
     public boolean isKeywordPrefixAutoAdditionEnabled() {
         return assistPreferences.isKeywordPrefixAutoAdditionEnabled();
     }
 
     public static class AssistPreferences {
 
-        private AcceptanceMode acceptanceMode;
         private boolean isKeywordPrefixAutoAdditionEnabled;
 
         private String separatorToUseInTsv;
@@ -72,29 +66,26 @@ public class SuiteSourceAssistantContext {
         private String separatorToUseInRobot;
 
         AssistPreferences() {
-            this(RedPlugin.getDefault().getPreferences().getAssistantAcceptanceMode(),
-                    RedPlugin.getDefault().getPreferences().isAssistantKeywordPrefixAutoAdditionEnabled(),
+            this(RedPlugin.getDefault().getPreferences().isAssistantKeywordPrefixAutoAdditionEnabled(),
                     RedPlugin.getDefault().getPreferences().getSeparatorToUse(false),
                     RedPlugin.getDefault().getPreferences().getSeparatorToUse(true));
         }
 
         @VisibleForTesting
-        AssistPreferences(final AcceptanceMode acceptanceMode, final boolean isKeywordPrefixAutoAdditionEnabled,
+        AssistPreferences(final boolean isKeywordPrefixAutoAdditionEnabled,
                 final String separatorToUse) {
-            this(acceptanceMode, isKeywordPrefixAutoAdditionEnabled, separatorToUse, separatorToUse);
+            this(isKeywordPrefixAutoAdditionEnabled, separatorToUse, separatorToUse);
         }
 
         @VisibleForTesting
-        AssistPreferences(final AcceptanceMode acceptanceMode, final boolean isKeywordPrefixAutoAdditionEnabled,
+        AssistPreferences(final boolean isKeywordPrefixAutoAdditionEnabled,
                 final String separatorToUseInRobot, final String separatorToUseInTsv) {
-            this.acceptanceMode = acceptanceMode;
             this.isKeywordPrefixAutoAdditionEnabled = isKeywordPrefixAutoAdditionEnabled;
             this.separatorToUseInRobot = separatorToUseInRobot;
             this.separatorToUseInTsv = separatorToUseInTsv;
         }
 
         void refresh() {
-            acceptanceMode = RedPlugin.getDefault().getPreferences().getAssistantAcceptanceMode();
             isKeywordPrefixAutoAdditionEnabled = RedPlugin.getDefault()
                     .getPreferences()
                     .isAssistantKeywordPrefixAutoAdditionEnabled();
@@ -104,10 +95,6 @@ public class SuiteSourceAssistantContext {
 
         public String getSeparatorToFollow(final boolean isTsvFile) {
             return isTsvFile ? separatorToUseInTsv : separatorToUseInRobot;
-        }
-
-        public AcceptanceMode getAcceptanceMode() {
-            return acceptanceMode;
         }
 
         public boolean isKeywordPrefixAutoAdditionEnabled() {

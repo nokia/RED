@@ -11,7 +11,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -25,7 +24,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
 
 public class ContentAssistPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
@@ -49,7 +47,6 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         final Composite parent = getFieldEditorParent();
 
         createAutoActivationEditors(parent);
-        createAcceptanceModeEditors(parent);
         createKeywordPrefixAutoAdditionEditor(parent);
     }
 
@@ -92,17 +89,6 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 
     }
 
-    private void createAcceptanceModeEditors(final Composite parent) {
-        final RadioGroupFieldEditor insertionModeEditor = new RadioGroupFieldEditor(
-                RedPreferences.ASSISTANT_COMPLETION_MODE, "Proposals", 2, createModes(), parent, true);
-        addField(insertionModeEditor);
-    }
-
-    private String[][] createModes() {
-        return new String[][] { new String[] { "Completion inserts", AcceptanceMode.INSERT.name() },
-                new String[] { "Completion overrides", AcceptanceMode.SUBSTITUTE.name() } };
-    }
-    
     private void createKeywordPrefixAutoAdditionEditor(final Composite parent) {
         final Group keywordsGroup = new Group(parent, SWT.NONE);
         keywordsGroup.setText("Keywords");
