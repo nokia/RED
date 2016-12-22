@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -21,9 +22,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResourceFileFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.LibraryAliasToUpperCaseReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonimFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
@@ -174,7 +175,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Resource import '%s' is invalid: file does not exist";
+            return "Resource import '%s' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)";
         }
 
         @Override
@@ -185,7 +186,10 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final IPath path = Path.fromPortableString(marker.getAttribute(AdditionalMarkerAttributes.PATH, null));
-            return ChangeImportedPathFixer.createFixersForSameFile((IFile) marker.getResource(), path);
+            final List<IMarkerResolution> fixers = new ArrayList<>();
+            fixers.add(new CreateResourceFileFixer(path.toPortableString()));
+            fixers.addAll(ChangeImportedPathFixer.createFixersForSameFile((IFile) marker.getResource(), path));
+            return fixers;
         }
     },
     INVALID_RESOURCE_IMPORT {
@@ -551,7 +555,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new LibraryAliasToUpperCaseReplacer());
+            return newArrayList(
+                    ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker), Arrays.asList("WITH NAME")));
         }
     },
     VARIABLE_AS_KEYWORD_USAGE_IN_SETTING {
