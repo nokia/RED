@@ -61,7 +61,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix) throws BadLocationException {
+            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
         final Optional<IRegion> liveVarRegion = DocumentUtilities.findLiveVariable(document, assist.isTsvFile(), offset);
         final String actualPrefix = DocumentUtilities.getPrefix(document, liveVarRegion, offset);
