@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _BIoy4Ib6EeWrUbOa1Nzguw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/14/16 5:54 PM
+Save-Time: 12/22/16 2:21 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,7 +42,7 @@ get-window "Properties for RobotProject"  | get-editbox -after [get-label "Locat
 	with [get-view Problems | get-tree] {
 	    get-item "Errors \\(1 item\\)" | get-property childCount | equals 1 | verify-true
 	    get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
-	        | equals [format "Resource import '%s' is invalid: file does not exist" [concat $path_to_file "not_esisting.robot"]]
+	        | equals [format "Resource import '%s' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" [concat $path_to_file "not_esisting.robot"]]
 	        | verify-true
 	        
 	    get-item "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
