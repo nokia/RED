@@ -84,18 +84,14 @@ public class RedSettingProposals {
         return String.format(DESCRIBED_SETTINGS.get(target, settingName.toLowerCase()), arg);
     }
 
-    public static RedSettingProposals create(final SettingTarget target) {
-        return create(target, ProposalMatchers.prefixesMatcher());
-    }
-
-    public static RedSettingProposals create(final SettingTarget target, final ProposalMatcher matcher) {
-        return new RedSettingProposals(target, matcher);
-    }
-
     private final SettingTarget target;
     private final ProposalMatcher matcher;
 
-    protected RedSettingProposals(final SettingTarget target, final ProposalMatcher matcher) {
+    public RedSettingProposals(final SettingTarget target) {
+        this(target, ProposalMatchers.prefixesMatcher());
+    }
+
+    public RedSettingProposals(final SettingTarget target, final ProposalMatcher matcher) {
         this.target = target;
         this.matcher = matcher;
     }
