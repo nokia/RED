@@ -1,0 +1,84 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _-DEa4MhSEeaVRsIP7EWHyA
+Element-Name: ContentAssistForVarsAndResourceOutsideWS
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _p3kDgMhVEeaVRsIP7EWHyA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/22/16 4:05 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//import project outside WS
+get-view "Project Explorer" | get-tree | get-menu "Import..." | click
+with [get-window Import | get-tree] {
+    select General | double-click
+    select "General/Existing Projects into Workspace" | double-click
+}
+set-dialog-result Folder [concat $user_folder  "/ResourceAndVars/OutWS"]
+with [get-window Import] {
+    get-button "Browse..." | click
+    get-button Finish | click
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type Enter
+    key-type Up
+    
+    //add Setting section
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    
+    //add resource
+    type-text REs
+    key-type "M1+SPACE"
+    wait 300
+    key-type Enter
+    wait 300
+    key-type Enter
+    
+	//add new line
+	wait 300
+    key-type Enter
+    
+	//add variable
+    type-text Var
+    key-type "M1+SPACE"
+    wait 300
+    key-type Enter
+    wait 300
+    key-type Enter
+}
+
+wait 2000
+get-view Problems | click
+with [get-view Problems | get-tree] {
+    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals [format "Path '%s/ResourceAndVars/OutWS/res.robot' is absolute. It is preferred to use relative paths" [replace $user_folder -old "\\" -new "/"]]
+        | verify-true
+    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals [format "Path '%s/ResourceAndVars/OutWS/vars.py' is absolute. It is preferred to use relative paths" [replace $user_folder -old "\\" -new "/"]]
+        | verify-true
+}
+
+//check how path looks like in content assist
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 61
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text re
+    key-type "M1+SPACE"
+    key-type Enter
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "OutWS/res.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${c}" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "OutWS\\/res.robot" 
+    | key-type "TRAVERSE_ESCAPE"
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
