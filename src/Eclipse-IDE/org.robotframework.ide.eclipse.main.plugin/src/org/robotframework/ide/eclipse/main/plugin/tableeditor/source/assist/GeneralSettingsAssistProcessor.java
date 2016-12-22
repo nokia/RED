@@ -66,7 +66,7 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
         final String additionalContent = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
 
-        final List<? extends AssistProposal> settingsProposals = RedSettingProposals.create(SettingTarget.GENERAL)
+        final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(SettingTarget.GENERAL)
                 .getSettingsProposals(prefix);
 
         final List<ICompletionProposal> proposals = newArrayList();

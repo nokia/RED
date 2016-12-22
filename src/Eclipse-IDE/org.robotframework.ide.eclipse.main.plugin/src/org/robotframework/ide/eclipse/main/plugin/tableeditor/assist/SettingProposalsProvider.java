@@ -37,7 +37,7 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
 
         final List<IContentProposal> proposals = newArrayList();
 
-        final List<? extends AssistProposal> settingsProposals = RedSettingProposals.create(settingTarget)
+        final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(settingTarget)
                 .getSettingsProposals(prefix);
 
         final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;

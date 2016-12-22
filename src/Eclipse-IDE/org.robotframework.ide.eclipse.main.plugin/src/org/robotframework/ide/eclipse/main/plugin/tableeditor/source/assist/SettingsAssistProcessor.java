@@ -55,7 +55,7 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
         final String additionalContent = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
 
-        final List<? extends AssistProposal> settingsProposals = RedSettingProposals.create(getTarget(document, offset))
+        final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(getTarget(document, offset))
                 .getSettingsProposals(prefix);
 
         final List<ICompletionProposal> proposals = newArrayList();
