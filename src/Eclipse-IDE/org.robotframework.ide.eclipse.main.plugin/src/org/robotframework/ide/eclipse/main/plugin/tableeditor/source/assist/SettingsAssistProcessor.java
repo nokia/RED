@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
@@ -52,10 +51,8 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix) throws BadLocationException {
+            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
-        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
-        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
         final String additionalContent = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
 
         final List<? extends AssistProposal> settingsProposals = RedSettingProposals.create(getTarget(document, offset))

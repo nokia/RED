@@ -60,10 +60,8 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix) throws BadLocationException {
+            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
-        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
-        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
         final String additionalContent = atTheEndOfLine ? DocumentUtilities.getDelimiter(document) : "";
 
         final List<? extends AssistProposal> sectionProposals = new RedSectionProposals().getSectionsProposals(prefix);
