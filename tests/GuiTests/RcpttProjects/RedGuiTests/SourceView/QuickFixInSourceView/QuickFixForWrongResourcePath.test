@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/19/16 10:43 AM
+Save-Time: 12/22/16 5:55 PM
 Testcase-Type: ecl
 Verifications: _qtiWAI7UEeWetPU-dn-gxQ
 
@@ -36,40 +36,40 @@ wait-for-problems -count 11
 //check if are all errors
 with [get-view Problems | get-tree] {
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "Resource import '../../../../../../SecondProject/abc.tsv' is invalid: file does not exist" 
+        | equals "Resource import '../../../../../../SecondProject/abc.tsv' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[0].getData().getLocation()" | equals "line 16" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[0].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals "Resource import '../SecondProject2/res2/res.robot' is invalid: file does not exist" | verify-true
+        | equals "Resource import '../SecondProject2/res2/res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[1].getData().getLocation()" | equals "line 6" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[1].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-        | equals "Resource import '../text_file.txt' is invalid: file does not exist" | verify-true
+        | equals "Resource import '../text_file.txt' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[2].getData().getLocation()" | equals "line 10" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[2].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[3].getText()" 
-        | equals "Resource import '/../../../../SecondProject/res1/res3/RES.ROBOT' is invalid: file does not exist" | verify-true
+        | equals "Resource import '/../../../../SecondProject/res1/res3/RES.ROBOT' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[3].getData().getLocation()" | equals "line 7" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[3].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
         
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[4].getText()" 
-        | equals "Resource import '/ala/has/a/cat.txt' is invalid: file does not exist" | verify-true
+        | equals "Resource import '/ala/has/a/cat.txt' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[4].getData().getLocation()" | equals "line 17" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[4].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
         
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[5].getText()" 
-        | equals "Resource import 'abc.tsv' is invalid: file does not exist" | verify-true
+        | equals "Resource import 'abc.tsv' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[5].getData().getLocation()" | equals "line 15" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[5].getData().getPath()" 
@@ -81,19 +81,19 @@ with [get-view Problems | get-tree] {
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[6].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[7].getText()" 
-        | equals "Resource import 'deep.resource' is invalid: file does not exist" | verify-true
+        | equals "Resource import 'deep.resource' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[7].getData().getLocation()" | equals "line 13" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[7].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[8].getText()" 
-        | equals "Resource import 'res1/deep_res.robot' is invalid: file does not exist" | verify-true
+        | equals "Resource import 'res1/deep_res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[8].getData().getLocation()" | equals "line 14" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[8].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[9].getText()" 
-        | equals "Resource import 'res1/res3/../../simple_res.robot' is invalid: file does not exist" | verify-true
+        | equals "Resource import 'res1/res3/../../simple_res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[9].getData().getLocation()" | equals "line 3" 
         | verify-true
     get-item "Errors \\(11 items\\)" | get-property "getItems().TreeItem[9].getData().getPath()" 
@@ -130,7 +130,7 @@ try -times 3 -delay 1000 -command{
 }	
 
 //-----------------------------------------------------------------------------------------------------------
-open-quick-fix -errorText "Errors (11 items)/Resource import '..\\/SecondProject2\\/res2\\/res.robot' is invalid: file does not exist"
+open-quick-fix -errorText "Errors (11 items)/Resource import '..\\/SecondProject2\\/res2\\/res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)"
 
 get-window "Quick Fix" | get-table | select "Change to SecondProject\\/res2\\/res.robot"
 with [get-window "Quick Fix"] {
@@ -158,7 +158,7 @@ get-window "Quick Fix" | get-button Finish | click
 wait-for-problems -count 10
 
 //-----------------------------------------------------------------------------------------------------------
-open-quick-fix -errorText "Errors (10 items)/Resource import '..\\/text_file.txt' is invalid: file does not exist"
+open-quick-fix -errorText "Errors (10 items)/Resource import '..\\/text_file.txt' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)"
 
 with [get-window "Quick Fix"] {
     with [get-table] {
@@ -177,7 +177,7 @@ get-window "Quick Fix" | get-button Finish | click
 wait-for-problems -count 9
 
 //-----------------------------------------------------------------------------------------------------------
-open-quick-fix -errorText "Errors (9 items)/Resource import 'abc.tsv' is invalid: file does not exist"
+open-quick-fix -errorText "Errors (9 items)/Resource import 'abc.tsv' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)"
 
 with [get-window "Quick Fix"] {
     with [get-table] {
@@ -195,7 +195,7 @@ get-window "Quick Fix" | get-button Finish | click
 wait-for-problems -count 8
 
 //-----------------------------------------------------------------------------------------------------------
-open-quick-fix -errorText "Errors (8 items)/Resource import 'res1\\/deep_res.robot' is invalid: file does not exist"
+open-quick-fix -errorText "Errors (8 items)/Resource import 'res1\\/deep_res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)"
 
 with [get-window "Quick Fix"] {
     with [get-table] {
@@ -214,7 +214,7 @@ get-window "Quick Fix" | get-button Finish | click
 wait-for-problems -count 7
 
 //---------------------------------------------------------------------------------------------------------------------
-open-quick-fix -errorText "Errors (7 items)/Resource import 'deep.resource' is invalid: file does not exist"
+open-quick-fix -errorText "Errors (7 items)/Resource import 'deep.resource' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)"
 
 try -times 3 -delay 1000 -command{
 	get-window "Quick Fix" 
@@ -224,7 +224,7 @@ try -times 3 -delay 1000 -command{
 }
 get-window "Quick Fix" | get-button OK | click
 
-open-quick-fix -errorText "Errors (7 items)/Resource import 'res1\\/res3\\/..\\/..\\/simple_res.robot' is invalid: file does not exist"
+open-quick-fix -errorText "Errors (7 items)/Resource import 'res1\\/res3\\/..\\/..\\/simple_res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)"
 
 with [get-window "Quick Fix"] {
     with [get-table] {
@@ -243,7 +243,7 @@ get-window "Quick Fix" | get-button Finish | click
 wait-for-problems -count 6
 wait 1000
 //-----------------------------------------------------------------------------------------------------------
-open-quick-fix -errorText "Errors (6 items)/Resource import 'deep.resource' is invalid: file does not exist"
+open-quick-fix -errorText "Errors (6 items)/Resource import 'deep.resource' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)"
 
 get-window "Quick Fix" 
     | get-label "No fixes available for 'Resource import 'deep.resource' is invalid: file does not exist'." 
