@@ -51,7 +51,7 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
                 final String prefix = DocumentUtilities.getPrefix(document, cellRegion, offset);
                 final int contentLength = cellRegion.isPresent() ? cellRegion.get().getLength() : 0;
 
-                return computeProposals(document, offset, contentLength, prefix);
+                return computeProposals(document, offset, contentLength, prefix, isAtTheOndOfLine(document, offset));
             }
         } catch (final BadLocationException e) {
             // we'll return nothing then
@@ -59,11 +59,17 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
         return null;
     }
 
+    private boolean isAtTheOndOfLine(final IDocument document, final int offset) throws BadLocationException {
+        // at the end of line when only whitespaces follow current position at this line
+        final IRegion lineRegion = document.getLineInformationOfOffset(offset);
+        return document.get(offset, lineRegion.getOffset() + lineRegion.getLength() - offset).trim().isEmpty();
+    }
+
     protected abstract boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException;
 
     protected abstract List<? extends ICompletionProposal> computeProposals(IDocument document, final int offset,
-            final int cellLength, final String prefix) throws BadLocationException;
+            final int cellLength, final String prefix, boolean isAtTheEndOfLine) throws BadLocationException;
 
     protected final boolean isInApplicableContentType(final IDocument document, final int offset)
             throws BadLocationException {

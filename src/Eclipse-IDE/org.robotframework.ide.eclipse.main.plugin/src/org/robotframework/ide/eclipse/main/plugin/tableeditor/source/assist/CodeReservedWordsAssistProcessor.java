@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -57,12 +56,10 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix) throws BadLocationException {
+            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         final int line = DocumentUtilities.getLine(document, offset);
-        final IRegion lineRegion = document.getLineInformation(line);
-        final boolean atTheEndOfLine = offset == lineRegion.getOffset() + lineRegion.getLength();
 
         final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent, line);
         final List<? extends AssistProposal> wordsProposals = new RedCodeReservedWordProposals(wordsPredicate)
