@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9rWNQHf-EeWYifgNPLzx_Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/16/16 5:26 PM
+Save-Time: 12/22/16 10:58 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,7 +33,9 @@ with [get-editor "resource_file.robot" | get-text-viewer] {
     
 	//add varaibles
     key-type "M1+SPACE"
-	check-content-assist-for-variables
+}    
+check-content-assist-for-variables
+with [get-editor "resource_file.robot" | get-text-viewer] {
 	key-type Esc
 }
 
@@ -101,7 +103,10 @@ with [get-editor "resource_file.robot" | get-text-viewer] {
     set-caret-pos 8 1
     key-type "NUMPAD_ENTER" "\\u000D" -times 2
     key-type "M1+SPACE"
-    check-content-assist-for-variables
+}
+check-content-assist-for-variables
+
+with [get-editor "resource_file.robot" | get-text-viewer] {    
 	key-type Esc
 	
 }
