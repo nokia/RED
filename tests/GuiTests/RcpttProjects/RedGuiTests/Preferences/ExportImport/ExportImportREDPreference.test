@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _x2ENoKdEEeazyPh6f3_hNQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/29/16 4:03 PM
+Save-Time: 12/22/16 2:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,7 +24,6 @@ with [get-window Preferences] {
     //content assist    
     get-tree | select "Robot Framework/Editor/Content Assist"
     get-group "Auto activation" | get-editbox -after [get-label "Auto activation delay (ms)"] | set-text 300
-    get-group Proposals | get-button "Completion overrides" | click
     get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | check
     
     //folding
@@ -133,7 +132,6 @@ get-window Preferences | get-tree | select "Robot Framework/Editor/Content Assis
 with [get-window Preferences] {
     get-group "Auto activation" | get-editbox -after [get-label "Auto activation delay (ms)"] | get-property text 
         | equals 300 | verify-true
-    get-group Proposals | get-button "Completion overrides" | get-property selected | equals true | verify-true
     get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" 
         | get-property selected | equals true | verify-true
 }
