@@ -65,7 +65,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
         final Optional<IRegion> liveVarRegion = DocumentUtilities.findLiveVariable(document, assist.isTsvFile(), offset);
         final String actualPrefix = DocumentUtilities.getPrefix(document, liveVarRegion, offset);
-        final int wholeLength = liveVarRegion.isPresent() ? liveVarRegion.get().getLength() + 1 : 0;
+        final int wholeLength = liveVarRegion.isPresent() ? liveVarRegion.get().getLength() : 0;
 
         final int line = DocumentUtilities.getLine(document, offset);
         final AssistProposalPredicate<String> globalVarPredicate = createGlobalVarPredicate(offset, line,
