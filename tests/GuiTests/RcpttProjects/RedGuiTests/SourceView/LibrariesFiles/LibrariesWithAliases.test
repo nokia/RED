@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PV3F4L4iEeaIos8Jik5jow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/13/16 1:47 PM
+Save-Time: 12/22/16 2:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,7 +42,7 @@ get-view Problems | get-tree
     + "Use WITH NAME instead." | get-menu "Quick Fix" | click
 with [get-window "Quick Fix" | get-table] {
     get-property "getItems().length" | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "Library alias declaration will be replaced by WITH NAME" 
+    get-property "getItems().TableItem[0].getText()" | equals "Change to 'WITH NAME'" 
         | verify-true
 }
 get-window "Quick Fix" | get-button Finish | click
