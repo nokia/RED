@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-UsioKUBEeazyPh6f3_hNQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/17/16 2:01 PM
+Save-Time: 12/22/16 2:23 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,7 +29,7 @@ proc "check-default-errors"{
 	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
 	        | equals "Invalid variable definition '${wrong'. Unable to recognize variable type" | verify-true
 	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
-	        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist" | verify-true
+	        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
 	 
 	        
 	    get-item "Warnings \\(9 items\\)" | get-property childCount | equals 9 | verify-true
@@ -105,7 +105,7 @@ with [get-view Problems | get-tree] {
     get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         | equals "Invalid variable definition '${wrong'. Unable to recognize variable type" | verify-true   
     get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getText()" 
-        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist" | verify-true
+        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
 
         
     get-item "Warnings \\(5 items\\)" | get-property childCount | equals 5 | verify-true
@@ -166,6 +166,7 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     type-text "test 3"
     key-type Enter
     key-type "M1+SPACE"
+    wait 300
     key-type Down -times 3
     key-type Enter
     type-text "${var_as_kw_name}"
