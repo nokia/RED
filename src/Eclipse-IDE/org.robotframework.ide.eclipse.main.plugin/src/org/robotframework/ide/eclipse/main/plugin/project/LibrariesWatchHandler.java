@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
@@ -43,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.red.jface.dialogs.ErrorDialogWithDetails;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -253,8 +253,11 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                     }
                 });
             } catch (InvocationTargetException | InterruptedException e) {
-                MessageDialog.openError(shell, "Regenerating library specification",
-                        "Problems occured during library specification generation: " + e.getCause().getMessage());
+                ErrorDialogWithDetails.openErrorDialogWithDetails(shell, "Regenerating library specification",
+                        "Problems occured during library specification generation:\n\n" + e.getCause().toString(),
+                        "Detailed information:",
+                        "org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException: ",
+                        "org.robotframework.ide.eclipse.main.plugin", null);
             }
         } else {
             rebuildTasksQueue.add(newRebuildTask);
@@ -320,7 +323,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private void refreshNavigator(final IProject project) {
         if (eventBroker == null) {
-            eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         }
         if (eventBroker != null) {
             eventBroker.post(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE, project);
