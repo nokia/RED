@@ -12,7 +12,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -26,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.red.jface.dialogs.ErrorDialogWithDetails;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
@@ -63,10 +63,12 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {
-            MessageDialog.openError(shell, "Regenerating library specification",
-                    "Problems occured during library specification generation: " + e.getCause().getMessage());
+            ErrorDialogWithDetails.openErrorDialogWithDetails(shell, "Regenerating library specification",
+                    "Problems occured during library specification generation:\n\n" + e.getCause().toString(),
+                    "Detailed information:",
+                    "org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException: ",
+                    "org.robotframework.ide.eclipse.main.plugin", null);
         }
-
     }
 
     private void rebuildLibraries(final IProgressMonitor monitor) {
@@ -97,4 +99,5 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
         }
         return groupedSpecifications;
     }
+
 }
