@@ -30,7 +30,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
@@ -60,13 +59,16 @@ public class MissingResourceFileCompletionProposal implements ICompletionProposa
         if (!file.exists()) {
             if (createFile(file)) {
                 try {
-                    marker.getResource().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                    marker.delete();
+                    // marker.getResource().deleteMarkers(RobotProblem.TYPE_ID, true,
+                    // IResource.DEPTH_INFINITE);
                 } catch (final CoreException e) {
                     StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()),
                             StatusManager.SHOW);
                 }
                 try {
-                    IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file, true);
+                    IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file,
+                            "org.robotframework.ide.tableditor", true);
                 } catch (PartInitException e) {
                     MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot open the file",
                             "Unfortunatelly, this file could not be opened properly.");
