@@ -187,7 +187,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final IPath path = Path.fromPortableString(marker.getAttribute(AdditionalMarkerAttributes.PATH, null));
             final List<IMarkerResolution> fixers = new ArrayList<>();
-            fixers.add(new CreateResourceFileFixer(path.toPortableString()));
+            fixers.add(CreateResourceFileFixer.createFixer(path.toPortableString(), marker));
             fixers.addAll(ChangeImportedPathFixer.createFixersForSameFile((IFile) marker.getResource(), path));
             return fixers;
         }
