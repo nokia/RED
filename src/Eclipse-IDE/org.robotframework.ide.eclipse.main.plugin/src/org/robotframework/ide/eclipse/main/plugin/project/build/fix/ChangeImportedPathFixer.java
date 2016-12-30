@@ -69,7 +69,8 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
 
     @Override
     public String getLabel() {
-        return "Change to " + validWsRelativePath.toString();
+        // return "Change to " + validWsRelativePath.toString();
+        return "Change to " + validFileRelativePath.toString();
     }
 
     @Override
