@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -14,6 +16,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ResolvedImportPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -26,65 +30,89 @@ import com.google.common.base.Optional;
  */
 public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
 
-    private final String nonExistingResource;
+    private final Optional<ICompletionProposal> proposal;
 
-    public CreateResourceFileFixer(final String nonExistingFile) {
-        this.nonExistingResource = nonExistingFile;
+    private final String label;
+
+    public static CreateResourceFileFixer createFixer(final String nonExistingFile, final IMarker marker) {
+        final IPath pathToCreate = getValidPathToCreate(marker);
+        if (pathToCreate == null || !isExtensionValid(pathToCreate.getFileExtension())) {
+            return new CreateResourceFileFixer(CreateResourceFileFixer.createEmptyProposal(),
+                    "Missing resource file cannot be auto-created");
+        } else {
+            return new CreateResourceFileFixer(
+                    CreateResourceFileFixer.createProposal(marker, pathToCreate, nonExistingFile),
+                    "Create missing " + nonExistingFile + " file");
+        }
     }
 
-    @Override
-    public String getLabel() {
-        return "Create missing " + nonExistingResource + " file.";
-    }
-
-    @Override
-    public Optional<ICompletionProposal> asContentProposal(IMarker marker, IDocument document,
-            RobotSuiteFile suiteModel) {
+    protected static IPath getValidPathToCreate(final IMarker marker) {
         final String srcPath = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
         final File file = new File(srcPath);
         try {
             file.getCanonicalPath();
         } catch (IOException e) {
-            return createEmptyProposal();
+            return null;
         }
-        final IPath fullPath = new Path(ResolvedImportPath
-                .from(ImportPath.from(srcPath))
+        final IPath fullPath = new Path(ResolvedImportPath.from(ImportPath.from(srcPath))
                 .get()
-                .resolveInRespectTo(suiteModel.getFile().getParent().getLocation().toFile().toURI())
+                .resolveInRespectTo(((IFileEditorInput) (PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .getActiveEditor()
+                        .getEditorInput())).getFile().getParent().getLocation().toFile().toURI())
                 .toString());
         final IPath workspaceDir = new Path(
                 ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile().toURI().toString());
         if (workspaceDir.matchingFirstSegments(fullPath) != workspaceDir.segmentCount()) {
-            return createEmptyProposal();
+            return null;
         }
-        final IPath path = new Path(ResolvedImportPath
+        final IPath pathToCreate = new Path(ResolvedImportPath
                 .reverseUriSpecialCharsEscapes(fullPath.removeFirstSegments(workspaceDir.segmentCount()).toString()));
-        if (path.segmentCount() < 2) {
-            return createEmptyProposal();
-        }
-        if (!ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0)).isAccessible()) {
-            return createEmptyProposal();
-        }
-        final String ext = path.getFileExtension();
-        if (path != null && path.isValidPath(path.toPortableString()) && ext != null && !ext.isEmpty()) {
-            return createProposal(marker, suiteModel, path);
+        if (pathToCreate == null || pathToCreate.segmentCount() < 2
+                || !ResourcesPlugin.getWorkspace().getRoot().getProject(pathToCreate.segment(0)).isAccessible()
+                || !pathToCreate.isValidPath(pathToCreate.toPortableString())) {
+            return null;
         } else {
-            return createEmptyProposal();
+            return pathToCreate;
         }
     }
 
-    private Optional<ICompletionProposal> createProposal(IMarker marker, RobotSuiteFile suiteModel, IPath path) {
-        MissingResourceFileCompletionProposal proposal = new MissingResourceFileCompletionProposal(getLabel(),
-                "<b>" + nonExistingResource
+    // this method should be implemented elsewhere
+    private static boolean isExtensionValid(final String extension) {
+        final List<String> validExts = Arrays
+                .asList(new String[] { "html", "htm", "xhtml", "tsv", "txt", "rst", "robot", "rest" });
+        return extension != null && validExts.contains(extension.toLowerCase());
+    }
+
+    public CreateResourceFileFixer(final Optional<ICompletionProposal> proposal, final String label) {
+        this.proposal = proposal;
+        this.label = label;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    @Override
+    public Optional<ICompletionProposal> asContentProposal(IMarker marker, IDocument document,
+            RobotSuiteFile suiteModel) {
+        return proposal;
+    }
+
+    private static Optional<ICompletionProposal> createProposal(IMarker marker, IPath path, String res) {
+        MissingResourceFileCompletionProposal proposal = new MissingResourceFileCompletionProposal(
+                "Create missing " + res + " file.",
+                "<b>" + res
                         + "</b><br> file will be created and opened for edition.<br><br>Resource path must be valid, "
                         + "inside project directory and must include file extension. Any missing parent directories will be also created.",
                 marker, path);
         return Optional.<ICompletionProposal> of(proposal);
     }
 
-    private Optional<ICompletionProposal> createEmptyProposal() {
-        EmptyCompletionProposal proposal = new EmptyCompletionProposal(
-                "Missing resource file cannot be auto-created",
+    private static Optional<ICompletionProposal> createEmptyProposal() {
+        EmptyCompletionProposal proposal = new EmptyCompletionProposal("Missing resource file cannot be auto-created",
                 "Please check your file path if you want to use this Quick Fix."
                         + "<br>Only valid and legal path to the file with explicit file extension "
                         + "inside existing open project in this workspace can be used."
