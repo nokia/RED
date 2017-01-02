@@ -7,6 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ public class RedSectionProposalsTest {
     public void allProposalsAreProvided_whenPrefixIsEmpty() {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("");
         
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("*** Keywords ***", "*** Settings ***",
+        assertThat(transform(proposals, toLabels())).containsExactly("*** Keywords ***", "*** Settings ***",
                 "*** Test Cases ***", "*** Variables ***");
     }
 
@@ -31,17 +34,17 @@ public class RedSectionProposalsTest {
     @Test
     public void proposalsAreProvidedInOrderInducedByGivenComparator() {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("*",
-                Commons.reverseComparator(AssistProposals.sortedByLabels()));
+                reverseComparator(AssistProposals.sortedByLabels()));
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("*** Variables ***", "*** Test Cases ***",
+        assertThat(transform(proposals, toLabels())).containsExactly("*** Variables ***", "*** Test Cases ***",
                 "*** Settings ***", "*** Keywords ***");
     }
 
     @Test
     public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
-        final List<? extends AssistProposal> proposals = new RedSectionProposals(Commons.substringMatcher())
+        final List<? extends AssistProposal> proposals = new RedSectionProposals(substringMatcher())
                 .getSectionsProposals("es");
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("*** Test Cases ***", "*** Variables ***");
+        assertThat(transform(proposals, toLabels())).containsExactly("*** Test Cases ***", "*** Variables ***");
     }
 }

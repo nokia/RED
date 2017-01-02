@@ -7,6 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.List;
 
@@ -64,9 +67,9 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
                 .getSettingsProposals("");
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("Default Tags", "Documentation",
-                "Force Tags", "Library", "Metadata", "Resource", "Suite Setup", "Suite Teardown", "Test Setup",
-                "Test Teardown", "Test Template", "Test Timeout", "Variables");
+        assertThat(transform(proposals, toLabels())).containsExactly("Default Tags", "Documentation", "Force Tags",
+                "Library", "Metadata", "Resource", "Suite Setup", "Suite Teardown", "Test Setup", "Test Teardown",
+                "Test Template", "Test Timeout", "Variables");
     }
 
     @Test
@@ -79,18 +82,18 @@ public class RedSettingProposalsTest {
     @Test
     public void generalSettingsProposalsAreProvidedInOrderInducedByGivenComparator() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
-                .getSettingsProposals("T", Commons.reverseComparator(AssistProposals.sortedByLabels()));
+                .getSettingsProposals("T", reverseComparator(AssistProposals.sortedByLabels()));
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("Test Timeout", "Test Template",
-                "Test Teardown", "Test Setup");
+        assertThat(transform(proposals, toLabels())).containsExactly("Test Timeout", "Test Template", "Test Teardown",
+                "Test Setup");
     }
 
     @Test
     public void onlyGeneralSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL,
-                Commons.substringMatcher()).getSettingsProposals("es");
+                substringMatcher()).getSettingsProposals("es");
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("Resource", "Test Setup", "Test Teardown",
+        assertThat(transform(proposals, toLabels())).containsExactly("Resource", "Test Setup", "Test Teardown",
                 "Test Template", "Test Timeout", "Variables");
     }
 
@@ -99,8 +102,8 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
                 .getSettingsProposals("");
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("[Arguments]", "[Documentation]",
-                "[Return]", "[Tags]", "[Teardown]", "[Timeout]");
+        assertThat(transform(proposals, toLabels())).containsExactly("[Arguments]", "[Documentation]", "[Return]",
+                "[Tags]", "[Teardown]", "[Timeout]");
     }
 
     @Test
@@ -113,18 +116,17 @@ public class RedSettingProposalsTest {
     @Test
     public void keywordSettingsProposalsAreProvidedInOrderInducedByGivenComparator() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
-                .getSettingsProposals("[T", Commons.reverseComparator(AssistProposals.sortedByLabels()));
+                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabels()));
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("[Timeout]", "[Teardown]", "[Tags]");
+        assertThat(transform(proposals, toLabels())).containsExactly("[Timeout]", "[Teardown]", "[Tags]");
     }
 
     @Test
     public void onlyKeywordSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD,
-                Commons.substringMatcher()).getSettingsProposals("me");
+                substringMatcher()).getSettingsProposals("me");
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("[Arguments]", "[Documentation]",
-                "[Timeout]");
+        assertThat(transform(proposals, toLabels())).containsExactly("[Arguments]", "[Documentation]", "[Timeout]");
     }
 
     @Test
@@ -132,7 +134,7 @@ public class RedSettingProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
                 .getSettingsProposals("");
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("[Documentation]", "[Setup]", "[Tags]",
+        assertThat(transform(proposals, toLabels())).containsExactly("[Documentation]", "[Setup]", "[Tags]",
                 "[Teardown]", "[Template]", "[Timeout]");
     }
 
@@ -146,17 +148,16 @@ public class RedSettingProposalsTest {
     @Test
     public void testCaseSettingsProposalsAreProvidedInOrderInducedByGivenComparator() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
-                .getSettingsProposals("[T", Commons.reverseComparator(AssistProposals.sortedByLabels()));
+                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabels()));
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("[Timeout]", "[Template]", "[Teardown]",
-                "[Tags]");
+        assertThat(transform(proposals, toLabels())).containsExactly("[Timeout]", "[Template]", "[Teardown]", "[Tags]");
     }
 
     @Test
     public void onlyTestCaseSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE,
-                Commons.substringMatcher()).getSettingsProposals("me");
+                substringMatcher()).getSettingsProposals("me");
 
-        assertThat(transform(proposals, Commons.toLabels())).containsExactly("[Documentation]", "[Timeout]");
+        assertThat(transform(proposals, toLabels())).containsExactly("[Documentation]", "[Timeout]");
     }
 }
