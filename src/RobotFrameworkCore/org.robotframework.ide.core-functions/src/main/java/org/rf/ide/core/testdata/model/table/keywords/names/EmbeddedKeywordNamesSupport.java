@@ -26,13 +26,13 @@ public class EmbeddedKeywordNamesSupport {
     /**
      * @return number of characters in definition which matches with given prefix
      */
-    public static int startsWithIgnoreCase(final String definitionName, final String occurenceNamePrefix) {
-        return startsWith(definitionName.toLowerCase(), occurenceNamePrefix.toLowerCase());
+    public static int startsWithIgnoreCase(final String definitionName, final String occurrenceNamePrefix) {
+        return startsWith(definitionName.toLowerCase(), occurrenceNamePrefix.toLowerCase());
     }
 
-    private static int startsWith(final String definitionName, final String occurenceNamePrefix) {
-        if (definitionName.startsWith(occurenceNamePrefix)) {
-            return occurenceNamePrefix.length();
+    private static int startsWith(final String definitionName, final String occurrenceNamePrefix) {
+        if (definitionName.startsWith(occurrenceNamePrefix)) {
+            return occurrenceNamePrefix.length();
         } else if (definitionName.indexOf('$') == -1) {
             return -1;
         }
@@ -42,7 +42,7 @@ public class EmbeddedKeywordNamesSupport {
         int i = definitionName.length();
         while (i >= 0) {
             final String shortenedDefinition = definitionName.substring(0, i);
-            final boolean matches = matchesIgnoreCase(shortenedDefinition, occurenceNamePrefix);
+            final boolean matches = matchesIgnoreCase(shortenedDefinition, occurrenceNamePrefix);
             if (matches) {
                 return i;
             }
