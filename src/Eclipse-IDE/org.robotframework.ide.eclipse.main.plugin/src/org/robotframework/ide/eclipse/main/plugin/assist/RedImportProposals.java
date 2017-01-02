@@ -40,7 +40,7 @@ public class RedImportProposals {
     public List<? extends AssistProposal> getImportsProposals(final String userContent,
             final Comparator<? super RedImportProposal> comparator) {
 
-        final ArrayList<RedImportProposal> proposals = new ArrayList<>();
+        final List<RedImportProposal> proposals = new ArrayList<>();
 
         final Map<LibrarySpecification, Collection<String>> libs = suiteFile.getImportedLibraries().asMap();
 
