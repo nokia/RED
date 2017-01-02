@@ -72,13 +72,9 @@ public abstract class RedFileLocationProposals {
         return proposals;
     }
 
-    static class RedPythonFileLocationsProposals extends RedFileLocationProposals {
+    private static class RedPythonFileLocationsProposals extends RedFileLocationProposals {
 
-        RedPythonFileLocationsProposals(final RobotSuiteFile suiteFile) {
-            this(suiteFile, ProposalMatchers.prefixesMatcher());
-        }
-
-        RedPythonFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
+        private RedPythonFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
             super(suiteFile, new Supplier<List<IFile>>() {
                 @Override
                 public List<IFile> get() {
@@ -88,13 +84,9 @@ public abstract class RedFileLocationProposals {
         }
     }
 
-    static class RedResourceFileLocationsProposals extends RedFileLocationProposals {
+    private static class RedResourceFileLocationsProposals extends RedFileLocationProposals {
 
-        RedResourceFileLocationsProposals(final RobotSuiteFile suiteFile) {
-            this(suiteFile, ProposalMatchers.prefixesMatcher());
-        }
-
-        RedResourceFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
+        private RedResourceFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
             super(suiteFile, new Supplier<List<IFile>>() {
 
                 @Override
