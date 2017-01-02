@@ -29,9 +29,8 @@ public class RedImportProposalTest {
                 new RedImportProposal("content", "bdd", type, ProposalMatch.EMPTY);
                 fail();
             } catch (final IllegalArgumentException e) {
-                continue;
+                // this is expected
             }
-            fail();
         }
     }
 
