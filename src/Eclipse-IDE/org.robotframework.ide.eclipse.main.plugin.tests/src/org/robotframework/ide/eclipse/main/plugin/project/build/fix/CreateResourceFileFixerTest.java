@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.junit.BeforeClass;
@@ -59,7 +60,8 @@ public class CreateResourceFileFixerTest {
         when(mockedMarker.getAttribute(AdditionalMarkerAttributes.PATH, null)).thenReturn("res.robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/dir1/res.robot");
+        assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/dir1/res.robot")),
+                path.segmentCount());
     }
 
     @Test
@@ -67,7 +69,8 @@ public class CreateResourceFileFixerTest {
         when(mockedMarker.getAttribute(AdditionalMarkerAttributes.PATH, null)).thenReturn("dir2/dir3/res.robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/dir1/dir2/dir3/res.robot");
+        assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/dir1/dir2/dir3/res.robot")),
+                path.segmentCount());
     }
 
     @Test
@@ -76,7 +79,9 @@ public class CreateResourceFileFixerTest {
                 .thenReturn("../dir1/non/existing/path/res.robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/dir1/non/existing/path/res.robot");
+        assertEquals(
+                path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/dir1/non/existing/path/res.robot")),
+                path.segmentCount());
     }
 
     @Test
@@ -85,7 +90,7 @@ public class CreateResourceFileFixerTest {
                 .thenReturn("do!@#$% ^&()/res !@#$%^&().robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/dir1/do!@#$% ^&()/res !@#$%^&().robot");
+        assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/dir1/do!@#$% ^&()/res !@#$%^&().robot")), path.segmentCount());
     }
 
     @Test
@@ -93,7 +98,8 @@ public class CreateResourceFileFixerTest {
         when(mockedMarker.getAttribute(AdditionalMarkerAttributes.PATH, null)).thenReturn("../res.robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/res.robot");
+        assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/res.robot")),
+                path.segmentCount());
     }
 
     @Test
@@ -102,7 +108,8 @@ public class CreateResourceFileFixerTest {
                 .thenReturn("../../" + projectProvider.getProject().getName() + "/res.robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/res.robot");
+        assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/res.robot")),
+                path.segmentCount());
     }
 
     @Test
@@ -128,7 +135,8 @@ public class CreateResourceFileFixerTest {
             assertNull(path);
         } else {
             assertNotNull(path);
-            assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/illeg*l/res.robot");
+            assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/dir1/illeg*l/res.robot")),
+                    path.segmentCount());
         }
     }
 
@@ -138,7 +146,8 @@ public class CreateResourceFileFixerTest {
                 .thenReturn(workspaceDir + "/" + projectProvider.getProject().getName() + "/res.robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/res.robot");
+        assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/res.robot")),
+                path.segmentCount());
     }
 
     @Test
@@ -147,7 +156,8 @@ public class CreateResourceFileFixerTest {
                 .thenReturn(workspaceDir + "/" + projectProvider.getProject().getName() + "/dir1/../dir1/res.robot");
         IPath path = CreateResourceFileFixer.getValidPathToCreate(mockedMarker);
         assertNotNull(path);
-        assertEquals(path.toPortableString(), "file:CreateResourceFileFixerTest/dir1/res.robot");
+        assertEquals(path.matchingFirstSegments(new Path("CreateResourceFileFixerTest/dir1/res.robot")),
+                path.segmentCount());
     }
 
     @Test
