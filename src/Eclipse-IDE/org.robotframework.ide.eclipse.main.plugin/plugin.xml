@@ -870,7 +870,7 @@
                             value="true">
                       </test>
                       <test
-                            property="org.robotframework.redxml.navigator.parentExcluded"
+                            property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
                             value="false">
                       </test>
                    </and>
@@ -915,7 +915,7 @@
                             value="true">
                       </test>
                       <test
-                            property="org.robotframework.redxml.navigator.parentExcluded"
+                            property="org.robotframework.redxml.navigator.isExcludedViaInheritance"
                             value="false">
                       </test>
                    </and>
@@ -4172,7 +4172,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlValidationPropertyTester"
           id="org.robotframework.redxml.validationConfigPropertyTester"
           namespace="org.robotframework.redxml.validation"
-          properties="isInternalFolder, isExcluded, isIncluded, isFile, parentExcluded"
+          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance"
           type="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
     </propertyTester>
     <propertyTester
@@ -4186,7 +4186,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"
           id="org.robotframework.redxml.navigatorProjectConfigPropertyTester"
           namespace="org.robotframework.redxml.navigator"
-          properties="isInternalFolder, isExcluded, isIncluded, isFile, parentExcluded"
+          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance"
           type="org.eclipse.core.resources.IResource">
     </propertyTester>
     <propertyTester

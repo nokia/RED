@@ -17,7 +17,7 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
     @VisibleForTesting static final String IS_INCLUDED = "isIncluded";
     @VisibleForTesting static final String IS_INTERNAL_FOLDER = "isInternalFolder";
     @VisibleForTesting static final String IS_FILE = "isFile";
-    @VisibleForTesting static final String PARENT_EXCLUDED = "parentExcluded";
+    @VisibleForTesting static final String PARENT_EXCLUDED = "isExcludedViaInheritance";
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
