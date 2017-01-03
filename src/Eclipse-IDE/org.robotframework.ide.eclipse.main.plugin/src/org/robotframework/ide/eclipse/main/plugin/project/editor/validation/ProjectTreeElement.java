@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -77,6 +78,9 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
 
     public boolean isInternalFolder() {
         return resource instanceof IFolder;
+    }
+    public boolean isFile() {
+        return resource instanceof IFile;
     }
 
     Collection<ProjectTreeElement> getAll() {
@@ -201,6 +205,7 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
             return true;
         }
 
+
         @Override
         public ImageDescriptor getImageDescriptor(final Object object) {
             final Image folderImg = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
@@ -231,4 +236,5 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
             return Objects.hashCode(path);
         }
     }
+
 }

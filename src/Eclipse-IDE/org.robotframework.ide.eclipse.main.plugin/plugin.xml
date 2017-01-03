@@ -200,7 +200,7 @@
        </description>
        <enablement>
           <objectClass
-                name="org.eclipse.core.resources.IFolder">
+                name="org.eclipse.core.resources.IResource">
           </objectClass>
        </enablement>
     </decorator>
@@ -863,11 +863,15 @@
                       type="org.eclipse.core.resources.IResource">
                    <and>
                       <instanceof
-                            value="org.eclipse.core.resources.IFolder">
+                            value="org.eclipse.core.resources.IResource">
                       </instanceof>
                       <test
                             property="org.robotframework.redxml.navigator.isIncluded"
                             value="true">
+                      </test>
+                      <test
+                            property="org.robotframework.redxml.navigator.parentExcluded"
+                            value="false">
                       </test>
                    </and>
                 </adapt>
@@ -904,11 +908,15 @@
                       type="org.eclipse.core.resources.IResource">
                    <and>
                       <instanceof
-                            value="org.eclipse.core.resources.IFolder">
+                            value="org.eclipse.core.resources.IResource">
                       </instanceof>
                       <test
                             property="org.robotframework.redxml.navigator.isExcluded"
                             value="true">
+                      </test>
+                      <test
+                            property="org.robotframework.redxml.navigator.parentExcluded"
+                            value="false">
                       </test>
                    </and>
                 </adapt>
@@ -2770,10 +2778,16 @@
                    ifEmpty="false"
                    operator="and">
                 <and>
-                   <test
+               	 <or>
+                  	 <test
                          property="org.robotframework.redxml.validation.isInternalFolder"
                          value="true">
-                   </test>
+                  	 </test>
+                  	 <test
+                         property="org.robotframework.redxml.validation.isFile"
+                         value="true">
+                  	 </test>
+                   </or>
                    <test
                          property="org.robotframework.redxml.validation.isExcluded"
                          value="true">
@@ -2798,11 +2812,17 @@
                    ifEmpty="false"
                    operator="and">
                 <and>
-                   <test
-                         property="org.robotframework.redxml.validation.isInternalFolder"
-                         value="true">
-                   </test>
-                   <test
+                	<or>
+                   		<test
+                        	 property="org.robotframework.redxml.validation.isInternalFolder"
+                        	 value="true">
+                  		</test>
+                  		<test
+                        	 property="org.robotframework.redxml.validation.isFile"
+                        	 value="true">
+                  		</test>
+                   </or>
+                  	<test
                          property="org.robotframework.redxml.validation.isIncluded"
                          value="true">
                    </test>
@@ -4152,7 +4172,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlValidationPropertyTester"
           id="org.robotframework.redxml.validationConfigPropertyTester"
           namespace="org.robotframework.redxml.validation"
-          properties="isInternalFolder, isExcluded, isIncluded"
+          properties="isInternalFolder, isExcluded, isIncluded, isFile, parentExcluded"
           type="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
     </propertyTester>
     <propertyTester
@@ -4166,7 +4186,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"
           id="org.robotframework.redxml.navigatorProjectConfigPropertyTester"
           namespace="org.robotframework.redxml.navigator"
-          properties="isInternalFolder, isExcluded, isIncluded"
+          properties="isInternalFolder, isExcluded, isIncluded, isFile, parentExcluded"
           type="org.eclipse.core.resources.IResource">
     </propertyTester>
     <propertyTester

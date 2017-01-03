@@ -11,12 +11,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.Proj
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
-
 public class RedXmlValidationPropertyTester extends PropertyTester {
 
     @VisibleForTesting static final String IS_EXCLUDED = "isExcluded";
     @VisibleForTesting static final String IS_INCLUDED = "isIncluded";
     @VisibleForTesting static final String IS_INTERNAL_FOLDER = "isInternalFolder";
+    @VisibleForTesting static final String IS_FILE = "isFile";
+    @VisibleForTesting static final String PARENT_EXCLUDED = "parentExcluded";
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -40,6 +41,10 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
             return isIncluded == expected;
         } else if (IS_EXCLUDED.equals(property)) {
             return projectElement.isExcluded() == expected;
+        } else if (IS_FILE.equals(property)) {
+            return projectElement.isFile() == expected;
+        } else if (PARENT_EXCLUDED.equals(property)) {
+            return projectElement.isExcludedViaInheritance() == expected;
         }
         return false;
     }
