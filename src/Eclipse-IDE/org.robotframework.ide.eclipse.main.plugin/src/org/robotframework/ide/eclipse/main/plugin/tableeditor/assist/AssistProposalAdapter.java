@@ -9,7 +9,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.jface.assist.RedTextContentAdapter.DefaultTextModificationStrategy;
+import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 
 import com.google.common.base.Optional;
 
@@ -30,7 +30,11 @@ public class AssistProposalAdapter implements RedContentProposal {
         this(wrappedProposal, modificationStrategy, "");
     }
 
-    public AssistProposalAdapter(final AssistProposal wrappedProposal,
+    public AssistProposalAdapter(final AssistProposal wrappedProposal, final String additionalSuffix) {
+        this(wrappedProposal, Optional.<ModificationStrategy> absent(), additionalSuffix);
+    }
+
+    private AssistProposalAdapter(final AssistProposal wrappedProposal,
             final Optional<ModificationStrategy> modificationStrategy, final String additionalSuffix) {
         this.wrappedProposal = wrappedProposal;
         this.modificationStrategy = modificationStrategy;
@@ -74,6 +78,6 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     @Override
     public ModificationStrategy getModificationStrategy() {
-        return modificationStrategy.or(new DefaultTextModificationStrategy());
+        return modificationStrategy.or(new SubstituteTextModificationStrategy());
     }
 }

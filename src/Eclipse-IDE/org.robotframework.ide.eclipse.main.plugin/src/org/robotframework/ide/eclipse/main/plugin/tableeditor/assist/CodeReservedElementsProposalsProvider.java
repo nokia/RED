@@ -19,9 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedCodeReservedWordProp
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
-import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
 import com.google.common.base.Optional;
@@ -47,11 +45,9 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
         final List<IContentProposal> proposals = newArrayList();
         for (final AssistProposal proposal : reservedWordProposals) {
 
-            final Optional<ModificationStrategy> modificationStrategy = Optional
-                    .<ModificationStrategy> of(new SubstituteTextModificationStrategy());
             final String additionalSuffix = RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel())
                     ? " " : "";
-            proposals.add(new AssistProposalAdapter(proposal, modificationStrategy, additionalSuffix));
+            proposals.add(new AssistProposalAdapter(proposal, additionalSuffix));
         }
         return proposals.toArray(new RedContentProposal[0]);
     }

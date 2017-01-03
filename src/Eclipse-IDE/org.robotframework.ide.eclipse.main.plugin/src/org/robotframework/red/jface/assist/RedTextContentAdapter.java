@@ -64,23 +64,6 @@ public class RedTextContentAdapter implements RedControlContentAdapter {
         ((Text) control).setSelection(range);
     }
 
-    public static class DefaultTextModificationStrategy implements ModificationStrategy {
-
-        @Override
-        public void insert(final Text text, final IContentProposal proposal) {
-            final String content = proposal.getContent();
-            final int cursorPosition = proposal.getCursorPosition();
-
-            final Point selection = text.getSelection();
-            text.insert(content);
-            // Insert will leave the cursor at the end of the inserted text. If this
-            // is not what we wanted, reset the selection.
-            if (cursorPosition < content.length()) {
-                text.setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
-            }
-        }
-    }
-
     public static class SubstituteTextModificationStrategy implements ModificationStrategy {
 
         @Override

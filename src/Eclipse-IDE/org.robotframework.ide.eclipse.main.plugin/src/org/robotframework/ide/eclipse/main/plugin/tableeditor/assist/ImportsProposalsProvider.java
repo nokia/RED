@@ -19,12 +19,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGro
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
-import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-
-import com.google.common.base.Optional;
 
 public abstract class ImportsProposalsProvider implements RedContentProposalProvider {
 
@@ -59,8 +55,7 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
             }
 
             for (final AssistProposal proposedSetting : importProposals) {
-                proposals.add(new AssistProposalAdapter(proposedSetting,
-                        Optional.<ModificationStrategy> of(new SubstituteTextModificationStrategy())));
+                proposals.add(new AssistProposalAdapter(proposedSetting));
             }
         }
         return proposals.toArray(new RedContentProposal[0]);
