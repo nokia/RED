@@ -15,12 +15,8 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
-import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-
-import com.google.common.base.Optional;
 
 public class SettingProposalsProvider implements RedContentProposalProvider {
 
@@ -43,8 +39,7 @@ public class SettingProposalsProvider implements RedContentProposalProvider {
         final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
         if (tableContext.getColumn() == 0) {
             for (final AssistProposal proposedSetting : settingsProposals) {
-                proposals.add(new AssistProposalAdapter(proposedSetting,
-                        Optional.<ModificationStrategy> of(new SubstituteTextModificationStrategy())));
+                proposals.add(new AssistProposalAdapter(proposedSetting));
             }
         }
         return proposals.toArray(new RedContentProposal[0]);

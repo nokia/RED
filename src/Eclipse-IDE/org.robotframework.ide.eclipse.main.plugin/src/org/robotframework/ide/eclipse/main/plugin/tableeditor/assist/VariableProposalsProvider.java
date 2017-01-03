@@ -56,9 +56,8 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         final List<IContentProposal> proposals = newArrayList();
         for (final AssistProposal proposedVariable : variableEntities) {
 
-            final Optional<ModificationStrategy> modificationStrategy = Optional
-                    .<ModificationStrategy> of(new VariableTextModificationStrategy());
-            proposals.add(new AssistProposalAdapter(proposedVariable, modificationStrategy));
+            proposals.add(new AssistProposalAdapter(proposedVariable, Optional
+                    .<ModificationStrategy> of(new VariableTextModificationStrategy())));
         }
         return proposals.toArray(new RedContentProposal[0]);
     }
