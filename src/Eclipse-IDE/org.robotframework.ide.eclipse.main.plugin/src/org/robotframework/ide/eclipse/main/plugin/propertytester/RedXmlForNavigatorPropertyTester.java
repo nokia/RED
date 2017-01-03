@@ -23,7 +23,7 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     @VisibleForTesting static final String IS_INCLUDED = "isIncluded";
     @VisibleForTesting static final String IS_INTERNAL_FOLDER = "isInternalFolder";
     @VisibleForTesting static final String IS_FILE = "isFile";
-    @VisibleForTesting static final String PARENT_EXCLUDED = "parentExcluded";
+    @VisibleForTesting static final String PARENT_EXCLUDED = "isExcludedViaInheritance";
     
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -38,7 +38,8 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final IResource projectElement, final String property, final boolean expected) {
-        RobotProjectConfig config=getConfig(projectElement);
+        IResource resource=projectElement;
+        RobotProjectConfig config=getConfig(resource);
         if (IS_INTERNAL_FOLDER.equals(property)) {
             return projectElement instanceof IFolder == expected;
         } else if (IS_INCLUDED.equals(property)) {
@@ -57,6 +58,7 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
         
         return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
     }
+    
     private RobotProjectConfig getConfig(final IResource projectElement)
     {
         final RobotProject robotProject = RedPlugin.getModelManager()
@@ -72,7 +74,7 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     private boolean isExcludedViaInheritance(final IResource projectElement) {
         IResource resource = projectElement;
         IPath path = resource.getProjectRelativePath();
-        RobotProjectConfig config=getConfig(projectElement);
+        RobotProjectConfig config=getConfig(resource);
         while (path.segmentCount() > 1) {
             resource = resource.getParent();
             if (isExcluded(resource,config)) {

@@ -46,15 +46,17 @@ abstract class ChangeExclusionHandler {
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
 
         }
+       
         SwtThread.asyncExec(new Runnable() {
             @Override
             public void run() {
                 final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
                 manager.update(RobotValidationExcludedDecorator.ID);
-                
-               
+
             }
         });
+      
+
     }
 
     private Multimap<IProject, IPath> groupByProject(final List<IResource> resourcesToChange) {
