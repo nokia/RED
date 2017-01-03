@@ -15,11 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedImportProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
-import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
-
-import com.google.common.base.Optional;
 
 public class ImportsInCodeProposalsProvider implements RedContentProposalProvider {
 
@@ -39,8 +35,7 @@ public class ImportsInCodeProposalsProvider implements RedContentProposalProvide
 
         final List<IContentProposal> proposals = newArrayList();
         for (final AssistProposal proposedImport : imports) {
-            proposals.add(new AssistProposalAdapter(proposedImport,
-                    Optional.<ModificationStrategy> of(new SubstituteTextModificationStrategy())));
+            proposals.add(new AssistProposalAdapter(proposedImport));
         }
         return proposals.toArray(new RedContentProposal[0]);
     }

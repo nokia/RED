@@ -19,12 +19,8 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
-import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
-import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-
-import com.google.common.base.Optional;
 
 public class KeywordProposalsInSettingsProvider implements RedContentProposalProvider {
 
@@ -49,8 +45,7 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
                     .getKeywordProposals(prefix);
 
             for (final AssistProposal proposedKeyword : keywordsEntities) {
-                proposals.add(new AssistProposalAdapter(proposedKeyword,
-                        Optional.<ModificationStrategy> of(new SubstituteTextModificationStrategy())));
+                proposals.add(new AssistProposalAdapter(proposedKeyword));
             }
         }
         return proposals.toArray(new RedContentProposal[0]);
