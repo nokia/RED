@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _p3kDgMhVEeaVRsIP7EWHyA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/22/16 4:05 PM
+Save-Time: 1/3/17 12:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -56,16 +56,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
 }
 
-wait 2000
-get-view Problems | click
-with [get-view Problems | get-tree] {
-    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-        | equals [format "Path '%s/ResourceAndVars/OutWS/res.robot' is absolute. It is preferred to use relative paths" [replace $user_folder -old "\\" -new "/"]]
-        | verify-true
-    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-        | equals [format "Path '%s/ResourceAndVars/OutWS/vars.py' is absolute. It is preferred to use relative paths" [replace $user_folder -old "\\" -new "/"]]
-        | verify-true
-}
 
 //check how path looks like in content assist
 with [get-editor "TestFile.robot" | get-text-viewer] {
@@ -81,4 +71,28 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "OutWS\\/res.robot" 
     | key-type "TRAVERSE_ESCAPE"
+
+
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 19
+    key-type Enter
+    type-text t1
+    key-type Enter
+    type-text "log  "
+    key-type "M1+SPACE" -times 3
+    key-type Enter -times 2
+    type-text key
+    key-type "M1+SPACE"
+    key-type Enter
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 12
+    key-type BackSpace -times 11
+    key-type "M1+s"
+}
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | contains "    log  ${c}"| verify-true
+get-editor "TestFile.robot" | get-text-viewer | get-property text | contains "    key from resource"| verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
