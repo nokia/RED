@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/22/16 2:41 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/3/17 11:15 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,18 +80,13 @@ try -times 5 -delay 1000 -command{
 }
 
 //check if new libs are adde to PE
-with [get-view "Project Explorer" | get-tree] {
-    get-item "NewProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
-    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)/Laptop" | get-property index 
-        | equals 0 | verify-true
-    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)/PC" | get-property index 
-        | equals 1 | verify-true
-}
+
 
 //add file with class
 get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
 set-dialog-result File "platform:/resource/NewProject/here_is_class.py"
 get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+
 get-window "Select library class" | get-table | select "here_is_class.Dog" | click -default
 get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" 
     | key-type "M1+s"
@@ -127,13 +122,20 @@ with [get-editor "here_is_class.py" | get-text-viewer] {
     key-type "M1+s"
 }
 // check error
-get-window "Regenerating library specification" 
-    | get-label "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Dog'Detailed information:Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.Try --help for usage information." 
-    | get-property caption 
-    | equals "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Dog'\n"
-    + "Detailed information:\n"
-    + "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.\n\n"
-    + "Try --help for usage information." | verify-true
+
+get-window "Regenerating library specification" | get-button "Details >>" | click
+with [get-window "Regenerating library specification"] {
+    get-label "Problems occured during library specification generation:Reason:Unable to generate library specification file for library 'here_is_class.Dog'" 
+        | get-property caption | equals "Problems occured during library specification generation:\n\n\n\n"
+        + "Reason:\n"
+        + "Unable to generate library specification file for library 'here_is_class.Dog'" | verify-true
+    with [get-list] {
+        get-property "getItems().String[0]" 
+            | equals "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'." 
+            | verify-true
+        get-property "getItems().String[1]" | equals "Try --help for usage information." | verify-true
+    }
+}
 get-window "Regenerating library specification" | get-button OK | click
 
 
@@ -256,17 +258,35 @@ with [get-editor "MainClass.py" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
     key-type "M1+s"
 }
-   
-get-window "Regenerating library specification" 
-    | get-label -index 1
-    | get-property caption 
-    | matches "Problems occured during library specification generation: Unable to generate library specification file for library 'MainClass'\n"
-     + "Detailed information:\n"
-     + "Importing test library 'MainClass' failed: ImportError: cannot import name SimpleClass\n"
-     + "Traceback \(most recent call last\):\n(.*\n)+\n"
-     + "Try --help for usage information\." | verify-true
-     
-     
+get-window "Regenerating library specification" | get-button "Details >>" | click
+with [get-window "Regenerating library specification"] {
+    get-label "Problems occured during library specification generation:Reason:Unable to generate library specification file for library 'MainClass'" 
+        | get-property caption | equals "Problems occured during library specification generation:\n\n\n\n"
+        + "Reason:\n"
+        + "Unable to generate library specification file for library 'MainClass'" | verify-true
+    with [get-list] {
+        get-property "getItems().String[0]" 
+            | equals "Importing test library 'MainClass' failed: ImportError: cannot import name 'SimpleClass'" 
+            | verify-true
+        get-property "getItems().String[1]" | equals "Traceback (most recent call last):" | verify-true
+        get-property "getItems().String[2]" 
+            | equals "File \"D:\\RED_testy\\aut-org.robotframework.red\\NewProject\\imports\\MainClass.py\", line 1, in <module>" 
+            | verify-true
+        get-property "getItems().String[3]" | equals "from class_to_import import SimpleClass" | verify-true
+        get-property "getItems().String[4]" | equals "PYTHONPATH:" | verify-true
+        get-property "getItems().String[5]" | equals "D:\\RED_testy\\aut-org.robotframework.red\\NewProject\\imports" 
+            | verify-true
+        get-property "getItems().String[6]" | equals "D:\\RED_testy\\aut-org.robotframework.red\\NewProject\\imports" 
+            | verify-true
+        get-property "getItems().String[7]" | equals "d:\\workspace_red\\tmp4" | verify-true
+        get-property "getItems().String[8]" | equals "C:\\Python36\\python36.zip" | verify-true
+        get-property "getItems().String[9]" | equals "C:\\Python36\\DLLs" | verify-true
+        get-property "getItems().String[10]" | equals "C:\\Python36\\lib" | verify-true
+        get-property "getItems().String[11]" | equals "C:\\Python36" | verify-true
+        get-property "getItems().String[12]" | equals "C:\\Python36\\lib\\site-packages" | verify-true
+        get-property "getItems().String[13]" | equals "Try --help for usage information." | verify-true
+    }
+}
 get-window "Regenerating library specification" | get-button OK | click
 
 
@@ -281,5 +301,7 @@ exec-with-options {
 	}
 	   verify-error {get-window "Problem Occurred"}
 } -allowStatusDialog   
+
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
