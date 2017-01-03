@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -40,17 +40,17 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
 
     @Override
     public void decorate(final Object element, final IDecoration decoration) {
-        final IFolder folder = RedPlugin.getAdapter(element, IFolder.class);
-        if (folder != null) {
+        final IResource resource = RedPlugin.getAdapter(element, IResource.class);
+        if (resource != null && (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER)) {
             final RobotProject robotProject = RedPlugin.getModelManager()
                     .getModel()
-                    .createRobotProject(folder.getProject());
+                    .createRobotProject(resource.getProject());
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
             if (config == null) {
                 config = robotProject.getRobotProjectConfig();
             }
-
-            if (config != null && config.isExcludedFromValidation(folder.getProjectRelativePath().toPortableString())) {
+            	
+            if (config != null && config.isExcludedFromValidation(resource.getProjectRelativePath().toPortableString())) {
                 decoration.addSuffix(" [excluded]");
                 decoration.setForegroundColor(ColorsManager.getColor(200, 200, 200));
             }
