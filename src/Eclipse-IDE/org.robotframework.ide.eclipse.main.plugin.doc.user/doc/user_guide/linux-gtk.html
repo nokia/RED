@@ -1,0 +1,32 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>GTK3 issues under Linux</h2>
+It was observed that using GTK3 library with Eclipse causes unexpected graphical glitches.<br>
+Those glitches are system independent although occurs more often under Debian and Ubuntu than RedHat<br>
+Most annoying one is screen flickering when editing large file with multiple folding sections in source editor.<br>
+Also some of the right click actions in red.xml are not activated.<br>
+<br>
+It is recommended to switch to GTK2 when working under Linux.<br>
+<br>
+RED Product for Linux has configuration to use GTK2,Eclipse users should check and change,if necessary, to GTK2.<br>
+<h3>Verifying current GTK version used</h3>
+GTK version can be checked in Eclipse under <i>Help-&gtInstallation Details-&gtConfiguration</i>,search for <i>org.eclipse.swt.internal.gtk.version</i> entry.
+<h3>Setting GTK2 system wide</h3>
+In console execute following:<br>
+<i>export SWT_GTK3=0</i> <br>
+than start eclipse:<br>
+<i>./eclipse</i> <br>
+<h3>Setting GTK2 in eclipse.ini</h3>
+GTK2 can be forced for eclipse instance,edit eclipse.ini to include following 2 lines above -vmargs section: <br>
+<i>--launcher.GTK_version</br>
+2</i></br>
+
+
+
+</body>
+</html>
