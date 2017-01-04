@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities.AccessibleKeywordsCollector;
@@ -33,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ListMultimap;
@@ -40,6 +42,7 @@ import com.google.common.io.Files;
 
 public class RedKeywordProposals {
 
+    private final RobotModel model;
     private final RobotSuiteFile suiteFile;
 
     private final ProposalMatcher matcher;
@@ -47,12 +50,20 @@ public class RedKeywordProposals {
     private final AssistProposalPredicate<LibrarySpecification> libraryPredicate;
 
     public RedKeywordProposals(final RobotSuiteFile suiteFile) {
-        this(suiteFile, ProposalMatchers.embeddedKeywordsMatcher(),
+        this(RedPlugin.getModelManager().getModel(), suiteFile, ProposalMatchers.embeddedKeywordsMatcher(),
                 AssistProposalPredicates.reservedLibraryPredicate());
     }
 
-    RedKeywordProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher,
+    @VisibleForTesting
+    public RedKeywordProposals(final RobotModel model, final RobotSuiteFile suiteFile) {
+        this(model, suiteFile, ProposalMatchers.embeddedKeywordsMatcher(),
+                AssistProposalPredicates.reservedLibraryPredicate());
+    }
+
+    @VisibleForTesting
+    RedKeywordProposals(final RobotModel model, final RobotSuiteFile suiteFile, final ProposalMatcher matcher,
             final AssistProposalPredicate<LibrarySpecification> libraryPredicate) {
+        this.model = model;
         this.suiteFile = suiteFile;
         this.matcher = matcher;
         this.libraryPredicate = libraryPredicate;
@@ -89,8 +100,8 @@ public class RedKeywordProposals {
     }
 
     private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite, final String userContent) {
-        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(suiteFile, matcher,
-                libraryPredicate, shouldUseQualifiedName(), userContent);
+        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(shouldUseQualifiedName(),
+                userContent);
         return new AccessibleKeywordsEntities(suite.getFile().getFullPath(), collector);
     }
 
@@ -131,26 +142,16 @@ public class RedKeywordProposals {
         return false;
     }
 
-    private static final class ProposalsKeywordCollector implements AccessibleKeywordsCollector {
-
-        private final RobotSuiteFile suiteFile;
-
-        private final ProposalMatcher matcher;
-
-        private final Predicate<LibrarySpecification> libraryPredicate;
+    private final class ProposalsKeywordCollector implements AccessibleKeywordsCollector {
 
         private final Predicate<RedKeywordProposal> shouldUseQualifiedName;
 
         private final String userContent;
 
-        private ProposalsKeywordCollector(final RobotSuiteFile suiteFile, final ProposalMatcher matcher,
-                final Predicate<LibrarySpecification> libraryPredicate,
-                final Predicate<RedKeywordProposal> shouldUseQualifiedName, final String userContent) {
-            this.matcher = matcher;
-            this.libraryPredicate = libraryPredicate;
+        private ProposalsKeywordCollector(final Predicate<RedKeywordProposal> shouldUseQualifiedName,
+                final String userContent) {
             this.userContent = userContent;
             this.shouldUseQualifiedName = shouldUseQualifiedName;
-            this.suiteFile = suiteFile;
         }
 
         @Override
@@ -160,7 +161,7 @@ public class RedKeywordProposals {
 
         private Map<String, Collection<KeywordEntity>> collectAccessibleKeywords() {
             final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
-            new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(new KeywordDetector() {
+            new KeywordDefinitionLocator(suiteFile.getFile(), model).locateKeywordDefinition(new KeywordDetector() {
 
                 @Override
                 public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
