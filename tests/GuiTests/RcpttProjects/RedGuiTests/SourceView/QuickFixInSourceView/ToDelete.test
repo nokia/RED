@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _vDNCUNJjEeadO8ZMLzLhdA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/4/17 11:41 AM
+Save-Time: 1/4/17 11:48 AM
 Testcase-Type: ecl
 Verifications: _qtiWAI7UEeWetPU-dn-gxQ,_vFf3wM6GEeawFJWg5rP2EA
 
@@ -50,8 +50,10 @@ with [get-view Problems] {
     with [get-tree] {
         get-column-header Location | click
         get-column-header Path | click
-        select "Errors (35 items)" | get-menu "Select All" | click
         select "Warnings (6 items)" | key-type "NUMPAD_ENTER" "\\u000D"
+        select "Errors (35 items)" | key-type "NUMPAD_ENTER" "\\u000D"
+        select "Errors (34 items)" | get-menu "Select All" | click
+
         click -default
     }
 }
