@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _vDNCUNJjEeadO8ZMLzLhdA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/4/17 1:07 PM
+Save-Time: 1/4/17 1:09 PM
 Testcase-Type: ecl
 Verifications: _qtiWAI7UEeWetPU-dn-gxQ,_vFf3wM6GEeawFJWg5rP2EA
 
@@ -286,7 +286,7 @@ with [get-view Problems | get-tree] {
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 62 1 |  key-type "#"
 //check warnings
 with [get-view Problems | get-tree] {
-    get-item "Warnings \\(6 items\\)" | get-property childCount | equals 7 | verify-true
+    //get-item "Warnings \\(6 items\\)" | get-property childCount | equals 7 | verify-true
     get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Path '/../../../../SecondProject/res1/res3/RES.ROBOT' is absolute. It is preferred to use relative paths" 
         | verify-true
