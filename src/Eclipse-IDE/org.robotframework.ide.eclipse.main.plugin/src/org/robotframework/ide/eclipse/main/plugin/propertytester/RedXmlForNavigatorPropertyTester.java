@@ -9,6 +9,7 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -38,13 +39,15 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final IResource projectElement, final String property, final boolean expected) {
-        IResource resource=projectElement;
-        RobotProjectConfig config=getConfig(resource);
         if (IS_INTERNAL_FOLDER.equals(property)) {
             return projectElement instanceof IFolder == expected;
         } else if (IS_INCLUDED.equals(property)) {
+            IResource resource=projectElement;
+            RobotProjectConfig config=getConfig(resource);
             return !isExcluded(projectElement,config) == expected;
         } else if (IS_EXCLUDED.equals(property)) {
+            IResource resource=projectElement;
+            RobotProjectConfig config=getConfig(resource);
             return isExcluded(projectElement,config) == expected;
         } else if (IS_FILE.equals(property)) {
             return projectElement instanceof IFile == expected;
