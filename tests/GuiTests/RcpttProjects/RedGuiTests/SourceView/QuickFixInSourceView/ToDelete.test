@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _vDNCUNJjEeadO8ZMLzLhdA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/4/17 1:09 PM
+Save-Time: 1/4/17 1:26 PM
 Testcase-Type: ecl
 Verifications: _qtiWAI7UEeWetPU-dn-gxQ,_vFf3wM6GEeawFJWg5rP2EA
 
@@ -318,18 +318,18 @@ with [get-view Problems | get-tree] {
         | equals "line 61" | verify-true
     get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[4].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
-        | equals "Path 'D:\\\\res.robot' is absolute. It is preferred to use relative paths" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getData().getLocation()" 
-        | equals "line 48" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getData().getPath()" 
+//    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+//        | equals "Path 'D:\\\\res.robot' is absolute. It is preferred to use relative paths" | verify-true
+//    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getData().getLocation()" 
+//        | equals "line 48" | verify-true
+//    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getData().getPath()" 
         | equals "/MediumRobotTest" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
         | equals "The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
         | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[6].getData().getLocation()" 
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getData().getLocation()" 
         | equals "line 16" | verify-true
-    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[6].getData().getPath()" 
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getData().getPath()" 
         | equals "/MediumRobotTest/res2" | verify-true
 }
 
