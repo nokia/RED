@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -92,11 +93,11 @@ public class RedXmlForNavigatorPropertyTesterTest {
     
     @Test
     public void testIsFileProperty() {
-        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("excluded_dir")), true)).isTrue();
-        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("excluded_dir")), false)).isFalse();
+        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("excluded_dir")), false)).isTrue();
+        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("excluded_dir")), true)).isFalse();
 
-        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("included_dir")), true)).isTrue();
-        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("included_dir")), false)).isFalse();
+        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("included_dir")), false)).isTrue();
+        assertThat(isFile(projectProvider.getDir(Path.fromPortableString("included_dir")), true)).isFalse();
 
         assertThat(isFile(projectProvider.getProject(), true)).isFalse();
         assertThat(isFile(projectProvider.getProject(), false)).isTrue();
@@ -104,11 +105,11 @@ public class RedXmlForNavigatorPropertyTesterTest {
     
     @Test
     public void testParentExcludedProperty() {
-        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("excluded_dir")), true)).isTrue();
-        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("excluded_dir")), false)).isFalse();
+        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("excluded_dir")), false)).isTrue();
+        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("excluded_dir")), true)).isFalse();
 
-        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("included_dir")), true)).isTrue();
-        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("included_dir")), false)).isFalse();
+        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("included_dir")), false)).isTrue();
+        assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("included_dir")), true)).isFalse();
 
         assertThat(isExcludedViaInheritance(projectProvider.getProject(), true)).isFalse();
         assertThat(isExcludedViaInheritance(projectProvider.getProject(), false)).isTrue();
