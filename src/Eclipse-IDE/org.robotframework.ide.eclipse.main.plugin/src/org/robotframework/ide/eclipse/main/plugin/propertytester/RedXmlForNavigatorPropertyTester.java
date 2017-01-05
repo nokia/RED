@@ -21,16 +21,19 @@ import com.google.common.base.Preconditions;
 public class RedXmlForNavigatorPropertyTester extends PropertyTester {
 
     @VisibleForTesting static final String IS_EXCLUDED = "isExcluded";
+
     @VisibleForTesting static final String IS_INCLUDED = "isIncluded";
+
     @VisibleForTesting static final String IS_INTERNAL_FOLDER = "isInternalFolder";
+
     @VisibleForTesting static final String IS_FILE = "isFile";
+
     @VisibleForTesting static final String PARENT_EXCLUDED = "isExcludedViaInheritance";
-    
+
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
-        Preconditions.checkArgument(receiver instanceof IResource,
-                "Property tester is unable to test properties of " + receiver.getClass().getName()
-                + ". It should be used with " + IResource.class.getName());
+        Preconditions.checkArgument(receiver instanceof IResource, "Property tester is unable to test properties of "
+                + receiver.getClass().getName() + ". It should be used with " + IResource.class.getName());
 
         if (expectedValue instanceof Boolean) {
             return testProperty((IResource) receiver, property, ((Boolean) expectedValue).booleanValue());
@@ -42,28 +45,29 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
         if (IS_INTERNAL_FOLDER.equals(property)) {
             return projectElement instanceof IFolder == expected;
         } else if (IS_INCLUDED.equals(property)) {
-            IResource resource=projectElement;
-            RobotProjectConfig config=getConfig(resource);
-            return !isExcluded(projectElement,config) == expected;
+            IResource resource = projectElement;
+            RobotProjectConfig config = getConfig(resource);
+            return !isExcluded(projectElement, config) == expected;
         } else if (IS_EXCLUDED.equals(property)) {
-            IResource resource=projectElement;
-            RobotProjectConfig config=getConfig(resource);
-            return isExcluded(projectElement,config) == expected;
+            IResource resource = projectElement;
+            RobotProjectConfig config = getConfig(resource);
+            return isExcluded(projectElement, config) == expected;
         } else if (IS_FILE.equals(property)) {
             return projectElement instanceof IFile == expected;
         } else if (PARENT_EXCLUDED.equals(property)) {
             return isExcludedViaInheritance(projectElement) == expected;
         }
-        return false;
+        else return false;
     }
 
     private boolean isExcluded(final IResource projectElement, RobotProjectConfig config) {
-        
-        return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
+        if (config != null) {
+            return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
+        } else
+            return false;
     }
-    
-    private RobotProjectConfig getConfig(final IResource projectElement)
-    {
+
+    private RobotProjectConfig getConfig(final IResource projectElement) {
         final RobotProject robotProject = RedPlugin.getModelManager()
                 .getModel()
                 .createRobotProject(projectElement.getProject());
@@ -77,10 +81,10 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     private boolean isExcludedViaInheritance(final IResource projectElement) {
         IResource resource = projectElement;
         IPath path = resource.getProjectRelativePath();
-        RobotProjectConfig config=getConfig(resource);
+        RobotProjectConfig config = getConfig(resource);
         while (path.segmentCount() > 1) {
             resource = resource.getParent();
-            if (isExcluded(resource,config)) {
+            if (isExcluded(resource, config)) {
                 return true;
             }
             path = resource.getProjectRelativePath();
