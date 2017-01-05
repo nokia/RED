@@ -39,7 +39,7 @@ public class SuiteSourceContextInformationValidator
 
     @Override
     public boolean updatePresentation(final int offset, final TextPresentation presentation) {
-        // todo : possibly update context informations
+        // TODO : possibly update context informations
         return false;
     }
 }

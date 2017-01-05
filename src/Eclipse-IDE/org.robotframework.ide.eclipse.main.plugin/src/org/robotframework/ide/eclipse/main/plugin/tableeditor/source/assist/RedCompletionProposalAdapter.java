@@ -25,8 +25,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.Optional;
-
 public class RedCompletionProposalAdapter implements Comparable<RedCompletionProposalAdapter>, ICompletionProposal,
         ICompletionProposalExtension3, ICompletionProposalExtension6 {
 
@@ -34,7 +32,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
     private final DocumentationModification modification;
 
-    private final Optional<IContextInformation> contextInformation;
+    private final IContextInformation contextInformation;
 
     public RedCompletionProposalAdapter(final AssistProposal proposal, final DocumentationModification modification) {
         this(proposal, modification, null);
@@ -44,7 +42,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
             final IContextInformation contextInformation) {
         this.adaptedProposal = proposal;
         this.modification = modification;
-        this.contextInformation = Optional.fromNullable(contextInformation);
+        this.contextInformation = contextInformation;
     }
 
     @Override
@@ -113,7 +111,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
     @Override
     public IContextInformation getContextInformation() {
-        return contextInformation.orNull();
+        return contextInformation;
     }
 
     @Override
