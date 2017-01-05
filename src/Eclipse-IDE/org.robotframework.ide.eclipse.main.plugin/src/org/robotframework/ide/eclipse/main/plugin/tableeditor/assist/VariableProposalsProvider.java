@@ -48,10 +48,10 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         final Optional<IRegion> varRegion = DocumentUtilities.findLiveVariable(contents, position);
         final String prefix = varRegion.isPresent() ? contents.substring(varRegion.get().getOffset(), position) : "";
 
-        final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
-        final AssistProposalPredicate<String> predicate = createGlobalVarPredicate(tableContext.getRow());
+        final Object rowElement = dataProvider.getRowObject(((NatTableAssistantContext) context).getRow());
+        final AssistProposalPredicate<String> predicate = createGlobalVarPredicate(rowElement);
         final List<? extends AssistProposal> variableEntities = new RedVariableProposals(suiteFile, predicate)
-                .getVariableProposals(prefix, getModelElement(tableContext));
+                .getVariableProposals(prefix, getModelElement(rowElement));
 
         final List<IContentProposal> proposals = newArrayList();
         for (final AssistProposal proposedVariable : variableEntities) {
@@ -62,8 +62,13 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
         return proposals.toArray(new RedContentProposal[0]);
     }
 
-    private RobotFileInternalElement getModelElement(final NatTableAssistantContext tableContext) {
-        final Object rowElement = dataProvider.getRowObject(tableContext.getRow());
+    private AssistProposalPredicate<String> createGlobalVarPredicate(final Object rowElement) {
+        return rowElement instanceof RobotElement
+                ? AssistProposalPredicates.globalVariablePredicate((RobotElement) rowElement)
+                : AssistProposalPredicates.<String> alwaysTrue();
+    }
+
+    private RobotFileInternalElement getModelElement(final Object rowElement) {
         if (rowElement instanceof RobotFileInternalElement) {
             return (RobotFileInternalElement) rowElement;
         } else if (rowElement instanceof Entry) {
@@ -71,13 +76,6 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
             return element != null ? element : suiteFile.findSection(RobotSettingsSection.class).get();
         }
         throw new IllegalStateException("Unrecognized element in table");
-    }
-
-    private AssistProposalPredicate<String> createGlobalVarPredicate(final int row) {
-        final Object element = dataProvider.getRowObject(row);
-        return element instanceof RobotElement
-                ? AssistProposalPredicates.globalVariablePredicate((RobotElement) element)
-                : AssistProposalPredicates.<String> alwaysTrue();
     }
 
     private static class VariableTextModificationStrategy implements ModificationStrategy {

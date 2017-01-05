@@ -45,7 +45,7 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
         final List<IContentProposal> proposals = newArrayList();
 
         final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
-        if (tableContext.getColumn() == 1 && isVariablesImport(tableContext.getRow())) {
+        if (tableContext.getColumn() == 1 && isValidImportSetting(tableContext.getRow())) {
 
             final List<? extends AssistProposal> importProposals;
             if (importType == SettingsGroup.LIBRARIES) {
@@ -61,7 +61,7 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
         return proposals.toArray(new RedContentProposal[0]);
     }
 
-    private boolean isVariablesImport(final int row) {
+    private boolean isValidImportSetting(final int row) {
         final Object element = dataProvider.getRowObject(row);
         return element instanceof RobotSetting && ((RobotSetting) element).getGroup() == importType;
     }
