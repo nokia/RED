@@ -19,7 +19,7 @@ public class RedPreferences {
     
     private final IPreferenceStore store;
 
-    RedPreferences(final IPreferenceStore store) {
+    protected RedPreferences(final IPreferenceStore store) {
         this.store = store;
     }
 
