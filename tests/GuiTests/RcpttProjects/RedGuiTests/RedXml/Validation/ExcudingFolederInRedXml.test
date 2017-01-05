@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-2m5wKjCEeWg6OFh_tHgTw
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/12/16 5:16 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/5/17 12:00 PM
 Testcase-Type: ecl
 Verifications: _m9LPkKj7EeW6oYCgHZ503g,_rI-sMKj8EeW6oYCgHZ503g,_lJPcoLh5EeWzJthH3JoEWQ
 
@@ -152,4 +152,34 @@ with [get-view "Project Explorer" | get-tree] {
     get-item RobotProject | get-property "getItems().TreeItem[9].getText()" | equals "red.xml" | verify-true
     get-item RobotProject | get-property "getItems().TreeItem[10].getText()" | equals "TestFile.robot" | verify-true
 }
+
+// Esclude single file and check errors - exclude in RED.xml
+
+// exclude file
+get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
+    | select "RobotProject/TestSuiteFolder/with_init.tsv" | get-menu Exclude | click
+// check file caption if includes [exclude] string
+get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
+    | get-item "RobotProject/TestSuiteFolder/with_init.tsv \\[excluded\\]" | get-property caption 
+    | equals "with_init.tsv [excluded]" | verify-true
+get-eclipse-window | key-type "M1+s"
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+// check if problems account excluded file 
+get-view Problems | get-label "2 errors, 2 warnings, 0 others" | get-property caption 
+    | equals "2 errors, 2 warnings, 0 others" | verify-true
+// include file
+get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
+    | select "RobotProject/TestSuiteFolder/with_init.tsv [excluded]" | get-menu Include | click
+// check file caption - it should be withouth [exclude]
+get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
+    | get-item "RobotProject/TestSuiteFolder/with_init.tsv" | get-property caption | equals "with_init.tsv" 
+    | verify-true
+get-eclipse-window | key-type "M1+s"
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+// list of errors should include error from included file
+get-view Problems | get-label "3 errors, 2 warnings, 0 others" | get-property caption 
+    | equals "3 errors, 2 warnings, 0 others" | verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
