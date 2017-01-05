@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalsWithImage;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
 
@@ -73,7 +73,7 @@ public class SectionsAssistProcessorTest {
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 19);
         
         assertThat(proposals).hasSize(4)
-            .haveExactly(4, proposalsWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
+            .haveExactly(4, proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
         
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
@@ -97,7 +97,7 @@ public class SectionsAssistProcessorTest {
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 0);
         
         assertThat(proposals).hasSize(4).haveExactly(4,
-                proposalsWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
         
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
@@ -121,7 +121,7 @@ public class SectionsAssistProcessorTest {
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 25);
 
         assertThat(proposals).hasSize(1).haveExactly(1,
-                proposalsWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
@@ -139,6 +139,6 @@ public class SectionsAssistProcessorTest {
             public RobotSuiteFile get() {
                 return model;
             }
-        }, new AssistPreferences(true, "  "));
+        }, new AssistPreferences(new MockRedPreferences(true, "  ")));
     }
 }
