@@ -75,7 +75,7 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
         try {
             getContainer().run(true, true, op);
         } catch (InterruptedException | InvocationTargetException e) {
-            throw new ProjectCreatingException("Problem occured when trying to create new Robot project.", e);
+            throw new ProjectCreatingException("Problem occurred when trying to create new Robot project.", e);
         }
         return newProjectHandle;
     }
