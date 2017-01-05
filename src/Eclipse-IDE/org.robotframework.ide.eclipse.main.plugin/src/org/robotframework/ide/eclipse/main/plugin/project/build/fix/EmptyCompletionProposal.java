@@ -19,16 +19,16 @@ public class EmptyCompletionProposal implements ICompletionProposal {
 
     private final String label;
 
-    private final String addInfo;
+    private final String additionalInfo;
 
     public EmptyCompletionProposal(final String label) {
         this.label = label;
-        this.addInfo = null;
+        this.additionalInfo = null;
     }
 
     public EmptyCompletionProposal(final String label, final String addInfo) {
         this.label = label;
-        this.addInfo = addInfo;
+        this.additionalInfo = addInfo;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class EmptyCompletionProposal implements ICompletionProposal {
 
     @Override
     public String getAdditionalProposalInfo() {
-        return addInfo;
+        return additionalInfo;
     }
 
     @Override
