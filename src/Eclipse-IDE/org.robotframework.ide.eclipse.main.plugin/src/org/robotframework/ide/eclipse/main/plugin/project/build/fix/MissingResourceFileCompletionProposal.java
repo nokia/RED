@@ -12,7 +12,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -30,12 +29,13 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * @author Lukasz Wlodarczyk
  */
-public class MissingResourceFileCompletionProposal implements ICompletionProposal{
+class MissingResourceFileCompletionProposal implements ICompletionProposal {
     
     private final String label, additionalInfo;
     private final IMarker marker;
@@ -43,13 +43,13 @@ public class MissingResourceFileCompletionProposal implements ICompletionProposa
 
     private final IProject project;
     
-    public MissingResourceFileCompletionProposal(final String label, final String additionalInfo,
+    MissingResourceFileCompletionProposal(final String label, final String additionalInfo,
             IMarker marker, IPath path) {
         this.label = label;
         this.additionalInfo = additionalInfo;
         this.marker = marker;
         this.path = path.removeFirstSegments(1);
-        this.project = ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0));
+        this.project = marker.getResource().getWorkspace().getRoot().getProject(path.segment(0));
     }
 
     @Override
@@ -60,15 +60,13 @@ public class MissingResourceFileCompletionProposal implements ICompletionProposa
             if (createFile(file)) {
                 try {
                     marker.delete();
-                    // marker.getResource().deleteMarkers(RobotProblem.TYPE_ID, true,
-                    // IResource.DEPTH_INFINITE);
                 } catch (final CoreException e) {
                     StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()),
                             StatusManager.SHOW);
                 }
                 try {
                     IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file,
-                            "org.robotframework.ide.tableditor", true);
+                            RobotFormEditor.ID, true);
                 } catch (PartInitException e) {
                     MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot open the file",
                             "Unfortunatelly, this file could not be opened properly.");
@@ -97,7 +95,7 @@ public class MissingResourceFileCompletionProposal implements ICompletionProposa
 
     @Override
     public Image getImage() {
-        return ImagesManager.getImage(RedImages.getChangeImage());
+        return ImagesManager.getImage(RedImages.getImageForFileWithExtension(path.getFileExtension()));
     }
 
     @Override

@@ -44,7 +44,7 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
                     if (resource.getType() == IResource.FILE && resource.getFullPath().lastSegment().equals(lastSegment)) {
                         final IPath resRelativePath = createCurrentFileRelativePath(problematicFile, (IFile) resource);
 
-                        fixers.add(new ChangeImportedPathFixer(resource.getFullPath().makeRelative(), resRelativePath));
+                        fixers.add(new ChangeImportedPathFixer(resRelativePath));
                     }
                     return true;
                 }
@@ -59,17 +59,14 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
         return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1);
     }
 
-    private final IPath validWsRelativePath;
     private final IPath validFileRelativePath;
 
-    public ChangeImportedPathFixer(final IPath validWsRelativePath, final IPath validFileRelativePath) {
-        this.validWsRelativePath = validWsRelativePath;
+    public ChangeImportedPathFixer(final IPath validFileRelativePath) {
         this.validFileRelativePath = validFileRelativePath;
     }
 
     @Override
     public String getLabel() {
-        // return "Change to " + validWsRelativePath.toString();
         return "Change to " + validFileRelativePath.toString();
     }
 
