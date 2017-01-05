@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalsWithImage;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
 import java.util.List;
 
@@ -109,7 +109,7 @@ public class SettingsAssistProcessorTest {
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(6).haveExactly(6,
-                proposalsWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
@@ -139,7 +139,7 @@ public class SettingsAssistProcessorTest {
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(3).haveExactly(3,
-                proposalsWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
@@ -166,7 +166,7 @@ public class SettingsAssistProcessorTest {
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(6).haveExactly(6,
-                proposalsWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
@@ -196,7 +196,7 @@ public class SettingsAssistProcessorTest {
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(2).haveExactly(2,
-                proposalsWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotSettingImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
@@ -215,6 +215,6 @@ public class SettingsAssistProcessorTest {
             public RobotSuiteFile get() {
                 return model;
             }
-        }, new AssistPreferences(true, "  "));
+        }, new AssistPreferences(new MockRedPreferences(true, "  ")));
     }
 }
