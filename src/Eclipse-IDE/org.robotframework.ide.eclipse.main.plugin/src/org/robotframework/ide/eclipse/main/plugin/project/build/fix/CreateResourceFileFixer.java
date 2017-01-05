@@ -16,13 +16,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ResolvedImportPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 /**
@@ -46,7 +45,8 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         }
     }
 
-    protected static IPath getValidPathToCreate(final IMarker marker) {
+    @VisibleForTesting
+    static IPath getValidPathToCreate(final IMarker marker) {
         final String srcPath = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
         final File file = new File(srcPath);
         try {
@@ -56,14 +56,9 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         }
         final IPath fullPath = new Path(ResolvedImportPath.from(ImportPath.from(srcPath))
                 .get()
-                .resolveInRespectTo(((IFileEditorInput) (PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow()
-                        .getActivePage()
-                        .getActiveEditor()
-                        .getEditorInput())).getFile().getParent().getLocation().toFile().toURI())
+                .resolveInRespectTo(marker.getResource().getLocationURI())
                 .toString());
-        final IPath workspaceDir = new Path(
-                ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile().toURI().toString());
+        final IPath workspaceDir = new Path(marker.getResource().getWorkspace().getRoot().getLocationURI().toString());
         if (workspaceDir.matchingFirstSegments(fullPath) != workspaceDir.segmentCount()) {
             return null;
         }
@@ -103,7 +98,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
 
     private static Optional<ICompletionProposal> createProposal(IMarker marker, IPath path, String res) {
         MissingResourceFileCompletionProposal proposal = new MissingResourceFileCompletionProposal(
-                "Create missing " + res + " file.",
+                "Create missing " + res + " file",
                 "<b>" + res
                         + "</b><br> file will be created and opened for edition.<br><br>Resource path must be valid, "
                         + "inside project directory and must include file extension. Any missing parent directories will be also created.",
