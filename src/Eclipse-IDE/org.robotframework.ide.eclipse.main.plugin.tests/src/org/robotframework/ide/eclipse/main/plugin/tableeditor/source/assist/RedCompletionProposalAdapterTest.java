@@ -73,16 +73,6 @@ public class RedCompletionProposalAdapterTest {
         assertThat(adapter5.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(50);
     }
 
-    // @Test
-    // public void cursorPositionIsAlwaysAtTheEndOfContent() {
-    // final AssistProposal proposal = mock(AssistProposal.class);
-    // when(proposal.getContent()).thenReturn("content");
-    //
-    // assertThat(new AssistProposalAdapter(proposal).getCursorPosition()).isEqualTo(7);
-    // assertThat(new AssistProposalAdapter(proposal, "
-    // enhanced").getCursorPosition()).isEqualTo(16);
-    // }
-
     @Test
     public void imageIsTakenFromAdaptedProposal() {
         final ImageDescriptor imageDescriptor = RedImages.getRobotImage();
