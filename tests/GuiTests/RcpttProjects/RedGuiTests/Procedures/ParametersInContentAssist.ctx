@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _cBeEIMN4Eeat3OoBX2X2jQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/21/16 4:20 PM
+Save-Time: 1/9/17 4:56 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -133,17 +133,32 @@ global [val user_keyword_teardown_vars [list "${/}"
 global [val common_lists [list "@{EMPTY}"]]
 global [val common_dicts [list "&{EMPTY}" "&{SUITE_METADATA}"]]
 
+
+global [val assist_source "source" ]
+
 proc "compare-variables" [val all_variables] {
 	$all_variables| each [val element] [val index] {
-		with [get-window ".*" -index 0 | get-table] {
-		    get-property [format "getItems().TableItem[%s].getText()" [plus $start_index $index]]| equals $element | verify-true
-
-	}
-	if [$count_items| eq true]{	
-		get-window ".*" -index 0  | get-table | get-property itemCount
-				 | equals [plus $start_index [$all_variables| invoke getElements | invoke size]] | verify-true	
-
-		}			
+	
+		if [$assist_source | eq source ]{
+			get-window  -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+			    | get-property [format "getItems().TableItem[%s].getText()" [plus $start_index $index]]| equals $element | verify-true
+	
+			if [$count_items| eq true]{	
+				get-window  -from "CompletionProposalPopup.createProposalSelector()"  | get-table | get-property itemCount
+						 | equals [plus $start_index [$all_variables| invoke getElements | invoke size]] | verify-true	
+		
+			}			
+		}-else{
+			get-window  -class ContentProposalPopup| get-table 
+			    | get-property [format "getItems().TableItem[%s].getText()" [plus $start_index $index]]| equals $element | verify-true
+	
+			if [$count_items| eq true]{	
+				get-window -class ContentProposalPopup | get-table | get-property itemCount
+						 | equals [plus $start_index [$all_variables| invoke getElements | invoke size]] | verify-true	
+		
+			}
+		
+		}
 	}
 }	
 
