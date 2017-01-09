@@ -22,22 +22,22 @@ public class AssistProposalAdapter implements RedContentProposal {
     private final String additionalSuffix;
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal) {
-        this(wrappedProposal, Optional.<ModificationStrategy> absent(), "");
+        this(wrappedProposal, null, "");
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal,
-            final Optional<ModificationStrategy> modificationStrategy) {
+            final ModificationStrategy modificationStrategy) {
         this(wrappedProposal, modificationStrategy, "");
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal, final String additionalSuffix) {
-        this(wrappedProposal, Optional.<ModificationStrategy> absent(), additionalSuffix);
+        this(wrappedProposal, null, additionalSuffix);
     }
 
     private AssistProposalAdapter(final AssistProposal wrappedProposal,
-            final Optional<ModificationStrategy> modificationStrategy, final String additionalSuffix) {
+            final ModificationStrategy modificationStrategy, final String additionalSuffix) {
         this.wrappedProposal = wrappedProposal;
-        this.modificationStrategy = modificationStrategy;
+        this.modificationStrategy = Optional.fromNullable(modificationStrategy);
         this.additionalSuffix = additionalSuffix;
     }
 
