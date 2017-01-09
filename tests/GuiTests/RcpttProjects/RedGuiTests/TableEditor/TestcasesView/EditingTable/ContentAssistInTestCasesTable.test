@@ -7,12 +7,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/9/17 4:19 PM
+Save-Time: 1/9/17 4:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+global [val assist_source "table" ] -override
 
 proc "check-content-list"{
 
