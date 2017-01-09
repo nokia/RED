@@ -17,8 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
 
-import com.google.common.base.Optional;
-
 public class AssistProposalAdapterTest {
 
     @Test
@@ -92,17 +90,15 @@ public class AssistProposalAdapterTest {
                 .isExactlyInstanceOf(SubstituteTextModificationStrategy.class);
         assertThat(new AssistProposalAdapter(proposal, "").getModificationStrategy())
                 .isExactlyInstanceOf(SubstituteTextModificationStrategy.class);
-        assertThat(
-                new AssistProposalAdapter(proposal, Optional.<ModificationStrategy> absent()).getModificationStrategy())
-                        .isExactlyInstanceOf(SubstituteTextModificationStrategy.class);
+        assertThat(new AssistProposalAdapter(proposal, (ModificationStrategy) null).getModificationStrategy())
+                .isExactlyInstanceOf(SubstituteTextModificationStrategy.class);
     }
 
     @Test
     public void modificationStrategyIsProvided_whenPassedToConstructor() {
         final AssistProposal proposal = mock(AssistProposal.class);
         final ModificationStrategy strategy = mock(ModificationStrategy.class);
-        final Optional<ModificationStrategy> optionalStrategy = Optional.of(strategy);
 
-        assertThat(new AssistProposalAdapter(proposal, optionalStrategy).getModificationStrategy()).isSameAs(strategy);
+        assertThat(new AssistProposalAdapter(proposal, strategy).getModificationStrategy()).isSameAs(strategy);
     }
 }
