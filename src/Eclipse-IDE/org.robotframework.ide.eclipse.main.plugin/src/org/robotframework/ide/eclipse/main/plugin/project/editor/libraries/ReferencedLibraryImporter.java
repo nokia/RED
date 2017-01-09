@@ -37,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 import com.google.common.base.Optional;
 
@@ -67,9 +68,9 @@ public class ReferencedLibraryImporter {
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {
-            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                    "RED was unable to find classes/modules inside '" + fullLibraryPath + "' module", e.getCause()),
-                    StatusManager.SHOW);
+            DetailedErrorDialog.openErrorDialog(
+                    "RED was unable to find classes/modules inside '" + fullLibraryPath + "' module",
+                    e.getCause().getMessage());
             return new ArrayList<>();
         }
 
