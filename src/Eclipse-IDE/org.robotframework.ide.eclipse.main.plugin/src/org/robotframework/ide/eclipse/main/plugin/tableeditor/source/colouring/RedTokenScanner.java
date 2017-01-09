@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -68,8 +69,12 @@ public class RedTokenScanner implements IRedTokenScanner {
 
             @Override
             public Deque<IRobotLineElement> get() {
-                final List<RobotLine> lines = document.getNewestModel().getFileContent();
-                return new RedTokensQueueBuilder().buildQueue(rangeOffset, rangeLength, lines, rangeLine);
+                try {
+                    final List<RobotLine> lines = document.getNewestModel().getFileContent();
+                    return new RedTokensQueueBuilder().buildQueue(rangeOffset, rangeLength, lines, rangeLine);
+                } catch (final InterruptedException e) {
+                    return new ArrayDeque<>();
+                }
             }
         });
     }
@@ -86,7 +91,8 @@ public class RedTokenScanner implements IRedTokenScanner {
         }
 
         if (tokensToAnalyze.isEmpty()) {
-            lastTokenPosition = new Position(getTokenOffset() + getTokenLength(), 0);
+            lastTokenPosition = lastTokenPosition == null ? new Position(0, 0)
+                    : new Position(getTokenOffset() + getTokenLength(), 0);
             return Token.EOF;
         }
         final IRobotLineElement nextToken = tokensToAnalyze.poll();

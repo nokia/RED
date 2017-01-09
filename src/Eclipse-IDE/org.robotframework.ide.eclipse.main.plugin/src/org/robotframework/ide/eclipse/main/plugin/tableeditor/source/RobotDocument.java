@@ -196,9 +196,11 @@ public class RobotDocument extends Document {
      * when waiting has been interrupted.
      * 
      * @return
+     * @throws InterruptedException
      */
-    public RobotFile getNewestModel() {
-        return getNewestFileOutput().getFileModel();
+    public RobotFile getNewestModel() throws InterruptedException {
+        final RobotFileOutput newestFileOutput = getNewestFileOutput();
+        return newestFileOutput == null ? new RobotFile(null) : newestFileOutput.getFileModel();
     }
 
     /**
@@ -206,12 +208,13 @@ public class RobotDocument extends Document {
      * thrown when waiting has been interrupted.
      * 
      * @return
+     * @throws InterruptedException
      */
-    public RobotFileOutput getNewestFileOutput() {
+    public RobotFileOutput getNewestFileOutput() throws InterruptedException {
         try {
             return getNewestOutput().get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new IllegalStateException("Waiting for newest model has been interrupted", e);
+        } catch (final ExecutionException e) {
+            throw new IllegalStateException("Parsing the file coulnd't be finished", e.getCause());
         }
     }
 

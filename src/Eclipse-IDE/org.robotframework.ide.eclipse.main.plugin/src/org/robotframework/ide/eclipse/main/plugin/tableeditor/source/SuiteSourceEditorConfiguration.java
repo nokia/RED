@@ -185,12 +185,16 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
             @Override
             public RobotSuiteFile get() {
-                final RobotDocument document = (RobotDocument) editor.getDocument();
-                final RobotFileOutput fileOutput = document.getNewestFileOutput();
-
                 final RobotSuiteFile suiteModel = editor.getFileModel();
                 suiteModel.dispose();
-                suiteModel.link(fileOutput);
+
+                try {
+                    final RobotDocument document = (RobotDocument) editor.getDocument();
+                    final RobotFileOutput fileOutput = document.getNewestFileOutput();
+                    suiteModel.link(fileOutput);
+                } catch (final InterruptedException e) {
+                    // ok we'll return not-yet-parsed version
+                }
                 return suiteModel;
             }
         };

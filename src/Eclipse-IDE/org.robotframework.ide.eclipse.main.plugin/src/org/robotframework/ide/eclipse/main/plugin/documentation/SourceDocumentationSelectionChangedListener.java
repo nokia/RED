@@ -25,7 +25,7 @@ import com.google.common.base.Optional;
 
 public class SourceDocumentationSelectionChangedListener {
 
-    private DocumentationView view;
+    private final DocumentationView view;
 
     private RobotSuiteFile suiteFile;
 
@@ -33,11 +33,11 @@ public class SourceDocumentationSelectionChangedListener {
 
     private IRegion currentRegion;
 
-    private AtomicBoolean isEditing = new AtomicBoolean();
+    private final AtomicBoolean isEditing = new AtomicBoolean();
 
     private static final Pattern possibleKeywordPattern = Pattern.compile("^[A-Za-z].*");
 
-    private DocViewDelayedUpdateJob delayedUpdateJob = new DocViewDelayedUpdateJob(
+    private final DocViewDelayedUpdateJob delayedUpdateJob = new DocViewDelayedUpdateJob(
             "Documentation View Delayed Update Job");
 
     public SourceDocumentationSelectionChangedListener(final DocumentationView view) {
@@ -72,14 +72,18 @@ public class SourceDocumentationSelectionChangedListener {
         protected IStatus run(final IProgressMonitor monitor) {
             RobotFile linkedFile = suiteFile.getLinkedElement();
             if (linkedFile == null && document != null) {
-                linkedFile = ((RobotDocument) document).getNewestModel();
+                try {
+                    linkedFile = ((RobotDocument) document).getNewestModel();
+                } catch (final InterruptedException e) {
+                    // linked file will be null then
+                }
             }
 
             if (linkedFile != null) {
                 final int lineSelected;
                 try {
                     lineSelected = (document.getLineOfOffset(currentRegion.getOffset()) + 1);
-                } catch (BadLocationException e1) {
+                } catch (final BadLocationException e1) {
                     // shouldn't happen
                     e1.printStackTrace();
                     return Status.OK_STATUS;
