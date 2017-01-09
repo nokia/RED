@@ -10,6 +10,8 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -19,13 +21,15 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-import org.robotframework.red.jface.dialogs.ErrorDialogWithDetails;
+import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
@@ -63,11 +67,14 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {
-            ErrorDialogWithDetails.openErrorDialogWithDetails(shell, "Regenerating library specification",
-                    "Problems occured during library specification generation:\n\n" + e.getCause().toString(),
-                    "Detailed information:",
-                    "org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException: ",
-                    "org.robotframework.ide.eclipse.main.plugin", null);
+            if (e.getCause() instanceof RobotEnvironmentDetailedException) {
+                RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
+                DetailedErrorDialog.openErrorDialog(exc.getReason(), exc.getDetails());
+            } else {
+                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                        "Problems occurred during library specification generation:\n" + e.getCause().getMessage(),
+                        e.getCause()), StatusManager.SHOW);
+            }
         }
     }
 
