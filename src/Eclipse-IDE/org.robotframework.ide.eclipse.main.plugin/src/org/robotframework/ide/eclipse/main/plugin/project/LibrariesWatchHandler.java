@@ -25,24 +25,29 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.fileWatcher.IWatchEventHandler;
 import org.rf.ide.core.fileWatcher.RedFileWatcher;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-import org.robotframework.red.jface.dialogs.ErrorDialogWithDetails;
+import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -253,11 +258,14 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                     }
                 });
             } catch (InvocationTargetException | InterruptedException e) {
-                ErrorDialogWithDetails.openErrorDialogWithDetails(shell, "Regenerating library specification",
-                        "Problems occured during library specification generation:\n\n" + e.getCause().toString(),
-                        "Detailed information:",
-                        "org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException: ",
-                        "org.robotframework.ide.eclipse.main.plugin", null);
+                if (e.getCause() instanceof RobotEnvironmentDetailedException) {
+                    RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
+                    DetailedErrorDialog.openErrorDialog(exc.getReason(), exc.getDetails());
+                } else {
+                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "Problems occurred during library specification generation:\n" + e.getCause().getMessage(),
+                            e.getCause()), StatusManager.SHOW);
+                }
             }
         } else {
             rebuildTasksQueue.add(newRebuildTask);
