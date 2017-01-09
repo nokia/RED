@@ -75,14 +75,17 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     }
 
     private void reparseModel() {
-        final RobotFileOutput fileOutput = document.getNewestFileOutput();
+        try {
+            final RobotFileOutput fileOutput = document.getNewestFileOutput();
+            final RobotSuiteFile suiteModel = getSuiteModel();
+            suiteModel.dispose();
+            suiteModel.link(fileOutput);
 
-        final RobotSuiteFile suiteModel = getSuiteModel();
-        suiteModel.dispose();
-        suiteModel.link(fileOutput);
-
-        final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
-        eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
+            final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+            eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
+        } catch (final InterruptedException e) {
+            // ok so the model will be reparsed later
+        }
     }
 
     private void updateFoldingStructure() {
