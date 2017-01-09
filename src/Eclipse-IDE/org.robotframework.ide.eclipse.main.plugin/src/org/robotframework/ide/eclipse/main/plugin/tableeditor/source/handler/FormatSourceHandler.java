@@ -27,7 +27,9 @@ public class FormatSourceHandler extends DIParameterizedHandler<E4FormatSourceHa
 
         @Execute
         public void formatSource(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
-            editor.getSourceEditor().getViewer().doOperation(ISourceViewer.FORMAT);
+            if (!editor.provideSuiteModel().isTsvFile()) {
+                editor.getSourceEditor().getViewer().doOperation(ISourceViewer.FORMAT);
+            }
         }
     }
 }
