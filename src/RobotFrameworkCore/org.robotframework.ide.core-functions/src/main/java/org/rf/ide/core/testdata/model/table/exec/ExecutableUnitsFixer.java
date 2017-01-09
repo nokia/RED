@@ -171,7 +171,7 @@ public class ExecutableUnitsFixer {
     }
 
     /**
-     * Special hanlding for TSV format:
+     * Special handling for TSV format:
      * <code>
      *  :FOR    ${x}    IN  10
         #   d
