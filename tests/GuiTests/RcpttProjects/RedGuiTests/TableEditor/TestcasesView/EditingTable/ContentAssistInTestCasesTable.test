@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/21/16 5:22 PM
+Save-Time: 1/9/17 4:19 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -85,13 +85,15 @@ with [get-editor "TestFile.robot"] {
 }
 
 check-content-assist-for-test-cases
-//close CA and open again
 
-with [get-editor "TestFile.robot"] {
-    with [get-editbox -after [get-label "Test Cases"] -index 1] {
-        key-type "TRAVERSE_ESCAPE"
-  	}
-}   
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	//close CA and open again
+	with [get-editor "TestFile.robot"] {
+	    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+	        key-type "TRAVERSE_ESCAPE"
+	  	}
+	}  
+} 
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
 
 with [get-editor "TestFile.robot"] {   
@@ -119,9 +121,16 @@ check-content-list
 //select Convert To Bytes
 get-window -class ContentProposalPopup | get-table | select "Convert To Bytes - BuiltIn" | double-click
 
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-editbox -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+
+}-else{
+	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
+	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}	
+
 //check if variables are filtered
 with [get-editor "TestFile.robot"] {
-    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         type-text "$"
         key-type "M1+SPACE"
@@ -133,9 +142,16 @@ check-automatic-variables-for-test-case -start_index 1
 //select curdir
 get-window -class ContentProposalPopup | get-table | select "${CURDIR}" | double-click
 
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-editbox -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+
+}-else{
+	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
+	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}	
+
 //go to next columns and check filtered dicts
 with [get-editor "TestFile.robot"] {
-    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         type-text "&"
         key-type "M1+SPACE"
@@ -152,15 +168,25 @@ with [get-window -class ContentProposalPopup | get-table] {
 
 //select Empty
 get-window -class ContentProposalPopup | get-table | select "&{EMPTY}" | double-click
-get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
 
-//go to next column and add varaible form bottom of list
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-editbox -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+
+}-else{
+	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
+	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+}	
+
+
+//go to next column and add varaible form bottom of list - Test Name
 with [get-editor "TestFile.robot"] {
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         key-type "M1+SPACE"
         wait 200
         key-type Up -times 6
-        key-type Enter -times 2
+        key-type Enter
+        wait 200
+        key-type Enter
     }
 }
 
