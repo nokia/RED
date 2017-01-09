@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 import com.google.common.base.Function;
@@ -197,11 +198,12 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             };
             final int returnCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine, handler);
             if (returnCode != 0) {
-                throw new RobotEnvironmentException("Unable to generate library specification file for library '"
-                        + libName + "'" + "\nDetailed information:\n" + Joiner.on('\n').join(lines));
+                throw new RobotEnvironmentDetailedException(Joiner.on('\n').join(lines),
+                        "Unable to generate library specification file for library '" + libName + "'");
             }
         } catch (final IOException e) {
-            throw new RobotEnvironmentException("Unable to generate library specification file for library '" + libName + "'",
+            throw new RobotEnvironmentDetailedException(e.getMessage(),
+                    "Unable to generate library specification file for library '" + libName + "'",
                     e);
         }
     }
