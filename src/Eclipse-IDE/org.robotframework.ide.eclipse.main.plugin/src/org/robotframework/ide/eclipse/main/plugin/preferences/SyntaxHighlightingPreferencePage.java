@@ -131,7 +131,8 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     private void refreshPreview() {
         @SuppressWarnings("unchecked")
         final List<StyleRange> ranges = newArrayList(Iterables.concat(getSectionHeaderRanges(), getCommentsRanges(),
-                getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges(), getGherkinRanges()));
+                getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges(),
+                getGherkinRanges(), getSpecialTokenRanges()));
         Collections.sort(ranges, new Comparator<StyleRange>() {
 
             @Override
@@ -145,16 +146,16 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     private List<StyleRange> getCommentsRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.COMMENT);
 
-        return newArrayList(new StyleRange(664, 54, preference.getColor(), null, preference.getFontStyle()));
+        return newArrayList(new StyleRange(689, 54, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getSectionHeaderRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.SECTION_HEADER);
 
         return newArrayList(new StyleRange(0, 16, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(120, 17, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(241, 16, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(615, 18, preference.getColor(), null, preference.getFontStyle())
+                new StyleRange(142, 17, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(263, 16, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(640, 18, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
@@ -162,84 +163,96 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.SETTING);
 
         return newArrayList(new StyleRange(17, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(41, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(81, 13, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(269, 11, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(290, 15, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(594, 8, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(647, 9, preference.getColor(), null, preference.getFontStyle())
+                new StyleRange(63, 10, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(103, 13, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(291, 11, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(312, 15, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(619, 8, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(672, 9, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
     private List<StyleRange> getDefinitionRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.DEFINITION);
 
-        return newArrayList(new StyleRange(258, 9, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(634, 11, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(807, 13, preference.getColor(), null, preference.getFontStyle())
+        return newArrayList(new StyleRange(280, 9, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(659, 11, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(832, 13, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
     private List<StyleRange> getKeywordCallRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.KEYWORD_CALL);
 
-        return newArrayList(new StyleRange(58, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(98, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(355, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(391, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(467, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(510, 12, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(556, 8, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(730, 9, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(747, 15, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(783, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(828, 19, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(854, 19, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(879, 25, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(911, 17, preference.getColor(), null, preference.getFontStyle())
+        return newArrayList(new StyleRange(80, 3, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(120, 3, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(377, 12, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(413, 12, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(437, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(471, 1, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(490, 12, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(515, 1, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(534, 12, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(562, 1, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(581, 8, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(755, 9, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(772, 15, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(808, 3, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(853, 19, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(879, 19, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(904, 25, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(936, 17, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
     private List<StyleRange> getVariableRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.VARIABLE);
 
-        return newArrayList(new StyleRange(138, 26, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(174, 27, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(213, 26, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(284, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(341, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(371, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(377, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(407, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(423, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(443, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(453, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(483, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(496, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(526, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(542, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(572, 10, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(585, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(606, 7, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(720, 6, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(766, 5, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(775, 6, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(790, 15, preference.getColor(), null, preference.getFontStyle())
+        return newArrayList(new StyleRange(160, 26, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(196, 27, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(235, 26, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(306, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(363, 7, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(393, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(399, 10, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(429, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(445, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(465, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(476, 7, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(506, 7, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(520, 7, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(550, 10, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(567, 10, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(597, 10, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(610, 7, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(631, 7, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(745, 6, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(791, 5, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(800, 6, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(815, 15, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
     private List<StyleRange> getGherkinRanges() {
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.GHERKIN);
 
-        return newArrayList(new StyleRange(822, 5, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(849, 4, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(875, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(906, 4, preference.getColor(), null, preference.getFontStyle())
+        return newArrayList(new StyleRange(847, 5, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(874, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(900, 3, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(931, 4, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
+    private List<StyleRange> getSpecialTokenRanges() {
+        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.SPECIAL);
+
+        return newArrayList(new StyleRange(44, 9, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(453, 8, preference.getColor(), null, preference.getFontStyle()));
+    }
+
     @Override
-    protected void performDefaults() {
+    
+protected void performDefaults() {
         for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
             currentPreferences.put(category, category.getDefault());
         }
