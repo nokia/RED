@@ -134,7 +134,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             public void widgetSelected(final SelectionEvent e) {
                 disableControls();
                 progressBar = createProgress(parent);
-                
+
                 final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
                 final Job job = new Job("Looking for python installations") {
                     @Override
@@ -337,7 +337,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                     }));
             getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME, activePath);
             getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES, allPaths);
-            
+
             MessageDialog.openInformation(getShell(), "Rebuild required",
                     "The changes you've made requires full workspace rebuild.");
 
@@ -362,14 +362,14 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                             }
                         } catch (final CoreException e) {
                             MessageDialog.openError(getShell(), "Workspace rebuild",
-                                    "Problems occured during workspace build " + e.getMessage());
+                                    "Problems occurred during workspace build " + e.getMessage());
                         }
                     }
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {
             MessageDialog.openError(getShell(), "Workspace rebuild",
-                    "Problems occured during workspace build " + e.getMessage());
+                    "Problems occurred during workspace build " + e.getMessage());
         }
     }
 

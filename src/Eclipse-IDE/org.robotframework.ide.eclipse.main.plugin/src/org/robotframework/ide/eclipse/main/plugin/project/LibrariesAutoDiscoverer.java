@@ -125,7 +125,7 @@ public class LibrariesAutoDiscoverer {
                         }
                     } catch (final InvocationTargetException e) {
                         MessageDialog.openError(getActiveShell(), "Discovering libraries",
-                                "Problems occured during discovering libraries: " + e.getCause().getMessage());
+                                "Problems occurred during discovering libraries: " + e.getCause().getMessage());
                     } finally {
                         isWorkspaceJobRunning.set(false);
                     }
@@ -211,9 +211,9 @@ public class LibrariesAutoDiscoverer {
                 }
             });
 
-            final List<ILineHandler> dryRunOutputlisteners = newArrayList();
-            dryRunOutputlisteners.add(dryRunOutputParser);
-            dryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputlisteners);
+            final List<ILineHandler> dryRunOutputListeners = newArrayList();
+            dryRunOutputListeners.add(dryRunOutputParser);
+            dryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputListeners);
 
             dryRunHandler.executeDryRunProcess(dryRunCommandLine, getProjectLocationFile());
         }
@@ -265,7 +265,7 @@ public class LibrariesAutoDiscoverer {
         final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
                 robotProject.getConfigurationFile(), addedLibs);
         if (eventBroker == null) {
-            eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         }
         if (eventBroker != null) {
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);

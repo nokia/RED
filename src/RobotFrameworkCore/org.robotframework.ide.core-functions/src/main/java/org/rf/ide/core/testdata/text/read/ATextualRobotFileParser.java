@@ -304,11 +304,11 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 libraryFixer.checkAndFixLine(parsingOutput, processingState);
                 /**
                  * special for case
-                 * 
+                 *
                  * <pre>
                  * *** Settings
                  * Suite Setup      Keyword
-                 * 
+                 *
                  * ...              argument_x
                  * </pre>
                  */
@@ -328,14 +328,14 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 isEOL = true;
                 final List<RobotLine> fileContent = fileModel.getFileContent();
                 if (fileContent.size() > 1) {
-                    RobotLine robotLine = fileContent.get(fileContent.size() - 1);
+                    final RobotLine robotLine = fileContent.get(fileContent.size() - 1);
                     if (robotLine.getEndOfLine().getFilePosition().isNotSet()) {
                         final List<IRobotLineElement> lastLineElements = robotLine.getLineElements();
                         robotLine.setEndOfLine(endOfLine, currentOffset,
                                 lastLineElements.get(lastLineElements.size() - 1).getEndColumn());
                     } else {
                         if (!robotLine.getEndOfLine().getTypes().contains(EndOfLineTypes.EOF)) {
-                            RobotLine newLine = new RobotLine(lineNumber, fileModel);
+                            final RobotLine newLine = new RobotLine(lineNumber, fileModel);
                             newLine.setEndOfLine(endOfLine, currentOffset, 0);
                             fileModel.addNewLine(newLine);
                         }
@@ -368,7 +368,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 lineReader.close();
             } catch (final IOException e) {
                 parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
-                        "Error occured, when file was closing. Stack trace\n\t" + e, robotFile.getAbsolutePath()));
+                        "Error occurred, when file was closing. Stack trace\n\t" + e, robotFile.getAbsolutePath()));
             }
         }
 
@@ -402,10 +402,10 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             final int lineNumber, final int currentOffset) {
         int newOffset = currentOffset;
         if (lineNumber > 1) {
-            RobotLine prevLine = parsingOutput.getFileModel().getFileContent().get(lineNumber - 2);
-            IRobotLineElement prevEOL = prevLine.getEndOfLine();
-            List<Constant> lineEnd = lineHolder.getLineEnd(prevEOL.getStartOffset());
-            IRobotLineElement buildEOL = EndOfLineBuilder.newInstance()
+            final RobotLine prevLine = parsingOutput.getFileModel().getFileContent().get(lineNumber - 2);
+            final IRobotLineElement prevEOL = prevLine.getEndOfLine();
+            final List<Constant> lineEnd = lineHolder.getLineEnd(prevEOL.getStartOffset());
+            final IRobotLineElement buildEOL = EndOfLineBuilder.newInstance()
                     .setEndOfLines(lineEnd)
                     .setStartColumn(prevEOL.getStartColumn())
                     .setStartOffset(prevEOL.getStartOffset())
@@ -539,11 +539,11 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 RobotTokenType.KEYWORDS_TABLE_HEADER);
 
         final String raw = robotToken.getRaw().replaceAll("\\s+|[*]", "");
-        List<IRobotTokenType> types = robotToken.getTypes();
-        for (IRobotTokenType type : types) {
+        final List<IRobotTokenType> types = robotToken.getTypes();
+        for (final IRobotTokenType type : types) {
             if (tableHeadersTypes.contains(type)) {
-                List<String> representations = type.getRepresentation();
-                for (String r : representations) {
+                final List<String> representations = type.getRepresentation();
+                for (final String r : representations) {
                     if (r.replaceAll("\\s+", "").equalsIgnoreCase(raw)) {
                         result = true;
                         break;
