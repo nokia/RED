@@ -1,0 +1,96 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _37OL4NdFEeazM-DbDmejpA
+Element-Name: QuickFixForMissingResourcePath
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _hmnS8I7CEeWetPU-dn-gxQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/10/17 4:33 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 31
+    hover-text 4 26
+    key-type "M1+1"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing this/new/folder/file.ROBOT file" 
+        | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Create missing this\\/new\\/folder\\/file.ROBOT file" | click -default
+get-editor "TestFile.robot" | click
+get-view Problems | get-tree 
+    | select "Errors (9 items)/Resource import 'single_file.html' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
+    | get-menu "Quick Fix" | click
+with [get-window "Quick Fix" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing single_file.html file" | verify-true
+}
+get-window "Quick Fix" | get-button Finish | click
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 9 23
+        hover-text 9 26
+        key-type "M1+1"
+    }
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing a  b/file.robot file" | verify-true
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    select "Create missing a  b\\/file.robot file" | key-type "NUMPAD_ENTER" "\\u000D"
+    click -default
+}
+get-editor "file.robot" | get-text-viewer | key-type "NUMPAD_ENTER" "\\u000D"
+with [get-editor "TestFile.robot"] {
+    click
+    get-text-viewer | hover-text 12 28
+}
+get-view Problems | get-tree 
+    | select "Errors (7 items)/Resource import '!@#$%20^&()_+\\/special_chars.txt' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
+    | get-menu "Quick Fix" | click
+with [get-window "Quick Fix" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Create missing !@#$%20^&()_+/special_chars.txt file" 
+        | verify-true
+}
+get-window "Quick Fix" | get-button Finish | click
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 15 29
+        hover-text 15 38
+        key-type "M1+1"
+    }
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals "Create missing ../SecondProject/folder1/in_second_project.robot file" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Create missing ..\\/SecondProject\\/folder1\\/in_second_project.robot file" | click -default
+get-editor "TestFile.robot" | click
+
+
+
+
+//
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 21 12
+//    hover-text 24 34
+//    type-text []
+//}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
