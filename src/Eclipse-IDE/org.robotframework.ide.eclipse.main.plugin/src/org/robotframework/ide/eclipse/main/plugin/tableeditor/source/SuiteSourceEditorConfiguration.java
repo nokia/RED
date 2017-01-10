@@ -75,6 +75,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.C
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableRowCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.GherkinPrefixRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.InTokenRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
@@ -89,6 +90,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.WithNameRule;
 import org.robotframework.red.graphics.ColorsManager;
 
 import com.google.common.base.Supplier;
@@ -413,6 +415,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final ColoringPreference gherkinPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.GHERKIN);
         final IToken gherkin = new Token(createAttribute(gherkinPref));
 
+        final ColoringPreference specialTokenPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SPECIAL);
+        final IToken specialToken = new Token(createAttribute(specialTokenPref));
+
         final ColoringPreference garbagePref = preferences
                 .getSyntaxColoring(SyntaxHighlightingCategory.DEFAULT_SECTION);
         final IToken defaultSection = new Token(createAttribute(garbagePref));
@@ -427,18 +432,18 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new TestCaseSettingsCallRule(call),
                 new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call), new CommentRule(comment),
-                new VariableUsageRule(variable) };
+                new VariableUsageRule(variable), new InTokenRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store, testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
                 new KeywordSettingsCallRule(call), new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call),
-                new CommentRule(comment), new VariableUsageRule(variable) };
+                new CommentRule(comment), new VariableUsageRule(variable), new InTokenRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, store, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsCallRule(call), new CommentRule(comment),
-                new VariableUsageRule(variable) };
+                new VariableUsageRule(variable), new WithNameRule(specialToken) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, store, settingsRules);
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
