@@ -58,7 +58,6 @@ public class RedContentAssistProcessorTest {
     @Test
     public void whenProposalsAreFound_theyAreReturnedInArray() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final Supplier<RobotSuiteFile> modelSupplier = createSupplier(model);
         final SuiteSourceAssistantContext context = createAssitant(model);
 
         final ITextViewer viewer = mock(ITextViewer.class);
@@ -180,16 +179,6 @@ public class RedContentAssistProcessorTest {
                 return model;
             }
         }, new AssistPreferences(new MockRedPreferences(false, "  ")));
-    }
-
-    private static Supplier<RobotSuiteFile> createSupplier(final RobotSuiteFile model) {
-        return new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        };
     }
 
     private static RedContentAssistProcessor createProcessorForContentTypes(final SuiteSourceAssistantContext context,
