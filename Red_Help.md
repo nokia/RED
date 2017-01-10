@@ -19,3 +19,5 @@
 *    [Remote debug] (red_help/user_guide/remote.html.md)    
 *    [Debug Robot&amp;Python scripts](red_help/user_guide/python_red_debug.html.md) 
 *    [How to integrate RED with Robotframework Maven Plugin](red_help/user_guide/maven.html.md) 
+*    [How to set GTK2 under Linux](linux-gtk.html.md)
+*    [Validation preferences - how to change severity level of validation errors](validation_preferences.html.md)

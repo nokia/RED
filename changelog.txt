@@ -1,3 +1,39 @@
+RED 0.7.4 - 2017/01/10
+** Enhancement
+
+    [RED-172] - Disable code formating CTRL SHIFT F for TSV files
+    [RED-377] - Implement import assistance in settings table
+    [RED-573] - validate on file focus change - RED-554 addition
+    [RED-589] - Properly inform user that RED do not support step into action for Library keywords
+    [RED-599] - Include/exclude validation for files
+    [RED-603] - Quick fix for missing resources - create new resource under path specified
+    [RED-632] - WITH NAME - provide marker when written in lower case (ERROR)
+    [RED-641] - Enabling automatically checking for new updates in preferences
+    [RED-645] - do not allow include folder/files when parent folder is excluded
+
+** Bug
+
+    [RED-153] - For command is not in content assist
+    [RED-336] - Button Check for updates in Product doesn't show newest version
+    [RED-474] - GUI freezes while opening content assistant
+    [RED-476] - Setting one order in content assist
+    [RED-485] - When user chooses variable proposal in table whole cell content gets replaced
+    [RED-579] - GitHub #57 Validation of environment variables like %{PATH} should be disabled
+    [RED-581] - Wrong path to resource when project is not in workspace
+    [RED-602] - Make Lib error window revisable,allow copy/paste
+    [RED-604] - blinking screen when working with VNC
+    [RED-609] - Clicking on Problems item does not show place with error
+    [RED-622] - RED wrongly sees prefixed keywords from aliased libs
+    [RED-623] - RPC-XML errors on startup [Claude case]
+    [RED-624] - GitHub #63 - validation error on variable file
+    [RED-669] - low performance on content assist
+
+** Sub-task
+
+    [RED-269] - Content assist to provide resource and lib names for KW prefixes
+    [RED-279] - After changing keyword from Content assist arguments are appended
+
+
 RED 0.7.3 - 2016/12/08
 ** Feature
     * [RED-394] - [table] display comments-only line from left side with formatting
