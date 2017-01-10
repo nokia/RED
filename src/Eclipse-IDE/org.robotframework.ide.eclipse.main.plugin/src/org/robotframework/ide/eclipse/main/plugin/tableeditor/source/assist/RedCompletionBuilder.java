@@ -52,8 +52,6 @@ public class RedCompletionBuilder {
 
         DecorationsStep proposalsShouldHaveIcon(Image image);
 
-        DecorationsStep currentPrefixShouldBeDecorated();
-
         RedCompletionProposal create();
     }
 
@@ -79,8 +77,6 @@ public class RedCompletionBuilder {
         private Image image;
 
         private boolean additionalInfoAsHtml;
-
-        private boolean decoratePrefix;
 
         private boolean activateAssitant;
 
@@ -164,16 +160,10 @@ public class RedCompletionBuilder {
         }
 
         @Override
-        public DecorationsStep currentPrefixShouldBeDecorated() {
-            this.decoratePrefix = true;
-            return this;
-        }
-
-        @Override
         public RedCompletionProposal create() {
             final int cursorPos = cursorPosition == -1 ? (contentToInsert.length() - cursorBackShift) : cursorPosition;
             return new RedCompletionProposal(contentToInsert, offset, length, 0, cursorPos, selectionLength, image,
-                    decoratePrefix, labelToDisplay, activateAssitant, operationsAfterAccept, additionalInfo,
+                    false, labelToDisplay, activateAssitant, operationsAfterAccept, additionalInfo,
                     additionalInfoAsHtml);
         }
     }
