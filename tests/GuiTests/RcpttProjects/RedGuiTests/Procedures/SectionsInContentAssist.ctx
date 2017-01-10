@@ -6,14 +6,14 @@ Element-Type: context
 Element-Version: 2.0
 Id: _cBDNYMN4Eeat3OoBX2X2jQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/19/16 4:29 PM
+Save-Time: 1/10/17 10:25 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
 proc "check-content-assist-for-settings"{
-	with [get-window ".*" -index 0 | get-table] {
+	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
 	    get-property itemCount | equals 17 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
@@ -38,7 +38,7 @@ proc "check-content-assist-for-settings"{
 
 
 proc "check-content-assist-for-variables"{
-	with [get-window ".*" -index 0 | get-table] {
+	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
 	    get-property itemCount | equals 7 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
@@ -50,9 +50,8 @@ proc "check-content-assist-for-variables"{
 	}
 }
 
-
 proc "check-content-assist-for-empty-file"{
-	with [get-window ".*" -index 0 | get-table] {
+	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
 	    get-property itemCount | equals 4 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "*** Keywords ***" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
@@ -63,7 +62,7 @@ proc "check-content-assist-for-empty-file"{
 
 
 proc "check-content-assist-for-keywords" [val source Source]{
-	with [get-window ".*" -index 0 | get-table] {
+	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
 	    get-property "getItems().TableItem[0].getText()" | equals "[Arguments]" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "[Documentation]" | verify-true
 	    get-property "getItems().TableItem[2].getText()" | equals "[Return]" | verify-true
@@ -80,9 +79,47 @@ proc "check-content-assist-for-keywords" [val source Source]{
 	}
 }	
 
+//copy for table editor
+proc "check-content-assist-for-keywords-for-table" [val source Source]{
+	with [get-window -class ContentProposalPopup| get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "[Arguments]" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "[Documentation]" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "[Return]" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "[Tags]" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "[Teardown]" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals And | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals But | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals Given | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals Then | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals When | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "Call Method - BuiltIn" | verify-true
+	}
+}	
 
 proc "check-content-assist-for-test-cases"{
-	with [get-window ".*" -index 0 | get-table] {
+	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "[Documentation]" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "[Setup]" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "[Tags]" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "[Teardown]" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "[Template]" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals And | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals But | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals Given | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals Then | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals When | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals "Catenate - BuiltIn" | verify-true
+	}  
+}
+
+//copy for table editor
+proc "check-content-assist-for-test-cases-for-table"{
+	with [get-window -class ContentProposalPopup| get-table] {
 	    get-property "getItems().TableItem[0].getText()" | equals "[Documentation]" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "[Setup]" | verify-true
 	    get-property "getItems().TableItem[2].getText()" | equals "[Tags]" | verify-true
@@ -101,7 +138,7 @@ proc "check-content-assist-for-test-cases"{
 }
 
 proc "check-keywords-content-assit"{
-	with [get-window ".*" -index 0 | get-table] {
+	with [get-window  -from "CompletionProposalPopup.createProposalSelector()"| get-table] {
 	    get-property "getItems().length" | equals 102 | verify-true
 	    get-property "getItems().TableItem[0].getText()" | equals "Call Method - BuiltIn" | verify-true
 	    get-property "getItems().TableItem[1].getText()" | equals "Catenate - BuiltIn" | verify-true
