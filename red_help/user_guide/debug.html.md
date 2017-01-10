@@ -1,14 +1,16 @@
 ## Debug
 
 Debug functionality is unique way of checking what is happening during
-TestCase and TestSuite execution.It works similiary as debug functionality in
+TestCase and TestSuite execution.It works similar as debug functionality in
 most of programming languages - it allows track execution of program for
-checking unwanted behaviour either on TestCase side or in tested software. It
+checking unwanted behavior either on TestCase side or in tested software. It
 is important to note that Debug functionality works only with text editor
 (debug actions can be set only there) therefore it is crucial to active it
 before switching to Debug perspective.  Try to not make changes in script in
 Debug mode as Eclipse have a problem with following changes respectful to
-Breakpoints.
+Breakpoints. **Note that step-into works only for Robot written Keywords, if
+you wish to step-into Python Keywords,check _Debug Robot and Python scripts_
+help content.**
 
 ### Basics
 
