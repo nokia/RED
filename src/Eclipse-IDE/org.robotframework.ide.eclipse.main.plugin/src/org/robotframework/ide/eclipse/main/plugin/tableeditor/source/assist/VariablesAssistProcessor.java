@@ -63,9 +63,17 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
-        final Optional<IRegion> liveVarRegion = DocumentUtilities.findLiveVariable(document, assist.isTsvFile(), offset);
+        final Optional<IRegion> liveVarRegion = DocumentUtilities.findLiveVariable(document, assist.isTsvFile(),
+                offset);
         final String actualPrefix = DocumentUtilities.getPrefix(document, liveVarRegion, offset);
-        final int wholeLength = liveVarRegion.isPresent() ? liveVarRegion.get().getLength() : 0;
+
+        final Optional<IRegion> varRegion = DocumentUtilities.findVariable(document, assist.isTsvFile(), offset);
+        int lengthToReplace;
+        if (varRegion.isPresent()) {
+            lengthToReplace = varRegion.get().getLength();
+        } else {
+            lengthToReplace = liveVarRegion.isPresent() ? offset - liveVarRegion.get().getOffset() : 0;
+        }
 
         final int line = DocumentUtilities.getLine(document, offset);
         final AssistProposalPredicate<String> globalVarPredicate = createGlobalVarPredicate(offset, line,
@@ -77,7 +85,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal varProposal : variableProposals) {
             final DocumentationModification modification = new DocumentationModification("",
-                    new Position(offset - actualPrefix.length(), wholeLength));
+                    new Position(offset - actualPrefix.length(), lengthToReplace));
 
             proposals.add(new RedCompletionProposalAdapter(varProposal, modification));
         }
