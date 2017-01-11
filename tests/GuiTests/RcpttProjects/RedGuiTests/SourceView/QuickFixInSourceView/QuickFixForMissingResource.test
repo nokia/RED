@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/10/17 5:47 PM
+Save-Time: 1/11/17 11:04 AM
 Testcase-Type: ecl
 Verifications: _vFf3wM6GEeawFJWg5rP2EA
 
@@ -190,6 +190,20 @@ no-file-to-generate-window
 //    }
 //}
 //no-file-to-generate-window
+
+//check if files are open
+with [get-tab-folder -index 1] {
+	get-property activePage | equals "*TestFile.robot" | verify-true
+    get-property "pages[0]" | equals "*TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "file.ROBOT" | verify-true
+    get-property "pages[2]" | equals "single_file.html" | verify-true
+    get-property "pages[3]" | equals "file.robot" | verify-true
+    get-property "pages[4]" | equals "special_chars.txt" | verify-true
+    get-property "pages[5]" | equals "in_second_project.robot" | verify-true
+    get-property "pages[6]" | equals "MY_RES.robot" | verify-true
+    get-property "pages[7]" | equals "full_path.txt" | verify-true
+    get-property tabCount | equals 8| verify-true
+}   
 
 with [get-view Problems | get-tree] {
     get-item "Errors \\(3 items\\)" | get-property childCount | equals 3 | verify-true
