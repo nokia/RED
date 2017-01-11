@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ZhFIANchEeazM-DbDmejpA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/11/17 2:01 PM
+Save-Time: 1/11/17 2:39 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -227,11 +227,12 @@ with [get-window "Quick Fix"] {
 //========================================== line 22 =======================================================================
 //file exists with the same beggining (deep_res.robot) - but is not in quik fix
 wait-for-problems -count 4   
+
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 22 31
+    wait 300
     key-type "M1+1"
 }
-wait 500
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "Create missing res1/res3/deep_res2.robot file" 
@@ -264,8 +265,9 @@ wait 500
 
 get-view Problems | get-tree 
     | select "Errors \(.* items\)/Resource import 'not_existing\\/folder\\/report.html' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | click
+wait 1000   
 open-quick-fix "Errors \(.* items\)/Resource import 'not_existing\\/folder\\/report.html' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
-wait 1000    
+ 
 with [get-window "Quick Fix" | get-table] {
     get-property itemCount | equals 3 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "Change to ../SecondProject/report.html" | verify-true
