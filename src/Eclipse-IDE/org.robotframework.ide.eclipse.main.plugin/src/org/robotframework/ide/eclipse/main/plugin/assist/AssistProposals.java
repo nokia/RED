@@ -162,15 +162,27 @@ public class AssistProposals {
         };
     }
 
-    public static Comparator<RedVariableProposal> sortedByOriginAndNames() {
+    public static Comparator<RedVariableProposal> sortedByTypesAndOrigin() {
+        final List<Character> typesOrder = newArrayList('$', '@', '&');
         return new Comparator<RedVariableProposal>() {
 
             @Override
             public int compare(final RedVariableProposal proposal1, final RedVariableProposal proposal2) {
-                if (proposal1.getOrigin() == proposal2.getOrigin()) {
-                    return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+                final char type1 = proposal1.getContent().charAt(0);
+                final char type2 = proposal2.getContent().charAt(0);
+                
+                if (type1 == type2) {
+                    final boolean isBuiltIn1 = proposal1.getOrigin() == VariableOrigin.BUILTIN;
+                    final boolean isBuiltIn2 = proposal2.getOrigin() == VariableOrigin.BUILTIN;
+                    
+                    if (isBuiltIn1 == isBuiltIn2) {
+                        return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+                    } else {
+                        return isBuiltIn1 ? 1 : -1;
+                    }
+                    
                 } else {
-                    return proposal1.getOrigin().compareTo(proposal2.getOrigin());
+                    return Integer.compare(typesOrder.indexOf(type1), typesOrder.indexOf(type2));
                 }
             }
         };

@@ -76,11 +76,13 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
         }
 
         final int line = DocumentUtilities.getLine(document, offset);
-        final AssistProposalPredicate<String> globalVarPredicate = createGlobalVarPredicate(offset, line,
+        final int lastTokenOffset = lastTokenOffset(offset, line, assist.getModel());
+
+        final AssistProposalPredicate<String> globalVarPredicate = createGlobalVarPredicate(lastTokenOffset,
                 assist.getModel());
 
         final List<? extends AssistProposal> variableProposals = new RedVariableProposals(assist.getModel(),
-                globalVarPredicate).getVariableProposals(actualPrefix, offset);
+                globalVarPredicate).getVariableProposals(actualPrefix, lastTokenOffset);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal varProposal : variableProposals) {
@@ -92,21 +94,21 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
         return proposals;
     }
 
-    private AssistProposalPredicate<String> createGlobalVarPredicate(final int offset, final int line,
+    private AssistProposalPredicate<String> createGlobalVarPredicate(final int lastTokenOffset,
             final RobotSuiteFile model) {
-        final List<RobotLine> fileContent = model.getLinkedElement().getFileContent();
-
-        int lastTokenOffset = offset;
-        for (int i = line; i >= 0; i--) {
-            final List<RobotToken> lineTokens = fileContent.get(i).getLineTokens();
-            if (!lineTokens.isEmpty()) {
-                lastTokenOffset = lineTokens.get(lineTokens.size() - 1).getStartOffset();
-                break;
-            }
-        }
-
         final Optional<? extends RobotElement> element = model.findElement(lastTokenOffset);
         return element.isPresent() ? AssistProposalPredicates.globalVariablePredicate(element.get())
                 : AssistProposalPredicates.<String> alwaysTrue();
+    }
+
+    private int lastTokenOffset(final int offset, final int line, final RobotSuiteFile model) {
+        final List<RobotLine> fileContent = model.getLinkedElement().getFileContent();
+        for (int i = line; i >= 0; i--) {
+            final List<RobotToken> lineTokens = fileContent.get(i).getLineTokens();
+            if (!lineTokens.isEmpty()) {
+                return lineTokens.get(lineTokens.size() - 1).getStartOffset();
+            }
+        }
+        return offset;
     }
 }
