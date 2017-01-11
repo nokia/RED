@@ -64,7 +64,6 @@ public class NavigatorKeywordsActionsProvider extends CommonActionProvider {
     @Override
     public void fillActionBars(final IActionBars actionBars) {
         actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, showDocumentationAction);
-        actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, showSourceAction);
     }
 
     @Override
