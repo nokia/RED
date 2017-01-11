@@ -398,7 +398,7 @@ class TestRunnerAgent:
         self._send_socket("library_import", name, attributes)
 
     def message(self, message):
-        if message['level'] in ('ERROR', 'FAIL'):
+        if message['level'] in ('ERROR', 'FAIL', 'NONE'):
             self._send_socket("message", message)
 
     def log_message(self, message):

@@ -12,17 +12,18 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 import org.robotframework.red.viewers.Selections;
 
-public class ShowLibrarySourceAction extends Action implements IEnablementUpdatingAction {
+public class ShowKeywordSourceAction extends Action implements IEnablementUpdatingAction {
 
     private final IWorkbenchPage page;
     private final ISelectionProvider selectionProvider;
 
-    public ShowLibrarySourceAction(final IWorkbenchPage page, final ISelectionProvider selectionProvider) {
-        super("Show library source");
+    public ShowKeywordSourceAction(final IWorkbenchPage page, final ISelectionProvider selectionProvider) {
+        super("Show keyword source");
 
         this.page = page;
         this.selectionProvider = selectionProvider;
@@ -30,17 +31,19 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
 
     @Override
     public void updateEnablement(final IStructuredSelection selection) {
-        setEnabled(selection.size() == 1 && selection.getFirstElement() instanceof LibrarySpecification);
+        setEnabled(selection.size() == 1 && selection.getFirstElement() instanceof KeywordSpecification);
     }
 
     @Override
     public void run() {
         final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
-        final LibrarySpecification libSpec = Selections.getSingleElement(
-                selection, LibrarySpecification.class);
+        final LibrarySpecification libSpec = RedPlugin
+                .getAdapter(selection.getPaths()[0].getParentPath().getLastSegment(), LibrarySpecification.class);
+        final KeywordSpecification kwSpec = Selections
+                .getSingleElement((IStructuredSelection) selectionProvider.getSelection(), KeywordSpecification.class);
         final IProject project = RedPlugin.getAdapter(selection.getPaths()[0].getFirstSegment(), IProject.class);
 
-        SourceOpeningSupport.open(page, RedPlugin.getModelManager().getModel(), project, libSpec);
+        SourceOpeningSupport.open(page, RedPlugin.getModelManager().getModel(), project, libSpec, kwSpec);
     }
 
 }
