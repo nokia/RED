@@ -21,9 +21,9 @@ public enum SyntaxHighlightingCategory {
     DEFINITION("definition", new ColoringPreference(new RGB(0, 0, 0), SWT.BOLD), "Keyword/Test Cases definition headers"),
     SECTION_HEADER("section", new ColoringPreference(new RGB(255, 0, 0), SWT.NORMAL), "Section headers"),
     SETTING("setting", new ColoringPreference(new RGB(149, 0, 85), SWT.NORMAL), "Settings"),
+    SPECIAL("special", new ColoringPreference(new RGB(128, 128, 64), SWT.BOLD), "Special items"),
     DEFAULT_SECTION("default", new ColoringPreference(new RGB(255, 200, 100), SWT.ITALIC), "Undefined tables"),
-    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), "Variables"),
-    SPECIAL("special", new ColoringPreference(new RGB(128, 128, 64), SWT.BOLD), "Special items");
+    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), "Variables");
 
     private String id;
 
