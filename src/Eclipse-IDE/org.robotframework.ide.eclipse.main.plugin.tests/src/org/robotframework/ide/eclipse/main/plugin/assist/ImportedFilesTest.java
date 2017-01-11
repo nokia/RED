@@ -32,6 +32,7 @@ public class ImportedFilesTest {
         projectProvider.createDir("dir1_1");
         projectProvider.createDir("dir2");
 
+        projectProvider.createFile("res.robot");
         projectProvider.createFile("dir1/res1.robot", "*** Variables ***");
         projectProvider.createFile("dir1_1/lib.py");
         projectProvider.createFile("dir1_1/vars.py");
@@ -46,9 +47,21 @@ public class ImportedFilesTest {
     }
 
     @Test
-    public void resourceFilesAreProperlyProvided() {
-        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles();
+    public void resourceFilesAreProperlyProvided_1() {
+        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("res.robot"));
         assertThat(transform(resourceFiles, toNames())).containsOnly("res1.robot", "res2.robot");
+    }
+
+    @Test
+    public void resourceFilesAreProperlyProvided_2() {
+        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir1/res1.robot"));
+        assertThat(transform(resourceFiles, toNames())).containsOnly("res.robot", "res2.robot");
+    }
+
+    @Test
+    public void resourceFilesAreProperlyProvided_3() {
+        final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir2/res2.robot"));
+        assertThat(transform(resourceFiles, toNames())).containsOnly("res.robot", "res1.robot");
     }
 
     @Test
