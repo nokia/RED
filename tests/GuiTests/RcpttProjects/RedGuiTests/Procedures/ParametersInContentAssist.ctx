@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _cBeEIMN4Eeat3OoBX2X2jQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/9/17 4:56 PM
+Save-Time: 1/11/17 4:59 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -202,8 +202,10 @@ proc "check-automatic-lists-for-test-case" [val start_index 0] [val count_items 
 }
 
 proc "check-all-variables-types"  [val start_index 0] [val count_items true]{
-	compare-variables [ emit [$common_first_vars |each [val item]{ echo $item }] [$common_vars| each [val item2]{ echo $item2}] 
-		[$common_dicts| each [val item3]{ echo $item3}]  [$common_lists| each [val item4]{ echo $item4}]| to-list ]
+	compare-variables [ emit [$common_first_vars |each [val item]{ echo $item }] 
+		[$common_vars| each [val item2]{ echo $item2}] 
+		[$common_lists| each [val item3]{ echo $item3}]  
+		[$common_dicts| each [val item4]{ echo $item4}]| to-list ]
 
 
 }
