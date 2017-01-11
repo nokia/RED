@@ -91,7 +91,7 @@ public abstract class RedFileLocationProposals {
 
                 @Override
                 public List<IFile> get() {
-                    return ImportedFiles.getResourceFiles();
+                    return ImportedFiles.getResourceFiles(suiteFile.getFile());
                 }
             }, matcher);
         }

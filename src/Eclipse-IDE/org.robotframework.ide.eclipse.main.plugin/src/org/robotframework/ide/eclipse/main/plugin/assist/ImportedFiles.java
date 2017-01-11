@@ -34,13 +34,13 @@ class ImportedFiles {
         });
     }
 
-    static List<IFile> getResourceFiles() {
+    static List<IFile> getResourceFiles(final IFile importingFile) {
         final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
         return getMatchingFiles(wsRoot, new FileMatcher() {
 
             @Override
             public boolean matches(final IFile file) {
-                return ASuiteFileDescriber.isResourceFile(file);
+                return !file.equals(importingFile) && ASuiteFileDescriber.isResourceFile(file);
             }
         });
     }
