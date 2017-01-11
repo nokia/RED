@@ -29,20 +29,6 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.e4.tools.compat"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.e4.tools.services"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
  
    <plugin
          id="ca.odell.glazedlists"
