@@ -22,7 +22,6 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
@@ -78,7 +77,7 @@ public class KeywordInLibrarySourceHyperlinkTest {
     @Test
     public void testFileHyperlinkProperties() {
         final KeywordInLibrarySourceHyperlink link = new KeywordInLibrarySourceHyperlink(model, new Region(20, 50),
-                projectProvider.getProject(), libSpec);
+                projectProvider.getProject(), libSpec, kwSpec);
         assertThat(link.getTypeLabel()).isNull();
         assertThat(link.getHyperlinkRegion()).isEqualTo(new Region(20, 50));
         assertThat(link.getHyperlinkText()).isEqualTo("Open Definition");
@@ -95,12 +94,11 @@ public class KeywordInLibrarySourceHyperlinkTest {
         assertThat(page.getEditorReferences()).isEmpty();
 
         final KeywordInLibrarySourceHyperlink link = new KeywordInLibrarySourceHyperlink(model, new Region(20, 50),
-                projectProvider.getProject(), libSpec);
+                projectProvider.getProject(), libSpec, kwSpec);
         link.open();
 
         assertThat(page.getEditorReferences()).hasSize(1);
         final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile())
-                .isEqualTo(LibspecsFolder.get(projectProvider.getProject()).getFile("testlib.py"));
+        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile("testlib.py"));
     }
 }

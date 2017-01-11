@@ -14,9 +14,9 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.KeywordDocumentationPopup;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -84,7 +84,7 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public String additionalLabelDecoration() {
-        return "[" + ShowLibrarySourceAction.extractLibraryLocation(model, project, libSpec) + "]";
+        return "[" + SourceOpeningSupport.extractLibraryLocation(model, project, libSpec) + "]";
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowKeywordDocumentationAction;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowKeywordSourceAction;
 
 public class NavigatorKeywordsActionsProvider extends CommonActionProvider {
 
@@ -26,6 +27,8 @@ public class NavigatorKeywordsActionsProvider extends CommonActionProvider {
     private ISelectionChangedListener listener;
 
     private ShowKeywordDocumentationAction showDocumentationAction;
+
+    private ShowKeywordSourceAction showSourceAction;
 
     @Override
     public void init(final ICommonActionExtensionSite site) {
@@ -38,6 +41,7 @@ public class NavigatorKeywordsActionsProvider extends CommonActionProvider {
             selectionProvider.addSelectionChangedListener(listener);
 
             showDocumentationAction = new ShowKeywordDocumentationAction(workbenchSite.getPage(), selectionProvider);
+            showSourceAction = new ShowKeywordSourceAction(workbenchSite.getPage(), selectionProvider);
         }
     }
 
@@ -46,6 +50,7 @@ public class NavigatorKeywordsActionsProvider extends CommonActionProvider {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
                 showDocumentationAction.updateEnablement((IStructuredSelection) event.getSelection());
+                showSourceAction.updateEnablement((IStructuredSelection) event.getSelection());
             }
         };
     }
@@ -59,11 +64,13 @@ public class NavigatorKeywordsActionsProvider extends CommonActionProvider {
     @Override
     public void fillActionBars(final IActionBars actionBars) {
         actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, showDocumentationAction);
+        actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, showSourceAction);
     }
 
     @Override
     public void fillContextMenu(final IMenuManager menu) {
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, showDocumentationAction);
+        menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, showSourceAction);
     }
 
 }

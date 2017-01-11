@@ -113,7 +113,7 @@ abstract class HyperlinksToKeywordsDetector {
                         break;
                     default:
                         definitionHyperlinks.add(new KeywordInLibrarySourceHyperlink(adjustedFromRegion,
-                                suiteFile.getFile().getProject(), keywordEntity.libSpec));
+                                suiteFile.getFile().getProject(), keywordEntity.libSpec, keywordEntity.kwSpec));
                         documentationHyperlinks.add(new KeywordDocumentationHyperlink(adjustedFromRegion,
                                 suiteFile.getFile().getProject(), keywordEntity.libSpec, keywordEntity.kwSpec));
                         break;

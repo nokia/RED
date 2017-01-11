@@ -23,7 +23,7 @@ public class RobotDryRunOutputParser implements ILineHandler {
     private static final String MESSAGE_EVENT_NAME = "message";
 
     private static final String LIBRARY_IMPORT_EVENT_NAME = "library_import";
-    
+
     private static final String START_SUITE_EVENT_NAME = "start_suite";
 
     private final ObjectMapper mapper;
@@ -31,12 +31,15 @@ public class RobotDryRunOutputParser implements ILineHandler {
     private Map<String, Object> parsedLine;
 
     private RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
-    
+
+    private final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
+
     private IDryRunStartSuiteHandler startSuiteHandler;
 
     public RobotDryRunOutputParser() {
         this.mapper = new ObjectMapper();
         this.parsedLine = new HashMap<String, Object>();
+        this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
 
     @SuppressWarnings("unchecked")
@@ -52,7 +55,7 @@ public class RobotDryRunOutputParser implements ILineHandler {
             final Map<String, Object> details = (Map<String, Object>) libraryImportList.get(1);
             String libraryName = (String) libraryImportList.get(0);
             final String originalName = (String) details.get("originalname");
-            if(originalName != null && !originalName.isEmpty() && !originalName.equals(libraryName)) {
+            if (originalName != null && !originalName.isEmpty() && !originalName.equals(libraryName)) {
                 libraryName = originalName;
             }
             final String importer = (String) details.get("importer");
@@ -62,23 +65,26 @@ public class RobotDryRunOutputParser implements ILineHandler {
             if (dryRunLibraryImportCollector != null) {
                 dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
             }
-            
+
         } else if (parsedLine.containsKey(MESSAGE_EVENT_NAME)) {
             final List<Object> messageList = (List<Object>) parsedLine.get(MESSAGE_EVENT_NAME);
             final Map<String, String> details = (Map<String, String>) messageList.get(0);
             final String messageLevel = details.get("level");
+            final String message = details.get("message");
 
-            if (dryRunLibraryImportCollector != null && messageLevel != null) {
-                if (messageLevel.equalsIgnoreCase("FAIL")) {
-                    String failMessage = details.get("message");
-                    dryRunLibraryImportCollector.collectFromFailMessageEvent(failMessage);
-
-                } else if (messageLevel.equalsIgnoreCase("ERROR")) {
-                    String errorMessage = details.get("message");
-                    dryRunLibraryImportCollector.collectFromErrorMessageEvent(errorMessage);
+            if (messageLevel != null) {
+                if (dryRunLibraryImportCollector != null) {
+                    if (messageLevel.equalsIgnoreCase("FAIL")) {
+                        dryRunLibraryImportCollector.collectFromFailMessageEvent(message);
+                    } else if (messageLevel.equalsIgnoreCase("ERROR")) {
+                        dryRunLibraryImportCollector.collectFromErrorMessageEvent(message);
+                    }
+                }
+                if (messageLevel.equalsIgnoreCase("NONE")) {
+                    dryRunLKeywordSourceCollector.collectFromMessageEvent(message);
                 }
             }
-            
+
         } else if (parsedLine.containsKey(START_SUITE_EVENT_NAME)) {
             final List<?> suiteList = (List<?>) parsedLine.get(START_SUITE_EVENT_NAME);
             final String suiteName = (String) suiteList.get(0);
@@ -92,7 +98,7 @@ public class RobotDryRunOutputParser implements ILineHandler {
         return dryRunLibraryImportCollector != null ? dryRunLibraryImportCollector.getImportedLibraries()
                 : new ArrayList<RobotDryRunLibraryImport>();
     }
-    
+
     public void filterImportedLibrariesByName(final String libraryName) {
         dryRunLibraryImportCollector.filterImportedLibrariesByName(libraryName);
     }
@@ -103,5 +109,9 @@ public class RobotDryRunOutputParser implements ILineHandler {
 
     public void setupRobotDryRunLibraryImportCollector(final Set<String> standardLibrariesNames) {
         dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(standardLibrariesNames);
+    }
+
+    public List<RobotDryRunKeywordSource> getKeywordSources() {
+        return dryRunLKeywordSourceCollector.getKeywordSources();
     }
 }

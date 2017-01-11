@@ -8,19 +8,14 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -29,28 +24,16 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.dryrun.IDryRunStartSuiteHandler;
-import org.rf.ide.core.dryrun.RobotDryRunHandler;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
-import org.rf.ide.core.dryrun.RobotDryRunOutputParser;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.ILineHandler;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
@@ -58,28 +41,17 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Pytho
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Optional;
-import com.google.common.io.Files;
 
 /**
  * @author mmarzec
  */
-public class LibrariesAutoDiscoverer {
+public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private IEventBroker eventBroker;
-
-    private final RobotProject robotProject;
-
-    private final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
-
-    private final RobotDryRunOutputParser dryRunOutputParser;
-
-    private final RobotDryRunHandler dryRunHandler;
 
     private boolean isSummaryWindowEnabled;
 
     private Optional<String> libraryNameToDiscover = Optional.absent();
-
-    private static AtomicBoolean isWorkspaceJobRunning = new AtomicBoolean(false);
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
             final IEventBroker eventBroker) {
@@ -96,16 +68,13 @@ public class LibrariesAutoDiscoverer {
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
             final boolean isSummaryWindowEnabled) {
-        this.robotProject = robotProject;
-        this.suiteFiles.addAll(suiteFiles);
+        super(robotProject, suiteFiles);
         this.isSummaryWindowEnabled = isSummaryWindowEnabled;
-        dryRunOutputParser = new RobotDryRunOutputParser();
-        dryRunOutputParser.setupRobotDryRunLibraryImportCollector(robotProject.getStandardLibraries().keySet());
-        dryRunHandler = new RobotDryRunHandler();
     }
 
-    public void start() {
-        if (isWorkspaceJobRunning.compareAndSet(false, true)) {
+    @Override
+    public void start(final Shell parent) {
+        if (isDryRunRunning.compareAndSet(false, true)) {
             final WorkspaceJob wsJob = new WorkspaceJob("Discovering libraries") {
 
                 @Override
@@ -118,16 +87,16 @@ public class LibrariesAutoDiscoverer {
 
                                 @Override
                                 public void run() {
-                                    new LibrariesAutoDiscovererWindow(getActiveShell(),
-                                            dryRunOutputParser.getImportedLibraries()).open();
+                                    new LibrariesAutoDiscovererWindow(parent, dryRunOutputParser.getImportedLibraries())
+                                            .open();
                                 }
                             });
                         }
                     } catch (final InvocationTargetException e) {
-                        MessageDialog.openError(getActiveShell(), "Discovering libraries",
+                        MessageDialog.openError(parent, "Discovering libraries",
                                 "Problems occurred during discovering libraries: " + e.getCause().getMessage());
                     } finally {
-                        isWorkspaceJobRunning.set(false);
+                        isDryRunRunning.set(false);
                     }
 
                     return Status.OK_STATUS;
@@ -142,80 +111,6 @@ public class LibrariesAutoDiscoverer {
             };
             wsJob.setUser(true);
             wsJob.schedule();
-        }
-    }
-
-    private void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException {
-
-        final SubMonitor subMonitor = SubMonitor.convert(monitor);
-        subMonitor.subTask("Preparing Robot dry run execution...");
-        subMonitor.setWorkRemaining(3);
-
-        final LibrariesSourcesCollector librariesSourcesCollector = collectPythonpathAndClasspathLocations();
-        subMonitor.worked(1);
-
-        final RunCommandLine dryRunCommandLine = createDryRunCommandLine(librariesSourcesCollector);
-        subMonitor.worked(1);
-
-        subMonitor.subTask("Executing Robot dry run...");
-        executeDryRun(dryRunCommandLine, subMonitor);
-        subMonitor.worked(1);
-
-        subMonitor.done();
-    }
-
-    private LibrariesSourcesCollector collectPythonpathAndClasspathLocations() throws InvocationTargetException {
-        boolean shouldCollectRecursively = true;
-        if (!RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()
-                && robotProject.getRuntimeEnvironment().isVirtualenv()) {
-            shouldCollectRecursively = false;
-        }
-        final LibrariesSourcesCollector librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
-        try {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(shouldCollectRecursively);
-        } catch (final CoreException e) {
-            throw new InvocationTargetException(e);
-        }
-        return librariesSourcesCollector;
-    }
-
-    private RunCommandLine createDryRunCommandLine(final LibrariesSourcesCollector librariesSourcesCollector)
-            throws InvocationTargetException {
-        final DryRunTargetsCollector dryRunTargetsCollector = new DryRunTargetsCollector();
-        dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations();
-
-        RunCommandLine runCommandLine = null;
-        try {
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            if (runtimeEnvironment == null) {
-                return null;
-            }
-            runCommandLine = dryRunHandler.buildDryRunCommand(runtimeEnvironment, getProjectLocationFile(),
-                    dryRunTargetsCollector.getSuiteNames(), librariesSourcesCollector.getPythonpathLocations(),
-                    librariesSourcesCollector.getClasspathLocations(),
-                    dryRunTargetsCollector.getAdditionalProjectsLocations());
-        } catch (final IOException e) {
-            throw new InvocationTargetException(e);
-        }
-        return runCommandLine;
-    }
-
-    private void executeDryRun(final RunCommandLine dryRunCommandLine, final SubMonitor subMonitor)
-            throws InvocationTargetException {
-        if (dryRunCommandLine != null) {
-            dryRunOutputParser.setStartSuiteHandler(new IDryRunStartSuiteHandler() {
-
-                @Override
-                public void processStartSuiteEvent(final String suiteName) {
-                    subMonitor.subTask("Executing Robot dry run on suite: " + suiteName);
-                }
-            });
-
-            final List<ILineHandler> dryRunOutputListeners = newArrayList();
-            dryRunOutputListeners.add(dryRunOutputParser);
-            dryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputListeners);
-
-            dryRunHandler.executeDryRunProcess(dryRunCommandLine, getProjectLocationFile());
         }
     }
 
@@ -400,90 +295,6 @@ public class LibrariesAutoDiscoverer {
                 addedLibs.add(library);
                 dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ADDED, "");
             }
-        }
-    }
-
-    private static Shell getActiveShell() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        final IWorkbenchWindow workbenchWindow = workbench.getActiveWorkbenchWindow();
-        return workbenchWindow != null ? workbenchWindow.getShell() : null;
-    }
-
-    private File getProjectLocationFile() {
-        File file = null;
-        final IPath projectLocation = robotProject.getProject().getLocation();
-        if (projectLocation != null) {
-            file = projectLocation.toFile();
-        }
-        return file;
-    }
-
-    public void addSuiteFileToDiscovering(final IResource suiteFile) {
-        synchronized (suiteFiles) {
-            if (!suiteFiles.contains(suiteFile)) {
-                suiteFiles.add(suiteFile);
-            }
-        }
-    }
-
-    public boolean hasSuiteFilesToDiscovering() {
-        return !suiteFiles.isEmpty();
-    }
-
-    private class DryRunTargetsCollector {
-
-        private final List<String> suiteNames = newArrayList();
-
-        private final List<String> additionalProjectsLocations = newArrayList();
-
-        public void collectSuiteNamesAndAdditionalProjectsLocations() {
-            final List<String> resourcesPaths = newArrayList();
-            for (final IResource resource : suiteFiles) {
-                RobotSuiteFile suiteFile = null;
-                if (resource.getType() == IResource.FILE) {
-                    suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
-                }
-                if (suiteFile != null && suiteFile.isResourceFile()) {
-                    final IPath resourceFilePath = RedWorkspace.Paths
-                            .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
-                    resourcesPaths.add(resourceFilePath.toString());
-                } else {
-                    if (resource.isLinked()) {
-                        collectLinkedSuiteNamesAndProjectsLocations(resource);
-                    } else {
-                        suiteNames.add(RobotLaunchConfigurationDelegate.createSuiteName(resource));
-                    }
-                }
-            }
-            if (!resourcesPaths.isEmpty()) {
-                final File tempSuiteFileWithResources = dryRunHandler.createTempSuiteFile(resourcesPaths);
-                if (tempSuiteFileWithResources != null) {
-                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithResources.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFileWithResources.getParent());
-                }
-            }
-        }
-
-        private void collectLinkedSuiteNamesAndProjectsLocations(final IResource resource) {
-            final IPath linkedFileLocation = resource.getLocation();
-            if (linkedFileLocation != null) {
-                final File linkedFile = linkedFileLocation.toFile();
-                if (linkedFile.exists()) {
-                    suiteNames.add(Files.getNameWithoutExtension(linkedFile.getName()));
-                    final String linkedFileParentPath = linkedFile.getParent();
-                    if (!additionalProjectsLocations.contains(linkedFileParentPath)) {
-                        additionalProjectsLocations.add(linkedFileParentPath);
-                    }
-                }
-            }
-        }
-
-        public List<String> getSuiteNames() {
-            return suiteNames;
-        }
-
-        public List<String> getAdditionalProjectsLocations() {
-            return additionalProjectsLocations;
         }
     }
 

@@ -13,6 +13,7 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -56,25 +58,28 @@ import org.robotframework.red.swt.SwtThread.Evaluation;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 
 public class RobotProject extends RobotContainer {
 
     private RobotProjectHolder projectHolder;
-    
+
     private Map<String, LibrarySpecification> stdLibsSpecs;
     private Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs;
     private List<ReferencedVariableFile> referencedVariableFiles;
-    
+
     private RobotProjectConfig configuration;
 
     private final LibrariesWatchHandler librariesWatchHandler;
+
+    private final Map<String, RobotDryRunKeywordSource> kwSources = new HashMap<>();
 
     RobotProject(final IProject project) {
         super(null, project);
         librariesWatchHandler = new LibrariesWatchHandler(this);
     }
-    
+
     public synchronized RobotProjectHolder getRobotProjectHolder() {
         if (projectHolder == null) {
             projectHolder = new RobotProjectHolder(getRuntimeEnvironment());
@@ -86,7 +91,7 @@ public class RobotProject extends RobotContainer {
     public RobotParser getEagerRobotParser() {
         return RobotParser.createEager(getRobotProjectHolder(), createPathsProvider());
     }
-    
+
     public RobotParser getRobotParser() {
         return RobotParser.create(getRobotProjectHolder(), createPathsProvider());
     }
@@ -179,7 +184,7 @@ public class RobotProject extends RobotContainer {
     public synchronized void unregisterWatchingOnReferencedLibraries(final List<ReferencedLibrary> libraries) {
         librariesWatchHandler.unregisterLibraries(libraries);
     }
-    
+
     public void clearDirtyLibSpecs(final Collection<LibrarySpecification> libSpecs) {
         librariesWatchHandler.removeDirtySpecs(libSpecs);
     }
@@ -247,7 +252,7 @@ public class RobotProject extends RobotContainer {
         }
         return configuration;
     }
-    
+
     public synchronized RobotProjectConfig getRobotProjectConfig() {
         readProjectConfigurationIfNeeded();
         return configuration;
@@ -255,7 +260,7 @@ public class RobotProject extends RobotContainer {
 
     /**
      * Returns the configuration model from opened editor.
-     * 
+     *
      * @return opened configuration
      */
     public RobotProjectConfig getOpenedProjectConfig() {
@@ -304,6 +309,7 @@ public class RobotProject extends RobotContainer {
         referencedVariableFiles = null;
         stdLibsSpecs = null;
         refLibsSpecs = null;
+        kwSources.clear();
     }
 
     public synchronized RobotRuntimeEnvironment getRuntimeEnvironment() {
@@ -333,7 +339,7 @@ public class RobotProject extends RobotContainer {
     public synchronized List<File> getModuleSearchPaths() {
         return getRobotProjectHolder().getModuleSearchPaths();
     }
-    
+
     public synchronized List<String> getPythonpath() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
@@ -358,7 +364,7 @@ public class RobotProject extends RobotContainer {
         }
         return newArrayList();
     }
-    
+
     public synchronized List<String> getClasspath() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
@@ -384,12 +390,12 @@ public class RobotProject extends RobotContainer {
         }
         return newArrayList(".");
     }
-    
+
     public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
         final Map<String, LibrarySpecification> stdLibs = getStandardLibraries();
         return isLibraryFrom(spec, stdLibs == null ? null : stdLibs.values());
     }
-    
+
     public synchronized boolean isReferencedLibrary(final LibrarySpecification spec) {
         final Map<ReferencedLibrary, LibrarySpecification> refLibs = getReferencedLibraries();
         return isLibraryFrom(spec, refLibs == null ? null : refLibs.values());
@@ -406,7 +412,7 @@ public class RobotProject extends RobotContainer {
         }
         return false;
     }
-    
+
     public synchronized String getPythonLibraryPath(final String libName) {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
@@ -419,7 +425,7 @@ public class RobotProject extends RobotContainer {
         }
         return "";
     }
-    
+
     public List<String> getVariableFilePaths() {
         readProjectConfigurationIfNeeded();
 
@@ -435,7 +441,7 @@ public class RobotProject extends RobotContainer {
         }
         return list;
     }
-    
+
     @VisibleForTesting
     public void setReferencedVariablesFiles(final List<ReferencedVariableFile> varFiles) {
         this.referencedVariableFiles = varFiles;
@@ -489,6 +495,17 @@ public class RobotProject extends RobotContainer {
             librariesWatchHandler.clearRemovedSpecs();
             getRuntimeEnvironment().resetCommandExecutors();    //needed when user will add a library again after removal
         }
+    }
+
+    public void updateKeywordSources(final List<RobotDryRunKeywordSource> keywordSources) {
+        for (final RobotDryRunKeywordSource keywordSource : keywordSources) {
+            final String qualifiedKwName = keywordSource.getLibraryName() + "." + keywordSource.getName();
+            kwSources.put(qualifiedKwName, keywordSource);
+        }
+    }
+
+    public Optional<RobotDryRunKeywordSource> getKeywordSource(final String qualifiedKwName) {
+        return Optional.fromNullable(kwSources.get(qualifiedKwName));
     }
 
     private class ProjectPathsProvider implements PathsProvider {
