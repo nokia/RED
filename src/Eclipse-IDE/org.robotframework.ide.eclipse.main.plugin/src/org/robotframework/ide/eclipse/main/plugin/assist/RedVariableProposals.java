@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newLinkedHashSet;
-import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByOriginAndNames;
+import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByTypesAndOrigin;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,7 +57,7 @@ public class RedVariableProposals {
 
     public List<? extends AssistProposal> getVariableProposals(final String userContent,
             final RobotFileInternalElement element) {
-        return getVariableProposals(userContent, sortedByOriginAndNames(), element);
+        return getVariableProposals(userContent, sortedByTypesAndOrigin(), element);
     }
 
     public List<? extends AssistProposal> getVariableProposals(final String userContent,
@@ -73,7 +73,7 @@ public class RedVariableProposals {
     }
 
     public List<? extends AssistProposal> getVariableProposals(final String userContent, final int offset) {
-        return getVariableProposals(userContent, sortedByOriginAndNames(), offset);
+        return getVariableProposals(userContent, sortedByTypesAndOrigin(), offset);
     }
 
     public List<? extends AssistProposal> getVariableProposals(final String userContent,
