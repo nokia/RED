@@ -111,8 +111,7 @@ public class SourceOpeningSupport {
             final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
             desc = editorRegistry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
             if (desc == null) {
-                throw new EditorOpeningException(
-                        "Unable to open editor for file: " + file.getName() + ". No suitable editor.");
+                throw new EditorOpeningException("No suitable editor for file: " + file.getName());
             }
         }
         return page.openEditor(new FileEditorInput(file), desc.getId());
@@ -122,8 +121,7 @@ public class SourceOpeningSupport {
         try {
             openInEditor(page, file);
         } catch (final PartInitException e) {
-            throw new EditorOpeningException(
-                    "Unable to open editor for file: " + file.getName() + ". No suitable editor.", e);
+            throw new EditorOpeningException("Unable to open editor for file: " + file.getName(), e);
         }
     }
 
@@ -138,8 +136,8 @@ public class SourceOpeningSupport {
             final IDocumentProvider documentProvider = editor.getDocumentProvider();
             final IDocument document = documentProvider.getDocument(editor.getEditorInput());
             final IRegion lineInformation = document.getLineInformation(line);
-            editor.getSelectionProvider()
-                    .setSelection(new TextSelection(lineInformation.getOffset(), lineInformation.getLength()));
+            final TextSelection selection = new TextSelection(lineInformation.getOffset(), lineInformation.getLength());
+            editor.getSelectionProvider().setSelection(selection);
         } catch (final BadLocationException e) {
             throw new LineSelectionException("Unable to select line: " + line, e);
         }
