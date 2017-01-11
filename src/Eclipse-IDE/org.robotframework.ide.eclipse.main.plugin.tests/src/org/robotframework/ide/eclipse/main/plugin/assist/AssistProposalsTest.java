@@ -370,21 +370,31 @@ public class AssistProposalsTest {
     }
 
     @Test
-    public void byLabelsAndOriginComparator_isSortingVariableProposalsFirstlyByOriginAndThenByNames() {
+    public void byTypesAndOriginComparator_isSortingVariableProposalsFirstlyByTypesThenByOriginAndFinallyByNames() {
         final List<RedVariableProposal> proposals = newArrayList(
-                varProposal("Xyz3", VariableOrigin.BUILTIN),
-                varProposal("Xyz2", VariableOrigin.IMPORTED),
-                varProposal("Xyz1", VariableOrigin.LOCAL),
-                varProposal("abc3", VariableOrigin.BUILTIN),
-                varProposal("abc2", VariableOrigin.IMPORTED),
-                varProposal("abc1", VariableOrigin.LOCAL),
-                varProposal("klm3", VariableOrigin.BUILTIN),
-                varProposal("klm2", VariableOrigin.IMPORTED),
-                varProposal("klm1", VariableOrigin.LOCAL));
-        Collections.sort(proposals, AssistProposals.sortedByOriginAndNames());
+                varProposal("${Xyz3}", VariableOrigin.BUILTIN),
+                varProposal("@{Xyz3}", VariableOrigin.BUILTIN),
+                varProposal("${Xyz2}", VariableOrigin.IMPORTED),
+                varProposal("@{Xyz2}", VariableOrigin.IMPORTED),
+                varProposal("${Xyz1}", VariableOrigin.LOCAL),
+                varProposal("@{Xyz1}", VariableOrigin.LOCAL),
+                varProposal("${abc3}", VariableOrigin.BUILTIN),
+                varProposal("@{abc3}", VariableOrigin.BUILTIN),
+                varProposal("${abc2}", VariableOrigin.IMPORTED),
+                varProposal("@{abc2}", VariableOrigin.IMPORTED),
+                varProposal("${abc1}", VariableOrigin.LOCAL),
+                varProposal("@{abc1}", VariableOrigin.LOCAL),
+                varProposal("${klm3}", VariableOrigin.BUILTIN),
+                varProposal("@{klm3}", VariableOrigin.BUILTIN),
+                varProposal("${klm2}", VariableOrigin.IMPORTED),
+                varProposal("@{klm2}", VariableOrigin.IMPORTED),
+                varProposal("${klm1}", VariableOrigin.LOCAL),
+                varProposal("@{klm1}", VariableOrigin.LOCAL));
+        Collections.sort(proposals, AssistProposals.sortedByTypesAndOrigin());
 
-        assertThat(transform(proposals, toLabel())).containsExactly("abc1", "klm1", "Xyz1", "abc2", "klm2", "Xyz2",
-                "abc3", "klm3", "Xyz3");
+        assertThat(transform(proposals, toLabel())).containsExactly("${abc1}", "${abc2}", "${klm1}", "${klm2}",
+                "${Xyz1}", "${Xyz2}", "${abc3}", "${klm3}", "${Xyz3}", "@{abc1}", "@{abc2}", "@{klm1}", "@{klm2}",
+                "@{Xyz1}", "@{Xyz2}", "@{abc3}", "@{klm3}", "@{Xyz3}");
     }
 
     @Test

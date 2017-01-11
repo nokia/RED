@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 
+import java.util.Objects;
+
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -24,7 +26,7 @@ class Proposals {
         return new Condition<ICompletionProposal>() {
             @Override
             public boolean matches(final ICompletionProposal proposal) {
-                return proposal.getImage().equals(image);
+                return Objects.equals(proposal.getImage(), image);
             }
         };
     }
