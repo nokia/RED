@@ -6,7 +6,8 @@ from robot.running.model import TestCase, Keyword
 from robot.running.namespace import Namespace
 import robot.running.importer
 from robot.running import TestLibrary
-from robot.running.testlibraries import _BaseTestLibrary
+from robot.running.testlibraries import _BaseTestLibrary, _DynamicLibrary
+from robot.running.handlers import _DynamicHandler, _JavaHandler
 from types import MethodType
 from threading import Lock
 from robot.running.builder import TestSuiteBuilder
@@ -97,6 +98,7 @@ class MyIMPORTER(object):
         self.func = None
         self.lock = Lock()
         self.cached_lib_items = list()
+        self.cached_kw_items = set()
 
     def __getattr__(self, name):
         self.lock.acquire()
@@ -164,14 +166,15 @@ class MyIMPORTER(object):
                     self.cached_lib_items.append(lib)
 
                 for p in errors:
-                    msg = Message(message='{LIB_ERROR: ' + argser[0] + ', value: VALUE_START(' + str(
-                        p) + ')VALUE_END, lib_file_import:' +
-                                          str(result.source) + '}', level='FAIL')
-                    LOGGER.message(msg)
+                    msg = '{LIB_ERROR: ' + argser[0] + ', value: VALUE_START(' + str(
+                        p) + ')VALUE_END, lib_file_import:' + str(result.source) + '}'
+                    LOGGER.message(Message(message=msg, level='FAIL'))
             else:
                 result = func(*argser, **kwargs)
         else:
             result = func(self.obj, *argser, **kwargs)
+
+        self._handle_keywords(result)
 
         return result
 
@@ -182,3 +185,32 @@ class MyIMPORTER(object):
         except:
             ''' (type, value, traceback) '''
             errors.append(sys.exc_info())
+
+    def _handle_keywords(self, library):
+        if library and hasattr(library, 'handlers'):
+            for keyword in library.handlers:
+                if keyword not in self.cached_kw_items and not isinstance(keyword, _JavaHandler):
+                    self.cached_kw_items.add(keyword)
+                    import json
+                    keyword_source = PythonKeywordSource(keyword)
+                    msg = json.dumps({'keyword': dict(keyword_source.__dict__)}, sort_keys=True)
+                    LOGGER.message(Message(message=msg, level='NONE'))
+
+
+class PythonKeywordSource(object):
+    def __init__(self, keyword):
+        import inspect
+        self.name = keyword.name
+        self.library_name = keyword.library.name
+        function = self._find_function(keyword)
+        self.file_path = inspect.getfile(function)
+        self.line_number = inspect.getsourcelines(function)[1]
+
+    @staticmethod
+    def _find_function(keyword):
+        if isinstance(keyword, _DynamicHandler):
+            return keyword.library._libcode.__dict__[keyword._run_keyword_method_name]
+        elif keyword._method:
+            return keyword._method
+        else:
+            return keyword.current_handler()

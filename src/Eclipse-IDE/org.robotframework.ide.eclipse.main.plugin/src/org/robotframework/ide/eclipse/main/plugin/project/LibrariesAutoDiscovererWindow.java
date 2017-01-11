@@ -47,18 +47,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
+import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.TreeContentProvider;
@@ -85,7 +79,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private StyledText detailsText;
 
-    private List<RobotDryRunLibraryImport> importedLibraries;
+    private final List<RobotDryRunLibraryImport> importedLibraries;
 
     public LibrariesAutoDiscovererWindow(final Shell parent, final List<RobotDryRunLibraryImport> importedLibraries) {
         super(parent);
@@ -176,8 +170,9 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
             @Override
             public void keyReleased(final KeyEvent e) {
-                if (e.keyCode == SWT.F3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1)
+                if (e.keyCode == SWT.F3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
                     handleFileOpeningEvent();
+                }
             }
         });
 
@@ -187,14 +182,16 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             @Override
             public void mouseDown(final MouseEvent e) {
                 if (e.button == 3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1
-                        && getOpenableFilePath().isPresent())
+                        && getOpenableFilePath().isPresent()) {
                     menu.setVisible(true);
+                }
             }
 
             @Override
             public void mouseDoubleClick(final MouseEvent e) {
-                if (e.button == 1 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1)
+                if (e.button == 1 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
                     handleFileOpeningEvent();
+                }
             }
         });
     }
@@ -215,45 +212,35 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     private void handleFileOpeningEvent() {
-        Optional<String> filePath = getOpenableFilePath();
+        final Optional<String> filePath = getOpenableFilePath();
         if (filePath.isPresent()) {
-            Optional<IFile> openableFile = getOpenableFile(filePath.get());
-            if (openableFile.isPresent())
-                openFileInEditor(openableFile.get());
+            final Optional<IFile> openableFile = getOpenableFile(filePath.get());
+            if (openableFile.isPresent()) {
+                final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                SourceOpeningSupport.tryToOpenInEditor(page, openableFile.get());
+            }
         }
     }
 
     private Optional<String> getOpenableFilePath() {
         final TreeSelection selection = (TreeSelection) discoveredLibrariesViewer.getSelection();
         if (selection != null && selection.getFirstElement() instanceof DryRunLibraryImportChildElement) {
-            DryRunLibraryImportChildElement childElement = (DryRunLibraryImportChildElement) selection
+            final DryRunLibraryImportChildElement childElement = (DryRunLibraryImportChildElement) selection
                     .getFirstElement();
-            if (childElement.isOpenableFilePath())
+            if (childElement.isOpenableFilePath()) {
                 return Optional.of(childElement.getValue());
+            }
         }
         return Optional.absent();
     }
 
-    private static Optional<IFile> getOpenableFile(String filePath) {
+    private static Optional<IFile> getOpenableFile(final String filePath) {
         final IPath path = new Path(filePath);
         final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
-        if (file != null && file.exists())
+        if (file != null && file.exists()) {
             return Optional.of(file);
-        return Optional.absent();
-    }
-
-    private void openFileInEditor(IFile file) {
-        try {
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            IEditorDescriptor descriptor = IDE.getEditorDescriptor(file);
-            if (!descriptor.isInternal()) {
-                final IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
-                descriptor = registry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
-            }
-            page.openEditor(new FileEditorInput(file), descriptor.getId());
-        } catch (PartInitException e) {
-            throw new RobotEditorOpeningException("Unable to open editor for file: " + file.getName(), e);
         }
+        return Optional.absent();
     }
 
     private void createDetailsComposite(final Composite mainComposite) {
@@ -379,7 +366,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 }
                 final String childElementValue = libraryImportChildElement.getValue();
                 if (childElementValue != null && !childElementValue.isEmpty()) {
-                    if (libraryImportChildElement.isOpenableFilePath())
+                    if (libraryImportChildElement.isOpenableFilePath()) {
                         label.append(new StyledString(childElementValue, new Styler() {
 
                             @Override
@@ -388,8 +375,9 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                                 textStyle.foreground = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
                             }
                         }));
-                    else
+                    } else {
                         label.append(childElementValue);
+                    }
                 }
             } else if (element instanceof DryRunLibraryImportListChildElement) {
                 label = new StyledString(((DryRunLibraryImportListChildElement) element).getName(), new Styler() {
@@ -459,9 +447,9 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         private String name;
 
-        private String value;
+        private final String value;
 
-        private boolean isOpenableFilePath;
+        private final boolean isOpenableFilePath;
 
         public DryRunLibraryImportChildElement(final String name, final String value) {
             this(name, value, false);
@@ -507,7 +495,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         private String name;
 
-        private List<DryRunLibraryImportChildElement> list = new ArrayList<>();
+        private final List<DryRunLibraryImportChildElement> list = new ArrayList<>();
 
         public DryRunLibraryImportListChildElement(final String name, final List<String> list) {
             if (name != null) {

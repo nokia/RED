@@ -8,14 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 
 /**
  * @author Michal Anglart
@@ -51,20 +46,8 @@ public class FileHyperlink implements IHyperlink {
 
     @Override
     public void open() {
-        try {
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            IEditorDescriptor desc = IDE.getEditorDescriptor(destinationFile);
-            if (!desc.isInternal()) {
-                // we don't want to open files with external editors (e.g. running script files etc)
-                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                desc = editorRegistry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
-            }
-            if (desc != null) {
-                page.openEditor(new FileEditorInput(destinationFile), desc.getId());
-            }
-        } catch (final PartInitException e) {
-            // nothing to do in such case
-        }
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        SourceOpeningSupport.tryToOpenInEditor(page, destinationFile);
     }
 
 }

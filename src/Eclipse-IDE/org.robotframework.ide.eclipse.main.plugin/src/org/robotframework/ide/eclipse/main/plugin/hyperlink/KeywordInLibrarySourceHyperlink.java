@@ -13,8 +13,9 @@ import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -32,17 +33,21 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     private final LibrarySpecification libSpec;
 
-    public KeywordInLibrarySourceHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec) {
-        this(RedPlugin.getModelManager().getModel(), from, project, libSpec);
+    private final KeywordSpecification kwSpec;
+
+    public KeywordInLibrarySourceHyperlink(final IRegion from, final IProject project,
+            final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
+        this(RedPlugin.getModelManager().getModel(), from, project, libSpec, kwSpec);
     }
 
     @VisibleForTesting
     KeywordInLibrarySourceHyperlink(final RobotModel model, final IRegion from, final IProject project,
-            final LibrarySpecification libSpec) {
+            final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
         this.model = model;
         this.source = from;
         this.project = project;
         this.libSpec = libSpec;
+        this.kwSpec = kwSpec;
     }
 
     @VisibleForTesting
@@ -72,7 +77,7 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     @Override
     public String additionalLabelDecoration() {
-        return "[" + ShowLibrarySourceAction.extractLibraryLocation(model, project, libSpec) + "]";
+        return "[" + SourceOpeningSupport.extractLibraryLocation(model, project, libSpec) + "]";
     }
 
     @Override
@@ -83,6 +88,6 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
     @Override
     public void open() {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        ShowLibrarySourceAction.openLibrarySource(page, model, project, libSpec);
+        SourceOpeningSupport.open(page, model, project, libSpec, kwSpec);
     }
 }

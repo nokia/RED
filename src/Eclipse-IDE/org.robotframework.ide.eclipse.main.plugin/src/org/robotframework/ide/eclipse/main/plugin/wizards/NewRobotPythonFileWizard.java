@@ -7,16 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin.wizards;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 
 /**
  * @author Michal Anglart
@@ -50,35 +45,10 @@ public class NewRobotPythonFileWizard extends BasicNewResourceWizard {
         final IFile newFile = mainPage.createNewFile();
         selectAndReveal(newFile);
 
-        try {
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            IEditorDescriptor desc = IDE.getEditorDescriptor(newFile);
-            if (!desc.isInternal()) {
-                // we don't want to open .py file with interpreter, so if there
-                // is no internal editor, then we will use default text editor
-                final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                desc = editorRegistry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
-                if (desc == null) {
-                    throw new EditorOpeningException("Unable to open editor for file: " + newFile.getName());
-                }
-            }
-            page.openEditor(new FileEditorInput(newFile), desc.getId());
-        } catch (final PartInitException e) {
-            throw new EditorOpeningException("Unable to open editor for file: " + newFile.getName(), e);
-        }
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        SourceOpeningSupport.tryToOpenInEditor(page, newFile);
 
         return true;
-    }
-
-    private static class EditorOpeningException extends RuntimeException {
-
-        public EditorOpeningException(final String msg) {
-            super(msg);
-        }
-
-        public EditorOpeningException(final String msg, final PartInitException cause) {
-            super(msg, cause);
-        }
     }
 
 }
