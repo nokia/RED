@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _57l1QPPsEeSRSqmeMHfJYA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/25/16 4:45 PM
+Save-Time: 1/11/17 4:14 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -23,7 +23,7 @@ Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | key-type F2
 
-if [ $is_product | eq true]{
+//if [ $is_product | eq true]{
 	// Rename file - file name is selected without extension - this is for product
 	with [get-window "Rename Resource"] {
 	    with [get-editbox -after [get-label "New name:"]] {
@@ -31,14 +31,14 @@ if [ $is_product | eq true]{
 	    }
 	    get-button OK | click
 	}
-}-else{
-	with [get-window "Rename Resource"] {
-	    with [get-editbox -after [get-label "New name:"]] {
-	        type-text "New.1.robot"
-	    }
-	    get-button OK | click
-	}
-}
+//}-else{
+//	with [get-window "Rename Resource"] {
+//	    with [get-editbox -after [get-label "New name:"]] {
+//	        type-text "New.1.robot"
+//	    }
+//	    get-button OK | click
+//	}
+//}
 // check if file extension is preserved, file should have .robot extension , not .1
 with [get-view "Project Explorer" | get-tree] {
     get-item RobotProject | get-property "getItems().length" | equals 4 | verify-true
