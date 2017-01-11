@@ -125,9 +125,9 @@ public class SourceOpeningSupport {
         }
     }
 
-    private static void handleOpeningError(final LibrarySpecification libSpec, final Throwable e) {
+    private static void handleOpeningError(final LibrarySpecification libSpec, final Throwable cause) {
         final String message = "Unable to open editor for library:\n" + libSpec.getName();
-        final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e.getCause());
+        final Status status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause);
         StatusManager.getManager().handle(status, StatusManager.SHOW);
     }
 
