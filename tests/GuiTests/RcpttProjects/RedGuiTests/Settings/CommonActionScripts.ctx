@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 1:58 PM
+Save-Time: 1/10/17 5:31 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -15,9 +15,6 @@ Entry-Name: .ecl.context
 //--------------------------- settings -----------------------------------------------------------------------------------------------------------------------
 //make full screen
 get-eclipse-window | maximize 
-
-
-
 
 
 proc "restore-interpreters"{
@@ -50,6 +47,10 @@ proc "os-specific" [val windowsValue] [val linuxValue]
 	echo [get-by-os -win $windowsValue -linux $linuxValue]
 }
 
+proc replace [val input] [val old] [val new]{
+	$input |str| invoke replace $old $new
+
+}
 
 //get python path: "C:\Pyhon27"
 global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os.path; print(os.path.dirname(sys.executable))" ]]
@@ -87,6 +88,8 @@ substitute-variables "${eclipse_home}" | let [val eclipse_home_path -input]{
 }
 
 global [val RED_workspace_path [get-workspace-location]]
+global [val RED_workspace_path_unix_style [replace $RED_workspace_path -old "\\" -new "/"]]
+
 global [val user_folder [get-java-property "user.home"]]
 
 global [val sys_sep [os-specific "\\" "/"]]
@@ -122,10 +125,7 @@ proc "check-debug-marker-on-ruler" [val line] [val script_name]{
 
 }
 
-proc replace [val input] [val old] [val new]{
-	$input |str| invoke replace $old $new
 
-}
 
 
 proc "compare-message-log2" [val ref_content]{
