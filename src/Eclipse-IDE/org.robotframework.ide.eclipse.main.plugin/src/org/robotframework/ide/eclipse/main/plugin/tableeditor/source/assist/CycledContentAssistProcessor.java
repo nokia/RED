@@ -21,7 +21,8 @@ import org.eclipse.jface.text.contentassist.ICompletionListenerExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistProcessor;
 import org.eclipse.swt.widgets.Display;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
@@ -47,6 +48,11 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         this.processors = newArrayList();
         this.currentPage = 0;
         this.canReopenAssitantProgramatically = false;
+    }
+
+    @VisibleForTesting
+    void setCanReopenAssitantProgramatically(final boolean canReopenAssitantProgramatically) {
+        this.canReopenAssitantProgramatically = canReopenAssitantProgramatically;
     }
 
     public void addProcessor(final RedContentAssistProcessor processor) {
@@ -163,19 +169,13 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     }
 
     @Override
-    public String toString() {
-        final String string = super.toString();
-        return string.substring(string.lastIndexOf('@'));
-    }
-
-    @Override
     public void selectionChanged(final ICompletionProposal proposal, final boolean smartToggle) {
         // nothing to do here
     }
 
     @Override
     public char[] getCompletionProposalAutoActivationCharacters() {
-        return RedPlugin.getDefault().getPreferences().getAssistantAutoActivationChars();
+        return assistContext.getAssistantAutoActivationChars();
     }
 
     public interface AssitantCallbacks {
