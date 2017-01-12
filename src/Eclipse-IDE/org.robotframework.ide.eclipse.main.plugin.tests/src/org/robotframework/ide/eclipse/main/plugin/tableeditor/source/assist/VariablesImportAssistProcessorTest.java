@@ -67,7 +67,7 @@ public class VariablesImportAssistProcessorTest {
     }
 
     @Test
-    public void resourcesImportsProcessorIsValidOnlyForKeywordsOrCasesSections() {
+    public void variablesImportsProcessorIsValidOnlyForSettingsSection() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
         final VariablesImportAssistProcessor processor = new VariablesImportAssistProcessor(createAssitant(model));
 
@@ -75,7 +75,7 @@ public class VariablesImportAssistProcessorTest {
     }
 
     @Test
-    public void resourcesImportsProcessorHasTitleDefined() {
+    public void variablesImportsProcessorHasTitleDefined() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
         final VariablesImportAssistProcessor processor = new VariablesImportAssistProcessor(createAssitant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
