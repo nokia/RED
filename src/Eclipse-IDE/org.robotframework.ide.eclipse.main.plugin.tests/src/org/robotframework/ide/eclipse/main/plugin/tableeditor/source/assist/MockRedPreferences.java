@@ -15,16 +15,24 @@ public class MockRedPreferences extends RedPreferences {
 
     private String separatorToUseInTsv;
 
+    private char[] assistantAutoActivationChars;
+
     MockRedPreferences(final boolean isKeywordPrefixAutoAdditionEnabled, final String separatorToUse) {
-        this(isKeywordPrefixAutoAdditionEnabled, separatorToUse, separatorToUse);
+        this(isKeywordPrefixAutoAdditionEnabled, separatorToUse, separatorToUse, new char[0]);
+    }
+
+    MockRedPreferences(final boolean isKeywordPrefixAutoAdditionEnabled, final String separatorToUse,
+            final char[] assistantAutoActivationChars) {
+        this(isKeywordPrefixAutoAdditionEnabled, separatorToUse, separatorToUse, assistantAutoActivationChars);
     }
 
     MockRedPreferences(final boolean isKeywordPrefixAutoAdditionEnabled, final String separatorToUseInRobot,
-            final String separatorToUseInTsv) {
+            final String separatorToUseInTsv, final char[] assistantAutoActivationChars) {
         super(null);
         this.isKeywordPrefixAutoAdditionEnabled = isKeywordPrefixAutoAdditionEnabled;
         this.separatorToUseInRobot = separatorToUseInRobot;
         this.separatorToUseInTsv = separatorToUseInTsv;
+        this.assistantAutoActivationChars = assistantAutoActivationChars;
     }
 
     @Override
@@ -47,5 +55,14 @@ public class MockRedPreferences extends RedPreferences {
 
     void setSeparatorToUseInTsv(final String separator) {
         this.separatorToUseInTsv = separator;
+    }
+
+    @Override
+    public char[] getAssistantAutoActivationChars() {
+        return assistantAutoActivationChars;
+    }
+
+    void setAssistatntAutoActivationChars(final char[] assistantAutoActivationChars) {
+        this.assistantAutoActivationChars = assistantAutoActivationChars;
     }
 }
