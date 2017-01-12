@@ -22,6 +22,16 @@ import com.google.common.base.Function;
  */
 class Proposals {
 
+    static Condition<? super ICompletionProposal> activatingAssistantAfterAccept() {
+        return new Condition<ICompletionProposal>() {
+
+            @Override
+            public boolean matches(final ICompletionProposal proposal) {
+                return ((RedCompletionProposalAdapter) proposal).shouldActivateAssitantAfterAccepting();
+            }
+        };
+    }
+
     static Condition<? super ICompletionProposal> proposalWithImage(final Image image) {
         return new Condition<ICompletionProposal>() {
             @Override
