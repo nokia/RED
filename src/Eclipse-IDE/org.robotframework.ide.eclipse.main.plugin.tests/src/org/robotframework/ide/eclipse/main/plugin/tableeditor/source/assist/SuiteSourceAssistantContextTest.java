@@ -114,6 +114,28 @@ public class SuiteSourceAssistantContextTest {
         verify(preferences, times(2)).getSeparatorToUse(true);
     }
 
+    @Test
+    public void contextCachesAutoActivationCharsPreference() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnlyTsv();
+        final MockRedPreferences preferences = spy(new MockRedPreferences(true, "\t", new char[] { 'a', 'b', 'c' }));
+
+        final SuiteSourceAssistantContext context = createContext(model, preferences);
+        for (int i = 0; i < 10; i++) {
+            assertThat(context.getAssistantAutoActivationChars()).containsExactly('a', 'b', 'c');
+        }
+
+        preferences.setAssistatntAutoActivationChars(new char[] { 'x', 'y', 'z' });
+        for (int i = 0; i < 10; i++) {
+            assertThat(context.getAssistantAutoActivationChars()).containsExactly('a', 'b', 'c');
+        }
+
+        context.refreshPreferences();
+        for (int i = 0; i < 10; i++) {
+            assertThat(context.getAssistantAutoActivationChars()).containsExactly('x', 'y', 'z');
+        }
+        verify(preferences, times(2)).getAssistantAutoActivationChars();
+    }
+
     private SuiteSourceAssistantContext createContext(final RobotSuiteFile model) {
         return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
             @Override
