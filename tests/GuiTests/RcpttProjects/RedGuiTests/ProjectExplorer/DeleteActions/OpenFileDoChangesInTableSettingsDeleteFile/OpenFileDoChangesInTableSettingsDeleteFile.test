@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _MMpZgPPnEeSRSqmeMHfJYA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/10/16 5:38 PM
+Save-Time: 1/12/17 4:41 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -35,11 +35,9 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 get-window "Delete Resources" | get-button OK | click
 
 //when deleteing a dirty file, there should be no Save window
-if [ $is_product | eq true]{
-	verify-error {get-window "Save Resource"}
-}-else{
-	get-window "Save Resource" | get-button No | click
-}
+
+verify-error {get-window "Save Resource"}
+
 	
 
 // when file is deleted, file should not exist in Project Explorer
