@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aNEgIET5EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/13/16 3:47 PM
+Save-Time: 1/12/17 9:41 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -177,7 +177,7 @@ repeat -times 3 -command{
 
 get-editor "TestFile.robot" | maximize
 
-check-row-for-test-setup-default -file "TestFile.robot" -row 1  -setting "Suite Setup" -c1 "Convert To Hex" -c2 "${False}" -c3 "${CURDIR}" -c4 "&{EMPTY}" -c5 "@{TEST_TAGS}"
+check-row-for-test-setup-default -file "TestFile.robot" -row 1  -setting "Suite Setup" -c1 "Convert To Hex" -c2 "${False}" -c3 "${CURDIR}" -c4 "@{EMPTY}" -c5 "&{SUITE_METADATA}"
 check-row-for-test-setup-default -file "TestFile.robot" -row 2  -setting "Suite Teardown"
 check-row-for-test-setup-default -file "TestFile.robot" -row 3  -setting "Test Setup"
 check-row-for-test-setup-default -file "TestFile.robot" -row 4  -setting "Test Teardown"
