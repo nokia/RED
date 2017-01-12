@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OdaRMJbhEeaa4JtzzKMFzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/24/16 5:26 PM
+Save-Time: 1/12/17 3:48 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -23,19 +23,15 @@ proc "wait-for-thread"{
 		}
 }
 proc "skip-all-bp-and-check-selection" [val is_selected true]{
-	if [$is_product | eq true]{
-		get-button "Skip All Breakpoints (M1+M3+B)"  | click
-		get-button "Skip All Breakpoints (M1+M3+B)" | get-property selected| equals $is_selected | verify-true
-	}-else{
-		get-button "Skip All Breakpoints"  | click
-		get-button "Skip All Breakpoints" | get-property selected | equals $is_selected | verify-true
-	}
+	get-button "Skip All Breakpoints (M1+M3+B)"  | click
+	get-button "Skip All Breakpoints (M1+M3+B)" | get-property selected| equals $is_selected | verify-true
 }
 	
 //open Debug perspective and switch on skipping all BP
 get-button "Open Perspective" | click
 get-window "Open Perspective" | get-table | select Debug | double-click
 wait 1000
+
 
 skip-all-bp-and-check-selection 
 
