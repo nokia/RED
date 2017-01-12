@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/22/16 12:11 PM
+Save-Time: 1/12/17 9:36 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -135,7 +135,7 @@ get-editor "ResourcesFromFolder.robot" | get-text-viewer | get-property text | e
     + "@{list_form_resource_in_PP}    item1    item2\n"
     + "&{dict_from_resource_in_PP}    key=value" | verify-true
 
-//check link to fole with noe extension
+//check link to file with no extension
 with [get-editor "test.robot"] {
     click
     with [get-text-viewer] {
@@ -193,19 +193,18 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[2].getText()" | equals "ResourceProject/res/res1/no_resource.robot" | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "ResourceProject/res/res_with_vars/res_with_vars.robot" 
         | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "ResourceProject/res/txt_res/res.txt" | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
 }
 
-//close window, open again and check if user cannot add itself
+//close window, open again and add 4th path
 with [get-editor "res.txt" | get-text-viewer] {
     set-caret-pos 2 13
     key-type "M1+SPACE"
-    key-type Down -times 4
+    key-type Down -times 3
     key-type Enter
 }
 get-editor "res.txt" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Resource    \n"
+    + "Resource    ../res_with_vars/res_with_vars.robot\n"
     + "*** Keywords ***\n"
     + "kw from txt file\n"
     + "    log  7" | verify-true
