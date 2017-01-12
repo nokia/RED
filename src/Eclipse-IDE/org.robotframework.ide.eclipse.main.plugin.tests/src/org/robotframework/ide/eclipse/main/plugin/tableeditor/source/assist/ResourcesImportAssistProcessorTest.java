@@ -67,7 +67,7 @@ public class ResourcesImportAssistProcessorTest {
     }
 
     @Test
-    public void resourcesImportsProcessorIsValidOnlyForKeywordsOrCasesSections() {
+    public void resourcesImportsProcessorIsValidOnlyForSettingsSection() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
         final ResourcesImportAssistProcessor processor = new ResourcesImportAssistProcessor(createAssitant(model));
 
