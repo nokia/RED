@@ -58,6 +58,10 @@ public class SuiteSourceAssistantContext {
         return assistPreferences.isKeywordPrefixAutoAdditionEnabled();
     }
 
+    public char[] getAssistantAutoActivationChars() {
+        return assistPreferences.getAssistantAutoActivationChars();
+    }
+
     static class AssistPreferences {
 
         // caches interesting preferences
@@ -67,6 +71,7 @@ public class SuiteSourceAssistantContext {
         private boolean isKeywordPrefixAutoAdditionEnabled;
         private String separatorToUseInTsv;
         private String separatorToUseInRobot;
+        private char[] autoActivationChars;
 
         AssistPreferences(final RedPreferences redPreferences) {
             this.redPreferences = redPreferences;
@@ -77,14 +82,19 @@ public class SuiteSourceAssistantContext {
             isKeywordPrefixAutoAdditionEnabled = redPreferences.isAssistantKeywordPrefixAutoAdditionEnabled();
             separatorToUseInRobot = redPreferences.getSeparatorToUse(false);
             separatorToUseInTsv = redPreferences.getSeparatorToUse(true);
+            autoActivationChars = redPreferences.getAssistantAutoActivationChars();
         }
 
-        public String getSeparatorToFollow(final boolean isTsvFile) {
+        String getSeparatorToFollow(final boolean isTsvFile) {
             return isTsvFile ? separatorToUseInTsv : separatorToUseInRobot;
         }
 
-        public boolean isKeywordPrefixAutoAdditionEnabled() {
+        boolean isKeywordPrefixAutoAdditionEnabled() {
             return isKeywordPrefixAutoAdditionEnabled;
+        }
+
+        public char[] getAssistantAutoActivationChars() {
+            return autoActivationChars;
         }
     }
 }
