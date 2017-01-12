@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qW9rQKJrEeWiTrudgyrHcQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/22/16 4:15 PM
+Save-Time: 1/12/17 4:26 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -182,24 +182,28 @@ with [get-view "Project Explorer" | get-tree] {
 
 //removed added class
 with [get-editor "here_is_class.py"] {
-    click
     with [get-text-viewer] {
         set-caret-pos 23 21
         select-range 23 25 21 1
-        key-type BackSpace
-        key-type "M1+s"
     }
+    get-text-viewer | key-type BackSpace
 }
-
-//check if window with error was shown
-get-window "Regenerating library specification" 
-    | get-label "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Animal'Detailed information:Importing test library 'here_is_class.Animal' failed: Module 'here_is_class' does not contain 'Animal'.Try --help for usage information." 
-    | get-property caption 
-    | equals "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Animal'\n"
-    + "Detailed information:\n"
-    + "Importing test library 'here_is_class.Animal' failed: Module 'here_is_class' does not contain 'Animal'.\n\n"
-    + "Try --help for usage information." | verify-true
-get-window "Regenerating library specification" | get-button OK | click
+exec-with-options {
+    get-editor "here_is_class.py" | get-text-viewer | key-type "M1+s"
+    get-window "Problem Occurred" 
+        | get-label "Unable to generate library specification file for library 'here_is_class.Animal'" 
+        | get-property caption 
+        | equals "Unable to generate library specification file for library 'here_is_class.Animal'" | verify-true
+    get-window "Problem Occurred" | get-label "See 'Details' for more information." | get-property caption 
+        | equals "See 'Details' for more information." | verify-true
+    get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property "getText()" 
+        | equals "Unable to generate library specification file for library 'here_is_class.Animal'\n"
+        + "Importing test library 'here_is_class.Animal' failed: Module 'here_is_class' does not contain 'Animal'.\n\n"
+        + "Try --help for usage information." | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
 
 //revert
 with [get-editor "here_is_class.py" | get-text-viewer] {
