@@ -27,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 
-@Ignore
 public class CycledContentAssistProcessorTest {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -203,6 +202,7 @@ public class CycledContentAssistProcessorTest {
         verifyZeroInteractions(callback);
     }
 
+    @Ignore
     @Test
     public void completionProposalAssistantIsOpened_whenAppliedProposalRequiresIt_1() {
         final AssistPreferences assistPreferences = new AssistPreferences(
@@ -222,6 +222,7 @@ public class CycledContentAssistProcessorTest {
         verify(callback).openCompletionProposals();
     }
 
+    @Ignore
     @Test
     public void completionProposalAssistantIsOpened_whenAppliedProposalRequiresIt_2() {
         final AssistPreferences assistPreferences = new AssistPreferences(
