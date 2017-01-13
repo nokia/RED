@@ -47,8 +47,6 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         final Style caseStyle = createStyle(preferences, SyntaxHighlightingCategory.DEFINITION);
         final Style settingStyle = createStyle(preferences, SyntaxHighlightingCategory.SETTING);
-        // final Style callStyle = createStyle(preferences,
-        // SyntaxHighlightingCategory.KEYWORD_CALL);
         
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
@@ -64,12 +62,6 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
                 CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.SELECT,
                 CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
-        // configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, callStyle,
-        // DisplayMode.NORMAL,
-        // CasesElementsInTreeLabelAccumulator.CASE_CALL_CONFIG_LABEL);
-        // configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, callStyle,
-        // DisplayMode.SELECT,
-        // CasesElementsInTreeLabelAccumulator.CASE_CALL_CONFIG_LABEL);
         
         final ImageDescriptor caseImage = isEditable ? RedImages.getTestCaseImage()
                 : RedImages.getGreyedImage(RedImages.getTestCaseImage());
