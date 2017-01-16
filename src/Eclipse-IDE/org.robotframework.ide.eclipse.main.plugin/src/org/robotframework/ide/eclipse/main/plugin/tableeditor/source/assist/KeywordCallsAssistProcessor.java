@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
 import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
 import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 
 /**
@@ -40,11 +41,8 @@ import com.google.common.base.Joiner;
  */
 public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
-    private final KeywordsAssistantTarget target;
-
-    public KeywordCallsAssistProcessor(final SuiteSourceAssistantContext assist, final KeywordsAssistantTarget target) {
+    public KeywordCallsAssistProcessor(final SuiteSourceAssistantContext assist) {
         super(assist);
-        this.target = target;
     }
 
     @Override
@@ -54,39 +52,15 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<String> getApplicableContentTypes() {
-        if (target == KeywordsAssistantTarget.CODE) {
-            return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
-                    SuiteSourcePartitionScanner.KEYWORDS_SECTION);
-        } else {
-            return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
-        }
+        return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+                SuiteSourcePartitionScanner.KEYWORDS_SECTION);
     }
 
     @Override
     protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
-        if (!isInApplicableContentType(document, offset)) {
-            return false;
-        }
-        final int noOfSeparators = DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile());
-        if (target == KeywordsAssistantTarget.CODE) {
-            return noOfSeparators > 0;
-        } else {
-            return noOfSeparators == 1 && isKeywordBasedSetting(lineContent);
-        }
-    }
-
-    private boolean isKeywordBasedSetting(final String lineContent) {
-        return startsWithOptionalSpace(lineContent, "test template")
-                || startsWithOptionalSpace(lineContent, "suite setup")
-                || startsWithOptionalSpace(lineContent, "suite teardown")
-                || startsWithOptionalSpace(lineContent, "test setup")
-                || startsWithOptionalSpace(lineContent, "test teardown");
-    }
-
-    private boolean startsWithOptionalSpace(final String string, final String potentialPrefix) {
-        return string.toLowerCase().startsWith(potentialPrefix.toLowerCase())
-                || string.toLowerCase().startsWith(" " + potentialPrefix.toLowerCase());
+        return isInApplicableContentType(document, offset)
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0;
     }
 
     @Override
@@ -116,12 +90,9 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return proposals;
     }
 
-    protected List<String> getArguments(final AssistProposal proposal, final String lineContent) {
-        if (startsWithOptionalSpace(lineContent, "test template")) {
-            return new ArrayList<>();
-        } else {
-            return proposal.getArguments();
-        }
+    protected List<String> getArguments(final AssistProposal proposal,
+            @SuppressWarnings("unused") final String lineContent) {
+        return proposal.getArguments();
     }
 
     private Collection<Runnable> createOperationsToPerformAfterAccepting(final ITextViewer viewer,
@@ -130,35 +101,38 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
             @Override
             public void run() {
-                final AssistProposal proposal = (AssistProposal) entity;
-                final String keywordName = entity.getNameFromDefinition();
+                final Collection<IRegion> regionsToLinkedEdit = calculateRegionsForLinkedMode(entity, startOffset,
+                        lineContent);
+                if (!regionsToLinkedEdit.isEmpty()) {
+                    SwtThread.asyncExec(new Runnable() {
 
-                final Collection<IRegion> regionsToLinkedEdit;
-                if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
-                    regionsToLinkedEdit = calculateRegionsForLinkedModeForEmbeddedKeyword(startOffset,
-                            proposal.getContent());
-                } else {
-                    final int separatorLength = assist.getSeparatorToFollow().length();
-                    regionsToLinkedEdit = calculateRegionsForLinkedModeForRegularKeyword(startOffset,
-                            proposal.getContent(), getArguments(proposal, lineContent), separatorLength);
+                        @Override
+                        public void run() {
+                            RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
+                        }
+                    });
                 }
-                if (regionsToLinkedEdit.isEmpty()) {
-                    return;
-                }
-
-                SwtThread.asyncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
-                    }
-                });
             }
         };
         return newArrayList(operation);
     }
 
-    private Collection<IRegion> calculateRegionsForLinkedModeForEmbeddedKeyword(final int startOffset,
+    @VisibleForTesting
+    Collection<IRegion> calculateRegionsForLinkedMode(final KeywordEntity entity, final int startOffset,
+            final String lineContent) {
+        final AssistProposal proposal = (AssistProposal) entity;
+        final String keywordName = entity.getNameFromDefinition();
+
+        if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
+            return calculateRegionsForLinkedModeOfEmbeddedKeyword(startOffset, proposal.getContent());
+        } else {
+            final int separatorLength = assist.getSeparatorToFollow().length();
+            return calculateRegionsForLinkedModeOfRegularKeyword(startOffset, proposal.getContent(),
+                    getArguments(proposal, lineContent), separatorLength);
+        }
+    }
+
+    private Collection<IRegion> calculateRegionsForLinkedModeOfEmbeddedKeyword(final int startOffset,
             final String wholeContent) {
         final Collection<IRegion> regions = new ArrayList<>();
         final Matcher matcher = Pattern.compile("\\$\\{[^\\}]+\\}").matcher(wholeContent);
@@ -168,7 +142,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return regions;
     }
 
-    private Collection<IRegion> calculateRegionsForLinkedModeForRegularKeyword(final int startOffset,
+    private Collection<IRegion> calculateRegionsForLinkedModeOfRegularKeyword(final int startOffset,
             final String wholeContent, final List<String> arguments, final int separatorLength) {
         final Collection<IRegion> regions = new ArrayList<>();
         int offset = startOffset + wholeContent.length();
@@ -180,10 +154,5 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             offset += requiredArg.length() + separatorLength;
         }
         return regions;
-    }
-
-    public static enum KeywordsAssistantTarget {
-        CODE, // proposals in user keywords or test cases
-        SETTINGS // proposals in general settings
     }
 }
