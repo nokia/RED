@@ -53,9 +53,9 @@ public class RedCompletionProposalAdapterTest {
         final DocumentationModification modification3 = new DocumentationModification("", new Position(30),
                 new ArrayList<Runnable>());
         final DocumentationModification modification4 = new DocumentationModification("", new Position(40),
-                new Point(100, 200), new ArrayList<Runnable>());
+                new Position(100, 200), new ArrayList<Runnable>());
         final DocumentationModification modification5 = new DocumentationModification("", new Position(50),
-                new Point(100, 200), true, new ArrayList<Runnable>());
+                new Position(100, 200), true, new ArrayList<Runnable>());
 
         final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, modification1);
         assertThat(adapter1.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(10);
@@ -227,7 +227,7 @@ public class RedCompletionProposalAdapterTest {
     @Test
     public void selectionIsTakenFromModification_whenProvided() {
         final DocumentationModification modification = new DocumentationModification("", new Position(0),
-                new Point(42, 84), new ArrayList<Runnable>());
+                new Position(42, 84), new ArrayList<Runnable>());
 
         final RedCompletionProposalAdapter adapter = new RedCompletionProposalAdapter(null, modification);
         assertThat(adapter.getSelection(mock(IDocument.class))).isEqualTo(new Point(42, 84));

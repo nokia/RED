@@ -94,6 +94,10 @@ public class AssistProposals {
         return new RedCodeReservedWordProposal(word, match);
     }
 
+    static RedWithNameProposal createWithNameProposal(final String word, final ProposalMatch match) {
+        return new RedWithNameProposal(word, match);
+    }
+
     static RedImportProposal createResourceImportInCodeProposal(final String nameToUse, final String bddPrefix,
             final ProposalMatch match) {
         return new RedImportProposal(nameToUse, bddPrefix, ModelType.RESOURCE_IMPORT_SETTING, match);

@@ -73,7 +73,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
     @Override
     public Point getSelection(final IDocument document) {
         if (modification.toSelect != null) {
-            return modification.toSelect;
+            return new Point(modification.toSelect.getOffset(), modification.toSelect.getLength());
         }
         final int x = modification.toReplace.offset + adaptedProposal.getContent().length()
                 + modification.contentSuffix.length();
@@ -135,7 +135,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
         public boolean activateAssistant;
 
-        private final Point toSelect;
+        private final Position toSelect;
 
         public Collection<Runnable> operationsAfterAccepting;
 
@@ -148,7 +148,12 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
             this(contentSuffix, toReplace, null, shouldActivate, new ArrayList<Runnable>());
         }
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace, final Point toSelect,
+        public DocumentationModification(final String contentSuffix, final Position toReplace,
+                final Position toSelect) {
+            this(contentSuffix, toReplace, toSelect, false, new ArrayList<Runnable>());
+        }
+
+        public DocumentationModification(final String contentSuffix, final Position toReplace, final Position toSelect,
                 final Collection<Runnable> operationsAfterAccepting) {
             this(contentSuffix, toReplace, toSelect, false, operationsAfterAccepting);
         }
@@ -158,7 +163,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
             this(contentSuffix, toReplace, null, false, operationsAfterAccepting);
         }
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace, final Point toSelect,
+        public DocumentationModification(final String contentSuffix, final Position toReplace, final Position toSelect,
                 final boolean activateAssistant, final Collection<Runnable> operationsAfterAccepting) {
             this.contentSuffix = contentSuffix;
             this.toReplace = toReplace;

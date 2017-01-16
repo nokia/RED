@@ -70,6 +70,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Suit
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.WithNameAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableRowCallRule;
@@ -213,6 +214,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
+        final WithNameAssistProcessor withNameAssistProcessor = new WithNameAssistProcessor(assistContext);
         final LibrariesImportAssistProcessor libraryImportsProcessor = new LibrariesImportAssistProcessor(assistContext);
         final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(
                 assistContext);
@@ -222,7 +224,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
-        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(libraryImportsProcessor,
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(withNameAssistProcessor,
+                libraryImportsProcessor,
                 variableImportsProcessor, resourceImportsProcessor, sectionsAssistProcessor, settingNamesProcessor,
                 keywordsAssistProcessor, variablesAssistProcessor);
 
@@ -336,12 +339,13 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final SettingsAssistProcessor settingsAssistProcessor = new SettingsAssistProcessor(assistContext);
         final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
+        final WithNameAssistProcessor withNameAssistProcessor = new WithNameAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(variableDefsAssistProcessor,
+                importsInCodeAssistProcessor, variablesAssistProcessor,
                 sectionsAssistProcessor, generalSettingNamesProcessor, libraryImportsProcessor,
                 variableImportsProcessor, resourceImportsProcessor, keywordCallsAssistProcessor1,
-                settingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor2,
-                importsInCodeAssistProcessor, variablesAssistProcessor);
+                settingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor2, withNameAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
