@@ -61,7 +61,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Cycl
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.GeneralSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInCodeAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor.KeywordsAssistantTarget;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LibrariesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
@@ -218,8 +218,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 assistContext);
         final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
                 assistContext);
-        final KeywordCallsAssistProcessor keywordsAssistProcessor = new KeywordCallsAssistProcessor(assistContext,
-                KeywordsAssistantTarget.SETTINGS);
+        final KeywordCallsAssistProcessor keywordsAssistProcessor = new KeywordCallsInSettingsAssistProcessor(
+                assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(libraryImportsProcessor,
@@ -262,8 +262,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext,
-                KeywordsAssistantTarget.CODE);
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
                 assistContext);
         final SettingsAssistProcessor tcSettingsAssistProcessor = new SettingsAssistProcessor(assistContext);
@@ -289,8 +288,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext,
-                KeywordsAssistantTarget.CODE);
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
                 assistContext);
         final SettingsAssistProcessor kwSettingsAssistProcessor = new SettingsAssistProcessor(assistContext);
@@ -330,10 +328,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 assistContext);
         final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
                 assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor1 = new KeywordCallsAssistProcessor(assistContext,
-                KeywordsAssistantTarget.SETTINGS);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor2 = new KeywordCallsAssistProcessor(assistContext,
-                KeywordsAssistantTarget.CODE);
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor1 = new KeywordCallsInSettingsAssistProcessor(
+                assistContext);
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor2 = new KeywordCallsAssistProcessor(assistContext);
         final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
                 assistContext);
         final SettingsAssistProcessor settingsAssistProcessor = new SettingsAssistProcessor(assistContext);
