@@ -46,7 +46,8 @@ public class KeywordSearcher {
                 final Iterator<T> iterator = keywords.iterator();
                 for (int i = 0; i < keywords.size() && iterator.hasNext(); i++) {
                     final T keyword = iterator.next();
-                    final String keywordNameFromKeywordDefinition = extractor.keywordName(keyword);
+                    final String keywordNameFromKeywordDefinition = QualifiedKeywordName
+                            .unifyDefinition(extractor.keywordName(keyword));
                     if (name.equalsIgnoreCase(keywordNameFromKeywordDefinition)) {
                         matchNameWhole.add(keyword);
                     }
