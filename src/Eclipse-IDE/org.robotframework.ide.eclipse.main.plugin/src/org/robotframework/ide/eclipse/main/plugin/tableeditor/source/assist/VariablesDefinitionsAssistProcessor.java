@@ -18,7 +18,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.swt.graphics.Point;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposals;
@@ -81,7 +80,8 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
             final String additionalContent = atTheEndOfLine
                     ? separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args) + separator) : "";
 
-            final Point toSelect = new Point(offset - prefix.length() + 2, newVarProposal.getContent().length() - 3);
+            final Position toSelect = new Position(offset - prefix.length() + 2,
+                    newVarProposal.getContent().length() - 3);
 
             final IRegion lineInfo = document.getLineInformationOfOffset(offset);
             final Collection<IRegion> regions = atTheEndOfLine

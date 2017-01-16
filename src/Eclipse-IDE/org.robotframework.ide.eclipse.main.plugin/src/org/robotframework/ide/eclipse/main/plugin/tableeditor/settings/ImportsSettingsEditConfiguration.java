@@ -12,6 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProp
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProposalsProvider.ResourceFileLocationsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProposalsProvider.VariableFileLocationsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.VariableProposalsProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.WithNameElementsProposalsProvider;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 
@@ -32,6 +33,7 @@ class ImportsSettingsEditConfiguration extends AbstractRegistryConfiguration {
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new VariableFileLocationsProposalsProvider(suiteFile, dataProvider),
                 new ResourceFileLocationsProposalsProvider(suiteFile, dataProvider),
+                new WithNameElementsProposalsProvider(dataProvider),
                 new LibrariesProposalsProvider(suiteFile, dataProvider),
                 new VariableProposalsProvider(suiteFile, dataProvider));
 
