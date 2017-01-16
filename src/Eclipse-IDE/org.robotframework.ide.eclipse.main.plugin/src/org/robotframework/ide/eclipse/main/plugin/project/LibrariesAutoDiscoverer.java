@@ -105,7 +105,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 @Override
                 protected void canceling() {
                     isSummaryWindowEnabled = false;
-                    dryRunHandler.destroyDryRunProcess();
+                    destroyDryRunProcess();
                     this.cancel();
                 }
             };
