@@ -45,16 +45,16 @@ public class CombinedAssistProcessor extends RedContentAssistProcessor {
     @Override
     protected List<ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
         final List<ICompletionProposal> proposals = newArrayList();
-        boolean noProposalsFound = true;
+        boolean proposalsFound = false;
 
         for (final RedContentAssistProcessor processor : processors) {
             final List<? extends ICompletionProposal> newProposals = processor.computeProposals(viewer, offset);
             if (newProposals != null) {
-                noProposalsFound = false;
+                proposalsFound = true;
                 proposals.addAll(newProposals);
             }
         }
-        return noProposalsFound && proposals.isEmpty() ? null : proposals;
+        return !proposalsFound && proposals.isEmpty() ? null : proposals;
     }
 
     @Override
