@@ -21,11 +21,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.widgets.Display;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
+import org.robotframework.red.swt.SwtThread;
 
 public class CycledContentAssistProcessorTest {
 
@@ -202,7 +202,6 @@ public class CycledContentAssistProcessorTest {
         verifyZeroInteractions(callback);
     }
 
-    @Ignore
     @Test
     public void completionProposalAssistantIsOpened_whenAppliedProposalRequiresIt_1() {
         final AssistPreferences assistPreferences = new AssistPreferences(
@@ -222,7 +221,6 @@ public class CycledContentAssistProcessorTest {
         verify(callback).openCompletionProposals();
     }
 
-    @Ignore
     @Test
     public void completionProposalAssistantIsOpened_whenAppliedProposalRequiresIt_2() {
         final AssistPreferences assistPreferences = new AssistPreferences(
@@ -271,5 +269,15 @@ public class CycledContentAssistProcessorTest {
         while (Display.getDefault().readAndDispatch()) {
             ;
         }
+
+        // injecting empty operation, so that all the events awaiting in queue for SWT thread
+        // will be for sure executed
+        SwtThread.syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                // nothing to do
+            }
+        });
     }
 }
