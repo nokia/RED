@@ -39,8 +39,8 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                             startDiscovering(monitor);
                             robotProject.updateKeywordSources(dryRunOutputParser.getKeywordSources());
                         } catch (final InvocationTargetException e) {
-                            MessageDialog.openError(parent, "Discovering libraries",
-                                    "Problems occurred during discovering libraries: " + e.getCause().getMessage());
+                            MessageDialog.openError(parent, "Discovering keywords",
+                                    "Problems occurred during discovering keywords: " + e.getCause().getMessage());
                         } finally {
                             stopDryRun();
                         }
