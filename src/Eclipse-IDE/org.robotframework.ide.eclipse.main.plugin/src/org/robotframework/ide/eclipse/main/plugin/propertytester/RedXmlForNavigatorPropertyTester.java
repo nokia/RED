@@ -9,7 +9,6 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -63,7 +62,7 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     private boolean isExcluded(final IResource projectElement, RobotProjectConfig config) {
         if (config != null) {
             return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
-        } else
+        }
             return false;
     }
 

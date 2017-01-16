@@ -65,7 +65,6 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
                 decoration.addSuffix(" [excluded]");
                 decoration.setForegroundColor(ColorsManager.getColor(200, 200, 200));
                 removeMarkers(resource);
-
             }
         }
     }
