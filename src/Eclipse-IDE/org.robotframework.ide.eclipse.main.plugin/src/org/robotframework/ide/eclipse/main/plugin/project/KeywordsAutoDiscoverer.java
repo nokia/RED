@@ -27,7 +27,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     public void start(final Shell parent) {
-        if (isDryRunRunning.compareAndSet(false, true)) {
+        if (startDryRun()) {
             try {
                 new ProgressMonitorDialog(parent).run(true, true, new IRunnableWithProgress() {
 
@@ -42,7 +42,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                             MessageDialog.openError(parent, "Discovering libraries",
                                     "Problems occurred during discovering libraries: " + e.getCause().getMessage());
                         } finally {
-                            isDryRunRunning.set(false);
+                            stopDryRun();
                         }
                     }
                 });

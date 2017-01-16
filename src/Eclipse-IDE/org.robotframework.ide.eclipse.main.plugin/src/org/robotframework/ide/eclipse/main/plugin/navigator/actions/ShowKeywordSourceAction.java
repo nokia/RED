@@ -39,8 +39,7 @@ public class ShowKeywordSourceAction extends Action implements IEnablementUpdati
         final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
         final LibrarySpecification libSpec = RedPlugin
                 .getAdapter(selection.getPaths()[0].getParentPath().getLastSegment(), LibrarySpecification.class);
-        final KeywordSpecification kwSpec = Selections
-                .getSingleElement((IStructuredSelection) selectionProvider.getSelection(), KeywordSpecification.class);
+        final KeywordSpecification kwSpec = Selections.getSingleElement(selection, KeywordSpecification.class);
         final IProject project = RedPlugin.getAdapter(selection.getPaths()[0].getFirstSegment(), IProject.class);
 
         SourceOpeningSupport.open(page, RedPlugin.getModelManager().getModel(), project, libSpec, kwSpec);

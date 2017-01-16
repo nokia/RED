@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 
 /**
  * @author mmarzec
@@ -25,13 +26,13 @@ class MessageLogParser implements ILineHandler {
 
     private final ObjectMapper mapper;
 
-    private Map<String, Object> parsedLine;
+    private Map<String, List<?>> eventMap;
 
     private final ILineHandler lineHandler;
 
     MessageLogParser(final ILineHandler lineHandler) {
         this.mapper = new ObjectMapper();
-        this.parsedLine = new HashMap<String, Object>();
+        this.eventMap = new HashMap<String, List<?>>();
         this.lineHandler = lineHandler;
     }
 
@@ -39,27 +40,22 @@ class MessageLogParser implements ILineHandler {
     @Override
     public void processLine(final String line) {
         try {
-            parsedLine = mapper.readValue(line, Map.class);
+            eventMap = mapper.readValue(line, new TypeReference<Map<String, List<?>>>() {
+            });
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        if (parsedLine.containsKey(LOG_MESSAGE_EVENT_NAME)) {
-            final Map<String, String> elements = extractElementsFromLine(parsedLine, LOG_MESSAGE_EVENT_NAME, 0);
+        if (eventMap.containsKey(LOG_MESSAGE_EVENT_NAME)) {
+            final Map<String, String> elements = (Map<String, String>) eventMap.get(LOG_MESSAGE_EVENT_NAME).get(0);
             lineHandler.processLine(
                     elements.get("timestamp") + " : " + elements.get("level") + " : " + elements.get("message") + '\n');
-        } else if (parsedLine.containsKey(START_TEST_EVENT_NAME)) {
-            final Map<String, String> elements = extractElementsFromLine(parsedLine, START_TEST_EVENT_NAME, 1);
+        } else if (eventMap.containsKey(START_TEST_EVENT_NAME)) {
+            final Map<String, String> elements = (Map<String, String>) eventMap.get(START_TEST_EVENT_NAME).get(1);
             lineHandler.processLine("Starting test: " + elements.get("longname") + '\n');
-        } else if (parsedLine.containsKey(END_TEST_EVENT_NAME)) {
-            final Map<String, String> elements = extractElementsFromLine(parsedLine, END_TEST_EVENT_NAME, 1);
+        } else if (eventMap.containsKey(END_TEST_EVENT_NAME)) {
+            final Map<String, String> elements = (Map<String, String>) eventMap.get(END_TEST_EVENT_NAME).get(1);
             lineHandler.processLine("Ending test: " + elements.get("longname") + '\n');
             lineHandler.processLine("\n");
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, String> extractElementsFromLine(final Map<String, Object> map, final String lineName, final int elementsPosition) {
-        final List<Object> list = (List<Object>) map.get(lineName);
-        return (Map<String, String>) list.get(elementsPosition);
     }
 }
