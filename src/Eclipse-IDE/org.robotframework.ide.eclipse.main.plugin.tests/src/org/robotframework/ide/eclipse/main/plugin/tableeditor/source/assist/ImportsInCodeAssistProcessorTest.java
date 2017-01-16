@@ -43,7 +43,7 @@ import com.google.common.base.Supplier;
 public class ImportsInCodeAssistProcessorTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(LibrariesImportAssistProcessorTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(ImportsInCodeAssistProcessorTest.class);
 
     private static RobotModel robotModel;
 

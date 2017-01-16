@@ -38,7 +38,7 @@ import com.google.common.base.Supplier;
 public class SettingsAssistProcessorTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(SectionsAssistProcessorTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(SettingsAssistProcessorTest.class);
 
     @Test
     public void settingsProcessorIsValidOnlyForVariablesSection() {
