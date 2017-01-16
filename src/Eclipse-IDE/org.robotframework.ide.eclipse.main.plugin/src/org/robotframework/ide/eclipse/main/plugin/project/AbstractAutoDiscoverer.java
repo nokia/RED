@@ -45,17 +45,17 @@ import com.google.common.io.Files;
  */
 public abstract class AbstractAutoDiscoverer {
 
-    static final AtomicBoolean isDryRunRunning = new AtomicBoolean(false);
+    private static final AtomicBoolean isDryRunRunning = new AtomicBoolean(false);
 
-    final RobotProject robotProject;
+    protected final RobotProject robotProject;
 
-    final RobotDryRunOutputParser dryRunOutputParser;
+    protected final RobotDryRunOutputParser dryRunOutputParser;
 
-    final RobotDryRunHandler dryRunHandler;
+    protected final RobotDryRunHandler dryRunHandler;
 
     private final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles) {
+    protected AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles) {
         this.robotProject = robotProject;
         this.dryRunOutputParser = new RobotDryRunOutputParser();
         this.dryRunOutputParser.setupRobotDryRunLibraryImportCollector(robotProject.getStandardLibraries().keySet());
@@ -70,9 +70,17 @@ public abstract class AbstractAutoDiscoverer {
         start(parent);
     }
 
-    abstract void start(final Shell parent);
+    protected abstract void start(final Shell parent);
 
-    void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException {
+    protected final boolean startDryRun() {
+        return isDryRunRunning.compareAndSet(false, true);
+    }
+
+    protected final void stopDryRun() {
+        isDryRunRunning.set(false);
+    }
+
+    protected void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException {
 
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");

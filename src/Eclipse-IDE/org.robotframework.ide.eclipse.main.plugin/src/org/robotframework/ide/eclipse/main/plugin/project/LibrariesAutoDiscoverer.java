@@ -74,7 +74,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     public void start(final Shell parent) {
-        if (isDryRunRunning.compareAndSet(false, true)) {
+        if (startDryRun()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Discovering libraries") {
 
                 @Override
@@ -96,7 +96,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         MessageDialog.openError(parent, "Discovering libraries",
                                 "Problems occurred during discovering libraries: " + e.getCause().getMessage());
                     } finally {
-                        isDryRunRunning.set(false);
+                        stopDryRun();
                     }
 
                     return Status.OK_STATUS;

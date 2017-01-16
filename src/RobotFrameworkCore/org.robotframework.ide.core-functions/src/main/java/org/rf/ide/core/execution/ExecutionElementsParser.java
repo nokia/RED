@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
 import org.rf.ide.core.executor.ILineHandler;
 
@@ -21,8 +22,7 @@ import org.rf.ide.core.executor.ILineHandler;
 public class ExecutionElementsParser implements ILineHandler {
 
     public static final String ROBOT_EXECUTION_PASS_STATUS = "PASS";
-    
-    
+
     private static final String START_SUITE_EVENT = "start_suite";
 
     private static final String END_SUITE_EVENT = "end_suite";
@@ -30,18 +30,18 @@ public class ExecutionElementsParser implements ILineHandler {
     private static final String START_TEST_EVENT = "start_test";
 
     private static final String END_TEST_EVENT = "end_test";
-    
+
     private static final String OUTPUT_FILE_EVENT = "output_file";
 
     private final ObjectMapper mapper;
 
-    private Map<String, Object> eventMap;
+    private Map<String, List<?>> eventMap;
 
     private final IExecutionHandler executionHandler;
 
     public ExecutionElementsParser(final IExecutionHandler executionHandler) {
         this.mapper = new ObjectMapper();
-        this.eventMap = new HashMap<String, Object>();
+        this.eventMap = new HashMap<String, List<?>>();
         this.executionHandler = executionHandler;
     }
 
@@ -49,11 +49,12 @@ public class ExecutionElementsParser implements ILineHandler {
     @Override
     public void processLine(final String line) {
         try {
-            eventMap = mapper.readValue(line, Map.class);
+            eventMap = mapper.readValue(line, new TypeReference<Map<String, List<?>>>() {
+            });
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        
+
         final String eventType = getEventType(eventMap);
         if (eventType == null) {
             return;
@@ -61,34 +62,35 @@ public class ExecutionElementsParser implements ILineHandler {
 
         switch (eventType) {
             case START_SUITE_EVENT:
-                final List<Object> startSuiteList = (List<Object>) eventMap.get(START_SUITE_EVENT);
+                final List<?> startSuiteList = eventMap.get(START_SUITE_EVENT);
                 final Map<String, String> startSuiteDetails = (Map<String, String>) startSuiteList.get(1);
                 final ExecutionElement startSuiteElement = createStartSuiteExecutionElement(
                         (String) startSuiteList.get(0), startSuiteDetails.get("source"));
                 executionHandler.processExecutionElement(startSuiteElement);
                 break;
             case END_SUITE_EVENT:
-                final List<Object> endSuiteList = (List<Object>) eventMap.get(END_SUITE_EVENT);
+                final List<?> endSuiteList = eventMap.get(END_SUITE_EVENT);
                 final Map<String, Object> endSuiteDetails = (Map<String, Object>) endSuiteList.get(1);
                 final ExecutionElement endSuiteElement = createEndSuiteExecutionElement((String) endSuiteList.get(0),
                         endSuiteDetails);
                 executionHandler.processExecutionElement(endSuiteElement);
                 break;
             case START_TEST_EVENT:
-                final List<Object> testList = (List<Object>) eventMap.get(START_TEST_EVENT);
-                final ExecutionElement startTestElement = createStartTestExecutionElement((String)testList.get(0));
+                final List<?> testList = eventMap.get(START_TEST_EVENT);
+                final ExecutionElement startTestElement = createStartTestExecutionElement((String) testList.get(0));
                 executionHandler.processExecutionElement(startTestElement);
                 break;
             case END_TEST_EVENT:
-                final List<Object> endTestList = (List<Object>) eventMap.get(END_TEST_EVENT);
+                final List<?> endTestList = eventMap.get(END_TEST_EVENT);
                 final Map<String, Object> endTestDetails = (Map<String, Object>) endTestList.get(1);
                 final ExecutionElement endTestElement = createEndTestExecutionElement((String) endTestList.get(0),
                         endTestDetails);
                 executionHandler.processExecutionElement(endTestElement);
                 break;
             case OUTPUT_FILE_EVENT:
-                final List<Object> outputFileList = (List<Object>) eventMap.get(OUTPUT_FILE_EVENT);
-                final ExecutionElement outputFilePathElement = createOutputFileExecutionElement((String) outputFileList.get(0));
+                final List<?> outputFileList = eventMap.get(OUTPUT_FILE_EVENT);
+                final ExecutionElement outputFilePathElement = createOutputFileExecutionElement(
+                        (String) outputFileList.get(0));
                 executionHandler.processExecutionElement(outputFilePathElement);
                 break;
             default:
@@ -101,21 +103,19 @@ public class ExecutionElementsParser implements ILineHandler {
         startElement.setSource(source);
         return startElement;
     }
-    
+
     public static ExecutionElement createStartTestExecutionElement(final String name) {
         return createNewExecutionElement(name, ExecutionElementType.TEST);
     }
 
-    public static ExecutionElement createEndTestExecutionElement(final String name,
-            final Map<?, ?> endTestDetails) {
+    public static ExecutionElement createEndTestExecutionElement(final String name, final Map<?, ?> endTestDetails) {
         return createEndExecutionElement(name, ExecutionElementType.TEST, endTestDetails);
     }
 
-    public static ExecutionElement createEndSuiteExecutionElement(final String name,
-            final Map<?, ?> endSuiteDetails) {
+    public static ExecutionElement createEndSuiteExecutionElement(final String name, final Map<?, ?> endSuiteDetails) {
         return createEndExecutionElement(name, ExecutionElementType.SUITE, endSuiteDetails);
     }
-    
+
     public static ExecutionElement createOutputFileExecutionElement(final String name) {
         return createNewExecutionElement(name, ExecutionElementType.OUTPUT_FILE);
     }
@@ -128,11 +128,11 @@ public class ExecutionElementsParser implements ILineHandler {
         endElement.setStatus((String) details.get("status"));
         return endElement;
     }
-    
+
     private static ExecutionElement createNewExecutionElement(final String name, final ExecutionElementType type) {
         return new ExecutionElement(name, type);
     }
-    
+
     private String getEventType(final Map<?, ?> eventMap) {
         if (eventMap == null) {
             return null;

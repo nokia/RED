@@ -10,35 +10,44 @@ package org.rf.ide.core.dryrun;
  */
 public class RobotDryRunKeywordSource {
 
-    private final String name;
+    private String name;
 
-    private final String libraryName;
+    private String libraryName;
 
-    private final String filePath;
+    private String filePath;
 
-    private final int lineNumber;
-
-    RobotDryRunKeywordSource(final String name, final String libraryName, final String filePath, final int lineNumber) {
-        this.name = name;
-        this.libraryName = libraryName;
-        this.filePath = filePath;
-        this.lineNumber = lineNumber;
-    }
+    private int lineNumber;
 
     public String getName() {
         return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     public String getLibraryName() {
         return libraryName;
     }
 
+    public void setLibraryName(final String libraryName) {
+        this.libraryName = libraryName;
+    }
+
     public String getFilePath() {
         return filePath;
     }
 
+    public void setFilePath(final String filePath) {
+        this.filePath = filePath;
+    }
+
     public int getLineNumber() {
         return lineNumber;
+    }
+
+    public void setLineNumber(final int lineNumber) {
+        this.lineNumber = lineNumber;
     }
 
 }

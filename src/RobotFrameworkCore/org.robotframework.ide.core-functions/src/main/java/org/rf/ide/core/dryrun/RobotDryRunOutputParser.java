@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.executor.ILineHandler;
 
 /**
@@ -28,7 +29,7 @@ public class RobotDryRunOutputParser implements ILineHandler {
 
     private final ObjectMapper mapper;
 
-    private Map<String, Object> parsedLine;
+    private Map<String, List<?>> eventMap;
 
     private RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
 
@@ -38,7 +39,7 @@ public class RobotDryRunOutputParser implements ILineHandler {
 
     public RobotDryRunOutputParser() {
         this.mapper = new ObjectMapper();
-        this.parsedLine = new HashMap<String, Object>();
+        this.eventMap = new HashMap<String, List<?>>();
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
 
@@ -46,12 +47,13 @@ public class RobotDryRunOutputParser implements ILineHandler {
     @Override
     public void processLine(final String line) {
         try {
-            parsedLine = mapper.readValue(line, Map.class);
+            eventMap = mapper.readValue(line, new TypeReference<Map<String, List<?>>>() {
+            });
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        if (parsedLine.containsKey(LIBRARY_IMPORT_EVENT_NAME)) {
-            final List<Object> libraryImportList = (List<Object>) parsedLine.get(LIBRARY_IMPORT_EVENT_NAME);
+        if (eventMap.containsKey(LIBRARY_IMPORT_EVENT_NAME)) {
+            final List<?> libraryImportList = eventMap.get(LIBRARY_IMPORT_EVENT_NAME);
             final Map<String, Object> details = (Map<String, Object>) libraryImportList.get(1);
             String libraryName = (String) libraryImportList.get(0);
             final String originalName = (String) details.get("originalname");
@@ -66,8 +68,8 @@ public class RobotDryRunOutputParser implements ILineHandler {
                 dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
             }
 
-        } else if (parsedLine.containsKey(MESSAGE_EVENT_NAME)) {
-            final List<Object> messageList = (List<Object>) parsedLine.get(MESSAGE_EVENT_NAME);
+        } else if (eventMap.containsKey(MESSAGE_EVENT_NAME)) {
+            final List<?> messageList = eventMap.get(MESSAGE_EVENT_NAME);
             final Map<String, String> details = (Map<String, String>) messageList.get(0);
             final String messageLevel = details.get("level");
             final String message = details.get("message");
@@ -85,8 +87,8 @@ public class RobotDryRunOutputParser implements ILineHandler {
                 }
             }
 
-        } else if (parsedLine.containsKey(START_SUITE_EVENT_NAME)) {
-            final List<?> suiteList = (List<?>) parsedLine.get(START_SUITE_EVENT_NAME);
+        } else if (eventMap.containsKey(START_SUITE_EVENT_NAME)) {
+            final List<?> suiteList = eventMap.get(START_SUITE_EVENT_NAME);
             final String suiteName = (String) suiteList.get(0);
             if (startSuiteHandler != null && suiteName != null) {
                 startSuiteHandler.processStartSuiteEvent(suiteName);
