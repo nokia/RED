@@ -47,7 +47,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                     }
                 });
             } catch (InvocationTargetException | InterruptedException e) {
-                dryRunHandler.destroyDryRunProcess();
+                destroyDryRunProcess();
             }
         }
     }

@@ -51,7 +51,7 @@ public abstract class AbstractAutoDiscoverer {
 
     protected final RobotDryRunOutputParser dryRunOutputParser;
 
-    protected final RobotDryRunHandler dryRunHandler;
+    private final RobotDryRunHandler dryRunHandler;
 
     private final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
 
@@ -78,6 +78,10 @@ public abstract class AbstractAutoDiscoverer {
 
     protected final void stopDryRun() {
         isDryRunRunning.set(false);
+    }
+
+    protected final void destroyDryRunProcess() {
+        dryRunHandler.destroyDryRunProcess();
     }
 
     protected void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException {
