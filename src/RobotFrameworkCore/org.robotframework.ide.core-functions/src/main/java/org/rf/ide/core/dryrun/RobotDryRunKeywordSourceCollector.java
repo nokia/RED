@@ -11,26 +11,27 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 
 /**
  * @author bembenek
  */
 public class RobotDryRunKeywordSourceCollector {
 
+    private static final String KEYWORD_KEY = "keyword";
+
     private final List<RobotDryRunKeywordSource> keywordSources = new ArrayList<>();
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    @SuppressWarnings("unchecked")
     public void collectFromMessageEvent(final String message) {
         try {
-            final Map<String, Object> parsedMessage = mapper.readValue(message, Map.class);
-            final Map<String, Object> keyword = (Map<String, Object>) parsedMessage.get("keyword");
-            final String name = (String) keyword.get("name");
-            final String libraryName = (String) keyword.get("library_name");
-            final String filePath = (String) keyword.get("file_path");
-            final int lineNumber = (int) keyword.get("line_number");
-            keywordSources.add(new RobotDryRunKeywordSource(name, libraryName, filePath, lineNumber));
+            final Map<String, RobotDryRunKeywordSource> keywordEntry = mapper.readValue(message,
+                    new TypeReference<Map<String, RobotDryRunKeywordSource>>() {
+                    });
+            if (keywordEntry.containsKey(KEYWORD_KEY)) {
+                keywordSources.add(keywordEntry.get(KEYWORD_KEY));
+            }
         } catch (final IOException e) {
             e.printStackTrace();
         }

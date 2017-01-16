@@ -201,10 +201,10 @@ class PythonKeywordSource(object):
     def __init__(self, keyword):
         import inspect
         self.name = keyword.name
-        self.library_name = keyword.library.name
+        self.libraryName = keyword.library.name
         function = self._find_function(keyword)
-        self.file_path = inspect.getfile(function)
-        self.line_number = inspect.getsourcelines(function)[1]
+        self.filePath = inspect.getfile(function)
+        self.lineNumber = inspect.getsourcelines(function)[1]
 
     @staticmethod
     def _find_function(keyword):
