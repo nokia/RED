@@ -234,9 +234,12 @@ class TestCaseTableValidator implements ModelUnitValidator {
             if (executableRowDescriptor.getRowType() == ERowType.FOR) {
                 final List<BuildMessage> messages = executableRowDescriptor.getMessages();
                 for (final BuildMessage buildMessage : messages) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_FOR_KEYWORD)
                             .formatMessageWith(buildMessage.getMessage());
-                    reporter.handleProblem(problem, file, keywordName);
+                    ProblemPosition position = new ProblemPosition(buildMessage.getFileRegion().getStart().getLine(),
+                            Range.closed(buildMessage.getFileRegion().getStart().getOffset(),
+                                    buildMessage.getFileRegion().getEnd().getOffset()));
+                    reporter.handleProblem(problem, file, position);
                 }
                 continue;
             }

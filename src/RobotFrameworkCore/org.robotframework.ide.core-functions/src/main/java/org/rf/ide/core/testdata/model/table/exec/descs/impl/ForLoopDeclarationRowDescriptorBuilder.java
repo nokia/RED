@@ -99,10 +99,13 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
         }
 
         if (!wasIn || !wasElementsToIterate) {
+            final RobotToken forToken = loopDescriptor.getAction().getToken();
             final BuildMessage errorMessage = BuildMessage
                     .createErrorMessage("Invalid FOR loop - missing values to iterate", fileName);
-            final FilePosition startFilePosition = keywordOrTestcase.getBeginPosition();
-            errorMessage.setFileRegion(new FileRegion(startFilePosition, execRowLine.getEndPosition()));
+            final FilePosition startFilePosition = forToken.getFilePosition();
+            final FilePosition endFilePosition = new FilePosition(startFilePosition.getLine(), forToken.getEndColumn(),
+                    forToken.getStartOffset() + forToken.getText().length());
+            errorMessage.setFileRegion(new FileRegion(startFilePosition, endFilePosition));
             loopDescriptor.addMessage(errorMessage);
         }
 

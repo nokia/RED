@@ -305,7 +305,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
+            return newArrayList();
         }
     },
     EMPTY_KEYWORD_SETTING {
@@ -317,6 +317,33 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "The %s keyword setting is empty";
+        }
+    },
+    INVALID_FOR_KEYWORD {
+
+        @Override
+        public String getProblemDescription() {
+            return "%s";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String keywordName = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final String keywordOriginalName = marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null);
+            final IFile suiteFile = (IFile) marker.getResource();
+
+            final ArrayList<IMarkerResolution> fixers = newArrayList();
+            fixers.addAll(ImportLibraryFixer.createFixers(suiteFile, keywordName));
+            fixers.addAll(CreateKeywordFixer.createFixers(keywordOriginalName));
+            fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
+                    new SimilaritiesAnalyst().provideSimilarAccessibleKeywords(suiteFile, keywordName)));
+
+            return fixers;
         }
     };
 
