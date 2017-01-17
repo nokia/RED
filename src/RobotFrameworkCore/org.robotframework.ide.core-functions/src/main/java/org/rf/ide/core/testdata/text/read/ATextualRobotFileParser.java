@@ -398,7 +398,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     public abstract boolean isPrettyAlignLineOnly(final String currentLineText);
 
     @VisibleForTesting
-    protected int handleCRLFcaseSplittedBetweenBuffers(final RobotFileOutput parsingOutput, final LineReader lineHolder,
+    int handleCRLFcaseSplittedBetweenBuffers(final RobotFileOutput parsingOutput, final LineReader lineHolder,
             final int lineNumber, final int currentOffset) {
         int newOffset = currentOffset;
         if (lineNumber > 1) {
@@ -412,7 +412,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                     .setLineNumber(prevEOL.getLineNumber())
                     .buildEOL();
             if (prevEOL.getTypes().get(0) != buildEOL.getTypes().get(0)) {
-                prevLine.setEndOfLine(lineEnd, currentOffset, prevEOL.getStartColumn());
+                prevLine.setEndOfLine(lineEnd, prevEOL.getStartOffset(), prevEOL.getStartColumn());
                 newOffset++;
             }
         }
