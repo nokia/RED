@@ -16,6 +16,9 @@ from robot.conf import RobotSettings
 import time
 import sys
 import threading
+import inspect
+import json
+import re
 
 
 class MyTestSuiteBuilder(TestSuiteBuilder):
@@ -191,7 +194,6 @@ class MyIMPORTER(object):
             for keyword in library.handlers:
                 if keyword not in self.cached_kw_items and not isinstance(keyword, _JavaHandler):
                     self.cached_kw_items.add(keyword)
-                    import json
                     keyword_source = PythonKeywordSource(keyword)
                     msg = json.dumps({'keyword': dict(keyword_source.__dict__)}, sort_keys=True)
                     LOGGER.message(Message(message=msg, level='NONE'))
@@ -199,15 +201,25 @@ class MyIMPORTER(object):
 
 class PythonKeywordSource(object):
     def __init__(self, keyword):
-        import inspect
         self.name = keyword.name
         self.libraryName = keyword.library.name
-        function = self._find_function(keyword)
-        self.filePath = inspect.getfile(function)
-        self.lineNumber = inspect.getsourcelines(function)[1]
+        source = self._find_source(keyword)
+        self.filePath = source[0]
+        self.line = source[1]
+        self.offset = source[2]
+        self.length = source[3]
 
-    @staticmethod
-    def _find_function(keyword):
+    def _find_source(self, keyword):
+        function = self._resolve_function(keyword)
+        path = inspect.getfile(function)
+        source = inspect.getsourcelines(function)
+        for lineIdx, line in enumerate(source[0]):
+            m = re.search('(?<=def\W)' + function.__name__, line)
+            if m is not None:
+                return path, source[1] + lineIdx - 1, m.start(0), len(function.__name__)
+        return path, 0, 0, 0
+
+    def _resolve_function(self, keyword):
         if isinstance(keyword, _DynamicHandler):
             return keyword.library._libcode.__dict__[keyword._run_keyword_method_name]
         elif keyword._method:

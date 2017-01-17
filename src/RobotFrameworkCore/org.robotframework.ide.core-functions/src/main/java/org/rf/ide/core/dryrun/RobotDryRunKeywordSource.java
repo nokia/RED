@@ -16,7 +16,11 @@ public class RobotDryRunKeywordSource {
 
     private String filePath;
 
-    private int lineNumber;
+    private int line;
+
+    private int offset;
+
+    private int length;
 
     public String getName() {
         return name;
@@ -42,12 +46,28 @@ public class RobotDryRunKeywordSource {
         this.filePath = filePath;
     }
 
-    public int getLineNumber() {
-        return lineNumber;
+    public int getLine() {
+        return line;
     }
 
-    public void setLineNumber(final int lineNumber) {
-        this.lineNumber = lineNumber;
+    public void setLine(final int line) {
+        this.line = line;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(final int offset) {
+        this.offset = offset;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(final int length) {
+        this.length = length;
     }
 
 }
