@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
@@ -31,7 +30,6 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.statushandlers.StatusManager;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -63,11 +61,12 @@ public class SourceOpeningSupport {
         final Optional<RobotDryRunKeywordSource> kwSource = tryToFindKeywordSource(model, project, libSpec, kwSpec);
         if (kwSource.isPresent()) {
             try {
-                final IPath location = new Path(kwSource.get().getFilePath());
+                final RobotDryRunKeywordSource source = kwSource.get();
+                final IPath location = new Path(source.getFilePath());
                 final IFile file = resolveFile(location, project, libSpec);
                 final IEditorPart editor = openInEditor(page, file);
                 if (editor instanceof TextEditor) {
-                    selectLine((TextEditor) editor, kwSource.get().getLineNumber() - 1);
+                    selectTextInLine((TextEditor) editor, source.getLine(), source.getOffset(), source.getLength());
                 }
             } catch (final CoreException e) {
                 handleOpeningError(libSpec, e);
@@ -131,12 +130,10 @@ public class SourceOpeningSupport {
         StatusManager.getManager().handle(status, StatusManager.SHOW);
     }
 
-    private static void selectLine(final TextEditor editor, final int line) {
+    private static void selectTextInLine(final TextEditor editor, final int line, final int offset, final int length) {
         try {
-            final IDocumentProvider documentProvider = editor.getDocumentProvider();
-            final IDocument document = documentProvider.getDocument(editor.getEditorInput());
-            final IRegion lineInformation = document.getLineInformation(line);
-            final TextSelection selection = new TextSelection(lineInformation.getOffset(), lineInformation.getLength());
+            final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+            final TextSelection selection = new TextSelection(document.getLineOffset(line) + offset, length);
             editor.getSelectionProvider().setSelection(selection);
         } catch (final BadLocationException e) {
             throw new LineSelectionException("Unable to select line: " + line, e);
