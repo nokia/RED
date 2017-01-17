@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _cBeEIMN4Eeat3OoBX2X2jQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/11/17 4:59 PM
+Save-Time: 1/12/17 10:12 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -162,7 +162,8 @@ proc "compare-variables" [val all_variables] {
 	}
 }	
 
-
+// index - check variables from index (default value = 0)
+// count_items - count all items. Bolean (default = true)
 proc "check_common-automatic-variables" [val start_index 0] [val count_items true]{
 	compare-variables [emit [$common_first_vars |each [val item]{ echo $item }] [$common_vars| each [val item2]{ echo $item2}] 
 		| to-list]
