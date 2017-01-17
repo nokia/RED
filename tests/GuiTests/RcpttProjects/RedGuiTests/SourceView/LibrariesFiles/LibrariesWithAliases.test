@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PV3F4L4iEeaIos8Jik5jow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/22/16 2:17 PM
+Save-Time: 1/17/17 1:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -113,6 +113,46 @@ with [get-editor "Test2.robot" | get-text-viewer] {
     wait 200
     key-type "M1+s"
 }
+
+
+//add alias by Content assist
+
+with [get-editor "Test2.robot" | get-text-viewer] {
+    set-caret-pos 13 1
+    //add library
+    type-text Li
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Down
+    
+    //add Process
+    wait 300
+    key-type Enter
+    
+    //opan assist and add default alias
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Right
+    key-type Enter
+    
+    //add library agian
+    type-text Li
+    key-type "M1+SPACE"
+    wait 200
+    key-type Enter
+}
+//select Telnet
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select Telnet | click -default
+with [get-editor "Test2.robot" | get-text-viewer] {
+	//add With name an change default value
+    key-type "M1+SPACE"
+    wait 200
+    key-type Enter
+    key-type BackSpace
+    type-text "my_name"
+    key-type "M1+s"
+}
+    
 get-editor "Test2.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "# many dots\n"
     + "Library    Collections    WITH NAME   ...\n"
@@ -122,7 +162,9 @@ get-editor "Test2.robot" | get-text-viewer | get-property text | equals "*** Set
     + "#number as alias\n"
     + "Library    DateTime   WITH NAME  8\n\n"
     + "#arguments\n"
-    + "Library    String   text\n\n"
+    + "Library    String   text\n"
+    + "Library    Process    WITH NAME    alias\n"
+    + "Library    Telnet    WITH NAME    my_name\n"
     + "*** Test Cases ***\n"
     + "kw\n"
     + "    ....Combine Lists    \n"
@@ -131,9 +173,9 @@ get-editor "Test2.robot" | get-text-viewer | get-property text | equals "*** Set
     + "    String.Convert To Lowercase  I AM GROOT!   \n"
     + "    text.Append To Environment Variable    name \n"
     + "    8.Convert Date    date    \n"
-    + "    ....Append To List    list_" | verify-true
+    + "    ....Append To List    list_" | verify-true    
     
-//check now amount of erorors (2 removed eralier)    
+//check now amount of errors (2 removed earlier)    
 with [get-view Problems | get-tree] {
     get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Ambiguous keyword 'Append To List' reference. Matching keywords are defined in: [lib, Collections, Collection]" 
