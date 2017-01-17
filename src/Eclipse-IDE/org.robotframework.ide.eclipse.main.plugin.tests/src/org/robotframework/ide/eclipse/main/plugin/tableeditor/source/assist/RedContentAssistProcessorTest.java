@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +23,13 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
-
-import com.google.common.base.Supplier;
 
 public class RedContentAssistProcessorTest {
 
     @Test
     public void whenNullProposalsAreFound_nullIsReturnedAsProposalsArray() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final SuiteSourceAssistantContext context = createAssitant(model);
+        final SuiteSourceAssistantContext context = createAssistant(model);
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -44,7 +42,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void whenNoProposalsAreFound_emptyArrayIsReturnedAsProposalsArray() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final SuiteSourceAssistantContext context = createAssitant(model);
+        final SuiteSourceAssistantContext context = createAssistant(model);
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -58,7 +56,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void whenProposalsAreFound_theyAreReturnedInArray() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
-        final SuiteSourceAssistantContext context = createAssitant(model);
+        final SuiteSourceAssistantContext context = createAssistant(model);
 
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(new Document("0123456789"));
@@ -169,16 +167,6 @@ public class RedContentAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(IDocument.DEFAULT_CONTENT_TYPE);
 
         assertThat(processor.getVirtualContentType(document, offset)).isEqualTo(IDocument.DEFAULT_CONTENT_TYPE);
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(false, "  ")));
     }
 
     private static RedContentAssistProcessor createProcessorForContentTypes(final SuiteSourceAssistantContext context,

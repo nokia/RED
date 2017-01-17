@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
@@ -37,12 +38,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
 
 public class KeywordCallsAssistProcessorTest {
 
@@ -78,7 +77,7 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void keywordsProcessorIsValidOnlyForKeywordsOrCasesSections() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION);
@@ -87,7 +86,7 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void keywordsProcessorHasTitleDefined() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
@@ -102,7 +101,7 @@ public class KeywordCallsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -120,7 +119,7 @@ public class KeywordCallsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -138,7 +137,7 @@ public class KeywordCallsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.TEST_CASES_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -172,7 +171,7 @@ public class KeywordCallsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -202,7 +201,7 @@ public class KeywordCallsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -226,7 +225,7 @@ public class KeywordCallsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -246,7 +245,7 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void regionsForLiveEditOfEmbeddedKeyword_areProperlyCalculated() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword ${e1} with ${e2} args");
         final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
@@ -257,7 +256,7 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void regionsForLiveEditOfRegularKeywordWithoutArguments_areEmpty() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword");
         final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
@@ -268,7 +267,7 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void regionsForLiveEditOfRegularKeywordWithSingleArgument_areProperlyCalculated() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword", "arg1");
         final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
@@ -279,7 +278,7 @@ public class KeywordCallsAssistProcessorTest {
     @Test
     public void regionsForLiveEditOfRegularKeywordWithManyArgument_areProperlyCalculated() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssitant(model));
+        final KeywordCallsAssistProcessor processor = new KeywordCallsAssistProcessor(createAssistant(model));
 
         final KeywordEntity entity = new MockProposal("keyword", "arg1", "arg2");
         final Collection<IRegion> regions = processor.calculateRegionsForLinkedMode(entity, 100, "");
@@ -290,16 +289,6 @@ public class KeywordCallsAssistProcessorTest {
     private static IDocument documentFromSuiteFile() throws Exception {
         final String content = projectProvider.getFileContent("suite.robot");
         return new Document(Splitter.on('\n').splitToList(content));
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(false, "  ")));
     }
 
     private static class MockProposal extends KeywordEntity implements AssistProposal {

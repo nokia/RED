@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.activatingAssistantAfterAccept;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
@@ -33,12 +34,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
 
 public class ImportsInCodeAssistProcessorTest {
 
@@ -75,7 +74,7 @@ public class ImportsInCodeAssistProcessorTest {
     @Test
     public void importsInCodeProcessorIsValidOnlyForKeywordsOrCasesSections() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION);
@@ -84,7 +83,7 @@ public class ImportsInCodeAssistProcessorTest {
     @Test
     public void importsInCodeProcessorHasTitleDefined() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
@@ -99,7 +98,7 @@ public class ImportsInCodeAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -117,7 +116,7 @@ public class ImportsInCodeAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -135,7 +134,7 @@ public class ImportsInCodeAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -167,7 +166,7 @@ public class ImportsInCodeAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -199,7 +198,7 @@ public class ImportsInCodeAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -224,7 +223,7 @@ public class ImportsInCodeAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssitant(model));
+        final ImportsInCodeAssistProcessor processor = new ImportsInCodeAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -254,15 +253,5 @@ public class ImportsInCodeAssistProcessorTest {
     private static IDocument documentFromSuiteFile() throws Exception {
         final String content = projectProvider.getFileContent("suite.robot");
         return new Document(Splitter.on('\n').splitToList(content));
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(true, "  ")));
     }
 }
