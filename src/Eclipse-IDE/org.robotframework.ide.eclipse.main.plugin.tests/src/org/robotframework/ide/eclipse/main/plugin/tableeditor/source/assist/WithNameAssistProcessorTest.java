@@ -9,10 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -21,14 +21,10 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
 
 public class WithNameAssistProcessorTest {
 
@@ -49,14 +45,14 @@ public class WithNameAssistProcessorTest {
     @Test
     public void withNameProcessorIsValidOnlyForSettingsSection() {
         final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssitant("suite.robot"));
+                createAssistant(projectProvider.getFile("suite.robot")));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Test
     public void withNameProcessorHasTitleDefined() {
         final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssitant("suite.robot"));
+                createAssistant(projectProvider.getFile("suite.robot")));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
@@ -69,7 +65,8 @@ public class WithNameAssistProcessorTest {
         // use real offset and probably mock settingsgroup
         when(document.getContentType(30)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssitant("suite.robot"));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
+                createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 30);
 
         assertThat(proposals).isNull();
@@ -84,7 +81,7 @@ public class WithNameAssistProcessorTest {
         when(document.getContentType(72)).thenReturn(SuiteSourcePartitionScanner.KEYWORDS_SECTION);
 
         final WithNameAssistProcessor processor = new WithNameAssistProcessor(
-                createAssitant("suite.robot"));
+                createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 72);
 
         assertThat(proposals).isNull();
@@ -98,7 +95,8 @@ public class WithNameAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(72)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssitant("suite.robot"));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
+                createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 72);
 
         assertThat(proposals).isNotNull();
@@ -114,7 +112,8 @@ public class WithNameAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(74)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssitant("suite.robot"));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
+                createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 74);
 
         assertThat(proposals).isNotNull();
@@ -130,7 +129,8 @@ public class WithNameAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(34)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssitant("suite.robot"));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
+                createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 34);
 
         assertThat(proposals).isNotNull();
@@ -146,7 +146,8 @@ public class WithNameAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
         when(document.getContentType(80)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
-        final WithNameAssistProcessor processor = new WithNameAssistProcessor(createAssitant("suite.robot"));
+        final WithNameAssistProcessor processor = new WithNameAssistProcessor(
+                createAssistant(projectProvider.getFile("suite.robot")));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 80);
 
         assertThat(proposals).isEmpty();
@@ -155,18 +156,5 @@ public class WithNameAssistProcessorTest {
     private IDocument documentFromFile(final String fileName) throws Exception {
         final String content = projectProvider.getFileContent(fileName);
         return new Document(Splitter.on('\n').splitToList(content));
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final String fileName) {
-        final IFile suite = projectProvider.getFile(fileName);
-        final RobotSuiteFile suiteModel = new RobotModel().createSuiteFile(suite);
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                suiteModel.parse();
-                return suiteModel;
-            }
-        }, new AssistPreferences(new MockRedPreferences(true, "  ")));
     }
 }

@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
@@ -27,12 +28,10 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
-import com.google.common.base.Supplier;
 
 public class KeywordCallsInSettingsAssistProcessorTest {
 
@@ -74,7 +73,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
     public void keywordsInSettingsProcessorIsValidOnlyForKeywordsOrCasesSections() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
@@ -83,7 +82,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
     public void keywordsInSettingsProcessorHasTitleDefined() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
@@ -99,7 +98,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -118,7 +117,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -137,7 +136,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -156,7 +155,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -175,7 +174,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -194,7 +193,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -213,7 +212,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -232,7 +231,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -274,7 +273,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -316,7 +315,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -358,7 +357,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -400,7 +399,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -442,7 +441,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
-                createAssitant(model));
+                createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
@@ -460,15 +459,5 @@ public class KeywordCallsInSettingsAssistProcessorTest {
     private static IDocument documentFromSuiteFile() throws Exception {
         final String content = projectProvider.getFileContent("suite.robot");
         return new Document(Splitter.on('\n').splitToList(content));
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(false, "  ")));
     }
 }

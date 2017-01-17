@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
@@ -24,16 +25,13 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Supplier;
 
 public class SectionsAssistProcessorTest {
 
     @Test
     public void sectionsProcessorIsValidOnlyForVariablesSection() {
-        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant());
+        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant((RobotSuiteFile) null));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
@@ -41,7 +39,7 @@ public class SectionsAssistProcessorTest {
 
     @Test
     public void sectionsProcessorProcessorHasTitleDefined() {
-        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant());
+        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant((RobotSuiteFile) null));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
@@ -53,7 +51,7 @@ public class SectionsAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant(model));
+        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 7);
 
         assertThat(proposals).isNull();
@@ -68,7 +66,7 @@ public class SectionsAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLines(lines).build();
-        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant(model));
+        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 19);
         
@@ -92,7 +90,7 @@ public class SectionsAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLines(lines).build();
-        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant(model));
+        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 0);
         
@@ -116,7 +114,7 @@ public class SectionsAssistProcessorTest {
         when(viewer.getDocument()).thenReturn(document);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLines(lines).build();
-        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant(model));
+        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 25);
 
@@ -126,19 +124,5 @@ public class SectionsAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Test Cases ***", "*** Settings ***"));
-    }
-
-    private static SuiteSourceAssistantContext createAssitant() {
-        return createAssitant(null);
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(true, "  ")));
     }
 }

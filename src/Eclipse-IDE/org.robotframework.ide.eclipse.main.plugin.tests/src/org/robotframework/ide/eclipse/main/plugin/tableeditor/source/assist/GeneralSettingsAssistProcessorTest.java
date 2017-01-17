@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
@@ -25,22 +26,21 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Supplier;
 
 public class GeneralSettingsAssistProcessorTest {
 
     @Test
     public void generalSettingsProcessorIsValidOnlyForSettingsSection() {
-        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssitant());
+        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(
+                createAssistant((RobotSuiteFile) null));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Test
     public void generalSettingsProcessorProcessorHasTitleDefined() {
-        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssitant());
+        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(
+                createAssistant((RobotSuiteFile) null));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
@@ -53,7 +53,7 @@ public class GeneralSettingsAssistProcessorTest {
         when(document.getContentType(7)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssitant(model));
+        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 7);
 
         assertThat(proposals).isNull();
@@ -68,7 +68,7 @@ public class GeneralSettingsAssistProcessorTest {
         when(document.getContentType(7)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssitant(model));
+        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 7);
 
         assertThat(proposals).isNull();
@@ -84,7 +84,7 @@ public class GeneralSettingsAssistProcessorTest {
         when(document.getContentType(17)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLines(lines).build();
-        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssitant(model));
+        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 17);
 
@@ -118,7 +118,7 @@ public class GeneralSettingsAssistProcessorTest {
         when(document.getContentType(21)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLines(lines).build();
-        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssitant(model));
+        final GeneralSettingsAssistProcessor processor = new GeneralSettingsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 21);
 
@@ -131,19 +131,5 @@ public class GeneralSettingsAssistProcessorTest {
                 new Document("*** Settings ***", "Test Teardown"),
                 new Document("*** Settings ***", "Test Timeout"),
                 new Document("*** Settings ***", "Test Template"));
-    }
-
-    private static SuiteSourceAssistantContext createAssitant() {
-        return createAssitant(null);
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(true, "  ")));
     }
 }

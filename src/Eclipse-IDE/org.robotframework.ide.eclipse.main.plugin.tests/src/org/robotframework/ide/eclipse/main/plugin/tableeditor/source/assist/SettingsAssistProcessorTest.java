@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
@@ -29,11 +30,8 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Supplier;
 
 public class SettingsAssistProcessorTest {
 
@@ -42,14 +40,14 @@ public class SettingsAssistProcessorTest {
 
     @Test
     public void settingsProcessorIsValidOnlyForVariablesSection() {
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant());
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant((RobotSuiteFile) null));
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
     }
 
     @Test
     public void settingsProcessorProcessorHasTitleDefined() {
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant());
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant((RobotSuiteFile) null));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
 
@@ -65,7 +63,7 @@ public class SettingsAssistProcessorTest {
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLines(lines).build();
 
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant(model));
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).isNull();
@@ -85,7 +83,7 @@ public class SettingsAssistProcessorTest {
 
         final RobotSuiteFile model = new RobotModel().createSuiteFile(file);
 
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant(model));
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).isNull();
@@ -105,7 +103,7 @@ public class SettingsAssistProcessorTest {
 
         final RobotSuiteFile model = new RobotModel().createSuiteFile(file);
 
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant(model));
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(6).haveExactly(6,
@@ -135,7 +133,7 @@ public class SettingsAssistProcessorTest {
 
         final RobotSuiteFile model = new RobotModel().createSuiteFile(file);
 
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant(model));
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(3).haveExactly(3,
@@ -162,7 +160,7 @@ public class SettingsAssistProcessorTest {
 
         final RobotSuiteFile model = new RobotModel().createSuiteFile(file);
 
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant(model));
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(6).haveExactly(6,
@@ -192,7 +190,7 @@ public class SettingsAssistProcessorTest {
 
         final RobotSuiteFile model = new RobotModel().createSuiteFile(file);
 
-        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant(model));
+        final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssistant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(2).haveExactly(2,
@@ -202,19 +200,5 @@ public class SettingsAssistProcessorTest {
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Test Cases ***", "case", "  [Template]  "),
                 new Document("*** Test Cases ***", "case", "  [Teardown]  "));
-    }
-
-    private static SuiteSourceAssistantContext createAssitant() {
-        return createAssitant(null);
-    }
-
-    private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(true, "  ")));
     }
 }
