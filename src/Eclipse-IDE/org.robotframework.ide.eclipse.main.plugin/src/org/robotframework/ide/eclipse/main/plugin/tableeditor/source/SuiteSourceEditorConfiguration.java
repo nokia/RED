@@ -212,22 +212,18 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
             final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
-        final WithNameAssistProcessor withNameAssistProcessor = new WithNameAssistProcessor(assistContext);
-        final LibrariesImportAssistProcessor libraryImportsProcessor = new LibrariesImportAssistProcessor(assistContext);
-        final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(
-                assistContext);
-        final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
-                assistContext);
-        final KeywordCallsAssistProcessor keywordsAssistProcessor = new KeywordCallsInSettingsAssistProcessor(
-                assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
-        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(withNameAssistProcessor,
-                libraryImportsProcessor,
-                variableImportsProcessor, resourceImportsProcessor, sectionsAssistProcessor, settingNamesProcessor,
-                keywordsAssistProcessor, variablesAssistProcessor);
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
+                new WithNameAssistProcessor(assistContext),
+                new LibrariesImportAssistProcessor(assistContext),
+                new VariablesImportAssistProcessor(assistContext),
+                new ResourcesImportAssistProcessor(assistContext),
+                new SectionsAssistProcessor(assistContext),
+                settingNamesProcessor,
+                new KeywordCallsInSettingsAssistProcessor(assistContext),
+                variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
@@ -243,12 +239,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
             final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
-        final VariablesDefinitionsAssistProcessor variableDefsAssistProcessor = new VariablesDefinitionsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
-        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(variableDefsAssistProcessor,
-                sectionsAssistProcessor, variablesAssistProcessor);
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
+                new VariablesDefinitionsAssistProcessor(assistContext),
+                new SectionsAssistProcessor(assistContext),
+                variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
@@ -263,17 +259,16 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
             final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
-        final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
-        final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
-                assistContext);
-        final SettingsAssistProcessor tcSettingsAssistProcessor = new SettingsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
-        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(sectionsAssistProcessor,
-                tcSettingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor,
-                importsInCodeAssistProcessor, variablesAssistProcessor);
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
+                new SectionsAssistProcessor(assistContext),
+                new SettingsAssistProcessor(assistContext),
+                new CodeReservedWordsAssistProcessor(assistContext),
+                keywordCallsAssistProcessor,
+                new ImportsInCodeAssistProcessor(assistContext),
+                variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
@@ -289,17 +284,16 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
             final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
-        final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
-        final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
-                assistContext);
-        final SettingsAssistProcessor kwSettingsAssistProcessor = new SettingsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
-        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(sectionsAssistProcessor,
-                kwSettingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor,
-                importsInCodeAssistProcessor, variablesAssistProcessor);
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
+                new SectionsAssistProcessor(assistContext),
+                new SettingsAssistProcessor(assistContext),
+                new CodeReservedWordsAssistProcessor(assistContext),
+                keywordCallsAssistProcessor,
+                new ImportsInCodeAssistProcessor(assistContext),
+                variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
@@ -320,39 +314,32 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
-        final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
-        final GeneralSettingsAssistProcessor generalSettingNamesProcessor = new GeneralSettingsAssistProcessor(
+        final GeneralSettingsAssistProcessor generalSettingProcessor = new GeneralSettingsAssistProcessor(
                 assistContext);
-        final VariablesDefinitionsAssistProcessor variableDefsAssistProcessor = new VariablesDefinitionsAssistProcessor(
-                assistContext);
-        final LibrariesImportAssistProcessor libraryImportsProcessor = new LibrariesImportAssistProcessor(
-                assistContext);
-        final VariablesImportAssistProcessor variableImportsProcessor = new VariablesImportAssistProcessor(
-                assistContext);
-        final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
-                assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor1 = new KeywordCallsInSettingsAssistProcessor(
-                assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor2 = new KeywordCallsAssistProcessor(assistContext);
-        final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
-                assistContext);
-        final SettingsAssistProcessor settingsAssistProcessor = new SettingsAssistProcessor(assistContext);
-        final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
-        final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
-        final WithNameAssistProcessor withNameAssistProcessor = new WithNameAssistProcessor(assistContext);
+        final KeywordCallsAssistProcessor keywordCallsProcessor = new KeywordCallsAssistProcessor(assistContext);
+        final VariablesAssistProcessor variablesProcessor = new VariablesAssistProcessor(assistContext);
 
-        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(variableDefsAssistProcessor,
-                importsInCodeAssistProcessor, variablesAssistProcessor,
-                sectionsAssistProcessor, generalSettingNamesProcessor, libraryImportsProcessor,
-                variableImportsProcessor, resourceImportsProcessor, keywordCallsAssistProcessor1,
-                settingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor2, withNameAssistProcessor);
+        final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(
+                new VariablesDefinitionsAssistProcessor(assistContext),
+                new WithNameAssistProcessor(assistContext),
+                new LibrariesImportAssistProcessor(assistContext),
+                new VariablesImportAssistProcessor(assistContext),
+                new ResourcesImportAssistProcessor(assistContext),
+                new SectionsAssistProcessor(assistContext),
+                generalSettingProcessor,
+                new SettingsAssistProcessor(assistContext),
+                new CodeReservedWordsAssistProcessor(assistContext),
+                new KeywordCallsInSettingsAssistProcessor(assistContext),
+                keywordCallsProcessor,
+                new ImportsInCodeAssistProcessor(assistContext),
+                variablesProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
         cycledProcessor.addProcessor(combinedProcessor);
-        cycledProcessor.addProcessor(generalSettingNamesProcessor);
-        cycledProcessor.addProcessor(keywordCallsAssistProcessor2);
-        cycledProcessor.addProcessor(variablesAssistProcessor);
+        cycledProcessor.addProcessor(generalSettingProcessor);
+        cycledProcessor.addProcessor(keywordCallsProcessor);
+        cycledProcessor.addProcessor(variablesProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, IDocument.DEFAULT_CONTENT_TYPE);
         contentAssistant.addCompletionListener(cycledProcessor);
