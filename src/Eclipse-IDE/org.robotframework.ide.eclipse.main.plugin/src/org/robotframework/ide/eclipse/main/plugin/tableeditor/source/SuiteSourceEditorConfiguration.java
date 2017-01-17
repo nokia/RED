@@ -446,13 +446,13 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         return new TextAttribute(ColorsManager.getColor(sectionPref.getRgb()), null, sectionPref.getFontStyle());
     }
 
-    private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
+    private void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
             final RedTokensStore store, final ISyntaxColouringRule[] rules) {
         final boolean useDirectScanner = Boolean.valueOf(System.getProperty("red.tmp.useDirectScanner")).booleanValue();
         final RedTokenScanner tokenScanner = new RedTokenScanner(rules);
         final ITokenScanner scanner = useDirectScanner ? tokenScanner : new RedCachingScanner(tokenScanner, store);
         final DefaultDamagerRepairer damagerRepairer = useDirectScanner ? new DefaultDamagerRepairer(scanner)
-                : new RedDamagerRepairer(scanner);
+                : new RedDamagerRepairer(scanner, editor.getViewer());
         reconciler.setDamager(damagerRepairer, contentType);
         reconciler.setRepairer(damagerRepairer, contentType);
     }
