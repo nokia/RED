@@ -104,11 +104,7 @@ public class AssistProposalPredicates {
 
             @Override
             public boolean apply(final String withName) {
-                if (RedWithNameProposals.WITH_NAME.equals(withName)) {
-                    // we're in at least 3rd cell
-                    return cellIndex >= 2;
-                }
-                return false;
+                return cellIndex >= 2 && RedWithNameProposals.WITH_NAME.equals(withName);
             }
         };
     }

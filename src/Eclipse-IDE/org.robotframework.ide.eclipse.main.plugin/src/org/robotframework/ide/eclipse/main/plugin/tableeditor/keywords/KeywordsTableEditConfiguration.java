@@ -8,6 +8,7 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CodeReservedElementsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsInCodeProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.KeywordProposalsProvider;
@@ -30,6 +31,7 @@ public class KeywordsTableEditConfiguration extends AbstractRegistryConfiguratio
     public void configureRegistry(final IConfigRegistry configRegistry) {
         final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
                 new SettingProposalsProvider(SettingTarget.KEYWORD),
+                new CodeReservedElementsProposalsProvider(dataProvider),
                 new KeywordProposalsProvider(suiteFile),
                 new ImportsInCodeProposalsProvider(suiteFile),
                 new VariableProposalsProvider(suiteFile, dataProvider));

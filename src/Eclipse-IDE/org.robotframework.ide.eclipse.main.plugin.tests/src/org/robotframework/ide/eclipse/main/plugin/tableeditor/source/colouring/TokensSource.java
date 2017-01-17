@@ -70,6 +70,7 @@ public class TokensSource {
                 .appendLine("*** Settings ***")
                 .appendLine("Documentation  abc  def  # comment")
                 .appendLine("Library  abc  def  # comment")
+                .appendLine("Library  abc  WITH NAME  def  # comment")
                 .appendLine("Resource  abc  def  # comment")
                 .appendLine("Variables  abc  def  # comment")
                 .appendLine("Metadata  abc  def  # comment")

@@ -61,9 +61,8 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
 
             final DocumentationModification modification = new DocumentationModification(additional,
                     new Position(offset - prefix.length(), cellLength),
-                    new Position(
-                            offset - prefix.length() + "WITH NAME".length() + assist.getSeparatorToFollow().length(),
-                            5));
+                    new Position(offset - prefix.length() + proposal.getContent().length()
+                            + assist.getSeparatorToFollow().length(), 5));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
         }
