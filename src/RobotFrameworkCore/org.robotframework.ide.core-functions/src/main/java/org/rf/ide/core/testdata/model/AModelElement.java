@@ -161,30 +161,19 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
     protected RobotToken updateOrCreate(final RobotToken current, final String newValue,
             final IRobotTokenType expectedType) {
-        RobotToken toReturn = null;
-        if (current == null) {
-            toReturn = new RobotToken();
-        } else {
-            toReturn = current;
-        }
-
+        final RobotToken toReturn = current != null ? current : new RobotToken();
         toReturn.setText(newValue);
 
         if (expectedType != null) {
             fixForTheType(toReturn, expectedType);
         }
-
         return toReturn;
     }
 
     protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
-        final List<IRobotTokenType> tagTypes = token.getTypes();
-        if (!tagTypes.contains(expectedMainType)) {
-            if (tagTypes.isEmpty()) {
-                tagTypes.add(expectedMainType);
-            } else {
-                tagTypes.add(0, expectedMainType);
-            }
+        final List<IRobotTokenType> types = token.getTypes();
+        if (!types.contains(expectedMainType)) {
+            types.add(0, expectedMainType);
         }
     }
 
@@ -193,7 +182,6 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         if (shouldNullCheck && token == null) {
             return;
         }
-
         fixForTheType(token, expectedMainType);
     }
 
