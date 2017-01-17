@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aJnaIM_iEeWblO0vn84SSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/17/17 9:55 AM
-Tags: Unstable
+Save-Time: 1/17/17 9:58 AM
 Testcase-Type: ecl
 Verifications: _gazR8NZREeW52_ojRMzdeg
 
@@ -42,7 +41,6 @@ get-view "Project Explorer" | get-tree | select "DuplicationKeywords/Test2.tsv"
     
 //select MyTest - duplicated keyword are in this file - first will be selected
 with [get-editor "Test2.tsv" | get-text-viewer] {
-    hover-text 7  5
     set-caret-pos 7 5
     open-declaration
     hover-text  7 5
