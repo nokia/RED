@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -73,7 +72,7 @@ public class RedTokenScanner implements IRedTokenScanner {
                     final List<RobotLine> lines = document.getNewestModel().getFileContent();
                     return new RedTokensQueueBuilder().buildQueue(rangeOffset, rangeLength, lines, rangeLine);
                 } catch (final InterruptedException e) {
-                    return new ArrayDeque<>();
+                    throw new UnableToScanTokensException("Unable to build tokens queue", e);
                 }
             }
         });
@@ -135,5 +134,14 @@ public class RedTokenScanner implements IRedTokenScanner {
     @Override
     public int getTokenLength() {
         return lastTokenPosition.getLength();
+    }
+
+    public static class UnableToScanTokensException extends IllegalStateException {
+
+        private static final long serialVersionUID = 1L;
+
+        public UnableToScanTokensException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
     }
 }
