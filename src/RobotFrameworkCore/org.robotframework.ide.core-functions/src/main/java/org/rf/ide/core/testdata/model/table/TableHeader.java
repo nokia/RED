@@ -26,7 +26,23 @@ public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
     private final List<RobotToken> comment = new ArrayList<>();
 
     public TableHeader(final RobotToken tableHeader) {
-        this.tableHeader = tableHeader;
+        this.tableHeader = fixHeaderType(tableHeader);
+    }
+
+    private RobotToken fixHeaderType(final RobotToken tableHeader) {
+        // moves table header type to the begin of types list
+        IRobotTokenType headerType = null;
+        for (final IRobotTokenType type : tableHeader.getTypes()) {
+            if (RobotTokenType.isTableHeader(type)) {
+                headerType = type;
+                break;
+            }
+        }
+        if (headerType != null) {
+            tableHeader.getTypes().remove(headerType);
+            fixForTheType(tableHeader, headerType);
+        }
+        return tableHeader;
     }
 
     public void addColumnName(final RobotToken columnName) {
@@ -59,20 +75,20 @@ public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
     }
 
     @Override
-    public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+    public void setComment(final String comment) {
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -133,7 +149,7 @@ public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(columnNames, index);
     }
 }
