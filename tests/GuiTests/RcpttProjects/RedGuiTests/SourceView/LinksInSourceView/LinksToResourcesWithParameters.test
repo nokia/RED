@@ -1,0 +1,168 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _ECH_IISiEeWImNPXuPy_LQ
+Element-Name: LinksToResourcesWithParameters
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Ahon0NzHEea53q6vmC55pw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/18/17 1:50 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// use system specific slash using robot variable ${/}
+
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "#importing from second project\n"
+    + "Resource    ../SecondProject/res2/res.robot\n"
+    + "Resource    ../SecondProject/res1/res3/RES.ROBOT\n"
+    + "Resource    ../SecondProject/res1/res.robot\n"
+    + "Resource    ../SecondProject/res1/res3/second project res.robot\n\n"
+    + "#importing file from this project\n"
+    + "Resource    res2${/}res.robot\n"
+    + "Resource    ${CURDIR}/res1/res3/res.robot\n\n"
+    + "Resource    %{HOME}/res1/simple_res.robot\n"
+    + "Resource    res1/res.robot\n"
+    + "Resource    t\\\\n"
+    + ".robot\n"
+    + "Resource    empty/empty.robot\n"
+    + "Resource    text_file.txt\n"
+    + "Resource    Capture.JPG\n"
+    + "Resource  ${execDir}\n"
+    + "Resource  ${outputdir}/no_file.txt\n"
+    + "#supported now\n"
+    + "Resource    two \\ spaces/normal.robot\n"
+    + "Resource    special letters/!@#$%^&()_;.robot\n"
+    + "   \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    from res 2\n"
+    + "    from res 3" 
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s" 
+    
+with [get-view Problems | get-tree] {
+
+	get-item "Errors \\(4 items\\)/Resource import 'Capture.JPG' is invalid: given file is not a Resource file" 
+        | get-property caption | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" 
+        | verify-true
+        
+    get-item "Errors \\(4 items\\)/Resource import '.*' is invalid: given location does not point to a file" 
+        | get-property caption 
+        | equals [format "Resource import '%s%sMediumRobotTest' is invalid: given location does not point to a file" $RED_workspace_path $sys_sep]
+        | verify-true
+        
+        
+    get-item "Errors \\(4 items\\)/Resource import '.*' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
+        | get-property caption 
+        | equals [format "Resource import '%s%sMediumRobotTest/no_file.txt' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" $RED_workspace_path $sys_sep]
+        | verify-true
+        
+    get-item "Errors \\(4 items\\)/The import name\\/path '%{HOME}\\/res1\\/simple_res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+        | get-property caption 
+        | equals "The import name/path '%{HOME}/res1/simple_res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+        | verify-true
+        
+    get-item "Warnings \\(1 item\\)/The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
+        | get-property caption 
+        | equals "The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
+        | verify-true
+}
+    
+//correct file name for path with ${outputdir}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 19 26
+    key-type BackSpace -times 2
+    type-text text
+    key-type "M1+s"
+    
+    //go to source
+    key-type F3
+}
+
+//check if editor is opened
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "text_file.txt" | verify-true
+    get-property activePage | equals "text_file.txt" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+
+//check path with ${/}
+get-editor "TestFile.robot" | click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 22
+    open-declaration
+}
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "text_file.txt" | verify-true
+    get-property "pages[2]" | equals "res.robot" | verify-true
+    get-property activePage | equals "res.robot" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+
+//chek if good file is open
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Resource    ../../SecondProject/res2/res.robot\n"
+    + "Resource    ../res1/res3/res.robot\n\n"
+    + "*** Variables ***\n"
+    + "${a}  5\n"
+    + "${this is duplicate}  22    \n"
+    + "@{list2}  text  text2\n\n"
+    + "*** Keywords ***\n"
+    + "from res 2\n"
+    + "    Log  ${a}\n"
+    + "    Log  ${sc_2} \n"
+    + "    Log  ${c}\n\n"
+    + "kw duplicate\n"
+    + "    Log  this is duplicate from /res2.res.robot" | verify-true
+
+//back to test and open second file
+with [get-editor "TestFile.robot"] {   
+    click
+    with [get-text-viewer] {
+        hover-text 10 17
+        set-caret-pos 10 18
+    	open-declaration
+    }
+}
+
+get-editor "res.robot" -index 1 | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${c}  7\n"
+    + "${this is duplicate}  33\n\n\n"
+    + "*** Keywords ***\n"
+    + "from res 3\n"
+    + "    Log  ${c}\n"
+    + "    \n"
+    + "kw duplicate\n"
+    + "    Log  this is duplicate from /res3.res.robot" | verify-true
+
+
+
+//check if  "${outputdir}" shows correct path in second project
+get-view "Project Explorer" | get-tree | select "SecondProject/Script.robot" | double-click
+
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 6 1
+    type-text Resource
+    key-type Tab
+    type-text "${outputdir}/no_file.robot"
+    key-type "M1+s"
+}
+
+get-view Problems | get-tree 
+    | get-item "Errors \\(4 items\\)/Resource import 'D:\\aut-org.robotframework.red-2\\SecondProject\\/no_file.robot' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
+    | get-property caption 
+    | equals [format "Resource import '%s%sSecondProject/no_file.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" $RED_workspace_path $sys_sep]
+    | verify-true
+    
+
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
