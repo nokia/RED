@@ -233,7 +233,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 : RobotRuntimeEnvironment.getVersion(robotConfig.getExecutor());
 
         final Process process = DebugPlugin.exec(cmdLine.getCommandLine(),
-                robotProject.getProject().getLocation().toFile());
+                robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
         
         final RobotConsoleFacade consoleFacade = new RobotConsoleFacade();
