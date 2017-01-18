@@ -48,6 +48,9 @@ public class NavigatorActionsProvider extends CommonActionProvider {
             runTestCaseAction = new RunTestCaseAction(selectionProvider, Mode.RUN);
             debugTestCaseAction = new RunTestCaseAction(selectionProvider, Mode.DEBUG);
             deleteAction = new DeleteRobotElementAction(workbenchSite.getPage(), selectionProvider);
+
+            runTestCaseAction.updateEnablement((IStructuredSelection) selectionProvider.getSelection());
+            debugTestCaseAction.updateEnablement((IStructuredSelection) selectionProvider.getSelection());
         }
     }
 
