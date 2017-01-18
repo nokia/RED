@@ -1,0 +1,159 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA
+Element-Name: EnivironmentTabInRunConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _cufqoN2BEea53q6vmC55pw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/18/17 5:14 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add test and run it to create run config
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
+    + "Library    OperatingSystem    \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  %{my_var}\n"
+    + "    Log Environment Variables"
+
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+
+//check how tab look
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/TestFile.robot"
+    get-tab-folder | get-tab-item Environment | click
+}
+
+with [get-window "Run Configurations" | get-control Any -after [get-label "Name:"] -index 8] {
+    get-property "getChildren().length" | equals 4 | verify-true
+    
+    //label
+    get-property "getChildren().Control[0].getText()" | equals "Environment variables to &set:" | verify-true
+    
+    //table - checking column amount
+    get-property "getChildren().Control[1].getChildren().Control[0].getColumnCount()" | equals 2 | verify-true
+    
+    //buttons
+    get-property "getChildren().Control[2].getChildren().length" | equals 4 | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[0].getText()" | equals "N&ew..." | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "Se&lect..." | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[2].getText()" | equals "E&dit..." | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[3].getText()" | equals "Rem&ove" | verify-true
+    get-property "getChildren().Control[3].getChildren().length" | equals 2 | verify-true
+        
+    //radio buttton - append    
+    get-property "getChildren().Control[3].getChildren().Control[0].getSelection()" | equals true | verify-true
+    get-property "getChildren().Control[3].getChildren().Control[0].getEnabled()" | equals false | verify-true
+    get-property "getChildren().Control[3].getChildren().Control[0].getText()" 
+        | equals "&Append environment to native environment" | verify-true
+        
+    //radio buttton - replace        
+    get-property "getChildren().Control[3].getChildren().Control[1].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[3].getChildren().Control[1].isEnabled()" | equals false | verify-true
+    get-property "getChildren().Control[3].getChildren().Control[1].getText()" 
+        | equals "Re&place native environment with specified environment" | verify-true
+}
+
+//add variable
+with [get-window "Run Configurations"] {
+    get-button "New..." | click
+    with [get-window "New Environment Variable"] {
+        with [get-editbox -after [get-label "Name:"]] {
+            set-text "my_var"
+            // go to next box by tab
+            key-type "TRAVERSE_TAB_NEXT"
+        }
+        get-editbox -after [get-label "Value:"] | set-text 23
+        get-button OK | click
+    }
+}
+
+//check if options are enabled
+with [get-window "Run Configurations"] {
+    get-button "Append environment to native environment" | get-property enablement | equals true | verify-true
+    get-button "Replace native environment with specified environment" | get-property enablement | equals true 
+        | verify-true
+}
+
+//run test
+with [get-window "Run Configurations"] {
+    get-button Apply | click
+    get-button Run | click
+}
+
+//check if var was logged
+get-view "Message Log" | get-editbox | get-object |invoke getLine 1| matches  ".* : INFO : 23\n"
+get-view "Message Log" | get-editbox |get-property "getLineCount()" -raw | gt 3 | verify-true
+
+
+//add new var with special chars
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tab-folder | get-tab-item Environment | click
+    get-button "New..." | click
+    with [get-window "New Environment Variable"] {
+        get-editbox -after [get-label "Name:"] | set-text "!@#$%^ &*()78"
+        get-editbox -after [get-label "Value:"] | set-text text
+        get-button OK | click
+    }
+    get-button "Replace native environment with specified environment" | click
+    get-button Run | click
+}
+
+
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+    + ".* : INFO : 23\n"
+    + ".* : INFO : !@#\$%\^ &\*\(\)78 = text\n"
+    + ".* : INFO : MY_VAR = 23\n"
+    + ".* : INFO : SYSTEMROOT = .*\n"
+    + "Ending test: RobotProject.TestFile.test 1" | verify-true
+    
+//edit var by button    
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tab-folder | get-tab-item Environment | click
+    get-table | select "my_var"
+    get-button "Edit..." | click
+    with [get-window "Edit Environment Variable"] {
+        get-editbox -after [get-label "Value:"] | set-text 238
+        get-button OK | click
+    }
+}
+
+//check table
+with [get-window "Run Configurations" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "!@#$%^ &*()78" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "my_var" | verify-true
+}
+
+//remove var
+with [get-window "Run Configurations"] {
+    get-table | select "!@#$%^ &*()78"
+    get-button Remove | click
+    get-button Apply | click
+}
+
+//check table
+with [get-window "Run Configurations" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "my_var" | verify-true
+    
+}
+//add new config
+with [get-window "Run Configurations"] {
+    get-button "New launch configuration" | click
+}
+//check that no var is from previouse config
+get-window "Run Configurations" | get-table | get-property itemCount | equals 0 | verify-true
+get-window "Run Configurations" |  get-button Close | click
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
