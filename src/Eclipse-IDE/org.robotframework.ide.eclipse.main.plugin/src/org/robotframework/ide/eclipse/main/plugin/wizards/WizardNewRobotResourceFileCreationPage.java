@@ -8,6 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.wizards;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -88,6 +91,13 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
 
         if (currentNameWithoutExtension.isEmpty()) {
             setErrorMessage("Name cannot be empty");
+            return false;
+        }
+        IPath resourcePath = getContainerFullPath().append(currentName.toLowerCase());
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        if (workspace.getRoot().getFolder(resourcePath).exists()
+                || workspace.getRoot().getFile(resourcePath).exists()) {
+            setErrorMessage(String.format("Resource  \"%s\" already exists", currentName));
             return false;
         }
         return isValid;
