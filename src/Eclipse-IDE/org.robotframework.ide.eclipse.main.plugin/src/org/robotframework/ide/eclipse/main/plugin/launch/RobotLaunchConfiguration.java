@@ -250,6 +250,28 @@ public class RobotLaunchConfiguration {
         return configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
     }
 
+    public String[] getEnvironmentVariables() throws CoreException {
+        final Map<String, String> vars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
+                (Map<String, String>) null);
+        if (vars == null) {
+            return null;
+        }
+        final boolean shouldAppendVars = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES,
+                true);
+        final List<String> varMappings = new ArrayList<>();
+        if (shouldAppendVars) {
+            append(varMappings, System.getenv());
+        }
+        append(varMappings, vars);
+        return varMappings.toArray(new String[0]);
+    }
+
+    private void append(final List<String> varMappings, final Map<String, String> vars) {
+        for (final Entry<String, String> entry : vars.entrySet()) {
+            varMappings.add(entry.getKey() + "=" + entry.getValue());
+        }
+    }
+
     public Map<String, List<String>> getSuitePaths() throws CoreException {
         final Map<String, String> mapping = configuration.getAttribute(TEST_SUITES_ATTRIBUTE,
                 new HashMap<String, String>());
