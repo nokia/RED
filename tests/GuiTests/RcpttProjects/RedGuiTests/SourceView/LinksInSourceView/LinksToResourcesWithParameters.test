@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Ahon0NzHEea53q6vmC55pw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/18/17 1:50 PM
+Save-Time: 1/18/17 5:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -46,24 +46,31 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
     + "    from res 3" 
 get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s" 
     
-with [get-view Problems | get-tree] {
+get-view Problems | get-tree | select "Errors \\(.* items\\)" | double-click
 
-	get-item "Errors \\(4 items\\)/Resource import 'Capture.JPG' is invalid: given file is not a Resource file" 
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | get-property childCount | equals 4 | verify-true    
+}-else{
+    //one mor erro for linux path
+	get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | get-property childCount | equals 5 | verify-true
+}	
+with [get-view Problems | get-tree] {
+	get-item "Errors \\(.* items\\)/Resource import 'Capture.JPG' is invalid: given file is not a Resource file" 
         | get-property caption | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" 
         | verify-true
         
-    get-item "Errors \\(4 items\\)/Resource import '.*' is invalid: given location does not point to a file" 
+    get-item "Errors \\(.* items\\)/Resource import '.*' is invalid: given location does not point to a file" 
         | get-property caption 
         | equals [format "Resource import '%s%sMediumRobotTest' is invalid: given location does not point to a file" $RED_workspace_path $sys_sep]
         | verify-true
         
         
-    get-item "Errors \\(4 items\\)/Resource import '.*' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
+    get-item "Errors \\(.* items\\)/Resource import '.*' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
         | get-property caption 
         | equals [format "Resource import '%s%sMediumRobotTest/no_file.txt' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" $RED_workspace_path $sys_sep]
         | verify-true
         
-    get-item "Errors \\(4 items\\)/The import name\\/path '%{HOME}\\/res1\\/simple_res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+    get-item "Errors \\(.* items\\)/The import name\\/path '%{HOME}\\/res1\\/simple_res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
         | get-property caption 
         | equals "The import name/path '%{HOME}/res1/simple_res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
         | verify-true
@@ -156,8 +163,14 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | get-property childCount | equals 4 | verify-true    
+}-else{
+    //one mor erro for linux path
+	get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | get-property childCount | equals 5 | verify-true
+}
 get-view Problems | get-tree 
-    | get-item "Errors \\(4 items\\)/Resource import 'D:\\aut-org.robotframework.red-2\\SecondProject\\/no_file.robot' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
+    | get-item "Errors \\(.* items\\)/Resource import '.*' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
     | get-property caption 
     | equals [format "Resource import '%s%sSecondProject/no_file.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" $RED_workspace_path $sys_sep]
     | verify-true
