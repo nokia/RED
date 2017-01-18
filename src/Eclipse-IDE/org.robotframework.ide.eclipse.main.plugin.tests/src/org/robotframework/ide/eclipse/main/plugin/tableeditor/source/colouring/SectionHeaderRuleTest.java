@@ -1,22 +1,29 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.robotframework.red.junit.Conditions.absent;
 import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
 import org.junit.Test;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
+import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 
 public class SectionHeaderRuleTest {
 
@@ -71,6 +78,22 @@ public class SectionHeaderRuleTest {
         }
         assertThat(thereWasName).isTrue();
     }
+    
+    @Test
+    public void sectionHeadersAreRecognized_EvenWhenFollowedBySingleSpace() {
+        final List<RobotToken> headers = headersWithSpaces();
+        assertThat(headers).isNotEmpty();
+
+        for (final RobotToken token : headers) {
+            final int positionInsideToken = new Random().nextInt(token.getText().length());
+            final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken);
+
+            assertThat(evaluatedToken).is(present());
+            assertThat(evaluatedToken.get().getPosition())
+                    .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
+            assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
+        }
+    }
 
     private Optional<PositionedTextToken> evaluate(final RobotToken token) {
         return evaluate(token, 0);
@@ -78,5 +101,31 @@ public class SectionHeaderRuleTest {
 
     private Optional<PositionedTextToken> evaluate(final RobotToken token, final int position) {
         return testedRule.evaluate(token, position, new ArrayList<IRobotLineElement>());
+    }
+
+    private static List<RobotToken> headersWithSpaces() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases *** ")
+                .appendLine("*** Keywords *** ")
+                .appendLine("*** Variables *** ")
+                .appendLine("*** Settings *** ")
+                .appendLine("*** unknown section *** ")
+                .build();
+        final List<RobotLine> lines = model.getLinkedElement().getFileContent();
+        final List<RobotToken> tokens = new ArrayList<>();
+        for (final RobotLine line : lines) {
+            tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
+        }
+        return newArrayList(filter(tokens, contains("*")));
+    }
+
+    private static Predicate<RobotToken> contains(final String substring) {
+        return new Predicate<RobotToken>() {
+
+            @Override
+            public boolean apply(final RobotToken element) {
+                return element.getText().contains(substring);
+            }
+        };
     }
 }
