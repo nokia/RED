@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aJnaIM_iEeWblO0vn84SSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/17/17 9:58 AM
+Save-Time: 1/18/17 1:55 PM
 Testcase-Type: ecl
 Verifications: _gazR8NZREeW52_ojRMzdeg
 
@@ -93,8 +93,8 @@ get-editor "lib.py" | get-text-viewer | get-property text | equals "def keyword_
 //check that coursor is at the end of line
 with [get-editor "lib.py" | get-text-viewer] {
     get-property "caretPosition.line" | equals 8 | verify-true
-    get-property "caretPosition.column" | equals 27 | verify-true
-    get-property "getSelectionText()" | equals "def another_kw_from_lib():" | verify-true
+    get-property "caretPosition.column" | equals 24 | verify-true
+    get-property "getSelectionText()" | equals "another_kw_from_lib" | verify-true
 }
 
 with [get-tab-folder -index 1] {
