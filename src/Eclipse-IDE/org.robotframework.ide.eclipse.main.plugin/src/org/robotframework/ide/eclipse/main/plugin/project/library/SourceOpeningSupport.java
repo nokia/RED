@@ -136,7 +136,7 @@ public class SourceOpeningSupport {
             final TextSelection selection = new TextSelection(document.getLineOffset(line) + offset, length);
             editor.getSelectionProvider().setSelection(selection);
         } catch (final BadLocationException e) {
-            throw new LineSelectionException("Unable to select line: " + line, e);
+            throw new TextSelectionException("Unable to select text in line: " + line, e);
         }
     }
 
@@ -190,11 +190,11 @@ public class SourceOpeningSupport {
         }
     }
 
-    private static class LineSelectionException extends RuntimeException {
+    private static class TextSelectionException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
 
-        public LineSelectionException(final String message, final Throwable cause) {
+        public TextSelectionException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }
