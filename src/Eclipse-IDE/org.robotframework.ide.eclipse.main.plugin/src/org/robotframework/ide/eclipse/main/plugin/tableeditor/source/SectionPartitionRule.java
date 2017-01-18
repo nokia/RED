@@ -22,9 +22,12 @@ class SectionPartitionRule implements IPredicateRule {
 
     private final IToken token;
 
-    SectionPartitionRule(final Section sectionType, final IToken token) {
+    private final boolean isTsv;
+
+    SectionPartitionRule(final Section sectionType, final IToken token, final boolean isTsv) {
         this.sectionType = sectionType;
         this.token = token;
+        this.isTsv = isTsv;
     }
 
     @Override
@@ -60,7 +63,7 @@ class SectionPartitionRule implements IPredicateRule {
             return false;
         }
         final int readAdditionally = readBeforeSection(scanner);
-        final String sectionHeader = getSectionHeader(scanner);
+        final String sectionHeader = getCell(scanner, isTsv);
         if (sectionHeader.isEmpty()) {
             return false;
         }
@@ -72,7 +75,7 @@ class SectionPartitionRule implements IPredicateRule {
             return false;
         }
         final int readAdditionally = readBeforeSection(scanner);
-        final String sectionHeader = getSectionHeader(scanner);
+        final String sectionHeader = getCell(scanner, isTsv);
 
         if (sectionHeader.isEmpty()) {
             return false;
@@ -149,33 +152,54 @@ class SectionPartitionRule implements IPredicateRule {
         return readAdditionally;
     }
 
-    private static String getSectionHeader(final ICharacterScanner scanner) {
-        int next = scanner.read();
+    private static String getCell(final ICharacterScanner scanner, final boolean isTsv) {
+        final int next = scanner.read();
         if (next == '*') {
-            final StringBuilder header = new StringBuilder();
-            header.append((char) next);
-            do {
-                next = scanner.read();
-                header.append((char) next);
-            } while (next == '*');
-
-            while (next == '*' || next == ' ' || next == '\t' || Character.isLetter(next)) {
-                next = scanner.read();
-                header.append((char) next);
-            }
-            header.deleteCharAt(header.length() - 1);
-            scanner.unread();
-            return header.toString();
+            return isTsv ? getTsvCell(scanner) : getNormalCell(scanner);
         } else {
             scanner.unread();
             return "";
         }
     }
 
-    private static final String PIPED_SECTION_START = "^\\*(\\s*\\*)*\\s?";
+    private static String getNormalCell(final ICharacterScanner scanner) {
+        final StringBuilder header = new StringBuilder("*");
+        int next;
+        do {
+            next = scanner.read();
+            header.append((char) next);
+        } while (next != ICharacterScanner.EOF && next != '\r' && next != '\n' && next != '\t'
+                && !isSeparator(scanner, next));
+        header.deleteCharAt(header.length() - 1);
+        scanner.unread();
+        return header.toString();
+    }
+
+    private static boolean isSeparator(final ICharacterScanner scanner, final int next) {
+        if (next == ' ') {
+            final String lookahead = lookAhead(scanner, 2);
+            return lookahead.startsWith(" ") || lookahead.startsWith("| ") || lookahead.startsWith("|\t")
+                    || lookahead.startsWith("|\n") || lookahead.startsWith("|\r");
+        }
+        return false;
+    }
+
+    private static String getTsvCell(final ICharacterScanner scanner) {
+        final StringBuilder header = new StringBuilder("*");
+        int next;
+        do {
+            next = scanner.read();
+            header.append((char) next);
+        } while (next != ICharacterScanner.EOF && next != '\r' && next != '\n' && next != '\t');
+        header.deleteCharAt(header.length() - 1);
+        scanner.unread();
+        return header.toString();
+    }
+
+    private static final String PIPED_SECTION_START = "^\\*(\\s*\\*)*\\s*";
     private static final String PIPED_SECTION_END = "(\\s*\\*)*((( \\|).*)?|\\s*)$";
 
-    private static final String NORMAL_SECTION_START = "^\\*(\\s?\\*)*\\s?";
+    private static final String NORMAL_SECTION_START = "^\\*(\\s?\\*)*\\s*";
     private static final String NORMAL_SECTION_END = "\\s?(\\*\\s?)*(((  )|\\t).*)?$";
 
 
@@ -223,9 +247,9 @@ class SectionPartitionRule implements IPredicateRule {
 
         private final Pattern pipedStartPattern;
 
-        private Section(final Pattern normalPattern, final Pattern pipedStartPattenr) {
+        private Section(final Pattern normalPattern, final Pattern pipedStartPattern) {
             this.normalPattern = normalPattern;
-            this.pipedStartPattern = pipedStartPattenr;
+            this.pipedStartPattern = pipedStartPattern;
         }
 
         boolean matches(final String header, final boolean startedWithPipedSeparator) {
