@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Pko4gIbxEeWrUbOa1Nzguw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/22/16 4:19 PM
+Save-Time: 1/17/17 5:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -150,9 +150,7 @@ with [get-editor "res.robot" | get-text-viewer] {
     open-declaration
 }
 
-//editor should not be open
-get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Resource    ../res1/res3/res.ROBOT" | verify-true
+//editor should be open on windows
 with [get-tab-folder -index 1] {
     get-property "pages[0]" | equals "TestFile.robot" | verify-true
     get-property "pages[1]" | equals "*res.robot" | verify-true
@@ -160,284 +158,291 @@ with [get-tab-folder -index 1] {
     get-property "pages[3]" | equals "second project res.robot" | verify-true
     get-property "pages[4]" | equals "text_file.txt" | verify-true
     get-property "pages[5]" | equals "RES.ROBOT" | verify-true
-    get-property activePage | equals "*res.robot" | verify-true
     get-property tabCount | equals 6 | verify-true
 }
 
-// use system specific slash using robot variable ${/}
-get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
-get-view "Project Explorer" | get-tree | select "MediumRobotTest/res2/res.robot" | double-click
-get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 9 17
-    key-type Delete
-    type-text "${/}"
-}
-
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 26 1
-    type-text "   from res 2"
-	key-type "M1+M2+F5"
-}
-
-//revalidate project
-get-editor "TestFile.robot" | get-text-viewer | key-type "M1+M2+F5"
-
-// KW is recognised
-get-tab-folder -index 4 | get-tab-item Problems | click
-//expand Problems
-get-view Problems | get-tree | select "Errors \\(.* item[s]?\\)" | double-click
-try -times 4 -delay 1000 -command{
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
-		get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property childCount | equals 2 | verify-true
-		with [get-view Problems | get-tree] {
-		    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-		        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
-		    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-		        | equals "Variable 'sc_2' is used, but not defined" | verify-true
-			}
-	}-else{
-		get-view Problems | get-tree | get-item "Errors \\(4 items\\)" | get-property childCount | equals 4 | verify-true
-	}
-}
-
-// Check if ${CURDIR} is recognised
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 9 25
-    open-declaration
-}
-
-// append ${CURDIR} to one of recognised resources
-get-tab-folder -index 1 | get-tab-item "*TestFile.robot" | click
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 9 13
-    type-text "${CURDIR}/"
-
-
-}
-// there should be no more errors than previously 2/3
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
-	get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property childCount | equals 2 | verify-true
-	with [get-view Problems | get-tree] {
-	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
-	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
-	}
-}-else{
-	get-view Problems | get-tree | get-item "Errors \\(4 items\\)" | get-property childCount | equals 4 | verify-true
-}
-
-
-get-editor "res.robot" -index 1 | get-text-viewer | set-caret-pos 9 1
-
-// check if env variable are supported %{HOME} - as this is env var, path is parametrised and error should be rised
-get-tab-folder -index 1 | get-tab-item "*TestFile.robot" | click
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 9 13
-    type-text "%{HOME}/"
-    wait 1000
-    }
-    
-// there should be no more errors than previously 5 as now path is parametrised 
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
-	get-view Problems | get-tree | get-item "Errors \\(4 items\\)" | get-property childCount | equals 4 | verify-true
-	with [get-view Problems | get-tree] {
-	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
-	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-	        | equals "The import name/path '%{HOME}/${CURDIR}/res2${/}res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
-	        | verify-true
-	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-	        | equals "Unknown keyword 'from res 2'" | verify-true
-	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
-	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
-	}
-}-else{
-	get-view Problems | get-tree | get-item "Errors \\(6 items\\)" | get-property childCount | equals 6 | verify-true
-}
-
-//---------------------- checking {execDir} and {outputdir} ----------------------------------------------------------------
-
-//add new resource with execDir
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 18 1
-    type-text "Resource  ${execDir}"
-    key-type "M1+s"
-
-}
-//this is workaround for problem with double errors
-get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
-wait 1000
-get-workspace-location | let [val project_path -input ]{
-	//check error to see path
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
-		get-view Problems | get-tree 
-		    | get-item "Errors \\(7 items\\)/.*is invalid: given location does not point to a file" 
-		    | get-property caption 
-		    | equals [format "Resource import '%s\\MediumRobotTest' is invalid: given location does not point to a file" $project_path]
-		    | verify-true
-	}-else{
-		get-view Problems | get-tree 
-	    | get-item "Errors \\(9 items\\)/.*is invalid: given location does not point to a file" 
-	    | get-property caption 
-	    | equals [format "Resource import '%s/MediumRobotTest' is invalid: given location does not point to a file" $project_path]
-	    | verify-true
-	}
-    
-	//add file name
-	with [get-editor "TestFile.robot" | get-text-viewer] {
-	    set-caret-pos 18 21
-	    type-text "/"
-	    type-text "text_file.txt"
-	}
-	wait 1000
-	//open declaration
-	with [get-editor "TestFile.robot" | get-text-viewer] {
-	    set-caret-pos 18 29
-	    open-declaration
-	}
-	get-tab-folder -index 1 | get-property activePage | equals "text_file.txt" | verify-true
-	
-	//check that error is gone
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{  
-		with [get-view Problems | get-tree] {
-		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-		        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
-		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
-		        | equals "The import name/path '%{HOME}/${CURDIR}/res2${/}res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
-		        | verify-true
-		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-		        | equals "Unknown keyword 'from res 2 second project'" | verify-true
-		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
-		        | equals "Unknown keyword 'from res 2'" | verify-true
-		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
-		        | equals "Variable 'sc_2' is used, but not defined" | verify-true
-		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
-		        | equals "Variable 'sc_2' is used, but not defined" | verify-true
-		}
-	}-else{
-
-	
-	with [get-view Problems | get-tree] {
-	    get-property "getItems().TreeItem[0].getText()" | equals "Errors (8 items)" | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-	        | equals "Resource import '../res1/res3/res.ROBOT' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
-	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "Resource import 't\\\\n"
-	        + ".robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" 
-	        | equals "The import name/path '%{HOME}/${CURDIR}/res2${/}res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
-	        | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[4].getText()" 
-	        | equals "Unknown keyword 'from res 2 second project'" | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[5].getText()" | equals "Unknown keyword 'from res 2'" 
-	        | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[6].getText()" 
-	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
-	    get-property "getItems().TreeItem[0].getItems().TreeItem[7].getText()" 
-	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
-	}
-	get-view Problems | get-tree 
-	    | get-item "Warnings \\(1 item\\)/The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
-	    | get-property caption 
-	    | equals "The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
-	    | verify-true
-		
-	}	
-	
-	//remove ${execDir} and add {outputdir}
-	with [get-editor "TestFile.robot" | get-text-viewer] {
-	    set-caret-pos 18 35
-	    key-type BackSpace
-	    key-type BackSpace -times 21
-	    type-text "outputdir}"
-	    key-type "M1+s"
-	}
-	//check error to see path inside param
-	wait 2000
-	get-view Problems | get-tree 
-	    | get-item "Errors \\(.* items\\)/.*is invalid: given location does not point to a file" 
-	    | get-property caption 
-	    | equals [format "Resource import '%s%sMediumRobotTest' is invalid: given location does not point to a file" $project_path $sys_sep]
-	    | verify-true
-    
-    //add file name and open decalraion
-	with [get-editor "TestFile.robot" | get-text-viewer] {
-	    set-caret-pos 18 23
-	    type-text "/text_file.txt"
-	    key-type "M1+s"
-	    set-caret-pos 18 27
-	    open-declaration
-	}
-	get-tab-folder -index 1 | get-property activePage | equals "text_file.txt" | verify-true
-	
-	//check this param in other porject
-	get-view "Project Explorer" | get-tree | select "SecondProject/Script.robot" | double-click
-	with [get-editor "Script.robot" | get-text-viewer] {
-	    set-caret-pos 6 1
-	    type-text "Resource    ${EXECDIR}"
-	    key-type "M1+s"
-	}
-	
-	get-menu "Project/Clean..." | click
-	get-window Clean | get-button OK | click
-	wait 1000
-		    
-	get-view Problems | get-tree 
-	    | get-item "Errors \\(.*\\)/Resource import '.*' is invalid: given location does not point to a file" 
-	    | get-property caption 
-	    | equals [format "Resource import '%s%sSecondProject' is invalid: given location does not point to a file" $project_path $sys_sep]
-	    | verify-true	   
-		
-	
-	 //check that error exists
-    if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{ 
-	    get-view Problems | get-label "7 errors, 1 warning, 0 others" | get-property caption 
-	    | equals "7 errors, 1 warning, 0 others" | verify-true
-    }-else{
-	    get-view Problems | get-label "9 errors, 1 warning, 0 others" | get-property caption 
-		    | equals "9 errors, 1 warning, 0 others" | verify-true
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-tab-folder -index 1 | get-property activePage | equals "RES.ROBOT" | verify-true
 	    
-    }
-    
-	//remove enire line
-	with [get-editor "Script.robot" | get-text-viewer] {
-	    set-caret-pos 6 22
-	    select-range 6 23 6 1
-	    key-type BackSpace
-	    key-type "M1+s"
-    }
-    
-    get-menu "Project/Clean..." | click
-	get-window Clean | get-button OK | click
+}-else{
+	get-tab-folder -index 1 | get-property activePage | equals "*res.robot" | verify-true
 
-    try -times 5 -delay 1000 -command{
-	    //check that error not exists
-	    if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{ 
-		    get-view Problems | get-label "6 errors, 1 warning, 0 others" | get-property caption 
-		    | equals "6 errors, 1 warning, 0 others" | verify-true
-	    }-else{
-		    get-view Problems | get-label "8 errors, 1 warning, 0 others" | get-property caption 
-			    | equals "8 errors, 1 warning, 0 others" | verify-true
-		    
-	    }
-	}
-    //add resource with "{outputdir}"
-	with [get-editor "Script.robot" | get-text-viewer] {
-	    set-caret-pos 6 1
-	    type-text "Resource   ${outputdir}"
-	    key-type "M1+s"
-	}
-	wait 1000
-		    
-	get-view Problems | get-tree 
-	    | get-item "Errors \\(.*\\)/Resource import '.*' is invalid: given location does not point to a file" 
-	    | get-property caption 
-	    | equals [format "Resource import '%s%sSecondProject' is invalid: given location does not point to a file" $project_path $sys_sep]
-	    | verify-true	   
-	    
 }
+
+//// use system specific slash using robot variable ${/}
+//get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+//get-view "Project Explorer" | get-tree | select "MediumRobotTest/res2/res.robot" | double-click
+//get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 9 17
+//    key-type Delete
+//    type-text "${/}"
+//}
+//
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 26 1
+//    type-text "   from res 2"
+//	key-type "M1+M2+F5"
+//}
+//
+////revalidate project
+//get-editor "TestFile.robot" | get-text-viewer | key-type "M1+M2+F5"
+//
+//// KW is recognised
+//get-tab-folder -index 4 | get-tab-item Problems | click
+////expand Problems
+//get-view Problems | get-tree | select "Errors \\(.* item[s]?\\)" | double-click
+//try -times 4 -delay 1000 -command{
+//	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+//		get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property childCount | equals 2 | verify-true
+//		with [get-view Problems | get-tree] {
+//		    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+//		        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
+//		    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+//		        | equals "Variable 'sc_2' is used, but not defined" | verify-true
+//			}
+//	}-else{
+//		get-view Problems | get-tree | get-item "Errors \\(4 items\\)" | get-property childCount | equals 4 | verify-true
+//	}
+//}
+//
+//// Check if ${CURDIR} is recognised
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 9 25
+//    open-declaration
+//}
+//
+//// append ${CURDIR} to one of recognised resources
+//get-tab-folder -index 1 | get-tab-item "*TestFile.robot" | click
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 9 13
+//    type-text "${CURDIR}/"
+//
+//
+//}
+//// there should be no more errors than previously 2/3
+//if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+//	get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property childCount | equals 2 | verify-true
+//	with [get-view Problems | get-tree] {
+//	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+//	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
+//	    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+//	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
+//	}
+//}-else{
+//	get-view Problems | get-tree | get-item "Errors \\(4 items\\)" | get-property childCount | equals 4 | verify-true
+//}
+//
+//
+//get-editor "res.robot" -index 1 | get-text-viewer | set-caret-pos 9 1
+//
+//// check if env variable are supported %{HOME} - as this is env var, path is parametrised and error should be rised
+//get-tab-folder -index 1 | get-tab-item "*TestFile.robot" | click
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 9 13
+//    type-text "%{HOME}/"
+//    wait 1000
+//    }
+//    
+//// there should be no more errors than previously 5 as now path is parametrised 
+//if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+//	get-view Problems | get-tree | get-item "Errors \\(4 items\\)" | get-property childCount | equals 4 | verify-true
+//	with [get-view Problems | get-tree] {
+//	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+//	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
+//	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+//	        | equals "The import name/path '%{HOME}/${CURDIR}/res2${/}res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+//	        | verify-true
+//	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+//	        | equals "Unknown keyword 'from res 2'" | verify-true
+//	    get-item "Errors \\(4 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+//	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
+//	}
+//}-else{
+//	get-view Problems | get-tree | get-item "Errors \\(6 items\\)" | get-property childCount | equals 6 | verify-true
+//}
+//
+////---------------------- checking {execDir} and {outputdir} ----------------------------------------------------------------
+//
+////add new resource with execDir
+//with [get-editor "TestFile.robot" | get-text-viewer] {
+//    set-caret-pos 18 1
+//    type-text "Resource  ${execDir}"
+//    key-type "M1+s"
+//
+//}
+////this is workaround for problem with double errors
+//get-menu "Project/Clean..." | click
+//get-window Clean | get-button OK | click
+//wait 1000
+//get-workspace-location | let [val project_path -input ]{
+//	//check error to see path
+//	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+//		get-view Problems | get-tree 
+//		    | get-item "Errors \\(7 items\\)/.*is invalid: given location does not point to a file" 
+//		    | get-property caption 
+//		    | equals [format "Resource import '%s\\MediumRobotTest' is invalid: given location does not point to a file" $project_path]
+//		    | verify-true
+//	}-else{
+//		get-view Problems | get-tree 
+//	    | get-item "Errors \\(9 items\\)/.*is invalid: given location does not point to a file" 
+//	    | get-property caption 
+//	    | equals [format "Resource import '%s/MediumRobotTest' is invalid: given location does not point to a file" $project_path]
+//	    | verify-true
+//	}
+//    
+//	//add file name
+//	with [get-editor "TestFile.robot" | get-text-viewer] {
+//	    set-caret-pos 18 21
+//	    type-text "/"
+//	    type-text "text_file.txt"
+//	}
+//	wait 1000
+//	//open declaration
+//	with [get-editor "TestFile.robot" | get-text-viewer] {
+//	    set-caret-pos 18 29
+//	    open-declaration
+//	}
+//	get-tab-folder -index 1 | get-property activePage | equals "text_file.txt" | verify-true
+//	
+//	//check that error is gone
+//	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{  
+//		with [get-view Problems | get-tree] {
+//		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+//		        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
+//		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+//		        | equals "The import name/path '%{HOME}/${CURDIR}/res2${/}res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+//		        | verify-true
+//		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+//		        | equals "Unknown keyword 'from res 2 second project'" | verify-true
+//		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+//		        | equals "Unknown keyword 'from res 2'" | verify-true
+//		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+//		        | equals "Variable 'sc_2' is used, but not defined" | verify-true
+//		    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+//		        | equals "Variable 'sc_2' is used, but not defined" | verify-true
+//		}
+//	}-else{
+//
+//	
+//	with [get-view Problems | get-tree] {
+//	    get-property "getItems().TreeItem[0].getText()" | equals "Errors (8 items)" | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+//	        | equals "Resource import '../res1/res3/res.ROBOT' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+//	        | equals "Resource import 'Capture.JPG' is invalid: given file is not a Resource file" | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "Resource import 't\\\\n"
+//	        + ".robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" 
+//	        | equals "The import name/path '%{HOME}/${CURDIR}/res2${/}res.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+//	        | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[4].getText()" 
+//	        | equals "Unknown keyword 'from res 2 second project'" | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[5].getText()" | equals "Unknown keyword 'from res 2'" 
+//	        | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[6].getText()" 
+//	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
+//	    get-property "getItems().TreeItem[0].getItems().TreeItem[7].getText()" 
+//	        | equals "Variable 'sc_2' is used, but not defined" | verify-true
+//	}
+//	get-view Problems | get-tree 
+//	    | get-item "Warnings \\(1 item\\)/The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
+//	    | get-property caption 
+//	    | equals "The keyword 'kw duplicate' is masking the keyword 'kw duplicate' defined in res. Use 'res.kw duplicate' in this suite file if the latter is desired" 
+//	    | verify-true
+//		
+//	}	
+//	
+//	//remove ${execDir} and add {outputdir}
+//	with [get-editor "TestFile.robot" | get-text-viewer] {
+//	    set-caret-pos 18 35
+//	    key-type BackSpace
+//	    key-type BackSpace -times 21
+//	    type-text "outputdir}"
+//	    key-type "M1+s"
+//	}
+//	//check error to see path inside param
+//	wait 2000
+//	get-view Problems | get-tree 
+//	    | get-item "Errors \\(.* items\\)/.*is invalid: given location does not point to a file" 
+//	    | get-property caption 
+//	    | equals [format "Resource import '%s%sMediumRobotTest' is invalid: given location does not point to a file" $project_path $sys_sep]
+//	    | verify-true
+//    
+//    //add file name and open decalraion
+//	with [get-editor "TestFile.robot" | get-text-viewer] {
+//	    set-caret-pos 18 23
+//	    type-text "/text_file.txt"
+//	    key-type "M1+s"
+//	    set-caret-pos 18 27
+//	    open-declaration
+//	}
+//	get-tab-folder -index 1 | get-property activePage | equals "text_file.txt" | verify-true
+//	
+//	//check this param in other porject
+//	get-view "Project Explorer" | get-tree | select "SecondProject/Script.robot" | double-click
+//	with [get-editor "Script.robot" | get-text-viewer] {
+//	    set-caret-pos 6 1
+//	    type-text "Resource    ${EXECDIR}"
+//	    key-type "M1+s"
+//	}
+//	
+//	get-menu "Project/Clean..." | click
+//	get-window Clean | get-button OK | click
+//	wait 1000
+//		    
+//	get-view Problems | get-tree 
+//	    | get-item "Errors \\(.*\\)/Resource import '.*' is invalid: given location does not point to a file" 
+//	    | get-property caption 
+//	    | equals [format "Resource import '%s%sSecondProject' is invalid: given location does not point to a file" $project_path $sys_sep]
+//	    | verify-true	   
+//		
+//	
+//	 //check that error exists
+//    if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{ 
+//	    get-view Problems | get-label "7 errors, 1 warning, 0 others" | get-property caption 
+//	    | equals "7 errors, 1 warning, 0 others" | verify-true
+//    }-else{
+//	    get-view Problems | get-label "9 errors, 1 warning, 0 others" | get-property caption 
+//		    | equals "9 errors, 1 warning, 0 others" | verify-true
+//	    
+//    }
+//    
+//	//remove enire line
+//	with [get-editor "Script.robot" | get-text-viewer] {
+//	    set-caret-pos 6 22
+//	    select-range 6 23 6 1
+//	    key-type BackSpace
+//	    key-type "M1+s"
+//    }
+//    
+//    get-menu "Project/Clean..." | click
+//	get-window Clean | get-button OK | click
+//
+//    try -times 5 -delay 1000 -command{
+//	    //check that error not exists
+//	    if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{ 
+//		    get-view Problems | get-label "6 errors, 1 warning, 0 others" | get-property caption 
+//		    | equals "6 errors, 1 warning, 0 others" | verify-true
+//	    }-else{
+//		    get-view Problems | get-label "8 errors, 1 warning, 0 others" | get-property caption 
+//			    | equals "8 errors, 1 warning, 0 others" | verify-true
+//		    
+//	    }
+//	}
+//    //add resource with "{outputdir}"
+//	with [get-editor "Script.robot" | get-text-viewer] {
+//	    set-caret-pos 6 1
+//	    type-text "Resource   ${outputdir}"
+//	    key-type "M1+s"
+//	}
+//	wait 1000
+//		    
+//	get-view Problems | get-tree 
+//	    | get-item "Errors \\(.*\\)/Resource import '.*' is invalid: given location does not point to a file" 
+//	    | get-property caption 
+//	    | equals [format "Resource import '%s%sSecondProject' is invalid: given location does not point to a file" $project_path $sys_sep]
+//	    | verify-true	   
+//	    
+//}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
