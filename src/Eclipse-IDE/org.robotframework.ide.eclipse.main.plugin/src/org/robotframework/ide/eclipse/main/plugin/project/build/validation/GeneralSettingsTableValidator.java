@@ -16,8 +16,6 @@ import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.ATags;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
@@ -260,10 +258,12 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     private void validateTags(final List<? extends ATags<?>> tagsSetting) {
         boolean wasAllEmpty = true;
 
+        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
         for (final ATags<?> tags : tagsSetting) {
             if (!tags.getTags().isEmpty()) {
                 wasAllEmpty = false;
-                validateVariablesInTagsSettings(tags.getTags());
+                final Set<String> accessibleVariables = validationContext.getAccessibleVariables();
+                unknownVarsValidator.reportUnknownVars(tags.getTags(), accessibleVariables);
             }
         }
 
@@ -314,16 +314,6 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         if (!executableRows.isEmpty()) {
             final Set<String> variables = validationContext.getAccessibleVariables();
             TestCaseTableValidator.reportUnknownVariables(validationContext, reporter, executableRows, variables);
-        }
-    }
-
-    private void validateVariablesInTagsSettings(final List<RobotToken> tags) {
-        final Set<String> accessibleVariables = validationContext.getAccessibleVariables();
-        for (final RobotToken tag : tags) {
-            final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
-                    .extract(tag, validationContext.getFile().getName()).getCorrectVariables();
-            TestCaseTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
-                    variablesDeclarationsInTag, accessibleVariables);
         }
     }
 
