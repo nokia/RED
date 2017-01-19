@@ -11,14 +11,12 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.navigator.CommonActionProvider;
 import org.eclipse.ui.navigator.ICommonActionConstants;
 import org.eclipse.ui.navigator.ICommonActionExtensionSite;
 import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.DeleteRobotElementAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.OpenAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction.Mode;
@@ -28,7 +26,6 @@ public class NavigatorActionsProvider extends CommonActionProvider {
     private ISelectionProvider selectionProvider;
 
     private OpenAction openAction;
-    private DeleteRobotElementAction deleteAction;
     private RunTestCaseAction runTestCaseAction;
     private RunTestCaseAction debugTestCaseAction;
 
@@ -47,21 +44,22 @@ public class NavigatorActionsProvider extends CommonActionProvider {
             openAction = new OpenAction(workbenchSite.getPage(), selectionProvider);
             runTestCaseAction = new RunTestCaseAction(selectionProvider, Mode.RUN);
             debugTestCaseAction = new RunTestCaseAction(selectionProvider, Mode.DEBUG);
-            deleteAction = new DeleteRobotElementAction(workbenchSite.getPage(), selectionProvider);
 
-            runTestCaseAction.updateEnablement((IStructuredSelection) selectionProvider.getSelection());
-            debugTestCaseAction.updateEnablement((IStructuredSelection) selectionProvider.getSelection());
+            updateElements((IStructuredSelection) selectionProvider.getSelection());
         }
+    }
+
+    private void updateElements(IStructuredSelection selection) {
+        openAction.updateEnablement(selection);
+        runTestCaseAction.updateEnablement(selection);
+        debugTestCaseAction.updateEnablement(selection);
     }
 
     private ISelectionChangedListener createSelectionListener() {
         return new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                openAction.updateEnablement((IStructuredSelection) event.getSelection());
-                runTestCaseAction.updateEnablement((IStructuredSelection) event.getSelection());
-                debugTestCaseAction.updateEnablement((IStructuredSelection) event.getSelection());
-                deleteAction.updateEnablement((IStructuredSelection) event.getSelection());
+                updateElements((IStructuredSelection) event.getSelection());
             }
         };
     }
@@ -75,7 +73,6 @@ public class NavigatorActionsProvider extends CommonActionProvider {
     @Override
     public void fillActionBars(final IActionBars actionBars) {
         actionBars.setGlobalActionHandler(ICommonActionConstants.OPEN, openAction);
-        actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(), deleteAction);
     }
 
     @Override
@@ -83,6 +80,5 @@ public class NavigatorActionsProvider extends CommonActionProvider {
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, openAction);
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, runTestCaseAction);
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, debugTestCaseAction);
-        menu.appendToGroup(ICommonMenuConstants.GROUP_EDIT, deleteAction);
     }
 }
