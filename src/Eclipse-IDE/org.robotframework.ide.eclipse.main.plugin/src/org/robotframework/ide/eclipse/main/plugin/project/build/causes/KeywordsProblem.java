@@ -333,15 +333,10 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final String keywordName = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
-            final String keywordOriginalName = marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null);
-            final IFile suiteFile = (IFile) marker.getResource();
 
             final ArrayList<IMarkerResolution> fixers = newArrayList();
-            fixers.addAll(ImportLibraryFixer.createFixers(suiteFile, keywordName));
-            fixers.addAll(CreateKeywordFixer.createFixers(keywordOriginalName));
             fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
-                    new SimilaritiesAnalyst().provideSimilarAccessibleKeywords(suiteFile, keywordName)));
+                    newArrayList("IN", "IN RANGE", "IN ENUMERATE", "IN ZIP")));
 
             return fixers;
         }
