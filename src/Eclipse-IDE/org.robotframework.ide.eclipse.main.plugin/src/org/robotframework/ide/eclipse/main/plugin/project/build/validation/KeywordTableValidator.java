@@ -20,7 +20,6 @@ import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
@@ -220,7 +219,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             allVariables.addAll(extractArgumentVariables(keyword, variableExtractor, fileName));
 
             reportUnknownVariablesInTimeoutSetting(keyword, allVariables);
-            reportUnknownVariablesInTagsSetting(keyword, allVariables);
+            reportUnknownVariablesInTags(keyword, allVariables);
             TestCaseTableValidator.reportUnknownVariables(validationContext, reporter,
                     collectKeywordExeRowsForVariablesChecking(keyword), allVariables);
         }
@@ -258,18 +257,12 @@ class KeywordTableValidator implements ModelUnitValidator {
         return arguments;
     }
 
-    private void reportUnknownVariablesInTagsSetting(final UserKeyword keyword, final Set<String> variables) {
+    private void reportUnknownVariablesInTags(final UserKeyword keyword, final Set<String> variables) {
         final List<KeywordTags> tags = keyword.getTags();
-        for (final KeywordTags keywordTags : tags) {
-            final List<RobotToken> tagsTokens = keywordTags.getTags();
-            for (final RobotToken tagToken : tagsTokens) {
-                final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
-                        .extract(tagToken, validationContext.getFile().getName()).getCorrectVariables();
-                if (!variablesDeclarationsInTag.isEmpty()) {
-                    TestCaseTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
-                            variablesDeclarationsInTag, variables);
-                }
-            }
+
+        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
+        for (final KeywordTags tag : tags) {
+            unknownVarsValidator.reportUnknownVars(tag.getTags(), variables);
         }
     }
 

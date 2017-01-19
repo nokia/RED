@@ -82,6 +82,8 @@ public class ProblemsReportingStrategy {
 
     public class ReportingInterruptedException extends RuntimeException {
 
+        private static final long serialVersionUID = 1L;
+
         public ReportingInterruptedException(final String message) {
             super(message);
         }

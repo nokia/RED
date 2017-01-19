@@ -13,7 +13,10 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -66,6 +69,8 @@ class VariablesTableValidator implements ModelUnitValidator {
         reportInvalidVariableName(variableTable);
         reportUnknownVariableTypes(variableTable);
         reportDuplicatedVariables(variableTable);
+        reportDictionaryValuesWithInvalidSyntax(variableTable);
+        reportUnknownVariablesInValues(variableTable);
     }
 
     private void reportVersionSpecificProblems(final VariableTable variableTable, final IProgressMonitor monitor)
@@ -134,6 +139,36 @@ class VariablesTableValidator implements ModelUnitValidator {
                         variable.getName());
                 reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
             }
+        }
+    }
+
+    private void reportDictionaryValuesWithInvalidSyntax(final VariableTable variableTable) {
+        for (final AVariable variableDef : variableTable.getVariables()) {
+            if (variableDef.getType() == VariableType.DICTIONARY) {
+                final DictionaryVariable dictionaryDef = (DictionaryVariable) variableDef;
+
+                for (final DictionaryKeyValuePair pair : dictionaryDef.getItems()) {
+                    if (!pair.getRaw().getText().contains("=")) {
+                        final String value = pair.getRaw().getText();
+                        final RobotProblem problem = RobotProblem
+                                .causedBy(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX)
+                                .formatMessageWith(value, variableDef.getName());
+                        final Map<String, Object> attributes = ImmutableMap
+                                .<String, Object> of(AdditionalMarkerAttributes.VALUE, value);
+
+                        reporter.handleProblem(problem, validationContext.getFile(), pair.getRaw(), attributes);
+                    }
+                }
+            }
+        }
+    }
+
+    private void reportUnknownVariablesInValues(final VariableTable variableTable) {
+        final Set<String> variables = validationContext.getAccessibleVariables();
+        final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
+
+        for (final AVariable variableDef : variableTable.getVariables()) {
+            unknownVarsValidator.reportUnknownVars(variableDef.getValueTokens(), variables);
         }
     }
 }
