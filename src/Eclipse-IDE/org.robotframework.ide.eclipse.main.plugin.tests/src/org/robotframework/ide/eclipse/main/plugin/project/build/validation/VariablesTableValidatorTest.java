@@ -6,8 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -62,7 +66,7 @@ public class VariablesTableValidatorTest {
                 .appendLine("*** Variables ***")
                 .appendLine("${scalar}  1")
                 .appendLine("@{list}  1")
-                .appendLine("&{dict}  1")
+                .appendLine("&{dict}  k=v")
                 .build();
 
         final FileValidationContext context = prepareContext();
@@ -184,6 +188,49 @@ public class VariablesTableValidatorTest {
     }
     
     @Test
+    public void invalidDictionaryItemsAreReported() throws Exception {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Variables ***")
+                .appendLine("&{dict}  a  ${b}  c=  d=1")
+                .build();
+
+        final FileValidationContext context = prepareContext(newHashSet("${b}"));
+        final VariablesTableValidator validator = new VariablesTableValidator(context,
+                file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
+        assertThat(reporter.getReportedProblems()).containsOnly(
+                new Problem(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX,
+                        new ProblemPosition(2, Range.closed(27, 28))),
+                new Problem(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX,
+                        new ProblemPosition(2, Range.closed(30, 34))));
+    }
+    
+    @Test
+    public void unknownVariablesAreReportedInValues() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Variables ***")
+                .appendLine("${scalar}  ${a}")
+                .appendLine("@{list}  ${b}  ${c}")
+                .appendLine("&{dict}  k1=${d}  k2=${e}")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final VariablesTableValidator validator = new VariablesTableValidator(context,
+                file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(5);
+        assertThat(reporter.getReportedProblems()).containsOnly(
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(29, 33))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(43, 47))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(49, 53))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(4, Range.closed(66, 70))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(4, Range.closed(75, 79))));
+    }
+    
+    @Test
     public void multipleProblemsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
                 .appendLine("scalar  1")
@@ -219,10 +266,13 @@ public class VariablesTableValidatorTest {
     }
 
     private static FileValidationContext prepareContext() {
+        return prepareContext(new HashSet<String>());
+    }
+
+    private static FileValidationContext prepareContext(final Set<String> variables) {
         final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
                 SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
                 Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
-        final FileValidationContext context = new FileValidationContext(parentContext, mock(IFile.class));
-        return context;
+        return new FileValidationContext(parentContext, mock(IFile.class), null, variables);
     }
 }
