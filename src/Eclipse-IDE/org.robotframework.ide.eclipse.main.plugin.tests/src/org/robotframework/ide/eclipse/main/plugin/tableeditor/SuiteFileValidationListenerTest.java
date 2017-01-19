@@ -66,7 +66,7 @@ public class SuiteFileValidationListenerTest {
                 "*** Variables ***",
                 "${var}  1",
                 "${var1}  2",
-                "${var1}  3  ${unknown}",
+                "${var1}  3  ${var}",
                 "{var}  4",
                 "{var}  4");
         varsSuiteModel = RedPlugin.getModelManager().createSuiteFile(varsFile);
