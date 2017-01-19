@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -20,6 +21,8 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedWithNameProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+
+import com.google.common.base.Joiner;
 
 public class WithNameAssistProcessor extends RedContentAssistProcessor {
 
@@ -49,32 +52,39 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
             final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-        final int line = DocumentUtilities.getLine(document, offset);
+        boolean isInLastCell = true;
+        if (!atTheEndOfLine) {
+            final String fullLine = DocumentUtilities.fullLineContent(document, offset);
+            final int cellsNumber = DocumentUtilities.getNumberOfCellSeparators(fullLine, assist.isTsvFile());
+            final int cellNumber = DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile());
+            isInLastCell = cellsNumber == cellNumber;
+        }
+        final String separator = assist.getSeparatorToFollow();
 
-        final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent, line);
+        final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent);
         final List<? extends AssistProposal> wordsProposals = new RedWithNameProposals(wordsPredicate)
                 .getWithNameProposals(prefix);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : wordsProposals) {
-            final String additional = getAdditionalContent(atTheEndOfLine, proposal);
+            final List<String> args = isInLastCell ? proposal.getArguments() : new ArrayList<String>();
+            final String contentSuffix = args.isEmpty() ? "" : (separator + Joiner.on(separator).join(args));
 
-            final DocumentationModification modification = new DocumentationModification(additional,
-                    new Position(offset - prefix.length(), cellLength),
-                    new Position(offset - prefix.length() + proposal.getContent().length()
-                            + assist.getSeparatorToFollow().length(), additional.trim().length()));
+            final Position toHighlight = contentSuffix.equals("")
+                    ? new Position(offset - prefix.length() + proposal.getContent().length(), 0)
+                    : new Position(offset - prefix.length() + proposal.getContent().length() + separator.length(),
+                            proposal.getArguments().get(0).length());
+
+            final DocumentationModification modification = new DocumentationModification(contentSuffix,
+                    new Position(offset - prefix.length(), cellLength), toHighlight);
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
         }
         return proposals;
     }
 
-    private String getAdditionalContent(final boolean atTheEndOfLine, final AssistProposal proposal) {
-            return assist.getSeparatorToFollow() + "alias";
-    }
 
-
-    private AssistProposalPredicate<String> createPredicate(final String lineContentTillOfsset, final int line) {
+    private AssistProposalPredicate<String> createPredicate(final String lineContentTillOfsset) {
         final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOfsset, assist.isTsvFile());
         return AssistProposalPredicates.withNamePredicate(separators);
     }

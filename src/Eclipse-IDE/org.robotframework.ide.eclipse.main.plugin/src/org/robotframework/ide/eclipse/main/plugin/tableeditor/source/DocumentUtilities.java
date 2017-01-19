@@ -259,6 +259,15 @@ public class DocumentUtilities {
         }
     }
 
+    public static String fullLineContent(final IDocument document, final int offset) {
+        try {
+            final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+            return document.get(lineInfo.getOffset(), lineInfo.getLength());
+        } catch (final BadLocationException e) {
+            throw new IllegalStateException("Unable to get line content at offset " + offset, e);
+        }
+    }
+
     public static String getPrefix(final IDocument document, final Optional<IRegion> optional, final int offset)
             throws BadLocationException {
         if (!optional.isPresent()) {

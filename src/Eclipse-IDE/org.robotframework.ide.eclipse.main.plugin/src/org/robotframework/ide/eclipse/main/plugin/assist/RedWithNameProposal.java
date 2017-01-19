@@ -5,9 +5,21 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.ArrayList;
+import java.util.List;
+
 class RedWithNameProposal extends BaseAssistProposal {
+
+    private final static ArrayList<String> ARGUMENTS = newArrayList("alias");
 
     RedWithNameProposal(final String word, final ProposalMatch match) {
         super(word, match);
+    }
+
+    @Override
+    public List<String> getArguments() {
+        return ARGUMENTS;
     }
 }
