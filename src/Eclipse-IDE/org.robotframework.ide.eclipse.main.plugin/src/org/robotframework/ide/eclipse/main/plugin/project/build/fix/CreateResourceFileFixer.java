@@ -101,7 +101,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
                 "Create missing " + res + " file",
                 "<b>" + res
                         + "</b><br> file will be created and opened for edition.<br><br>Resource path must be valid, "
-                        + "inside project directory and must include file extension. Any missing parent directories will be also created.",
+                        + "inside project directory and must include robot resource extension. Any missing parent directories will be also created.",
                 marker, path);
         return Optional.<ICompletionProposal> of(proposal);
     }
@@ -109,7 +109,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
     private static Optional<ICompletionProposal> createEmptyProposal() {
         EmptyCompletionProposal proposal = new EmptyCompletionProposal("Missing resource file cannot be auto-created",
                 "Please check your file path if you want to use this Quick Fix."
-                        + "<br>Only valid and legal path to the file with explicit file extension "
+                        + "<br>Only valid and legal path to the file with explicit robot resource extension "
                         + "inside existing open project in this workspace can be used."
                         + "<br>All missing parent directories inside project will be auto-generated.");
         return Optional.<ICompletionProposal> of(proposal);
