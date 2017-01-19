@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Jc9QEJbWEeaa4JtzzKMFzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/18/17 11:37 AM
+Save-Time: 1/19/17 11:42 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -75,6 +75,7 @@ exec-with-options -disableJobWaiting -command {
 	wait 1000
 	check-debug-marker-on-ruler -line 8 -script_name "DataTest.robot"  
 	
+	get-button "Resume (F8)" | click
 	
 }	
 wait 2000
