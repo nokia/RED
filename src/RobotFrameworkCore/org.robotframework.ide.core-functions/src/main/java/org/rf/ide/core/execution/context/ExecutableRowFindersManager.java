@@ -97,9 +97,8 @@ public class ExecutableRowFindersManager {
             setupTeardownExecutableRowFinder.setCurrentModel(currentModel);
         }
         if (userKeywordExecutableRowFinder != null) {
-            userKeywordExecutableRowFinder.setUserKeywords(userKeywords);
-            userKeywordExecutableRowFinder.setResourceImportReferences(resourceImportReferences);
-            userKeywordExecutableRowFinder.setRobotParser(this.robotParser);
+            userKeywordExecutableRowFinder.updateResourceImportReferences(resourceImportReferences, robotParser);
+            userKeywordExecutableRowFinder.updateAccessibleKeywords(userKeywords);
         }
     }
 
@@ -119,7 +118,7 @@ public class ExecutableRowFindersManager {
     public void updateResourceImportReferences(final List<ResourceImportReference> resourceImportReferences) {
         this.resourceImportReferences = resourceImportReferences;
         if (userKeywordExecutableRowFinder != null) {
-            userKeywordExecutableRowFinder.setResourceImportReferences(resourceImportReferences);
+            userKeywordExecutableRowFinder.updateResourceImportReferences(resourceImportReferences, robotParser);
         }
     }
 

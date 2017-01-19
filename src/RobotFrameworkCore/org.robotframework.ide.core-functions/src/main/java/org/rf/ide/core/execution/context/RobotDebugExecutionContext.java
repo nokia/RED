@@ -11,7 +11,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.ResourceImporter;
-import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
@@ -117,7 +117,10 @@ public class RobotDebugExecutionContext {
     public KeywordPosition findKeywordPosition() {
         final IRobotExecutableRowFinder executableRowFinder = getExecutableRowFinder();
         final RobotExecutableRow<?> executableRow = findExecutableRow(executableRowFinder);
-        return createNewKeywordPosition(executableRow);
+        if (executableRow == null) {
+            return new KeywordPosition(findFirstResourceImportPath(), -1);
+        }
+        return new KeywordPosition(findPath(executableRow), findLine(executableRow));
     }
 
     public IRobotExecutableRowFinder getExecutableRowFinder() {
@@ -147,53 +150,28 @@ public class RobotDebugExecutionContext {
         return executableRow;
     }
 
-    private KeywordPosition createNewKeywordPosition(final RobotExecutableRow<?> executableRow) {
-        final String path;
-        if (executableRow != null) {
-            final ARobotSectionTable table = getTableFromWhichExecutableRowCome(executableRow);
-
-            final RobotFileOutput robotFileOutput = table.getParent().getParent();
-            if (robotFileOutput.getType() == RobotFileType.RESOURCE) {
-                path = getFirstResourceImportPath();
-            } else {
-                path = robotFileOutput.getProcessedFile().getAbsolutePath();
-            }
-        } else {
-            path = getFirstResourceImportPath();
+    private String findPath(final RobotExecutableRow<?> executableRow) {
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<AModelElement<?>> element = (RobotExecutableRow<AModelElement<?>>) executableRow;
+        final ARobotSectionTable table = (ARobotSectionTable) element.getParent().getParent();
+        final RobotFileOutput robotFileOutput = table.getParent().getParent();
+        if (robotFileOutput.getType() == RobotFileType.RESOURCE) {
+            return findFirstResourceImportPath();
         }
-        final int line = getLine(executableRow);
-        return new KeywordPosition(path, line);
+        return robotFileOutput.getProcessedFile().getAbsolutePath();
     }
 
-    private ARobotSectionTable getTableFromWhichExecutableRowCome(final RobotExecutableRow<?> executableRow) {
-        final ARobotSectionTable table;
-        if (executableRow.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-            @SuppressWarnings("unchecked")
-            RobotExecutableRow<UserKeyword> executableRowKeyword = (RobotExecutableRow<UserKeyword>) executableRow;
-            table = executableRowKeyword.getParent().getParent();
-        } else {
-            @SuppressWarnings("unchecked")
-            RobotExecutableRow<TestCase> executableRowKeyword = (RobotExecutableRow<TestCase>) executableRow;
-            table = executableRowKeyword.getParent().getParent();
-        }
-        return table;
-    }
-
-    private int getLine(final RobotExecutableRow<?> executableRow) {
-        if (executableRow == null) {
-            return -1;
-        }
+    private int findLine(final RobotExecutableRow<?> executableRow) {
         final IExecutableRowDescriptor<?> buildLineDescription = executableRow.buildLineDescription();
-        if (buildLineDescription.getRowType() != ERowType.FOR_CONTINUE) {
-            return executableRow.getAction().getLineNumber();
-        } else {
+        if (buildLineDescription.getRowType() == ERowType.FOR_CONTINUE) {
             return ((ForLoopContinueRowDescriptor<?>) buildLineDescription).getKeywordAction()
                     .getToken()
                     .getLineNumber();
         }
+        return executableRow.getAction().getLineNumber();
     }
 
-    private String getFirstResourceImportPath() {
+    private String findFirstResourceImportPath() {
         for (int i = currentKeywords.size() - 1; i >= 0; i--) {
             final ResourceImportReference resImport = currentKeywords.get(i).getResourceImportReference();
             if (resImport != null) {
@@ -342,21 +320,27 @@ public class RobotDebugExecutionContext {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
+        public boolean equals(final Object obj) {
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
-            KeywordPosition other = (KeywordPosition) obj;
+            }
+            final KeywordPosition other = (KeywordPosition) obj;
             if (filePath == null) {
-                if (other.filePath != null)
+                if (other.filePath != null) {
                     return false;
-            } else if (!filePath.equals(other.filePath))
+                }
+            } else if (!filePath.equals(other.filePath)) {
                 return false;
-            if (lineNumber != other.lineNumber)
+            }
+            if (lineNumber != other.lineNumber) {
                 return false;
+            }
             return true;
         }
 
