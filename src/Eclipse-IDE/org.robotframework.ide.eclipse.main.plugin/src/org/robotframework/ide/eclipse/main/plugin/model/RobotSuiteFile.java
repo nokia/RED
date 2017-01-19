@@ -249,7 +249,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         if (fileExt != null && fileExt.toLowerCase().equals("tsv")) {
             return true;
         }
-        return getContentTypeId().equals(ASuiteFileDescriber.SUITE_FILE_TSV_CONTENT_ID);
+        return ASuiteFileDescriber.SUITE_FILE_TSV_CONTENT_ID.equals(getContentTypeId());
     }
 
     public boolean isSuiteFile() {
