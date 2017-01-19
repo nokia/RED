@@ -21,7 +21,7 @@ public class RedWithNameProposalTest {
         final RedWithNameProposal proposal = new RedWithNameProposal("", ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEmpty();
-        assertThat(proposal.getArguments()).isEmpty();
+        assertThat(proposal.getArguments()).containsExactly("alias");
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEmpty();
         assertThat(proposal.getStyledLabel().length()).isEqualTo(0);
@@ -34,7 +34,7 @@ public class RedWithNameProposalTest {
         final RedWithNameProposal proposal = new RedWithNameProposal("content", ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("content");
-        assertThat(proposal.getArguments()).isEmpty();
+        assertThat(proposal.getArguments()).containsExactly("alias");
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEqualTo("content");
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("content");
@@ -49,7 +49,7 @@ public class RedWithNameProposalTest {
                 new ProposalMatch(Range.closedOpen(1, 3), Range.closedOpen(4, 7)));
 
         assertThat(proposal.getContent()).isEqualTo("content");
-        assertThat(proposal.getArguments()).isEmpty();
+        assertThat(proposal.getArguments()).containsExactly("alias");
         assertThat(proposal.getImage()).isNull();
         assertThat(proposal.getLabel()).isEqualTo("content");
 
