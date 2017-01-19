@@ -54,6 +54,11 @@ public class UnknownVariable extends AVariable {
     }
 
     @Override
+    public List<RobotToken> getValueTokens() {
+        return getItems();
+    }
+
+    @Override
     public boolean isPresent() {
         return true;
     }
