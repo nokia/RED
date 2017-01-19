@@ -93,19 +93,21 @@ public class VariableTableModelUpdaterTest {
 
             @Override
             public boolean isPresent() {
-                // TODO Auto-generated method stub
                 return false;
             }
 
             @Override
             public List<RobotToken> getElementTokens() {
-                // TODO Auto-generated method stub
+                return null;
+            }
+
+            @Override
+            public List<RobotToken> getValueTokens() {
                 return null;
             }
 
             @Override
             public boolean removeElementToken(final int index) {
-                // TODO Auto-generated method stub
                 return false;
             }
 

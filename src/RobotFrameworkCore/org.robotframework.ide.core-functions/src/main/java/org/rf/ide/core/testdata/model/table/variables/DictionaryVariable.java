@@ -64,8 +64,38 @@ public class DictionaryVariable extends AVariable {
     }
 
     @Override
+    public List<RobotToken> getValueTokens() {
+        final List<RobotToken> valueTokens = new ArrayList<>();
+        for (final DictionaryKeyValuePair pair : items) {
+            valueTokens.add(pair.getRaw());
+        }
+        return Collections.unmodifiableList(valueTokens);
+    }
+
+    @Override
     public boolean isPresent() {
         return (getDeclaration() != null);
+    }
+
+    @Override
+    public List<RobotToken> getElementTokens() {
+        final List<RobotToken> tokens = new ArrayList<>();
+        if (isPresent()) {
+            tokens.add(getDeclaration());
+            for (final DictionaryKeyValuePair p : items) {
+                if (p.getRaw() != null) {
+                    tokens.add(p.getRaw());
+                }
+            }
+            tokens.addAll(getComment());
+        }
+
+        return tokens;
+    }
+
+    @Override
+    public boolean removeElementToken(final int index) {
+        return false;
     }
 
     public static class DictionaryKeyValuePair implements Serializable {
@@ -92,84 +122,50 @@ public class DictionaryVariable extends AVariable {
         private RobotToken value;
 
         public DictionaryKeyValuePair(final RobotToken raw, final RobotToken key, final RobotToken value) {
-            setRaw(raw);
-            setKey(key);
-            setValue(value);
+            this.raw = fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE, true);
+            this.key = fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY, true);
+            this.value = fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE, true);
         }
 
         public RobotToken getKey() {
             return key;
         }
 
-        public void setKey(final RobotToken key) {
-            fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY, true);
-            this.key = key;
-        }
-
         public RobotToken getValue() {
             return value;
-        }
-
-        public void setValue(final RobotToken value) {
-            fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE, true);
-            this.value = value;
         }
 
         public RobotToken getRaw() {
             return raw;
         }
 
-        public void setRaw(final RobotToken raw) {
-            fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE, true);
-            this.raw = raw;
+        public void set(final String raw) {
+            final DictionaryKeyValuePair newElement = createFromRaw(raw);
+            this.raw = newElement.raw;
+            this.key = newElement.key;
+            this.value = newElement.value;
         }
 
-        protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
-            final List<IRobotTokenType> tagTypes = token.getTypes();
-            if (!tagTypes.contains(expectedMainType)) {
-                if (tagTypes.isEmpty()) {
-                    tagTypes.add(expectedMainType);
-                } else {
-                    tagTypes.add(0, expectedMainType);
-                }
-            }
-        }
-
-        protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
+        private RobotToken fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
                 final boolean shouldNullCheck) {
             if (shouldNullCheck && token == null) {
-                return;
+                return null;
             }
-
-            fixForTheType(token, expectedMainType);
+            return fixForTheType(token, expectedMainType);
         }
 
-        protected void fixTypes() {
+        private void fixTypes() {
             fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE);
             fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY);
             fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE);
         }
-    }
 
-    @Override
-    public List<RobotToken> getElementTokens() {
-        final List<RobotToken> tokens = new ArrayList<>();
-        if (isPresent()) {
-            tokens.add(getDeclaration());
-            for (final DictionaryKeyValuePair p : items) {
-                if (p.getRaw() != null) {
-                    tokens.add(p.getRaw());
-                }
+        private RobotToken fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
+            final List<IRobotTokenType> tagTypes = token.getTypes();
+            if (!tagTypes.contains(expectedMainType)) {
+                tagTypes.add(0, expectedMainType);
             }
-            tokens.addAll(getComment());
+            return token;
         }
-
-        return tokens;
-    }
-
-    @Override
-    public boolean removeElementToken(final int index) {
-        // TODO Auto-generated method stub
-        return false;
     }
 }

@@ -16,17 +16,16 @@ public interface IVariableHolder {
 
     VariableType getType();
 
-
     VariableScope getScope();
-
 
     String getName();
 
+    RobotToken getDeclaration();
+
+    List<RobotToken> getValueTokens();
 
     List<RobotToken> getComment();
 
-
     void addCommentPart(final RobotToken rt);
 
-    RobotToken getDeclaration();
 }

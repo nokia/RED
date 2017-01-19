@@ -54,6 +54,11 @@ public class ScalarVariable extends AVariable {
     }
 
     @Override
+    public List<RobotToken> getValueTokens() {
+        return getValues();
+    }
+
+    @Override
     public boolean isPresent() {
         return (getDeclaration() != null);
     }
