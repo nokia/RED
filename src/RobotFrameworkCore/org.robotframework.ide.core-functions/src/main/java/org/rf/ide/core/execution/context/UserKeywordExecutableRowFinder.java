@@ -34,27 +34,18 @@ import com.google.common.io.Files;
  */
 public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder {
 
-    private List<UserKeyword> userKeywords;
+    private final List<ResourceImportReference> resourceImportReferences = new ArrayList<>();
 
-    private List<ResourceImportReference> resourceImportReferences = new ArrayList<>();
+    private final ListMultimap<String, UserKeyword> accessibleKeywords = ArrayListMultimap.create();
 
-    private ListMultimap<String, UserKeyword> accessibleKeywords = ArrayListMultimap.create();
+    private final KeywordSearcher keywordSearcher = new KeywordSearcher();
 
-    private KeywordSearcher keywordSearcher;
-
-    private UserKeywordExtractor userKeywordExtractor;
-
-    private RobotParser robotParser;
+    private final UserKeywordExtractor userKeywordExtractor = new UserKeywordExtractor();
 
     public UserKeywordExecutableRowFinder(final RobotParser robotParser, final List<UserKeyword> userKeywords,
-            final List<ResourceImportReference> resourceImportReferencesTestSuite) {
-        this.robotParser = robotParser;
-        this.userKeywords = userKeywords;
-        this.userKeywordExtractor = new UserKeywordExtractor();
-        this.keywordSearcher = new KeywordSearcher();
-        collectAllReferences(new HashSet<Path>(0), resourceImportReferencesTestSuite);
-        fillAllKeywordsMap(null, getLocalTestSuiteKeywords());
-        addKeywordsFromReferences(resourceImportReferences);
+            final List<ResourceImportReference> resourceImportReferences) {
+        updateResourceImportReferences(resourceImportReferences, robotParser);
+        updateAccessibleKeywords(userKeywords);
     }
 
     @Override
@@ -66,9 +57,9 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
 
         if (newUserKeyword == null) {
             final String keywordName = extractIfNameIsFromVariableDeclaration(parentKeywordContext.getName());
-            ListMultimap<String, UserKeyword> foundKeywords = keywordSearcher.findKeywords(accessibleKeywords.asMap(),
-                    accessibleKeywords.values(), userKeywordExtractor, keywordName, true);
-            List<UserKeyword> bestMatchingKeywords = keywordSearcher.getBestMatchingKeyword(foundKeywords,
+            final ListMultimap<String, UserKeyword> foundKeywords = keywordSearcher.findKeywords(
+                    accessibleKeywords.asMap(), accessibleKeywords.values(), userKeywordExtractor, keywordName, true);
+            final List<UserKeyword> bestMatchingKeywords = keywordSearcher.getBestMatchingKeyword(foundKeywords,
                     userKeywordExtractor, keywordName);
 
             if (bestMatchingKeywords.size() == 1) {
@@ -86,7 +77,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
 
         if (newUserKeyword != null) {
             if (userKeywordExtractor.scope(newUserKeyword) == KeywordScope.RESOURCE) {
-                ResourceImportReference reference = findResource(parentKeywordContext, newUserKeyword);
+                final ResourceImportReference reference = findResource(parentKeywordContext, newUserKeyword);
 
                 if (reference != null) {
                     parentKeywordContext.setResourceImportReference(reference);
@@ -101,7 +92,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
     }
 
     private ResourceImportReference findResource(final KeywordContext parentKeywordContext,
-            UserKeyword newUserKeyword) {
+            final UserKeyword newUserKeyword) {
         ResourceImportReference reference = null;
         if (parentKeywordContext.getResourceImportReference() != null) {
             reference = parentKeywordContext.getResourceImportReference();
@@ -144,30 +135,45 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         return name;
     }
 
+    public void updateResourceImportReferences(final List<ResourceImportReference> resourceImportReferences,
+            final RobotParser robotParser) {
+        collectAllReferences(new HashSet<Path>(0), Collections.unmodifiableList(resourceImportReferences), robotParser);
+    }
+
     private void collectAllReferences(final Set<Path> visitedPaths,
-            final List<ResourceImportReference> currentReferences) {
+            final List<ResourceImportReference> currentReferences, final RobotParser robotParser) {
         for (final ResourceImportReference ref : currentReferences) {
             final File processedFile = ref.getReference().getProcessedFile();
-            Path referencePath = processedFile.toPath().toAbsolutePath();
+            final Path referencePath = processedFile.toPath().toAbsolutePath();
             if (!visitedPaths.contains(referencePath)) {
                 visitedPaths.add(referencePath);
                 resourceImportReferences.add(ref);
-                if (this.robotParser != null
+                if (robotParser != null
                         && processedFile.lastModified() != ref.getReference().getLastModificationEpochTime()) {
-                    final List<RobotFileOutput> parse = this.robotParser.parse(processedFile);
+                    final List<RobotFileOutput> parse = robotParser.parse(processedFile);
                     if (!parse.isEmpty()) {
                         ref.updateReference(parse.get(0));
                     }
                 }
-                List<ResourceImportReference> referencesOfReference = ref.getReference().getResourceImportReferences();
+                final List<ResourceImportReference> referencesOfReference = ref.getReference()
+                        .getResourceImportReferences();
                 if (!referencesOfReference.isEmpty()) {
-                    collectAllReferences(visitedPaths, referencesOfReference);
+                    collectAllReferences(visitedPaths, referencesOfReference, robotParser);
                 }
             }
         }
     }
 
-    private void addKeywordsFromReferences(final List<ResourceImportReference> resourceImportReferences) {
+    public void updateAccessibleKeywords(final List<UserKeyword> userKeywords) {
+        addKeywordsFromTestSuite(userKeywords);
+        addKeywordsFromReferences();
+    }
+
+    private void addKeywordsFromTestSuite(final List<UserKeyword> userKeywords) {
+        fillAllKeywordsMap(null, Collections.unmodifiableList(userKeywords));
+    }
+
+    private void addKeywordsFromReferences() {
         for (final ResourceImportReference refImport : resourceImportReferences) {
             final String fullFileName = refImport.getReference().getProcessedFile().getName();
             fillAllKeywordsMap(Files.getNameWithoutExtension(fullFileName).toLowerCase(),
@@ -185,22 +191,6 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
                         userKeyword);
             }
         }
-    }
-
-    private List<UserKeyword> getLocalTestSuiteKeywords() {
-        return Collections.unmodifiableList(this.userKeywords);
-    }
-
-    public void setUserKeywords(final List<UserKeyword> userKeywords) {
-        this.userKeywords = userKeywords;
-    }
-
-    public void setResourceImportReferences(final List<ResourceImportReference> resourceImportReferences) {
-        this.resourceImportReferences = resourceImportReferences;
-    }
-
-    public void setRobotParser(final RobotParser robotParser) {
-        this.robotParser = robotParser;
     }
 
     private class UserKeywordExtractor implements Extractor<UserKeyword> {
