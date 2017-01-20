@@ -90,7 +90,7 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Item '%s' in dictionary '%s' have to contain '=' separator";
+            return "Item '%s' in dictionary '%s' has to contain '=' separator";
         }
 
         @Override
