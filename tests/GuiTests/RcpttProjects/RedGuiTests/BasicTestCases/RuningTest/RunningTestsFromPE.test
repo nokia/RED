@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _aZra8NS6EeWO-beUKyHz0g
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/5/16 5:37 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/20/17 12:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,7 @@ with [get-view "Project Explorer" | get-tree] {
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot/Test Cases"
 
-//check if all test cases
+//check if all test cases are in tree
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/TestFile.robot/Test Cases" | get-property childCount | equals 5 | verify-true
     get-item "RobotProject/TestFile.robot/Test Cases" | get-property "getItems().TreeItem[0].getText()" 
@@ -71,7 +71,6 @@ get-view "Message Log" | get-editbox | get-property text | matches "Starting tes
 //run test with section    
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot/Test Cases/TEST with section" | get-menu Run | click
-    select "RobotProject/TestFile.robot/Test Cases"
 }
 
 get-view "Message Log" | get-editbox | get-property text 
@@ -82,6 +81,7 @@ get-view "Message Log" | get-editbox | get-property text
 
 
 //check that cannot run tests from Test Case node:    
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot/Test Cases"
 with [get-view "Project Explorer" | get-tree] {
     get-menu Open | get-property enablement | equals true | verify-true
     get-menu Open | get-property index | equals 0 | verify-true
@@ -89,8 +89,6 @@ with [get-view "Project Explorer" | get-tree] {
     get-menu Run | get-property index | equals 1 | verify-true
     get-menu Debug | get-property enablement | equals false | verify-true
     get-menu Debug | get-property index | equals 2 | verify-true
-    get-menu Delete | get-property enablement | equals true | verify-true
-    get-menu Delete | get-property index | equals 4 | verify-true
 }
 
 //check options on single test
@@ -103,8 +101,6 @@ with [get-view "Project Explorer" | get-tree] {
     get-menu Run | get-property index | equals 1 | verify-true
     get-menu Debug | get-property enablement | equals true | verify-true
     get-menu Debug | get-property index | equals 2 | verify-true
-    get-menu Delete | get-property enablement | equals true | verify-true
-    get-menu Delete | get-property index | equals 4 | verify-true
 }
 
 
