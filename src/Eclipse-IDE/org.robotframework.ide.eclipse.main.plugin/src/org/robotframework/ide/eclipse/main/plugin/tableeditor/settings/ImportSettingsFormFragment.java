@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import static com.google.common.base.Predicates.instanceOf;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -75,7 +73,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
 import org.robotframework.red.forms.RedFormToolkit;
@@ -349,7 +346,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         }
         CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
-        setFocus();
     }
 
     public void clearSettingsSelection() {

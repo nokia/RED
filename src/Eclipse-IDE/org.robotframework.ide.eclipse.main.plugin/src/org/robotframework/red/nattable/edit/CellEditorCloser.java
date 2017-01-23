@@ -14,15 +14,15 @@ public class CellEditorCloser {
             if (!commited) {
                 cellEditor.close();
             }
-        }
-        SwtThread.asyncExec(new Runnable() {
+            SwtThread.asyncExec(new Runnable() {
 
-            @Override
-            public void run() {
-                if (table != null && !table.isDisposed()) {
-                    table.setFocus();
+                @Override
+                public void run() {
+                    if (table != null && !table.isDisposed()) {
+                        table.setFocus();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }

@@ -184,7 +184,6 @@ class RobotOutlinePage extends ContentOutlinePage {
                 } else {
                     final ISectionEditorPart activatedPage = editor.activatePage(getSection(element.get()));
                     if (activatedPage != null) {
-                        activatedPage.setFocus();
                         activatedPage.revealElement(element.get());
                     }
                 }

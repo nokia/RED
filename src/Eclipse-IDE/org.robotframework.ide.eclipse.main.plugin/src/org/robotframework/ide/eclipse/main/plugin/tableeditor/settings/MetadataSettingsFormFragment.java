@@ -82,7 +82,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
@@ -347,7 +346,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         }
         CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
-        setFocus();
     }
 
     public void clearSettingsSelection() {
