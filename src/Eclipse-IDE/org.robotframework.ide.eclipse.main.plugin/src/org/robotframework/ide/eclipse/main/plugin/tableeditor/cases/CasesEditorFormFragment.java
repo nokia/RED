@@ -189,7 +189,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AssistanceLabelAccumulator(dataProvider,
-                        Predicates.<PositionCoordinateSerializer> alwaysTrue(), 
+                        Predicates.<PositionCoordinateSerializer> alwaysTrue(),
                         new Predicate<Object>() {
                             @Override
                             public boolean apply(final Object rowObject) {
@@ -339,7 +339,6 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         }
         CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
-        setFocus();
     }
 
     public void clearSettingsSelection() {

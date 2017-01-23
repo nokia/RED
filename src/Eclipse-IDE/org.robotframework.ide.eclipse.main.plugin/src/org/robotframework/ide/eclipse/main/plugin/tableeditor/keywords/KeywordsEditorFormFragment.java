@@ -339,7 +339,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         }
         CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
-        setFocus();
     }
 
     public void clearSettingsSelection() {
