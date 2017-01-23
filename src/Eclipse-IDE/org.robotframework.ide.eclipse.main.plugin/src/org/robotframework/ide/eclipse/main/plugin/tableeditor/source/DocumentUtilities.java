@@ -259,10 +259,11 @@ public class DocumentUtilities {
         }
     }
 
-    public static String fullLineContent(final IDocument document, final int offset) {
+    public static boolean isInLastCellOfLine(final IDocument document, final int offset, final boolean isTsv) {
         try {
             final IRegion lineInfo = document.getLineInformationOfOffset(offset);
-            return document.get(lineInfo.getOffset(), lineInfo.getLength());
+            return offset + calculateCellRegionEnd(document, isTsv, offset) == lineInfo.getOffset()
+                    + lineInfo.getLength();
         } catch (final BadLocationException e) {
             throw new IllegalStateException("Unable to get line content at offset " + offset, e);
         }
