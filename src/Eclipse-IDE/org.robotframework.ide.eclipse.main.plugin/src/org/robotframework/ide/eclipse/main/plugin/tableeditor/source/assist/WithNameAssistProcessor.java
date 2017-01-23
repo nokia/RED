@@ -52,13 +52,8 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
             final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-        boolean isInLastCell = true;
-        if (!atTheEndOfLine) {
-            final String fullLine = DocumentUtilities.fullLineContent(document, offset);
-            final int cellsNumber = DocumentUtilities.getNumberOfCellSeparators(fullLine, assist.isTsvFile());
-            final int cellNumber = DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile());
-            isInLastCell = cellsNumber == cellNumber;
-        }
+        final boolean isInLastCell = atTheEndOfLine ? true
+                : DocumentUtilities.isInLastCellOfLine(document, offset, assist.isTsvFile());
         final String separator = assist.getSeparatorToFollow();
 
         final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent);
