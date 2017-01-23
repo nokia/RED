@@ -79,7 +79,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         assistSupport.install(composite.getText(), context, Optional.<RedContentProposalListener> absent());
         parent.redraw();
 
-        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
         return composite;
     }
@@ -154,7 +154,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     public void close() {
         super.close();
 
-        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
     }
 
