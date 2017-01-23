@@ -11,12 +11,10 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
 
 import com.google.common.collect.Range;
 
-@SuppressWarnings("unchecked")
 public class VariablesMatchesCollectionTest {
 
     @Test

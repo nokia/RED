@@ -118,6 +118,7 @@ public class SuiteSourceEditorFoldingSupportTest {
                 new Position(419, 44), new Position(187, 53), new Position(292, 51));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void allAnnotationsAreAddedInitially() {
         final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
@@ -132,6 +133,7 @@ public class SuiteSourceEditorFoldingSupportTest {
         verifyNoMoreInteractions(annotationsModel);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void whenNoFoldingPositionAppearsOrDissappears_theAnnotationsAreSendAsChanged() {
         final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
@@ -148,6 +150,7 @@ public class SuiteSourceEditorFoldingSupportTest {
         verifyNoMoreInteractions(annotationsModel);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void whenNewFoldingPositionAppears_itIsSendAsAddedWhileOtherAreChanged() {
         final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
@@ -164,6 +167,7 @@ public class SuiteSourceEditorFoldingSupportTest {
         verifyNoMoreInteractions(annotationsModel);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void whenFoldingPositionDissappears_itIsSendAsRemovedWhileOtherAreChanged() {
         final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
@@ -180,6 +184,7 @@ public class SuiteSourceEditorFoldingSupportTest {
         verifyNoMoreInteractions(annotationsModel);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void whenFoldingPositionIsChanged_ItIsRemovedAndNewIsAdded() {
         final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
