@@ -331,7 +331,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private void refreshNavigator(final IProject project) {
         if (eventBroker == null) {
-            eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+            eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
         }
         if (eventBroker != null) {
             eventBroker.post(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE, project);
