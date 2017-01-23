@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 public class RedPreferencesInitializerTest {
 
@@ -36,7 +35,7 @@ public class RedPreferencesInitializerTest {
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
-        for (SyntaxHighlightingCategory category : SyntaxHighlightingCategory.values()) {
+        for (final SyntaxHighlightingCategory category : SyntaxHighlightingCategory.values()) {
             final String prefix = RedPreferences.SYNTAX_COLORING_PREFIX + category.getId();
             final ColoringPreference preference = category.getDefault();
             verify(preferences).putInt(prefix + ".fontStyle", preference.getFontStyle());
@@ -52,7 +51,7 @@ public class RedPreferencesInitializerTest {
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
-        for (ProblemCategory category : ProblemCategory.values()) {
+        for (final ProblemCategory category : ProblemCategory.values()) {
             verify(preferences).put(category.getId(), category.getDefaultSeverity().name());
         }
     }
