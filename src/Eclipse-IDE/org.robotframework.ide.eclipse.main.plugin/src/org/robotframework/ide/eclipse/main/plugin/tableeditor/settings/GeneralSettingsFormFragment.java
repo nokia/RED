@@ -680,7 +680,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             }
             CellEditorCloser.closeForcibly(table.get());
             selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
-            setFocus();
         }
     }
 
