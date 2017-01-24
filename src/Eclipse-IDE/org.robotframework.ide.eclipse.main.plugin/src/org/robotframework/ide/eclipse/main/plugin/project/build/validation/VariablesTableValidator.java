@@ -19,6 +19,8 @@ import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -148,19 +150,38 @@ class VariablesTableValidator implements ModelUnitValidator {
                 final DictionaryVariable dictionaryDef = (DictionaryVariable) variableDef;
 
                 for (final DictionaryKeyValuePair pair : dictionaryDef.getItems()) {
-                    if (!pair.getRaw().getText().contains("=")) {
-                        final String value = pair.getRaw().getText();
-                        final RobotProblem problem = RobotProblem
-                                .causedBy(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX)
-                                .formatMessageWith(value, variableDef.getName());
-                        final Map<String, Object> attributes = ImmutableMap
-                                .<String, Object> of(AdditionalMarkerAttributes.VALUE, value);
+                    final boolean hasAssignment = pair.getRaw().getText().contains("=");
 
-                        reporter.handleProblem(problem, validationContext.getFile(), pair.getRaw(), attributes);
+                    if (!hasAssignment && !isOtherDictionary(pair.getRaw())) {
+                        reportDictionarySyntaxProblem(variableDef, pair, true, "has to contain '=' separator");
+                    } else if (hasAssignment && keyIsListOrDict(pair.getKey())) {
+                        reportDictionarySyntaxProblem(variableDef, pair, false, "cannot use list or dictionary as key");
                     }
                 }
             }
         }
+    }
+
+    private boolean keyIsListOrDict(final RobotToken token) {
+        return (token.getText().startsWith("@{") || token.getText().startsWith("&{")) && token.getText().endsWith("}");
+    }
+
+    private boolean isOtherDictionary(final RobotToken token) {
+        return token.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)
+                && token.getText().startsWith("&{") && token.getText().endsWith("}");
+    }
+
+    private void reportDictionarySyntaxProblem(final AVariable variableDef, final DictionaryKeyValuePair pair,
+            final boolean change, final String additionalMsg) {
+        final String value = pair.getRaw().getText();
+        final RobotProblem problem = RobotProblem
+                .causedBy(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX)
+                .formatMessageWith(value, variableDef.getName(), additionalMsg);
+        final Map<String, Object> attributes = change
+                ? ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.VALUE, value)
+                : ImmutableMap.<String, Object> of();
+
+        reporter.handleProblem(problem, validationContext.getFile(), pair.getRaw(), attributes);
     }
 
     private void reportUnknownVariablesInValues(final VariableTable variableTable) {
