@@ -8,7 +8,6 @@ package org.rf.ide.core.execution.context;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.TestCaseExecutionRowCounter;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
@@ -25,7 +24,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
 
     private TestCaseExecutionRowCounter testCaseExecutionRowCounter;
     
-    private IRobotExecutableRowFinder userKeywordExecutableRowFinder;
+    private final IRobotExecutableRowFinder userKeywordExecutableRowFinder;
     
     private IRobotExecutableRowFinder nestedForLoopExecutableRowFinder;
 

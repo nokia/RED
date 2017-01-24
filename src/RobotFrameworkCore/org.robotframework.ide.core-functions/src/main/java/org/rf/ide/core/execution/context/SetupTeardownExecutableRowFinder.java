@@ -7,7 +7,6 @@ package org.rf.ide.core.execution.context;
 
 import java.util.List;
 
-import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -62,7 +61,7 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
     private RobotExecutableRow<TestCase> extractExecutableRowFromSettingTable(
             final List<? extends AKeywordBaseSetting<SettingTable>> settingsList) {
         if (settingsList != null && !settingsList.isEmpty()) {
-            TestCase tempCase = new TestCase(null);
+            final TestCase tempCase = new TestCase(null);
             tempCase.setParent(settingsList.get(0).getParent().getParent().getTestCaseTable());
             return createSetupExecutableRow(settingsList.get(0).getKeywordName(), tempCase);
         }
@@ -137,7 +136,7 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
             return typeName;
         }
         
-        public static boolean isTypeOf(final String givenTypeName, SetupTeardownKeywordTypes expectedType) {
+        public static boolean isTypeOf(final String givenTypeName, final SetupTeardownKeywordTypes expectedType) {
             return expectedType.getTypeName().equalsIgnoreCase(givenTypeName);
         }
         
