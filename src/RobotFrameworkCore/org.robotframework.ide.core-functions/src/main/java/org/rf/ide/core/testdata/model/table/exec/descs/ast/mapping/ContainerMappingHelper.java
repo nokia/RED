@@ -12,10 +12,10 @@ import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.Container;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.Container.ContainerType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElement;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.ContainerElementType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.IContainerElement;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.Container.ContainerType;
 
 
 public class ContainerMappingHelper {
@@ -122,11 +122,13 @@ public class ContainerMappingHelper {
             final IContainerElement startElement) {
 
         return String.format(
-                "Missing closing \'%s\' for type %s.",
+                "Missing closing bracket \'%s\' for type %s.",
                 ""
                         + ContainerElementType.getCloseContainerType(
                                 containerType.getOpenType())
-                                .getRepresentation(), containerType);
+                                .getRepresentation()
+                                .get(0),
+                containerType);
     }
 
 
