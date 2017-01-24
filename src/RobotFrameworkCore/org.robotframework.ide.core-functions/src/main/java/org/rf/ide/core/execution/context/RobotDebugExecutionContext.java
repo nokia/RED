@@ -9,19 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.ResourceImporter;
-import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
-import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
-import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 /**
@@ -115,70 +106,21 @@ public class RobotDebugExecutionContext {
     }
 
     public KeywordPosition findKeywordPosition() {
-        final IRobotExecutableRowFinder executableRowFinder = getExecutableRowFinder();
-        final RobotExecutableRow<?> executableRow = findExecutableRow(executableRowFinder);
-        if (executableRow == null) {
-            return new KeywordPosition(findFirstResourceImportPath(), -1);
-        }
-        return new KeywordPosition(findPath(executableRow), findLine(executableRow));
+        return new KeywordPositionFinder(currentKeywords, provideExecutableRowFinder()).find();
     }
 
-    public IRobotExecutableRowFinder getExecutableRowFinder() {
-        IRobotExecutableRowFinder executableRowFinder = null;
+    private IRobotExecutableRowFinder provideExecutableRowFinder() {
         if (isKeywordDirectlyFromTestCase()) {
             if (isSetupTeardownKeywordStarted) {
-                executableRowFinder = executableRowFindersManager.provideSetupTeardownExecutableRowFinder();
+                return executableRowFindersManager.provideSetupTeardownExecutableRowFinder();
             } else {
-                executableRowFinder = executableRowFindersManager
-                        .provideTestCaseExecutableRowFinder(testCaseExecutionRowCounter);
+                return executableRowFindersManager.provideTestCaseExecutableRowFinder(testCaseExecutionRowCounter);
             }
         } else if (isForLoopStarted) {
-            executableRowFinder = executableRowFindersManager
-                    .provideForLoopExecutableRowFinder(testCaseExecutionRowCounter);
+            return executableRowFindersManager.provideForLoopExecutableRowFinder(testCaseExecutionRowCounter);
         } else { // keyword from Keywords section or resource file
-            executableRowFinder = executableRowFindersManager.provideUserKeywordExecutableRowFinder();
+            return executableRowFindersManager.provideUserKeywordExecutableRowFinder();
         }
-
-        return executableRowFinder;
-    }
-
-    private RobotExecutableRow<?> findExecutableRow(final IRobotExecutableRowFinder executableRowFinder) {
-        RobotExecutableRow<?> executableRow = null;
-        if (executableRowFinder != null) {
-            executableRow = executableRowFinder.findExecutableRow(currentKeywords);
-        }
-        return executableRow;
-    }
-
-    private String findPath(final RobotExecutableRow<?> executableRow) {
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<AModelElement<?>> element = (RobotExecutableRow<AModelElement<?>>) executableRow;
-        final ARobotSectionTable table = (ARobotSectionTable) element.getParent().getParent();
-        final RobotFileOutput robotFileOutput = table.getParent().getParent();
-        if (robotFileOutput.getType() == RobotFileType.RESOURCE) {
-            return findFirstResourceImportPath();
-        }
-        return robotFileOutput.getProcessedFile().getAbsolutePath();
-    }
-
-    private int findLine(final RobotExecutableRow<?> executableRow) {
-        final IExecutableRowDescriptor<?> buildLineDescription = executableRow.buildLineDescription();
-        if (buildLineDescription.getRowType() == ERowType.FOR_CONTINUE) {
-            return ((ForLoopContinueRowDescriptor<?>) buildLineDescription).getKeywordAction()
-                    .getToken()
-                    .getLineNumber();
-        }
-        return executableRow.getAction().getLineNumber();
-    }
-
-    private String findFirstResourceImportPath() {
-        for (int i = currentKeywords.size() - 1; i >= 0; i--) {
-            final ResourceImportReference resImport = currentKeywords.get(i).getResourceImportReference();
-            if (resImport != null) {
-                return resImport.getReference().getProcessedFile().getAbsolutePath();
-            }
-        }
-        return null;
     }
 
     private void checkStartKeywordType(final String type) {
@@ -238,116 +180,6 @@ public class RobotDebugExecutionContext {
                 || (executableRowFindersManager.hasCurrentTestCase()
                         && SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.isTypeOf(keywordType,
                                 SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.NEW_TEARDOWN));
-    }
-
-    protected static class KeywordContext {
-
-        private final String name;
-
-        private final String type;
-
-        private int keywordExecutableRowCounter = 0;
-
-        private ResourceImportReference resourceImportReference;
-
-        private UserKeyword userKeyword;
-
-        public KeywordContext(final String name, final String type) {
-            this.name = name;
-            this.type = type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getKeywordExecutableRowCounter() {
-            return keywordExecutableRowCounter;
-        }
-
-        public void incrementKeywordExecutableRowCounter() {
-            keywordExecutableRowCounter++;
-        }
-
-        public ResourceImportReference getResourceImportReference() {
-            return resourceImportReference;
-        }
-
-        public void setResourceImportReference(final ResourceImportReference resourceImportReference) {
-            this.resourceImportReference = resourceImportReference;
-        }
-
-        public UserKeyword getUserKeyword() {
-            return userKeyword;
-        }
-
-        public void setUserKeyword(final UserKeyword userKeyword) {
-            this.userKeyword = userKeyword;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-    }
-
-    public static class KeywordPosition {
-
-        private final int lineNumber;
-
-        private final String filePath;
-
-        KeywordPosition(final String filePath, final int lineNumber) {
-            this.filePath = filePath;
-            this.lineNumber = lineNumber;
-        }
-
-        public int getLineNumber() {
-            return lineNumber;
-        }
-
-        public String getFilePath() {
-            return filePath;
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((filePath == null) ? 0 : filePath.hashCode());
-            result = prime * result + lineNumber;
-            return result;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final KeywordPosition other = (KeywordPosition) obj;
-            if (filePath == null) {
-                if (other.filePath != null) {
-                    return false;
-                }
-            } else if (!filePath.equals(other.filePath)) {
-                return false;
-            }
-            if (lineNumber != other.lineNumber) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("KeywordPosition [lineNumber=%s, filePath=%s]", lineNumber, filePath);
-        }
     }
 
     protected static class TestCaseExecutionRowCounter {
