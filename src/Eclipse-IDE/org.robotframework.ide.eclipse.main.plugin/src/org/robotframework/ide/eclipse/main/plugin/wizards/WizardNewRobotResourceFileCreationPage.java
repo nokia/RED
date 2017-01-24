@@ -97,16 +97,16 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
             return false;
         }
 
-        setExtension();
-        IPath resourcePath = getContainerFullPath().append(currentName);
+        IPath resourcePath = getContainerFullPath().append(currentName + getFileExtension());
         IFile file = createFileHandle(resourcePath);
         IContainer cont = file.getParent();
         IResource[] res = null;
-        String problemMessage = NLS.bind(IDEWorkbenchMessages.ResourceGroup_nameExists, getFileName());
+        String name = currentName.contains(".") ? currentName : currentName.concat(".robot");
         try {
             res = cont.members();
+            String problemMessage = NLS.bind(IDEWorkbenchMessages.ResourceGroup_nameExists, name);
             for (IResource re : res) {
-                if (currentName.compareToIgnoreCase(re.getName()) == 0) {
+                if (name.compareToIgnoreCase(re.getName()) == 0) {
                     setErrorMessage(problemMessage);
                     return false;
                 }
