@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.execution.ExecutionElementsParser;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
-import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordPosition;
+import org.rf.ide.core.execution.context.KeywordPosition;
 import org.rf.ide.core.testdata.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
