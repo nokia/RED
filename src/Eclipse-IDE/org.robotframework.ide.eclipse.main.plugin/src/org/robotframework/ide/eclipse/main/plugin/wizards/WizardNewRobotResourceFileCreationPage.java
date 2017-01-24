@@ -8,17 +8,21 @@ package org.robotframework.ide.eclipse.main.plugin.wizards;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
+import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 import com.google.common.collect.Maps;
 
@@ -84,7 +88,6 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
     @Override
     protected boolean validatePage() {
         final boolean isValid = super.validatePage();
-
         final String currentName = getFileName();
         final String currentNameWithoutExtension = currentName.contains(".")
                 ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
@@ -93,12 +96,24 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
             setErrorMessage("Name cannot be empty");
             return false;
         }
-        IPath resourcePath = getContainerFullPath().append(currentName.toLowerCase());
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        if (workspace.getRoot().getFolder(resourcePath).exists()
-                || workspace.getRoot().getFile(resourcePath).exists()) {
-            setErrorMessage(String.format("Resource  \"%s\" already exists", currentName));
-            return false;
+
+        setExtension();
+        IPath resourcePath = getContainerFullPath().append(currentName);
+        IFile file = createFileHandle(resourcePath);
+        IContainer cont = file.getParent();
+        IResource[] res = null;
+        String problemMessage = NLS.bind(IDEWorkbenchMessages.ResourceGroup_nameExists, getFileName());
+        try {
+            res = cont.members();
+            for (IResource re : res) {
+                if (currentName.compareToIgnoreCase(re.getName()) == 0) {
+                    setErrorMessage(problemMessage);
+                    return false;
+                }
+            }
+        } catch (CoreException e) {
+
+            e.printStackTrace();
         }
         return isValid;
     }
