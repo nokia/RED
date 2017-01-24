@@ -8,10 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -32,15 +30,33 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 
 /**
  * @author Michal Anglart
  */
 class SimilaritiesAnalyst {
 
+    private static final int DEFAULT_LIMIT = 5;
     private static final int DEFAULT_MAXIMUM_DISTANCE = 2;
 
-    private final SimilarityWithLevenshteinDistance similaritiesAlgorithm = new SimilarityWithLevenshteinDistance();
+
+    private final int limit;
+
+    private final int maximumDistance;
+
+    private final SimilarityWithLevenshteinDistance similaritiesAlgorithm;
+
+    SimilaritiesAnalyst() {
+        this(DEFAULT_LIMIT, DEFAULT_MAXIMUM_DISTANCE);
+    }
+
+    SimilaritiesAnalyst(final int limit, final int maximumDistance) {
+        this.limit = limit;
+        this.maximumDistance = maximumDistance;
+        this.similaritiesAlgorithm = new SimilarityWithLevenshteinDistance();
+    }
+
 
     Collection<String> provideSimilarLibraries(final IFile suiteFile, final String libraryName) {
         final RobotProject robotProject = RedPlugin.getModelManager().createProject(suiteFile.getProject());
@@ -52,12 +68,12 @@ class SimilaritiesAnalyst {
                         return lib.getName();
                     }
                 }));
-        return similaritiesAlgorithm.onlyWordsWithinDistance(allLibs, libraryName, DEFAULT_MAXIMUM_DISTANCE);
+        return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allLibs, libraryName, maximumDistance));
     }
 
     Collection<String> provideSimilarAccessibleKeywords(final IFile suiteFile, final String keywordName) {
         final Collection<String> allNames = getAccessibleKeywords(suiteFile);
-        return similaritiesAlgorithm.onlyWordsWithinDistance(allNames, keywordName, DEFAULT_MAXIMUM_DISTANCE);
+        return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allNames, keywordName, maximumDistance));
     }
 
     private Collection<String> getAccessibleKeywords(final IFile suiteFile) {
@@ -81,14 +97,14 @@ class SimilaritiesAnalyst {
         return names;
     }
 
-    public Collection<String> provideSimilarAccessibleVariables(final IFile suiteFile, final int offset,
+    Collection<String> provideSimilarAccessibleVariables(final IFile suiteFile, final int offset,
             final String varName) {
         final Collection<String> allNames = getAccessibleVariables(suiteFile, offset);
-        return similaritiesAlgorithm.onlyWordsWithinDistance(allNames, varName, DEFAULT_MAXIMUM_DISTANCE);
+        return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allNames, varName, maximumDistance));
     }
 
     private Collection<String> getAccessibleVariables(final IFile suiteFile, final int offset) {
-        final List<String> names = new ArrayList<>();
+        final Set<String> names = new LinkedHashSet<>();
         new VariableDefinitionLocator(suiteFile).locateVariableDefinitionWithLocalScope(new VariableDetector() {
 
             @Override
@@ -118,5 +134,9 @@ class SimilaritiesAnalyst {
             }
         }, offset);
         return names;
+    }
+
+    private <T> Collection<T> limit(final Collection<T> elements) {
+        return newArrayList(Iterables.limit(elements, limit));
     }
 }
