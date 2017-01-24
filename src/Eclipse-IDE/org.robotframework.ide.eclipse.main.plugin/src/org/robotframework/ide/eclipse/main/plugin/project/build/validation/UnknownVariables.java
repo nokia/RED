@@ -11,7 +11,6 @@ import java.util.Set;
 
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableComputationHelper;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.Number;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
@@ -92,8 +91,7 @@ class UnknownVariables {
     }
 
     private String getVariableName(final VariableDeclaration variableDeclaration) {
-        final Optional<TextPosition> extractVariableName = new VariableComputationHelper()
-                .extractVariableName(variableDeclaration);
+        final Optional<TextPosition> extractVariableName = variableDeclaration.getTextWithoutComputation();
         if (extractVariableName.isPresent()) {
             return extractVariableName.get().getText();
         }
@@ -103,8 +101,7 @@ class UnknownVariables {
     private String getVariableNameWithBrackets(final VariableDeclaration variableDeclaration) {
         final String name = variableDeclaration.asToken().getText();
 
-        final Optional<TextPosition> extractVariableName = new VariableComputationHelper()
-                .extractVariableName(variableDeclaration);
+        final Optional<TextPosition> extractVariableName = variableDeclaration.getTextWithoutComputation();
         if (extractVariableName.isPresent()) {
             return name.substring(0, 2) + extractVariableName.get().getText() + name.charAt(name.length() - 1);
         }

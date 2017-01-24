@@ -90,16 +90,18 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Item '%s' in dictionary '%s' has to contain '=' separator";
+            return "Item '%s' in dictionary '%s' %s";
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final IRegion problemRegion = RobotProblem.getRegionOf(marker);
-            final String value = marker.getAttribute(AdditionalMarkerAttributes.VALUE, "");
+            final String value = marker.getAttribute(AdditionalMarkerAttributes.VALUE, null);
 
             final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
-            fixers.addAll(ChangeToFixer.createFixers(problemRegion, newArrayList(value + "=value")));
+            if (value != null) {
+                fixers.addAll(ChangeToFixer.createFixers(problemRegion, newArrayList(value + "=value")));
+            }
             return fixers;
         }
     },
