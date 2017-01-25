@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _weV9oNy2Eea53q6vmC55pw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/25/17 11:09 AM
+Save-Time: 1/25/17 12:50 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,7 +80,7 @@ get-window "New Robot Resource file" | get-button "as .tsv file" | click
 check-error-and-Finish-button -file_name "AbC.tsv"  -window_name "Resource file"
 get-window "New Robot Resource file"  | get-button Cancel | click
 
-//-----------------------------------inside folder ------------------------------------------
+//-----------------------------------file inside folder ------------------------------------------
 
 //add new file abc
 get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder" | get-menu "New/Robot Test Suite" | click
@@ -110,30 +110,76 @@ with [get-window "New Robot Resource file"] {
     get-button Finish | click
 }
 
+//------------------------------------------- python file --------------------------------------------------------------------------------------------
+//add python file
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+with [get-window "New Robot python file"] {
+    get-editbox -after [get-label "File name:"] | set-text "new.py"
+    get-button Finish | click
+}
+
+//add python file again
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+get-window "New Robot python file" | get-editbox -after [get-label "File name:"] | set-text "new.py"
+check-error-and-Finish-button -file_name "new.py" -window_name "python file"
+
+//with [get-window "New Robot python file"] {
+//    get-editbox -after [get-label "Robot python file"] | get-property text | equals "'new.py' already exists." 
+//        | verify-true
+//    get-button Finish | get-property enablement | equals false | verify-true
+//}
+
+//change to other name
+with [get-window "New Robot python file" | get-editbox -after [get-label "File name:"]] {
+    click-text 1
+    key-type Left
+    set-text "new1.py"
+}
+get-window "New Robot python file" | get-editbox -after [get-label "Robot python file"] | get-property text 
+    | equals "Create new Robot python file (variable/library)" | verify-true
+    
+//changed to new.py again and change to variable file    
+with [get-window "New Robot python file"] {
+    with [get-editbox -after [get-label "File name:"]] {
+        click-text 5
+        key-type Left -times 3
+        set-text "new.py"
+    }
+    get-button "Variables file" | click
+}
+check-error-and-Finish-button -file_name "new.py" -window_name "python file"
+
+
+get-window "New Robot python file" | get-button Library | click
+check-error-and-Finish-button -file_name "new.py" -window_name "python file"
+
+get-window "New Robot python file" | get-button "Dynamic API library" | click
+check-error-and-Finish-button -file_name "new.py" -window_name "python file"
+
+get-window "New Robot python file" | get-button Cancel | click
 
 
 //check PE
 with [get-view "Project Explorer" | get-tree] {
-    get-item RobotProject | get-property childCount | equals 6 | verify-true
+
+	//root
+    get-item RobotProject | get-property "getItems().length" | equals 7 | verify-true
     get-item RobotProject | get-property "getItems().TreeItem[0].getText()" 
         | equals "Robot Standard libraries \[.*\]" | verify-true
-     //folder   
     get-item RobotProject | get-property "getItems().TreeItem[1].getText()" | equals TestSuiteFolder | verify-true
-    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().length" | equals 3 | verify-true
-    
-    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
-        | equals "TestFILE.txt" | verify-true
-    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" 
-        | equals "__init__.robot" | verify-true    
-    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[2].getText()" | equals "abc.tsv" 
-        | verify-true
-    
-    
-
-    //root    
     get-item RobotProject | get-property "getItems().TreeItem[2].getText()" | equals "ABC.tsv" | verify-true
     get-item RobotProject | get-property "getItems().TreeItem[3].getText()" | equals "abc.robot" | verify-true
-    get-item RobotProject | get-property "getItems().TreeItem[4].getText()" | equals "red.xml" | verify-true
-    get-item RobotProject | get-property "getItems().TreeItem[5].getText()" | equals "TestFile.robot" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[4].getText()" | equals "new.py" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[5].getText()" | equals "red.xml" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[6].getText()" | equals "TestFile.robot" | verify-true
+    
+    //folder
+    get-item "RobotProject/TestSuiteFolder" | get-property childCount | equals 3 | verify-true
+    get-item "RobotProject/TestSuiteFolder" | get-property "getItems().TreeItem[0].getText()" | equals "TestFILE.txt" 
+        | verify-true
+    get-item "RobotProject/TestSuiteFolder" | get-property "getItems().TreeItem[1].getText()" | equals "__init__.robot" 
+        | verify-true
+    get-item "RobotProject/TestSuiteFolder" | get-property "getItems().TreeItem[2].getText()" | equals "abc.tsv" 
+        | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
