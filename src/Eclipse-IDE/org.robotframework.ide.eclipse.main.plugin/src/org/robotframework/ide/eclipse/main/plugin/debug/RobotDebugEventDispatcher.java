@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.debug;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +30,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.execution.ExecutionElementsParser;
-import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
 import org.rf.ide.core.execution.context.KeywordPosition;
+import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
 import org.rf.ide.core.testdata.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -45,26 +46,26 @@ import com.google.common.base.Optional;
 /**
  * Listens to events from the TestRunnerAgent and fires corresponding
  * debug events.
- * 
+ *
  * @author mmarzec
  */
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotDebugEventDispatcher extends Job {
 
     private final RobotDebugTarget target;
-    
+
     private final RobotEventBroker robotEventBroker;
 
     private boolean isStopping;
-    
+
     private boolean isBreakpointConditionFulfilled;
-    
+
     private final RobotDebugExecutionContext executionContext;
-    
+
     private final KeywordExecutionManager keywordExecutionManager;
-    
+
     private final Optional<RobotConsoleFacade> consoleFacade;
-    
+
     public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteFilesToDebug,
             final RobotEventBroker robotEventBroker, final Optional<RobotConsoleFacade> consoleFacade) {
         super("Robot Event Dispatcher");
@@ -95,8 +96,9 @@ public class RobotDebugEventDispatcher extends Job {
         String event = eventReader.readLine();
         final ObjectMapper mapper = new ObjectMapper();
         while (!target.isTerminated() && event != null) {
-            
-            final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {};
+
+            final TypeReference<Map<String, Object>> stringToObjectMapType = new TypeReference<Map<String, Object>>() {
+            };
             final Map<String, Object> eventMap = mapper.readValue(event, stringToObjectMapType);
             final String eventType = getEventType(eventMap);
             if (eventType == null) {
@@ -107,7 +109,7 @@ public class RobotDebugEventDispatcher extends Job {
                 case "pid":
                     handlePidEvent();
                     break;
-                case "resource_import": //since Robot 2.9
+                case "resource_import": // since Robot 2.9
                     handleResourceImportEvent(eventMap);
                     break;
                 case "start_suite":
@@ -172,7 +174,7 @@ public class RobotDebugEventDispatcher extends Job {
         robotEventBroker.sendClearEventToMessageLogView();
         target.started();
     }
-    
+
     private void handleResourceImportEvent(final Map<String, ?> eventMap) {
         final List<?> importList = (List<?>) eventMap.get("resource_import");
         final Map<?, ?> importElements = (Map<?, ?>) importList.get(1);
@@ -185,7 +187,7 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> suiteElements = (Map<?, ?>) suiteList.get(1);
         final IPath suiteFilePath = new Path((String) suiteElements.get("source"));
         printRemoteDebugSuiteMessage(suiteFilePath);
-        
+
         final IFile currentSuiteFile = keywordExecutionManager.extractCurrentSuite(suiteFilePath);
 
         if (currentSuiteFile != null) {
@@ -194,23 +196,24 @@ public class RobotDebugEventDispatcher extends Job {
             executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0), robotParser);
         }
 
-        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartSuiteExecutionElement(
-                (String) suiteList.get(0), (String) suiteElements.get("source")));
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser
+                .createStartSuiteExecutionElement((String) suiteList.get(0), (String) suiteElements.get("source")));
     }
-    
+
     private void handleStartTestEvent(final Map<String, ?> eventMap) {
         final List<?> testList = (List<?>) eventMap.get("start_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
         final String line = "Starting test: " + testElements.get("longname") + '\n';
         final String testCaseName = (String) testList.get(0);
-        
+
         final boolean hasTestCase = executionContext.startTest(testCaseName);
         printRemoteDebugTestCaseMessage(testCaseName, hasTestCase);
-        
+
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
-        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartTestExecutionElement(testCaseName));
+        robotEventBroker.sendExecutionEventToExecutionView(
+                ExecutionElementsParser.createStartTestExecutionElement(testCaseName));
     }
-    
+
     @SuppressWarnings({ "unchecked" })
     private void handleStartKeywordEvent(final Map<String, ?> eventMap) {
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
@@ -218,7 +221,7 @@ public class RobotDebugEventDispatcher extends Job {
         final Map<?, ?> keywordDetails = (Map<?, ?>) startList.get(1);
         final String keywordType = (String) keywordDetails.get("type");
         final List<String> keywordArgs = (List<String>) keywordDetails.get("args");
-        
+
         checkKeywordBeforeStart(currentKeywordName, keywordType, keywordArgs);
 
         executionContext.startKeyword(currentKeywordName, keywordType, keywordArgs);
@@ -227,7 +230,8 @@ public class RobotDebugEventDispatcher extends Job {
 
         final KeywordPosition keywordPosition = executionContext.findKeywordPosition();
         final int keywordLineNumber = keywordPosition.getLineNumber();
-        final String currentResourceFile = keywordExecutionManager.extractCurrentResourceFile(keywordPosition.getFilePath());
+        final String currentResourceFile = keywordExecutionManager
+                .extractCurrentResourceFile(keywordPosition.getFilePath());
         if (currentResourceFile != null) {
             executedFileName = new File(currentResourceFile).getName();
         }
@@ -253,7 +257,7 @@ public class RobotDebugEventDispatcher extends Job {
         return hasBreakpoint || (target.getRobotThread().isStepping() && !target.hasStepOver()
                 && !target.hasStepReturn() && keywordLineNumber >= 0);
     }
-    
+
     @SuppressWarnings("unchecked")
     private void handleVarsEvent(final Map<String, ?> eventMap) {
         final List<?> varList = (List<?>) eventMap.get("vars");
@@ -273,8 +277,8 @@ public class RobotDebugEventDispatcher extends Job {
         if (!keywordExecutionManager.getBreakpointCondition().isEmpty()) {
             target.sendEventToAgent(keywordExecutionManager.createJsonFromBreakpointCondition());
         } else {
-            target.sendExecutionEventToAgent(isStopping ? ExecutionEvent.STOP_EXECUTION
-                    : ExecutionEvent.CONTINUE_EXECUTION);
+            target.sendExecutionEventToAgent(
+                    isStopping ? ExecutionEvent.STOP_EXECUTION : ExecutionEvent.CONTINUE_EXECUTION);
         }
     }
 
@@ -309,7 +313,7 @@ public class RobotDebugEventDispatcher extends Job {
         final List<?> endList = (List<?>) eventMap.get("end_keyword");
         final String keyword = (String) endList.get(0);
         target.getCurrentKeywordsContextMap().remove(keyword);
-        
+
         final Map<?, ?> endElements = (Map<?, ?>) endList.get(1);
         final String keywordType = (String) endElements.get("type");
         executionContext.endKeyword(keywordType);
@@ -318,23 +322,22 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleEndTestEvent(final Map<String, ?> eventMap) {
         final List<?> testList = (List<?>) eventMap.get("end_test");
         final Map<?, ?> testElements = (Map<?, ?>) testList.get(1);
-        
+
         executionContext.endTest();
-        
+
         final String line = "Ending test: " + testElements.get("longname") + "\n\n";
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
-        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndTestExecutionElement(
-                (String) testList.get(0), testElements));
+        robotEventBroker.sendExecutionEventToExecutionView(
+                ExecutionElementsParser.createEndTestExecutionElement((String) testList.get(0), testElements));
     }
-    
+
     private void handleEndSuiteEvent(final Map<String, ?> eventMap) {
         final List<?> suiteList = (List<?>) eventMap.get("end_suite");
         target.clearStackFrames();
-        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createEndSuiteExecutionElement(
-                (String) suiteList.get(0), (Map<?, ?>) suiteList.get(1)));
+        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser
+                .createEndSuiteExecutionElement((String) suiteList.get(0), (Map<?, ?>) suiteList.get(1)));
         executionContext.endSuite();
     }
-
 
     private void handleCloseEvent() {
         target.terminated();
@@ -347,10 +350,11 @@ public class RobotDebugEventDispatcher extends Job {
                 + messageElements.get("message") + '\n';
         robotEventBroker.sendAppendLineEventToMessageLogView(line);
     }
-    
+
     private void handleOutputFile(final Map<?, ?> eventMap) {
         final List<?> outputFileList = (List<?>) eventMap.get("output_file");
-        robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createOutputFileExecutionElement((String) outputFileList.get(0)));
+        robotEventBroker.sendExecutionEventToExecutionView(
+                ExecutionElementsParser.createOutputFileExecutionElement((String) outputFileList.get(0)));
     }
 
     private String getEventType(final Map<String, ?> eventMap) {
@@ -360,23 +364,23 @@ public class RobotDebugEventDispatcher extends Job {
         final Set<String> keySet = eventMap.keySet();
         return keySet.isEmpty() ? null : keySet.iterator().next();
     }
-    
+
     private void resetSteppingState() {
         if (target.getRobotThread().isStepping()) {
             target.getRobotThread().setSteppingOver(false);
             target.getRobotThread().setSteppingReturn(false);
         }
     }
-    
+
     private void resetStackFramesState() {
         target.setHasStackFramesCreated(false);
     }
-    
+
     private void resetBreakpointConditionState() {
         isBreakpointConditionFulfilled = false;
         keywordExecutionManager.setBreakpointCondition("");
     }
-    
+
     private void printRemoteDebugSuiteMessage(final IPath suiteFilePath) {
         try {
             if (consoleFacade.isPresent() && suiteFilePath != null && suiteFilePath.getFileExtension() != null) {
@@ -397,7 +401,7 @@ public class RobotDebugEventDispatcher extends Job {
             }
         }
     }
-    
+
     private void checkKeywordBeforeStart(final String currentKeywordName, final String keywordType,
             final List<String> keywordArgs) {
         if (keywordExecutionManager.getCurrentSuiteFile() == null
@@ -410,48 +414,58 @@ public class RobotDebugEventDispatcher extends Job {
             showError("Robot Event Dispatcher Error", message);
             throw new MissingFileToExecuteException(message);
         }
-        
-        if (keywordExecutionManager.getCurrentSuiteFile() == null && keywordExecutionManager.getCurrentSuiteLocation() != null) {
-            tryToFindInitSuiteFile();
+
+        if (!executionContext.isInSuite() && keywordExecutionManager.getCurrentSuiteLocation() != null) {
+            handleInitFile();
         }
-        
+
         if (executionContext.isTestCaseTeardownKeyword(keywordType)) {
             target.clearStackFrames();
         }
     }
-    
+
+    private void handleInitFile() {
+        final IFile currentInitFile = keywordExecutionManager.getCurrentInitFile();
+        if (currentInitFile == null) {
+            tryToFindInitSuiteFile();
+        } else {
+            switchSuite(currentInitFile.getParent(), currentInitFile);
+        }
+    }
+
     private void tryToFindInitSuiteFile() {
         final IContainer suiteContainer = ResourcesPlugin.getWorkspace()
                 .getRoot()
                 .getContainerForLocation(keywordExecutionManager.getCurrentSuiteLocation());
         if (suiteContainer != null
                 && (suiteContainer.getType() == IResource.FOLDER || suiteContainer.getType() == IResource.PROJECT)) {
-            final IResource initFile = findInitFile(suiteContainer);
-            if (initFile != null && initFile.getType() == IResource.FILE) {
-                final IFile currentSuiteFile = (IFile) initFile;
-                keywordExecutionManager.setCurrentSuiteParent(suiteContainer);
-                keywordExecutionManager.setCurrentSuiteName(initFile.getName());
-                keywordExecutionManager.setCurrentSuiteFile(currentSuiteFile);
-                final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(currentSuiteFile);
-                final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
-                executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0),
-                        robotParser);
+            final Optional<IFile> initFile = findInitSuiteFile(suiteContainer);
+            if (initFile.isPresent()) {
+                keywordExecutionManager.setCurrentInitFile(initFile.get());
+                switchSuite(suiteContainer, initFile.get());
             }
         }
     }
-    
-    private IResource findInitFile(final IContainer suiteContainer) {
-        IResource member = suiteContainer.findMember("__init__.robot");
-        if (member != null) {
-            return member;
+
+    private Optional<IFile> findInitSuiteFile(final IContainer suiteContainer) {
+        for (final String initFileName : Arrays.asList("__init__.robot", "__init__.txt", "__init__.tsv")) {
+            final IResource member = suiteContainer.findMember(initFileName);
+            if (member != null && member.getType() == IResource.FILE) {
+                return Optional.of((IFile) member);
+            }
         }
-        member = suiteContainer.findMember("__init__.txt");
-        if (member != null) {
-            return member;
-        }
-        return suiteContainer.findMember("__init__.tsv");
+        return Optional.absent();
     }
-    
+
+    private void switchSuite(final IContainer suiteContainer, final IFile suiteFile) {
+        keywordExecutionManager.setCurrentSuiteParent(suiteContainer);
+        keywordExecutionManager.setCurrentSuiteName(suiteFile.getName());
+        keywordExecutionManager.setCurrentSuiteFile(suiteFile);
+        final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(suiteFile);
+        final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
+        executionContext.startSuite(robotParser.parse(suiteFile.getLocation().toFile()).get(0), robotParser);
+    }
+
     private void showError(final String title, final String message) {
         final Display display = PlatformUI.getWorkbench().getDisplay();
         display.syncExec(new Runnable() {
@@ -462,14 +476,16 @@ public class RobotDebugEventDispatcher extends Job {
             }
         });
     }
-    
+
     private static class MissingFileToExecuteException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
 
         public MissingFileToExecuteException(final String message) {
             super(message);
         }
     }
-    
+
     public static enum ExecutionEvent {
         CONTINUE_EXECUTION("continue"),
         STOP_EXECUTION("stop"),

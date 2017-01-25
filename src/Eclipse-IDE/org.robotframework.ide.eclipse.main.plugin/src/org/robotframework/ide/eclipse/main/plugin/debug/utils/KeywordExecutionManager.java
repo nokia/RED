@@ -1,3 +1,8 @@
+/*
+ * Copyright 2017 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -30,8 +35,10 @@ public class KeywordExecutionManager {
 
     private final List<IResource> suiteFilesToDebug;
 
+    private IFile currentInitFile;
+
     private IFile currentSuiteFile;
-    
+
     private IPath currentSuiteLocation;
 
     private String currentSuiteName = "";
@@ -100,8 +107,8 @@ public class KeywordExecutionManager {
                     final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                             IMarker.LINE_NUMBER);
                     if (keywordLineNumber == breakpointLineNum) {
-                        final boolean hasHitCountConditionFullfilled = checkHitCountCondition(currentBreakpoint);
-                        if (hasHitCountConditionFullfilled) {
+                        final boolean hasHitCountConditionFulfilled = checkHitCountCondition(currentBreakpoint);
+                        if (hasHitCountConditionFulfilled) {
                             breakpointCondition = currentBreakpoint.getMarker().getAttribute(
                                     RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                             hasBreakpoint = true;
@@ -126,7 +133,7 @@ public class KeywordExecutionManager {
         return "{\"keywordCondition\":[\"" + keywordName + "\", [\"" + Joiner.on("\", \"").join(conditionElements)
                 + "\"]]}";
     }
-    
+
     private boolean isBreakpointSourceFileInCurrentExecutionContext(final IResource breakpointSourceFile,
             final String executedSuite) {
 
@@ -143,23 +150,23 @@ public class KeywordExecutionManager {
 
 
     private boolean checkHitCountCondition(final IBreakpoint currentBreakpoint) {
-        boolean hasHitCountConditionFullfilled = false;
+        boolean hasHitCountConditionFulfilled = false;
         final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
                 RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
         if (breakpointHitCount > 1) {
             if (breakpointHitCounts.containsKey(currentBreakpoint)) {
                 final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
                 if (currentHitCount == breakpointHitCount) {
-                    hasHitCountConditionFullfilled = true;
+                    hasHitCountConditionFulfilled = true;
                 }
                 breakpointHitCounts.put(currentBreakpoint, currentHitCount);
             } else {
                 breakpointHitCounts.put(currentBreakpoint, 1);
             }
         } else {
-            hasHitCountConditionFullfilled = true;
+            hasHitCountConditionFulfilled = true;
         }
-        return hasHitCountConditionFullfilled;
+        return hasHitCountConditionFulfilled;
     }
 
     private IFile extractSuiteFile(final String suiteName, final IPath suiteParentPath, final List<IResource> resources) {
@@ -204,6 +211,14 @@ public class KeywordExecutionManager {
         }
     }
 
+    public IFile getCurrentInitFile() {
+        return currentInitFile;
+    }
+
+    public void setCurrentInitFile(final IFile currentInitFile) {
+        this.currentInitFile = currentInitFile;
+    }
+
     public IFile getCurrentSuiteFile() {
         return currentSuiteFile;
     }
@@ -215,7 +230,7 @@ public class KeywordExecutionManager {
     public String getCurrentSuiteName() {
         return currentSuiteName;
     }
-    
+
     public void setCurrentSuiteName(final String currentSuiteName) {
         this.currentSuiteName = currentSuiteName;
     }
