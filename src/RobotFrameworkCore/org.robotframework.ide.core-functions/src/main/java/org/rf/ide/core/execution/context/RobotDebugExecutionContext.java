@@ -50,7 +50,7 @@ public class RobotDebugExecutionContext {
     }
 
     public void resourceImport(final String path) {
-        if (currentModel != null) { // import during suite execution
+        if (isInSuite()) { // import during suite execution
             new ResourceImporter(robotParser).importDebugResource(currentModel.getParent(), path);
             executableRowFindersManager
                     .updateResourceImportReferences(currentModel.getParent().getResourceImportReferences());
@@ -73,7 +73,7 @@ public class RobotDebugExecutionContext {
     }
 
     public boolean startTest(final String testName) {
-        if (currentModel != null) {
+        if (isInSuite()) {
             final TestCaseTable testCaseTable = currentModel.getTestCaseTable();
             final List<TestCase> testCases = testCaseTable.getTestCases();
             for (final TestCase testCase : testCases) {
@@ -180,6 +180,10 @@ public class RobotDebugExecutionContext {
                 || (executableRowFindersManager.hasCurrentTestCase()
                         && SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.isTypeOf(keywordType,
                                 SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.NEW_TEARDOWN));
+    }
+
+    public boolean isInSuite() {
+        return currentModel != null;
     }
 
     protected static class TestCaseExecutionRowCounter {

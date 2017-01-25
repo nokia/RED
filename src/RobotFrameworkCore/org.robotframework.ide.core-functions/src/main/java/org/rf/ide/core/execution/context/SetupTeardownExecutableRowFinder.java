@@ -75,12 +75,11 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         return row;
     }
 
-    
     private boolean isSuiteSetup(final KeywordContext currentKeywordContext) {
         final String currentKeywordType = currentKeywordContext.getType();
         return SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.SUITE_SETUP)
                 || (currentTestCase == null
-                        && SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.NEW_SETUP)); 
+                        && SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.NEW_SETUP));
     }
 
     private boolean isSuiteTeardown(final KeywordContext currentKeywordContext) {
@@ -124,7 +123,7 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         SUITE_SETUP("Suite Setup"),
         SUITE_TEARDOWN("Suite Teardown"),
         NEW_SETUP("Setup"), // since Robot 3.0 a2
-        NEW_TEARDOWN("Teardown"); // since Robot 3.0 a2 
+        NEW_TEARDOWN("Teardown"); // since Robot 3.0 a2
 
         private String typeName;
 
@@ -135,17 +134,17 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         private String getTypeName() {
             return typeName;
         }
-        
+
         public static boolean isTypeOf(final String givenTypeName, final SetupTeardownKeywordTypes expectedType) {
             return expectedType.getTypeName().equalsIgnoreCase(givenTypeName);
         }
-        
+
         public static boolean isSuiteSetupTeardownType(final String typeName) {
-            return SUITE_SETUP.getTypeName().equalsIgnoreCase(typeName) || SUITE_TEARDOWN.getTypeName().equalsIgnoreCase(typeName);
+            return isTypeOf(typeName, SUITE_SETUP) || isTypeOf(typeName, SUITE_TEARDOWN);
         }
-        
+
         public static boolean isNewSetupTeardownType(final String typeName) {
-            return NEW_SETUP.getTypeName().equalsIgnoreCase(typeName) || NEW_TEARDOWN.getTypeName().equalsIgnoreCase(typeName);
+            return isTypeOf(typeName, NEW_SETUP) || isTypeOf(typeName, NEW_TEARDOWN);
         }
     }
 }
