@@ -5,45 +5,85 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VUELoPPUEeSZ7tiwCS22GA
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/4/16 2:02 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/25/17 12:00 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-button "Open Perspective" | click
-with [get-window "Open Perspective"] {
-    get-table | select "Robot( \\(default\\))?"
-    get-button OK | click
-}
-
+//add folder with name that exists
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Folder" | click
 with [get-window "New Folder" | get-editbox -after [get-label "Folder name:"]] {
     set-text TestSuiteFolder
 }
+
+//check error
+get-window "New Folder" | get-editbox -after [get-label Folder] | get-property text 
+    | equals "'TestSuiteFolder' already exists." | verify-true
+    
+//check if button is disabled    
 with [get-window "New Folder" | get-button Finish] {
     get-property enablement | equals false | verify-true
-    get-property caption | equals "&Finish" | verify-true
 }
 get-window "New Folder" | get-button Cancel | click
-get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
-with [get-window "New Robot Test Suite" | get-editbox -after [get-label "File name:"]] {
-    set-text "TestFile.robot"
-}
-with [get-window "New Robot Test Suite" | get-button Finish] {
+
+//name folder as test name
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Folder" | click
+get-window "New Folder" | get-editbox -after [get-label "Folder name:"] | set-text "TestFile.robot"
+
+//check error
+get-window "New Folder" | get-editbox -after [get-label Folder] | get-property text 
+    | equals "'TestFile.robot' already exists." | verify-true
+    
+//button is disabled    
+with [get-window "New Folder"  | get-button Finish] {
     get-property enablement | equals false | verify-true
-    get-property caption | equals "&Finish" | verify-true
 }
-get-window "New Robot Test Suite" | get-button Cancel | click
-with [get-view "Project Explorer" | get-tree] {
-    select "RobotProject/TestSuiteFolder" | double-click
-    select "RobotProject/TestFile.robot"
+get-window "New Folder"  | get-button Cancel | click
+
+
+///--------------------------------------------- Robot Test Suites ------------------------------------------------------------------------------
+
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suites folder" | click
+with [get-window "New Robot Test Suites folder"] {
+    get-editbox -after [get-label "Folder name:"] | set-text abc
+    get-button Finish | click
 }
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot"
-with [get-view "Project Explorer" | get-tree] {
-    get-item RobotProject | get-property "getItems().TreeItem[1].getText()" | equals TestSuiteFolder | verify-true
-    get-item RobotProject | get-property "getItems().TreeItem[3].getText()" | equals "TestFile.robot" | verify-true
+
+//add folder abc again
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suites folder" | click
+get-window "New Robot Test Suites folder" | get-editbox -after [get-label "Folder name:"] | set-text abc
+
+//check error
+with [get-window "New Robot Test Suites folder"] {
+    get-editbox -after [get-label "Robot Suites Folder"] | get-property text | equals "'abc' already exists." 
+        | verify-true
+    get-button Finish | get-property enablement | equals false | verify-true
 }
+//add new character
+get-window "New Robot Test Suites folder" | get-editbox -after [get-label "Folder name:"] | set-text abc1
+
+//now user can add folder
+get-window "New Robot Test Suites folder" | get-editbox -after [get-label "Robot Suites Folder"] | get-property text 
+    | equals "Create new Robot test suites folder" | verify-true
+get-window "New Robot Test Suites folder" | get-button Finish | get-property enablement | equals true | verify-true
+
+
+//set abc again but select init file
+with [get-window "New Robot Test Suites folder"] {
+    get-editbox -after [get-label "Folder name:"] | set-text abc
+    get-button "Create suite initialization file" | check
+    get-button "as .tsv file" | click
+}
+
+//error should be shown
+with [get-window "New Robot Test Suites folder"] {
+    get-editbox -after [get-label "Robot Suites Folder"] | get-property text | equals "'abc' already exists." 
+        | verify-true
+    get-button Finish | get-property enablement | equals false | verify-true
+}
+
+get-window "New Robot Test Suites folder" | get-button Cancel | click
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
