@@ -1,0 +1,139 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CreateFilesThatExist
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _weV9oNy2Eea53q6vmC55pw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 1/25/17 11:09 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-error-and-Finish-button" [val file_name]  [val window_name "Test Suite"]{
+	with [get-window [format "New Robot %s" $window_name]] {
+	    get-editbox -after [get-label [format "Robot %s" $window_name]] | get-property text | equals [format"'%s' already exists." $file_name]
+	        | verify-true
+	        
+	    //button Finish is disabled
+	    get-button Finish | get-property enablement | equals false | verify-true
+	}
+}
+
+
+
+//add abc file (with default .robot extension)
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text abc
+    get-button Finish | click
+}
+
+//add file ABC
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+get-window "New Robot Test Suite" | get-editbox -after [get-label "File name:"] | set-text ABC
+
+//check error
+check-error-and-Finish-button -file_name "ABC.robot"
+
+//change extension and add new file
+with [get-window "New Robot Test Suite"] {
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+//add new file abc
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+get-window "New Robot Test Suite" | get-editbox -after [get-label "File name:"] | set-text abc
+
+check-error-and-Finish-button -file_name "abc.robot"
+    
+//change extension to .tsv    
+get-window "New Robot Test Suite" | get-button "as .tsv file" | click
+check-error-and-Finish-button -file_name "abc.tsv"
+
+//add one character to  name and check tah user can add new file
+get-window "New Robot Test Suite" | get-editbox -after [get-label "File name:"] | set-text "abc1.tsv"
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "Robot Test Suite"] | get-property text | equals "Create new Robot test suite file" 
+        | verify-true
+    get-button Finish | get-property enablement | equals true | verify-true
+}
+get-window "New Robot Test Suite" | get-button Cancel | click
+
+//------------------------------------------------------- resources -------------------------------------------------------------
+//add
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Resource file" | click
+get-window "New Robot Resource file" | get-editbox -after [get-label "File name:"] | set-text AbC
+check-error-and-Finish-button -file_name "AbC.robot" -window_name "Resource file"
+
+//change extenstion to .txt
+get-window "New Robot Resource file" | get-button "as .txt file" | click
+get-window "New Robot Resource file" | get-editbox -after [get-label "Robot Resource file"] | get-property text 
+    | equals "Create new Robot resource file" | verify-true
+
+//changed to .tsv    
+get-window "New Robot Resource file" | get-button "as .tsv file" | click
+check-error-and-Finish-button -file_name "AbC.tsv"  -window_name "Resource file"
+get-window "New Robot Resource file"  | get-button Cancel | click
+
+//-----------------------------------inside folder ------------------------------------------
+
+//add new file abc
+get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder" | get-menu "New/Robot Test Suite" | click
+get-window "New Robot Test Suite" | get-editbox -after [get-label "File name:"] | set-text abc
+
+//check that it is ok
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "Robot Test Suite"] | get-property text | equals "Create new Robot test suite file" 
+        | verify-true
+    get-button Finish | get-property enablement | equals true | verify-true
+}
+
+//check that .tsv is ok
+get-window "New Robot Test Suite" | get-button "as .tsv file" | click
+get-window "New Robot Test Suite" | get-editbox -after [get-label "Robot Test Suite"] | get-property text 
+    | equals "Create new Robot test suite file" | verify-true
+    
+//add tsv file    
+get-window "New Robot Test Suite" | get-button Finish | click
+
+//add resource: TestFILE
+get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder" | get-menu "New/Robot Resource file" 
+    | click
+with [get-window "New Robot Resource file"] {
+    get-editbox -after [get-label "File name:"] | set-text TestFILE
+    get-button "as .txt file" | click
+    get-button Finish | click
+}
+
+
+
+//check PE
+with [get-view "Project Explorer" | get-tree] {
+    get-item RobotProject | get-property childCount | equals 6 | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Robot Standard libraries \[.*\]" | verify-true
+     //folder   
+    get-item RobotProject | get-property "getItems().TreeItem[1].getText()" | equals TestSuiteFolder | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().length" | equals 3 | verify-true
+    
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "TestFILE.txt" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" 
+        | equals "__init__.robot" | verify-true    
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[2].getText()" | equals "abc.tsv" 
+        | verify-true
+    
+    
+
+    //root    
+    get-item RobotProject | get-property "getItems().TreeItem[2].getText()" | equals "ABC.tsv" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[3].getText()" | equals "abc.robot" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[4].getText()" | equals "red.xml" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[5].getText()" | equals "TestFile.robot" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

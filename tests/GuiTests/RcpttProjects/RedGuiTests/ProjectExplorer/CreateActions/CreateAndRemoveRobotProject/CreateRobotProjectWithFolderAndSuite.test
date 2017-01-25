@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/18/16 2:00 PM
+Save-Time: 1/17/17 2:35 PM
 Testcase-Type: ecl
 Verifications: _Xbz7EJUqEeaXOtocAkFx_w
 
@@ -28,10 +28,10 @@ proc "compare-items" [val item_amount] [val ref_list_of_items] {
 
 proc "compare-menu-for_new-items"{
 
-	get-menu "File/New"|  get-object  | invoke getMenu  | invoke	 	getItemCount |int | let [val items_in_menu -input]{
-	
+	get-menu "File/New"|  get-object  | invoke getMenu | invoke getItemCount |int | let [val items_in_menu -input]{
 		if [ $items_in_menu | eq 9]{
-			compare-items -item_amount 9 -ref_list_of_items [list "MenuItem {Robot Project}"
+			compare-items -item_amount 9 -ref_list_of_items [list 
+			        "MenuItem {Robot Project}"
 					"MenuItem {P&roject...}"
 					"MenuItem {|}"
 					"MenuItem {Robot Test Suites folder}"
@@ -42,7 +42,8 @@ proc "compare-menu-for_new-items"{
 					"MenuItem {&Other...	M1+N}"] 
 					
 		}-else {
-			compare-items -item_amount 11 -ref_list_of_items [list "MenuItem {Robot Project}"
+			compare-items -item_amount 11 -ref_list_of_items [list 
+			        "MenuItem {Robot Project}"
 					"MenuItem {P&roject...}"
 					"MenuItem {|}"
 					"MenuItem {Robot Test Suites folder}"
