@@ -988,6 +988,52 @@ public class RobotDebugExecutionContextTest {
         assertTrue(debugExecutionContext.isTestCaseTeardownKeyword("Teardown"));
     }
 
+    @Test
+    public void test_SetupInInit() throws URISyntaxException {
+        // prepare
+        final String initPath = "init" + File.separatorChar + "__init__.robot";
+        final String suitePath = "init" + File.separatorChar + "testExecContextWithInit.robot";
+
+        final String pathToInit = RobotModelTestProvider.getFilePath(initPath).toAbsolutePath().toString();
+        final String pathToTestCase = RobotModelTestProvider.getFilePath(suitePath).toAbsolutePath().toString();
+
+        final KeywordPosition[] linesSequenceToHit = new KeywordPosition[] { new KeywordPosition(pathToInit, 2),
+                new KeywordPosition(pathToInit, 7), new KeywordPosition(pathToTestCase, 3),
+                new KeywordPosition(pathToTestCase, 7), new KeywordPosition(pathToInit, 3),
+                new KeywordPosition(pathToInit, 10) };
+
+        final RobotFile initModelFile = RobotModelTestProvider.getModelFile(initPath, parser);
+        final RobotFile suiteModelFile = RobotModelTestProvider.getModelFile(suitePath, parser);
+
+        // execute & verify
+        debugExecutionContext.startSuite(initModelFile.getParent(), parser);
+        debugExecutionContext.startKeyword("Init Setup Kw", "Setup", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("suite setup"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Setup");
+
+        debugExecutionContext.startSuite(suiteModelFile.getParent(), parser);
+        debugExecutionContext.startTest("Test");
+        debugExecutionContext.startKeyword("Local Kw", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("local"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endTest();
+        debugExecutionContext.endSuite();
+
+        debugExecutionContext.startSuite(initModelFile.getParent(), parser);
+        debugExecutionContext.startKeyword("Init Teardown Kw", "Teardown", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("init teardown"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+    }
+
     private void startBuiltInLogKeyword1() {
         debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
         checkKeywordLine1();
