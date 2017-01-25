@@ -119,7 +119,7 @@ public class VariablesValueConverterTest {
         objs.add(new String("xyz"));
 
         // execute
-        List<Double> c = VariablesValueConverter.convert(objs, Double.class);
+        VariablesValueConverter.convert(objs, Double.class);
 
         // verify
         Assert.fail("Shouldn't reach here.");

@@ -38,10 +38,6 @@ public class SuiteSourceFormattingStrategyTest {
         return formatter.format(content, "\n", new FormatterProperties(SeparatorType.CONSTANT, 4));
     }
 
-    private String formatDynamic(final String content) {
-        return formatter.format(content, "\n", new FormatterProperties(SeparatorType.DYNAMIC, 2));
-    }
-
     private static String createContent(final String... lines) {
         return Joiner.on("\n").join(lines) + "\n";
     }

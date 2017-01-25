@@ -178,7 +178,7 @@ public abstract class ACreationOfListVariableTest {
         values.add("");
         values.add("value");
 
-        final AVariable aVariable = variableTable.createListVariable(0, "list", values);
+        variableTable.createListVariable(0, "list", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -199,7 +199,7 @@ public abstract class ACreationOfListVariableTest {
         values.add("value");
         values.add("");
 
-        final AVariable aVariable = variableTable.createListVariable(0, "list", values);
+        variableTable.createListVariable(0, "list", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);

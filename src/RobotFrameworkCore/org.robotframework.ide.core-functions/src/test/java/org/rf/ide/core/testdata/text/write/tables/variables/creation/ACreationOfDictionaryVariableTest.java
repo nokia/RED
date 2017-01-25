@@ -133,7 +133,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         data.add(variableTable.createEntry("", ""));
         data.add(variableTable.createEntry("key", "value"));
 
-        final AVariable aVariable = variableTable.createDictionaryVariable(0, "dict", data);
+        variableTable.createDictionaryVariable(0, "dict", data);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -154,7 +154,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         data.add(variableTable.createEntry("key", "value"));
         data.add(variableTable.createEntry("", ""));
 
-        final AVariable aVariable = variableTable.createDictionaryVariable(0, "dict", data);
+        variableTable.createDictionaryVariable(0, "dict", data);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
