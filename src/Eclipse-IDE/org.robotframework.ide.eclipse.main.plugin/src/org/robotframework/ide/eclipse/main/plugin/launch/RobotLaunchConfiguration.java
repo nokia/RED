@@ -91,7 +91,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setRemoteDebugHost("");
     }
 
-    private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
+    public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
             final Map<IResource, List<String>> suitesMapping) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
@@ -411,6 +411,19 @@ public class RobotLaunchConfiguration {
 
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final String configurationName = manager.generateLaunchConfigurationName("New Configuration");
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+                .newInstance(null, configurationName);
+
+        fillDefaults(configuration, resourcesToTestCases);
+
+        return configuration;
+    }
+
+    public static ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelectedTestCasesWithName(
+            final Map<IResource, List<String>> resourcesToTestCases, final String name) throws CoreException {
+
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final String configurationName = manager.generateLaunchConfigurationName(name);
         final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
                 .newInstance(null, configurationName);
 

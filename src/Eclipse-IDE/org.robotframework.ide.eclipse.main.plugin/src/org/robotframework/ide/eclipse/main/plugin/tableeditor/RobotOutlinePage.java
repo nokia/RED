@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -34,6 +35,7 @@ import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
@@ -50,10 +52,13 @@ import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRo
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.red.viewers.Selections;
+import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Optional;
 
 class RobotOutlinePage extends ContentOutlinePage {
+
+    public static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.outline.context";
 
     private final RobotFormEditor editor;
     private final RobotSuiteFile suiteModel;
@@ -105,6 +110,12 @@ class RobotOutlinePage extends ContentOutlinePage {
                 new LinkWithEditorAction(editorSelectionProvider, editorSourceWidget));
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
         getSite().getActionBars().getToolBarManager().add(new ExpandAllAction(getTreeViewer()));
+        
+        MenuManager menuManager = new MenuManager("Outline popup", "RobotOutlinePage.popup");
+        Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
+        getTreeViewer().getControl().setMenu(menu);
+        getSite().registerContextMenu ("RobotOutlinePage.popup", menuManager, getTreeViewer());
+        Viewers.boundViewerWithContext(getTreeViewer(), getSite(), CONTEXT_ID);
     }
 
     private CaretListener createCaretListener() {
