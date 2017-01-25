@@ -111,7 +111,6 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             return;
         }
         final URI uriAddress = location.getUriAddress();
-        @SuppressWarnings("resource")
         final Socket s = new Socket();
         try {
             final SocketAddress sockaddr = new InetSocketAddress(uriAddress.getHost(), uriAddress.getPort());

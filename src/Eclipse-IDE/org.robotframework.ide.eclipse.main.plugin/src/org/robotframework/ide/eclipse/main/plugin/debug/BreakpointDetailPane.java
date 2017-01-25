@@ -46,7 +46,7 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     private IMarker currentMarker;
 
-    private final ListenerList listenersList = new ListenerList();
+    private final ListenerList<Object> listenersList = new ListenerList<>();
 
     private HitCountSelectionListener selectionListener;
 

@@ -103,7 +103,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         headers.addAll(variableTable.getHeaders());
         headers.addAll(testCaseTable.getHeaders());
         headers.addAll(keywordTable.getHeaders());
-        Collections.sort(headers, new TableHeaderComparator());
+        Collections.sort(headers, new TableHeaderComparator<>());
 
         for (final TableHeader<? extends ARobotSectionTable> th : headers) {
             List<AModelElement<ARobotSectionTable>> sorted = null;
