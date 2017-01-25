@@ -660,127 +660,482 @@
        </enablement>
     </commonWizard>
  </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler"
+            commandId="org.eclipse.debug.ui.commands.ToggleBreakpoint">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandAllHandler"
+            commandId="org.eclipse.ui.edit.text.folding.expand_all">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseAllHandler"
+            commandId="org.eclipse.ui.edit.text.folding.collapse_all">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandHandler"
+            commandId="org.eclipse.ui.edit.text.folding.expand">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseHandler"
+            commandId="org.eclipse.ui.edit.text.folding.collapse">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+   </extension>
  <extension
-       point="org.eclipse.ui.menus">
-    <menuContribution
-          allPopups="false"
-          locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=export">
-       <separator
-             name="org.robotframework.red.navigator"
-             visible="true">
-       </separator>
-       <menu
-             icon="resources/robot.png"
-             label="Robot Framework">
-          <command
-                commandId="org.robotframework.red.reloadProjectRuntimeEnvironment"
-                label="Reset Robot Environment"
-                style="push">
-             <visibleWhen
-                   checkEnabled="true">
-             </visibleWhen>
-          </command>
-          <command
-                commandId="org.robotframework.red.configureRobotNature"
-                label="Configure as Robot project"
-                style="push"
-                tooltip="Configure as Robot project">
-             <parameter
-                   name="org.robotframework.red.configureRobotNature.enablement"
-                   value="enable">
-             </parameter>
-             <visibleWhen
-                   checkEnabled="false">
-                <with
-                      variable="selection">
-                   <iterate
-                         ifEmpty="false"
-                         operator="and">
-                      <adapt
-                            type="org.eclipse.core.resources.IResource">
-                         <and>
-                            <instanceof
-                                  value="org.eclipse.core.resources.IProject">
-                            </instanceof>
-                            <not>
-                               <test
-                                     property="org.eclipse.core.resources.projectNature"
-                                     value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-                               </test>
-                            </not>
-                         </and>
-                      </adapt>
-                   </iterate>
-                </with>
-             </visibleWhen>
-          </command>
-          <command
-                commandId="org.robotframework.red.configureRobotNature"
-                label="Deconfigure as Robot project"
-                style="push"
-                tooltip="Deconfigure as Robot project">
-             <parameter
-                   name="org.robotframework.red.configureRobotNature.enablement"
-                   value="disable">
-             </parameter>
-             <visibleWhen
-                   checkEnabled="false">
-                <with
-                      variable="selection">
-                   <iterate
-                         ifEmpty="false"
-                         operator="and">
-                      <adapt
-                            type="org.eclipse.core.resources.IResource">
-                         <and>
-                            <instanceof
-                                  value="org.eclipse.core.resources.IProject">
-                            </instanceof>
-                            <test
-                                  property="org.eclipse.core.resources.projectNature"
-                                  value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-                            </test>
-                         </and>
-                      </adapt>
-                   </iterate>
-                </with>
-             </visibleWhen>
-          </command>
-          <separator
-                name="validation"
-                visible="true">
-          </separator>
-          <command
-                commandId="org.robotframework.red.include"
-                label="Include for validation"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.red.exclude"
-                label="Exclude from validation"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.red.revalidateSelection"
-                label="Revalidate"
-                style="push">
-          </command>
-          <separator
-                name="navigation"
-                visible="true">
-          </separator>
-          <command
-                commandId="org.robotframework.red.autoDiscoverLibraries"
-                label="Automatically discover and add libraries to red.xml"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.red.addLibraryFromNavigator"
-                label="Add Library to red.xml"
-                style="push">
-          </command>
-       </menu>
-    </menuContribution>
+       point="org.eclipse.ui.themes">
+    <themeElementCategory
+          id="org.robotframework.ide.eclipse.theme"
+          label="Robot">
+    </themeElementCategory>
+    <themeElementCategory
+          id="org.robotframework.ide.eclipse.table.theme"
+          label="Table Editor"
+          parentId="org.robotframework.ide.eclipse.theme">
+    </themeElementCategory>
+    <themeElementCategory
+          id="org.robotframework.ide.eclipse.source.theme"
+          label="Source Editor"
+          parentId="org.robotframework.ide.eclipse.theme">
+    </themeElementCategory>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.table.theme"
+          id="org.robotframework.ide.eclipse.cell.highlight"
+          isEditable="true"
+          label="Highlighted cell color"
+          value="255, 245, 210">
+       <description>
+          This color is used in RED table editor in order to highlight currently hovered cell
+       </description>
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.table.theme"
+          id="org.robotframework.ide.eclipse.row.selected"
+          isEditable="true"
+          label="Selected cell color"
+          value="255, 250, 245">
+       <description>
+          This color is used in RED table editor in order to highlight currently selected cells
+       </description>
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.ide.eclipse.comment"
+          isEditable="true"
+          label="Comments "
+          value="200, 200, 200">
+       <description>
+          Color used for comments in RED table editor
+       </description>
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.ide.eclipse.variable"
+          isEditable="true"
+          label="Variables"
+          value="COLOR_DARK_GREEN">
+       <description>
+          Color used for variables in RED table editor
+       </description>
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.source.theme"
+          id="org.robotframework.ide.eclipse.section.header"
+          isEditable="true"
+          label="Section header"
+          value="255,0,0">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.source.theme"
+          id="org.robotframework.ide.eclipse.setting"
+          label="Setting "
+          value="255,205,165">
+    </colorDefinition>
+    <fontDefinition
+          categoryId="org.robotframework.ide.eclipse.source.theme"
+          defaultsTo="org.eclipse.jface.textfont"
+          id="org.robotframework.ide.textfont"
+          isEditable="true"
+          label="Text Font">
+    </fontDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.ide.eclipse.robotConsoleRedStream"
+          isEditable="true"
+          label="Robot Console Red Stream"
+          value="0,0,0">
+       <description>
+          This color is used inside Robot test runs console for messages printed by RED
+       </description>
+    </colorDefinition>
+ </extension>
+ <extension
+       point="org.eclipse.ui.contexts">
+    <context
+          description="Context for details editing"
+          id="org.robotframework.ide.eclipse.details.context"
+          name="Detail Context"
+          parentId="org.eclipse.ui.contexts.window">
+    </context>
+    <context
+          description="Context for Robot suite files editor"
+          id="org.robotframework.ide.eclipse.tableeditor.context"
+          name="Table Editor Context"
+          parentId="org.eclipse.ui.contexts.window">
+    </context>
+    <context
+          description="Context active in each page with tables of Table editor"
+          id="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          name="Context for tables pages"
+          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+    </context>
+    <context
+          description="Context for Variables section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.variables.context"
+          name="Variables Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
+    </context>
+    <context
+          description="Context for Test Cases section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.cases.context"
+          name="Test Cases Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
+    </context>
+    <context
+          description="Context for Settings section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.context"
+          name="Settings Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
+    </context>
+    <context
+          description="Context for Settings General section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.general.context"
+          name="General Settings Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
+    </context>
+    <context
+          description="Context for Settings Metadata section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.metadata.context"
+          name="Metadata Settings Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
+    </context>
+    <context
+          description="Context for Settings Imports section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.settings.import.context"
+          name="Imports Settings Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
+    </context>
+    <context
+          description="Context for Keywords section editor page"
+          id="org.robotframework.ide.eclipse.tableeditor.keywords.context"
+          name="Test Cases Editor Context"
+          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
+    </context>
+    <context
+          description="Context active in source page of Table editor"
+          id="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          name="Context for source page"
+          parentId="org.robotframework.ide.eclipse.tableeditor.context">
+    </context>
+    <context
+          description="Context for red.xml files editor"
+          id="org.robotframework.ide.eclipse.redxmleditor.context"
+          name="Context for red xml files editor"
+          parentId="org.eclipse.ui.contexts.window">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.libraries.context"
+          name="Context for Referenced Libraries section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.varmapping.context"
+          name="Context for Variables mappings section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.varfiles.context"
+          name="Context for Variable files section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.validation.context"
+          name="Context for Validation section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.tableeditor.outline.context"
+          name="Context for Robot files selection outline"
+          parentId="org.eclipse.ui.contexts.window">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.pythonpath.context"
+          name="Context for pythonpaths section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.classpath.context"
+          name="Context for classpaths section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+ </extension>
+ <extension
+       point="org.eclipse.ui.commands">
+    <category
+          id="org.robotframework.ide.eclipse.robotCommands"
+          name="Robot">
+    </category>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.configureRobotNature"
+          name="Configure Robot nature">
+       <commandParameter
+             id="org.robotframework.red.configureRobotNature.enablement"
+             name="Enable/Disable Robot nature"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.reloadProjectRuntimeEnvironment"
+          name="Reset Robot Environment">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.include"
+          name="Include">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.exclude"
+          name="Exclude">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.addLibraryFromNavigator"
+          name="Add Library">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.autoDiscoverLibraries"
+          name="Auto Discover Libraries">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertNew"
+          name="Add new element">
+       <commandParameter
+             id="org.robotframework.ide.eclipse.insertNew.variableType"
+             name="Variable Type"
+             optional="true">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertNewLine"
+          name="Add new line">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.moveElementUp"
+          name="Move up">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.moveElementDown"
+          name="Move down">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.deleteSection"
+          name="Delete section">
+       <commandParameter
+             id="org.robotframework.ide.eclipse.deleteSection.sectionName"
+             name="name"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.findElementUsages"
+          name="Find keyword usages in workspace">
+       <commandParameter
+             id="org.robotframework.ide.eclipse.findElementUsages.place"
+             name="name"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.extractKeyword"
+          name="Extract to new keyword">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.showInSource"
+          name="Show in source">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.showInTable"
+          name="Show in table">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.showInDocView"
+          name="Show in Doc View">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.renameKeyword"
+          name="Rename">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.assignToVariable"
+          name="Assign to variable">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.openDeclaration"
+          name="Open declaration">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.expandAll"
+          name="Expand All">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.collapseAll"
+          name="Collapse All">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.cutRow"
+          name="Cut row">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.copyRow"
+          name="Copy row">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.pasteRow"
+          name="Paste row">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.deleteRow"
+          name="Delete row">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.selectWholeRow"
+          name="Select whole row(s)">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertCell"
+          name="Insert cell">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.deleteCell"
+          name="Delete cell">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.editSetting"
+          name="Edit Setting">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.formatSource"
+          name="Format source">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.renameInSource"
+          name="Rename">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.toggleComment"
+          name="Toggle comment">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.runSingleTestFromSource"
+          name="Run single test">
+       <commandParameter
+             id="org.robotframework.red.runSingleTestFromSource.mode"
+             name="Mode"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.runSelectedTestsFromTable"
+          name="Run selected tests">
+       <commandParameter
+             id="org.robotframework.red.runSelectedTestsFromTable.mode"
+             name="Mode"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.undoInTable"
+          name="Undo">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.redoInTable"
+          name="Redo">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.revalidateSelection"
+          name="Revalidate selection">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.revalidateEditor"
+          name="Revalidate project">
+       <commandParameter
+             id="org.robotframework.red.revalidateEditor.mode"
+             name="Mode"
+             optional="false">
+       </commandParameter>
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -1047,430 +1402,6 @@
 	    </enabledWhen>
 	 </handler>
 	
- </extension>
- <extension
-       point="org.eclipse.ui.themes">
-    <themeElementCategory
-          id="org.robotframework.ide.eclipse.theme"
-          label="Robot">
-    </themeElementCategory>
-    <themeElementCategory
-          id="org.robotframework.ide.eclipse.table.theme"
-          label="Table Editor"
-          parentId="org.robotframework.ide.eclipse.theme">
-    </themeElementCategory>
-    <themeElementCategory
-          id="org.robotframework.ide.eclipse.source.theme"
-          label="Source Editor"
-          parentId="org.robotframework.ide.eclipse.theme">
-    </themeElementCategory>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.table.theme"
-          id="org.robotframework.ide.eclipse.cell.highlight"
-          isEditable="true"
-          label="Highlighted cell color"
-          value="255, 245, 210">
-       <description>
-          This color is used in RED table editor in order to highlight currently hovered cell
-       </description>
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.table.theme"
-          id="org.robotframework.ide.eclipse.row.selected"
-          isEditable="true"
-          label="Selected cell color"
-          value="255, 250, 245">
-       <description>
-          This color is used in RED table editor in order to highlight currently selected cells
-       </description>
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.comment"
-          isEditable="true"
-          label="Comments "
-          value="200, 200, 200">
-       <description>
-          Color used for comments in RED table editor
-       </description>
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.variable"
-          isEditable="true"
-          label="Variables"
-          value="COLOR_DARK_GREEN">
-       <description>
-          Color used for variables in RED table editor
-       </description>
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.source.theme"
-          id="org.robotframework.ide.eclipse.section.header"
-          isEditable="true"
-          label="Section header"
-          value="255,0,0">
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.source.theme"
-          id="org.robotframework.ide.eclipse.setting"
-          label="Setting "
-          value="255,205,165">
-    </colorDefinition>
-    <fontDefinition
-          categoryId="org.robotframework.ide.eclipse.source.theme"
-          defaultsTo="org.eclipse.jface.textfont"
-          id="org.robotframework.ide.textfont"
-          isEditable="true"
-          label="Text Font">
-    </fontDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.robotConsoleRedStream"
-          isEditable="true"
-          label="Robot Console Red Stream"
-          value="0,0,0">
-       <description>
-          This color is used inside Robot test runs console for messages printed by RED
-       </description>
-    </colorDefinition>
- </extension>
- <extension
-       point="org.eclipse.ui.contexts">
-    <context
-          description="Context for details editing"
-          id="org.robotframework.ide.eclipse.details.context"
-          name="Detail Context"
-          parentId="org.eclipse.ui.contexts.window">
-    </context>
-    <context
-          description="Context for Robot suite files editor"
-          id="org.robotframework.ide.eclipse.tableeditor.context"
-          name="Table Editor Context"
-          parentId="org.eclipse.ui.contexts.window">
-    </context>
-    <context
-          description="Context active in each page with tables of Table editor"
-          id="org.robotframework.ide.eclipse.tableeditor.tables.context"
-          name="Context for tables pages"
-          parentId="org.robotframework.ide.eclipse.tableeditor.context">
-    </context>
-    <context
-          description="Context for Variables section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.variables.context"
-          name="Variables Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
-    </context>
-    <context
-          description="Context for Test Cases section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.cases.context"
-          name="Test Cases Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
-    </context>
-    <context
-          description="Context for Settings section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.settings.context"
-          name="Settings Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
-    </context>
-    <context
-          description="Context for Settings General section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.settings.general.context"
-          name="General Settings Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
-    </context>
-    <context
-          description="Context for Settings Metadata section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.settings.metadata.context"
-          name="Metadata Settings Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
-    </context>
-    <context
-          description="Context for Settings Imports section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.settings.import.context"
-          name="Imports Settings Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.settings.context">
-    </context>
-    <context
-          description="Context for Keywords section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.keywords.context"
-          name="Test Cases Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
-    </context>
-    <context
-          description="Context active in source page of Table editor"
-          id="org.robotframework.ide.eclipse.tableeditor.sources.context"
-          name="Context for source page"
-          parentId="org.robotframework.ide.eclipse.tableeditor.context">
-    </context>
-    <context
-          description="Context for red.xml files editor"
-          id="org.robotframework.ide.eclipse.redxmleditor.context"
-          name="Context for red xml files editor"
-          parentId="org.eclipse.ui.contexts.window">
-    </context>
-    <context
-          id="org.robotframework.ide.eclipse.redxmleditor.libraries.context"
-          name="Context for Referenced Libraries section editor page"
-          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
-    </context>
-    <context
-          id="org.robotframework.ide.eclipse.redxmleditor.varmapping.context"
-          name="Context for Variables mappings section editor page"
-          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
-    </context>
-    <context
-          id="org.robotframework.ide.eclipse.redxmleditor.varfiles.context"
-          name="Context for Variable files section editor page"
-          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
-    </context>
-    <context
-          id="org.robotframework.ide.eclipse.redxmleditor.validation.context"
-          name="Context for Validation section editor page"
-          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
-    </context>
-    <context
-          id="org.robotframework.ide.eclipse.redxmleditor.pythonpath.context"
-          name="Context for pythonpaths section editor page"
-          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
-    </context>
-    <context
-          id="org.robotframework.ide.eclipse.redxmleditor.classpath.context"
-          name="Context for classpaths section editor page"
-          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
-    </context>
- </extension>
- <extension
-       point="org.eclipse.ui.commands">
-    <category
-          id="org.robotframework.ide.eclipse.robotCommands"
-          name="Robot">
-    </category>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.configureRobotNature"
-          name="Configure Robot nature">
-       <commandParameter
-             id="org.robotframework.red.configureRobotNature.enablement"
-             name="Enable/Disable Robot nature"
-             optional="false">
-       </commandParameter>
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.reloadProjectRuntimeEnvironment"
-          name="Reset Robot Environment">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.include"
-          name="Include">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.exclude"
-          name="Exclude">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.addLibraryFromNavigator"
-          name="Add Library">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.autoDiscoverLibraries"
-          name="Auto Discover Libraries">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.insertNew"
-          name="Add new element">
-       <commandParameter
-             id="org.robotframework.ide.eclipse.insertNew.variableType"
-             name="Variable Type"
-             optional="true">
-       </commandParameter>
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.insertNewLine"
-          name="Add new line">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.moveElementUp"
-          name="Move up">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.moveElementDown"
-          name="Move down">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.deleteSection"
-          name="Delete section">
-       <commandParameter
-             id="org.robotframework.ide.eclipse.deleteSection.sectionName"
-             name="name"
-             optional="false">
-       </commandParameter>
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.findElementUsages"
-          name="Find keyword usages in workspace">
-       <commandParameter
-             id="org.robotframework.ide.eclipse.findElementUsages.place"
-             name="name"
-             optional="false">
-       </commandParameter>
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.extractKeyword"
-          name="Extract to new keyword">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.showInSource"
-          name="Show in source">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.showInTable"
-          name="Show in table">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.showInDocView"
-          name="Show in Doc View">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.renameKeyword"
-          name="Rename">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.assignToVariable"
-          name="Assign to variable">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.openDeclaration"
-          name="Open declaration">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.expandAll"
-          name="Expand All">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.collapseAll"
-          name="Collapse All">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.cutRow"
-          name="Cut row">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.copyRow"
-          name="Copy row">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.pasteRow"
-          name="Paste row">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.deleteRow"
-          name="Delete row">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.selectWholeRow"
-          name="Select whole row(s)">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.insertCell"
-          name="Insert cell">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.deleteCell"
-          name="Delete cell">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.editSetting"
-          name="Edit Setting">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.formatSource"
-          name="Format source">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.renameInSource"
-          name="Rename">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.toggleComment"
-          name="Toggle comment">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.runSingleTestFromSource"
-          name="Run single test">
-       <commandParameter
-             id="org.robotframework.red.runSingleTestFromSource.mode"
-             name="Mode"
-             optional="false">
-       </commandParameter>
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.runSingleTestFromTable"
-          name="Run single test">
-       <commandParameter
-             id="org.robotframework.red.runSingleTestFromTable.mode"
-             name="Mode"
-             optional="false">
-       </commandParameter>
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.undoInTable"
-          name="Undo">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.redoInTable"
-          name="Redo">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.revalidateSelection"
-          name="Revalidate selection">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.revalidateEditor"
-          name="Revalidate project">
-       <commandParameter
-             id="org.robotframework.red.revalidateEditor.mode"
-             name="Mode"
-             optional="false">
-       </commandParameter>
-    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -1927,8 +1858,8 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunTestHandler"
-          commandId="org.robotframework.red.runSingleTestFromTable">
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunSelectedTestsHandler"
+          commandId="org.robotframework.red.runSelectedTestsFromTable">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.casesPartIsActiveAndEditable">
@@ -2832,6 +2763,45 @@
        </enabledWhen>
     </handler>
  </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunSelectedTestsHandler"
+               commandId="org.robotframework.red.runSelectedTestsFromTable">
+            <activeWhen>
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="org.eclipse.ui.views.ContentOutline">
+                  </equals>
+               </with>
+            </activeWhen>
+            <enabledWhen>
+               <with
+                     variable="selection">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
+                     </instanceof>
+                  </iterate>
+               </with>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenDeclarationHandler"
+               commandId="org.robotframework.ide.eclipse.openDeclaration">
+            <activeWhen>
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="org.eclipse.ui.views.ContentOutline">
+                  </equals>
+               </with>
+            </activeWhen>
+         </handler>
+      </extension>
  <extension
        point="org.eclipse.ui.bindings">
     <key
@@ -2989,22 +2959,42 @@
        </parameter>
     </key>
     <key
-          commandId="org.robotframework.red.runSingleTestFromTable"
+          commandId="org.robotframework.red.runSelectedTestsFromTable"
           contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M3+R">
        <parameter
-             id="org.robotframework.red.runSingleTestFromTable.mode"
+             id="org.robotframework.red.runSelectedTestsFromTable.mode"
              value="RUN">
        </parameter>
     </key>
     <key
-          commandId="org.robotframework.red.runSingleTestFromTable"
+          commandId="org.robotframework.red.runSelectedTestsFromTable"
           contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M3+M1+R">
        <parameter
-             id="org.robotframework.red.runSingleTestFromTable.mode"
+             id="org.robotframework.red.runSelectedTestsFromTable.mode"
+             value="DEBUG">
+       </parameter>
+    </key>
+    <key
+          commandId="org.robotframework.red.runSelectedTestsFromTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.outline.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M3+R">
+       <parameter
+             id="org.robotframework.red.runSelectedTestsFromTable.mode"
+             value="RUN">
+       </parameter>
+    </key>
+    <key
+          commandId="org.robotframework.red.runSelectedTestsFromTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.outline.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M3+M1+R">
+       <parameter
+             id="org.robotframework.red.runSelectedTestsFromTable.mode"
              value="DEBUG">
        </parameter>
     </key>
@@ -3046,6 +3036,134 @@
              value="PROJECT">
        </parameter>
     </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.openDeclaration"
+          contextId="org.robotframework.ide.eclipse.tableeditor.outline.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="F3">
+    </key>
+ </extension>
+ <extension
+       point="org.eclipse.ui.menus">
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.eclipse.ui.navigator.ProjectExplorer#PopupMenu?after=export">
+       <separator
+             name="org.robotframework.red.navigator"
+             visible="true">
+       </separator>
+       <menu
+             icon="resources/robot.png"
+             label="Robot Framework">
+          <command
+                commandId="org.robotframework.red.reloadProjectRuntimeEnvironment"
+                label="Reset Robot Environment"
+                style="push">
+             <visibleWhen
+                   checkEnabled="true">
+             </visibleWhen>
+          </command>
+          <command
+                commandId="org.robotframework.red.configureRobotNature"
+                label="Configure as Robot project"
+                style="push"
+                tooltip="Configure as Robot project">
+             <parameter
+                   name="org.robotframework.red.configureRobotNature.enablement"
+                   value="enable">
+             </parameter>
+             <visibleWhen
+                   checkEnabled="false">
+                <with
+                      variable="selection">
+                   <iterate
+                         ifEmpty="false"
+                         operator="and">
+                      <adapt
+                            type="org.eclipse.core.resources.IResource">
+                         <and>
+                            <instanceof
+                                  value="org.eclipse.core.resources.IProject">
+                            </instanceof>
+                            <not>
+                               <test
+                                     property="org.eclipse.core.resources.projectNature"
+                                     value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                               </test>
+                            </not>
+                         </and>
+                      </adapt>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
+          <command
+                commandId="org.robotframework.red.configureRobotNature"
+                label="Deconfigure as Robot project"
+                style="push"
+                tooltip="Deconfigure as Robot project">
+             <parameter
+                   name="org.robotframework.red.configureRobotNature.enablement"
+                   value="disable">
+             </parameter>
+             <visibleWhen
+                   checkEnabled="false">
+                <with
+                      variable="selection">
+                   <iterate
+                         ifEmpty="false"
+                         operator="and">
+                      <adapt
+                            type="org.eclipse.core.resources.IResource">
+                         <and>
+                            <instanceof
+                                  value="org.eclipse.core.resources.IProject">
+                            </instanceof>
+                            <test
+                                  property="org.eclipse.core.resources.projectNature"
+                                  value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                            </test>
+                         </and>
+                      </adapt>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
+          <separator
+                name="validation"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.red.include"
+                label="Include for validation"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.red.exclude"
+                label="Exclude from validation"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.red.revalidateSelection"
+                label="Revalidate"
+                style="push">
+          </command>
+          <separator
+                name="navigation"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.red.autoDiscoverLibraries"
+                label="Automatically discover and add libraries to red.xml"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.red.addLibraryFromNavigator"
+                label="Add Library to red.xml"
+                style="push">
+          </command>
+       </menu>
+    </menuContribution>
  </extension>
  <extension
        point="org.eclipse.ui.menus">
@@ -4111,54 +4229,6 @@
          </dynamic>
       </menuContribution>
    </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler"
-            commandId="org.eclipse.debug.ui.commands.ToggleBreakpoint">
-         <activeWhen>
-            <reference
-                  definitionId="org.robotframework.sourcePartIsActive">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandAllHandler"
-            commandId="org.eclipse.ui.edit.text.folding.expand_all">
-         <activeWhen>
-            <reference
-                  definitionId="org.robotframework.sourcePartIsActive">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseAllHandler"
-            commandId="org.eclipse.ui.edit.text.folding.collapse_all">
-         <activeWhen>
-            <reference
-                  definitionId="org.robotframework.sourcePartIsActive">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandHandler"
-            commandId="org.eclipse.ui.edit.text.folding.expand">
-         <activeWhen>
-            <reference
-                  definitionId="org.robotframework.sourcePartIsActive">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseHandler"
-            commandId="org.eclipse.ui.edit.text.folding.collapse">
-         <activeWhen>
-            <reference
-                  definitionId="org.robotframework.sourcePartIsActive">
-            </reference>
-         </activeWhen>
-      </handler>
-   </extension>
  <extension
        point="org.eclipse.core.expressions.propertyTesters">
     <propertyTester
@@ -4200,7 +4270,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.SelectionsPropertyTester"
           id="org.robotframework.selectionsPropertyTester"
           namespace="org.robotframework.selection"
-          properties="allElementsHaveSameType"
+          properties="allElementsHaveSameType,selectedActualFile"
           type="org.eclipse.jface.viewers.IStructuredSelection">
     </propertyTester>
     <propertyTester
@@ -5392,5 +5462,99 @@
                Robot Framework preferences: Autodiscovering, Editor, Errors/Warnings
             </description>
          </transfer>
+      </extension>
+      <extension
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="popup:RobotOutlinePage.popup">
+            <command
+                  commandId="org.robotframework.red.runSelectedTestsFromTable"
+                  icon="resources/exec_run.png"
+                  label="Run "
+                  style="push">
+               <parameter
+                     name="org.robotframework.red.runSelectedTestsFromTable.mode"
+                     value="RUN">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
+                        </instanceof>
+                     </iterate>
+                     <and>
+                        <test
+                              property="org.robotframework.selection.selectedActualFile"
+                              value="true">
+                        </test>
+                     </and>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.robotframework.red.runSelectedTestsFromTable"
+                  icon="resources/exec_debug.png"
+                  label="Debug"
+                  style="push">
+               <parameter
+                     name="org.robotframework.red.runSelectedTestsFromTable.mode"
+                     value="DEBUG">
+               </parameter>
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
+                        </instanceof>
+                     </iterate>
+                     <and>
+                        <test
+                              property="org.robotframework.selection.selectedActualFile"
+                              value="true">
+                        </test>
+                     </and>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.robotframework.ide.eclipse.openDeclaration"
+                  label="Open Declaration"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="selection">
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall">
+                        </instanceof>
+                     </iterate>
+                     <and>
+                        <count
+                              value="1">
+                        </count>
+                     </and>
+                     <and>
+                        <test
+                              property="org.robotframework.selection.selectedActualFile"
+                              value="true">
+                        </test>
+                     </and>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menuContribution>
       </extension>
 </plugin>

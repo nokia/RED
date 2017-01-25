@@ -25,7 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.Run
 
 public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
 
-    private static final String RUN_TEST_COMMAND_ID = "org.robotframework.red.runSingleTestFromTable";
+    private static final String RUN_TEST_COMMAND_ID = "org.robotframework.red.runSelectedTestsFromTable";
 
     static final String RUN_TEST_COMMAND_MODE_PARAMETER = RUN_TEST_COMMAND_ID + ".mode";
 
@@ -50,18 +50,30 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         if (selection instanceof StructuredSelection && !selection.isEmpty()) {
             final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
-            RobotCase testCase = null;
-            Object firstElement = structuredSelection.getFirstElement();
-            if (firstElement instanceof RobotKeywordCall) {
-                firstElement = ((RobotKeywordCall) firstElement).getParent();
+            boolean isTestCaseFound = false;
+            RobotCase firstAndOnlyCase = null;
+            for (Object o : structuredSelection.toList()) {
+                RobotCase testCase = null;
+                if (o instanceof RobotKeywordCall) {
+                    testCase = (RobotCase) ((RobotKeywordCall) o).getParent();
+                } else if (o instanceof RobotCase) {
+                    testCase = (RobotCase) o;
+                }
+                if (testCase != null) {
+                    isTestCaseFound = true;
+                    if (firstAndOnlyCase != null) {
+                        if (!firstAndOnlyCase.equals(testCase)) {
+                            firstAndOnlyCase = null;
+                            break;
+                        }
+                    } else {
+                        firstAndOnlyCase = testCase;
+                    }
+                }
             }
-            if (firstElement instanceof RobotCase) {
-                testCase = (RobotCase) firstElement;
-            }
-
-            if (testCase != null) {
+            if (isTestCaseFound) {
                 contributeBefore(contributedItems);
-                contributedItems.add(createCurrentCaseItem(activeWindow, testCase));
+                contributedItems.add(createCurrentCaseItem(activeWindow, firstAndOnlyCase));
             }
         }
         return contributedItems.toArray(new IContributionItem[0]);
@@ -71,7 +83,8 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
     protected IContributionItem createCurrentCaseItem(final IServiceLocator serviceLocator, final RobotCase testCase) {
         final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(
                 serviceLocator, id, RUN_TEST_COMMAND_ID, SWT.PUSH);
-        contributionParameters.label = getModeName() + " test: '" + testCase.getName() + "'";
+        contributionParameters.label = getModeName()
+                + (testCase == null ? " selected tests" : " test: '" + testCase.getName() + "'");
         contributionParameters.icon = getImageDescriptor();
         final HashMap<String, String> parameters = new HashMap<>();
         parameters.put(RUN_TEST_COMMAND_MODE_PARAMETER, getModeName().toUpperCase());
