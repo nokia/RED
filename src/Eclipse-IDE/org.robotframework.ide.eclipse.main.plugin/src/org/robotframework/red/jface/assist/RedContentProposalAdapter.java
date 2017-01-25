@@ -73,7 +73,7 @@ public class RedContentProposalAdapter {
     private static final int POPUP_MINIMUM_WIDTH = 300;
     private static final int POPUP_OFFSET = 3;
 
-    private final ListenerList proposalListeners = new ListenerList();
+    private final ListenerList<Object> proposalListeners = new ListenerList<>();
 
     private final RedContentProposalProvider proposalProvider;
     private final ILabelProvider labelProvider;

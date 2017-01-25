@@ -253,7 +253,6 @@ public class UserKeywordRemoveSettingsTest {
         assertThat(keyword.getUnitSettings()).containsOnlyElementsOf(settingsWhichShouldRemain);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void forExecutableRow_shouldReturnFalse() {
         // prepare
