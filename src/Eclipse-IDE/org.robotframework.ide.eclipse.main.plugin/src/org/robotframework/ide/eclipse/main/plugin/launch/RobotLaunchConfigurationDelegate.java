@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -90,7 +89,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         robotEventBroker = new RobotEventBroker(
-                (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+                PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
@@ -122,7 +121,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
 
-                ILaunchConfiguration config = findLaunchConfiguration(resources);
+                ILaunchConfiguration config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
                 if (config == null) {
                     config = RobotLaunchConfiguration.createDefault(launchConfigurationType, resources);
                 }
@@ -133,28 +132,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         };
         job.setUser(false);
         job.schedule();
-    }
-
-    private ILaunchConfiguration findLaunchConfiguration(final List<IResource> resources) throws CoreException {
-        
-        final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
-        if (resources.size() == 1 && (resources.get(0) instanceof IProject || resources.get(0) instanceof IFolder)) {
-            final String resourceName = resources.get(0).getName();
-            final String projectName = resources.get(0).getProject().getName();
-            for (final ILaunchConfiguration configuration : launchConfigs) {
-                if (configuration.getName().equals(resourceName)
-                        && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
-                    return configuration;
-                }
-            }
-        }
-        for (final ILaunchConfiguration configuration : launchConfigs) {
-            final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-            if (robotConfig.isSuitableFor(resources)) {
-                return configuration;
-            }
-        }
-        return null;
     }
 
     @Override
