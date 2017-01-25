@@ -214,9 +214,12 @@ class PythonKeywordSource(object):
         path = inspect.getfile(function)
         source = inspect.getsourcelines(function)
         for lineIdx, line in enumerate(source[0]):
-            m = re.search('(?<=def\W)' + function.__name__, line)
+            m = re.search('(?<=def)(\s*)([^ \t\n\r\f\v(]+)', line)
             if m is not None:
-                return path, source[1] + lineIdx - 1, m.start(0), len(function.__name__)
+                line = source[1] + lineIdx - 1
+                offset = m.start(2)
+                length = len(m.group(2))
+                return path, line, offset, length
         return path, 0, 0, 0
 
     def _resolve_function(self, keyword):
