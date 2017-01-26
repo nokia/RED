@@ -33,14 +33,14 @@ public class KeywordPositionFinder {
     }
 
     public KeywordPosition find() {
-        final RobotExecutableRow<?> executableRow = findExecutableRow(executableRowFinder);
+        final RobotExecutableRow<?> executableRow = findExecutableRow();
         if (executableRow == null) {
             return new KeywordPosition(findFirstResourceImportPath(), -1);
         }
         return new KeywordPosition(findPath(executableRow), findLine(executableRow));
     }
 
-    private RobotExecutableRow<?> findExecutableRow(final IRobotExecutableRowFinder executableRowFinder) {
+    private RobotExecutableRow<?> findExecutableRow() {
         if (executableRowFinder != null) {
             return executableRowFinder.findExecutableRow(currentKeywords);
         }
