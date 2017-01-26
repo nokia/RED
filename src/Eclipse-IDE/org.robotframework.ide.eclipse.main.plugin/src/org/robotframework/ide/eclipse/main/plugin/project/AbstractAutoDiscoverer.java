@@ -16,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -33,12 +32,7 @@ import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-
-import com.google.common.io.Files;
 
 /**
  * @author bembenek
@@ -51,9 +45,9 @@ public abstract class AbstractAutoDiscoverer {
 
     protected final RobotDryRunOutputParser dryRunOutputParser;
 
-    private final RobotDryRunHandler dryRunHandler;
+    protected final RobotDryRunHandler dryRunHandler;
 
-    private final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
+    protected final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
 
     protected AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles) {
         this.robotProject = robotProject;
@@ -80,12 +74,8 @@ public abstract class AbstractAutoDiscoverer {
         isDryRunRunning.set(false);
     }
 
-    protected final void destroyDryRunProcess() {
-        dryRunHandler.destroyDryRunProcess();
-    }
-
-    protected void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException {
-
+    protected void startDiscovering(final IProgressMonitor monitor,
+            final IDryRunTargetsCollector dryRunTargetsCollector) throws InvocationTargetException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");
         subMonitor.setWorkRemaining(3);
@@ -93,7 +83,11 @@ public abstract class AbstractAutoDiscoverer {
         final LibrariesSourcesCollector librariesSourcesCollector = collectPythonpathAndClasspathLocations();
         subMonitor.worked(1);
 
-        final RunCommandLine dryRunCommandLine = createDryRunCommandLine(librariesSourcesCollector);
+        dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations();
+        subMonitor.worked(1);
+
+        final RunCommandLine dryRunCommandLine = createDryRunCommandLine(librariesSourcesCollector,
+                dryRunTargetsCollector);
         subMonitor.worked(1);
 
         subMonitor.subTask("Executing Robot dry run...");
@@ -118,25 +112,20 @@ public abstract class AbstractAutoDiscoverer {
         return librariesSourcesCollector;
     }
 
-    private RunCommandLine createDryRunCommandLine(final LibrariesSourcesCollector librariesSourcesCollector)
-            throws InvocationTargetException {
-        final DryRunTargetsCollector dryRunTargetsCollector = new DryRunTargetsCollector();
-        dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations();
-
-        RunCommandLine runCommandLine = null;
+    private RunCommandLine createDryRunCommandLine(final LibrariesSourcesCollector librariesSourcesCollector,
+            final IDryRunTargetsCollector dryRunTargetsCollector) throws InvocationTargetException {
         try {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             if (runtimeEnvironment == null) {
                 return null;
             }
-            runCommandLine = dryRunHandler.buildDryRunCommand(runtimeEnvironment, getProjectLocationFile(),
+            return dryRunHandler.buildDryRunCommand(runtimeEnvironment, getProjectLocationFile(),
                     dryRunTargetsCollector.getSuiteNames(), librariesSourcesCollector.getPythonpathLocations(),
                     librariesSourcesCollector.getClasspathLocations(),
                     dryRunTargetsCollector.getAdditionalProjectsLocations());
         } catch (final IOException e) {
             throw new InvocationTargetException(e);
         }
-        return runCommandLine;
     }
 
     private void executeDryRun(final RunCommandLine dryRunCommandLine, final SubMonitor subMonitor)
@@ -179,61 +168,13 @@ public abstract class AbstractAutoDiscoverer {
         return !suiteFiles.isEmpty();
     }
 
-    private class DryRunTargetsCollector {
+    protected interface IDryRunTargetsCollector {
 
-        private final List<String> suiteNames = newArrayList();
+        void collectSuiteNamesAndAdditionalProjectsLocations();
 
-        private final List<String> additionalProjectsLocations = newArrayList();
+        List<String> getSuiteNames();
 
-        public void collectSuiteNamesAndAdditionalProjectsLocations() {
-            final List<String> resourcesPaths = newArrayList();
-            for (final IResource resource : suiteFiles) {
-                RobotSuiteFile suiteFile = null;
-                if (resource.getType() == IResource.FILE) {
-                    suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
-                }
-                if (suiteFile != null && suiteFile.isResourceFile()) {
-                    final IPath resourceFilePath = RedWorkspace.Paths
-                            .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
-                    resourcesPaths.add(resourceFilePath.toString());
-                } else {
-                    if (resource.isLinked()) {
-                        collectLinkedSuiteNamesAndProjectsLocations(resource);
-                    } else {
-                        suiteNames.add(RobotLaunchConfigurationDelegate.createSuiteName(resource));
-                    }
-                }
-            }
-            if (!resourcesPaths.isEmpty()) {
-                final File tempSuiteFileWithResources = dryRunHandler.createTempSuiteFile(resourcesPaths);
-                if (tempSuiteFileWithResources != null) {
-                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithResources.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFileWithResources.getParent());
-                }
-            }
-        }
-
-        private void collectLinkedSuiteNamesAndProjectsLocations(final IResource resource) {
-            final IPath linkedFileLocation = resource.getLocation();
-            if (linkedFileLocation != null) {
-                final File linkedFile = linkedFileLocation.toFile();
-                if (linkedFile.exists()) {
-                    suiteNames.add(Files.getNameWithoutExtension(linkedFile.getName()));
-                    final String linkedFileParentPath = linkedFile.getParent();
-                    if (!additionalProjectsLocations.contains(linkedFileParentPath)) {
-                        additionalProjectsLocations.add(linkedFileParentPath);
-                    }
-                }
-            }
-        }
-
-        public List<String> getSuiteNames() {
-            return suiteNames;
-        }
-
-        public List<String> getAdditionalProjectsLocations() {
-            return additionalProjectsLocations;
-        }
+        List<String> getAdditionalProjectsLocations();
     }
 
 }
