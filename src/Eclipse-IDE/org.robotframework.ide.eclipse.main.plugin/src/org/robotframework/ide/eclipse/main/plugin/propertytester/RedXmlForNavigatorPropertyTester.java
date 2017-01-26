@@ -44,26 +44,27 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
         if (IS_INTERNAL_FOLDER.equals(property)) {
             return projectElement instanceof IFolder == expected;
         } else if (IS_INCLUDED.equals(property)) {
-            IResource resource = projectElement;
-            RobotProjectConfig config = getConfig(resource);
+            final IResource resource = projectElement;
+            final RobotProjectConfig config = getConfig(resource);
             return !isExcluded(projectElement, config) == expected;
         } else if (IS_EXCLUDED.equals(property)) {
-            IResource resource = projectElement;
-            RobotProjectConfig config = getConfig(resource);
+            final IResource resource = projectElement;
+            final RobotProjectConfig config = getConfig(resource);
             return isExcluded(projectElement, config) == expected;
         } else if (IS_FILE.equals(property)) {
             return projectElement instanceof IFile == expected;
         } else if (PARENT_EXCLUDED.equals(property)) {
             return isExcludedViaInheritance(projectElement) == expected;
+        } else {
+            return false;
         }
-        else return false;
     }
 
-    private boolean isExcluded(final IResource projectElement, RobotProjectConfig config) {
+    private boolean isExcluded(final IResource projectElement, final RobotProjectConfig config) {
         if (config != null) {
             return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
         }
-            return false;
+        return false;
     }
 
     private RobotProjectConfig getConfig(final IResource projectElement) {
@@ -80,7 +81,7 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     private boolean isExcludedViaInheritance(final IResource projectElement) {
         IResource resource = projectElement;
         IPath path = resource.getProjectRelativePath();
-        RobotProjectConfig config = getConfig(resource);
+        final RobotProjectConfig config = getConfig(resource);
         while (path.segmentCount() > 1) {
             resource = resource.getParent();
             if (isExcluded(resource, config)) {
