@@ -21,7 +21,7 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public abstract class ACreationOfThreeTestCaseExecutablesWithOneStepTest extends ACreationOfThreeExecUnitsTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "testCases//exec//new//threeTestCases//oneExecInEveryTestCase//";
+    public static final String PRETTY_NEW_DIR_LOCATION = "testCases//exec//new//threeTcs//oneExecInEachTc//";
 
     private final String extension;
 
@@ -31,7 +31,7 @@ public abstract class ACreationOfThreeTestCaseExecutablesWithOneStepTest extends
 
     @Override
     public List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesAllWithNames() {
-        List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneTestCaseInside();
+        final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneTestCaseInside();
         for (int index = 0; index < 3; index++) {
             String name = "TestCase";
             if (index > 0) {
@@ -46,7 +46,7 @@ public abstract class ACreationOfThreeTestCaseExecutablesWithOneStepTest extends
 
     @Override
     public List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesTheFirstWithoutName() {
-        List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneTestCaseInside();
+        final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneTestCaseInside();
         for (int index = 1; index < 3; index++) {
             String name = "TestCase";
             name += (index + 1);
@@ -57,16 +57,16 @@ public abstract class ACreationOfThreeTestCaseExecutablesWithOneStepTest extends
     }
 
     private List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> createModelWithOneTestCaseInside() {
-        List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnits = new ArrayList<>(
+        final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnits = new ArrayList<>(
                 0);
 
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
         modelFile.includeTestCaseTableSection();
-        TestCaseTable keywordTable = modelFile.getTestCaseTable();
+        final TestCaseTable keywordTable = modelFile.getTestCaseTable();
 
         for (int index = 0; index < 3; index++) {
-            RobotToken testName = new RobotToken();
-            TestCase execUnit = new TestCase(testName);
+            final RobotToken testName = new RobotToken();
+            final TestCase execUnit = new TestCase(testName);
             execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
             keywordTable.addTest(execUnit);
             execUnits.add(execUnit);
@@ -80,7 +80,7 @@ public abstract class ACreationOfThreeTestCaseExecutablesWithOneStepTest extends
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("TestExecutionActionWithAllCombinationsNoCommentLine"));
+                convert("ExecActionAllCombinationsNoCommentLine"));
 
         return store;
     }
@@ -90,7 +90,7 @@ public abstract class ACreationOfThreeTestCaseExecutablesWithOneStepTest extends
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("TestExecutionActionWithAllCombinationsNoCommentLineWithoutOneTestName"));
+                convert("ExecActionAllCombinationsNoCommentLineMissingTestName"));
 
         return store;
     }

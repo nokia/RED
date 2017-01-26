@@ -37,15 +37,15 @@ public abstract class AListVariablesUpdateTest {
             throws Exception {
         // prepare
         final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
-                + "Input_LastVariableIsCommentOnlyListBeforeOnlyOneVariable_updateNameToBeCorrect." + getExtension();
+                + "Input_SingleListVarAndComment_updateNameToBeCorrect." + getExtension();
         final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
-                + "Output_LastVariableIsCommentOnlyListBeforeOnlyOneVariable_updateNameToBeCorrect." + getExtension();
+                + "Output_SingleListVarAndComment_updateNameToBeCorrect." + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test data prepare
         final VariableTable variableTable = modelFile.getVariableTable();
-        List<AVariable> variables = variableTable.getVariables();
+        final List<AVariable> variables = variableTable.getVariables();
         ((ListVariable) variables.get(1)).setName("list");
 
         // verify
@@ -57,17 +57,17 @@ public abstract class AListVariablesUpdateTest {
             throws Exception {
         // prepare
         final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
-                + "Input_LastVariableIsCommentOnlyListBeforeOnlyOneVariable_updateNameToBeCorrect_andPutValueToScalar."
+                + "Input_SingleListVarAndComment_updateNameToBeCorrect_andPutValueToScalar."
                 + getExtension();
         final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
-                + "Output_LastVariableIsCommentOnlyListBeforeOnlyOneVariable_updateNameToBeCorrect_andPutValueToScalar."
+                + "Output_SingleListVarAndComment_updateNameToBeCorrect_andPutValueToScalar."
                 + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test data prepare
         final VariableTable variableTable = modelFile.getVariableTable();
-        List<AVariable> variables = variableTable.getVariables();
+        final List<AVariable> variables = variableTable.getVariables();
         ((ScalarVariable) variables.get(0)).addValue(RobotToken.create("ok"));
         ((ListVariable) variables.get(1)).setName("list");
 
