@@ -10,8 +10,9 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement.OpenStrategy;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.OpenStrategy;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
@@ -78,9 +79,9 @@ public class SuiteFileTableElementHyperlink extends RedClipboard implements RedH
     @Override
     public void open() {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        final OpenStrategy openStrategy = targetElement.getOpenRobotEditorStrategy(page);
+        final OpenStrategy openStrategy = targetElement.getOpenRobotEditorStrategy();
         if (openStrategy != null) {
-            openStrategy.run(labelPart);
+            openStrategy.run(page, ElementOpenMode.OPEN_IN_TABLES, labelPart);
         }
     }
 }

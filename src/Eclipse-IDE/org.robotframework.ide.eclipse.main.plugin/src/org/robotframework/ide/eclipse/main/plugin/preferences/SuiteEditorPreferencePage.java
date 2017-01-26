@@ -11,14 +11,12 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
-import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -28,15 +26,14 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
+
+import com.google.common.base.Function;
 
 public class SuiteEditorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-    private RadioGroupFieldEditor editors;
-
-    private StringFieldEditor separatorEditor;
-
-    private Group generalGroup;
+    private Function<PropertyChangeEvent, Void> enablementUpdater;
 
     public SuiteEditorPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -54,24 +51,33 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
 
         createLink(parent);
         createGeneralSettingsGroup(parent);
-        new Label(parent, SWT.NONE);
         createTablesSettingsGroup(parent);
+        createSourceSettingsGroup(parent);
     }
-    
+
     private void createLink(final Composite parent) {
         final Link link = new Link(parent, SWT.NONE);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).hint(150, SWT.DEFAULT).grab(true, false).applyTo(link);
+        GridDataFactory.fillDefaults()
+                .align(SWT.FILL, SWT.BEGINNING)
+                .hint(150, SWT.DEFAULT)
+                .span(2, 1)
+                .grab(true, false)
+                .applyTo(link);
 
-        final String text = "Robot editor preferences. See <a href=\"org.eclipse.ui.preferencePages.GeneralTextEditor\">'Text Editors'</a> for general text editor preferences "
-                + "and <a href=\"org.eclipse.ui.preferencePages.ColorsAndFonts\">'Colors and Fonts'</a> to configure the font.";
+        final String generalTextEditorPageId = "org.eclipse.ui.preferencePages.GeneralTextEditor";
+        final String colorsAndFontsPageId = "org.eclipse.ui.preferencePages.ColorsAndFonts";
+
+        final String text = "Robot editor preferences. See <a href=\"" + generalTextEditorPageId
+                + "\">'Text Editors'</a> for general text editor preferences " + "and <a href=\"" + colorsAndFontsPageId
+                + "\">'Colors and Fonts'</a> to configure the font.";
         link.setText(text);
         link.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                if ("org.eclipse.ui.preferencePages.GeneralTextEditor".equals(e.text)) {
+                if (generalTextEditorPageId.equals(e.text)) {
                     PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
-                } else if ("org.eclipse.ui.preferencePages.ColorsAndFonts".equals(e.text)) {
+                } else if (colorsAndFontsPageId.equals(e.text)) {
                     PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null,
                             "selectFont:org.robotframework.ide.textfont");
                 }
@@ -80,52 +86,27 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
     }
 
     private void createGeneralSettingsGroup(final Composite parent) {
-        generalGroup = new Group(parent, SWT.NONE);
-        generalGroup.setText("General settings");
-        GridDataFactory.fillDefaults().indent(0, 5).grab(true, false).span(2, 1).applyTo(generalGroup);
-        GridLayoutFactory.fillDefaults().applyTo(generalGroup);
-        
-        editors = new RadioGroupFieldEditor(RedPreferences.SEPARATOR_MODE,
-                "When Tab key is pressed in source editor", 1, createTabPressLabelsAndValues(), generalGroup);
-        addField(editors);
-        GridDataFactory.fillDefaults().indent(5, 5).applyTo(editors.getLabelControl(generalGroup));
-        
-        final String regex = "^(ss+)|t+|((s|t)+\\|(s|t)+)$";
-        separatorEditor = new RegexValidatedStringFieldEditor(RedPreferences.SEPARATOR_TO_USE,
-                "user defined separator (use '|', 's' for space or 't' for tab)", regex, generalGroup);
-        separatorEditor.setErrorMessage(
-                "User defined spearator should have at least one tab or two spaces, or bar '|' sourrounded "
-                        + "with at least one space or tab");
-        addField(separatorEditor);
-        GridDataFactory.fillDefaults().indent(5, 0).applyTo(separatorEditor.getLabelControl(generalGroup));
-        final SeparatorsMode currentMode = SeparatorsMode
-                .valueOf(getPreferenceStore().getString(RedPreferences.SEPARATOR_MODE));
-        separatorEditor.setEnabled(currentMode != SeparatorsMode.ALWAYS_TABS, generalGroup);
+        final Composite internalComposite = new Composite(parent, SWT.NONE);
+        GridDataFactory.fillDefaults().indent(0, 10).grab(true, false).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(internalComposite);
+
+        final ComboBoxFieldEditor elementsOpeningStrategyEditor = new ComboBoxFieldEditor(
+                RedPreferences.FILE_ELEMENTS_OPEN_MODE, "Prefer opening file elements from Project Explorer in",
+                "File elements (like e.g. test case) will be opened in page chosen here unless last time editor "
+                        + "was closed with different active page",
+                5, createElementsOpenModeLabelsAndValues(), internalComposite);
+        addField(elementsOpeningStrategyEditor);
     }
 
-    @Override
-    public void propertyChange(final PropertyChangeEvent event) {
-        if (event.getSource() == editors) {
-            final SeparatorsMode newMode = SeparatorsMode.valueOf((String) event.getNewValue());
-            separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, generalGroup);
-        }
-        super.propertyChange(event);
-    }
-
-    private String[][] createTabPressLabelsAndValues() {
-        return new String[][] {
-                new String[] { "the tab character ('\\t') should be used", SeparatorsMode.ALWAYS_TABS.name() },
-                new String[] { "user defined separator should be used",
-                        SeparatorsMode.ALWAYS_USER_DEFINED_SEPARATOR.name() },
-                new String[] {
-                        "file dependent seperator should be used ('\\t' for *.tsv files, user defined for *.robot)",
-                        SeparatorsMode.FILETYPE_DEPENDENT.name() } };
+    private String[][] createElementsOpenModeLabelsAndValues() {
+        return new String[][] { new String[] { "source page of editor", ElementOpenMode.OPEN_IN_SOURCE.name() },
+                new String[] { "designated table page of editor", ElementOpenMode.OPEN_IN_TABLES.name() } };
     }
 
     private void createTablesSettingsGroup(final Composite parent) {
         final Group tablesGroup = new Group(parent, SWT.NONE);
         tablesGroup.setText("Tables");
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(tablesGroup);
+        GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).span(2, 1).applyTo(tablesGroup);
         GridLayoutFactory.fillDefaults().applyTo(tablesGroup);
 
         final IntegerFieldEditor columnsEditor = new IntegerFieldEditor(
@@ -149,4 +130,56 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                         CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name() } };
     }
 
+    private void createSourceSettingsGroup(final Composite parent) {
+        final Group sourceGroup = new Group(parent, SWT.NONE);
+        sourceGroup.setText("Source");
+        GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).span(2, 1).applyTo(sourceGroup);
+        GridLayoutFactory.fillDefaults().applyTo(sourceGroup);
+
+        final RadioGroupFieldEditor editors = new RadioGroupFieldEditor(RedPreferences.SEPARATOR_MODE,
+                "When Tab key is pressed in source editor", 1, createTabPressLabelsAndValues(), sourceGroup);
+        addField(editors);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(editors.getLabelControl(sourceGroup));
+
+        final String regex = "^(ss+)|t+|((s|t)+\\|(s|t)+)$";
+        final RegexValidatedStringFieldEditor separatorEditor = new RegexValidatedStringFieldEditor(
+                RedPreferences.SEPARATOR_TO_USE, "user defined separator (use '|', 's' for space or 't' for tab)",
+                regex, sourceGroup);
+        separatorEditor.setErrorMessage(
+                "User defined spearator should have at least one tab or two spaces, or bar '|' sourrounded "
+                        + "with at least one space or tab");
+        addField(separatorEditor);
+        GridDataFactory.fillDefaults().indent(5, 0).applyTo(separatorEditor.getLabelControl(sourceGroup));
+        final SeparatorsMode currentMode = SeparatorsMode
+                .valueOf(getPreferenceStore().getString(RedPreferences.SEPARATOR_MODE));
+        separatorEditor.setEnabled(currentMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
+
+        enablementUpdater = new Function<PropertyChangeEvent, Void>() {
+
+            @Override
+            public Void apply(final PropertyChangeEvent event) {
+                if (event.getSource() == editors) {
+                    final SeparatorsMode newMode = SeparatorsMode.valueOf((String) event.getNewValue());
+                    separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
+                }
+                return null;
+            }
+        };
+    }
+
+    private String[][] createTabPressLabelsAndValues() {
+        return new String[][] {
+                new String[] { "the tab character ('\\t') should be used", SeparatorsMode.ALWAYS_TABS.name() },
+                new String[] { "user defined separator should be used",
+                        SeparatorsMode.ALWAYS_USER_DEFINED_SEPARATOR.name() },
+                new String[] {
+                        "file dependent seperator should be used ('\\t' for *.tsv files, user defined for *.robot)",
+                        SeparatorsMode.FILETYPE_DEPENDENT.name() } };
+    }
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent event) {
+        enablementUpdater.apply(event);
+        super.propertyChange(event);
+    }
 }

@@ -26,7 +26,6 @@ import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.graphics.Image;
@@ -36,7 +35,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -183,26 +181,10 @@ public class RobotFormEditor extends FormEditor {
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
 
-            setActivePart(getPageToActivate());
+            setActivePart(RobotFormEditorActivePageSaver.getLastActivePageId(getEditorInput()));
         } catch (final Exception e) {
             throw new RobotEditorOpeningException("Unable to initialize Suite editor", e);
         }
-    }
-
-    private String getPageToActivate() {
-        if (getEditorInput() instanceof IFileEditorInput) {
-            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
-            final IFile file = fileInput.getFile();
-
-            final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
-            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
-            final IDialogSettings section = dialogSettings.getSection(sectionName);
-            if (section == null) {
-                return null;
-            }
-            return section.get("activePage");
-        }
-        return null;
     }
 
     private void setActivePart(final String pageIdToActivate) {
@@ -420,7 +402,9 @@ public class RobotFormEditor extends FormEditor {
 
         updateActivePage();
         final IEditorPart activeEditor = getActiveEditor();
-        saveActivePage(activeEditor instanceof ISectionEditorPart ? ((ISectionEditorPart) activeEditor).getId() : "");
+        final String activePageId = activeEditor instanceof ISectionEditorPart
+                ? ((ISectionEditorPart) activeEditor).getId() : "";
+        RobotFormEditorActivePageSaver.saveActivePageId(getEditorInput(), activePageId);
 
         if (documentationViewPartListener != null) {
             documentationViewPartListener.pageChanged(activeEditor);
@@ -487,21 +471,6 @@ public class RobotFormEditor extends FormEditor {
             }
 
             document.set(content);
-        }
-    }
-
-    private void saveActivePage(final String activePageClassName) {
-        if (getEditorInput() instanceof IFileEditorInput) {
-            final IFileEditorInput fileInput = (IFileEditorInput) getEditorInput();
-            final IFile file = fileInput.getFile();
-
-            final String sectionName = ID + ".activePage." + file.getFullPath().toPortableString();
-            final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
-            IDialogSettings section = dialogSettings.getSection(sectionName);
-            if (section == null) {
-                section = dialogSettings.addNewSection(sectionName);
-            }
-            section.put("activePage", activePageClassName);
         }
     }
 

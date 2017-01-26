@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
-import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
@@ -123,8 +122,8 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
     }
 
     @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), RobotSuiteFileSection.this);
+    public OpenStrategy getOpenRobotEditorStrategy() {
+        return new PageActivatingOpeningStrategy(RobotSuiteFileSection.this);
     }
 
     @Override
