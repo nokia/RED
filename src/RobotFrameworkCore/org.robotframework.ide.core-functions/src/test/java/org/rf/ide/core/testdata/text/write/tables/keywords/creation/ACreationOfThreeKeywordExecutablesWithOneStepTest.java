@@ -21,7 +21,7 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public abstract class ACreationOfThreeKeywordExecutablesWithOneStepTest extends ACreationOfThreeExecUnitsTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//exec//new//threeKeywords//oneExecInEveryKeyword//";
+    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//exec//new//threeKws//oneExecInEachKw//";
 
     private final String extension;
 
@@ -31,7 +31,7 @@ public abstract class ACreationOfThreeKeywordExecutablesWithOneStepTest extends 
 
     @Override
     public List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesAllWithNames() {
-        List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneKeywordInside();
+        final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneKeywordInside();
         for (int index = 0; index < 3; index++) {
             String name = "UserKeyword";
             if (index > 0) {
@@ -46,7 +46,7 @@ public abstract class ACreationOfThreeKeywordExecutablesWithOneStepTest extends 
 
     @Override
     public List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> getExecutablesTheFirstWithoutName() {
-        List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneKeywordInside();
+        final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> units = createModelWithOneKeywordInside();
         for (int index = 1; index < 3; index++) {
             String name = "UserKeyword";
             name += (index + 1);
@@ -57,16 +57,16 @@ public abstract class ACreationOfThreeKeywordExecutablesWithOneStepTest extends 
     }
 
     private List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> createModelWithOneKeywordInside() {
-        List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnits = new ArrayList<>(
+        final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnits = new ArrayList<>(
                 0);
 
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
         for (int index = 0; index < 3; index++) {
-            RobotToken keywordName = new RobotToken();
-            UserKeyword execUnit = new UserKeyword(keywordName);
+            final RobotToken keywordName = new RobotToken();
+            final UserKeyword execUnit = new UserKeyword(keywordName);
             execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
             keywordTable.addKeyword(execUnit);
             execUnits.add(execUnit);
@@ -80,7 +80,7 @@ public abstract class ACreationOfThreeKeywordExecutablesWithOneStepTest extends 
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("KeywordExecutionActionWithAllCombinationsNoCommentLine"));
+                convert("ExecActionAllCombinationsNoCommentLine"));
 
         return store;
     }
@@ -90,7 +90,7 @@ public abstract class ACreationOfThreeKeywordExecutablesWithOneStepTest extends 
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                convert("KeywordExecutionActionWithAllCombinationsNoCommentLineWithoutOneKeywordName"));
+                convert("ExecActionAllCombinationsNoCommentLineMissingKeywordName"));
 
         return store;
     }
