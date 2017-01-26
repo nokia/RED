@@ -205,7 +205,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                                 return rowObject instanceof RobotElement;
                             }
                         }),
-                new AlternatingRowConfigLabelAccumulator(), 
+                new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
@@ -336,7 +336,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
-    public void revealSetting(final RobotKeywordCall setting) {
+    public void revealSetting(final RobotKeywordCall setting, final boolean focus) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(metadataSection);
 
         if (dataProvider.isFilterSet() && !dataProvider.isProvided(setting)) {
@@ -345,6 +345,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
         }
         CellEditorCloser.closeForcibly(table);
+        if (focus) {
+            table.setFocus();
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
     }
 

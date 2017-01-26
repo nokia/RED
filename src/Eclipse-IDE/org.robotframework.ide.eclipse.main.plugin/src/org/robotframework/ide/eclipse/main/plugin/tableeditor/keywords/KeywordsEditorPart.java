@@ -65,7 +65,12 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         @Override
         public void revealElement(final RobotElement robotElement) {
-            keywordsFragment.revealElement(robotElement);
+            keywordsFragment.revealElement(robotElement, false);
+        }
+
+        @Override
+        public void revealElementAndFocus(final RobotElement robotElement) {
+            keywordsFragment.revealElement(robotElement, true);
         }
 
         @Override

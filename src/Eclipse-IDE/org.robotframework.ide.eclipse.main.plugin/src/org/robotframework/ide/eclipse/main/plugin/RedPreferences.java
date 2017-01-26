@@ -10,6 +10,7 @@ import java.util.EnumSet;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
@@ -26,6 +27,7 @@ public class RedPreferences {
     public static final String OTHER_RUNTIMES = "otherRuntimes";
     public static final String ACTIVE_RUNTIME = "activeRuntime";
 
+    public static final String FILE_ELEMENTS_OPEN_MODE = "fileElementOpenMode";
     public static final String SEPARATOR_MODE = "separatorMode";
     public static final String SEPARATOR_TO_USE = "separatorToUse";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
@@ -54,6 +56,10 @@ public class RedPreferences {
         return store.getString(OTHER_RUNTIMES);
     }
     
+    public ElementOpenMode getElementOpenMode() {
+        return ElementOpenMode.valueOf(store.getString(FILE_ELEMENTS_OPEN_MODE));
+    }
+
     public SeparatorsMode getSeparatorsMode() {
         return SeparatorsMode.valueOf(store.getString(SEPARATOR_MODE));
     }

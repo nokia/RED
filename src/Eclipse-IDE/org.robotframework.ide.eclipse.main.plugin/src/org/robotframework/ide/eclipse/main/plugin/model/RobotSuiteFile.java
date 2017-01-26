@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
-import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
@@ -331,7 +330,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
+    public OpenStrategy getOpenRobotEditorStrategy() {
         return new OpenStrategy();
     }
 

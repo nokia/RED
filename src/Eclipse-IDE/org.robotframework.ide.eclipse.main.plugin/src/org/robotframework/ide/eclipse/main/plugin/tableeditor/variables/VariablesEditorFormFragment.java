@@ -283,13 +283,16 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         return fileModel.findSection(RobotVariablesSection.class).orNull();
     }
 
-    void revealVariable(final RobotVariable robotVariable) {
+    void revealVariable(final RobotVariable robotVariable, final boolean focus) {
         if (dataProvider.isFilterSet() && !dataProvider.isProvided(robotVariable)) {
             final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
                     + RobotVariablesSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotVariablesSection.SECTION_NAME, ""));
         }
         CellEditorCloser.closeForcibly(table);
+        if (focus) {
+            table.setFocus();
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { robotVariable }));
     }
 

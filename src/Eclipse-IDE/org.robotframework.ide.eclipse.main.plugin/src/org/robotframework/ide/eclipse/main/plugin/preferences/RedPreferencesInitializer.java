@@ -18,6 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -61,6 +62,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeEditorPreferences(final IEclipsePreferences preferences) {
+        preferences.put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
         preferences.put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILETYPE_DEPENDENT.name());
         preferences.put(RedPreferences.SEPARATOR_TO_USE, "ssss");
         preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);

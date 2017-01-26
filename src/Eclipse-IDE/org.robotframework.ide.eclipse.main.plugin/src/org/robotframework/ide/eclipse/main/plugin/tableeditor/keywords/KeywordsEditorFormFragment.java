@@ -190,7 +190,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AssistanceLabelAccumulator(dataProvider,
-                        Predicates.<PositionCoordinateSerializer> alwaysTrue(), 
+                        Predicates.<PositionCoordinateSerializer> alwaysTrue(),
                         new Predicate<Object>() {
                             @Override
                             public boolean apply(final Object rowObject) {
@@ -331,13 +331,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         return fileModel.findSection(RobotKeywordsSection.class).orNull();
     }
 
-    public void revealElement(final RobotElement element) {
+    public void revealElement(final RobotElement element, final boolean focus) {
         if (dataProvider.isFilterSet() && !dataProvider.isProvided(element)) {
             final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
                     + RobotKeywordsSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotKeywordsSection.SECTION_NAME, ""));
         }
         CellEditorCloser.closeForcibly(table);
+        if (focus) {
+            table.setFocus();
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
     }
 

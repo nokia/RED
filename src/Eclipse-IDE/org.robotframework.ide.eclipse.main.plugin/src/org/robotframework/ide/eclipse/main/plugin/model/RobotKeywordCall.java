@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
-import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
@@ -197,14 +196,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         return comment;
     }
 
-    public RobotSuiteFileSection getSection() {
-        RobotElement current = this;
-        while (current != null && !(current instanceof RobotSuiteFileSection)) {
-            current = current.getParent();
-        }
-        return (RobotSuiteFileSection) current;
-    }
-
     @Override
     public Position getPosition() {
         final FilePosition begin = linkedElement.getBeginPosition();
@@ -243,8 +234,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getSection(), this);
+    public OpenStrategy getOpenRobotEditorStrategy() {
+        return new PageActivatingOpeningStrategy(this);
     }
 
     @Override

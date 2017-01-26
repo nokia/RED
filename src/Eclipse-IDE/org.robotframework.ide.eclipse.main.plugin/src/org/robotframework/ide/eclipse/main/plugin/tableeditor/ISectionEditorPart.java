@@ -25,6 +25,8 @@ public interface ISectionEditorPart {
 
     void revealElement(RobotElement robotElement);
 
+    void revealElementAndFocus(RobotElement robotElement);
+
     void setFocus();
 
     SelectionLayerAccessor getSelectionLayerAccessor();

@@ -9,7 +9,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.red.viewers.Selections;
+
+import com.google.common.base.Optional;
 
 public class OpenAction extends Action implements IEnablementUpdatingAction {
 
@@ -26,15 +29,16 @@ public class OpenAction extends Action implements IEnablementUpdatingAction {
     @Override
     public void run() {
         final IStructuredSelection selection = (IStructuredSelection) selectionProvider.getSelection();
-        final Object element = selection.getFirstElement();
-        if (element instanceof RobotElement) {
-            ((RobotElement) element).getOpenRobotEditorStrategy(page).run();
+        final Optional<RobotFileInternalElement> element = Selections.getOptionalFirstElement(selection,
+                RobotFileInternalElement.class);
+        if (element.isPresent()) {
+            element.get().getOpenRobotEditorStrategy().run(page);
         }
     }
 
     @Override
     public void updateEnablement(final IStructuredSelection selection) {
-        setEnabled(selection.size() == 1 && selection.getFirstElement() instanceof RobotElement);
+        setEnabled(selection.size() == 1
+                && Selections.getOptionalFirstElement(selection, RobotFileInternalElement.class).isPresent());
     }
-
 }
