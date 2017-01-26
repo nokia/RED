@@ -32,6 +32,7 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -127,7 +128,8 @@ public class RobotLaunchConfiguration {
         return configuration.getName();
     }
 
-    private ILaunchConfigurationWorkingCopy asWorkingCopy() {
+    @VisibleForTesting
+    ILaunchConfigurationWorkingCopy asWorkingCopy() {
         return configuration instanceof ILaunchConfigurationWorkingCopy ? (ILaunchConfigurationWorkingCopy) configuration
                 : null;
     }
@@ -402,7 +404,7 @@ public class RobotLaunchConfiguration {
     public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
             final String outputFilePath) throws CoreException {
         final RobotLaunchConfiguration robotLaunchConfig = new RobotLaunchConfiguration(launchCopy);
-        robotLaunchConfig.setExecutorArguments("-R" + " " + outputFilePath);
+        robotLaunchConfig.setExecutorArguments("-R " + outputFilePath);
         robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
     }
 
@@ -411,19 +413,6 @@ public class RobotLaunchConfiguration {
 
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final String configurationName = manager.generateLaunchConfigurationName("New Configuration");
-        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
-                .newInstance(null, configurationName);
-
-        fillDefaults(configuration, resourcesToTestCases);
-
-        return configuration;
-    }
-
-    public static ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelectedTestCasesWithName(
-            final Map<IResource, List<String>> resourcesToTestCases, final String name) throws CoreException {
-
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final String configurationName = manager.generateLaunchConfigurationName(name);
         final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
                 .newInstance(null, configurationName);
 
