@@ -16,7 +16,7 @@ import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOf
 
 public abstract class ACreationOfKeywordExecutableThreeStepsTest extends ACreationOfThreeExecutionRowsTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//exec//new//oneKeyword//threeExecs//";
+    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//exec//new//oneKw//threeExecs//";
 
     private final String extension;
 
@@ -59,11 +59,11 @@ public abstract class ACreationOfKeywordExecutableThreeStepsTest extends ACreati
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeLinesWithoutCommentedLineCmpFile(
-                convert("KeywordExecutionActionWithAllCombinationsNoCommentLine"));
+                convert("ExecActionAllCombinationsNoCommentLine"));
         store.setThreeLinesWithCommentAndEmptyLineCmpFile(
-                convert("KeywordExecutionActionWithThreeArgsCommentAndOneCommentedLineAndOneEmpty"));
+                convert("ExecActionWith3ArgsCommentOneCommentedLineAndOneEmpty"));
         store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
-                convert("KeywordExecutionActionEmptyLineInTheMiddleCommentTheFirst"));
+                convert("ExecActionEmptyLineInTheMiddleCommentInFirst"));
 
         return store;
     }
@@ -73,11 +73,11 @@ public abstract class ACreationOfKeywordExecutableThreeStepsTest extends ACreati
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
         store.setThreeLinesWithoutCommentedLineCmpFile(
-                convert("KeywordExecutionActionWithAllCombinationsNoCommentLineWithoutKeywordName"));
+                convert("ExecActionAllCombinationsNoCommentLineMissingKwName"));
         store.setThreeLinesWithCommentAndEmptyLineCmpFile(
-                convert("KeywordExecutionActionWithThreeArgsCommentAndOneCommentedLineAndOneEmptyWithoutKeywordName"));
+                convert("ExecActionWith3ArgsCommentOneCommentedLineAndOneEmptyWithoutKwName"));
         store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
-                convert("KeywordExecutionActionEmptyLineInTheMiddleCommentTheFirstWithoutKeywordName"));
+                convert("ExecActionEmptyLineInTheMiddleCommentInFirstWithoutKwName"));
 
         return store;
     }
