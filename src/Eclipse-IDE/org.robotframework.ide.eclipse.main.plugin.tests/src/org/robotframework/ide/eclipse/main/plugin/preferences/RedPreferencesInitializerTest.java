@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 
 public class RedPreferencesInitializerTest {
@@ -56,4 +57,12 @@ public class RedPreferencesInitializerTest {
         }
     }
 
+    @Test
+    public void byDefaultElementsAreOpenedInSourcePageOfEditor() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
+    }
 }

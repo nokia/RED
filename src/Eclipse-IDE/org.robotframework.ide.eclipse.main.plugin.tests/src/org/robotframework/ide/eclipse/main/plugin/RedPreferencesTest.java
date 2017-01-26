@@ -15,6 +15,7 @@ import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 
 import com.google.common.collect.Iterables;
 
@@ -39,6 +40,26 @@ public class RedPreferencesTest {
             assertThat(elements).is(contatingElementOnlyWhen(FoldableElements.KEYWORDS, (i & 2) != 0));
             assertThat(elements).is(contatingElementOnlyWhen(FoldableElements.DOCUMENTATION, (i & 1) != 0));
         }
+    }
+
+    @Test
+    public void elementsOpenModeIsTakenFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.FILE_ELEMENTS_OPEN_MODE)).thenReturn(ElementOpenMode.OPEN_IN_SOURCE.name());
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.getElementOpenMode()).isEqualTo(ElementOpenMode.OPEN_IN_SOURCE);
+    }
+
+    @Test
+    public void elementsOpenModeIsTakenFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.FILE_ELEMENTS_OPEN_MODE)).thenReturn(ElementOpenMode.OPEN_IN_TABLES.name());
+
+        final RedPreferences preferences = new RedPreferences(store);
+
+        assertThat(preferences.getElementOpenMode()).isEqualTo(ElementOpenMode.OPEN_IN_TABLES);
     }
 
     private static <T extends Iterable<?>> Condition<T> contatingElementOnlyWhen(final Object element,
