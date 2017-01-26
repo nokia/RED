@@ -18,15 +18,15 @@ import java.util.List;
 import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
-import org.rf.ide.core.executor.TestRunnerAgentHandler;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.rf.ide.core.executor.TestRunnerAgentHandler;
 
 /**
  * @author mmarzec
  */
 public class RobotDryRunHandler {
-    
+
     private Process dryRunProcess;
 
     public RunCommandLine buildDryRunCommand(final RobotRuntimeEnvironment environment, final File projectLocation,
@@ -73,14 +73,14 @@ public class RobotDryRunHandler {
             }
         }
     }
-    
+
     public void destroyDryRunProcess() {
         if (dryRunProcess != null) {
             dryRunProcess.destroy();
         }
     }
 
-    public File createTempSuiteFile(final List<String> resourcesPaths) {
+    public File createTempSuiteFile(final List<String> resourcesPaths, final List<String> libraryNames) {
         File file = null;
         PrintWriter printWriter = null;
         try {
@@ -92,7 +92,10 @@ public class RobotDryRunHandler {
             for (final String path : resourcesPaths) {
                 printWriter.println("Resource  " + path);
             }
-        } catch (IOException e) {
+            for (final String name : libraryNames) {
+                printWriter.println("Library  " + name);
+            }
+        } catch (final IOException e) {
             // nothing to do
         } finally {
             if (printWriter != null) {

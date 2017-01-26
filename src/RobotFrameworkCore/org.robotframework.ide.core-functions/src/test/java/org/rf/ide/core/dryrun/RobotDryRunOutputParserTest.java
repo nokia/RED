@@ -219,7 +219,7 @@ public class RobotDryRunOutputParserTest {
         dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
         verifyLibraryImport(dryRunOutputParser, 1, 2, DryRunLibraryType.UNKNOWN, libName, args, importers, "");
     }
-    
+
     @Test
     public void testProcessLine_withStartSuiteEvent() {
         final String suiteName = "testSuite1";
@@ -290,7 +290,7 @@ public class RobotDryRunOutputParserTest {
                 + ", value: VALUE_START((Importing test library " + libName
                 + " failed))VALUE_END, lib_file_import:None}\",\"timestamp\":\"12345\"}]}";
     }
-    
+
     private String createStartSuiteJSON(String suiteName) {
         return "{\"start_suite\":[\"" + suiteName + "\",{\"longname\":\"" + suiteName + "\"}]}";
     }
