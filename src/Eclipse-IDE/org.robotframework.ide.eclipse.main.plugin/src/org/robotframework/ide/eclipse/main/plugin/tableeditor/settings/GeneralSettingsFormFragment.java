@@ -665,10 +665,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
-    public void revealSetting(final RobotSetting setting) {
+    public void revealSetting(final RobotSetting setting, final boolean focus) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(generalSettingsSection);
         if ("Documentation".equals(setting.getName())) {
-            documentation.forceFocus();
+            if (focus) {
+                documentation.forceFocus();
+            }
             documentation.selectAll();
             clearSettingsSelection();
         } else if (table.isPresent()) {
@@ -679,6 +681,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
             }
             CellEditorCloser.closeForcibly(table.get());
+            if (focus) {
+                table.get().setFocus();
+            }
             selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
         }
     }

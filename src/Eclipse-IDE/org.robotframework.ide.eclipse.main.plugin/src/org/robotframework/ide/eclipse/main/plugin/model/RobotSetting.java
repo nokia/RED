@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -96,9 +95,8 @@ public class RobotSetting extends RobotKeywordCall {
     }
 
     @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(),
-                this);
+    public OpenStrategy getOpenRobotEditorStrategy() {
+        return new PageActivatingOpeningStrategy(this);
     }
 
     public enum SettingsGroup {

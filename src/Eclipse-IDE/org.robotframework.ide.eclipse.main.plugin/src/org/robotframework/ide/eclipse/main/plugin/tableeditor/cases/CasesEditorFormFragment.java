@@ -331,13 +331,16 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         return fileModel.findSection(RobotCasesSection.class).orNull();
     }
 
-    public void revealElement(final RobotElement element) {
+    public void revealElement(final RobotElement element, final boolean focus) {
         if (dataProvider.isFilterSet() && !dataProvider.isProvided(element)) {
             final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
                     + RobotCasesSection.SECTION_NAME.replaceAll(" ", "_");
             eventBroker.send(topic, new FilterSwitchRequest(RobotCasesSection.SECTION_NAME.replaceAll(" ", "_"), ""));
         }
         CellEditorCloser.closeForcibly(table);
+        if (focus) {
+            table.setFocus();
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
     }
 

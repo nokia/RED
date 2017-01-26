@@ -49,6 +49,11 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     }
 
     @Override
+    public void revealElementAndFocus(final RobotElement robotElement) {
+        getComponent().revealElementAndFocus(robotElement);
+    }
+
+    @Override
     public void setFocus() {
         getComponent().setFocus();
     }

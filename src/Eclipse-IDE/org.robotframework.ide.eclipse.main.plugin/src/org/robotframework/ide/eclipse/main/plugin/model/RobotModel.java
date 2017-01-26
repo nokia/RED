@@ -13,7 +13,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IWorkbenchPage;
 
 public class RobotModel implements RobotElement {
 
@@ -77,11 +76,6 @@ public class RobotModel implements RobotElement {
     @Override
     public ImageDescriptor getImage() {
         return null;
-    }
-
-    @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new OpenStrategy();
     }
 
     synchronized List<RobotElementChange> removeProject(final IProject project) {

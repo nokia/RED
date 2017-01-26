@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
-import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -143,8 +142,8 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
     }
 
     @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), parent, this);
+    public OpenStrategy getOpenRobotEditorStrategy() {
+        return new PageActivatingOpeningStrategy(this);
     }
 
     @Override

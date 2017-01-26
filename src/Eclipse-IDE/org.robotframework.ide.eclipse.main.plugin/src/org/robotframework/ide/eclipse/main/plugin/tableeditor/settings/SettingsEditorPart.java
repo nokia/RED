@@ -77,10 +77,19 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public void revealElement(final RobotElement robotElement) {
+            revealElement(robotElement, false);
+        }
+
+        @Override
+        public void revealElementAndFocus(final RobotElement robotElement) {
+            revealElement(robotElement, true);
+        }
+
+        private void revealElement(final RobotElement robotElement, final boolean focus) {
             if (robotElement instanceof RobotSetting) {
                 final RobotSetting setting = (RobotSetting) robotElement;
                 if (setting.getGroup() == SettingsGroup.NO_GROUP) {
-                    generalFragment.revealSetting(setting);
+                    generalFragment.revealSetting(setting, focus);
                     if (metadataFragment.isPresent()) {
                         metadataFragment.get().clearSettingsSelection();
                     }
@@ -88,7 +97,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
                 } else if (setting.getGroup() == SettingsGroup.METADATA) {
                     generalFragment.clearSettingsSelection();
                     if (metadataFragment.isPresent()) {
-                        metadataFragment.get().revealSetting(setting);
+                        metadataFragment.get().revealSetting(setting, focus);
                     }
                     importFragment.clearSettingsSelection();
                 } else if (setting.isImportSetting()) {
@@ -96,7 +105,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
                     if (metadataFragment.isPresent()) {
                         metadataFragment.get().clearSettingsSelection();
                     }
-                    importFragment.revealSetting(setting);
+                    importFragment.revealSetting(setting, focus);
                 }
             }
         }
@@ -106,12 +115,12 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             return suiteModel.findSection(RobotSettingsSection.class);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             generalFragment = new GeneralSettingsFormFragment();
-            final MetadataSettingsFormFragment fragment = shouldShowMetadata() ? new MetadataSettingsFormFragment()
-                    : null;
-            metadataFragment = Optional.fromNullable(fragment);
+            metadataFragment = shouldShowMetadata() ? Optional.of(new MetadataSettingsFormFragment())
+                    : Optional.<MetadataSettingsFormFragment> absent();
             importFragment = new ImportSettingsFormFragment();
 
             if (metadataFragment.isPresent()) {
@@ -119,15 +128,11 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             } else {
                 return newArrayList(generalFragment, importFragment);
             }
-
         }
 
         private boolean shouldShowMetadata() {
-            final Object model = getContext().get(RobotEditorSources.SUITE_FILE_MODEL);
-            if (model instanceof RobotSuiteFile) {
-                return !((RobotSuiteFile) model).isResourceFile();
-            }
-            return true;
+            final RobotSuiteFile model = (RobotSuiteFile) getContext().get(RobotEditorSources.SUITE_FILE_MODEL);
+            return model != null && !model.isResourceFile();
         }
 
         @Override
@@ -190,6 +195,5 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             final IDirtyProviderService dirtyProviderService = getContext().getActive(IDirtyProviderService.class);
             dirtyProviderService.setDirtyState(false);
         }
-
     }
 }

@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IWorkbenchPage;
 
 /**
  * An interface which all Robot model objects has to implement
@@ -52,34 +51,4 @@ public interface RobotElement {
      * @return image descriptor
      */
     ImageDescriptor getImage();
-
-    /**
-     * Returns open strategy capable of opening and selecting this element in
-     * editor.
-     * 
-     * @param page
-     * @return
-     */
-    OpenStrategy getOpenRobotEditorStrategy(IWorkbenchPage page);
-
-    /**
-     * The strategy for opening this element in editor.
-     */
-    public class OpenStrategy {
-        public void run() {
-            run(null);
-        }
-
-        /**
-         * Opens proper editor page for given element and then selects the cell which contains given
-         * string.
-         * 
-         * @param labelWhichShouldBeInSelectedCell
-         *            After opening the cell containing this string
-         *            should be selected
-         */
-        public void run(final String labelWhichShouldBeInSelectedCell) {
-
-        }
-    }
 }

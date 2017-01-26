@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.text.Position;
-import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
@@ -187,8 +186,8 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     }
 
     @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(), this);
+    public OpenStrategy getOpenRobotEditorStrategy() {
+        return new PageActivatingOpeningStrategy(this);
     }
 
     protected int countRowsOfTypeUpTo(final ModelType type, final int toIndex) {

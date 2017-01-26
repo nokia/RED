@@ -201,7 +201,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                                 return rowObject instanceof RobotElement;
                             }
                         }),
-                new AlternatingRowConfigLabelAccumulator(), 
+                new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
@@ -337,7 +337,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
-    public void revealSetting(final RobotSetting setting) {
+    public void revealSetting(final RobotSetting setting, final boolean focus) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(importSettingsSection);
         if (dataProvider.isFilterSet() && !dataProvider.isProvided(setting)) {
             final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
@@ -345,6 +345,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
         }
         CellEditorCloser.closeForcibly(table);
+        if (focus) {
+            table.setFocus();
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
     }
 

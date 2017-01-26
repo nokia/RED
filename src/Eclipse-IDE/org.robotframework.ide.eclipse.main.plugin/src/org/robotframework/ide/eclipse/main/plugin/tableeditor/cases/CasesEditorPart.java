@@ -65,7 +65,12 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
 
         @Override
         public void revealElement(final RobotElement robotElement) {
-            casesFragment.revealElement(robotElement);
+            casesFragment.revealElement(robotElement, false);
+        }
+
+        @Override
+        public void revealElementAndFocus(final RobotElement robotElement) {
+            casesFragment.revealElement(robotElement, true);
         }
 
         @Override

@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
-import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -87,8 +86,8 @@ public class ArtificialGroupingRobotElement implements RobotFileInternalElement 
     }
 
     @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
-        return groupedElements.get(0).getOpenRobotEditorStrategy(page);
+    public OpenStrategy getOpenRobotEditorStrategy() {
+        return groupedElements.get(0).getOpenRobotEditorStrategy();
     }
 
     @Override
