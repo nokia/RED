@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 
 public class NamedElement implements RobotElement {
@@ -50,11 +49,6 @@ public class NamedElement implements RobotElement {
 
     @Override
     public ImageDescriptor getImage() {
-        return null;
-    }
-
-    @Override
-    public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return null;
     }
 }
