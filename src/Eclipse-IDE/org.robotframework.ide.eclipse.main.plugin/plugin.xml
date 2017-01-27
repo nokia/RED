@@ -304,7 +304,7 @@
               contributorClass="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor"
               default="true"
               icon="resources/file_robot.png"
-              id="org.robotframework.ide.tableeditor"
+              id="org.robotframework.ide.tableditor"
               name="Robot Table Editor">
            <contentTypeBinding
                  contentTypeId="org.robotframework.red.robotfile">

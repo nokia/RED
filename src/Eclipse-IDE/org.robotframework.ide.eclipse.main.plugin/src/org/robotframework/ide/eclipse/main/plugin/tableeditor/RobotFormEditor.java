@@ -83,7 +83,7 @@ public class RobotFormEditor extends FormEditor {
 
     private static final String EDITOR_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.context";
 
-    public static final String ID = "org.robotframework.ide.tableeditor";
+    public static final String ID = "org.robotframework.ide.tableditor";
 
     private final List<IEditorPart> parts = newArrayList();
 
