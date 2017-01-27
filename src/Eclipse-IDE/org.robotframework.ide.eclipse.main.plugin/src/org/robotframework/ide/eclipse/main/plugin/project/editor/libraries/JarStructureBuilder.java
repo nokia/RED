@@ -22,8 +22,8 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
 public class JarStructureBuilder {
@@ -42,11 +42,11 @@ public class JarStructureBuilder {
 
     }
 
-    public List<JarClass> provideEntriesFromFile(final String path) {
+    public Collection<ILibraryClass> provideEntriesFromFile(final String path) {
         return provideEntriesFromFile(new File(path));
     }
 
-    public List<JarClass> provideEntriesFromFile(final File file) {
+    public Collection<ILibraryClass> provideEntriesFromFile(final File file) {
         if (file.getName().endsWith(".jar")) {
             return provideEntriesFromJarFile(file);
         } else {
@@ -54,8 +54,8 @@ public class JarStructureBuilder {
         }
     }
 
-    private List<JarClass> provideEntriesFromJarFile(final File file) {
-        final List<JarClass> jarClasses = newArrayList();
+    private Collection<ILibraryClass> provideEntriesFromJarFile(final File file) {
+        final List<ILibraryClass> jarClasses = newArrayList();
         try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry entry = zipStream.getNextEntry();
             while (entry != null) {
@@ -73,14 +73,15 @@ public class JarStructureBuilder {
         return jarClasses;
     }
 
-    private List<JarClass> providePythonEntriesFromJarFile(final File file) {
+    private Collection<JarClass> providePythonEntriesFromJarFile(final File file) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
-        final Collection<PythonClass> entriesFromFile = pythonLibStructureBuilder.provideEntriesFromFile(file.getPath(),
+        final Collection<ILibraryClass> entriesFromFile = pythonLibStructureBuilder.provideEntriesFromFile(
+                file.getPath(),
                 Optional.<String> absent(), false);
 
         final List<JarClass> jarClasses = newArrayList();
-        for (final PythonClass pythonClass : entriesFromFile) {
+        for (final ILibraryClass pythonClass : entriesFromFile) {
             jarClasses.add(JarClass.createFromZipPythonEntry(pythonClass.getQualifiedName()));
         }
 
@@ -91,7 +92,7 @@ public class JarStructureBuilder {
         return entryName.endsWith(".class");
     }
 
-    public static class JarClass {
+    public static class JarClass implements ILibraryClass {
 
         private final String qualifiedName;
 
@@ -109,13 +110,26 @@ public class JarStructureBuilder {
             return new JarClass(name);
         }
 
+        @Override
         public String getQualifiedName() {
             return qualifiedName;
         }
 
+        @Override
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
             return ReferencedLibrary.create(LibraryType.JAVA, qualifiedName,
                     RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return obj != null && JarClass.class == obj.getClass()
+                    && Objects.equal(this.qualifiedName, ((JarClass) obj).qualifiedName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(qualifiedName);
         }
     }
 }

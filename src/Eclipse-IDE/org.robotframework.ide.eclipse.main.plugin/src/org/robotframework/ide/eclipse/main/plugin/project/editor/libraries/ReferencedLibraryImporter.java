@@ -51,7 +51,7 @@ public class ReferencedLibraryImporter {
             final String fullLibraryPath) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
-        final List<PythonClass> pythonClasses = newArrayList();
+        final List<ILibraryClass> pythonClasses = newArrayList();
 
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
@@ -102,7 +102,7 @@ public class ReferencedLibraryImporter {
     public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment,
             final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
         final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(environment, config, project);
-        final List<JarClass> classesFromJar = newArrayList();
+        final List<ILibraryClass> classesFromJar = newArrayList();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 
