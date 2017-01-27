@@ -13,6 +13,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +45,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
@@ -141,13 +142,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         List<RobotProblem> libProblems;
         switch (libType) {
             case JAVA:
-                libProblems = findJavaLibaryProblem(libraryPath, library.getName());
+                libProblems = findJavaLibraryProblem(libraryPath, library.getName());
                 break;
             case PYTHON:
                 libProblems = findPythonLibraryProblem(libraryPath, library.getName());
                 break;
             case VIRTUAL:
-                libProblems = findVirtualLibaryProblem(libraryPath);
+                libProblems = findVirtualLibraryProblem(libraryPath);
                 break;
             default:
                 libProblems = newArrayList();
@@ -159,7 +160,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         }
     }
 
-    private List<RobotProblem> findJavaLibaryProblem(final IPath libraryPath, final String libName) {
+    private List<RobotProblem> findJavaLibraryProblem(final IPath libraryPath, final String libName) {
         final List<RobotProblem> javaLibProblems = newArrayList();
 
         if (!"jar".equals(libraryPath.getFileExtension())) {
@@ -171,10 +172,10 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final IPath absolutePath = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
         final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
         boolean containsClass = false;
-        final List<JarClass> classes = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
+        final Collection<ILibraryClass> classes = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
                 robotProject.getRobotProjectConfig(), robotProject.getProject())
                         .provideEntriesFromFile(absolutePath.toFile());
-        for (final JarClass jarClass : classes) {
+        for (final ILibraryClass jarClass : classes) {
             if (jarClass.getQualifiedName().equals(libName)) {
                 containsClass = true;
                 break;
@@ -199,7 +200,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         return pyLibProblems;
     }
 
-    private List<RobotProblem> findVirtualLibaryProblem(final IPath libraryPath) {
+    private List<RobotProblem> findVirtualLibraryProblem(final IPath libraryPath) {
         return newArrayList(validatePath(libraryPath, ConfigFileProblem.MISSING_LIBRARY_FILE));
     }
 
