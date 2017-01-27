@@ -7,13 +7,17 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/8/16 4:11 PM
+Save-Time: 1/27/17 11:53 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//reset server
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Reset Robot Environment" 
+    | click
+    
 //remove autodiscover
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 
@@ -103,6 +107,10 @@ get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.
     | click
 
 wait 500
+
+//this is added because test: AddLibraryToRedXmlByQuickFix was affecing this test
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
  
 //expand erorrs
 get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | expand-all
