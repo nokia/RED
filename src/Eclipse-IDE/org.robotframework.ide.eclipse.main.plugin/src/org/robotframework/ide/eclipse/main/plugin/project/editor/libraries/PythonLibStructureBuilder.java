@@ -43,12 +43,12 @@ public class PythonLibStructureBuilder {
         this.additionalSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(project);
     }
 
-    public Collection<PythonClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,
+    public Collection<ILibraryClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,
             final boolean allowDuplicationOfFileAndClassName) throws RobotEnvironmentException {
 
         final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName,
                 additionalSearchPaths);
-        return newLinkedHashSet(transform(classes, new Function<String, PythonClass>() {
+        return newLinkedHashSet(transform(classes, new Function<String, ILibraryClass>() {
 
             @Override
             public PythonClass apply(final String name) {
@@ -57,7 +57,7 @@ public class PythonLibStructureBuilder {
         }));
     }
 
-    public static final class PythonClass {
+    public static final class PythonClass implements ILibraryClass {
 
         private final String qualifiedName;
 
@@ -84,10 +84,12 @@ public class PythonLibStructureBuilder {
             }
         }
 
+        @Override
         public String getQualifiedName() {
             return qualifiedName;
         }
 
+        @Override
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
             final IPath path = new Path(fullLibraryPath);
             final IPath pathWithoutModuleName = fullLibraryPath.endsWith("__init__.py") ? path.removeLastSegments(2)
