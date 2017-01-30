@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/27/17 12:04 PM
+Save-Time: 1/30/17 1:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -152,7 +152,7 @@ get-view "Message Log" | get-editbox | get-property text
 get-view Outline | get-tree | select "tsv_file.tsv/Test Cases/embeded kw" | get-menu Run | click
 get-editor "tsv_file.tsv" | get-text-viewer | get-property "getSelectionText()" | equals "embeded kw" | verify-true
 
-//open run config and check if 2 run congig were added
+//open run config and check if 2 run configs were added
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 3 | verify-true
 with [get-window "Run Configurations" | get-tree] {
@@ -180,6 +180,18 @@ with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
     get-item "tsv_file.tsv/embeded kw" | get-property checked | equals true | verify-true
 }
 get-window "Run Configurations" | get-button Close | click
+
+
+//run file from PE again - check that entire file is run not last config
+get-view "Project Explorer" | get-tree | select "RunTestFromOutline/tsv_file.tsv" | get-menu "Run As/1 Robot Test" 
+    | click
+get-view "Message Log" | get-editbox | get-property text 
+    | equals "Starting test: RunTestFromOutline.Tsv File.check text\n"
+    + "Ending test: RunTestFromOutline.Tsv File.check text\n\n"
+    + "Starting test: RunTestFromOutline.Tsv File.embeded kw\n"
+    + ".* : INFO : cat\n"
+    + "Ending test: RunTestFromOutline.Tsv File.embeded kw" | verify-true
+
 
 //open declaration for embeded test
 get-view Outline | get-tree | select "tsv_file.tsv/Test Cases/embeded kw/Select cat from list" 
