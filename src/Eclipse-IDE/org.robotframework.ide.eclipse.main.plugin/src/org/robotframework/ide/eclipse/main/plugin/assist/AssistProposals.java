@@ -40,7 +40,6 @@ public class AssistProposals {
 
     static RedFileLocationProposal createFileLocationProposal(final IFile fromFile, final IFile toFile,
             final ProposalMatch match) {
-        final String label = toFile.getFullPath().makeRelative().toString();
         
         final String content;
         if (RedSystemProperties.isWindowsPlatform()
@@ -49,7 +48,7 @@ public class AssistProposals {
         } else {
             content = createCurrentFileRelativePath(fromFile, toFile);
         }
-        return new RedFileLocationProposal(content, label, toFile, match);
+        return new RedFileLocationProposal(content, content, toFile, match);
     }
 
     private static String createCurrentFileRelativePath(final IFile from, final IFile to) {
