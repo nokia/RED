@@ -197,7 +197,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getContent()).isEqualTo("dir/file.txt");
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getImageForResource(toFile));
-        assertThat(proposal.getStyledLabel().getString()).isEqualTo(PROJECT_NAME + "/dir/file.txt");
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("dir/file.txt");
         assertThat(proposal.hasDescription()).isFalse();
         assertThat(proposal.getDescription()).isEmpty();
 
