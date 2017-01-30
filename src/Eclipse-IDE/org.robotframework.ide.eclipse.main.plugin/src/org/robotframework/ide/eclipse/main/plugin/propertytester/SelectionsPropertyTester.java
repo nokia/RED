@@ -9,7 +9,8 @@ import java.util.List;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 import org.robotframework.red.viewers.Selections;
 
@@ -39,30 +40,25 @@ public class SelectionsPropertyTester extends PropertyTester {
         if (ALL_ELEMENTS_HAVE_SAME_TYPE.equals(property)) {
             return testIfAllElementsHaveSameType(selection, expected);
         } else if (SELECTED_ACTUAL_FILE.equals(property)) {
-            return testIfIsSelectedActualFile(selection, expected);
+            return testIfIsSelectedActualProjectMember(selection, expected);
         }
         return false;
     }
 
-    private boolean testIfIsSelectedActualFile(final IStructuredSelection selection, final boolean expected) {
-        Object firstSelectedElement = null;
+    private boolean testIfIsSelectedActualProjectMember(final IStructuredSelection selection, final boolean expected) {
         if (selection.isEmpty()) {
-            return expected;
-        } else {
-            firstSelectedElement = selection.getFirstElement();
+            return !expected;
         }
-        while (firstSelectedElement instanceof RobotElement) {
-            RobotElement robotElement = (RobotElement) firstSelectedElement;
-            if (robotElement.getParent() != null) {
-                firstSelectedElement = robotElement.getParent();
-            } else {
-                break;
+        final Object firstSelectedElement = selection.getFirstElement();
+        if (firstSelectedElement instanceof RobotFileInternalElement) {
+            final RobotSuiteFile parentFile = ((RobotFileInternalElement) firstSelectedElement).getSuiteFile();
+            if (parentFile instanceof RobotSuiteStreamFile) {
+                return !expected;
             }
+        } else {
+            return !expected;
         }
-        if (firstSelectedElement instanceof RobotSuiteStreamFile) {
-            return false;
-        }
-        return true;
+        return expected;
     }
 
     private boolean testIfAllElementsHaveSameType(final IStructuredSelection selection, final boolean expected) {
