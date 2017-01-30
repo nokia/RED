@@ -7,10 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -50,33 +53,36 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         if (selection instanceof StructuredSelection && !selection.isEmpty()) {
             final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
-            boolean isTestCaseFound = false;
-            RobotCase firstAndOnlyCase = null;
-            for (Object o : structuredSelection.toList()) {
-                RobotCase testCase = null;
-                if (o instanceof RobotKeywordCall) {
-                    testCase = (RobotCase) ((RobotKeywordCall) o).getParent();
-                } else if (o instanceof RobotCase) {
-                    testCase = (RobotCase) o;
-                }
-                if (testCase != null) {
-                    isTestCaseFound = true;
-                    if (firstAndOnlyCase != null) {
-                        if (!firstAndOnlyCase.equals(testCase)) {
-                            firstAndOnlyCase = null;
-                            break;
-                        }
-                    } else {
-                        firstAndOnlyCase = testCase;
-                    }
-                }
-            }
-            if (isTestCaseFound) {
+            Set<RobotCase> firstCases = findFirstCases(structuredSelection);
+            if (firstCases.size() == 1) {
                 contributeBefore(contributedItems);
-                contributedItems.add(createCurrentCaseItem(activeWindow, firstAndOnlyCase));
+                contributedItems.add(createCurrentCaseItem(activeWindow, firstCases.toArray(new RobotCase[1])[0]));
+            } else if (firstCases.size() > 1) {
+                contributeBefore(contributedItems);
+                contributedItems.add(createCurrentCaseItem(activeWindow, null));
             }
         }
         return contributedItems.toArray(new IContributionItem[0]);
+    }
+
+    private Set<RobotCase> findFirstCases(final IStructuredSelection selection) {
+        Set<RobotCase> firstCases = new HashSet<RobotCase>();
+        for (Object o : selection.toList()) {
+            RobotCase testCase = null;
+            if (o instanceof RobotKeywordCall) {
+                testCase = (RobotCase) ((RobotKeywordCall) o).getParent();
+            } else if (o instanceof RobotCase) {
+                testCase = (RobotCase) o;
+            }
+            if (testCase != null) {
+                firstCases.add(testCase);
+                if (firstCases.size() > 1) {
+                    // This method should never return set bigger than 2 elements
+                    break;
+                }
+            }
+        }
+        return firstCases;
     }
 
     @Override

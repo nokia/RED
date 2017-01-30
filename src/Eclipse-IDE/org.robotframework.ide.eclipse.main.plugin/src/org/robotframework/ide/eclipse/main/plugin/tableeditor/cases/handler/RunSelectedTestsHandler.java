@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -33,8 +34,8 @@ public class RunSelectedTestsHandler extends DIParameterizedHandler<E4RunTestHan
                 @Named(RunTestFromTableDynamicMenuItem.RUN_TEST_COMMAND_MODE_PARAMETER) final String mode) {
 
             if (!selection.isEmpty()) {
-                ArrayList<RobotCase> testCasesToCall = new ArrayList<RobotCase>();
-                for (Object o : ((StructuredSelection) selection).toList()) {
+                List<RobotCase> testCasesToCall = new ArrayList<RobotCase>();
+                for (Object o : selection.toList()) {
                     RobotCase testCase = null;
                     if (o instanceof RobotKeywordCall) {
                         testCase = (RobotCase) ((RobotKeywordCall) o).getParent();

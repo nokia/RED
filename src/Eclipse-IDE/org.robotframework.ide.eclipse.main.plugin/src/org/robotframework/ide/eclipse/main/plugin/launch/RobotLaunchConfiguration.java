@@ -397,6 +397,13 @@ public class RobotLaunchConfiguration {
         }
     }
 
+    public boolean isGeneralPurposeConfiguration() {
+        if (getName().endsWith(RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX)) {
+            return false;
+        }
+        return true;
+    }
+
     public String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
         return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getExecutor().executableName();
     }
