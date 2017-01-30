@@ -84,7 +84,7 @@ public class RedFileLocationProposalsTest {
         final List<? extends AssistProposal> proposals = proposalsProvider
                 .getFilesLocationsProposals(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1");
         assertThat(transform(proposals, toLabels()))
-                .containsExactly(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1/res1.robot");
+                .containsExactly("dir1/res1.robot");
     }
 
     @Test
@@ -95,7 +95,7 @@ public class RedFileLocationProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("1");
         assertThat(transform(proposals, toLabels()))
-                .containsExactly(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1/res1.robot");
+                .containsExactly("dir1/res1.robot");
     }
 
     @Test
@@ -106,8 +106,7 @@ public class RedFileLocationProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
         assertThat(transform(proposals, toLabels())).containsExactly(
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir1/res1.robot",
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir2/res2.robot");
+                "dir1/res1.robot", "dir2/res2.robot");
     }
 
     @Test
@@ -130,9 +129,7 @@ public class RedFileLocationProposalsTest {
             }
         };
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
-        assertThat(transform(proposals, toLabels())).containsExactly(
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir2/res2.robot",
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir1/res1.robot");
+        assertThat(transform(proposals, toLabels())).containsExactly("dir2/res2.robot", "dir1/res1.robot");
     }
 
     @Test
@@ -153,7 +150,7 @@ public class RedFileLocationProposalsTest {
         final List<? extends AssistProposal> proposals = proposalsProvider
                 .getFilesLocationsProposals(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/l");
         assertThat(transform(proposals, toLabels()))
-                .containsExactly(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/lib.py");
+                .containsExactly("dir1_1/lib.py");
     }
 
     @Test
@@ -164,7 +161,7 @@ public class RedFileLocationProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
         assertThat(transform(proposals, toLabels()))
-                .containsExactly(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/vars.py");
+                .containsExactly("dir1_1/vars.py");
     }
 
     @Test
@@ -175,8 +172,7 @@ public class RedFileLocationProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
         assertThat(transform(proposals, toLabels())).containsExactly(
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/lib.py",
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/vars.py");
+                "dir1_1/lib.py", "dir1_1/vars.py");
     }
 
     @Test
@@ -200,7 +196,6 @@ public class RedFileLocationProposalsTest {
         };
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
         assertThat(transform(proposals, toLabels())).containsExactly(
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/vars.py",
-                RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/lib.py");
+                "dir1_1/vars.py", "dir1_1/lib.py");
     }
 }
