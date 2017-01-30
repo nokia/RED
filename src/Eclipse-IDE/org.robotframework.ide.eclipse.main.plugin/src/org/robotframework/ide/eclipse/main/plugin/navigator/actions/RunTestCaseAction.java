@@ -78,34 +78,44 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
 
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-
-                final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
-
                 final List<RobotCase> selectedTestCases = Selections.getElements(selection, RobotCase.class);
-                for (final RobotCase robotCase : selectedTestCases) {
+                final Map<IResource, List<String>> resourcesToTestCases = groupTestCasesByResource(selectedTestCases);
+                final ILaunchConfigurationWorkingCopy configurationWorkingCopy = prepareConfiguration(
+                        resourcesToTestCases);
+                configurationWorkingCopy.doSave().launch(mode.launchMgrName, monitor);
+
+
+                return Status.OK_STATUS;
+            }
+
+            private Map<IResource, List<String>> groupTestCasesByResource(final List<RobotCase> robotCases) {
+                final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
+                for (final RobotCase robotCase : robotCases) {
                     final IResource suiteFile = robotCase.getSuiteFile().getFile();
                     if (!resourcesMapping.containsKey(suiteFile)) {
                         resourcesMapping.put(suiteFile, new ArrayList<String>());
                     }
                     resourcesMapping.get(suiteFile).add(robotCase.getName());
                 }
-                List<IResource> resources = new ArrayList<IResource>(resourcesMapping.keySet());
-                ILaunchConfiguration configuration = RobotLaunchConfigurationFinder
+                return resourcesMapping;
+            }
+
+            private ILaunchConfigurationWorkingCopy prepareConfiguration(
+                    final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
+                final List<IResource> resources = new ArrayList<IResource>(resourcesToTestCases.keySet());
+                final ILaunchConfiguration configuration = RobotLaunchConfigurationFinder
                         .findLaunchConfigurationSelectedTestCases(resources);
                 ILaunchConfigurationWorkingCopy configurationWorkingCopy = null;
-                if(configuration == null){
+                if (configuration == null) {
                     configurationWorkingCopy = RobotLaunchConfiguration
-                            .createLaunchConfigurationForSelectedTestCases(resourcesMapping);
+                            .createLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
                     configurationWorkingCopy.rename(
                             resources.get(0).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX);
                 } else {
                     configurationWorkingCopy = configuration.getWorkingCopy();
-                    RobotLaunchConfiguration.fillDefaults(configurationWorkingCopy, resourcesMapping);
+                    RobotLaunchConfiguration.fillDefaults(configurationWorkingCopy, resourcesToTestCases);
                 }
-                configurationWorkingCopy.doSave().launch(mode.launchMgrName, monitor);
-
-
-                return Status.OK_STATUS;
+                return configurationWorkingCopy;
             }
         };
         job.setUser(false);
