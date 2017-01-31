@@ -109,8 +109,6 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
                 if (configuration == null) {
                     configurationWorkingCopy = RobotLaunchConfiguration
                             .createLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
-                    configurationWorkingCopy.rename(
-                            resources.get(0).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX);
                 } else {
                     configurationWorkingCopy = configuration.getWorkingCopy();
                     RobotLaunchConfiguration.fillDefaults(configurationWorkingCopy, resourcesToTestCases);

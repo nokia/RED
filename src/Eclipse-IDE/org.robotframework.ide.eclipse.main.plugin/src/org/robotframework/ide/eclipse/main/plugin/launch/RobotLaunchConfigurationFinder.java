@@ -30,7 +30,7 @@ public class RobotLaunchConfigurationFinder {
             final String resourceName = resources.get(0).getName();
             final String projectName = resources.get(0).getProject().getName();
             for (final ILaunchConfiguration configuration : launchConfigs) {
-                if (configuration.getName().equals(resourceName)
+                if (configuration.getName().startsWith(resourceName)
                         && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
                     return configuration;
                 }
@@ -38,7 +38,7 @@ public class RobotLaunchConfigurationFinder {
         }
         for (final ILaunchConfiguration configuration : launchConfigs) {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-            if (robotConfig.isGeneralPurposeConfiguration() && robotConfig.isSuitableFor(resources)) {
+            if (robotConfig.isSuitableFor(resources)) {
                 return configuration;
             }
         }
@@ -60,6 +60,32 @@ public class RobotLaunchConfigurationFinder {
                         && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
                     return configuration;
                 }
+            }
+        }
+        return null;
+    }
+
+    public static ILaunchConfiguration findLaunchConfigurationExceptSelectedTestCases(final List<IResource> resources)
+            throws CoreException {
+
+        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType launchConfigurationType = launchManager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
+        if (resources.size() == 1 && (resources.get(0) instanceof IProject || resources.get(0) instanceof IFolder)) {
+            final String resourceName = resources.get(0).getName();
+            final String projectName = resources.get(0).getProject().getName();
+            for (final ILaunchConfiguration configuration : launchConfigs) {
+                if (configuration.getName().equals(resourceName)
+                        && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
+                    return configuration;
+                }
+            }
+        }
+        for (final ILaunchConfiguration configuration : launchConfigs) {
+            final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+            if (robotConfig.isGeneralPurposeConfiguration() && robotConfig.isSuitableFor(resources)) {
+                return configuration;
             }
         }
         return null;

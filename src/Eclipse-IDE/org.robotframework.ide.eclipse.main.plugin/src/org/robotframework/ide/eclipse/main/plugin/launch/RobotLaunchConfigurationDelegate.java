@@ -99,7 +99,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             final List<IResource> resources = Selections.getAdaptableElements((IStructuredSelection) selection,
                     IResource.class);
             if (!resources.isEmpty()) {
-                launch(resources, mode);
+                launch(resources, mode, true);
             }
         }
     }
@@ -109,11 +109,11 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final IEditorInput input = editor.getEditorInput();
         if (input instanceof FileEditorInput) {
             final IResource file = ((FileEditorInput) input).getFile();
-            launch(newArrayList(file), mode);
+            launch(newArrayList(file), mode, false);
         }
     }
 
-    private void launch(final List<IResource> resources, final String mode) {
+    private void launch(final List<IResource> resources, final String mode, final boolean generalOnly) {
         if (resources.isEmpty()) {
             throw new IllegalStateException("There should be at least one suite selected for launching");
         }
@@ -121,7 +121,12 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
 
-                ILaunchConfiguration config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
+                ILaunchConfiguration config = null;
+                if (generalOnly) {
+                    config = RobotLaunchConfigurationFinder.findLaunchConfigurationExceptSelectedTestCases(resources);
+                } else {
+                    config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
+                }
                 if (config == null) {
                     config = RobotLaunchConfiguration.createDefault(launchConfigurationType, resources);
                 }
