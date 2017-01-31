@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KcAh0J2aEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/12/17 10:14 AM
+Save-Time: 1/31/17 11:17 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,7 +15,6 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 //import project outside of workspace
-	
 get-menu "File/Import..." | click
 get-window Import | get-tree | select "General/Existing Projects into Workspace" | double-click
 set-dialog-result Folder [concat $user_folder "/Project1"]
@@ -24,8 +23,15 @@ with [get-window Import] {
     get-button Finish | click
 }
 
+//add resource to project in workspace
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Resource file" | click
+with [get-window "New Robot Resource file"] {
+    get-editbox -after [get-label "File name:"] | set-text "res_from_ws"
+    get-button Finish | click
+}
 
-//open editor
+
+//open editor in test outsiede ws
 with [get-view "Project Explorer" | get-tree] {
     select "MediumRobotTest/Script.robot" | double-click
 }
@@ -44,22 +50,23 @@ with [get-editor "Script.robot" | get-text-viewer] {
     wait 300
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "MediumRobotTest/Resources/res1.robot" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "MediumRobotTest/Resources 2/res2.tsv" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "${varfrompython}" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Resources/res1.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Resources 2/res2.tsv" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals [concat $RED_workspace_path_unix_style  "/RobotProject/res_from_ws.robot"] | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "${varfrompython}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
     
     //list are at the end
-    get-property "getItems().TableItem[27].getText()" | equals "${True}" | verify-true
-    get-property "getItems().TableItem[28].getText()" | equals "@{listfrompy}" | verify-true
-    get-property "getItems().TableItem[29].getText()" | equals "@{EMPTY}" | verify-true
-    get-property "getItems().TableItem[30].getText()" | equals "&{EMPTY}" | verify-true
-    get-property "getItems().TableItem[31].getText()" | equals "&{SUITE_METADATA}" | verify-true
+    get-property "getItems().TableItem[28].getText()" | equals "${True}" | verify-true
+    get-property "getItems().TableItem[29].getText()" | equals "@{listfrompy}" | verify-true
+    get-property "getItems().TableItem[30].getText()" | equals "@{EMPTY}" | verify-true
+    get-property "getItems().TableItem[31].getText()" | equals "&{EMPTY}" | verify-true
+    get-property "getItems().TableItem[32].getText()" | equals "&{SUITE_METADATA}" | verify-true
 }
 
 wait 200
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "MediumRobotTest\\/Resources 2\\/res2.tsv" | click -default
+    | select "Resources 2\\/res2.tsv" | click -default
 
 wait 2000    
 //add Log to test with var: "${from_res2}" 
