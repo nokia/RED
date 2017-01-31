@@ -228,4 +228,4 @@ class PythonKeywordSource(object):
         elif keyword._method:
             return keyword._method
         else:
-            return keyword.current_handler()
+            return keyword._get_handler(keyword.library.get_instance(), keyword._handler_name)
