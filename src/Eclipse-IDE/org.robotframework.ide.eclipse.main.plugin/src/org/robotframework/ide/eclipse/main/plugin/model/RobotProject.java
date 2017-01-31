@@ -505,7 +505,7 @@ public class RobotProject extends RobotContainer {
         }
     }
 
-    public Optional<RobotDryRunKeywordSource> getKeywordSource(final String qualifiedKwName) {
+    public synchronized Optional<RobotDryRunKeywordSource> getKeywordSource(final String qualifiedKwName) {
         return Optional.fromNullable(kwSources.get(qualifiedKwName));
     }
 
