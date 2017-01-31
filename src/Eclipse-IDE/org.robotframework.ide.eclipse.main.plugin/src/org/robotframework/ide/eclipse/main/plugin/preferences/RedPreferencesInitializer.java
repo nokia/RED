@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static com.google.common.collect.Iterables.transform;
+
 import java.util.EnumSet;
 import java.util.List;
 
@@ -24,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 
 public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
 
@@ -45,11 +46,11 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
-        final List<PythonInstallationDirectory> pybotPaths = RobotRuntimeEnvironment.whereArePythonInterpreters();
-        if (!pybotPaths.isEmpty()) {
-            final String activePath = pybotPaths.get(0).getAbsolutePath();
+        final List<PythonInstallationDirectory> interpreterPaths = RobotRuntimeEnvironment.whereArePythonInterpreters();
+        if (!interpreterPaths.isEmpty()) {
+            final String activePath = interpreterPaths.get(0).getAbsolutePath();
             final String allPaths = Joiner.on(';').join(
-                    Iterables.transform(pybotPaths, new Function<PythonInstallationDirectory, String>() {
+                    transform(interpreterPaths, new Function<PythonInstallationDirectory, String>() {
                         @Override
                         public String apply(final PythonInstallationDirectory dir) {
                             return dir.getAbsolutePath();
@@ -57,7 +58,9 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
                     }));
             
             preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
+            preferences.put(RedPreferences.ACTIVE_RUNTIME_EXEC, "");
             preferences.put(RedPreferences.OTHER_RUNTIMES, allPaths);
+            preferences.put(RedPreferences.OTHER_RUNTIMES_EXECS, "");
         }
     }
 
