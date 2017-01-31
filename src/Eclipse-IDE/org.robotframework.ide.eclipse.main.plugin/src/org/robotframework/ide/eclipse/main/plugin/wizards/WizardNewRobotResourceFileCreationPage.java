@@ -106,14 +106,14 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
         
         final IContainer container = file.getParent();
         if (!container.exists()) {
-            setErrorMessage("Folder '" + container.getFullPath().toString() + "' does not exist");
+            setErrorMessage("Folder '" + container.getFullPath().toString() + "' does not exists");
             return false;
         }
 
         try {
             for (final IResource resource : container.members()) {
                 if (name.equalsIgnoreCase(resource.getName())) {
-                    setErrorMessage("'" + name + "' already exist");
+                    setErrorMessage("'" + name + "' already exists");
                     return false;
                 }
             }
