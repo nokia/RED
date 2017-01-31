@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.library;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
@@ -16,6 +15,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.junit.After;
@@ -46,11 +46,7 @@ public class SourceOpeningSupportTest {
 
     private LibrarySpecification libSpec;
 
-    private KeywordSpecification kwSpec;
-
     private RobotProject project;
-
-    private RobotDryRunKeywordSource kwSource;
 
     @Before
     public void before() throws Exception {
@@ -62,31 +58,17 @@ public class SourceOpeningSupportTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(lib);
 
-        library = projectProvider.createFile("testlib.py", "#comment", "def keyword():", "  print(\"kw\")");
+        library = projectProvider.createFile("testlib.py", "#comment", "def defined_kw():", "  print(\"kw\")",
+                "def discovered_kw():", "  print(\"kw\")");
         projectProvider.configure(config);
-
-        kwSpec = new KeywordSpecification();
-        kwSpec.setFormat("ROBOT");
-        kwSpec.setName("keyword");
-        kwSpec.setArguments(new ArrayList<String>());
-        kwSpec.setDocumentation("");
 
         libSpec = new LibrarySpecification();
         libSpec.setName("testlib");
-        libSpec.getKeywords().add(kwSpec);
         libSpec.setSourceFile(library);
 
         project = model.createRobotProject(projectProvider.getProject());
         project.setStandardLibraries(new HashMap<String, LibrarySpecification>());
         project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
-
-        kwSource = new RobotDryRunKeywordSource();
-        kwSource.setFilePath(library.getRawLocation().toOSString());
-        kwSource.setLibraryName(libSpec.getName());
-        kwSource.setName(kwSpec.getName());
-        kwSource.setLine(1);
-        kwSource.setOffset(4);
-        kwSource.setLength(7);
     }
 
     @After
@@ -100,57 +82,57 @@ public class SourceOpeningSupportTest {
 
         SourceOpeningSupport.open(page, model, project.getProject(), libSpec);
 
-        assertThat(page.getEditorReferences()).hasSize(1);
-
-        final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile("testlib.py"));
-
-        final TextEditor editor = (TextEditor) page.getEditorReferences()[0].getEditor(false);
-        final TextSelection selection = (TextSelection) editor.getSelectionProvider().getSelection();
-        assertThat(selection.getText()).isEqualTo("");
-        assertThat(selection.getStartLine()).isEqualTo(0);
-        assertThat(selection.getOffset()).isEqualTo(0);
-        assertThat(selection.getLength()).isEqualTo(0);
+        verifyOpenedFile("testlib.py");
+        verifyEmptySelection();
     }
 
     @Test
     public void testIfLibraryIsOpened_whenKeywordNotFound() throws Exception {
         assertThat(page.getEditorReferences()).isEmpty();
 
+        final KeywordSpecification kwSpec = new KeywordSpecification();
+        kwSpec.setName("Not Existing Kw");
+
         SourceOpeningSupport.open(page, model, project.getProject(), libSpec, kwSpec);
 
-        assertThat(page.getEditorReferences()).hasSize(1);
-
-        final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile("testlib.py"));
-
-        final TextEditor editor = (TextEditor) page.getEditorReferences()[0].getEditor(false);
-        final TextSelection selection = (TextSelection) editor.getSelectionProvider().getSelection();
-        assertThat(selection.getText()).isEqualTo("");
-        assertThat(selection.getStartLine()).isEqualTo(0);
-        assertThat(selection.getOffset()).isEqualTo(0);
-        assertThat(selection.getLength()).isEqualTo(0);
+        verifyOpenedFile("testlib.py");
+        verifyEmptySelection();
     }
 
     @Test
     public void testIfLibraryIsOpenedAndTextIsSelected_whenKeywordFound() throws Exception {
         assertThat(page.getEditorReferences()).isEmpty();
 
+        final KeywordSpecification kwSpec = new KeywordSpecification();
+        kwSpec.setName("Defined Kw");
+
+        final RobotDryRunKeywordSource kwSource = new RobotDryRunKeywordSource();
+        kwSource.setFilePath(library.getRawLocation().toOSString());
+        kwSource.setLibraryName(libSpec.getName());
+        kwSource.setName(kwSpec.getName());
+        kwSource.setLine(1);
+        kwSource.setOffset(4);
+        kwSource.setLength(10);
+
         project.updateKeywordSources(Collections.singletonList(kwSource));
 
         SourceOpeningSupport.open(page, model, project.getProject(), libSpec, kwSpec);
 
-        assertThat(page.getEditorReferences()).hasSize(1);
+        verifyOpenedFile("testlib.py");
+        verifySelection(1, 13, "defined_kw");
+    }
 
-        final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile("testlib.py"));
+    @Test
+    public void testIfLibraryIsOpenedAndTextIsSelected_whenKeywordFoundByAutoDiscoverer() throws Exception {
+        assertThat(page.getEditorReferences()).isEmpty();
 
-        final TextEditor editor = (TextEditor) page.getEditorReferences()[0].getEditor(false);
-        final TextSelection selection = (TextSelection) editor.getSelectionProvider().getSelection();
-        assertThat(selection.getText()).isEqualTo("keyword");
-        assertThat(selection.getStartLine()).isEqualTo(1);
-        assertThat(selection.getOffset()).isEqualTo(13);
-        assertThat(selection.getLength()).isEqualTo(7);
+        final KeywordSpecification kwSpec = new KeywordSpecification();
+        kwSpec.setName("Discovered Kw");
+
+        SourceOpeningSupport.open(page, model, project.getProject(), libSpec, kwSpec);
+
+        verifyOpenedFile("testlib.py");
+        verifySelection(3, 45, "discovered_kw");
     }
 
     @Test
@@ -159,11 +141,23 @@ public class SourceOpeningSupportTest {
 
         SourceOpeningSupport.tryToOpenInEditor(page, library);
 
+        verifyOpenedFile("testlib.py");
+        verifyEmptySelection();
+    }
+
+    @Test
+    public void testIfLibraryLocationIsExtracted() throws Exception {
+        final IPath location = SourceOpeningSupport.extractLibraryLocation(model, project.getProject(), libSpec);
+        assertThat(location.lastSegment()).isEqualTo("testlib.py");
+    }
+
+    private void verifyOpenedFile(final String fileName) throws PartInitException {
         assertThat(page.getEditorReferences()).hasSize(1);
-
         final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile("testlib.py"));
+        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile(fileName));
+    }
 
+    private void verifyEmptySelection() {
         final TextEditor editor = (TextEditor) page.getEditorReferences()[0].getEditor(false);
         final TextSelection selection = (TextSelection) editor.getSelectionProvider().getSelection();
         assertThat(selection.getText()).isEqualTo("");
@@ -172,9 +166,13 @@ public class SourceOpeningSupportTest {
         assertThat(selection.getLength()).isEqualTo(0);
     }
 
-    @Test
-    public void testIfLibraryLocationIsExtracted() throws Exception {
-        final IPath location = SourceOpeningSupport.extractLibraryLocation(model, project.getProject(), libSpec);
-        assertThat(location.lastSegment()).isEqualTo("testlib.py");
+    private void verifySelection(final int expectedLine, final int expectedOffset, final String expectedText) {
+        final TextEditor editor = (TextEditor) page.getEditorReferences()[0].getEditor(false);
+        final TextSelection selection = (TextSelection) editor.getSelectionProvider().getSelection();
+        assertThat(selection.getText()).isEqualTo(expectedText);
+        assertThat(selection.getStartLine()).isEqualTo(expectedLine);
+        assertThat(selection.getOffset()).isEqualTo(expectedOffset);
+        assertThat(selection.getLength()).isEqualTo(expectedText.length());
     }
+
 }

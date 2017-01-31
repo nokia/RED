@@ -32,7 +32,7 @@ public class RobotDryRunHandler {
     public RunCommandLine buildDryRunCommand(final RobotRuntimeEnvironment environment, final File projectLocation,
             final Collection<String> suites, final Collection<String> pythonPathLocations,
             final Collection<String> classPathLocations, final Collection<String> additionalProjectsLocations)
-                    throws IOException {
+            throws IOException {
 
         final IRunCommandLineBuilder builder = RunCommandLineCallBuilder.forEnvironment(environment);
 
@@ -56,11 +56,12 @@ public class RobotDryRunHandler {
         handlerThread.start();
     }
 
-    public void executeDryRunProcess(final RunCommandLine dryRunCommandLine, final File projectDir) throws InvocationTargetException {
+    public void executeDryRunProcess(final RunCommandLine dryRunCommandLine, final File projectDir)
+            throws InvocationTargetException {
         if (dryRunCommandLine != null) {
             try {
                 ProcessBuilder processBuilder = new ProcessBuilder(dryRunCommandLine.getCommandLine());
-                if(projectDir != null && projectDir.exists()) {
+                if (projectDir != null && projectDir.exists()) {
                     processBuilder = processBuilder.directory(projectDir);
                 }
                 dryRunProcess = processBuilder.start();

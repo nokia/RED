@@ -311,16 +311,14 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         private Optional<File> findPythonLibraryModulePath(final RobotDryRunLibraryImport dryRunLibraryImport) {
-            Optional<File> modulePath = Optional.absent();
             try {
                 final EnvironmentSearchPaths envSearchPaths = new RedEclipseProjectConfig(config)
                         .createEnvironmentSearchPaths(project.getProject());
-                modulePath = project.getRuntimeEnvironment().getModulePath(dryRunLibraryImport.getName(),
-                        envSearchPaths);
+                return project.getRuntimeEnvironment().getModulePath(dryRunLibraryImport.getName(), envSearchPaths);
             } catch (final RobotEnvironmentException e1) {
                 // that's fine
             }
-            return modulePath;
+            return Optional.absent();
         }
 
         private void addJavaLibrary(final RobotDryRunLibraryImport dryRunLibraryImport) {
