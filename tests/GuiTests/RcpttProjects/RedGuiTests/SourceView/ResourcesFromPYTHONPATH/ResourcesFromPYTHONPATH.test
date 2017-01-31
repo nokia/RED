@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/12/17 9:36 AM
+Save-Time: 1/31/17 3:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -186,12 +186,12 @@ with [get-editor "res.txt" | get-text-viewer] {
     key-type Enter
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "ResourceProject/LibsFromPythonPath/SimpleResource.robot" 
+    get-property "getItems().TableItem[0].getText()" | equals "../../../../RED_testy/RcpttProjects/RedGuiTests/TestData/LibsFromPythonPath/SimpleResource.robot" 
         | verify-true
     get-property "getItems().TableItem[1].getText()" 
-        | equals "ResourceProject/LibsFromPythonPath/Resources/ResourcesFromFolder.robot" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "ResourceProject/res/res1/no_resource.robot" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "ResourceProject/res/res_with_vars/res_with_vars.robot" 
+        | equals "../../../../RED_testy/RcpttProjects/RedGuiTests/TestData/LibsFromPythonPath/Resources/ResourcesFromFolder.robot" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "../res1/no_resource.robot" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "../res_with_vars/res_with_vars.robot" 
         | verify-true
     get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
 }
