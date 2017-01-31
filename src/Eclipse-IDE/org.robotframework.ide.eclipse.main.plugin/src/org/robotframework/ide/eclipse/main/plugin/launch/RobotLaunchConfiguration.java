@@ -10,9 +10,11 @@ import static com.google.common.collect.Iterables.getFirst;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -419,12 +421,31 @@ public class RobotLaunchConfiguration {
             final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
 
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final String configurationName = manager.generateLaunchConfigurationName("New Configuration");
+        final String name = getNameForConfiguration(resourcesToTestCases.keySet());
+        final String configurationName = manager.generateLaunchConfigurationName(name);
         final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
                 .newInstance(null, configurationName);
 
         fillDefaults(configuration, resourcesToTestCases);
 
         return configuration;
+    }
+
+    private static String getNameForConfiguration(final Set<IResource> resources) {
+        if (resources.size() == 1) {
+            return getFirst(resources, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
+        }
+        Set<IProject> projects = new HashSet<IProject>();
+        for (IResource res : resources) {
+            if (projects.add(res.getProject())) {
+                if (projects.size() > 1) {
+                    break;
+                }
+            }
+        }
+        if (projects.size() == 1) {
+            return getFirst(projects, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
+        }
+        return "New Configuration";
     }
 }
