@@ -95,7 +95,12 @@ public class RobotRuntimeEnvironment {
         }
         final RobotCommandExecutor cmdExec = PythonInterpretersCommandExecutors.getInstance()
                 .getDirectRobotCommandExecutor(installationDirectory);
-        return cmdExec.getRobotVersion();
+        return exactVersion(executor, cmdExec.getRobotVersion());
+    }
+
+    private static String exactVersion(final SuiteExecutor executor, final String version) {
+        return version != null && executor == SuiteExecutor.IronPython64
+                ? version.replaceAll("IronPython", "IronPython x64") : version;
     }
 
     private static Collection<PythonInstallationDirectory> whereIsPythonInterpreter(final SuiteExecutor interpreter) {
@@ -145,20 +150,35 @@ public class RobotRuntimeEnvironment {
         if (!location.isDirectory()) {
             throw new IllegalArgumentException("The location " + location.getAbsolutePath() + " is not a directory.");
         }
+        final List<PythonInstallationDirectory> installations = possibleInstallationsFor(location);
+        if (installations.isEmpty()) {
+            throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
+                    + " does not seem to be a valid python installation directory");
+        }
+        return installations.get(0);
+    }
+
+    public static List<PythonInstallationDirectory> possibleInstallationsFor(final File location) {
+        final List<PythonInstallationDirectory> installations = new ArrayList<>();
         for (final File file : location.listFiles()) {
             final String fileName = file.getName();
             if (file.isFile() && (fileName.equals("python") || fileName.equals("python.exe"))) {
-                return new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python);
-            } else if (file.isFile() && (fileName.equals("jython") || fileName.equals("jython.exe"))) {
-                return new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Jython);
-            } else if (file.isFile() && (fileName.equals("ipy") || fileName.equals("ipy.exe"))) {
-                return new PythonInstallationDirectory(location.toURI(), SuiteExecutor.IronPython);
-            } else if (file.isFile() && (fileName.equals("pypy") || fileName.equals("pypy.exe"))) {
-                return new PythonInstallationDirectory(location.toURI(), SuiteExecutor.PyPy);
+                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Python));
+            }
+            if (file.isFile() && (fileName.equals("jython") || fileName.equals("jython.exe"))) {
+                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.Jython));
+            }
+            if (file.isFile() && (fileName.equals("ipy") || fileName.equals("ipy.exe"))) {
+                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.IronPython));
+            }
+            if (file.isFile() && (fileName.equals("ipy64") || fileName.equals("ipy64.exe"))) {
+                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.IronPython64));
+            }
+            if (file.isFile() && (fileName.equals("pypy") || fileName.equals("pypy.exe"))) {
+                installations.add(new PythonInstallationDirectory(location.toURI(), SuiteExecutor.PyPy));
             }
         }
-        throw new IllegalArgumentException("The location: " + location.getAbsolutePath()
-                + " does not seem to be a valid python installation directory");
+        return installations;
     }
 
     /**
@@ -170,7 +190,7 @@ public class RobotRuntimeEnvironment {
     private static String getRobotFrameworkVersion(final PythonInstallationDirectory pythonLocation) {
         final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                 .getRobotCommandExecutor(pythonLocation);
-        return executor.getRobotVersion();
+        return exactVersion(pythonLocation.getInterpreter(), executor.getRobotVersion());
     }
 
     public String getPythonExecutablePath() {
@@ -256,6 +276,21 @@ public class RobotRuntimeEnvironment {
         try {
             final PythonInstallationDirectory location = checkPythonInstallationDir(pathToPython);
             return new RobotRuntimeEnvironment(location, getRobotFrameworkVersion(location));
+        } catch (final IllegalArgumentException e) {
+            return new RobotRuntimeEnvironment(pathToPython, null);
+        }
+    }
+
+    public static RobotRuntimeEnvironment create(final String pathToPython, final SuiteExecutor interpreter) {
+        return create(new File(pathToPython), interpreter);
+    }
+
+    public static RobotRuntimeEnvironment create(final File pathToPython, final SuiteExecutor interpreter) {
+        try {
+            final PythonInstallationDirectory location = checkPythonInstallationDir(pathToPython);
+            final PythonInstallationDirectory correctedLocation = new PythonInstallationDirectory(location.toURI(),
+                    interpreter);
+            return new RobotRuntimeEnvironment(correctedLocation, getRobotFrameworkVersion(correctedLocation));
         } catch (final IllegalArgumentException e) {
             return new RobotRuntimeEnvironment(pathToPython, null);
         }
@@ -464,7 +499,7 @@ public class RobotRuntimeEnvironment {
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getVariables(normalizedPath, args);
         }
-        return new LinkedHashMap<String, Object>();
+        return new LinkedHashMap<>();
     }
     
     public boolean isVirtualenv() {
@@ -558,8 +593,22 @@ public class RobotRuntimeEnvironment {
             this.interpreter = interpreter;
         }
 
-        SuiteExecutor getInterpreter() {
+        public SuiteExecutor getInterpreter() {
             return interpreter;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof PythonInstallationDirectory) {
+                final PythonInstallationDirectory that = (PythonInstallationDirectory) obj;
+                return super.equals(obj) && this.interpreter == that.interpreter;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * super.hashCode() + ((interpreter == null) ? 0 : interpreter.hashCode());
         }
     }
 }
