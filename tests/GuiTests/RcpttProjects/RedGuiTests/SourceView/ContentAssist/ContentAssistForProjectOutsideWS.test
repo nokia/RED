@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KcAh0J2aEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/31/17 11:17 AM
+Save-Time: 1/31/17 4:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -52,7 +52,7 @@ with [get-editor "Script.robot" | get-text-viewer] {
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property "getItems().TableItem[0].getText()" | equals "Resources/res1.robot" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "Resources 2/res2.tsv" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals [concat $RED_workspace_path_unix_style  "/RobotProject/res_from_ws.robot"] | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals  ".*/RobotProject/res_from_ws.robot" | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "${varfrompython}" | verify-true
     get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
     
