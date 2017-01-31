@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _88Mx8J2SEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/12/17 11:18 AM
+Save-Time: 1/31/17 12:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -31,14 +31,14 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
 }
 //check list of files
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "VariableProject/getVar.py" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "VariableProject/var 2.py" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "VariableProject/var 3.py" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "VariableProject/var.py" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "VariableProject/space in name/ abc.py" | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "VariableProject/space in name/ def.py" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "VariableProject/space in name/after  .py" | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals "VariableProject/space in name/var here .py" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "getVar.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "var 2.py" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "var 3.py" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "var.py" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "space in name/ abc.py" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "space in name/ def.py" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "space in name/after  .py" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "space in name/var here .py" | verify-true
 
     //check variables below
     get-property "getItems().TableItem[8].getText()" | equals "${a}" | verify-true
@@ -69,7 +69,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     key-type "M1+SPACE"
 }
 //var.py
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "VariableProject\\/var.py" 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "var.py" 
     | click -default
 with [get-editor "tsv_test.tsv" | get-text-viewer] {
 	//var3.py
@@ -96,7 +96,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     wait 200
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "VariableProject\\/space in name\\/ def.py" | click -default
+    | select "space in name\\/ def.py" | click -default
 
 //wait for adding variables to content assist
 wait 3000
