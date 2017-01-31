@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XYaQ4GayEeWtd9WfYYPSCg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/18/16 12:17 PM
+Save-Time: 1/31/17 11:19 AM
 Testcase-Type: ecl
 Verifications: _soBX8JUbEeaXOtocAkFx_w
 
@@ -14,59 +14,56 @@ Verifications: _soBX8JUbEeaXOtocAkFx_w
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-java-property "user.home" |let [val user_home -input]{
-	concat $user_home "/new_folder"| let [val project_path_outside_ws -input] {
-
-		if [get-file [uri-from-path $project_path_outside_ws] | get exists]{
-			delete-file [uri-from-path $project_path_outside_ws]
-		}
-		get-view "Project Explorer" | get-tree | get-menu "New/Robot Project" | click
-		with [get-window "New Robot project"] {
-		    get-editbox -after [get-label "Project name:"] | set-text new
-		    get-button "Use default location" | uncheck
-		}
-		
-		with [get-window "New Robot project"] {
-	    get-editbox -after [get-label "Robot Project"] | get-property text 
-	        | equals "Project location directory must be specified" | verify-true
-	    get-editbox -after [get-label "Location:"] | get-property text | equals "" | verify-true
-		}
+concat $user_folder "/new_folder"| let [val project_path_outside_ws -input] {
+	if [get-file [uri-from-path $project_path_outside_ws] | get exists]{
+		delete-file [uri-from-path $project_path_outside_ws]
+	}
+	get-view "Project Explorer" | get-tree | get-menu "New/Robot Project" | click
+	with [get-window "New Robot project"] {
+	    get-editbox -after [get-label "Project name:"] | set-text new
+	    get-button "Use default location" | uncheck
+	}
 	
-		set-dialog-result Folder $project_path_outside_ws
+	with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Robot Project"] | get-property text 
+        | equals "Project location directory must be specified" | verify-true
+    get-editbox -after [get-label "Location:"] | get-property text | equals "" | verify-true
+	}
 
-		with [get-window "New Robot project"] {
-		    get-button "Browse..." | click
-		    get-button Finish | click
-		}
-		get-view "Project Explorer" | get-tree | select new | get-menu "New/Robot Test Suite" | click
-		with [get-window "New Robot Test Suite"] {
-		    get-editbox -after [get-label "File name:"] | set-text "test.robot"
-		    get-button Finish | click
-		}
-		with [get-editor "test.robot"] {
-		    with [get-text-viewer] {
-		        set-caret-pos 1 19
-		        key-type "NUMPAD_ENTER" "\\u000D"
-		        type-text aba
-		        key-type Enter
-		        key-type Tab
-		        type-text "Log   5"
-		        key-type "M1+s"
-		    }
-		    close
-		}
-		get-view "Project Explorer" | get-tree | select new | select new | get-menu Delete | click
-		get-window "Delete Resources" | get-button OK | click
-		get-view "Project Explorer" | get-tree | get-menu "Import..." | click
-		with [get-window Import | get-tree] {
-		    select General | select General | double-click
-		    select "General/Existing Projects into Workspace" | select "General/Existing Projects into Workspace" | double-click
-		}
-		set-dialog-result Folder $project_path_outside_ws
-		with [get-window Import] {
-		    get-button "Browse..." | click
-		    get-button Finish | click
-		}
+	set-dialog-result Folder $project_path_outside_ws
+
+	with [get-window "New Robot project"] {
+	    get-button "Browse..." | click
+	    get-button Finish | click
+	}
+	get-view "Project Explorer" | get-tree | select new | get-menu "New/Robot Test Suite" | click
+	with [get-window "New Robot Test Suite"] {
+	    get-editbox -after [get-label "File name:"] | set-text "test.robot"
+	    get-button Finish | click
+	}
+	with [get-editor "test.robot"] {
+	    with [get-text-viewer] {
+	        set-caret-pos 1 19
+	        key-type "NUMPAD_ENTER" "\\u000D"
+	        type-text aba
+	        key-type Enter
+	        key-type Tab
+	        type-text "Log   5"
+	        key-type "M1+s"
+	    }
+	    close
+	}
+	get-view "Project Explorer" | get-tree | select new | select new | get-menu Delete | click
+	get-window "Delete Resources" | get-button OK | click
+	get-view "Project Explorer" | get-tree | get-menu "Import..." | click
+	with [get-window Import | get-tree] {
+	    select General | select General | double-click
+	    select "General/Existing Projects into Workspace" | select "General/Existing Projects into Workspace" | double-click
+	}
+	set-dialog-result Folder $project_path_outside_ws
+	with [get-window Import] {
+	    get-button "Browse..." | click
+	    get-button Finish | click
 	}
 }
 
