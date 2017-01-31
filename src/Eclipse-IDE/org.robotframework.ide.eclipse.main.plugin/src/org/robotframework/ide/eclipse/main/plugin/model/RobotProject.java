@@ -317,7 +317,8 @@ public class RobotProject extends RobotContainer {
         if (configuration == null || configuration.usesPreferences()) {
             return RedPlugin.getDefault().getActiveRobotInstallation();
         }
-        return RedPlugin.getDefault().getRobotInstallation(configuration.providePythonLocation());
+        return RedPlugin.getDefault().getRobotInstallation(configuration.providePythonLocation(),
+                configuration.providePythonInterpreter());
     }
 
     public IFile getConfigurationFile() {

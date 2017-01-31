@@ -42,9 +42,10 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsContentProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage;
@@ -55,6 +56,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatche
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 
 class FrameworksSectionFormFragment implements ISectionFormFragment {
 
@@ -158,13 +160,17 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
                 final Object[] elements = viewer.getCheckedElements();
                 File file;
+                SuiteExecutor executor;
                 if (elements.length == 1 && sourceButton.getSelection()) {
                     final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) elements[0];
                     file = env.getFile();
+                    executor = file instanceof PythonInstallationDirectory
+                            ? ((PythonInstallationDirectory) file).getInterpreter() : null;
                 } else {
                     file = null;
+                    executor = null;
                 }
-                editorInput.getProjectConfiguration().assignPythonLocation(file);
+                editorInput.getProjectConfiguration().assignPythonLocation(file, executor);
                 setDirty(true);
             }
         });
@@ -190,7 +196,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
         ColumnViewerToolTipSupport.enableFor(viewer);
 
-        viewer.setContentProvider(new InstalledRobotsContentProvider());
+        viewer.setContentProvider(new ListInputStructuredContentProvider());
         ViewerColumnsFactory.newColumn("Name").withWidth(200)
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer)).createFor(viewer);
         ViewerColumnsFactory.newColumn("Path").withWidth(200)
@@ -204,16 +210,20 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
             public void checkStateChanged(final CheckStateChangedEvent event) {
                 final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
                 File file;
+                SuiteExecutor executor;
                 if (event.getChecked()) {
                     final RobotRuntimeEnvironment env = (RobotRuntimeEnvironment) event.getElement();
                     viewer.setCheckedElements(new Object[] { env });
                     file = env.getFile();
+                    executor = file instanceof PythonInstallationDirectory
+                            ? ((PythonInstallationDirectory) file).getInterpreter() : null;
                 } else {
                     sourceButton.setSelection(false);
                     viewer.getTable().setEnabled(false);
                     file = null;
+                    executor = null;
                 }
-                configuration.assignPythonLocation(file);
+                configuration.assignPythonLocation(file, executor);
                 setDirty(true);
                 viewer.refresh();
             }

@@ -5,7 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -33,10 +36,12 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -52,6 +57,7 @@ import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.rf.ide.core.executor.SuiteExecutor;
@@ -61,11 +67,10 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnv
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.red.swt.SwtThread;
+import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 
 public class InstalledRobotsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -139,22 +144,8 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 final Job job = new Job("Looking for python installations") {
                     @Override
                     protected IStatus run(final IProgressMonitor monitor) {
-                        final List<PythonInstallationDirectory> interpreters = RobotRuntimeEnvironment
-                                .whereArePythonInterpreters();
+                        addOnlyNonExisting(RobotRuntimeEnvironment.whereArePythonInterpreters());
 
-                        for (final PythonInstallationDirectory directory : interpreters) {
-                            boolean contains = false;
-                            for (final RobotRuntimeEnvironment environment : installations) {
-                                if (environment.getFile().equals(directory)) {
-                                    contains = true;
-                                    break;
-                                }
-                            }
-                            if (!contains) {
-                                installations.add(RobotRuntimeEnvironment.create(directory));
-                                dirty = true;
-                            }
-                        }
                         setProperty(key, null);
                         return Status.OK_STATUS;
                     }
@@ -164,6 +155,25 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             }
 
         };
+    }
+
+    private boolean addOnlyNonExisting(final Collection<PythonInstallationDirectory> locations) {
+        boolean added = false;
+        for (final PythonInstallationDirectory directory : locations) {
+            boolean contains = false;
+            for (final RobotRuntimeEnvironment environment : installations) {
+                if (environment.getFile().equals(directory)) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (!contains) {
+                added = true;
+                installations.add(RobotRuntimeEnvironment.create(directory, directory.getInterpreter()));
+                dirty = true;
+            }
+        }
+        return added;
     }
 
     private ProgressBar createProgress(final Composite parent) {
@@ -225,7 +235,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         });
         ColumnViewerToolTipSupport.enableFor(viewer);
 
-        viewer.setContentProvider(new InstalledRobotsContentProvider());
+        viewer.setContentProvider(new ListInputStructuredContentProvider());
         ViewerColumnsFactory.newColumn("Name")
                 .withWidth(300)
                 .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
@@ -296,12 +306,39 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 dirDialog.setMessage("Select location of python with robot framework installed");
                 final String path = dirDialog.open();
                 if (path != null) {
-                    installations.add(RobotRuntimeEnvironment.create(path));
+                    final List<PythonInstallationDirectory> possibleExecutors = RobotRuntimeEnvironment
+                            .possibleInstallationsFor(new File(path));
 
-                    dirty = true;
-                    viewer.setSelection(StructuredSelection.EMPTY);
-                    viewer.refresh();
+                    boolean changed = false;
+                    if (possibleExecutors.size() > 1) {
+                        final List<PythonInstallationDirectory> toAdd = askUsersWhatShouldBeAdded(path,
+                                possibleExecutors);
+                        changed = addOnlyNonExisting(toAdd);
+                    } else {
+                        changed = true;
+                        installations.add(RobotRuntimeEnvironment.create(path));
+                    }
+                    if (changed) {
+                        dirty = true;
+                        viewer.setSelection(StructuredSelection.EMPTY);
+                        viewer.refresh();
+                    }
                 }
+            }
+
+            private List<PythonInstallationDirectory> askUsersWhatShouldBeAdded(final String path,
+                    final List<PythonInstallationDirectory> possibleExecutors) {
+                final List<PythonInstallationDirectory> result = new ArrayList<>();
+                final ListSelectionDialog dialog = new ListSelectionDialog(getShell(), possibleExecutors,
+                        new ListInputStructuredContentProvider(), new InterpretersExecutablesLabelProvider(),
+                        "Select which of following interpreters detected inside '" + path + "' should be added:");
+                if (dialog.open() == Window.OK) {
+                    for (final Object object : dialog.getResult()) {
+                        final PythonInstallationDirectory executor = (PythonInstallationDirectory) object;
+                        result.add(executor);
+                    }
+                }
+                return result;
             }
         };
     }
@@ -327,16 +364,23 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             final RobotRuntimeEnvironment checkedEnv = checkedElement.length == 0 ? null
                     : (RobotRuntimeEnvironment) checkedElement[0];
 
+            final List<String> allPathsList = new ArrayList<>();
+            final List<String> allExecsList = new ArrayList<>();
+
+            for (final RobotRuntimeEnvironment installation : installations) {
+                allPathsList.add(installation.getFile().getAbsolutePath());
+                allExecsList.add(getExecOf(installation));
+            }
+
             final String activePath = checkedEnv == null ? "" : checkedEnv.getFile().getAbsolutePath();
-            final String allPaths = Joiner.on(';').join(
-                    Iterables.transform(installations, new Function<RobotRuntimeEnvironment, String>() {
-                        @Override
-                        public String apply(final RobotRuntimeEnvironment env) {
-                            return env.getFile().getAbsolutePath();
-                        }
-                    }));
+            final String activeExec = checkedEnv == null ? "" : getExecOf(checkedEnv);
+            final String allPaths = Joiner.on(';').join(allPathsList);
+            final String allExecs = Joiner.on(";").join(allExecsList);
+
             getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME, activePath);
+            getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
             getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES, allPaths);
+            getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES_EXECS, allExecs);
 
             MessageDialog.openInformation(getShell(), "Rebuild required",
                     "The changes you've made requires full workspace rebuild.");
@@ -346,6 +390,11 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         } else {
             return true;
         }
+    }
+
+    private String getExecOf(final RobotRuntimeEnvironment installation) {
+        return installation.getFile() instanceof PythonInstallationDirectory ? installation.getInterpreter().name()
+                : "";
     }
 
     private void rebuildWorkspace() {
@@ -403,6 +452,14 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                     progressBar = null;
                 }
             });
+        }
+    }
+
+    private static class InterpretersExecutablesLabelProvider extends LabelProvider {
+
+        @Override
+        public String getText(final Object element) {
+            return ((PythonInstallationDirectory) element).getInterpreter().executableName();
         }
     }
 }

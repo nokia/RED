@@ -19,7 +19,7 @@ public class Environments {
 
     private final RobotRuntimeEnvironment activeEnvironment;
 
-    public Environments(final List<RobotRuntimeEnvironment> allEnvironments,
+    Environments(final List<RobotRuntimeEnvironment> allEnvironments,
             final RobotRuntimeEnvironment activeEnvironment) {
         this.allEnvironments = allEnvironments;
         this.activeEnvironment = activeEnvironment;
