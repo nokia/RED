@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _p3kDgMhVEeaVRsIP7EWHyA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/31/17 12:20 PM
+Save-Time: 1/31/17 4:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -72,7 +72,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 wait 300
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals [concat [replace $user_folder "\\" "/"] "/ResourceAndVars/OutWS/res.robot" ]| verify-true
+    get-property "getItems().TableItem[0].getText()" | equals ".*/ResourceAndVars/OutWS/res.robot" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "${c}" | verify-true
 }
 
@@ -104,12 +104,9 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 
 
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals [format "*** Settings ***\n"
-    + "Resource    %s/ResourceAndVars/OutWS/res.robot\n"
-    + "Variables    %s/ResourceAndVars/OutWS/vars.py\n \n"
-    + "*** Test Cases ***\n"
+  get-editor "TestFile.robot" | get-text-viewer | get-property text | contains  "*** Test Cases ***\n"
     + "t1\n"
     + "    log  ${c}\n"
-    + "    key from resource" [replace $user_folder "\\" "/"] [replace $user_folder "\\" "/"]]| verify-true
+    + "    key from resource" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
