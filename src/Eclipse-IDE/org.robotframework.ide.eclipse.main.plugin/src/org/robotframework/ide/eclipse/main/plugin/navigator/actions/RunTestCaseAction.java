@@ -64,6 +64,7 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
                     resourcesMapping.get(suiteFile).add(robotCase.getName());
                 }
                 RobotLaunchConfiguration.createLaunchConfigurationForSelectedTestCases(resourcesMapping)
+                        .doSave()
                         .launch(mode.launchMgrName, monitor);
 
                 return Status.OK_STATUS;
