@@ -25,11 +25,11 @@ public class RedPreferences {
     }
 
     public static final String OTHER_RUNTIMES = "otherRuntimes";
-    public static final String OTHER_RUNTIMES_EXECS = "otherRuntimesExecs";
+    public static final String OTHER_RUNTIMES_EXECS = "red.otherRuntimesExecs";
     public static final String ACTIVE_RUNTIME = "activeRuntime";
-    public static final String ACTIVE_RUNTIME_EXEC = "activeRuntimeExec";
+    public static final String ACTIVE_RUNTIME_EXEC = "red.activeRuntimeExec";
 
-    public static final String FILE_ELEMENTS_OPEN_MODE = "fileElementOpenMode";
+    public static final String FILE_ELEMENTS_OPEN_MODE = "red.editor.general.fileElementOpenMode";
     public static final String SEPARATOR_MODE = "separatorMode";
     public static final String SEPARATOR_TO_USE = "separatorToUse";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
