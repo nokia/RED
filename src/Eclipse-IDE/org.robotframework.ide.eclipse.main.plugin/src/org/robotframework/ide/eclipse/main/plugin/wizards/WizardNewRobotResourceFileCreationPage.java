@@ -13,16 +13,15 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
-import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 import com.google.common.collect.Maps;
 
@@ -88,6 +87,10 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
     @Override
     protected boolean validatePage() {
         final boolean isValid = super.validatePage();
+        if (!isValid) {
+            return false;
+        }
+
         final String currentName = getFileName();
         final String currentNameWithoutExtension = currentName.contains(".")
                 ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
@@ -97,24 +100,26 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
             return false;
         }
 
-        IPath resourcePath = getContainerFullPath().append(currentName + getFileExtension());
-        IFile file = createFileHandle(resourcePath);
-        IContainer cont = file.getParent();
-        IResource[] res = null;
-        String name = currentName.contains(".") ? currentName : currentName.concat(".robot");
+        final String name = currentName.contains(".") ? currentName : currentName + ".robot";
+        final IPath resourcePath = getContainerFullPath().append(name);
+        final IFile file = createFileHandle(resourcePath);
+        
+        final IContainer container = file.getParent();
+        if (!container.exists()) {
+            setErrorMessage("Folder '" + container.getFullPath().toString() + "' does not exist");
+            return false;
+        }
+
         try {
-            res = cont.members();
-            String problemMessage = NLS.bind(IDEWorkbenchMessages.ResourceGroup_nameExists, name);
-            for (IResource re : res) {
-                if (name.compareToIgnoreCase(re.getName()) == 0) {
-                    setErrorMessage(problemMessage);
+            for (final IResource resource : container.members()) {
+                if (name.equalsIgnoreCase(resource.getName())) {
+                    setErrorMessage("'" + name + "' already exist");
                     return false;
                 }
             }
-        } catch (CoreException e) {
-
-            e.printStackTrace();
+        } catch (final CoreException e) {
+            ErrorDialog.openError(getShell(), "Problem occurred", "Error when validating wizard page", e.getStatus());
         }
-        return isValid;
+        return true;
     }
 }
