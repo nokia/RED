@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+import org.rf.ide.core.executor.SuiteExecutor;
+
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "pathsRelativityPoint", "variableMappings", "libraries",
         "pythonPaths", "classPaths", "remoteLocations", "referencedVariableFiles", "excludedPath",
@@ -338,16 +340,23 @@ public class RobotProjectConfig {
         return executionEnvironment == null ? null : new File(executionEnvironment.path);
     }
 
-    public void assignPythonLocation(final File location) {
+    public SuiteExecutor providePythonInterpreter() {
+        return executionEnvironment == null ? null : executionEnvironment.getInterpreter();
+    }
+
+    public void assignPythonLocation(final File location, final SuiteExecutor executor) {
         if (location == null) {
             executionEnvironment = null;
             return;
         }
         if (executionEnvironment == null) {
-            executionEnvironment = ExecutionEnvironment.create(location.getAbsolutePath());
+            executionEnvironment = ExecutionEnvironment.create(location.getAbsolutePath(), executor);
         }
         if (!executionEnvironment.getPath().equals(location.getAbsolutePath())) {
             executionEnvironment.setPath(location.getAbsolutePath());
+        }
+        if (executionEnvironment.getInterpreter() != executor) {
+            executionEnvironment.setInterpreter(executor);
         }
     }
 
@@ -401,14 +410,18 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ExecutionEnvironment {
 
-        public static ExecutionEnvironment create(final String path) {
+        public static ExecutionEnvironment create(final String path, final SuiteExecutor executor) {
             final ExecutionEnvironment environment = new ExecutionEnvironment();
             environment.setPath(path);
+            environment.setInterpreter(executor);
             return environment;
         }
 
         @XmlAttribute
         private String path;
+
+        @XmlAttribute
+        private String interpreter;
 
         public void setPath(final String path) {
             this.path = path;
@@ -416,6 +429,14 @@ public class RobotProjectConfig {
 
         public String getPath() {
             return path;
+        }
+
+        public void setInterpreter(final SuiteExecutor executor) {
+            this.interpreter = executor.name();
+        }
+
+        public SuiteExecutor getInterpreter() {
+            return interpreter == null ? null : SuiteExecutor.fromName(interpreter);
         }
     }
 
