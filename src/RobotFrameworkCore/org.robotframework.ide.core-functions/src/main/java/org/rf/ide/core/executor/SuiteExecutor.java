@@ -30,6 +30,12 @@ public enum SuiteExecutor {
             return "ipy" + getExtension();
         }
     },
+    IronPython64 {
+        @Override
+        public String executableName() {
+            return "ipy64" + getExtension();
+        }
+    },
     PyPy {
         @Override
         public String executableName() {
