@@ -57,10 +57,10 @@ public class SourceOpeningSupportTest {
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(lib);
+        projectProvider.configure(config);
 
         library = projectProvider.createFile("testlib.py", "#comment", "def defined_kw():", "  print(\"kw\")",
                 "def discovered_kw():", "  print(\"kw\")");
-        projectProvider.configure(config);
 
         libSpec = new LibrarySpecification();
         libSpec.setName("testlib");
@@ -151,10 +151,10 @@ public class SourceOpeningSupportTest {
         assertThat(location.lastSegment()).isEqualTo("testlib.py");
     }
 
-    private void verifyOpenedFile(final String fileName) throws PartInitException {
+    private void verifyOpenedFile(final String expectedFilePath) throws PartInitException {
         assertThat(page.getEditorReferences()).hasSize(1);
         final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
-        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile(fileName));
+        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile(expectedFilePath));
     }
 
     private void verifyEmptySelection() {
