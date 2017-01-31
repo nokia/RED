@@ -68,25 +68,22 @@ class PageActivatingOpeningStrategy extends OpenStrategy {
         if (isEditorAlreadyOpen(page, editorInput)) {
             final IEditorPart editor = page.openEditor(editorInput, robotEditorDescriptor.getId());
             if (editor instanceof RobotFormEditor) {
+                final RobotFormEditor suiteEditor = (RobotFormEditor) editor;
 
-                if (isOpenedAtTablePage((RobotFormEditor) editor)) {
-                    openInTablePage(page, robotEditorDescriptor, labelWhichShouldBeInSelectedCell);
-
-                } else {
-                    openInSourcePage(page, robotEditorDescriptor);
-                }
+                final ElementOpenMode openMode = getOpenModeForOpenedEditor(suiteEditor);
+                openInMode(page, robotEditorDescriptor, openMode, labelWhichShouldBeInSelectedCell);
             }
 
         } else {
             final ElementOpenMode openMode = getOpenModeForClosedEditor();
-
-            if (openMode == ElementOpenMode.OPEN_IN_TABLES) {
-                openInTablePage(page, robotEditorDescriptor, labelWhichShouldBeInSelectedCell);
-
-            } else if (openMode == ElementOpenMode.OPEN_IN_SOURCE) {
-                openInSourcePage(page, robotEditorDescriptor);
-            }
+            openInMode(page, robotEditorDescriptor, openMode, labelWhichShouldBeInSelectedCell);
         }
+    }
+
+    private boolean isEditorAlreadyOpen(final IWorkbenchPage page, final FileEditorInput editorInput) {
+        final IEditorReference[] editors = page.findEditors(editorInput, RobotFormEditor.ID,
+                IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID);
+        return editors.length > 0;
     }
 
     private ElementOpenMode getOpenModeForClosedEditor() {
@@ -100,15 +97,20 @@ class PageActivatingOpeningStrategy extends OpenStrategy {
         }
     }
 
-    private boolean isEditorAlreadyOpen(final IWorkbenchPage page, final FileEditorInput editorInput) {
-        final IEditorReference[] editors = page.findEditors(editorInput, RobotFormEditor.ID,
-                IWorkbenchPage.MATCH_INPUT | IWorkbenchPage.MATCH_ID);
-        return editors.length > 0;
+    private ElementOpenMode getOpenModeForOpenedEditor(final RobotFormEditor robotEditor) {
+        final IEditorPart activePage = robotEditor.getActiveEditor();
+        return activePage instanceof ISectionEditorPart ? ElementOpenMode.OPEN_IN_TABLES
+                : ElementOpenMode.OPEN_IN_SOURCE;
     }
 
-    private boolean isOpenedAtTablePage(final RobotFormEditor robotEditor) {
-        final IEditorPart activePage = robotEditor.getActiveEditor();
-        return activePage instanceof ISectionEditorPart;
+    private void openInMode(final IWorkbenchPage page, final IEditorDescriptor robotEditorDescriptor,
+            final ElementOpenMode openMode, final String labelWhichShouldBeInSelectedCell) throws PartInitException {
+        if (openMode == ElementOpenMode.OPEN_IN_TABLES) {
+            openInTablePage(page, robotEditorDescriptor, labelWhichShouldBeInSelectedCell);
+
+        } else if (openMode == ElementOpenMode.OPEN_IN_SOURCE) {
+            openInSourcePage(page, robotEditorDescriptor);
+        }
     }
 
     private void openInTablePage(final IWorkbenchPage page, final IEditorDescriptor robotEditorDescriptor,
