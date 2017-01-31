@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9aBo4JQ7EeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/18/17 2:23 PM
+Save-Time: 1/31/17 3:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -60,7 +60,8 @@ with [get-window "Run Configurations"] {
             get-property "values[0]" | equals Python | verify-true
             get-property "values[1]" | equals Jython | verify-true
             get-property "values[2]" | equals IronPython | verify-true
-            get-property "values[3]" | equals PyPy | verify-true
+            get-property "values[3]" | equals IronPython64 | verify-true
+            get-property "values[4]" | equals PyPy | verify-true
         }
         get-label "interpreter taken from sytem PATH environment variable" | get-property caption 
             | equals "interpreter taken from sytem PATH environment variable" | verify-true
