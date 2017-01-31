@@ -17,6 +17,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.fileWatcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
@@ -81,8 +82,9 @@ public class RedPlugin extends AbstractUIPlugin {
         return InstalledRobotEnvironments.getActiveRobotInstallation(new RedPreferences(getPreferenceStore()));
     }
 
-    public RobotRuntimeEnvironment getRobotInstallation(final File file) {
-        return InstalledRobotEnvironments.getRobotInstallation(new RedPreferences(getPreferenceStore()), file);
+    public RobotRuntimeEnvironment getRobotInstallation(final File file, final SuiteExecutor executor) {
+        return InstalledRobotEnvironments.getRobotInstallation(new RedPreferences(getPreferenceStore()), file,
+                executor);
     }
 
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {

@@ -25,7 +25,9 @@ public class RedPreferences {
     }
 
     public static final String OTHER_RUNTIMES = "otherRuntimes";
+    public static final String OTHER_RUNTIMES_EXECS = "otherRuntimesExecs";
     public static final String ACTIVE_RUNTIME = "activeRuntime";
+    public static final String ACTIVE_RUNTIME_EXEC = "activeRuntimeExec";
 
     public static final String FILE_ELEMENTS_OPEN_MODE = "fileElementOpenMode";
     public static final String SEPARATOR_MODE = "separatorMode";
@@ -51,11 +53,19 @@ public class RedPreferences {
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
     }
+
+    public String getActiveRuntimeExec() {
+        return store.getString(ACTIVE_RUNTIME_EXEC);
+    }
     
     public String getAllRuntimes() {
         return store.getString(OTHER_RUNTIMES);
     }
     
+    public String getAllRuntimesExecs() {
+        return store.getString(OTHER_RUNTIMES_EXECS);
+    }
+
     public ElementOpenMode getElementOpenMode() {
         return ElementOpenMode.valueOf(store.getString(FILE_ELEMENTS_OPEN_MODE));
     }

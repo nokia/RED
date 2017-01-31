@@ -44,8 +44,8 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
+import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 import org.robotframework.red.viewers.Selections;
-import org.robotframework.red.viewers.StructuredContentProvider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
@@ -92,7 +92,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
 
         viewer = new ListViewer(parent, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getControl());
-        viewer.setContentProvider(new SyntaxHighlightingCategoriesContentProvider());
+        viewer.setContentProvider(new ListInputStructuredContentProvider());
         viewer.setLabelProvider(new SyntaxHighlightingCategoriesLabelProvider());
         viewer.addSelectionChangedListener(new SyntaxHighlightingCategoriesSelectionListener());
         viewer.setInput(newArrayList(currentPreferences.keySet()));
@@ -277,13 +277,6 @@ protected void performDefaults() {
         return super.performOk();
     }
 
-    private class SyntaxHighlightingCategoriesContentProvider extends StructuredContentProvider {
-        @Override
-        public Object[] getElements(final Object inputElement) {
-            return ((List<?>) inputElement).toArray();
-        }
-    }
-
     private class SyntaxHighlightingCategoriesLabelProvider extends LabelProvider {
         @Override
         public String getText(final Object element) {
@@ -349,8 +342,8 @@ protected void performDefaults() {
 
         @Override
         public void widgetSelected(final SelectionEvent e) {
-            final Optional<SyntaxHighlightingCategory> selected = 
-                    Selections.getOptionalFirstElement((IStructuredSelection) viewer.getSelection(), 
+            final Optional<SyntaxHighlightingCategory> selected =
+                    Selections.getOptionalFirstElement((IStructuredSelection) viewer.getSelection(),
                             SyntaxHighlightingCategory.class);
             if (selected.isPresent()) {
                 final SyntaxHighlightingCategory selectedCategory = selected.get();
