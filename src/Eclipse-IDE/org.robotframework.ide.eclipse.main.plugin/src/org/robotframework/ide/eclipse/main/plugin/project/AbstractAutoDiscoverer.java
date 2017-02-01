@@ -66,11 +66,11 @@ public abstract class AbstractAutoDiscoverer {
 
     protected abstract void start(final Shell parent);
 
-    protected final boolean startDryRun() {
+    protected synchronized final boolean startDryRun() {
         return isDryRunRunning.compareAndSet(false, true);
     }
 
-    protected final void stopDryRun() {
+    protected synchronized final void stopDryRun() {
         isDryRunRunning.set(false);
     }
 
