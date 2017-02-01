@@ -44,7 +44,7 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
 
     @Override
     public void run() {
-        runTestCase((IStructuredSelection) selectionProvider.getSelection(), mode);
+        runSelectedTestCases((IStructuredSelection) selectionProvider.getSelection(), mode);
     }
 
     public static void runTestCase(final IStructuredSelection selection, final Mode mode) {
@@ -64,7 +64,6 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
                     resourcesMapping.get(suiteFile).add(robotCase.getName());
                 }
                 RobotLaunchConfiguration.createLaunchConfigurationForSelectedTestCases(resourcesMapping)
-                        .doSave()
                         .launch(mode.launchMgrName, monitor);
 
                 return Status.OK_STATUS;
