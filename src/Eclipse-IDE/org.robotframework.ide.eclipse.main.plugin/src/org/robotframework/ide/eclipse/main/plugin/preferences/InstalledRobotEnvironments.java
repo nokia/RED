@@ -9,6 +9,8 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -110,7 +112,8 @@ public class InstalledRobotEnvironments {
         if (Strings.isNullOrEmpty(allPaths)) {
             return new ConcurrentHashMap<>();
         }
-        final Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> envs = new ConcurrentHashMap<>();
+        final Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> envs = Collections
+                .synchronizedMap(new LinkedHashMap<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>>());
 
         final String[] paths = allPaths.split(";");
         final String[] execs = allExecs.isEmpty() ? new String[0] : allExecs.split(";");
@@ -135,9 +138,14 @@ public class InstalledRobotEnvironments {
     private static Supplier<RobotRuntimeEnvironment> environmentSupplier(final String path, final String exec) {
         return new Supplier<RobotRuntimeEnvironment>() {
 
+            private RobotRuntimeEnvironment environment;
+
             @Override
             public RobotRuntimeEnvironment get() {
-                return createRuntimeEnvironment(path, exec);
+                if (environment == null) {
+                    environment = createRuntimeEnvironment(path, exec);
+                }
+                return environment;
             }
         };
     }
