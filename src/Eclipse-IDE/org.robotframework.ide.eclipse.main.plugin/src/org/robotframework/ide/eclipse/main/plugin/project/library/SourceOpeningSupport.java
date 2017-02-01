@@ -65,8 +65,9 @@ public class SourceOpeningSupport {
                 final IPath location = new Path(source.getFilePath());
                 final IFile file = resolveFile(location, project, libSpec);
                 final IEditorPart editor = openInEditor(page, file);
-                if (editor instanceof TextEditor) {
-                    selectTextInLine((TextEditor) editor, source.getLine(), source.getOffset(), source.getLength());
+                final TextEditor textEditor = editor.getAdapter(TextEditor.class);
+                if (textEditor != null) {
+                    selectTextInLine(textEditor, source.getLine(), source.getOffset(), source.getLength());
                 }
             } catch (final CoreException e) {
                 handleOpeningError(libSpec, e);
