@@ -173,13 +173,19 @@ public class RobotLaunchConfiguration {
     }
 
     public void setSuitePaths(final Map<String, List<String>> suitesToCases) {
+        // test case names should be always in lower case
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
             final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), new Function<String, String>() {
 
                 @Override
                 public String apply(final String path) {
-                    return Joiner.on("::").join(filter(suitesToCases.get(path), Predicates.notNull()));
+                    List<String> testSuites = new ArrayList<String>();
+                    Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
+                    for (String s : temp) {
+                        testSuites.add(s.toLowerCase());
+                    }
+                    return Joiner.on("::").join(testSuites);
                 }
             });
             launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
