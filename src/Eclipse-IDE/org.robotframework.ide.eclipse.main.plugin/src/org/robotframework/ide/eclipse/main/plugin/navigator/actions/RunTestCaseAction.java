@@ -47,32 +47,6 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
         runSelectedTestCases((IStructuredSelection) selectionProvider.getSelection(), mode);
     }
 
-    public static void runTestCase(final IStructuredSelection selection, final Mode mode) {
-        final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
-
-            @Override
-            public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-
-                final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
-
-                final List<RobotCase> selectedTestCases = Selections.getElements(selection, RobotCase.class);
-                for (final RobotCase robotCase : selectedTestCases) {
-                    final IResource suiteFile = robotCase.getSuiteFile().getFile();
-                    if (!resourcesMapping.containsKey(suiteFile)) {
-                        resourcesMapping.put(suiteFile, new ArrayList<String>());
-                    }
-                    resourcesMapping.get(suiteFile).add(robotCase.getName());
-                }
-                RobotLaunchConfiguration.createLaunchConfigurationForSelectedTestCases(resourcesMapping)
-                        .launch(mode.launchMgrName, monitor);
-
-                return Status.OK_STATUS;
-            }
-        };
-        job.setUser(false);
-        job.schedule();
-    }
-
     public static void runSelectedTestCases(final IStructuredSelection selection, final Mode mode) {
         final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
 
