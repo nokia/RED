@@ -57,9 +57,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
             return "The location " + env.getFile().getAbsolutePath() + " does not seem to be a valid python directory.";
         } else if (!env.hasRobotInstalled()) {
             return "The python installation " + env.getFile().getAbsolutePath()
-                    + " does not seem to have robot framework installed\n\n"
-                    + "If there is a pip available you can try to click 'Install Robot' button or you have "
-                    + "to do it manually (see Robot Framework manual for details).";
+                    + " does not seem to have robot framework installed.";
         }
         return "Python installation in " + env.getFile().getAbsolutePath() + " has " + env.getVersion();
     }
