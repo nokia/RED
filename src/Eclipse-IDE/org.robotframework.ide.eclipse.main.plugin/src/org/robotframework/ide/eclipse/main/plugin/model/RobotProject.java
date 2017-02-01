@@ -498,11 +498,9 @@ public class RobotProject extends RobotContainer {
         }
     }
 
-    public void updateKeywordSources(final List<RobotDryRunKeywordSource> keywordSources) {
-        for (final RobotDryRunKeywordSource keywordSource : keywordSources) {
-            final String qualifiedKwName = keywordSource.getLibraryName() + "." + keywordSource.getName();
-            kwSources.put(qualifiedKwName, keywordSource);
-        }
+    public void addKeywordSource(final RobotDryRunKeywordSource keywordSource) {
+        final String qualifiedKwName = keywordSource.getLibraryName() + "." + keywordSource.getName();
+        kwSources.put(qualifiedKwName, keywordSource);
     }
 
     public synchronized Optional<RobotDryRunKeywordSource> getKeywordSource(final String qualifiedKwName) {
