@@ -12,6 +12,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 
+import com.google.common.base.Function;
+
 /**
  * @author Michal Anglart
  */
@@ -23,10 +25,14 @@ public class FileHyperlink implements IHyperlink {
 
     private final String label;
 
-    public FileHyperlink(final IRegion from, final IFile toFile, final String label) {
+    private final Function<IFile, Void> operationToPerformAfterOpening;
+
+    public FileHyperlink(final IRegion from, final IFile toFile, final String label,
+            final Function<IFile, Void> operationToPerformAfterOpening) {
         this.source = from;
         this.destinationFile = toFile;
         this.label = label;
+        this.operationToPerformAfterOpening = operationToPerformAfterOpening;
     }
 
     @Override
@@ -48,6 +54,6 @@ public class FileHyperlink implements IHyperlink {
     public void open() {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
         SourceOpeningSupport.tryToOpenInEditor(page, destinationFile);
+        operationToPerformAfterOpening.apply(destinationFile);
     }
-
 }
