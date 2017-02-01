@@ -52,14 +52,12 @@ public class RobotLaunchConfigurationFinder {
         final ILaunchConfigurationType launchConfigurationType = launchManager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
-        if (resources.size() == 1 && (resources.get(0) instanceof IProject || resources.get(0) instanceof IFolder)) {
-            final String resourceName = resources.get(0).getName();
-            final String projectName = resources.get(0).getProject().getName();
-            for (final ILaunchConfiguration configuration : launchConfigs) {
-                if (configuration.getName().equals(resourceName + SELECTED_TESTS_CONFIG_SUFFIX)
-                        && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
-                    return configuration;
-                }
+        final String configurationName = RobotLaunchConfiguration.getNameForSelectedTestCasesConfiguration(resources);
+        final String projectName = resources.get(0).getProject().getName();
+        for (final ILaunchConfiguration configuration : launchConfigs) {
+            if (configuration.getName().equals(configurationName)
+                    && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
+                return configuration;
             }
         }
         return null;
