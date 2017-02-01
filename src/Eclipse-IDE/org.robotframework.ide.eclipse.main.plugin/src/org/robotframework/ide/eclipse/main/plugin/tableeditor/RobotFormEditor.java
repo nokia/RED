@@ -58,6 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.documentation.DocumentationVie
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -181,9 +182,23 @@ public class RobotFormEditor extends FormEditor {
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
 
-            setActivePart(RobotFormEditorActivePageSaver.getLastActivePageId(getEditorInput()));
+            activateProperPage();
         } catch (final Exception e) {
             throw new RobotEditorOpeningException("Unable to initialize Suite editor", e);
+        }
+    }
+
+    private void activateProperPage() {
+        final String pageToActivate = RobotFormEditorActivePageSaver.getLastActivePageId(getEditorInput());
+        if (pageToActivate == null) {
+            final ElementOpenMode openMode = RedPlugin.getDefault().getPreferences().getElementOpenMode();
+            if (openMode == ElementOpenMode.OPEN_IN_SOURCE) {
+                setActivePart("");
+            } else {
+                setActivePage(0);
+            }
+        } else {
+            setActivePart(pageToActivate);
         }
     }
 
@@ -481,6 +496,10 @@ public class RobotFormEditor extends FormEditor {
         final SuiteSourceEditor editor = getSourceEditor();
         setActiveEditor(editor);
         return editor;
+    }
+
+    public void activateFirstPage() {
+        setActivePage(0);
     }
 
     public ISectionEditorPart activatePage(final RobotSuiteFileSection section) {

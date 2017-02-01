@@ -7,15 +7,21 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 /**
@@ -59,5 +65,25 @@ public class SourceHyperlinksToFilesDetector extends HyperlinksToFilesDetector i
         return lineContent.trim().toLowerCase().startsWith("resource")
                 || lineContent.trim().toLowerCase().startsWith("variables")
                 || lineContent.trim().toLowerCase().startsWith("library");
+    }
+
+    @Override
+    protected Function<IFile, Void> performAfterOpening() {
+        return new Function<IFile, Void>() {
+
+            @Override
+            public Void apply(final IFile file) {
+                final IEditorPart activeEditor = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow()
+                        .getActivePage()
+                        .getActiveEditor();
+                if (activeEditor instanceof RobotFormEditor
+                        && activeEditor.getEditorInput().equals(new FileEditorInput(file))) {
+                    final RobotFormEditor suiteEditor = (RobotFormEditor) activeEditor;
+                    suiteEditor.activateSourcePage();
+                }
+                return null;
+            }
+        };
     }
 }
