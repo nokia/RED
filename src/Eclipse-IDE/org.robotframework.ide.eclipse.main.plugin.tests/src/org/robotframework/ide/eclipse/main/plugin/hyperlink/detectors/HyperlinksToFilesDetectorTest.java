@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
@@ -20,6 +21,8 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
+
+import com.google.common.base.Function;
 
 public class HyperlinksToFilesDetectorTest {
 
@@ -103,6 +106,13 @@ public class HyperlinksToFilesDetectorTest {
     }
 
     private static HyperlinksToFilesDetector createDetector() {
-        return new HyperlinksToFilesDetector() {};
+        return new HyperlinksToFilesDetector() {
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected Function<IFile, Void> performAfterOpening() {
+                return mock(Function.class);
+            }
+        };
     }
 }
