@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 abstract class HyperlinksToFilesDetector {
@@ -76,10 +77,13 @@ abstract class HyperlinksToFilesDetector {
 
     private Optional<IHyperlink> createHyperlink(final IRegion fromRegion, final IResource destination) {
         if (destination != null && destination.exists() && destination.getType() == IResource.FILE) {
-            return Optional.<IHyperlink> of(new FileHyperlink(fromRegion, (IFile) destination, "Open File"));
+            return Optional.<IHyperlink> of(
+                    new FileHyperlink(fromRegion, (IFile) destination, "Open File", performAfterOpening()));
         }
         return Optional.absent();
     }
+
+    protected abstract Function<IFile, Void> performAfterOpening();
 
     private boolean isPath(final String pathAsString) {
         return pathAsString.endsWith("/") || pathAsString.endsWith(".py") || pathAsString.endsWith(".class")
