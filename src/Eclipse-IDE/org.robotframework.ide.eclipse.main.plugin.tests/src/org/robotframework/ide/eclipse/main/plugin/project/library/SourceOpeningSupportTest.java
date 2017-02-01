@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.library;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -82,8 +81,7 @@ public class SourceOpeningSupportTest {
 
         SourceOpeningSupport.open(page, model, project.getProject(), libSpec);
 
-        verifyOpenedFile("testlib.py");
-        verifyEmptySelection();
+        verifyEmptySelection("testlib.py");
     }
 
     @Test
@@ -95,8 +93,7 @@ public class SourceOpeningSupportTest {
 
         SourceOpeningSupport.open(page, model, project.getProject(), libSpec, kwSpec);
 
-        verifyOpenedFile("testlib.py");
-        verifyEmptySelection();
+        verifyEmptySelection("testlib.py");
     }
 
     @Test
@@ -114,12 +111,11 @@ public class SourceOpeningSupportTest {
         kwSource.setOffset(4);
         kwSource.setLength(10);
 
-        project.updateKeywordSources(Collections.singletonList(kwSource));
+        project.addKeywordSource(kwSource);
 
         SourceOpeningSupport.open(page, model, project.getProject(), libSpec, kwSpec);
 
-        verifyOpenedFile("testlib.py");
-        verifySelection(1, 13, "defined_kw");
+        verifySelection("testlib.py", 1, 13, "defined_kw");
     }
 
     @Test
@@ -131,8 +127,7 @@ public class SourceOpeningSupportTest {
 
         SourceOpeningSupport.open(page, model, project.getProject(), libSpec, kwSpec);
 
-        verifyOpenedFile("testlib.py");
-        verifySelection(3, 45, "discovered_kw");
+        verifySelection("testlib.py", 3, 45, "discovered_kw");
     }
 
     @Test
@@ -141,8 +136,7 @@ public class SourceOpeningSupportTest {
 
         SourceOpeningSupport.tryToOpenInEditor(page, library);
 
-        verifyOpenedFile("testlib.py");
-        verifyEmptySelection();
+        verifyEmptySelection("testlib.py");
     }
 
     @Test
@@ -151,14 +145,12 @@ public class SourceOpeningSupportTest {
         assertThat(location.lastSegment()).isEqualTo("testlib.py");
     }
 
-    private void verifyOpenedFile(final String expectedFilePath) throws PartInitException {
+    private void verifyEmptySelection(final String expectedFilePath) throws PartInitException {
         assertThat(page.getEditorReferences()).hasSize(1);
         final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
         assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile(expectedFilePath));
-    }
 
-    private void verifyEmptySelection() {
-        final TextEditor editor = (TextEditor) page.getEditorReferences()[0].getEditor(false);
+        final TextEditor editor = page.getEditorReferences()[0].getEditor(true).getAdapter(TextEditor.class);
         final TextSelection selection = (TextSelection) editor.getSelectionProvider().getSelection();
         assertThat(selection.getText()).isEqualTo("");
         assertThat(selection.getStartLine()).isEqualTo(0);
@@ -166,8 +158,13 @@ public class SourceOpeningSupportTest {
         assertThat(selection.getLength()).isEqualTo(0);
     }
 
-    private void verifySelection(final int expectedLine, final int expectedOffset, final String expectedText) {
-        final TextEditor editor = (TextEditor) page.getEditorReferences()[0].getEditor(false);
+    private void verifySelection(final String expectedFilePath, final int expectedLine, final int expectedOffset,
+            final String expectedText) throws PartInitException {
+        assertThat(page.getEditorReferences()).hasSize(1);
+        final IFileEditorInput editorInput = (IFileEditorInput) page.getEditorReferences()[0].getEditorInput();
+        assertThat(editorInput.getFile()).isEqualTo(projectProvider.getFile(expectedFilePath));
+
+        final TextEditor editor = page.getEditorReferences()[0].getEditor(true).getAdapter(TextEditor.class);
         final TextSelection selection = (TextSelection) editor.getSelectionProvider().getSelection();
         assertThat(selection.getText()).isEqualTo(expectedText);
         assertThat(selection.getStartLine()).isEqualTo(expectedLine);

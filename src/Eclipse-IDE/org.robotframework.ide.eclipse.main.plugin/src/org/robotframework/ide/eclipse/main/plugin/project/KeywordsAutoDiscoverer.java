@@ -15,10 +15,12 @@ import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
+import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -45,7 +47,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
                         try {
                             startDiscovering(monitor, new DryRunTargetsCollector());
-                            robotProject.updateKeywordSources(dryRunOutputParser.getKeywordSources());
+                            startAddingKeywordsToProject(monitor);
                         } catch (final InvocationTargetException e) {
                             MessageDialog.openError(parent, "Discovering keywords",
                                     "Problems occurred during discovering keywords: " + e.getCause().getMessage());
@@ -57,6 +59,21 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
             } catch (InvocationTargetException | InterruptedException e) {
                 dryRunHandler.destroyDryRunProcess();
             }
+        }
+    }
+
+    private void startAddingKeywordsToProject(final IProgressMonitor monitor) {
+        final List<RobotDryRunKeywordSource> dryRunKeywordSources = dryRunOutputParser.getKeywordSources();
+        if (!dryRunKeywordSources.isEmpty()) {
+            final SubMonitor subMonitor = SubMonitor.convert(monitor);
+            subMonitor.setWorkRemaining(dryRunKeywordSources.size() + 1);
+            subMonitor.subTask("Adding discovered keywords to project: ");
+            for (final RobotDryRunKeywordSource keywordSource : dryRunKeywordSources) {
+                robotProject.addKeywordSource(keywordSource);
+                subMonitor.worked(1);
+            }
+            subMonitor.worked(1);
+            subMonitor.done();
         }
     }
 
