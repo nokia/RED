@@ -52,7 +52,7 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
                     }
                     
                     if (testCase != null) {
-                        RunTestCaseAction.runTestCase(new StructuredSelection(Arrays.asList(testCase)),
+                        RunTestCaseAction.runSelectedTestCases(new StructuredSelection(Arrays.asList(testCase)),
                                 Mode.valueOf(mode));
                     }
                 }

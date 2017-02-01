@@ -49,7 +49,8 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
             final RobotCase testCase = getTestCase(suiteModel, selection.getOffset());
 
             if (testCase != null) {
-                RunTestCaseAction.runTestCase(new StructuredSelection(Arrays.asList(testCase)), Mode.valueOf(mode));
+                RunTestCaseAction.runSelectedTestCases(new StructuredSelection(Arrays.asList(testCase)),
+                        Mode.valueOf(mode));
             }
         }
     }
