@@ -61,6 +61,8 @@ public class RobotLaunchConfiguration {
     private static final String REMOTE_DEBUG_PORT_ATTRIBUTE = "Remote debug port";
     private static final String REMOTE_DEBUG_TIMEOUT_ATTRIBUTE = "Remote debug timeout";
 
+    private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
+
 
     private final ILaunchConfiguration configuration;
     
@@ -93,6 +95,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
         robotConfig.setRemoteDebugHost("");
+        robotConfig.setIsGeneralPurposeEnabled(true);
     }
 
     public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
@@ -121,6 +124,7 @@ public class RobotLaunchConfiguration {
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
         robotConfig.setRemoteDebugHost("");
+        robotConfig.setIsGeneralPurposeEnabled(true);
     }
     
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -199,6 +203,13 @@ public class RobotLaunchConfiguration {
         }
     }
     
+    public void setIsGeneralPurposeEnabled(final boolean isGeneralPurposeEnabled) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, isGeneralPurposeEnabled);
+        }
+    }
+
     public void setIncludedTags(final List<String> tags) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
@@ -406,11 +417,8 @@ public class RobotLaunchConfiguration {
         }
     }
 
-    public boolean isGeneralPurposeConfiguration() {
-        if (getName().endsWith(RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX)) {
-            return false;
-        }
-        return true;
+    public boolean isGeneralPurposeConfiguration() throws CoreException {
+        return configuration.getAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, false);
     }
 
     public String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
@@ -434,6 +442,9 @@ public class RobotLaunchConfiguration {
                 .newInstance(null, configurationName);
 
         fillDefaults(configuration, resourcesToTestCases);
+
+        RobotLaunchConfiguration robotConfiguration = new RobotLaunchConfiguration(configuration);
+        robotConfiguration.setIsGeneralPurposeEnabled(false);
 
         return configuration;
     }
