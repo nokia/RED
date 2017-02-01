@@ -327,7 +327,7 @@ class SuitesToRunComposite extends Composite {
             final String name = testCase.getName();
             suite.addChild(new TestCaseLaunchElement(suite, name,
                     entry.getValue().isEmpty() || entry.getValue().contains(name.toLowerCase()), false));
-            allCases.remove(name);
+            allCases.remove(name.toLowerCase());
         }
         for (final String missingSuite : allCases) {
             suite.addChild(new TestCaseLaunchElement(suite, missingSuite, true, true));
