@@ -382,11 +382,11 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             // execs preference. This may seem a bit weird to have separated ACTIVE_RUNTIME and
             // ACTIVE_RUNTIME_EXEC pair, but implementing it this way gives us both directions
             // versions compatibility.
-            getPreferenceStore().setValue(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
-            getPreferenceStore().setValue(RedPreferences.OTHER_RUNTIMES_EXECS, allExecs);
+            getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
+            getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES_EXECS, allExecs);
 
-            getPreferenceStore().setValue(RedPreferences.ACTIVE_RUNTIME, activePath);
-            getPreferenceStore().setValue(RedPreferences.OTHER_RUNTIMES, allPaths);
+            getPreferenceStore().putValue(RedPreferences.ACTIVE_RUNTIME, activePath);
+            getPreferenceStore().putValue(RedPreferences.OTHER_RUNTIMES, allPaths);
 
             MessageDialog.openInformation(getShell(), "Rebuild required",
                     "The changes you've made requires full workspace rebuild.");
