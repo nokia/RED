@@ -1,0 +1,174 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _3rgSAOb1Eea8xchJV-6nrg
+Element-Name: GoToLineInPython
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _H31jIOhpEeaQF4EqtSuP0w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/1/17 3:31 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "open-definition" [val editor] [val line] [val col] {
+	with [get-editor $editor] {
+	    click
+	    with [get-text-viewer] {
+	        set-caret-pos $line $col
+	        key-type F3
+	    }
+	}
+
+}
+proc "check-python-file" [val python_file_name] [val line] [val col] [val selected_text]{
+	with [get-editor $python_file_name | get-text-viewer] {
+	    get-property "caretPosition.line" | equals $line | verify-true
+	    get-property "caretPosition.column" | equals  $col| verify-true
+	    get-property "getSelectionText()" | equals $selected_text | verify-true
+	}
+}
+
+//add new line to run autodiscovery
+get-view "Project Explorer" | get-tree | select "GoToPythonFile/test.robot" | double-click
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 31 39
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+s"
+}
+
+//check if 4 libs were added
+get-window "Discovering libraries summary" | get-label "Discovered libraries (6):" | get-property caption 
+    | equals "Discovered libraries (6):" | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+
+//go to resource and run autodiscovery
+get-view "Project Explorer" | get-tree | select "GoToPythonFile/res.robot" | select "GoToPythonFile/res.robot" 
+    | double-click
+with [get-editor "res.robot" | get-text-viewer] {
+    set-caret-pos 31 51
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+s"
+}
+
+//6 libs should be added
+get-window "Discovering libraries summary" | get-label "Discovered libraries (6):" | get-property caption 
+    | equals "Discovered libraries (6):" | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+
+
+//go to first kw (Add 7 Copies Of Coffee To Cart) and press F3
+open-definition -editor "test.robot" -line 11 -col 13
+check-python-file -python_file_name "lib_with_decorators.py" -line 4 -col 23 -selected_text "add_copies_to_cart" 
+
+// simple kw with decorator
+open-definition -editor "test.robot" -line 12 -col 9
+check-python-file -python_file_name "lib_with_decorators.py" -line 9 -col 17 -selected_text "add_new_item" 
+
+//rock
+open-definition -editor "test.robot" -line 13 -col 7
+check-python-file -python_file_name "lib_with_decorators.py" -line 17 -col 24 -selected_text "i_have_3_decorators" 
+
+//sum
+open-definition -editor "test.robot" -line 16 -col 8
+check-python-file -python_file_name "few_kw.py" -line 1 -col 8 -selected_text "sum"
+
+//divide
+open-definition -editor "test.robot" -line 17 -col 8
+check-python-file -python_file_name "few_kw.py" -line 4 -col 11 -selected_text "divide"
+
+//multiply
+open-definition -editor "test.robot" -line 18 -col 8
+check-python-file -python_file_name "few_kw.py" -line 7 -col 13 -selected_text "multiply"
+
+//divide
+open-definition -editor "test.robot" -line 19 -col 18
+
+//two kw in different files
+with [get-editor "test.robot" | get-text-viewer] {
+    hover-text 19 12
+    set-caret-pos 19 13
+    hover-text 19 12 -with M1
+}
+
+//this only checks that this menu is visible - rcppt cannot click on it
+get-window -from "Information Window" | get-table | select "Show All Definitions" | click
+
+//got to def
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 19 16
+    hover-text 19 12
+    key-type F3
+}
+check-python-file -python_file_name "ClassWithDecorators.py" -line 13 -col 30 -selected_text "MY_KW_WITH_DECORATOR2"
+
+//Daisy_Flower
+open-definition -editor "test.robot" -line 23 -col 14
+check-python-file -python_file_name "Flower.py" -line 5 -col 21 -selected_text "daisy_flower"
+
+//second kw
+open-definition -editor "test.robot" -line 31 -col 36
+check-python-file -python_file_name "libs_in_class.py" -line 17 -col 29 -selected_text "second_kw_from_class"
+
+//space in lib name - now carte selection
+open-definition -editor "test.robot" -line 34 -col 25
+get-editor "lib with space.py" | get-text-viewer | get-property "getSelectionCount()" | equals 0 | verify-true
+with [get-editor "lib with space.py" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 1 | verify-true
+    get-property "caretPosition.column" | equals 1 | verify-true
+}
+
+
+//--------------------------------------------------------------- res--------------------------------------------------------------------
+//clean to remove errors
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+
+//lib from python path
+open-definition -editor  "res.robot" -line 13 -col 9
+check-python-file -python_file_name "LibFromPythonPath.py" -line 4 -col 14 -selected_text "MyLib"
+
+//lib that is twice in the same file
+open-definition -editor  "res.robot" -line 16 -col 6
+check-python-file -python_file_name "the_same_kws.py" -line 4 -col 8 -selected_text "abc"
+
+//kw that is imported
+open-definition -editor  "res.robot" -line 18 -col 7
+check-python-file -python_file_name "my_module.py" -line 1 -col 10 -selected_text "tiger"
+
+//kw that has other decorator set
+open-definition -editor  "res.robot" -line 21 -col 19
+check-python-file -python_file_name "libs_with_other_decorator.py" -line 5 -col 29 -selected_text "other_usage_of_deocrator"
+
+
+//kw that has 3 decorators
+open-definition -editor  "res.robot" -line 24 -col 7
+check-python-file -python_file_name "lib_with_decorators.py" -line 17 -col 24 -selected_text "i_have_3_decorators"
+
+//build-in String
+open-definition -editor  "res.robot" -line 31 -col 29
+check-python-file -python_file_name "String.py" -line 51 -col 29 -selected_text "convert_to_lowercase"
+
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(2 items\\)/Ambiguous keyword 'I am in 2 files' reference. Matching keywords are defined in: \\[ClassWithDecorators, few_kw\\]" 
+        | get-property index | equals 0 | verify-true
+    get-item "Errors \\(2 items\\)/Unknown keyword 'jazz'" | get-property index | equals 1 | verify-true
+}
+get-view Problems | get-tree 
+    | select "Warnings (4 items)/Given keyword name 'Daisy_Flower' is not consistent with keyword definition 'Daisy Flower'"
+with [get-view Problems | get-tree] {
+    get-item "Warnings \\(4 items\\)/Given keyword name 'Daisy_Flower' is not consistent with keyword definition 'Daisy Flower'" 
+        | get-property childCount | equals 0 | verify-true
+    get-item "Warnings \\(4 items\\)/Given keyword name 'keyword_with_longer_documentation' is not consistent with keyword definition 'Keyword With Longer Documentation'" 
+        | get-property index | equals 1 | verify-true
+    get-item "Warnings \\(4 items\\)/Given keyword name 'MyLib' is not consistent with keyword definition 'My Lib'" 
+        | get-property index | equals 2 | verify-true
+    get-item "Warnings \\(4 items\\)/The path .*LibsFromPythonPath is absolute. RED prefers using workspace-relative paths which makes your projects more portable" 
+        | get-property index | equals 3 | verify-true
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
