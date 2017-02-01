@@ -66,18 +66,7 @@ public class InstalledRobotEnvironments {
             all = readAllFromPreferences(preferences);
         }
 
-        final InterpreterWithLocation key;
-        if (executor == null) {
-            final List<PythonInstallationDirectory> installations = RobotRuntimeEnvironment
-                    .possibleInstallationsFor(file);
-            if (installations.isEmpty()) {
-                key = new InterpreterWithLocation(file, null);
-            } else {
-                key = new InterpreterWithLocation(file, installations.get(0).getInterpreter());
-            }
-        } else {
-            key = new InterpreterWithLocation(file, executor);
-        }
+        final InterpreterWithLocation key = InterpreterWithLocation.create(file, executor);
         return all.containsKey(key) ? all.get(key).get() : null;
     }
 
@@ -119,18 +108,15 @@ public class InstalledRobotEnvironments {
         final String[] execs = allExecs.isEmpty() ? new String[0] : allExecs.split(";");
         for (int i = 0; i < paths.length; i++) {
             final String path = paths[i];
-            final String exec = execs.length == 0 ? "" : execs[i];
+            final File location = new File(path);
 
-            if (exec.isEmpty()) {
-                final File location = new File(path);
-                final List<PythonInstallationDirectory> installations = RobotRuntimeEnvironment
-                        .possibleInstallationsFor(location);
-                final SuiteExecutor executor = installations.isEmpty() ? null : installations.get(0).getInterpreter();
-                envs.put(new InterpreterWithLocation(location, executor), environmentSupplier(path, executor.name()));
-            } else {
-                final SuiteExecutor executor = SuiteExecutor.fromName(exec);
-                envs.put(new InterpreterWithLocation(new File(path), executor), environmentSupplier(path, exec));
-            }
+            final String exec = execs.length == 0 ? "" : execs[i];
+            final SuiteExecutor executor = exec.isEmpty() ? null : SuiteExecutor.fromName(exec);
+
+            final InterpreterWithLocation key = InterpreterWithLocation.create(location, executor);
+            final Supplier<RobotRuntimeEnvironment> envSupplier = environmentSupplier(path,
+                    key.executor == null ? "" : key.executor.name());
+            envs.put(key, envSupplier);
         }
         return envs;
     }
@@ -156,9 +142,23 @@ public class InstalledRobotEnvironments {
 
         private final SuiteExecutor executor;
 
-        public InterpreterWithLocation(final File location, final SuiteExecutor executor) {
+        private InterpreterWithLocation(final File location, final SuiteExecutor executor) {
             this.location = location;
             this.executor = executor;
+        }
+
+        static InterpreterWithLocation create(final File file, final SuiteExecutor executor) {
+            if (executor == null) {
+                final List<PythonInstallationDirectory> installations = RobotRuntimeEnvironment
+                        .possibleInstallationsFor(file);
+                if (installations.isEmpty()) {
+                    return new InterpreterWithLocation(file, null);
+                } else {
+                    return new InterpreterWithLocation(file, installations.get(0).getInterpreter());
+                }
+            } else {
+                return new InterpreterWithLocation(file, executor);
+            }
         }
 
         @Override
