@@ -96,7 +96,7 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
                 ? currentName.substring(0, currentName.lastIndexOf(".")) : currentName;
 
         if (currentNameWithoutExtension.isEmpty()) {
-            setErrorMessage("Name cannot be empty");
+            setErrorMessage("Name cannot be empty.");
             return false;
         }
 
@@ -106,14 +106,14 @@ class WizardNewRobotResourceFileCreationPage extends WizardNewFileCreationPage {
         
         final IContainer container = file.getParent();
         if (!container.exists()) {
-            setErrorMessage("Folder '" + container.getFullPath().toString() + "' does not exists");
+            setErrorMessage("Folder '" + container.getFullPath().toString() + "' does not exists.");
             return false;
         }
 
         try {
             for (final IResource resource : container.members()) {
                 if (name.equalsIgnoreCase(resource.getName())) {
-                    setErrorMessage("'" + name + "' already exists");
+                    setErrorMessage("'" + name + "' already exists.");
                     return false;
                 }
             }
