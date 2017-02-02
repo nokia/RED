@@ -57,7 +57,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private IEventBroker eventBroker;
 
-    private boolean showSummary;
+    private final boolean showSummary;
 
     private Optional<String> libraryNameToDiscover = Optional.absent();
 
@@ -88,6 +88,9 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
                     try {
                         startDiscovering(monitor, new DryRunTargetsCollector());
+                        if (monitor.isCanceled()) {
+                            return Status.CANCEL_STATUS;
+                        }
                         final List<RobotDryRunLibraryImport> importedLibraries = getImportedLibraries();
                         startAddingLibrariesToProjectConfiguration(monitor, importedLibraries);
                         if (showSummary) {
@@ -105,9 +108,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
                 @Override
                 protected void canceling() {
-                    showSummary = false;
                     dryRunHandler.destroyDryRunProcess();
-                    this.cancel();
                 }
             };
             wsJob.setUser(true);
@@ -127,13 +128,11 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             final List<RobotDryRunLibraryImport> importedLibraries) {
         if (!importedLibraries.isEmpty()) {
             final RobotProjectConfigUpdater configUpdater = RobotProjectConfigUpdater.create(robotProject);
-            final List<RobotDryRunLibraryImport> knownLibraries = LibraryImportFilter.filterKnown(importedLibraries);
-            final List<RobotDryRunLibraryImport> notExistingLibraries = LibraryImportFilter
-                    .filterNotExisting(knownLibraries, configUpdater.config.getLibraries());
+            final List<RobotDryRunLibraryImport> librariesToAdd = configUpdater.getLibrariesToAdd(importedLibraries);
 
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
-            subMonitor.setWorkRemaining(notExistingLibraries.size() + 1);
-            for (final RobotDryRunLibraryImport libraryImport : notExistingLibraries) {
+            subMonitor.setWorkRemaining(librariesToAdd.size() + 1);
+            for (final RobotDryRunLibraryImport libraryImport : librariesToAdd) {
                 subMonitor.subTask("Adding discovered library to project configuration: " + libraryImport.getName());
                 configUpdater.addLibrary(libraryImport);
                 subMonitor.worked(1);
@@ -262,28 +261,33 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private static class RobotProjectConfigUpdater {
 
-        private final RobotProject robotProject;
+        private final RobotProject project;
 
         private final RobotProjectConfig config;
 
-        private final boolean isOpened;
+        private final boolean persistConfig;
 
         private final List<ReferencedLibrary> addedLibs = new ArrayList<>();
 
-        private RobotProjectConfigUpdater(final RobotProject robotProject, final RobotProjectConfig config,
-                final boolean isOpened) {
-            this.robotProject = robotProject;
+        private RobotProjectConfigUpdater(final RobotProject project, final RobotProjectConfig config,
+                final boolean persistConfig) {
+            this.project = project;
             this.config = config;
-            this.isOpened = isOpened;
+            this.persistConfig = persistConfig;
         }
 
         static RobotProjectConfigUpdater create(final RobotProject robotProject) {
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
             if (config == null) {
                 config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
-                return new RobotProjectConfigUpdater(robotProject, config, false);
+                return new RobotProjectConfigUpdater(robotProject, config, true);
             }
-            return new RobotProjectConfigUpdater(robotProject, config, true);
+            return new RobotProjectConfigUpdater(robotProject, config, false);
+        }
+
+        List<RobotDryRunLibraryImport> getLibrariesToAdd(final List<RobotDryRunLibraryImport> importedLibraries) {
+            final List<RobotDryRunLibraryImport> knownLibraries = LibraryImportFilter.filterKnown(importedLibraries);
+            return LibraryImportFilter.filterNotExisting(knownLibraries, config.getLibraries());
         }
 
         void addLibrary(final RobotDryRunLibraryImport dryRunLibraryImport) {
@@ -297,15 +301,15 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         void update(final IEventBroker eventBroker) {
             if (!addedLibs.isEmpty()) {
                 sendProjectConfigChangedEvent(eventBroker);
-                if (!isOpened) {
-                    new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
+                if (persistConfig) {
+                    new RedEclipseProjectConfigWriter().writeConfiguration(config, project);
                 }
             }
         }
 
         private void sendProjectConfigChangedEvent(IEventBroker eventBroker) {
             final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                    robotProject.getConfigurationFile(), addedLibs);
+                    project.getConfigurationFile(), addedLibs);
             if (eventBroker == null) {
                 eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
             }
@@ -316,8 +320,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         private void addPythonLibrary(final RobotDryRunLibraryImport dryRunLibraryImport) {
             final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
-                    robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(),
-                    robotProject.getProject());
+                    project.getRuntimeEnvironment(), project.getRobotProjectConfig(), project.getProject());
             Collection<ILibraryClass> pythonClasses = newArrayList();
             try {
                 pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(dryRunLibraryImport.getSourcePath(),
@@ -341,9 +344,8 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         private Optional<File> findPythonLibraryModulePath(final RobotDryRunLibraryImport dryRunLibraryImport) {
             try {
                 final EnvironmentSearchPaths envSearchPaths = new RedEclipseProjectConfig(config)
-                        .createEnvironmentSearchPaths(robotProject.getProject());
-                return robotProject.getRuntimeEnvironment().getModulePath(dryRunLibraryImport.getName(),
-                        envSearchPaths);
+                        .createEnvironmentSearchPaths(project.getProject());
+                return project.getRuntimeEnvironment().getModulePath(dryRunLibraryImport.getName(), envSearchPaths);
             } catch (final RobotEnvironmentException e1) {
                 // that's fine
             }
@@ -351,9 +353,8 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         private void addJavaLibrary(final RobotDryRunLibraryImport dryRunLibraryImport) {
-            final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(
-                    robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(),
-                    robotProject.getProject());
+            final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(project.getRuntimeEnvironment(),
+                    project.getRobotProjectConfig(), project.getProject());
             Collection<ILibraryClass> classesFromJar = newArrayList();
             try {
                 classesFromJar = jarStructureBuilder.provideEntriesFromFile(dryRunLibraryImport.getSourcePath());

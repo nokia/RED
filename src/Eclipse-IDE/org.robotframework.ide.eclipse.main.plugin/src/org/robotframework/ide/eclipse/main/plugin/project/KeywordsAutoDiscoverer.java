@@ -47,6 +47,9 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
                         try {
                             startDiscovering(monitor, new DryRunTargetsCollector());
+                            if (monitor.isCanceled()) {
+                                return;
+                            }
                             startAddingKeywordsToProject(monitor, dryRunOutputParser.getKeywordSources());
                         } catch (final InvocationTargetException e) {
                             MessageDialog.openError(parent, "Discovering keywords",

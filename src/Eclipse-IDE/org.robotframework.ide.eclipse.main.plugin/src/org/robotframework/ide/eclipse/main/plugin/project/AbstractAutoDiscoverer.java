@@ -131,7 +131,7 @@ public abstract class AbstractAutoDiscoverer {
 
     private void executeDryRun(final RunCommandLine dryRunCommandLine, final SubMonitor subMonitor)
             throws InvocationTargetException {
-        if (dryRunCommandLine != null) {
+        if (dryRunCommandLine != null && !subMonitor.isCanceled()) {
             dryRunOutputParser.setStartSuiteHandler(new IDryRunStartSuiteHandler() {
 
                 @Override
