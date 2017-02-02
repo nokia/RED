@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _H31jIOhpEeaQF4EqtSuP0w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/1/17 3:31 PM
+Save-Time: 2/2/17 9:48 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -151,7 +151,9 @@ check-python-file -python_file_name "lib_with_decorators.py" -line 17 -col 24 -s
 
 //build-in String
 open-definition -editor  "res.robot" -line 31 -col 29
-check-python-file -python_file_name "String.py" -line 51 -col 29 -selected_text "convert_to_lowercase"
+get-editor "String.py" | get-text-viewer |get-property "getSelectionText()" | equals  "convert_to_lowercase"| verify-true
+
+
 
 with [get-view Problems | get-tree] {
     get-item "Errors \\(2 items\\)/Ambiguous keyword 'I am in 2 files' reference. Matching keywords are defined in: \\[ClassWithDecorators, few_kw\\]" 
