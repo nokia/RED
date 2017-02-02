@@ -7,8 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -26,7 +25,7 @@ public class RobotLaunchConfigurationFinder {
         final ILaunchConfigurationType launchConfigurationType = launchManager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
-        if (resources.size() == 1 && (resources.get(0) instanceof IProject || resources.get(0) instanceof IFolder)) {
+        if (resources.size() == 1 && (resources.get(0) instanceof IContainer)) {
             final String resourceName = resources.get(0).getName();
             final String projectName = resources.get(0).getProject().getName();
             for (final ILaunchConfiguration configuration : launchConfigs) {
@@ -70,7 +69,7 @@ public class RobotLaunchConfigurationFinder {
         final ILaunchConfigurationType launchConfigurationType = launchManager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
-        if (resources.size() == 1 && (resources.get(0) instanceof IProject || resources.get(0) instanceof IFolder)) {
+        if (resources.size() == 1 && (resources.get(0) instanceof IContainer)) {
             final String resourceName = resources.get(0).getName();
             final String projectName = resources.get(0).getProject().getName();
             for (final ILaunchConfiguration configuration : launchConfigs) {
