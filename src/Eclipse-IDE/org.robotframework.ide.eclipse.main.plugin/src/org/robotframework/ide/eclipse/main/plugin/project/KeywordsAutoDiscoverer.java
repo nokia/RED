@@ -47,7 +47,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
                         try {
                             startDiscovering(monitor, new DryRunTargetsCollector());
-                            startAddingKeywordsToProject(monitor);
+                            startAddingKeywordsToProject(monitor, dryRunOutputParser.getKeywordSources());
                         } catch (final InvocationTargetException e) {
                             MessageDialog.openError(parent, "Discovering keywords",
                                     "Problems occurred during discovering keywords: " + e.getCause().getMessage());
@@ -62,17 +62,16 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
         }
     }
 
-    private void startAddingKeywordsToProject(final IProgressMonitor monitor) {
-        final List<RobotDryRunKeywordSource> dryRunKeywordSources = dryRunOutputParser.getKeywordSources();
+    private void startAddingKeywordsToProject(final IProgressMonitor monitor,
+            final List<RobotDryRunKeywordSource> dryRunKeywordSources) {
         if (!dryRunKeywordSources.isEmpty()) {
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
-            subMonitor.setWorkRemaining(dryRunKeywordSources.size() + 1);
-            subMonitor.subTask("Adding discovered keywords to project: ");
+            subMonitor.setWorkRemaining(dryRunKeywordSources.size());
             for (final RobotDryRunKeywordSource keywordSource : dryRunKeywordSources) {
+                subMonitor.subTask("Adding discovered keywords to project: " + keywordSource.getName());
                 robotProject.addKeywordSource(keywordSource);
                 subMonitor.worked(1);
             }
-            subMonitor.worked(1);
             subMonitor.done();
         }
     }

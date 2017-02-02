@@ -52,13 +52,13 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
     private final String detailedDescription;
 
     public RedConfigFileCompletionProposal(final IMarker marker, final IFile externalFile,
-            final String shortDescritption, final String detailedDescription) {
+            final String shortDescription, final String detailedDescription) {
         this.marker = marker;
         this.externalFile = externalFile;
-        this.shortDescription = shortDescritption;
+        this.shortDescription = shortDescription;
         this.detailedDescription = detailedDescription;
 
-        final IEclipseContext context = ((IEclipseContext) PlatformUI.getWorkbench().getService(IEclipseContext.class))
+        final IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class)
                 .getActiveLeaf();
         ContextInjectionFactory.inject(this, context);
     }
@@ -83,7 +83,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
 
                 final RedProjectEditor redXmlEditor = openEditor();
                 openDesiredPageInEditor(redXmlEditor);
-                
+
                 fireEvents();
             }
         } catch (final ProposalApplyingException | CoreException e) {
@@ -134,6 +134,8 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
     }
 
     static class ProposalApplyingException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
 
         public ProposalApplyingException(final String message) {
             super(message);

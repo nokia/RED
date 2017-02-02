@@ -71,8 +71,8 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
         private List<VariableMapping> changedMappings;
 
         public DefineLibraryProposal(final IMarker marker, final IFile externalFile, final String variableName,
-                final String shortDescritption) {
-            super(marker, externalFile, shortDescritption, null);
+                final String shortDescription) {
+            super(marker, externalFile, shortDescription, null);
             this.name = variableName;
         }
 
