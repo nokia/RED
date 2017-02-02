@@ -41,7 +41,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
@@ -50,7 +49,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ResourceCreator;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class GeneralSettingsLibrariesImportValidatorTest {
@@ -546,7 +544,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final FileValidationContext context = prepareContext(suiteFile, refLibs);
 
         final GeneralSettingsLibrariesImportValidator validator = new GeneralSettingsLibrariesImportValidator(context,
-                suiteFile, newArrayList(libImport), reporter, Optional.<LibrariesAutoDiscoverer> absent());
+                suiteFile, newArrayList(libImport), reporter);
         try {
             validator.validate(null);
         } catch (final CoreException e) {
