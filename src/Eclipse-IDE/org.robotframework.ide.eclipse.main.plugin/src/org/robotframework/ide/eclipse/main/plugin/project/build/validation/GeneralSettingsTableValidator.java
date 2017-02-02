@@ -27,7 +27,6 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -148,15 +147,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void validateLibraries(final RobotSuiteFile suiteFile, final List<LibraryImport> libraryImports,
             final IProgressMonitor monitor) throws CoreException {
-        new GeneralSettingsLibrariesImportValidator(validationContext, suiteFile, libraryImports,
-                reporter, getLibrariesAutoDiscoverer()).validate(monitor);
-    }
-
-    private Optional<LibrariesAutoDiscoverer> getLibrariesAutoDiscoverer() {
-        if (validationContext.isValidatingChangedFiles()) {
-            return validationContext.getLibrariesAutoDiscoverer();
-        }
-        return Optional.absent();
+        new GeneralSettingsLibrariesImportValidator(validationContext, suiteFile, libraryImports, reporter)
+                .validate(monitor);
     }
 
     private void validateVariables(final RobotSuiteFile suiteFile, final List<VariablesImport> variablesImports,

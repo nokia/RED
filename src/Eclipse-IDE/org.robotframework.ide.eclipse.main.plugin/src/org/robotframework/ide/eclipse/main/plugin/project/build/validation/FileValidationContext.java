@@ -25,12 +25,10 @@ import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
-import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.collect.ListMultimap;
 
 public class FileValidationContext extends AccessibleKeywordsEntities {
@@ -133,10 +131,6 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
     public boolean isValidatingChangedFiles() {
         return context.isValidatingChangedFiles();
-    }
-
-    public Optional<LibrariesAutoDiscoverer> getLibrariesAutoDiscoverer() {
-        return context.getLibrariesAutoDiscoverer();
     }
 
     private static final class ValidationKeywordCollector implements AccessibleKeywordsCollector {
