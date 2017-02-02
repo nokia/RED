@@ -452,12 +452,13 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
+        when(robotProject.getParent()).thenReturn(model);
         when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
         when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
         when(robotProject.getVersion()).thenReturn("3.0");
 
-        return new ValidationContext(model, project, logger);
+        return new ValidationContext(robotProject, logger);
     }
 
     private class MockRobotFileValidator extends RobotFileValidator {
