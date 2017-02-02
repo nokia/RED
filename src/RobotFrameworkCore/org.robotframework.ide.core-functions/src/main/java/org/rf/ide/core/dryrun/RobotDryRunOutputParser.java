@@ -101,10 +101,6 @@ public class RobotDryRunOutputParser implements ILineHandler {
                 : new ArrayList<RobotDryRunLibraryImport>();
     }
 
-    public void filterImportedLibrariesByName(final String libraryName) {
-        dryRunLibraryImportCollector.filterImportedLibrariesByName(libraryName);
-    }
-
     public void setStartSuiteHandler(final IDryRunStartSuiteHandler startSuiteHandler) {
         this.startSuiteHandler = startSuiteHandler;
     }

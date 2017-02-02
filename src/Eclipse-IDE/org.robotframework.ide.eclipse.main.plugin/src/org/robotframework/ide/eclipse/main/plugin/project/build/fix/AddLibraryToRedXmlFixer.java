@@ -79,8 +79,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         private final Collection<ReferencedLibrary> addedLibraries = new ArrayList<>();
 
         public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
-                final String shortDescritption) {
-            super(marker, externalFile, shortDescritption, null);
+                final String shortDescription) {
+            super(marker, externalFile, shortDescription, null);
             this.suiteFile = suiteFile;
         }
 
@@ -93,7 +93,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         private boolean importLibraryByName(final IFile externalFile, final RobotProjectConfig config) {
             final RobotProject project = RedPlugin.getModelManager().createProject(externalFile.getProject());
             final RobotRuntimeEnvironment env = project.getRuntimeEnvironment();
-            
+
             Optional<File> modulePath = Optional.absent();
             try {
                 final String currentFileDirectoryPath = suiteFile.getFile().getParent().getLocation().toOSString();
@@ -139,7 +139,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                 final List<IResource> suitesList = new ArrayList<>();
                 suitesList.add(suiteFile.getFile());
                 new LibrariesAutoDiscoverer(project, suitesList, eventBroker, pathOrName).start();
-                
+
                 return false;
             }
         }
