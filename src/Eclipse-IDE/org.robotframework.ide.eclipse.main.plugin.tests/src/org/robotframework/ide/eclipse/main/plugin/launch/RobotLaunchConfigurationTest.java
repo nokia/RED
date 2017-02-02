@@ -13,33 +13,52 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfigurationTest {
+
+    private ILaunchManager manager;
+
+    private final static String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
+    private IProject project;
+
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+
+
+    @Before
+    public void setup() throws CoreException {
+        manager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType launchConfigurationType = manager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
+        for (final ILaunchConfiguration config : launchConfigs) {
+            config.delete();
+        }
+        project = projectProvider.getProject();
+    }
 
     @Test
     public void nullVariablesArrayIsReturned_whenThereAreNoVariablesDefined() throws Exception {
@@ -89,7 +108,7 @@ public class RobotLaunchConfigurationTest {
     public void defaultConfigurationObtained_whenDefaultConfigurationIsCreated() throws CoreException {
         RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         assertThat(robotConfig.getName()).isEqualTo("Resource");
-        assertThat(robotConfig.getProjectName()).isEqualTo("Project");
+        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.getSuitePaths().keySet()).containsExactly("Resource");
         assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);
         assertThat(robotConfig.getExecutorArguments()).isEqualTo("");
@@ -107,7 +126,7 @@ public class RobotLaunchConfigurationTest {
         suites.put("key", newArrayList("value"));
         robotConfig.setExecutor(SuiteExecutor.PyPy);
         robotConfig.setExecutorArguments("arguments");
-        robotConfig.setProjectName("Project");
+        robotConfig.setProjectName(PROJECT_NAME);
         robotConfig.setSuitePaths(suites);
         robotConfig.setIsIncludeTagsEnabled(true);
         robotConfig.setIsExcludeTagsEnabled(true);
@@ -128,17 +147,6 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
-        for (ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("Project");
-        if (project.exists()) {
-            project.delete(false, null);
-        }
         IResource res = project.getFile("Resource1");
         IResource res2 = project.getFile("Resource2");
         Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
@@ -149,7 +157,7 @@ public class RobotLaunchConfigurationTest {
         ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
         RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        assertThat(robotConfig.getProjectName()).isEqualTo("Project");
+        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
         assertThat(suitePaths.keySet()).containsExactlyInAnyOrder("Resource1", "Resource2");
         assertThat(suitePaths).containsEntry("Resource1", casesForRes);
@@ -165,19 +173,6 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void suitesObtained_whenSuitesCollectedFromConfiguration() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
-        for (ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-        IProgressMonitor monitor = new NullProgressMonitor();
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("Project");
-        if (project.exists()) {
-            project.delete(false, monitor);
-        }
-        project.create(monitor);
         List<IResource> resources = newArrayList();
         for (int i = 0; i < 3; i++) {
             IResource res = project.getFile("Resource " + i + ".fake");
@@ -191,24 +186,10 @@ public class RobotLaunchConfigurationTest {
         for (int i = 0; i < resources.size(); i++) {
             assertThat(obtainedSuites).containsKey(resources.get(i));
         }
-        project.delete(false, monitor);
     }
 
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
-        for (ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-        IProgressMonitor monitor = new NullProgressMonitor();
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("Project");
-        if (project.exists()) {
-            project.delete(false, monitor);
-        }
-        project.create(monitor);
         IResource res = project.getFile("Resource");
         List<IResource> resources = newArrayList(res);
         ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
@@ -216,7 +197,6 @@ public class RobotLaunchConfigurationTest {
         RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         RobotProject projectFromConfig = robotConfig.getRobotProject();
         assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
-        project.delete(false, monitor);
     }
 
     @Test
@@ -242,65 +222,26 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void configurationSuitableForResources_whenApplicable() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
-        for (ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-        IProgressMonitor monitor = new NullProgressMonitor();
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("Project");
-        if (project.exists()) {
-            project.delete(false, monitor);
-        }
-        project.create(monitor);
-        project.open(monitor);
-        IResource res = project.getFile("Resource");
-        byte[] bytes = "File contents".getBytes();
-        InputStream source = new ByteArrayInputStream(bytes);
-        ((IFile) res).create(source, IResource.NONE, null);
+    public void configurationSuitableForResources_whenApplicable() throws CoreException, IOException {
+        IResource res = projectProvider.createFile("Resource", "");
         List<IResource> resources = newArrayList(res);
         ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
         RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         assertThat(robotConfig.isSuitableFor(resources)).isTrue();
-        project.delete(false, monitor);
     }
 
     @Test
-    public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
-        for (ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-        IProgressMonitor monitor = new NullProgressMonitor();
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("Project");
-        if (project.exists()) {
-            project.delete(false, monitor);
-        }
-        project.create(monitor);
-        project.open(monitor);
-        IResource res = project.getFile("Resource");
-        byte[] bytes = "File contents".getBytes();
-        InputStream source = new ByteArrayInputStream(bytes);
-        ((IFile) res).create(source, IResource.NONE, null);
+    public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException, IOException {
+        IResource res = projectProvider.createFile("Resource", "");
         List<IResource> resources = newArrayList(res);
         ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
         RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
-        IResource anotherRes = project.getFile("Another Resource");
-        bytes = "File contents".getBytes();
-        source = new ByteArrayInputStream(bytes);
-        ((IFile) anotherRes).create(source, IResource.NONE, null);
+        IResource anotherRes = projectProvider.createFile("Another Resource", "");
         resources.add(anotherRes);
         assertThat(robotConfig.isSuitableFor(resources)).isFalse();
-        project.delete(false, monitor);
     }
 
     @Test
@@ -312,17 +253,6 @@ public class RobotLaunchConfigurationTest {
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
-        for (ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("Project");
-        if (project.exists()) {
-            project.delete(false, null);
-        }
         IResource res = project.getFile("Resource");
         List<IResource> resources = newArrayList(res);
         ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
