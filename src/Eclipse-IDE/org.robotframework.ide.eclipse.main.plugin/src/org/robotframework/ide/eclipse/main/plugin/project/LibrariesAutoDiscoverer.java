@@ -124,7 +124,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     private List<RobotDryRunLibraryImport> getImportedLibraries() {
         final List<RobotDryRunLibraryImport> importedLibraries = dryRunOutputParser.getImportedLibraries();
         if (libraryNameToDiscover.isPresent()) {
-            return filterDryRunLibraryImportsByName(importedLibraries, libraryNameToDiscover.get());
+            return LibraryImportFilter.filterByName(importedLibraries, libraryNameToDiscover.get());
         }
         return importedLibraries;
     }
@@ -132,14 +132,14 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor,
             final List<RobotDryRunLibraryImport> importedLibraries) {
         if (!importedLibraries.isEmpty()) {
-            final List<RobotDryRunLibraryImport> knownLibraries = filterUnknownDryRunLibraryImports(importedLibraries);
             final RobotProjectConfigUpdater configUpdater = RobotProjectConfigUpdater.create(robotProject);
-            final List<RobotDryRunLibraryImport> librariesToAdd = filterExistingReferencedLibraries(knownLibraries,
-                    configUpdater.config.getLibraries());
+            final List<RobotDryRunLibraryImport> knownLibraries = LibraryImportFilter.filterKnown(importedLibraries);
+            final List<RobotDryRunLibraryImport> notExistingLibraries = LibraryImportFilter
+                    .filterNotExisting(knownLibraries, configUpdater.config.getLibraries());
 
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
-            subMonitor.setWorkRemaining(librariesToAdd.size() + 1);
-            for (final RobotDryRunLibraryImport libraryImport : librariesToAdd) {
+            subMonitor.setWorkRemaining(notExistingLibraries.size() + 1);
+            for (final RobotDryRunLibraryImport libraryImport : notExistingLibraries) {
                 subMonitor.subTask("Adding discovered library to project configuration: " + libraryImport.getName());
                 configUpdater.addLibrary(libraryImport);
                 subMonitor.worked(1);
@@ -150,45 +150,6 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             subMonitor.worked(1);
             subMonitor.done();
         }
-    }
-
-    private List<RobotDryRunLibraryImport> filterDryRunLibraryImportsByName(
-            final List<RobotDryRunLibraryImport> importedLibraries, final String libraryName) {
-        for (final RobotDryRunLibraryImport robotDryRunLibraryImport : importedLibraries) {
-            if (robotDryRunLibraryImport.getName().equalsIgnoreCase(libraryName)) {
-                return Collections.singletonList(robotDryRunLibraryImport);
-            }
-        }
-        return Collections.emptyList();
-    }
-
-    private List<RobotDryRunLibraryImport> filterUnknownDryRunLibraryImports(
-            final List<RobotDryRunLibraryImport> importedLibraries) {
-        final List<RobotDryRunLibraryImport> filteredLibrariesImports = newArrayList();
-        for (final RobotDryRunLibraryImport dryRunLibraryImport : importedLibraries) {
-            if (dryRunLibraryImport.getType() != DryRunLibraryType.UNKNOWN) {
-                filteredLibrariesImports.add(dryRunLibraryImport);
-            }
-        }
-        return filteredLibrariesImports;
-    }
-
-    private List<RobotDryRunLibraryImport> filterExistingReferencedLibraries(
-            final List<RobotDryRunLibraryImport> importedLibraries, final List<ReferencedLibrary> referencedLibraries) {
-        final List<RobotDryRunLibraryImport> filteredLibrariesImports = newArrayList();
-        final List<String> currentLibrariesNames = newArrayList();
-        for (final ReferencedLibrary referencedLibrary : referencedLibraries) {
-            currentLibrariesNames.add(referencedLibrary.getName());
-        }
-        for (final RobotDryRunLibraryImport dryRunLibraryImport : importedLibraries) {
-            if (!currentLibrariesNames.contains(dryRunLibraryImport.getName())) {
-                filteredLibrariesImports.add(dryRunLibraryImport);
-            } else {
-                dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ALREADY_EXISTING,
-                        "Library '" + dryRunLibraryImport.getName() + "' already existing in project configuration.");
-            }
-        }
-        return filteredLibrariesImports;
     }
 
     private class DryRunTargetsCollector implements IDryRunTargetsCollector {
@@ -249,6 +210,48 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         @Override
         public List<String> getAdditionalProjectsLocations() {
             return additionalProjectsLocations;
+        }
+
+    }
+
+    private static class LibraryImportFilter {
+
+        static List<RobotDryRunLibraryImport> filterByName(final List<RobotDryRunLibraryImport> importedLibraries,
+                final String libraryName) {
+            for (final RobotDryRunLibraryImport libraryImport : importedLibraries) {
+                if (libraryImport.getName().equalsIgnoreCase(libraryName)) {
+                    return Collections.singletonList(libraryImport);
+                }
+            }
+            return Collections.emptyList();
+        }
+
+        static List<RobotDryRunLibraryImport> filterKnown(final List<RobotDryRunLibraryImport> importedLibraries) {
+            final List<RobotDryRunLibraryImport> result = newArrayList();
+            for (final RobotDryRunLibraryImport libraryImport : importedLibraries) {
+                if (libraryImport.getType() != DryRunLibraryType.UNKNOWN) {
+                    result.add(libraryImport);
+                }
+            }
+            return result;
+        }
+
+        static List<RobotDryRunLibraryImport> filterNotExisting(final List<RobotDryRunLibraryImport> importedLibraries,
+                final List<ReferencedLibrary> existingLibraries) {
+            final List<RobotDryRunLibraryImport> result = newArrayList();
+            final List<String> existingLibraryNames = newArrayList();
+            for (final ReferencedLibrary existingLibrary : existingLibraries) {
+                existingLibraryNames.add(existingLibrary.getName());
+            }
+            for (final RobotDryRunLibraryImport libraryImport : importedLibraries) {
+                if (!existingLibraryNames.contains(libraryImport.getName())) {
+                    result.add(libraryImport);
+                } else {
+                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ALREADY_EXISTING,
+                            "Library '" + libraryImport.getName() + "' already existing in project configuration.");
+                }
+            }
+            return result;
         }
 
     }
