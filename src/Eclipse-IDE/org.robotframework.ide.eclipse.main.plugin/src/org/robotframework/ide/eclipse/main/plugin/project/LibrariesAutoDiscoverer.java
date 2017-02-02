@@ -47,6 +47,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Pytho
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
 /**
@@ -56,27 +57,26 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private IEventBroker eventBroker;
 
-    private boolean isSummaryWindowEnabled;
+    private boolean showSummary;
 
     private Optional<String> libraryNameToDiscover = Optional.absent();
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
             final IEventBroker eventBroker) {
         this(robotProject, suiteFiles, eventBroker, null);
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
             final IEventBroker eventBroker, final String libraryNameToDiscover) {
         this(robotProject, suiteFiles, true);
         this.eventBroker = eventBroker;
-        this.libraryNameToDiscover = libraryNameToDiscover != null && !libraryNameToDiscover.isEmpty()
-                ? Optional.of(libraryNameToDiscover) : Optional.<String> absent();
+        this.libraryNameToDiscover = Optional.fromNullable(Strings.emptyToNull(libraryNameToDiscover));
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
-            final boolean isSummaryWindowEnabled) {
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+            final boolean showSummary) {
         super(robotProject, suiteFiles);
-        this.isSummaryWindowEnabled = isSummaryWindowEnabled;
+        this.showSummary = showSummary;
     }
 
     @Override
@@ -90,14 +90,8 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         startDiscovering(monitor, new DryRunTargetsCollector());
                         final List<RobotDryRunLibraryImport> importedLibraries = getImportedLibraries();
                         startAddingLibrariesToProjectConfiguration(monitor, importedLibraries);
-                        if (isSummaryWindowEnabled) {
-                            SwtThread.syncExec(new Runnable() {
-
-                                @Override
-                                public void run() {
-                                    new LibrariesAutoDiscovererWindow(parent, importedLibraries).open();
-                                }
-                            });
+                        if (showSummary) {
+                            showSummary(parent, importedLibraries);
                         }
                     } catch (final InvocationTargetException e) {
                         MessageDialog.openError(parent, "Discovering libraries",
@@ -111,7 +105,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
                 @Override
                 protected void canceling() {
-                    isSummaryWindowEnabled = false;
+                    showSummary = false;
                     dryRunHandler.destroyDryRunProcess();
                     this.cancel();
                 }
@@ -150,6 +144,16 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             subMonitor.worked(1);
             subMonitor.done();
         }
+    }
+
+    private void showSummary(final Shell parent, final List<RobotDryRunLibraryImport> importedLibraries) {
+        SwtThread.syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                new LibrariesAutoDiscovererWindow(parent, importedLibraries).open();
+            }
+        });
     }
 
     private class DryRunTargetsCollector implements IDryRunTargetsCollector {

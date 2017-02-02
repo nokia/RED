@@ -22,7 +22,7 @@ public class RobotModel implements RobotElement {
         if (project == null) {
             return null;
         }
-        final RobotProject robotProject = new RobotProject(project);
+        final RobotProject robotProject = new RobotProject(this, project);
         if (projects.contains(robotProject)) {
             return (RobotProject) projects.get(projects.indexOf(robotProject));
         } else {

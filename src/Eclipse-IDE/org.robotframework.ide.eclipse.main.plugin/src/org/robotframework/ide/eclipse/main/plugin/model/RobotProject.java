@@ -75,8 +75,8 @@ public class RobotProject extends RobotContainer {
 
     private final Map<String, RobotDryRunKeywordSource> kwSources = new HashMap<>();
 
-    RobotProject(final IProject project) {
-        super(null, project);
+    RobotProject(final RobotModel model, final IProject project) {
+        super(model, project);
         librariesWatchHandler = new LibrariesWatchHandler(this);
     }
 

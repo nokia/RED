@@ -49,7 +49,8 @@ public abstract class AbstractAutoDiscoverer {
 
     protected final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
 
-    protected AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles) {
+    protected AbstractAutoDiscoverer(final RobotProject robotProject,
+            final Collection<? extends IResource> suiteFiles) {
         this.robotProject = robotProject;
         this.dryRunOutputParser = new RobotDryRunOutputParser();
         this.dryRunOutputParser.setupRobotDryRunLibraryImportCollector(robotProject.getStandardLibraries().keySet());
@@ -154,18 +155,6 @@ public abstract class AbstractAutoDiscoverer {
             file = projectLocation.toFile();
         }
         return file;
-    }
-
-    public void addSuiteFileToDiscovering(final IResource suiteFile) {
-        synchronized (suiteFiles) {
-            if (!suiteFiles.contains(suiteFile)) {
-                suiteFiles.add(suiteFile);
-            }
-        }
-    }
-
-    public boolean hasSuiteFilesToDiscovering() {
-        return !suiteFiles.isEmpty();
     }
 
     protected interface IDryRunTargetsCollector {

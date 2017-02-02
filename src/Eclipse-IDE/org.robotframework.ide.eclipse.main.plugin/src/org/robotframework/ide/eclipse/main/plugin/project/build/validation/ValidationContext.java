@@ -11,15 +11,12 @@ import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -31,7 +28,6 @@ import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -44,14 +40,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 /**
@@ -75,24 +69,11 @@ public class ValidationContext {
 
     private boolean isValidatingChangedFiles;
 
-    private Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = Optional.absent();
-
-    public ValidationContext(final IProject project, final BuildLogger logger) {
-        this(RedPlugin.getModelManager().getModel(), project, logger);
-    }
-
-    public ValidationContext(final RobotModel model, final IProject project, final BuildLogger logger) {
-        this.model = model;
+    public ValidationContext(final RobotProject robotProject, final BuildLogger logger) {
+        this.model = (RobotModel) robotProject.getParent();
         this.logger = logger;
-        final RobotProject robotProject = model.createRobotProject(project);
         this.projectConfig = robotProject.getRobotProjectConfig();
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-
-        if (projectConfig != null && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
-            librariesAutoDiscoverer = Optional
-                    .of(new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(),
-                            projectConfig.isLibrariesAutoDiscoveringSummaryWindowEnabled()));
-        }
 
         final String versionGot = robotProject.getVersion();
         this.version = (runtimeEnvironment != null && versionGot != null) ? RobotVersion.from(versionGot) : null;
@@ -161,10 +142,6 @@ public class ValidationContext {
 
     public void setIsValidatingChangedFiles(final boolean isValidatingChangedFiles) {
         this.isValidatingChangedFiles = isValidatingChangedFiles;
-    }
-
-    public Optional<LibrariesAutoDiscoverer> getLibrariesAutoDiscoverer() {
-        return librariesAutoDiscoverer;
     }
 
     public FileValidationContext createUnitContext(final IFile file) {

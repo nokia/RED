@@ -271,6 +271,8 @@ public class RobotFormEditor extends FormEditor {
         }
         updateActivePage();
 
+        OnSaveLibrariesAutodiscoveryTrigger.createFor(currentModel).startLibrariesAutoDiscoveryIfRequired();
+
         if (shouldClose) {
             reopenEditor();
         }
