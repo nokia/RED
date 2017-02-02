@@ -19,7 +19,6 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -28,18 +27,14 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImportsValidator {
 
-    private final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer;
-    
     public GeneralSettingsLibrariesImportValidator(final FileValidationContext validationContext,
-            final RobotSuiteFile suiteFile, final List<LibraryImport> imports, final ProblemsReportingStrategy reporter,
-            final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer) {
+            final RobotSuiteFile suiteFile, final List<LibraryImport> imports,
+            final ProblemsReportingStrategy reporter) {
         super(validationContext, suiteFile, imports, reporter);
-        this.librariesAutoDiscoverer = librariesAutoDiscoverer;
     }
 
     @Override
@@ -121,20 +116,6 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                     ? ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH, pathOrName)
                     : ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, pathOrName);
             reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
-
-            // FIXME : what it does here?
-            if (librariesAutoDiscoverer.isPresent()) {
-                librariesAutoDiscoverer.get().addSuiteFileToDiscovering(suiteFile.getFile());
-            }
-        }
-    }
-
-    @Override
-    protected void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
-        // FIXME : remove this
-        super.reportMissingImportPath(path, pathToken, importPath);
-        if (librariesAutoDiscoverer.isPresent()) {
-            librariesAutoDiscoverer.get().addSuiteFileToDiscovering(suiteFile.getFile());
         }
     }
 }

@@ -38,7 +38,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
@@ -65,7 +64,7 @@ public class RobotArtifactsValidator {
     public static Job revalidate(final RobotSuiteFile suiteModel) {
         if (shouldValidate(suiteModel)) {
             final IFile file = suiteModel.getFile();
-            final ValidationContext context = new ValidationContext(file.getProject(), new BuildLogger());
+            final ValidationContext context = new ValidationContext(suiteModel.getProject(), new BuildLogger());
 
             try {
                 final Optional<? extends ModelUnitValidator> validator = ModelUnitValidatorConfigFactory
@@ -118,8 +117,8 @@ public class RobotArtifactsValidator {
             }
 
             private Object getLock(final IResource resource) {
-                Object newLock = new Object();
-                Object oldLock = VALIDATION_LOCKS.putIfAbsent(resource, newLock);
+                final Object newLock = new Object();
+                final Object oldLock = VALIDATION_LOCKS.putIfAbsent(resource, newLock);
                 return oldLock != null ? oldLock : newLock;
             }
         };
@@ -159,15 +158,11 @@ public class RobotArtifactsValidator {
             logger.log("VALIDATING: validation of '" + project.getName() + "' project started");
             logger.log("VALIDATING: gathering files to be validated");
 
-            final ValidationContext context = new ValidationContext(project, logger);
+            final ValidationContext context = new ValidationContext(RedPlugin.getModelManager().createProject(project),
+                    logger);
             final List<ModelUnitValidator> validators = validatorConfig.createValidators(context);
 
             validateModelUnits(monitor, Queues.newArrayDeque(validators));
-
-            final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = context.getLibrariesAutoDiscoverer();
-            if (librariesAutoDiscoverer.isPresent() && librariesAutoDiscoverer.get().hasSuiteFilesToDiscovering()) {
-                librariesAutoDiscoverer.get().start();
-            }
 
             return Status.OK_STATUS;
         } catch (final CoreException | InterruptedException e) {
