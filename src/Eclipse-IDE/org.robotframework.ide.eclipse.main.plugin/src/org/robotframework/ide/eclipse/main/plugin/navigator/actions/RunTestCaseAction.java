@@ -86,6 +86,9 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
                 } else {
                     configurationWorkingCopy = configuration.getWorkingCopy();
                     RobotLaunchConfiguration.fillDefaults(configurationWorkingCopy, resourcesToTestCases);
+                    RobotLaunchConfiguration robotConfiguration = new RobotLaunchConfiguration(
+                            configurationWorkingCopy);
+                    robotConfiguration.setIsGeneralPurposeEnabled(false);
                 }
                 return configurationWorkingCopy;
             }
