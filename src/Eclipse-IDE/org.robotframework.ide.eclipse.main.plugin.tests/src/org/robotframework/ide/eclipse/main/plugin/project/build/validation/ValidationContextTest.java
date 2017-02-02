@@ -36,7 +36,7 @@ public class ValidationContextTest {
         when(robotProject.getVersion()).thenReturn("3.0");
 
         // execute
-        final ValidationContext valCtx = new ValidationContext(model, project, new BuildLogger());
+        final ValidationContext valCtx = new ValidationContext(robotProject, new BuildLogger());
 
         // verify
         assertThat(valCtx.getVersion().isEqualTo(new RobotVersion(3, 0))).isTrue();
@@ -58,7 +58,7 @@ public class ValidationContextTest {
         when(robotProject.getVersion()).thenReturn(null);
 
         // execute
-        final ValidationContext valCtx = new ValidationContext(model, project, new BuildLogger());
+        final ValidationContext valCtx = new ValidationContext(robotProject, new BuildLogger());
 
         // verify
         assertThat(valCtx.getVersion()).isNull();
