@@ -5224,6 +5224,12 @@
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.syntax"
             name="Syntax Coloring">
       </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.DefaultLaunchConfigurationPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.launch.default"
+            name="Default Launch Configuration">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -5429,7 +5435,7 @@
                      node="org.robotframework.ide.eclipse.main.plugin">
                   <key
                         match="prefix"
-                        name="red.problem.category">
+                        name="red">
                   </key>
                   <key
                         match="prefix"

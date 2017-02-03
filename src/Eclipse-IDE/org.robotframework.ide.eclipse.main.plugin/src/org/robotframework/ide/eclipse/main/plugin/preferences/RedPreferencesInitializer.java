@@ -43,6 +43,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSyntaxColoringPreferences(preferences);
         initializeAutodiscoveringPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
+        initializeDefaultLaunchConfigurationPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -78,6 +79,11 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putBoolean(RedPreferences.FOLDABLE_CASES, true);
         preferences.putBoolean(RedPreferences.FOLDABLE_KEYWORDS, true);
         preferences.putBoolean(RedPreferences.FOLDABLE_DOCUMENTATION, true);
+    }
+
+    private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
+        preferences.put(RedPreferences.ADDITIONAL_INTERPRETER_ARGUMENTS, "");
+        preferences.put(RedPreferences.ADDITIONAL_ROBOT_ARGUMENTS, "");
     }
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
