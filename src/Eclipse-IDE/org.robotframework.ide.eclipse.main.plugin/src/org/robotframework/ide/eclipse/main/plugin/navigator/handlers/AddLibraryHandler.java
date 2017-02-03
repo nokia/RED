@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,15 +17,11 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.AddLibraryHandler.E4AddLibraryHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
-import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
+import org.robotframework.ide.eclipse.main.plugin.project.LibrariesConfigUpdater;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -51,33 +46,15 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
 
             for (final IFile file : selectedFiles) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(file.getProject());
-                RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-                final boolean inEditor = config != null;
-                if (config == null) {
-                    config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
-                }
+                final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
 
                 final Shell shell = Display.getCurrent().getActiveShell();
                 final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(shell,
-                        robotProject.getRuntimeEnvironment(), robotProject.getProject(), config,
+                        robotProject.getRuntimeEnvironment(), robotProject.getProject(), updater.getConfig(),
                         file.getLocation().toString());
 
-                final List<ReferencedLibrary> addedLibs = new ArrayList<>();
-                for (final ReferencedLibrary library : newLibraries) {
-                    if (config.addReferencedLibrary(library)) {
-                        addedLibs.add(library);
-                    }
-                }
-
-                if (!addedLibs.isEmpty()) {
-                    final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                            robotProject.getConfigurationFile(), addedLibs);
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-
-                    if (!inEditor) {
-                        new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
-                    }
-                }
+                updater.addLibraries(newLibraries);
+                updater.finalizeLibrariesAdding(eventBroker);
             }
         }
     }
