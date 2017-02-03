@@ -94,7 +94,7 @@ public class ImportLibraryComposite {
     private ISelectionChangedListener rightViewerSelectionChangedListener;
 
     private final RobotProject robotProject;
-    
+
     private final IEventBroker eventBroker;
 
     public ImportLibraryComposite(final RobotEditorCommandsStack commandsStack, final RobotSuiteFile fileModel,
@@ -104,7 +104,7 @@ public class ImportLibraryComposite {
         this.fileModel = fileModel;
         this.shell = shell;
         robotProject = fileModel.getProject();
-        eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     public Composite createImportResourcesComposite(final Composite parent) {
@@ -181,7 +181,7 @@ public class ImportLibraryComposite {
         editLibPathBtn.setEnabled(false);
         editLibPathBtn.addSelectionListener(createEditLibPathListener());
         GridDataFactory.fillDefaults().indent(0, 10).applyTo(editLibPathBtn);
-        
+
         final Button editLibArgsBtn = formToolkit.createButton(newLibBtnsComposite, "Edit Arguments", SWT.PUSH);
         editLibArgsBtn.setEnabled(false);
         editLibArgsBtn.addSelectionListener(createEditLibArgsListener());
@@ -294,6 +294,10 @@ public class ImportLibraryComposite {
         final ReferencedLibrary referencedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, nameWithoutExtension,
                 path.toPortableString());
         config.addReferencedLibrary(referencedLibrary);
+        saveConfiguration(config);
+    }
+
+    private void saveConfiguration(final RobotProjectConfig config) {
         robotProject.clearConfiguration();
         new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
@@ -316,7 +320,7 @@ public class ImportLibraryComposite {
                     + "' already exists in current project.");
         }
     }
-    
+
     private boolean isLibraryAvailable(final String libName) {
         final Settings libs = (Settings) rightViewer.getInput();
         for(final LibrarySpecification spec : libs.getImportedLibraries()) {
@@ -331,7 +335,7 @@ public class ImportLibraryComposite {
         }
         return false;
     }
-    
+
     private SelectionListener createEditLibPathListener() {
         return new SelectionAdapter() {
 
@@ -370,7 +374,7 @@ public class ImportLibraryComposite {
                         }
                     }
                 }
-                
+
                 newShell.dispose();
                 if(newPath != null) {
                     if (!spec.getName().equals(nameWithoutExtension)) {
@@ -384,7 +388,7 @@ public class ImportLibraryComposite {
             }
         };
     }
-    
+
     private void editLibraryInProjectConfiguration(final IPath oldPath, final String newPath,
             final String nameWithoutExtension) {
         final RobotProjectConfig config = robotProject.getRobotProjectConfig();
@@ -396,9 +400,7 @@ public class ImportLibraryComposite {
                 break;
             }
         }
-        robotProject.clearConfiguration();
-        new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
-        eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
+        saveConfiguration(config);
     }
 
     private SelectionListener createEditLibArgsListener() {
@@ -438,7 +440,7 @@ public class ImportLibraryComposite {
             }
         };
     }
-    
+
     private void handleLibraryAdd(final Settings libs, final List<LibrarySpecification> specs) {
         libs.getLibrariesToImport().removeAll(specs);
         libs.getImportedLibraries().addAll(specs);
@@ -560,7 +562,7 @@ public class ImportLibraryComposite {
             }
         }
     }
-    
+
     private ElementTreeSelectionDialog createAddVariableSelectionDialog(final Shell shell,
             final IResource initialSelection) {
         final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(shell, new WorkbenchLabelProvider(),
@@ -576,16 +578,16 @@ public class ImportLibraryComposite {
     }
 
     private static class LibrariesLabelProvider extends StyledCellLabelProvider {
-        
+
         @Override
         public void update(final ViewerCell cell) {
-            
+
             final StyledString label = getStyledText(cell.getElement());
             cell.setText(label.getString());
             cell.setStyleRanges(label.getStyleRanges());
-            
+
             cell.setImage(getImage(cell.getElement()));
-            
+
             super.update(cell);
         }
 

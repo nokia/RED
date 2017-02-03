@@ -33,7 +33,6 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -55,28 +54,33 @@ import com.google.common.io.Files;
  */
 public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
-    private IEventBroker eventBroker;
+    private final IEventBroker eventBroker;
 
     private final boolean showSummary;
 
-    private Optional<String> libraryNameToDiscover = Optional.absent();
+    private final Optional<String> libraryNameToDiscover;
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
             final IEventBroker eventBroker) {
-        this(robotProject, suiteFiles, eventBroker, null);
+        this(robotProject, suiteFiles, eventBroker, true, null);
     }
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
             final IEventBroker eventBroker, final String libraryNameToDiscover) {
-        this(robotProject, suiteFiles, true);
-        this.eventBroker = eventBroker;
-        this.libraryNameToDiscover = Optional.fromNullable(Strings.emptyToNull(libraryNameToDiscover));
+        this(robotProject, suiteFiles, eventBroker, true, libraryNameToDiscover);
     }
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
             final boolean showSummary) {
+        this(robotProject, suiteFiles, null, showSummary, null);
+    }
+
+    private LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+            final IEventBroker eventBroker, final boolean showSummary, final String libraryNameToDiscover) {
         super(robotProject, suiteFiles);
+        this.eventBroker = eventBroker == null ? PlatformUI.getWorkbench().getService(IEventBroker.class) : eventBroker;
         this.showSummary = showSummary;
+        this.libraryNameToDiscover = Optional.fromNullable(Strings.emptyToNull(libraryNameToDiscover));
     }
 
     @Override
@@ -91,10 +95,10 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         if (monitor.isCanceled()) {
                             return Status.CANCEL_STATUS;
                         }
-                        final List<RobotDryRunLibraryImport> importedLibraries = getImportedLibraries();
-                        startAddingLibrariesToProjectConfiguration(monitor, importedLibraries);
+                        final List<RobotDryRunLibraryImport> libraryImports = getLibraryImportsToProcess();
+                        startAddingLibrariesToProjectConfiguration(monitor, libraryImports);
                         if (showSummary) {
-                            showSummary(parent, importedLibraries);
+                            showSummary(parent, libraryImports);
                         }
                     } catch (final InvocationTargetException e) {
                         MessageDialog.openError(parent, "Discovering libraries",
@@ -116,41 +120,46 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
     }
 
-    private List<RobotDryRunLibraryImport> getImportedLibraries() {
-        final List<RobotDryRunLibraryImport> importedLibraries = dryRunOutputParser.getImportedLibraries();
+    private List<RobotDryRunLibraryImport> getLibraryImportsToProcess() {
+        final List<RobotDryRunLibraryImport> libraryImports = dryRunOutputParser.getImportedLibraries();
         if (libraryNameToDiscover.isPresent()) {
-            return LibraryImportFilter.filterByName(importedLibraries, libraryNameToDiscover.get());
+            for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
+                if (libraryImport.getName().equalsIgnoreCase(libraryNameToDiscover.get())) {
+                    return Collections.singletonList(libraryImport);
+                }
+            }
+            return Collections.emptyList();
         }
-        return importedLibraries;
+        return libraryImports;
     }
 
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor,
-            final List<RobotDryRunLibraryImport> importedLibraries) {
-        if (!importedLibraries.isEmpty()) {
-            final RobotProjectConfigUpdater configUpdater = RobotProjectConfigUpdater.create(robotProject);
-            final List<RobotDryRunLibraryImport> librariesToAdd = configUpdater.getLibrariesToAdd(importedLibraries);
+            final List<RobotDryRunLibraryImport> libraryImports) {
+        if (!libraryImports.isEmpty()) {
+            final ImportedLibrariesConfigUpdater updater = new ImportedLibrariesConfigUpdater(robotProject);
+            final List<RobotDryRunLibraryImport> libraryImportsToAdd = updater.getLibraryImportsToAdd(libraryImports);
 
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
-            subMonitor.setWorkRemaining(librariesToAdd.size() + 1);
-            for (final RobotDryRunLibraryImport libraryImport : librariesToAdd) {
+            subMonitor.setWorkRemaining(libraryImportsToAdd.size() + 1);
+            for (final RobotDryRunLibraryImport libraryImport : libraryImportsToAdd) {
                 subMonitor.subTask("Adding discovered library to project configuration: " + libraryImport.getName());
-                configUpdater.addLibrary(libraryImport);
+                updater.addLibrary(libraryImport);
                 subMonitor.worked(1);
             }
 
             subMonitor.subTask("Updating project configuration...");
-            configUpdater.update(eventBroker);
+            updater.finalizeLibrariesAdding(eventBroker);
             subMonitor.worked(1);
             subMonitor.done();
         }
     }
 
-    private void showSummary(final Shell parent, final List<RobotDryRunLibraryImport> importedLibraries) {
+    private void showSummary(final Shell parent, final List<RobotDryRunLibraryImport> libraryImports) {
         SwtThread.syncExec(new Runnable() {
 
             @Override
             public void run() {
-                new LibrariesAutoDiscovererWindow(parent, importedLibraries).open();
+                new LibrariesAutoDiscovererWindow(parent, libraryImports).open();
             }
         });
     }
@@ -217,183 +226,110 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     }
 
-    private static class LibraryImportFilter {
+    private static class ImportedLibrariesConfigUpdater extends LibrariesConfigUpdater {
 
-        static List<RobotDryRunLibraryImport> filterByName(final List<RobotDryRunLibraryImport> importedLibraries,
-                final String libraryName) {
-            for (final RobotDryRunLibraryImport libraryImport : importedLibraries) {
-                if (libraryImport.getName().equalsIgnoreCase(libraryName)) {
-                    return Collections.singletonList(libraryImport);
-                }
-            }
-            return Collections.emptyList();
+        ImportedLibrariesConfigUpdater(final RobotProject robotProject) {
+            super(robotProject);
         }
 
-        static List<RobotDryRunLibraryImport> filterKnown(final List<RobotDryRunLibraryImport> importedLibraries) {
-            final List<RobotDryRunLibraryImport> result = newArrayList();
-            for (final RobotDryRunLibraryImport libraryImport : importedLibraries) {
-                if (libraryImport.getType() != DryRunLibraryType.UNKNOWN) {
-                    result.add(libraryImport);
-                }
-            }
-            return result;
-        }
-
-        static List<RobotDryRunLibraryImport> filterNotExisting(final List<RobotDryRunLibraryImport> importedLibraries,
-                final List<ReferencedLibrary> existingLibraries) {
-            final List<RobotDryRunLibraryImport> result = newArrayList();
+        List<RobotDryRunLibraryImport> getLibraryImportsToAdd(final List<RobotDryRunLibraryImport> libraryImports) {
             final List<String> existingLibraryNames = newArrayList();
-            for (final ReferencedLibrary existingLibrary : existingLibraries) {
+            for (final ReferencedLibrary existingLibrary : config.getLibraries()) {
                 existingLibraryNames.add(existingLibrary.getName());
             }
-            for (final RobotDryRunLibraryImport libraryImport : importedLibraries) {
-                if (!existingLibraryNames.contains(libraryImport.getName())) {
-                    result.add(libraryImport);
-                } else {
-                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ALREADY_EXISTING,
-                            "Library '" + libraryImport.getName() + "' already existing in project configuration.");
+
+            final List<RobotDryRunLibraryImport> result = newArrayList();
+            for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
+                if (libraryImport.getType() != DryRunLibraryType.UNKNOWN) {
+                    if (existingLibraryNames.contains(libraryImport.getName())) {
+                        libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ALREADY_EXISTING,
+                                "Library '" + libraryImport.getName() + "' already existing in project configuration.");
+                    } else {
+                        result.add(libraryImport);
+                    }
                 }
             }
             return result;
         }
 
-    }
-
-    private static class RobotProjectConfigUpdater {
-
-        private final RobotProject project;
-
-        private final RobotProjectConfig config;
-
-        private final boolean persistConfig;
-
-        private final List<ReferencedLibrary> addedLibs = new ArrayList<>();
-
-        private RobotProjectConfigUpdater(final RobotProject project, final RobotProjectConfig config,
-                final boolean persistConfig) {
-            this.project = project;
-            this.config = config;
-            this.persistConfig = persistConfig;
-        }
-
-        static RobotProjectConfigUpdater create(final RobotProject robotProject) {
-            RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-            if (config == null) {
-                config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
-                return new RobotProjectConfigUpdater(robotProject, config, true);
-            }
-            return new RobotProjectConfigUpdater(robotProject, config, false);
-        }
-
-        List<RobotDryRunLibraryImport> getLibrariesToAdd(final List<RobotDryRunLibraryImport> importedLibraries) {
-            final List<RobotDryRunLibraryImport> knownLibraries = LibraryImportFilter.filterKnown(importedLibraries);
-            return LibraryImportFilter.filterNotExisting(knownLibraries, config.getLibraries());
-        }
-
-        void addLibrary(final RobotDryRunLibraryImport dryRunLibraryImport) {
-            if (dryRunLibraryImport.getType() == DryRunLibraryType.JAVA) {
-                addJavaLibrary(dryRunLibraryImport);
-            } else {
-                addPythonLibrary(dryRunLibraryImport);
+        void addLibrary(final RobotDryRunLibraryImport libraryImport) {
+            if (libraryImport.getType() == DryRunLibraryType.JAVA) {
+                addJavaLibrary(libraryImport);
+            } else if (libraryImport.getType() == DryRunLibraryType.PYTHON) {
+                addPythonLibrary(libraryImport);
             }
         }
 
-        void update(final IEventBroker eventBroker) {
-            if (!addedLibs.isEmpty()) {
-                sendProjectConfigChangedEvent(eventBroker);
-                if (persistConfig) {
-                    new RedEclipseProjectConfigWriter().writeConfiguration(config, project);
-                }
-            }
-        }
-
-        private void sendProjectConfigChangedEvent(IEventBroker eventBroker) {
-            final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                    project.getConfigurationFile(), addedLibs);
-            if (eventBroker == null) {
-                eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
-            }
-            if (eventBroker != null) {
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-            }
-        }
-
-        private void addPythonLibrary(final RobotDryRunLibraryImport dryRunLibraryImport) {
+        private void addPythonLibrary(final RobotDryRunLibraryImport libraryImport) {
             final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
-                    project.getRuntimeEnvironment(), project.getRobotProjectConfig(), project.getProject());
+                    robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(),
+                    robotProject.getProject());
             Collection<ILibraryClass> pythonClasses = newArrayList();
             try {
-                pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(dryRunLibraryImport.getSourcePath(),
-                        Optional.of(dryRunLibraryImport.getName()), true);
+                pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath(),
+                        Optional.of(libraryImport.getName()), true);
             } catch (final RobotEnvironmentException e) {
-                final Optional<File> modulePath = findPythonLibraryModulePath(dryRunLibraryImport);
+                final Optional<File> modulePath = findPythonLibraryModulePath(libraryImport);
                 if (modulePath.isPresent()) {
                     final Path path = new Path(modulePath.get().getPath());
                     final ReferencedLibrary newLibrary = ReferencedLibrary.create(LibraryType.PYTHON,
-                            dryRunLibraryImport.getName(), path.toPortableString());
-                    addReferencedLibraries(dryRunLibraryImport, Collections.singletonList(newLibrary));
+                            libraryImport.getName(), path.toPortableString());
+                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ADDED, "");
+                    addLibraries(Collections.singletonList(newLibrary));
                 } else {
-                    dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
+                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
                 }
                 return;
             }
 
-            addReferencedLibrariesFromClasses(dryRunLibraryImport, pythonClasses);
+            addReferencedLibrariesFromClasses(libraryImport, pythonClasses);
         }
 
-        private Optional<File> findPythonLibraryModulePath(final RobotDryRunLibraryImport dryRunLibraryImport) {
+        private Optional<File> findPythonLibraryModulePath(final RobotDryRunLibraryImport libraryImport) {
             try {
                 final EnvironmentSearchPaths envSearchPaths = new RedEclipseProjectConfig(config)
-                        .createEnvironmentSearchPaths(project.getProject());
-                return project.getRuntimeEnvironment().getModulePath(dryRunLibraryImport.getName(), envSearchPaths);
+                        .createEnvironmentSearchPaths(robotProject.getProject());
+                return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), envSearchPaths);
             } catch (final RobotEnvironmentException e1) {
                 // that's fine
             }
             return Optional.absent();
         }
 
-        private void addJavaLibrary(final RobotDryRunLibraryImport dryRunLibraryImport) {
-            final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(project.getRuntimeEnvironment(),
-                    project.getRobotProjectConfig(), project.getProject());
+        private void addJavaLibrary(final RobotDryRunLibraryImport libraryImport) {
+            final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(
+                    robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(),
+                    robotProject.getProject());
             Collection<ILibraryClass> classesFromJar = newArrayList();
             try {
-                classesFromJar = jarStructureBuilder.provideEntriesFromFile(dryRunLibraryImport.getSourcePath());
+                classesFromJar = jarStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath());
             } catch (final RobotEnvironmentException e) {
-                dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
+                libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
                 return;
             }
 
-            addReferencedLibrariesFromClasses(dryRunLibraryImport, classesFromJar);
+            addReferencedLibrariesFromClasses(libraryImport, classesFromJar);
         }
 
-        private void addReferencedLibrariesFromClasses(final RobotDryRunLibraryImport dryRunLibraryImport,
-                final Collection<ILibraryClass> libClasses) {
-            final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
-            if (libClasses.isEmpty()) {
-                dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
-                        "RED was unable to find classes inside '" + dryRunLibraryImport.getSourcePath() + "' module.");
+        private void addReferencedLibrariesFromClasses(final RobotDryRunLibraryImport libraryImport,
+                final Collection<ILibraryClass> libraryClasses) {
+            if (libraryClasses.isEmpty()) {
+                libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
+                        "RED was unable to find classes inside '" + libraryImport.getSourcePath() + "' module.");
             } else {
-                for (final ILibraryClass libClass : libClasses) {
-                    if (libClass.getQualifiedName().equalsIgnoreCase(dryRunLibraryImport.getName())) {
-                        librariesToAdd.add(libClass.toReferencedLibrary(dryRunLibraryImport.getSourcePath()));
+                final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
+                for (final ILibraryClass libraryClass : libraryClasses) {
+                    if (libraryClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
+                        librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath()));
                     }
                 }
                 if (librariesToAdd.isEmpty()) {
-                    dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
-                            "RED was unable to find class '" + dryRunLibraryImport.getName() + "' inside '"
-                                    + dryRunLibraryImport.getSourcePath() + "' module.");
-                }
-            }
-
-            addReferencedLibraries(dryRunLibraryImport, librariesToAdd);
-        }
-
-        private void addReferencedLibraries(final RobotDryRunLibraryImport dryRunLibraryImport,
-                final Collection<ReferencedLibrary> librariesToAdd) {
-            for (final ReferencedLibrary library : librariesToAdd) {
-                if (config.addReferencedLibrary(library)) {
-                    addedLibs.add(library);
-                    dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ADDED, "");
+                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
+                            "RED was unable to find class '" + libraryImport.getName() + "' inside '"
+                                    + libraryImport.getSourcePath() + "' module.");
+                } else {
+                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ADDED, "");
+                    addLibraries(librariesToAdd);
                 }
             }
         }

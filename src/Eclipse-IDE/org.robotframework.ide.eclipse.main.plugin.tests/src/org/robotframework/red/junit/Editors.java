@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.refactoring;
+package org.robotframework.red.junit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.IEditorPart;
@@ -19,24 +19,24 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
  * @author Michal Anglart
  *
  */
-class Editors {
+public class Editors {
 
-    static TextEditor openInTextEditor(final IFile redXmlFile) throws PartInitException {
-        return (TextEditor) openInEditor(redXmlFile, EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+    public static TextEditor openInTextEditor(final IFile file) throws PartInitException {
+        return (TextEditor) openInEditor(file, EditorsUI.DEFAULT_TEXT_EDITOR_ID);
     }
 
-    static RedProjectEditor openInProjectEditor(final IFile redXmlFile) throws PartInitException {
-        return (RedProjectEditor) openInEditor(redXmlFile, RedProjectEditor.ID);
+    public static RedProjectEditor openInProjectEditor(final IFile file) throws PartInitException {
+        return (RedProjectEditor) openInEditor(file, RedProjectEditor.ID);
     }
 
-    private static IEditorPart openInEditor(final IFile redXmlFile, final String editorId) throws PartInitException {
+    private static IEditorPart openInEditor(final IFile file, final String editorId) throws PartInitException {
         return PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow()
                 .getActivePage()
-                .openEditor(new FileEditorInput(redXmlFile), editorId, true, IWorkbenchPage.MATCH_ID);
+                .openEditor(new FileEditorInput(file), editorId, true, IWorkbenchPage.MATCH_ID);
     }
 
-    static boolean isAnyEditorOpened() {
+    public static boolean isAnyEditorOpened() {
         return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences().length > 0;
     }
 }
