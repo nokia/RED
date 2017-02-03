@@ -1,0 +1,171 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _znjMEBtDEeWSh6BKjAxDIw
+Element-Name: SelectedTestRunConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _4lAb8OldEea0ALtmCcrmfA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/2/17 6:06 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-selection-of-tests" [val t1 false] [val t2 false] [val t3 false] {
+	with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+	    get-item "TestFile.robot/test 1" | get-property checked | equals $t1 | verify-true
+	    get-item "TestFile.robot/TEST 2" | get-property checked | equals $t2 | verify-true
+	    get-item "TestFile.robot/test 3" | get-property checked | equals $t3 | verify-true
+	}
+}
+
+proc "check-console-for-all-tests"{
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+    + ".* : INFO : 7\n"
+    + "Ending test: RobotProject.TestFile.test 1\n\n"
+    + "Starting test: RobotProject.TestFile.TEST 2\n"
+    + "Ending test: RobotProject.TestFile.TEST 2\n\n"
+    + "Starting test: RobotProject.TestFile.test 3\n"
+    + ".* : INFO : Removed tag 'tags'.\n"
+    + "Ending test: RobotProject.TestFile.test 3" | verify-true
+}
+    
+//open test and add content
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  7\n"
+    + "    \n"
+    + "TEST 2\n"
+    + "    Should Be Equal As Integers    5    5\n"
+    + "    No Operation\n"
+    + "    Comment    comment\n"
+    + "    \n"
+    + "test 3\n"
+    + "    Convert To Hex    56265\n"
+    + "    Remove Tags    tags" 
+
+get-button "Save \((Ctrl|M1)\+S\)" | click
+
+//run middle test - capital letters
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 3
+    get-menu "Run test: 'TEST 2'" | click
+}
+
+//check log if one test was run
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.TEST 2\n"
+    + "Ending test: RobotProject.TestFile.TEST 2" | verify-true
+    
+//check if run config exists    
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select Robot
+with [get-window "Run Configurations" | get-tree] {
+    get-item Robot | get-property childCount | equals 1 | verify-true
+    get-item Robot | get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot (Selected Test Cases)" 
+        | verify-true
+}
+
+//only one test should be selected
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot (Selected Test Cases)"
+check-selection-of-tests -t2 true
+get-window "Run Configurations" | get-button Close | click
+
+//run entire file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+check-console-for-all-tests
+
+
+//check if are 2 run configs
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations" | get-tree] {
+    get-item Robot | get-property childCount | equals 2 | verify-true
+    get-item Robot | get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
+    get-item Robot | get-property "getItems().TreeItem[1].getText()" | equals "TestFile.robot (Selected Test Cases)" 
+        | verify-true
+}
+check-selection-of-tests -t2 true
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot"
+check-selection-of-tests -t1 true -t2 true -t3 true
+get-window "Run Configurations"| get-button Close | click
+
+//run test 1 from PE
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot/Test Cases/test 1" | get-menu Run | click
+
+//check if one test was run
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+    + ".* : INFO : 7\n"
+    + "Ending test: RobotProject.TestFile.test 1" | verify-true
+    
+//check if is still only one coniguration for Selected test
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 2 | verify-true
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot (Selected Test Cases)"
+check-selection-of-tests -t1 true
+get-window "Run Configurations"| get-button Close | click
+
+//press green button - selected test should be run   
+ get-button "Run.*" -index 0  | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+    + ".* : INFO : 7\n"
+    + "Ending test: RobotProject.TestFile.test 1" | verify-true
+get-menu "Run/Run Configurations..." | click
+
+
+//remove all configs
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/TestFile.robot"
+    get-button "Delete selected launch configuration(s)" | click
+    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-tree | select "Robot/TestFile.robot (Selected Test Cases)"
+    get-button "Delete selected launch configuration(s)" | click
+    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-button Close | click
+}
+//------------------------------------------------------ run and debug ----------------------------------------
+
+//debug test from source and than run normal
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 10 5
+    get-menu "Debug test: 'test 3'" | click
+
+    set-caret-pos 12 8
+    get-menu "Run test: 'test 3'" | click
+}
+//check console
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 3\n"
+    + ".* : INFO : Removed tag 'tags'.\n"
+    + "Ending test: RobotProject.TestFile.test 3" | verify-true
+
+//run test by button - now is wrong name - shoud be "get-button "Run TestFile.robot (Selected Test Cases)" | click"
+//get-button "Run.*" -index 0 | get-property tooltip | equals "Run TestFile.robot" | verify-true
+
+get-button "Run.*" -index 0 | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 3\n"
+    + ".* : INFO : Removed tag 'tags'.\n"
+    + "Ending test: RobotProject.TestFile.test 3" | verify-true
+    
+//run entire test
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+check-console-for-all-tests
+    
+//check if are 2 run configs
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 2 | verify-true
+
+check-selection-of-tests -t3 true
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot"
+check-selection-of-tests -t1 true -t2 true -t3 true
+
+get-window "Run Configurations"| get-button Close | click
+
+//click button - entire test should be run
+get-button "Run.*" -index 0 | click
+check-console-for-all-tests
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
