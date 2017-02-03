@@ -1,0 +1,208 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA
+Element-Name: DefauleRunConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _XUivgOobEea0ALtmCcrmfA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/3/17 4:54 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//add 2 tests
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "abc\n"
+    + "    [Tags]    test 1\n"
+    + "    log  9\n"
+    + "    \n"
+    + "def\n"
+    + "    log  8" 
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+//check default preference
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Default Launch Configuration"
+with [get-window Preferences] {
+    get-label "Configure default robot launch configuration" | get-property caption 
+        | equals "Configure default robot launch configuration" | verify-true
+    with [get-control Any -after [get-label "Configure default robot launch configuration"]] {
+        get-property "getChildren().length" | equals 5 | verify-true
+        get-property "getChildren().Control[1].getText()" | equals "Additional interpreter arguments:" | verify-true
+        get-property "getChildren().Control[2].getText()" | equals "" | verify-true
+        get-property "getChildren().Control[2].getEditable()" | equals true | verify-true
+        get-property "getChildren().Control[3].getText()" | equals "Additional Robot Framework arguments:" | verify-true
+        get-property "getChildren().Control[4].getText()" | equals "" | verify-true
+        get-property "getChildren().Control[4].getEditable()" | equals true | verify-true
+    }
+}
+
+//add --version
+with [get-window Preferences] {
+    get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "--version"
+    get-button Apply | click
+    get-button OK | click
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+
+//open run configs an chceck if arg was added
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot"
+with [get-window "Run Configurations" | get-group Executor] {
+    get-button "Use interpreter as defined in project configuration" | get-property selected | equals true | verify-true
+    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "--version" 
+        | verify-true
+    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text | equals "" | verify-true
+}
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "TestFile.robot/abc" | get-property checked | equals true | verify-true
+    get-item "TestFile.robot/def" | get-property checked | equals true | verify-true
+}
+
+//remove run config
+with [get-window "Run Configurations"] {
+    get-button "Delete selected launch configuration(s)" | click
+    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-button Close | click
+}
+
+//check console
+get-view "Message Log" | get-editbox | get-property text | equals "" | verify-true
+with [get-view Console | get-text-viewer] {
+    get-property text | equals "Python .*\n"
+        + "Command: .* --version -m robot.run .*\n"
+        + "Suite Executor: Robot Framework .* \(.*\)" | verify-true
+    get-property "getLineCount()" | equals 4 | verify-true
+}
+
+//remove --version and add Robot interpereter pref
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-editbox -after [get-label "Additional interpreter arguments:"] | set-text ""
+    get-editbox -after [get-label "Additional Robot Framework arguments:"] 
+        | set-text "-i \"test 1\" -o None -d None -l None -r None"
+    get-button OK | click
+}
+
+
+//run test
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+
+//check that one test was run
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.abc\n"
+    + ".* : INFO : 9\n"
+    + "Ending test: RobotProject.TestFile.abc" | verify-true
+    
+    
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.TestFile -i \"test 1\" -o None -d None -l None -r None .*RobotProject\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "==============================================================================\n"
+    + "RobotProject                                                                  \n"
+    + "==============================================================================\n"
+    + "RobotProject.TestFile                                                         \n"
+    + "==============================================================================\n"
+    + "abc                                                                   \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "RobotProject.TestFile                                                 \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "RobotProject                                                          \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  None" | verify-true
+    
+//run from outlie single test    
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/def" | get-menu Run | click
+
+//no test should be runbut args should be added
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.TestFile -t RobotProject.TestFile.def -i \"test 1\" -o None -d None -l None -r None .*RobotProject\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.TestFile.def' in suite 'RobotProject.TestFile'.\n\n"
+    + "Try --help for usage information." | verify-true
+    
+//check if run config for selected test was created
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot (Selected Test Cases)"
+with [get-window "Run Configurations" | get-group Executor] {
+    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+        | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
+}
+
+//check if run config for antire test remains
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot"
+with [get-window "Run Configurations" | get-group Executor] {
+    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+        | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
+}
+get-window "Run Configurations" | get-button Close | click
+
+
+//remove tag arg
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-editbox -after [get-label "Additional Robot Framework arguments:"] | set-text "-o None -d None -l None -r None"
+    get-button OK | click
+}
+
+///add new tsv file
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text new
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+//set single test
+get-editor "new.tsv" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "\tlog\t8" 
+
+//save it
+with [get-editor "new.tsv" | get-text-viewer] {
+    set-caret-pos 3 1
+    key-type "M1+s"
+}
+//debug it    
+get-view "Project Explorer" | get-tree | select "RobotProject/new.tsv" | get-menu "Debug As/1 Robot Test" | click
+
+//open run conigs and check if new one was added
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 3 | verify-true
+get-window "Run Configurations" | get-tree | select "Robot/new.tsv"
+with [get-window "Run Configurations" | get-group Executor] {
+    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
+    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+        | equals "-o None -d None -l None -r None" | verify-true
+}
+
+//check for selected tests
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot (Selected Test Cases)"
+get-window "Run Configurations" | get-group Executor | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+    
+//check full file    
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot"
+get-window "Run Configurations" | get-group Executor | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+get-window "Run Configurations" | get-button Close | click
+
+get-view Console | get-text-viewer | get-property text 
+    | contains "Output:  None" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
