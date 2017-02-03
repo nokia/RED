@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.File;
 import java.util.Collections;
@@ -45,6 +46,12 @@ public class InstalledRobotEnvironments {
                         } else if (RedPreferences.ACTIVE_RUNTIME.equals(event.getKey())) {
                             active = createRuntimeEnvironment((String) event.getNewValue(),
                                     RedPlugin.getDefault().getPreferences().getActiveRuntimeExec());
+                        } else if (RedPreferences.ACTIVE_RUNTIME_EXEC.equals(event.getKey())
+                                && newHashSet(event.getOldValue(), event.getNewValue()).equals(newHashSet(
+                                        SuiteExecutor.IronPython.name(), SuiteExecutor.IronPython64.name()))) {
+                            active = createRuntimeEnvironment(
+                                    RedPlugin.getDefault().getPreferences().getActiveRuntime(),
+                                    (String) event.getNewValue());
                         } else if (RedPreferences.OTHER_RUNTIMES.equals(event.getKey())) {
                             all = createRuntimeEnvironments((String) event.getNewValue(),
                                     RedPlugin.getDefault().getPreferences().getAllRuntimesExecs());
