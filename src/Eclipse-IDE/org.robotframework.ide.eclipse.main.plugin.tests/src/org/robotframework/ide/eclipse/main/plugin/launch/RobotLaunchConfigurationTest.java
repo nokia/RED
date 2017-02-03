@@ -26,6 +26,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -39,7 +40,7 @@ import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfigurationTest {
 
-    private ILaunchManager manager;
+    private static ILaunchManager manager;
 
     private final static String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
     private IProject project;
@@ -51,13 +52,23 @@ public class RobotLaunchConfigurationTest {
     @Before
     public void setup() throws CoreException {
         manager = DebugPlugin.getDefault().getLaunchManager();
+        removeAllConfigurations();
+        project = projectProvider.getProject();
+    }
+
+    @AfterClass
+    public static void clean() throws CoreException {
+        removeAllConfigurations();
+    }
+
+    private static void removeAllConfigurations() throws CoreException {
         final ILaunchConfigurationType launchConfigurationType = manager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
         for (final ILaunchConfiguration config : launchConfigs) {
             config.delete();
         }
-        project = projectProvider.getProject();
+
     }
 
     @Test
@@ -106,7 +117,7 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void defaultConfigurationObtained_whenDefaultConfigurationIsCreated() throws CoreException {
-        RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         assertThat(robotConfig.getName()).isEqualTo("Resource");
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.getSuitePaths().keySet()).containsExactly("Resource");
@@ -121,8 +132,8 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void defaultConfigurationObtained_whenCustomConfigurationFilledDefaults() throws CoreException {
-        RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        Map<String, List<String>> suites = new HashMap<String, List<String>>();
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final Map<String, List<String>> suites = new HashMap<String, List<String>>();
         suites.put("key", newArrayList("value"));
         robotConfig.setExecutor(SuiteExecutor.PyPy);
         robotConfig.setExecutorArguments("arguments");
@@ -147,18 +158,18 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
-        IResource res = project.getFile("Resource1");
-        IResource res2 = project.getFile("Resource2");
-        Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
-        List<String> casesForRes = newArrayList("case1", "case3");
-        List<String> casesForRes2 = newArrayList("case1");
+        final IResource res = project.getFile("Resource1");
+        final IResource res2 = project.getFile("Resource2");
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
+        final List<String> casesForRes = newArrayList("case1", "case3");
+        final List<String> casesForRes2 = newArrayList("case1");
         resourcesToTestCases.put(res, casesForRes);
         resourcesToTestCases.put(res2, casesForRes2);
-        ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
-        RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
-        Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
+        final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
         assertThat(suitePaths.keySet()).containsExactlyInAnyOrder("Resource1", "Resource2");
         assertThat(suitePaths).containsEntry("Resource1", casesForRes);
         assertThat(suitePaths).containsEntry("Resource2", casesForRes2);
@@ -173,15 +184,15 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void suitesObtained_whenSuitesCollectedFromConfiguration() throws CoreException {
-        List<IResource> resources = newArrayList();
+        final List<IResource> resources = newArrayList();
         for (int i = 0; i < 3; i++) {
-            IResource res = project.getFile("Resource " + i + ".fake");
+            final IResource res = project.getFile("Resource " + i + ".fake");
             resources.add(res);
         }
-        ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
-        RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        Map<IResource, List<String>> obtainedSuites = robotConfig.collectSuitesToRun();
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final Map<IResource, List<String>> obtainedSuites = robotConfig.collectSuitesToRun();
         assertThat(obtainedSuites).hasSameSizeAs(resources);
         for (int i = 0; i < resources.size(); i++) {
             assertThat(obtainedSuites).containsKey(resources.get(i));
@@ -190,22 +201,22 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
-        IResource res = project.getFile("Resource");
-        List<IResource> resources = newArrayList(res);
-        ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+        final IResource res = project.getFile("Resource");
+        final List<IResource> resources = newArrayList(res);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
-        RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        RobotProject projectFromConfig = robotConfig.getRobotProject();
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotProject projectFromConfig = robotConfig.getRobotProject();
         assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
     }
 
     @Test
     public void remoteDebugPortAndTimeoutAreCorrect_whenSet() throws CoreException {
-        RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setRemoteDebugPort("1234");
         robotConfig.setRemoteDebugTimeout("9876");
-        Optional<Integer> port = robotConfig.getRemoteDebugPort();
-        Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
+        final Optional<Integer> port = robotConfig.getRemoteDebugPort();
+        final Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
         assertThat(port.isPresent()).isTrue();
         assertThat(port.get()).isEqualTo(1234);
         assertThat(timeout.isPresent()).isTrue();
@@ -214,48 +225,48 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void remoteDebugPortAndTimeoutAreAbsent_whenNotSet() throws CoreException {
-        RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        Optional<Integer> port = robotConfig.getRemoteDebugPort();
-        Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final Optional<Integer> port = robotConfig.getRemoteDebugPort();
+        final Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
         assertThat(port.isPresent()).isFalse();
         assertThat(timeout.isPresent()).isFalse();
     }
 
     @Test
     public void configurationSuitableForResources_whenApplicable() throws CoreException, IOException {
-        IResource res = projectProvider.createFile("Resource", "");
-        List<IResource> resources = newArrayList(res);
-        ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+        final IResource res = projectProvider.createFile("Resource", "");
+        final List<IResource> resources = newArrayList(res);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
-        RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         assertThat(robotConfig.isSuitableFor(resources)).isTrue();
     }
 
     @Test
     public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException, IOException {
-        IResource res = projectProvider.createFile("Resource", "");
-        List<IResource> resources = newArrayList(res);
-        ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+        final IResource res = projectProvider.createFile("Resource", "");
+        final List<IResource> resources = newArrayList(res);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
-        RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
-        IResource anotherRes = projectProvider.createFile("Another Resource", "");
+        final IResource anotherRes = projectProvider.createFile("Another Resource", "");
         resources.add(anotherRes);
         assertThat(robotConfig.isSuitableFor(resources)).isFalse();
     }
 
     @Test
     public void configuredForRerunFailedTests_whenAskedForRerun() throws CoreException {
-        RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         RobotLaunchConfiguration.prepareRerunFailedTestsConfiguration(robotConfig.asWorkingCopy(), "path");
         assertThat(robotConfig.getExecutorArguments()).isEqualTo("-R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
-        IResource res = project.getFile("Resource");
-        List<IResource> resources = newArrayList(res);
-        ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+        final IResource res = project.getFile("Resource");
+        final List<IResource> resources = newArrayList(res);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
         return new RobotLaunchConfiguration(configuration);
     }
