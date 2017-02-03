@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+import org.robotframework.red.junit.Editors;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Optional;
