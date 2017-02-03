@@ -50,6 +50,10 @@ public class RedPreferences {
 
     public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
 
+    public static final String ADDITIONAL_INTERPRETER_ARGUMENTS = "red.additionalInterpreterArguments";
+
+    public static final String ADDITIONAL_ROBOT_ARGUMENTS = "red.additionalRobotArguments";
+
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
     }
@@ -139,6 +143,14 @@ public class RedPreferences {
 
     public int getFoldingLineLimit() {
         return store.getInt(FOLDING_LINE_LIMIT);
+    }
+
+    public String getAdditionalInterpreterArguments() {
+        return store.getString(ADDITIONAL_INTERPRETER_ARGUMENTS);
+    }
+
+    public String getAdditionalRobotArguments() {
+        return store.getString(ADDITIONAL_ROBOT_ARGUMENTS);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {

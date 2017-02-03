@@ -33,6 +33,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -86,8 +87,10 @@ public class RobotLaunchConfiguration {
 
     public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         robotConfig.setExecutor(SuiteExecutor.Python);
-        robotConfig.setExecutorArguments("");
+        robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
+        robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
         robotConfig.setProjectName("");
         robotConfig.setSuitePaths(new HashMap<String, List<String>>());
         robotConfig.setIsIncludeTagsEnabled(false);
@@ -107,7 +110,9 @@ public class RobotLaunchConfiguration {
             final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
             robotConfig.setExecutor(interpreter);
         }
-        robotConfig.setExecutorArguments("");
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
+        robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
         robotConfig.setProjectName(project.getName());
         
         final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
