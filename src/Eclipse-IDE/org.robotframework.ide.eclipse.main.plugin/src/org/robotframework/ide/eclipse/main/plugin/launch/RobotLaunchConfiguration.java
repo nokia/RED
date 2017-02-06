@@ -132,6 +132,48 @@ public class RobotLaunchConfiguration {
         robotConfig.setIsGeneralPurposeEnabled(true);
     }
     
+    public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
+            final String outputFilePath) throws CoreException {
+        final RobotLaunchConfiguration robotLaunchConfig = new RobotLaunchConfiguration(launchCopy);
+        robotLaunchConfig.setExecutorArguments("-R " + outputFilePath);
+        robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
+    }
+
+    public static ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelectedTestCases(
+            final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
+
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final String name = getNameForSelectedTestCasesConfiguration(resourcesToTestCases.keySet());
+        final String configurationName = manager.generateLaunchConfigurationName(name);
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+                .newInstance(null, configurationName);
+
+        fillDefaults(configuration, resourcesToTestCases);
+
+        final RobotLaunchConfiguration robotConfiguration = new RobotLaunchConfiguration(configuration);
+        robotConfiguration.setIsGeneralPurposeEnabled(false);
+
+        return configuration;
+    }
+
+    public static String getNameForSelectedTestCasesConfiguration(final Collection<IResource> resources) {
+        if (resources.size() == 1) {
+            return getFirst(resources, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
+        }
+        final Set<IProject> projects = new HashSet<>();
+        for (final IResource res : resources) {
+            if (projects.add(res.getProject())) {
+                if (projects.size() > 1) {
+                    break;
+                }
+            }
+        }
+        if (projects.size() == 1) {
+            return getFirst(projects, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
+        }
+        return "New Configuration";
+    }
+
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
         this.configuration = config;
     }
@@ -189,9 +231,9 @@ public class RobotLaunchConfiguration {
 
                 @Override
                 public String apply(final String path) {
-                    List<String> testSuites = new ArrayList<String>();
-                    Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
-                    for (String s : temp) {
+                    final List<String> testSuites = new ArrayList<>();
+                    final Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
+                    for (final String s : temp) {
                         testSuites.add(s.toLowerCase());
                     }
                     return Joiner.on("::").join(testSuites);
@@ -428,47 +470,5 @@ public class RobotLaunchConfiguration {
 
     public String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
         return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getExecutor().executableName();
-    }
-    
-    public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
-            final String outputFilePath) throws CoreException {
-        final RobotLaunchConfiguration robotLaunchConfig = new RobotLaunchConfiguration(launchCopy);
-        robotLaunchConfig.setExecutorArguments("-R " + outputFilePath);
-        robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
-    }
-
-    public static ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelectedTestCases(
-            final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
-
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final String name = getNameForSelectedTestCasesConfiguration(resourcesToTestCases.keySet());
-        final String configurationName = manager.generateLaunchConfigurationName(name);
-        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
-                .newInstance(null, configurationName);
-
-        fillDefaults(configuration, resourcesToTestCases);
-
-        RobotLaunchConfiguration robotConfiguration = new RobotLaunchConfiguration(configuration);
-        robotConfiguration.setIsGeneralPurposeEnabled(false);
-
-        return configuration;
-    }
-
-    public static String getNameForSelectedTestCasesConfiguration(final Collection<IResource> resources) {
-        if (resources.size() == 1) {
-            return getFirst(resources, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
-        }
-        Set<IProject> projects = new HashSet<IProject>();
-        for (IResource res : resources) {
-            if (projects.add(res.getProject())) {
-                if (projects.size() > 1) {
-                    break;
-                }
-            }
-        }
-        if (projects.size() == 1) {
-            return getFirst(projects, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
-        }
-        return "New Configuration";
     }
 }
