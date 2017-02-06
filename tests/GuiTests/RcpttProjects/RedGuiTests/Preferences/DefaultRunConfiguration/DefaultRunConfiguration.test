@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/6/17 11:31 AM
+Save-Time: 2/6/17 12:07 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -99,7 +99,7 @@ get-preferences-menu | click
 with [get-window Preferences] {
     get-editbox -after [get-label "Additional interpreter arguments:"] | set-text ""
     get-editbox -after [get-label "Additional Robot Framework arguments:"] 
-        | set-text "-i \"test 1\" -o None -d None -l None -r None"
+        | set-text "-i test 1 -o None -d None -l None -r None"
     get-button OK | click
 }
 
@@ -115,7 +115,7 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     
     
 get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -i \"test 1\" -o None -d None -l None -r None .*RobotProject\n"
+    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -i test 1 -o None -d None -l None -r None .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "==============================================================================\n"
     + "RobotProject                                                                  \n"
@@ -136,28 +136,29 @@ get-view Console | get-text-viewer | get-property text
     
 //run from outlie single test    
 get-view Outline | get-tree | select "test_for_run_config.robot/Test Cases/def" | get-menu Run | click
+wait-for-console
 
 //no test should be run but args should be added
 get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i \"test 1\" -o None -d None -l None -r None .*RobotProject\n"
+    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
     + "Try --help for usage information." | verify-true
-    
+  
 //check if run config for selected test was created
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot (Selected Test Cases)"
 with [get-window "Run Configurations" | get-group Executor] {
     get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-        | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+        | equals "-i test 1 -o None -d None -l None -r None" | verify-true
     get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
 }
 
-//check if run config for antire test remains
+//check if run config for entire test remains
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot"
 with [get-window "Run Configurations" | get-group Executor] {
     get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-        | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+        | equals "-i test 1 -o None -d None -l None -r None" | verify-true
     get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
 }
 get-window "Run Configurations" | get-button Close | click
@@ -206,13 +207,13 @@ with [get-window "Run Configurations" | get-group Executor] {
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot (Selected Test Cases)"
 get-window "Run Configurations" | get-group Executor | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
     
 //check full file    
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot"
 get-window "Run Configurations" | get-group Executor | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
+    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
 get-window "Run Configurations" | get-button Close | click
 
 get-view Console | get-text-viewer | get-property text 
