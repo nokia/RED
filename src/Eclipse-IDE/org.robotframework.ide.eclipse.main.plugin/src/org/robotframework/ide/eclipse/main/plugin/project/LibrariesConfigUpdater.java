@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 /**
  * @author bembenek
  */
-public class LibrariesConfigUpdater {    
+public class LibrariesConfigUpdater {
 
     protected final RobotProject robotProject;
 
@@ -54,6 +54,7 @@ public class LibrariesConfigUpdater {
         if (!addedLibraries.isEmpty()) {
             if (isEditorOpened) {
                 robotProject.clearConfiguration();
+                robotProject.clearKwSources();
                 new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
             }
             fireEvents(eventBroker);

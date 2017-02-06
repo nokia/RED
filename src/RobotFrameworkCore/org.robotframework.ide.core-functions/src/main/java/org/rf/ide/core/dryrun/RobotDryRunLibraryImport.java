@@ -17,57 +17,58 @@ import java.util.Objects;
  */
 public class RobotDryRunLibraryImport {
 
-    private String name;
+    private final String name;
 
-    private String sourcePath;
+    private final String sourcePath;
 
     private String additionalInfo;
 
-    private List<String> importersPaths = newArrayList();
-    
-    private List<String> args = newArrayList();
+    private final List<String> importersPaths = newArrayList();
+
+    private final List<String> args = newArrayList();
 
     private DryRunLibraryImportStatus status;
 
-    private DryRunLibraryType type;
+    private final DryRunLibraryType type;
 
     public RobotDryRunLibraryImport(final String name) {
         this(name, "", "", new ArrayList<String>());
     }
-    
+
     public RobotDryRunLibraryImport(final String name, final String importerPath, final List<String> args) {
         this(name, "", importerPath, args);
     }
 
     public RobotDryRunLibraryImport(final String name, final String sourcePath, final String importerPath, final List<String> args) {
         this.name = name;
-        this.sourcePath = checkLibSourcePathAndType(sourcePath);
+        this.sourcePath = resolveSourcePath(sourcePath);
+        this.type = resolveType(this.sourcePath);
         if (importerPath != null && !importerPath.isEmpty() && !importersPaths.contains(importerPath)) {
             this.importersPaths.add(importerPath);
         }
         this.args.addAll(args);
     }
 
-    private String checkLibSourcePathAndType(final String sourcePath) {
-        String sourcePathCheckResult = "";
-        if (sourcePath == null || sourcePath.isEmpty()) {
-            type = DryRunLibraryType.UNKNOWN;
-        } else {
-            sourcePathCheckResult = sourcePath;
+    private String resolveSourcePath(final String sourcePath) {
+        if (!sourcePath.isEmpty()) {
             if (sourcePath.endsWith(".pyc")) {
-                sourcePathCheckResult = sourcePath.substring(0, sourcePath.length() - 1);
+                return sourcePath.substring(0, sourcePath.length() - 1);
             } else if (sourcePath.endsWith("$py.class")) {
-                sourcePathCheckResult = sourcePath.replace("$py.class", ".py");
-            }
-            
-            if (sourcePathCheckResult.endsWith(".jar") || sourcePathCheckResult.endsWith(".java")
-                    || sourcePathCheckResult.endsWith(".class")) {
-                type = DryRunLibraryType.JAVA;
-            } else {
-                type = DryRunLibraryType.PYTHON;
+                return sourcePath.replace("$py.class", ".py");
             }
         }
-        return sourcePathCheckResult;
+        return sourcePath;
+    }
+
+    private DryRunLibraryType resolveType(final String sourcePath) {
+        if (!sourcePath.isEmpty()) {
+            if (sourcePath.endsWith(".jar") || sourcePath.endsWith(".java") || sourcePath.endsWith(".class")) {
+                return DryRunLibraryType.JAVA;
+            } else {
+                return DryRunLibraryType.PYTHON;
+            }
+        }
+        return DryRunLibraryType.UNKNOWN;
     }
 
     public String getName() {
@@ -76,10 +77,6 @@ public class RobotDryRunLibraryImport {
 
     public String getSourcePath() {
         return sourcePath;
-    }
-
-    public void setSourcePath(String sourcePath) {
-        this.sourcePath = sourcePath;
     }
 
     public List<String> getImportersPaths() {
@@ -102,7 +99,7 @@ public class RobotDryRunLibraryImport {
         this.status = status;
         this.additionalInfo = additionalInfo;
     }
-    
+
     public void addImporterPath(final String path) {
         if(!importersPaths.contains(path)) {
             importersPaths.add(path);
@@ -129,7 +126,7 @@ public class RobotDryRunLibraryImport {
     public int hashCode() {
         return Objects.hash(name, sourcePath, type);
     }
-    
+
     public static enum DryRunLibraryImportStatus {
         ADDED("Added to project configuration"),
         ALREADY_EXISTING("Already existing in project configuration"),

@@ -302,6 +302,7 @@ public class RobotProject extends RobotContainer {
     public synchronized void clearAll() {
         projectHolder = null;
         clearConfiguration();
+        clearKwSources();
     }
 
     public synchronized void clearConfiguration() {
@@ -309,6 +310,9 @@ public class RobotProject extends RobotContainer {
         referencedVariableFiles = null;
         stdLibsSpecs = null;
         refLibsSpecs = null;
+    }
+
+    public synchronized void clearKwSources() {
         kwSources.clear();
     }
 

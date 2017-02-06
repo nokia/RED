@@ -103,7 +103,9 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     } catch (final InvocationTargetException e) {
                         MessageDialog.openError(parent, "Discovering libraries",
                                 "Problems occurred during discovering libraries: " + e.getCause().getMessage());
+                        return Status.CANCEL_STATUS;
                     } finally {
+                        monitor.done();
                         stopDryRun();
                     }
 
@@ -140,9 +142,9 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             final List<RobotDryRunLibraryImport> libraryImportsToAdd = updater.getLibraryImportsToAdd(libraryImports);
 
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
+            subMonitor.subTask("Adding libraries to project configuration...");
             subMonitor.setWorkRemaining(libraryImportsToAdd.size() + 1);
             for (final RobotDryRunLibraryImport libraryImport : libraryImportsToAdd) {
-                subMonitor.subTask("Adding discovered library to project configuration: " + libraryImport.getName());
                 updater.addLibrary(libraryImport);
                 subMonitor.worked(1);
             }
@@ -150,7 +152,6 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             subMonitor.subTask("Updating project configuration...");
             updater.finalizeLibrariesAdding(eventBroker);
             subMonitor.worked(1);
-            subMonitor.done();
         }
     }
 
@@ -317,7 +318,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
                         "RED was unable to find classes inside '" + libraryImport.getSourcePath() + "' module.");
             } else {
-                final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
+                final Collection<ReferencedLibrary> librariesToAdd = newArrayList();
                 for (final ILibraryClass libraryClass : libraryClasses) {
                     if (libraryClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
                         librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath()));
