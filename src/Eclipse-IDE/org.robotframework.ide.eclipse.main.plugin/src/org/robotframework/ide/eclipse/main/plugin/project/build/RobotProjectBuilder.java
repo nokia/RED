@@ -27,7 +27,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     private final BuildLogger logger;
     private final ProblemsReportingStrategy reporter;
     private final ProblemsReportingStrategy fatalReporter;
-    
+
     public RobotProjectBuilder() {
         this(ProblemsReportingStrategy.reportOnly(), ProblemsReportingStrategy.reportAndPanic(), new BuildLogger());
     }
@@ -101,6 +101,7 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
     public static void clean(final RobotProject project) throws CoreException {
         project.getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
         project.clearConfiguration();
+        project.clearKwSources();
 
         LibspecsFolder.get(project.getProject()).removeNonSpecResources();
     }

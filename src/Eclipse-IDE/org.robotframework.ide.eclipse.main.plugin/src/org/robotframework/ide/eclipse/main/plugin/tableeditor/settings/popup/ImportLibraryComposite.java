@@ -299,6 +299,7 @@ public class ImportLibraryComposite {
 
     private void saveConfiguration(final RobotProjectConfig config) {
         robotProject.clearConfiguration();
+        robotProject.clearKwSources();
         new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
     }
