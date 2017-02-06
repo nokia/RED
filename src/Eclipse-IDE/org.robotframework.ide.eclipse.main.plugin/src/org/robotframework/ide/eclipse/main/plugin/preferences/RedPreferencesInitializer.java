@@ -50,6 +50,8 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         final List<PythonInstallationDirectory> interpreterPaths = RobotRuntimeEnvironment.whereArePythonInterpreters();
         if (!interpreterPaths.isEmpty()) {
             final String activePath = interpreterPaths.get(0).getAbsolutePath();
+            final String activeExec = interpreterPaths.get(0).getInterpreter().name();
+
             final String allPaths = Joiner.on(';').join(
                     transform(interpreterPaths, new Function<PythonInstallationDirectory, String>() {
                         @Override
@@ -57,11 +59,19 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
                             return dir.getAbsolutePath();
                         }
                     }));
+            final String allExecs = Joiner.on(';')
+                    .join(transform(interpreterPaths, new Function<PythonInstallationDirectory, String>() {
+
+                        @Override
+                        public String apply(final PythonInstallationDirectory dir) {
+                            return dir.getInterpreter().name();
+                        }
+                    }));
             
             preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
-            preferences.put(RedPreferences.ACTIVE_RUNTIME_EXEC, "");
+            preferences.put(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
             preferences.put(RedPreferences.OTHER_RUNTIMES, allPaths);
-            preferences.put(RedPreferences.OTHER_RUNTIMES_EXECS, "");
+            preferences.put(RedPreferences.OTHER_RUNTIMES_EXECS, allExecs);
         }
     }
 
