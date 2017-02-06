@@ -68,7 +68,7 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
             });
         } catch (InvocationTargetException | InterruptedException e) {
             if (e.getCause() instanceof RobotEnvironmentDetailedException) {
-                RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
+                final RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
                 DetailedErrorDialog.openErrorDialog(exc.getReason(), exc.getDetails());
             } else {
                 StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
@@ -87,6 +87,7 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
             robotProject.clearDirtyLibSpecs(groupedSpecifications.values());
             robotProject.clearConfiguration();
+            robotProject.clearKwSources();
         }
 
         SwtThread.asyncExec(new Runnable() {

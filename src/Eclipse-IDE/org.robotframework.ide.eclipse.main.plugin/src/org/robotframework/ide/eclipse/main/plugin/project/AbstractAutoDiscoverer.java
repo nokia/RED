@@ -79,7 +79,7 @@ public abstract class AbstractAutoDiscoverer {
             final IDryRunTargetsCollector dryRunTargetsCollector) throws InvocationTargetException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");
-        subMonitor.setWorkRemaining(3);
+        subMonitor.setWorkRemaining(4);
 
         final LibrariesSourcesCollector librariesSourcesCollector = collectPythonpathAndClasspathLocations();
         subMonitor.worked(1);
@@ -94,8 +94,6 @@ public abstract class AbstractAutoDiscoverer {
         subMonitor.subTask("Executing Robot dry run...");
         executeDryRun(dryRunCommandLine, subMonitor);
         subMonitor.worked(1);
-
-        subMonitor.done();
     }
 
     private LibrariesSourcesCollector collectPythonpathAndClasspathLocations() throws InvocationTargetException {

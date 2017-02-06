@@ -69,9 +69,9 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             .synchronizedListMultimap(ArrayListMultimap.<LibrarySpecification, String> create());
 
     private final Set<LibrarySpecification> dirtySpecs = Collections.synchronizedSet(new HashSet<LibrarySpecification>());
-    
+
     private final Set<LibrarySpecification> removedSpecs = new HashSet<>();
-    
+
     private final Map<ReferencedLibrary, String> registeredRefLibraries = Collections.synchronizedMap(new HashMap<ReferencedLibrary, String>());
 
     private final ConcurrentLinkedQueue<RebuildTask> rebuildTasksQueue = new ConcurrentLinkedQueue<>();
@@ -178,7 +178,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             removedSpecs.addAll(specsToRemove);
         }
     }
-    
+
     public boolean isLibSpecDirty(final LibrarySpecification spec) {
         return dirtySpecs.contains(spec);
     }
@@ -196,7 +196,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     public void unregisterFile(final String fileName, final IWatchEventHandler handler) {
         RedFileWatcher.getInstance().unregisterFile(fileName, this);
     }
-    
+
     @Override
     public void watchServiceInterrupted() {
         registeredLibrarySpecifications.clear();
@@ -259,7 +259,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 });
             } catch (InvocationTargetException | InterruptedException e) {
                 if (e.getCause() instanceof RobotEnvironmentDetailedException) {
-                    RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
+                    final RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
                     DetailedErrorDialog.openErrorDialog(exc.getReason(), exc.getDetails());
                 } else {
                     StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
@@ -278,6 +278,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         groupedSpecifications.putAll(rebuildTask.getProject(), rebuildTask.getSpecsToRebuild());
         invokeLibrariesBuilder(monitor, groupedSpecifications);
         robotProject.clearConfiguration();
+        robotProject.clearKwSources();
 
         rebuildTasksQueue.poll();
 
@@ -287,7 +288,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             handleRebuildTask(monitor, nextRebuildTask);
         }
     }
-    
+
     protected void invokeLibrariesBuilder(final IProgressMonitor monitor,
             final Multimap<IProject, LibrarySpecification> groupedSpecifications) {
         try {
@@ -331,13 +332,13 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private void refreshNavigator(final IProject project) {
         if (eventBroker == null) {
-            eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         }
         if (eventBroker != null) {
             eventBroker.post(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE, project);
         }
     }
-    
+
     private String findLibraryFileAbsolutePath(final ReferencedLibrary library) {
 
         String absolutePath = registeredRefLibraries.get(library);
@@ -365,7 +366,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
         return absolutePath;
     }
-    
+
     private String extractLibraryAbsolutePathFromDir(final ReferencedLibrary library, final IPath libraryPath) {
         final String fileExtension = library.provideType() == LibraryType.PYTHON ? ".py" : ".java";
         final String libraryName = library.getName();
@@ -392,12 +393,12 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
         return null;
     }
-    
+
     private void clearHandler(final String modifiedFileName) {
         removeLibrarySpecification(modifiedFileName);
         registeredRefLibraries.clear();
     }
-    
+
     public Set<LibrarySpecification> getRemovedSpecs() {
         return removedSpecs;
     }
@@ -412,14 +413,14 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     protected Map<ReferencedLibrary, String> getRegisteredRefLibraries() {
         return registeredRefLibraries;
     }
-    
+
     /**
      * for testing purposes only
      */
     protected ListMultimap<LibrarySpecification, String> getLibrarySpecifications() {
         return registeredLibrarySpecifications;
     }
-    
+
     /**
      * for testing purposes only
      */
