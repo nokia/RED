@@ -38,6 +38,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
@@ -100,6 +101,8 @@ public class RobotFormEditor extends FormEditor {
 
     private static RobotFormEditorPartListener robotFormEditorPartListener;
 
+    private final OnSaveLibrariesAutodiscoveryTrigger2 saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger2();
+
     public RedClipboard getClipboard() {
         return clipboard;
     }
@@ -119,6 +122,9 @@ public class RobotFormEditor extends FormEditor {
                     IResourceChangeEvent.POST_CHANGE);
             
             initRobotFormEditorPartListener(site.getPage());
+
+            site.getService(ICommandService.class).addExecutionListener(saveLibDiscoveryTrigger);
+
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
         }
@@ -271,7 +277,7 @@ public class RobotFormEditor extends FormEditor {
         }
         updateActivePage();
 
-        OnSaveLibrariesAutodiscoveryTrigger.createFor(currentModel).startLibrariesAutoDiscoveryIfRequired();
+        saveLibDiscoveryTrigger.startLibrariesAutoDiscoveryIfRequired(currentModel);
 
         if (shouldClose) {
             reopenEditor();
@@ -355,6 +361,8 @@ public class RobotFormEditor extends FormEditor {
         super.dispose();
 
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(validationListener);
+
+        getSite().getService(ICommandService.class).removeExecutionListener(saveLibDiscoveryTrigger);
 
         clipboard.dispose();
         suiteModel.dispose();
