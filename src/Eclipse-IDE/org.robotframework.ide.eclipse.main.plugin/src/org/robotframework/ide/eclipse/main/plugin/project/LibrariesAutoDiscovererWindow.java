@@ -157,7 +157,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                     if (selection instanceof DryRunLibraryImportChildElement) {
                         detailsText.setText(selection.toString());
                     } else if (selection instanceof RobotDryRunLibraryImport) {
-                        detailsText.setText(convertDryRunLibraryImportToText(selection));
+                        detailsText.setText(convertDryRunLibraryImportToText((RobotDryRunLibraryImport) selection));
                     } else {
                         detailsText.setText("");
                     }
@@ -256,9 +256,9 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         detailsText.setAlwaysShowScrollBars(false);
     }
 
-    private String convertDryRunLibraryImportToText(final Object selection) {
+    private String convertDryRunLibraryImportToText(final RobotDryRunLibraryImport libraryImport) {
         final StringBuilder libraryImportTxtBuilder = new StringBuilder("");
-        for (final Object child : extractDryRunLibraryImportChildren((RobotDryRunLibraryImport) selection)) {
+        for (final Object child : extractDryRunLibraryImportChildren(libraryImport)) {
             if (child instanceof DryRunLibraryImportChildElement) {
                 libraryImportTxtBuilder.append(child + "\n");
             } else if (child instanceof DryRunLibraryImportListChildElement) {
@@ -401,8 +401,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         private Image getImage(final Object element) {
             if (element instanceof RobotDryRunLibraryImport) {
                 final RobotDryRunLibraryImport libraryImport = (RobotDryRunLibraryImport) element;
-                if (libraryImport.getStatus() == null
-                        || libraryImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
+                if (libraryImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
                     return ImagesManager.getImage(RedImages.getFatalErrorImage());
                 } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.ADDED) {
                     return ImagesManager.getImage(RedImages.getBigSuccessImage());

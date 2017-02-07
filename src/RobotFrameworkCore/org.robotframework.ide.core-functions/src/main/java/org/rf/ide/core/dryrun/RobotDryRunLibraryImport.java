@@ -13,7 +13,6 @@ import java.util.Objects;
 
 /**
  * @author mmarzec
- *
  */
 public class RobotDryRunLibraryImport {
 
@@ -21,7 +20,7 @@ public class RobotDryRunLibraryImport {
 
     private final String sourcePath;
 
-    private String additionalInfo;
+    private final DryRunLibraryType type;
 
     private final List<String> importersPaths = newArrayList();
 
@@ -29,24 +28,27 @@ public class RobotDryRunLibraryImport {
 
     private DryRunLibraryImportStatus status;
 
-    private final DryRunLibraryType type;
+    private String additionalInfo;
 
     public RobotDryRunLibraryImport(final String name) {
-        this(name, "", "", new ArrayList<String>());
+        this(name, "", new ArrayList<String>());
     }
 
     public RobotDryRunLibraryImport(final String name, final String importerPath, final List<String> args) {
         this(name, "", importerPath, args);
     }
 
-    public RobotDryRunLibraryImport(final String name, final String sourcePath, final String importerPath, final List<String> args) {
+    public RobotDryRunLibraryImport(final String name, final String sourcePath, final String importerPath,
+            final List<String> args) {
         this.name = name;
-        this.sourcePath = resolveSourcePath(sourcePath);
+        this.sourcePath = sourcePath != null ? resolveSourcePath(sourcePath) : "";
         this.type = resolveType(this.sourcePath);
-        if (importerPath != null && !importerPath.isEmpty() && !importersPaths.contains(importerPath)) {
+        if (importerPath != null && !importerPath.isEmpty()) {
             this.importersPaths.add(importerPath);
         }
         this.args.addAll(args);
+        this.status = DryRunLibraryImportStatus.NOT_ADDED;
+        this.additionalInfo = "";
     }
 
     private String resolveSourcePath(final String sourcePath) {
@@ -95,13 +97,16 @@ public class RobotDryRunLibraryImport {
         return additionalInfo;
     }
 
-    public void setStatusAndAdditionalInfo(final DryRunLibraryImportStatus status, final String additionalInfo) {
+    public void setStatus(final DryRunLibraryImportStatus status) {
         this.status = status;
+    }
+
+    public void setAdditionalInfo(final String additionalInfo) {
         this.additionalInfo = additionalInfo;
     }
 
     public void addImporterPath(final String path) {
-        if(!importersPaths.contains(path)) {
+        if (!importersPaths.contains(path)) {
             importersPaths.add(path);
         }
     }
@@ -149,6 +154,3 @@ public class RobotDryRunLibraryImport {
         UNKNOWN
     }
 }
-
-
-

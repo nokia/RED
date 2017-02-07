@@ -10,8 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
-
 import com.google.common.io.Files;
 
 /**
@@ -19,9 +17,9 @@ import com.google.common.io.Files;
  */
 public class RobotDryRunLibraryImportCollector {
 
-    private List<RobotDryRunLibraryImport> importedLibraries = new LinkedList<>();
+    private final List<RobotDryRunLibraryImport> importedLibraries = new LinkedList<>();
 
-    private Set<String> standardLibrariesNames;
+    private final Set<String> standardLibrariesNames;
 
     private RobotDryRunLibraryImport currentLibraryImportWithFail;
 
@@ -43,7 +41,7 @@ public class RobotDryRunLibraryImportCollector {
             } else {
                 dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName, importer, args);
             }
-            int index = importedLibraries.indexOf(dryRunLibraryImport);
+            final int index = importedLibraries.indexOf(dryRunLibraryImport);
             if (index < 0) {
                 if (!standardLibrariesNames.contains(libraryName)) {
                     importedLibraries.add(dryRunLibraryImport);
@@ -57,18 +55,17 @@ public class RobotDryRunLibraryImportCollector {
 
     public void collectFromFailMessageEvent(final String message) {
         if (message != null) {
-            String libraryName = extractLibName(message);
+            final String libraryName = extractLibName(message);
             if (!libraryName.isEmpty()) {
                 final String failReason = extractFailReason(message);
                 resetCurrentLibraryImportWithFail();
                 final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName);
-                int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
+                final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
                 if (libIndex < 0) {
-                    dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, failReason);
+                    dryRunLibraryImport.setAdditionalInfo(failReason);
                     importedLibraries.add(dryRunLibraryImport);
                 } else {
-                    importedLibraries.get(libIndex).setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
-                            failReason);
+                    importedLibraries.get(libIndex).setAdditionalInfo(failReason);
                 }
                 currentLibraryImportWithFail = dryRunLibraryImport;
             }
@@ -82,23 +79,25 @@ public class RobotDryRunLibraryImportCollector {
             final int endIndex = message.lastIndexOf("' does not exist");
             if (nameStartIndex > 0 && endIndex > nameStartIndex) {
                 final String libName = message.substring(nameStartIndex + nameStartTxt.length(), endIndex);
+                final String importer = extractImporter(message, nameStartIndex);
                 final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libName);
-                final String errorStartTxt = "Error in file '";
-                final int errorStartIndex = message.indexOf(errorStartTxt);
-                String importer = "";
-                if (errorStartIndex >= 0) {
-                    importer = message.substring(errorStartIndex + errorStartTxt.length(), nameStartIndex);
-                }
-                int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
+                final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
                 if (libIndex < 0) {
                     dryRunLibraryImport.addImporterPath(importer);
-                    dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, message);
+                    dryRunLibraryImport.setAdditionalInfo(message);
                     importedLibraries.add(dryRunLibraryImport);
                 } else {
                     importedLibraries.get(libIndex).addImporterPath(importer);
+                    importedLibraries.get(libIndex).setAdditionalInfo(message);
                 }
             }
         }
+    }
+
+    private String extractImporter(final String message, final int nameStartIndex) {
+        final String errorStartTxt = "Error in file '";
+        final int errorStartIndex = message.indexOf(errorStartTxt);
+        return errorStartIndex == -1 ? "" : message.substring(errorStartIndex + errorStartTxt.length(), nameStartIndex);
     }
 
     private String extractLibName(final String message) {
@@ -110,9 +109,9 @@ public class RobotDryRunLibraryImportCollector {
     }
 
     private String extractElement(final String message, final String key) {
-        int keyIndex = message.indexOf(key);
+        final int keyIndex = message.indexOf(key);
         if (keyIndex >= 0) {
-            int endIndex = message.indexOf(",", keyIndex);
+            final int endIndex = message.indexOf(",", keyIndex);
             if (endIndex >= 0 && endIndex > keyIndex) {
                 return message.substring(keyIndex + key.length(), endIndex).trim();
             }
@@ -122,11 +121,11 @@ public class RobotDryRunLibraryImportCollector {
 
     private String extractFailReason(final String message) {
         if (message != null) {
-            String failReason = message.replaceAll("\\\\n", "\n").replaceAll("\\\\'", "'");
+            final String failReason = message.replaceAll("\\\\n", "\n").replaceAll("\\\\'", "'");
             final String startText = "VALUE_START";
             final String endText = "VALUE_END";
-            int beginIndex = failReason.indexOf(startText);
-            int endIndex = failReason.lastIndexOf(endText);
+            final int beginIndex = failReason.indexOf(startText);
+            final int endIndex = failReason.lastIndexOf(endText);
             if (beginIndex >= 0 && endIndex > 0) {
                 return failReason.substring(beginIndex + startText.length() + 1, endIndex)
                         .replace("<class 'robot.errors.DataError'>, DataError(", "");
