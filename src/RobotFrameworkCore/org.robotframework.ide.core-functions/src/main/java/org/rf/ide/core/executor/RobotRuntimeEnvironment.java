@@ -160,6 +160,10 @@ public class RobotRuntimeEnvironment {
 
     public static List<PythonInstallationDirectory> possibleInstallationsFor(final File location) {
         final List<PythonInstallationDirectory> installations = new ArrayList<>();
+
+        if (!location.exists()) {
+            return installations;
+        }
         for (final File file : location.listFiles()) {
             final String fileName = file.getName();
             if (file.isFile() && (fileName.equals("python") || fileName.equals("python.exe"))) {
