@@ -40,11 +40,29 @@ import com.google.common.base.Optional;
 
 class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
-    private static final String SAVE_ALL_COMMAND_ID = "org.eclipse.ui.file.saveAll";
+    static final String SAVE_ALL_COMMAND_ID = "org.eclipse.ui.file.saveAll";
 
     private static OnSaveLibrariesAutodiscoveryTrigger globalBatchSaveResponsibleTrigger = null;
 
     private static final List<RobotSuiteFile> suitesForDiscover = new ArrayList<>();
+
+    private final DiscovererFactory discovererFactory;
+
+    OnSaveLibrariesAutodiscoveryTrigger() {
+        this(new DiscovererFactory() {
+
+            @Override
+            public LibrariesAutoDiscoverer create(final RobotProject robotProject, final List<IFile> suites) {
+                final boolean showSummary = robotProject.getRobotProjectConfig()
+                        .isLibrariesAutoDiscoveringSummaryWindowEnabled();
+                return new LibrariesAutoDiscoverer(robotProject, suites, showSummary);
+            }
+        });
+    }
+
+    OnSaveLibrariesAutodiscoveryTrigger(final DiscovererFactory discovererFactory) {
+        this.discovererFactory = discovererFactory;
+    }
 
     @Override
     public void preExecute(final String commandId, final ExecutionEvent event) {
@@ -93,21 +111,15 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         if (shouldStartAutoDiscovering(suite)) {
 
             if (globalBatchSaveResponsibleTrigger == null) {
-                startAutoDiscovering(suite);
+                startAutoDiscovering(suite.getProject(), newArrayList(suite.getFile()));
             } else {
                 suitesForDiscover.add(suite);
             }
         }
     }
 
-    private void startAutoDiscovering(final RobotSuiteFile suite) {
-        startAutoDiscovering(suite.getProject(), newArrayList(suite.getFile()));
-    }
-
     private void startAutoDiscovering(final RobotProject robotProject, final List<IFile> suites) {
-        final boolean showSummary = robotProject.getRobotProjectConfig()
-                .isLibrariesAutoDiscoveringSummaryWindowEnabled();
-        new LibrariesAutoDiscoverer(robotProject, suites, showSummary).start();
+        discovererFactory.create(robotProject, suites).start();
     }
 
     private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {
@@ -165,5 +177,10 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         boolean unknownLibraryWasDetected() {
             return detectedLibraryProblem;
         }
+    }
+
+    public interface DiscovererFactory {
+
+        LibrariesAutoDiscoverer create(RobotProject project, List<IFile> suites);
     }
 }
