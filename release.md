@@ -1,3 +1,47 @@
+# RED - Robot Editor v0.7.5
+## Introduction
+RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.7+, preferably 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+
+## Updates
+- #54 - RED goes to line in python file where keyword is defined
+- #66 - run/debug actions on test cases in Outline
+- #55 and #67 - new preference in Preferences to allow passing default additional interpreter and Robot arguments. Check Preferences -> Robot Framework-> Default Launch Configurations
+- #71 - support for IronPython 64 bits - from now on IronPython 32bits adn 64 bits are separate entry in Installed Frameworks in Preferences and red.xml
+- Debug breakpoints fix to include breakpoints in Suite Setup/Teardown/__init__ 
+- Better reporting of FOR loop errors
+- WITH NAME code coloring and code assistance
+- Autodiscover fix to work when red.xml is opened and dirty,also refactoring around when to trigger autodiscovery on save
+- Removed hardcoded dependency with E4tools package to get rid of errors when different version is installed already in Eclipse (Eclipse for Eclipse Committers for instance). Installation requires Internet connection to get dependencies.
+- #72 - Renamed long filename used in jUnits so filepath is not longer than ~220 chars, checkout under Windows/NTFS should work if done near the root of disk.
+- Check **[changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)** for details
+
+## What's in the package
+- Robot Perspective & Robot nature (Project,files and other file artifacts)
+- Text Source editor with syntax coloring, code assistance and real-time validation
+- Table editors synced with Source
+- Debug Perspective for test case debugging with breakpoints, stepping, variable watch
+- Remote debug
+- Support for dictionaries & lists
+- Eclipse help
+- File support: .robot, .txt, .tsv
+
+## Known issues
+- GTK3 seems to mess up with Eclipse under Linux. Force usage of GTK2 by executing command in terminal: export SWT_GTK3=0
+- Under Ubuntu/Xubuntu it was discovered that NullPointerException is shown when opening file from Project Explorer and clicking on file structure instead of file name. As a workaround open file by clicking on filename. Use GTK2 if possible. 
+- Cannot delete library by right click of mouse in red.xml under Ubuntu/Mint. Use Delete key as workaround Use GTK2 if possible.
+
+
+
+
 # RED - Robot Editor v0.7.4
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
