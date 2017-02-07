@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -42,11 +43,11 @@ public class JarStructureBuilder {
 
     }
 
-    public Collection<ILibraryClass> provideEntriesFromFile(final String path) {
+    public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
         return provideEntriesFromFile(new File(path));
     }
 
-    public Collection<ILibraryClass> provideEntriesFromFile(final File file) {
+    public Collection<ILibraryClass> provideEntriesFromFile(final File file) throws RobotEnvironmentException {
         if (file.getName().endsWith(".jar")) {
             return provideEntriesFromJarFile(file);
         } else {
@@ -54,7 +55,7 @@ public class JarStructureBuilder {
         }
     }
 
-    private Collection<ILibraryClass> provideEntriesFromJarFile(final File file) {
+    private Collection<ILibraryClass> provideEntriesFromJarFile(final File file) throws RobotEnvironmentException {
         final List<ILibraryClass> jarClasses = newArrayList();
         try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry entry = zipStream.getNextEntry();
@@ -73,7 +74,7 @@ public class JarStructureBuilder {
         return jarClasses;
     }
 
-    private Collection<JarClass> providePythonEntriesFromJarFile(final File file) {
+    private Collection<JarClass> providePythonEntriesFromJarFile(final File file) throws RobotEnvironmentException {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
         final Collection<ILibraryClass> entriesFromFile = pythonLibStructureBuilder.provideEntriesFromFile(
