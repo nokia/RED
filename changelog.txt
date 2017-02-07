@@ -1,3 +1,50 @@
+RED 0.7.5 - 2017/02/07
+** Feature
+
+    [RED-259] - [github #54] Going to line in python file where keyword is defined 
+
+** Enhancement
+
+    [RED-255] - Wizard should be aware of already existing files
+    [RED-484] - Content proposals in table should work similarly to source content proposal
+    [RED-600] - Include/exclude validation - revalidate or remove markers without Project Clean
+    [RED-601] - WITH NAME - code assistance and coloring
+    [RED-646] - (github #66) run/debug actions on test cases in outline
+    [RED-660] - (github #67) provide possibility pass env vars to python interpreter
+    [RED-677] - FOR loop errors are marked as "Unknown keyword" at FOR keyword instead of real location
+    [RED-682] - Support 64-bits IronPython (github #71)
+    [RED-683] - Run configuration template (github #55)
+
+** Bug
+
+    [RED-131] - Variables from Arguments are not in content assist - verify first
+    [RED-330] - Quick Fix makes keyword name to camel case
+    [RED-466] - Colouring sections in TSV
+    [RED-540] - Error occurs when Library file doesn't exist and user uses Quick fix
+    [RED-571] - On save libraries detection is not really triggered by save operation
+    [RED-595] - Variable section is not colored when space is afer section name
+    [RED-644] - Source is not coloring on yellow for wrong section
+    [RED-661] - Some breakpoints are not taken into account
+    [RED-662] - RED doesn't stop on breakpoints in robot library file
+    [RED-666] - coloring dispersers in large file due to buffer size
+    [RED-674] - Unable to "step into" (F5)
+    [RED-676] - Variables used to initialize other variables should be validated
+    [RED-678] - Context menu in Project Explorer for robot file sections (e.g. "Test Cases") has enabled run/debug options for the first time
+    [RED-684] - Debug does not stop on Suite Teardown line in __init__ file
+    [RED-695] - Autodiscover does not add libs to red.xml when it is opened
+
+** Task
+
+    [RED-612] - Refactoring of LinksToResourceInSourceView test
+    [RED-655] - Check RobotFramework 3.0.1 with RED
+    [RED-673] - Eclipse IDE for Eclipse Committers Mars - cannot install any RED above 0.6.5
+    [RED-691] - Shorten the paths to some files
+
+Sub-task
+
+    [RED-699] - Run action should be different for Project Explorer and Toolbar
+
+
 RED 0.7.4 - 2017/01/10
 ** Enhancement
 
