@@ -5,11 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
-import java.util.EnumSet;
+import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.EnumSet;
+import java.util.Set;
+
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.osgi.service.prefs.BackingStoreException;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
@@ -59,7 +65,7 @@ public class RedPreferences {
     }
 
     public String getActiveRuntimeExec() {
-        return store.getString(ACTIVE_RUNTIME_EXEC);
+        return getStringPreferenceOrEmptyIfOnlyDependentDefined(ACTIVE_RUNTIME, ACTIVE_RUNTIME_EXEC);
     }
     
     public String getAllRuntimes() {
@@ -67,7 +73,23 @@ public class RedPreferences {
     }
     
     public String getAllRuntimesExecs() {
-        return store.getString(OTHER_RUNTIMES_EXECS);
+        return getStringPreferenceOrEmptyIfOnlyDependentDefined(OTHER_RUNTIMES, OTHER_RUNTIMES_EXECS);
+    }
+
+    private String getStringPreferenceOrEmptyIfOnlyDependentDefined(final String dependentPreference,
+            final String preference) {
+        final IEclipsePreferences[] nodes = ((ScopedPreferenceStore) store).getPreferenceNodes(false);
+        for (final IEclipsePreferences prefNode : nodes) {
+            try {
+                final Set<String> keys = newHashSet(prefNode.keys());
+                if (keys.contains(dependentPreference) && !keys.contains(preference)) {
+                    return "";
+                }
+            } catch (final BackingStoreException e) {
+                // ok we'll return from store
+            }
+        }
+        return store.getString(preference);
     }
 
     public ElementOpenMode getElementOpenMode() {
