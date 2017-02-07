@@ -243,8 +243,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
                 if (libraryImport.getType() != DryRunLibraryType.UNKNOWN) {
                     if (existingLibraryNames.contains(libraryImport.getName())) {
-                        libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ALREADY_EXISTING,
-                                "Library '" + libraryImport.getName() + "' already existing in project configuration.");
+                        libraryImport.setStatus(DryRunLibraryImportStatus.ALREADY_EXISTING);
                     } else {
                         result.add(libraryImport);
                     }
@@ -265,25 +264,22 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
                     robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(),
                     robotProject.getProject());
-            Collection<ILibraryClass> pythonClasses = newArrayList();
             try {
-                pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath(),
-                        Optional.of(libraryImport.getName()), true);
+                final Collection<ILibraryClass> libraryClasses = pythonLibStructureBuilder.provideEntriesFromFile(
+                        libraryImport.getSourcePath(), Optional.of(libraryImport.getName()), true);
+                addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
             } catch (final RobotEnvironmentException e) {
                 final Optional<File> modulePath = findPythonLibraryModulePath(libraryImport);
                 if (modulePath.isPresent()) {
                     final Path path = new Path(modulePath.get().getPath());
                     final ReferencedLibrary newLibrary = ReferencedLibrary.create(LibraryType.PYTHON,
                             libraryImport.getName(), path.toPortableString());
-                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ADDED, "");
                     addLibraries(Collections.singletonList(newLibrary));
+                    libraryImport.setStatus(DryRunLibraryImportStatus.ADDED);
                 } else {
-                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
+                    libraryImport.setAdditionalInfo(e.getMessage());
                 }
-                return;
             }
-
-            addReferencedLibrariesFromClasses(libraryImport, pythonClasses);
         }
 
         private Optional<File> findPythonLibraryModulePath(final RobotDryRunLibraryImport libraryImport) {
@@ -292,46 +288,37 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         .createEnvironmentSearchPaths(robotProject.getProject());
                 return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), envSearchPaths);
             } catch (final RobotEnvironmentException e1) {
-                // that's fine
+                return Optional.absent();
             }
-            return Optional.absent();
         }
 
         private void addJavaLibrary(final RobotDryRunLibraryImport libraryImport) {
             final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(
                     robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(),
                     robotProject.getProject());
-            Collection<ILibraryClass> classesFromJar = newArrayList();
             try {
-                classesFromJar = jarStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath());
+                final Collection<ILibraryClass> libraryClasses = jarStructureBuilder
+                        .provideEntriesFromFile(libraryImport.getSourcePath());
+                addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
             } catch (final RobotEnvironmentException e) {
-                libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
-                return;
+                libraryImport.setAdditionalInfo(e.getMessage());
             }
-
-            addReferencedLibrariesFromClasses(libraryImport, classesFromJar);
         }
 
         private void addReferencedLibrariesFromClasses(final RobotDryRunLibraryImport libraryImport,
                 final Collection<ILibraryClass> libraryClasses) {
-            if (libraryClasses.isEmpty()) {
-                libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
-                        "RED was unable to find classes inside '" + libraryImport.getSourcePath() + "' module.");
+            final Collection<ReferencedLibrary> librariesToAdd = newArrayList();
+            for (final ILibraryClass libraryClass : libraryClasses) {
+                if (libraryClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
+                    librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath()));
+                }
+            }
+            if (!librariesToAdd.isEmpty()) {
+                addLibraries(librariesToAdd);
+                libraryImport.setStatus(DryRunLibraryImportStatus.ADDED);
             } else {
-                final Collection<ReferencedLibrary> librariesToAdd = newArrayList();
-                for (final ILibraryClass libraryClass : libraryClasses) {
-                    if (libraryClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
-                        librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath()));
-                    }
-                }
-                if (librariesToAdd.isEmpty()) {
-                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
-                            "RED was unable to find class '" + libraryImport.getName() + "' inside '"
-                                    + libraryImport.getSourcePath() + "' module.");
-                } else {
-                    libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ADDED, "");
-                    addLibraries(librariesToAdd);
-                }
+                libraryImport.setAdditionalInfo("RED was unable to find class '" + libraryImport.getName()
+                        + "' inside '" + libraryImport.getSourcePath() + "' module.");
             }
         }
 
