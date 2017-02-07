@@ -101,7 +101,7 @@ public class RobotFormEditor extends FormEditor {
 
     private static RobotFormEditorPartListener robotFormEditorPartListener;
 
-    private final OnSaveLibrariesAutodiscoveryTrigger2 saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger2();
+    private final OnSaveLibrariesAutodiscoveryTrigger saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger();
 
     public RedClipboard getClipboard() {
         return clipboard;

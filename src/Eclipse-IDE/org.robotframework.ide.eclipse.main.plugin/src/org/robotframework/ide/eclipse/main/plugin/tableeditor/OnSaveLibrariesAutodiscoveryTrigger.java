@@ -6,11 +6,16 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IExecutionListener;
+import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -30,60 +35,98 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Supplier;
 
-class OnSaveLibrariesAutodiscoveryTrigger {
+class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
-    private final RobotSuiteFile suite;
+    private static final String SAVE_ALL_COMMAND_ID = "org.eclipse.ui.file.saveAll";
 
-    private final Supplier<LibrariesAutoDiscoverer> discoverer;
+    private static OnSaveLibrariesAutodiscoveryTrigger globalBatchSaveResponsibleTrigger = null;
 
-    static OnSaveLibrariesAutodiscoveryTrigger createFor(final RobotSuiteFile suite) {
-        return new OnSaveLibrariesAutodiscoveryTrigger(suite, new Supplier<LibrariesAutoDiscoverer>() {
+    private static final List<RobotSuiteFile> suitesForDiscover = new ArrayList<>();
 
-            @Override
-            public LibrariesAutoDiscoverer get() {
-                final RobotProject robotProject = suite.getProject();
-                final List<IFile> suites = newArrayList(suite.getFile());
-                final boolean showSummary = robotProject.getRobotProjectConfig()
-                        .isLibrariesAutoDiscoveringSummaryWindowEnabled();
-                return new LibrariesAutoDiscoverer(robotProject, suites, showSummary);
-            }
-        });
-    }
-
-    @VisibleForTesting
-    OnSaveLibrariesAutodiscoveryTrigger(final RobotSuiteFile suite,
-            final Supplier<LibrariesAutoDiscoverer> discoverer) {
-        this.suite = suite;
-        this.discoverer = discoverer;
-    }
-
-    void startLibrariesAutoDiscoveryIfRequired() {
-        if (shouldStartAutoDiscovering()) {
-            discoverer.get().start();
+    @Override
+    public void preExecute(final String commandId, final ExecutionEvent event) {
+        if (globalBatchSaveResponsibleTrigger == null && SAVE_ALL_COMMAND_ID.equals(commandId)) {
+            globalBatchSaveResponsibleTrigger = this;
         }
     }
 
-    private boolean shouldStartAutoDiscovering() {
+    @Override
+    public void notHandled(final String commandId, final NotHandledException exception) {
+        if (SAVE_ALL_COMMAND_ID.equals(commandId)) {
+            globalBatchSaveResponsibleTrigger = null;
+            suitesForDiscover.clear();
+        }
+    }
+
+    @Override
+    public void postExecuteFailure(final String commandId, final ExecutionException exception) {
+        if (SAVE_ALL_COMMAND_ID.equals(commandId)) {
+            globalBatchSaveResponsibleTrigger = null;
+            suitesForDiscover.clear();
+        }
+    }
+
+    @Override
+    public void postExecuteSuccess(final String commandId, final Object returnValue) {
+        if (globalBatchSaveResponsibleTrigger == this && SAVE_ALL_COMMAND_ID.equals(commandId)) {
+            globalBatchSaveResponsibleTrigger = null;
+
+            if (!suitesForDiscover.isEmpty()) {
+                final RobotProject project = suitesForDiscover.get(0).getProject();
+                startAutoDiscovering(project,
+                        newArrayList(transform(suitesForDiscover, new Function<RobotSuiteFile, IFile>() {
+
+                    @Override
+                    public IFile apply(final RobotSuiteFile suite) {
+                        return suite.getFile();
+                    }
+                })));
+            }
+            suitesForDiscover.clear();
+        }
+    }
+
+    void startLibrariesAutoDiscoveryIfRequired(final RobotSuiteFile suite) {
+        if (shouldStartAutoDiscovering(suite)) {
+
+            if (globalBatchSaveResponsibleTrigger == null) {
+                startAutoDiscovering(suite);
+            } else {
+                suitesForDiscover.add(suite);
+            }
+        }
+    }
+
+    private void startAutoDiscovering(final RobotSuiteFile suite) {
+        startAutoDiscovering(suite.getProject(), newArrayList(suite.getFile()));
+    }
+
+    private void startAutoDiscovering(final RobotProject robotProject, final List<IFile> suites) {
+        final boolean showSummary = robotProject.getRobotProjectConfig()
+                .isLibrariesAutoDiscoveringSummaryWindowEnabled();
+        new LibrariesAutoDiscoverer(robotProject, suites, showSummary).start();
+    }
+
+    private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {
         final RobotProjectConfig projectConfig = suite.getProject().getRobotProjectConfig();
         final boolean isAutodiscoveryEnabled = projectConfig != null
                 && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled();
         return isAutodiscoveryEnabled && currentModelHaveUnknownLibrary(suite);
     }
 
-    private boolean currentModelHaveUnknownLibrary(final RobotSuiteFile currentModel) {
-        final List<LibraryImport> imports = collectLibraryImports(currentModel);
+    private boolean currentModelHaveUnknownLibrary(final RobotSuiteFile suite) {
+        final List<LibraryImport> imports = collectLibraryImports(suite);
 
         final UnknownLibraryDetectingReportingStrategy reporter = new UnknownLibraryDetectingReportingStrategy();
 
-        final ValidationContext generalContext = new ValidationContext(currentModel.getProject(),
+        final ValidationContext generalContext = new ValidationContext(suite.getProject(),
                 new BuildLogger());
-        final FileValidationContext fileContext = new FileValidationContext(generalContext, currentModel.getFile());
+        final FileValidationContext fileContext = new FileValidationContext(generalContext, suite.getFile());
         final GeneralSettingsLibrariesImportValidator importsValidator = new GeneralSettingsLibrariesImportValidator(
-                fileContext, currentModel, imports, reporter);
+                fileContext, suite, imports, reporter);
         try {
             importsValidator.validate(new NullProgressMonitor());
             return reporter.unknownLibraryWasDetected();
