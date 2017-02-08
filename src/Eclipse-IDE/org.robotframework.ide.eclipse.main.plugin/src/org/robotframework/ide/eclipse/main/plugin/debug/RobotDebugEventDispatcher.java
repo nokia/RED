@@ -106,6 +106,9 @@ public class RobotDebugEventDispatcher extends Job {
             }
 
             switch (eventType) {
+                case "ready to start":
+                    handleReadyToStartEvent();
+                    break;
                 case "pid":
                     handlePidEvent();
                     break;
@@ -168,6 +171,10 @@ public class RobotDebugEventDispatcher extends Job {
 
             event = eventReader.readLine();
         }
+    }
+
+    private void handleReadyToStartEvent() {
+        target.sendEventToAgent("do start");
     }
 
     private void handlePidEvent() {
