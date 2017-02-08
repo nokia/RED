@@ -193,10 +193,14 @@ class MyIMPORTER(object):
         if library and hasattr(library, 'handlers'):
             for keyword in library.handlers:
                 if keyword not in self.cached_kw_items and not isinstance(keyword, _JavaHandler):
-                    self.cached_kw_items.add(keyword)
-                    keyword_source = PythonKeywordSource(keyword)
-                    msg = json.dumps({'keyword': dict(keyword_source.__dict__)}, sort_keys=True)
-                    LOGGER.message(Message(message=msg, level='NONE'))
+                    try:
+                        keyword_source = PythonKeywordSource(keyword)
+                        msg = json.dumps({'keyword': dict(keyword_source.__dict__)}, sort_keys=True)
+                        LOGGER.message(Message(message=msg, level='NONE'))
+                    except:
+                        pass #TODO: add logging 
+                    finally:
+                        self.cached_kw_items.add(keyword)
 
 
 class PythonKeywordSource(object):
