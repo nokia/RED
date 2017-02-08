@@ -37,7 +37,7 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotSuitesAndTestsNaming;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotSuitesNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
@@ -188,7 +188,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     if (resource.isLinked()) {
                         collectLinkedSuiteNamesAndProjectsLocations(resource);
                     } else {
-                        suiteNames.add(RobotSuitesAndTestsNaming.createSuiteName(resource));
+                        suiteNames.add(RobotSuitesNaming.createSuiteName(resource));
                     }
                 }
             }
