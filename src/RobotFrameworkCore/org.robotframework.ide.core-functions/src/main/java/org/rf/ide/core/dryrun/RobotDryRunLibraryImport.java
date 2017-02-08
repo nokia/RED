@@ -132,6 +132,13 @@ public class RobotDryRunLibraryImport {
         return Objects.hash(name, sourcePath, type);
     }
 
+    @Override
+    public String toString() {
+        return "RobotDryRunLibraryImport [name=" + name + ", sourcePath=" + sourcePath + ", type=" + type
+                + ", importersPaths=" + importersPaths + ", args=" + args + ", status=" + status + ", additionalInfo="
+                + additionalInfo + "]";
+    }
+
     public static enum DryRunLibraryImportStatus {
         ADDED("Added to project configuration"),
         ALREADY_EXISTING("Already existing in project configuration"),

@@ -40,7 +40,7 @@ public class RobotProjectConfig {
     public static final String FILENAME = "red.xml";
 
     private static final String CURRENT_VERSION = "1.0";
-    
+
     private static final String VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB = "1024";
 
     @XmlElement(name = "configVersion", required = true)
@@ -65,7 +65,7 @@ public class RobotProjectConfig {
 
     @XmlElement(name = "remoteLocations", required = false)
     private List<RemoteLocation> remoteLocations = new ArrayList<>();
-    
+
     @XmlElement(name = "variableFiles", required = false)
     private List<ReferencedVariableFile> referencedVariableFiles = new ArrayList<>();
 
@@ -74,19 +74,19 @@ public class RobotProjectConfig {
 
     @XmlElementWrapper(name = "excludedForValidation", required = false)
     private List<ExcludedFolderPath> excludedPath = new ArrayList<>();
-    
+
     @XmlElement(name = "isValidatedFileSizeCheckingEnabled", required = false)
     private boolean isValidatedFileSizeCheckingEnabled = true;
-    
+
     @XmlElement(name = "validatedFileMaxSize", required = false)
     private String validatedFileMaxSize = VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
-    
+
     @XmlElement(name = "isReferencedLibrariesAutoReloadEnabled", required = false)
     private boolean isReferencedLibrariesAutoReloadEnabled = true;
-    
+
     @XmlElement(name = "isReferencedLibrariesAutoDiscoveringEnabled", required = false)
     private boolean isReferencedLibrariesAutoDiscoveringEnabled = true;
-    
+
     @XmlElement(name = "isLibrariesAutoDiscoveringSummaryWindowEnabled", required = false)
     private boolean isLibrariesAutoDiscoveringSummaryWindowEnabled = false;
 
@@ -208,7 +208,7 @@ public class RobotProjectConfig {
     public List<ExcludedFolderPath> getExcludedPath() {
         return excludedPath;
     }
-    
+
     public void setIsValidatedFileSizeCheckingEnabled(final boolean isFileSizeCheckingEnabled) {
         this.isValidatedFileSizeCheckingEnabled = isFileSizeCheckingEnabled;
     }
@@ -216,7 +216,7 @@ public class RobotProjectConfig {
     public boolean isValidatedFileSizeCheckingEnabled() {
         return this.isValidatedFileSizeCheckingEnabled;
     }
-    
+
     public void setValidatedFileMaxSize(final String validatedFileMaxSize) {
         this.validatedFileMaxSize = validatedFileMaxSize;
     }
@@ -224,11 +224,11 @@ public class RobotProjectConfig {
     public String getValidatedFileMaxSize() {
         return this.validatedFileMaxSize;
     }
-    
+
     public String getValidatedFileDefaultMaxSize() {
         return VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
     }
-    
+
     public void setIsReferencedLibrariesAutoReloadEnabled(final boolean isReferencedLibrariesAutoReloadEnabled) {
         this.isReferencedLibrariesAutoReloadEnabled = isReferencedLibrariesAutoReloadEnabled;
     }
@@ -244,7 +244,7 @@ public class RobotProjectConfig {
     public void setReferencedLibrariesAutoDiscoveringEnabled(final boolean isReferencedLibrariesAutoDiscoveringEnabled) {
         this.isReferencedLibrariesAutoDiscoveringEnabled = isReferencedLibrariesAutoDiscoveringEnabled;
     }
-    
+
     public boolean isLibrariesAutoDiscoveringSummaryWindowEnabled() {
         return isLibrariesAutoDiscoveringSummaryWindowEnabled;
     }
@@ -367,7 +367,7 @@ public class RobotProjectConfig {
     public boolean hasRemoteLibraries() {
         return remoteLocations != null && !remoteLocations.isEmpty();
     }
-    
+
     public List<ReferencedVariableFile> getReferencedVariableFiles() {
         return referencedVariableFiles;
     }
@@ -380,7 +380,7 @@ public class RobotProjectConfig {
             referencedVariableFiles.add(variableFile);
         }
     }
-    
+
     public void removeReferencedVariableFiles(final List<ReferencedVariableFile> selectedFiles) {
         referencedVariableFiles.removeAll(selectedFiles);
     }
@@ -496,7 +496,7 @@ public class RobotProjectConfig {
         public LibraryType provideType() {
             return LibraryType.valueOf(type);
         }
-        
+
         @Override
         public boolean equals(final Object obj) {
             if (obj == null) {
@@ -511,6 +511,11 @@ public class RobotProjectConfig {
         @Override
         public int hashCode() {
             return Objects.hash(type, name);
+        }
+
+        @Override
+        public String toString() {
+            return "ReferencedLibrary [type=" + type + ", name=" + name + ", path=" + path + "]";
         }
     }
 
@@ -579,7 +584,7 @@ public class RobotProjectConfig {
             return path.replaceAll("[^A-Za-z0-9]", "_");
         }
     }
-    
+
     @XmlRootElement(name = "referencedVariableFile")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ReferencedVariableFile {
@@ -652,7 +657,7 @@ public class RobotProjectConfig {
         private Object toListIfNeeded(final Object object) {
             return object instanceof Object[] ? newArrayList((Object[]) object) : object;
         }
-        
+
         @Override
         public boolean equals(final Object obj) {
             if (obj == null) {
