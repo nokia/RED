@@ -60,9 +60,9 @@ public class DocumentationView {
     private DocumentationViewPartListener documentationViewPartListener;
 
     private CurrentlyDisplayedDocElement currentlyDisplayedDocElement;
-    
+
     private final AtomicBoolean hasShowLibdocEnabled = new AtomicBoolean();
-    
+
     private ShowLibdocAction showLibdocAction;
 
     @PostConstruct
@@ -138,7 +138,7 @@ public class DocumentationView {
             SwtThread.asyncExec(new DocTextSetter(documentationText, parentName, fileName));
         }
     }
-    
+
     public void showLibdoc(final RobotFileInternalElement element) {
         if (element == null) {
             clearView();
@@ -176,13 +176,13 @@ public class DocumentationView {
         resetCurrentlyDisplayedElement();
         showDocumentation(element);
     }
-    
+
     private void initCurrentlyDisplayedDocElement() {
         if (currentlyDisplayedDocElement == null) {
             currentlyDisplayedDocElement = new CurrentlyDisplayedDocElement();
         }
     }
-    
+
     private void clearView() {
         resetCurrentlyDisplayedElement();
         SwtThread.asyncExec(new DocTextSetter());
@@ -193,11 +193,11 @@ public class DocumentationView {
             currentlyDisplayedDocElement.reset();
         }
     }
-    
+
     public boolean hasShowLibdocEnabled() {
         return hasShowLibdocEnabled.get();
     }
-    
+
     public void setShowLibdocEnabled() {
         hasShowLibdocEnabled.set(true);
         showLibdocAction.setChecked(true);
@@ -227,7 +227,7 @@ public class DocumentationView {
         private final String documentationSettingParentName;
 
         private final String fileName;
-        
+
         public DocTextSetter() {
             this("", "", "");
         }
@@ -241,18 +241,20 @@ public class DocumentationView {
 
         @Override
         public void run() {
-            styledText.setText("");
+            if (!styledText.isDisposed()) {
+                styledText.setText("");
 
-            if (!documentationSettingParentName.isEmpty() && !fileName.isEmpty()) {
-                styledText.append(documentationSettingParentName + "\n");
-                styledText.append(fileName + "\n\n");
+                if (!documentationSettingParentName.isEmpty() && !fileName.isEmpty()) {
+                    styledText.append(documentationSettingParentName + "\n");
+                    styledText.append(fileName + "\n\n");
 
-                styledText.setStyleRange(
-                        new StyleRange(0, documentationSettingParentName.length(), null, null, SWT.BOLD));
-                styledText.setStyleRange(new StyleRange(documentationSettingParentName.length() + 1, fileName.length(),
-                        null, null, SWT.ITALIC));
+                    styledText.setStyleRange(
+                            new StyleRange(0, documentationSettingParentName.length(), null, null, SWT.BOLD));
+                    styledText.setStyleRange(new StyleRange(documentationSettingParentName.length() + 1,
+                            fileName.length(), null, null, SWT.ITALIC));
+                }
+                styledText.append(documentationText);
             }
-            styledText.append(documentationText);
         }
 
     }
@@ -389,7 +391,7 @@ public class DocumentationView {
         public void dispose() {
         }
     }
-    
+
     class ShowLibdocAction extends Action implements IWorkbenchAction {
 
         private static final String ID = "org.robotframework.action.documentationView.ShowLibdocAction";
