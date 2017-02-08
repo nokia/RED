@@ -142,19 +142,26 @@ class TestRunnerAgent:
     def __init__(self, *args):
         self.port = int(args[0])
         self.MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
-        HOST = "localhost"
-        if len(args) >= 3:
-            HOST = args[2]
-        self.host = HOST
+        self.host = args[2] if len(args) >= 3 and args[2].lower() != 'no_wait' else 'localhost'
         self.sock = None
         self.filehandler = None
         self.streamhandler = None
         self._connect()
         self._send_pid()
-        self._create_debugger((len(args) >= 2) and (args[1].lower() == 'true'))
+        self._create_debugger(args[1].lower() == 'true')
         self._create_kill_server()
         self._is_robot_paused = False
-        self._is_debug_enabled = (args[1].lower() == 'true')
+        self._is_debug_enabled = (args[1].lower() == 'true')        
+        self._wait_for_requestor(*args)
+
+    def _wait_for_requestor(self, *args):
+        if len(args) >= 3 and args[2].lower() == 'no_wait' or len(args) >= 4 and args[3].lower() == 'no_wait':
+            return 
+        
+        self._send_socket('ready to start')
+        data = ''
+        while data != 'do start':
+            data = self.sock.recv(4096).decode('utf-8')
 
     def _create_debugger(self, pause_on_failure):
         self._debugger = RobotDebugger(pause_on_failure)

@@ -214,7 +214,7 @@ public class RunCommandLineCallBuilder {
             final String debugInfo = enableDebug ? "True" : "False";
             final int port = findFreePort();
 
-            final List<String> cmdLine = new ArrayList<String>();
+            final List<String> cmdLine = new ArrayList<>();
 
             cmdLine.add(executablePath);
             if (executor == SuiteExecutor.Jython) {
@@ -239,7 +239,7 @@ public class RunCommandLineCallBuilder {
             cmdLine.addAll(tagsToExclude);
             cmdLine.add("--listener");
             cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":"
-                    + debugInfo);
+                    + debugInfo + (enableDryRun ? ":no_wait" : ""));
             if (enableDryRun) {
                 cmdLine.add("--prerunmodifier");
                 cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("SuiteVisitorImportProxy.py").toPath().toString());
@@ -331,7 +331,7 @@ public class RunCommandLineCallBuilder {
         private final int port;
 
         RunCommandLine(final List<String> commandLine, final int port) {
-            this.commandLine = new ArrayList<String>(commandLine);
+            this.commandLine = new ArrayList<>(commandLine);
             this.port = port;
         }
 

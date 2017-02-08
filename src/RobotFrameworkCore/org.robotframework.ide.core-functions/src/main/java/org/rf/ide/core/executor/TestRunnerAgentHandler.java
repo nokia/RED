@@ -6,8 +6,10 @@
 package org.rf.ide.core.executor;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,6 +24,8 @@ public class TestRunnerAgentHandler implements Runnable {
     private final List<ILineHandler> listeners;
     
     private final int port;
+
+    private BufferedWriter agentWriter;
     
     public TestRunnerAgentHandler(final int port) {
         listeners = new ArrayList<>();
@@ -31,9 +35,14 @@ public class TestRunnerAgentHandler implements Runnable {
     @Override
     public void run() {
         try (ServerSocket socket = new ServerSocket(port)) {
-            socket.setReuseAddress(true);
-            final Socket client = socket.accept();
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            final BufferedReader reader;
+            synchronized (this) {
+                socket.setReuseAddress(true);
+                final Socket client = socket.accept();
+
+                agentWriter = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+                reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            }
             
             String line;
             while ((line = reader.readLine()) != null) {
@@ -43,6 +52,11 @@ public class TestRunnerAgentHandler implements Runnable {
             }
         } catch (final IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                agentWriter.close();
+            } catch (final IOException e) {
+            }
         }
     }
 
@@ -54,4 +68,8 @@ public class TestRunnerAgentHandler implements Runnable {
         listeners.remove(listener);
     }
     
+    public synchronized void startTests() throws IOException {
+        agentWriter.write("do start");
+        agentWriter.flush();
+    }
 }
