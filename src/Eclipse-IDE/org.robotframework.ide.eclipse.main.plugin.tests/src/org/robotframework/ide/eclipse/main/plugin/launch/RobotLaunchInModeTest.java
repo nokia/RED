@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Nokia Solutions and Networks
+ * Copyright 2017 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -11,11 +11,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.ILaunch;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -30,11 +32,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.collect.Lists;
+public class RobotLaunchInModeTest {
 
-public class RobotLaunchConfigurationDelegateTest {
-
-    private static final String PROJECT_NAME = RobotLaunchConfigurationDelegateTest.class.getSimpleName();
+    private static final String PROJECT_NAME = RobotLaunchInModeTest.class.getSimpleName();
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
@@ -42,11 +42,11 @@ public class RobotLaunchConfigurationDelegateTest {
     @BeforeClass
     public static void before() throws Exception {
         projectProvider.createDir(Path.fromPortableString("001__suites_a"));
-        projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"), 
+        projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"),
                 "*** Test Cases ***",
-                "001__case1", 
-                "  Log  10", 
-                "001__case2", 
+                "001__case1",
+                "  Log  10",
+                "001__case2",
                 "  Log  20");
     }
 
@@ -56,14 +56,11 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final Collection<IResource> suiteResources = Lists
-                .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
         final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
         robotConfig.addSuite("001__suites_a", new ArrayList<String>());
 
-        final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = delegate.createStandardModeCmd(robotConfig, robotProject, suiteResources,
-                false);
+        final RobotLaunchInMode launchMode = createModeUnderTest();
+        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
     }
@@ -76,14 +73,11 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final Collection<IResource> suiteResources = Lists
-                .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
-        final RobotLaunchConfigurationMock launchConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
-        launchConfig.addSuite("001__suites_a", newArrayList("001__case1"));
+        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
+        robotConfig.addSuite("001__suites_a", newArrayList("001__case1"));
 
-        final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = delegate.createStandardModeCmd(launchConfig, robotProject, suiteResources,
-                false);
+        final RobotLaunchInMode launchMode = createModeUnderTest();
+        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
         assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
@@ -104,13 +98,10 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
-        final RobotLaunchConfigurationMock launchConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
-        final Collection<IResource> suiteResources = Lists
-                .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
-        
-        final RunCommandLine commandLine = delegate.createStandardModeCmd(launchConfig, robotProject, suiteResources,
-                false);
+        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
+
+        final RobotLaunchInMode launchMode = createModeUnderTest();
+        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
@@ -132,35 +123,24 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
-        final RobotLaunchConfigurationMock launchConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
-        final Collection<IResource> suiteResources = Lists
-                .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
+        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
 
-        final RunCommandLine commandLine = delegate.createStandardModeCmd(launchConfig, robotProject, suiteResources,
-                false);
+        final RobotLaunchInMode launchMode = createModeUnderTest();
+        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
                 projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
     }
-    
-    @Test
-    public void commandLineContainsActualProjectName() throws Exception {
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
-        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final Collection<IResource> suiteResources = Lists
-                .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
-        final RobotLaunchConfigurationMock launchConfig = new RobotLaunchConfigurationMock("DifferentProjectName");
-        launchConfig.addSuite("001__suites_a", newArrayList("001__case1"));
+    private static RobotLaunchInMode createModeUnderTest() {
+        return new RobotLaunchInMode() {
 
-        final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = delegate.createStandardModeCmd(launchConfig, robotProject, suiteResources,
-                false);
-
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
+            @Override
+            protected Process launchAndAttachToProcess(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
+                    final IProgressMonitor monitor) throws CoreException, IOException {
+                return null;
+            }
+        };
     }
 }
