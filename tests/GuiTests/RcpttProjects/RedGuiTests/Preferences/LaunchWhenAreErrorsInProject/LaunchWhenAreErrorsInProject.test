@@ -1,0 +1,191 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _U6980O38EeaEfJH5Ahap2w,_znjMEBtDEeWSh6BKjAxDIw
+Element-Name: LaunchWhenAreErrorsInProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Nm22AO38EeaEfJH5Ahap2w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/8/17 3:41 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-error-window"{
+with [get-window "Errors in Workspace"] {
+	get-label "Errors exist in required project(s):RobotProjectProceed with launch?" | get-property caption 
+        | equals "Errors exist in required project(s):\n\n"
+        + "RobotProject\n\n"
+        + "Proceed with launch?" | verify-true
+    get-button "Always launch without asking" | get-property selected | equals false | verify-true
+	}
+}
+
+//set one test with error and one correct
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    I will cause an error\n"
+    + "    \n \n"
+    + "test 2\n"
+    + "    Log    here is ok"
+ 
+get-button "Save \((Ctrl|M1)\+S\)" | click
+ 
+exec-with-options -disableJobWaiting -command {    
+	//run test from PE
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+	
+	//check window
+	check-error-window
+	
+	//cancel running
+	get-window "Errors in Workspace" | get-button Cancel | click
+}
+//check that test was not run
+get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
+    | get-property "getText()" | equals "" | verify-true
+    
+//run test 1 with error  
+exec-with-options -disableJobWaiting -command {  
+	get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1" | get-menu Run | click
+	check-error-window
+	get-window "Errors in Workspace" | get-button Cancel | click
+}	
+get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
+    | get-property "getText()" | equals "" | verify-true
+    
+//run test that has no error - window will be shown
+exec-with-options -disableJobWaiting -command {
+	get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 2" | get-menu Run | click
+	check-error-window
+	
+	//run this test
+	get-window "Errors in Workspace" | get-button Proceed | click
+}
+get-view Console | get-text-viewer | get-property text 
+    | contains  "test 2                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "RobotProject.TestFile                                                 | PASS |\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "RobotProject                                                          | PASS |\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n" | verify-true
+    
+//run test 1 from PE    
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot/Test Cases/test 1" | get-menu Run | click
+	
+	//select to run always
+	with [get-window "Errors in Workspace"] {
+	    get-button "Always launch without asking" | check
+	    get-button Proceed | click
+	}
+}
+get-view Console | get-text-viewer | get-property text 
+    | contains 
+    "test 1                                                                | FAIL |\n"
+    + "No keyword with name 'I will cause an error' found.\n"
+    + "------------------------------------------------------------------------------\n"
+    + "RobotProject.TestFile                                                 | FAIL |\n"
+    + "1 critical test, 0 passed, 1 failed\n"
+    + "1 test total, 0 passed, 1 failed\n"
+    + "==============================================================================\n"
+    + "RobotProject                                                          | FAIL |\n"
+    + "1 critical test, 0 passed, 1 failed\n"
+    + "1 test total, 0 passed, 1 failed\n" | verify-true
+    
+//run entire test    
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+
+get-view Console | get-text-viewer | get-property text 
+    | contains 
+     "test 1                                                                | FAIL |\n"
+    + "No keyword with name 'I will cause an error' found.\n"
+    + "------------------------------------------------------------------------------\n"
+    + "test 2                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "RobotProject.TestFile                                                 | FAIL |\n"
+    + "2 critical tests, 1 passed, 1 failed\n"
+    + "2 tests total, 1 passed, 1 failed\n"
+    + "==============================================================================\n"
+    + "RobotProject                                                          | FAIL |\n"
+    + "2 critical tests, 1 passed, 1 failed\n"
+    + "2 tests total, 1 passed, 1 failed\n" | verify-true
+    
+
+
+
+
+
+
+//create new tsv suite
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text new
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+get-editor "new.tsv" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "from tsv\n"
+    + "\tlog\t54" 
+    
+get-button "Save \((Ctrl|M1)\+S\)" | click    
+
+//run test - no window should be shown 
+get-view "Project Explorer" | get-tree | select "RobotProject/new.tsv" | get-menu "Run As/1 Robot Test" | click
+get-view Console | get-text-viewer | get-property text 
+    | contains "from tsv                                                              | PASS |\n" | verify-true
+    
+//change preference to prompt window    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Run\\/Debug/Launching"
+    get-group "Continue launch if project contains errors" | get-button Prompt | click
+    get-button OK | click
+}
+//run test one more time
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RobotProject/new.tsv" | get-menu "Run As/1 Robot Test" | click
+	check-error-window
+	get-window "Errors in Workspace" | get-button Proceed | click
+}	
+//add marker not in test but in Settings
+get-editor "new.tsv" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Resource\tno.robot\n\n"
+    + "*** Test Cases ***\n"
+    + "from tsv\n"
+    + "\tlog\t54" 
+
+get-button "Save \((Ctrl|M1)\+S\)" | click      
+exec-with-options -disableJobWaiting -command {    
+	get-view "Project Explorer" | get-tree | select "RobotProject/new.tsv" | get-menu "Run As/1 Robot Test" | click
+	get-window "Errors in Workspace" | get-button Proceed | click    
+}	
+
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.New.from tsv\n"
+    + ".* : INFO : 54\n"
+    + "Ending test: RobotProject.New.from tsv" | verify-true
+
+
+
+//debug test    
+exec-with-options -disableJobWaiting -command {  
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+	    | get-menu "Debug As/1 Robot Test" | click
+	get-window "Errors in Workspace" | get-button Proceed | click
+}	
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+    + ".* : FAIL : No keyword with name 'I will cause an error' found.\n"
+    + "Ending test: RobotProject.TestFile.test 1\n\n"
+    + "Starting test: RobotProject.TestFile.test 2\n"
+    + ".* : INFO : here is ok\n"
+    + "Ending test: RobotProject.TestFile.test 2" | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
