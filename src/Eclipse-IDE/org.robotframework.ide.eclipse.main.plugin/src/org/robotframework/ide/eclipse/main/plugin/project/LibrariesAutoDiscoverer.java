@@ -160,6 +160,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
             @Override
             public void run() {
+                RedPlugin.logInfo("LIBRARY IMPORTS: \n" + libraryImports.toString());
                 new LibrariesAutoDiscovererWindow(parent, libraryImports).open();
             }
         });
