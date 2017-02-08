@@ -33,7 +33,6 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.debug.ui.ILaunchShortcut;
@@ -72,8 +71,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements
-        ILaunchConfigurationDelegate, ILaunchShortcut {
+public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements ILaunchShortcut {
 
     private final ILaunchConfigurationType launchConfigurationType;
 
@@ -451,5 +449,11 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             });
             hasViewsInitialized = true;
         }
+    }
+
+    @Override
+    protected IProject[] getProjectsForProblemSearch(final ILaunchConfiguration configuration, final String mode)
+            throws CoreException {
+        return new IProject[] { new RobotLaunchConfiguration(configuration).getRobotProject().getProject() };
     }
 }
