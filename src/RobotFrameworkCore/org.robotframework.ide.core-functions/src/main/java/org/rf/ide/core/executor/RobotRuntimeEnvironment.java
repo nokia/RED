@@ -518,13 +518,14 @@ public class RobotRuntimeEnvironment {
         return false;
     }
 
-    public void startTestRunnerAgentHandler(final int port, final ILineHandler lineHandler,
+    public TestRunnerAgentHandler startTestRunnerAgentHandler(final int port, final ILineHandler lineHandler,
             final IExecutionHandler executionHandler) {
         final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
         testRunnerAgentHandler.addListener(new MessageLogParser(lineHandler));
         testRunnerAgentHandler.addListener(new ExecutionElementsParser(executionHandler));
         final Thread handlerThread = new Thread(testRunnerAgentHandler);
         handlerThread.start();
+        return testRunnerAgentHandler;
     }
 
     @Override
