@@ -21,7 +21,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
-public class RobotSuitesAndTestsNaming {
+public class RobotSuitesNaming {
 
     public static String createSuiteName(final IResource suite) {
         return createSuiteName(suite.getProject(), suite.getProjectRelativePath());

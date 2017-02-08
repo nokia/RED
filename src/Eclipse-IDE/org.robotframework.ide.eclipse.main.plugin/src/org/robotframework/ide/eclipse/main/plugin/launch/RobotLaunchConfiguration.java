@@ -481,7 +481,7 @@ public class RobotLaunchConfiguration {
 
         final List<String> suiteNames = new ArrayList<>();
         for (final IResource suite : suites) {
-            suiteNames.add(RobotSuitesAndTestsNaming.createSuiteName(suite));
+            suiteNames.add(RobotSuitesNaming.createSuiteName(suite));
         }
         return suiteNames;
     }
@@ -526,7 +526,7 @@ public class RobotLaunchConfiguration {
         final List<String> tests = new ArrayList<>();
         for (final Entry<String, List<String>> entries : getSuitePaths().entrySet()) {
             for (final String testName : entries.getValue()) {
-                tests.add(RobotSuitesAndTestsNaming.createSuiteName(getProject(), Path.fromPortableString(entries.getKey())) + "."
+                tests.add(RobotSuitesNaming.createSuiteName(getProject(), Path.fromPortableString(entries.getKey())) + "."
                         + testName);
             }
         }
