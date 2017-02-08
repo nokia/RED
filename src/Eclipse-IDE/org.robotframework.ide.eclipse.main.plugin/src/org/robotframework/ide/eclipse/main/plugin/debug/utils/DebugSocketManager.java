@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.google.common.base.Optional;
+
 /**
  * @author mmarzec
  *
@@ -30,13 +32,13 @@ public class DebugSocketManager implements Runnable {
     private boolean hasServerException;
     
     public DebugSocketManager(final String host, final int port) {
-        this(host, port, DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT);
+        this(host, port, Optional.<Integer> absent());
     }
 
-    public DebugSocketManager(final String host, final int port, final int connectionTimeout) {
+    public DebugSocketManager(final String host, final int port, final Optional<Integer> timeout) {
         this.host = host;
         this.port = port;
-        this.connectionTimeoutInMilliseconds = connectionTimeout;
+        this.connectionTimeoutInMilliseconds = timeout.or(DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT);
     }
 
     @Override

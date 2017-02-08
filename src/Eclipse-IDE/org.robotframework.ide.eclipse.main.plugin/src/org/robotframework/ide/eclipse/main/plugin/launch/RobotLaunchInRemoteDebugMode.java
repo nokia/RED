@@ -44,7 +44,7 @@ public class RobotLaunchInRemoteDebugMode extends RobotLaunchInMode {
 
         final String host = robotConfig.getRemoteDebugHost();
         final DebugSocketManager socketManager = new DebugSocketManager(host, cmdLine.getPort(),
-                robotConfig.getRemoteDebugTimeout().get());
+                robotConfig.getRemoteDebugTimeout());
         new Thread(socketManager).start();
         final boolean isDebugServerSocketListening = socketManager.waitForDebugServerSocket();
 
