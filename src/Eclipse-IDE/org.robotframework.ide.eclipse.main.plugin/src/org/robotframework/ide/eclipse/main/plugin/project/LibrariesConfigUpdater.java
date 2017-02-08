@@ -12,7 +12,6 @@ import java.util.List;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**
@@ -52,7 +51,6 @@ public class LibrariesConfigUpdater {
     }
 
     public void finalizeLibrariesAdding(final IEventBroker eventBroker) {
-        RedPlugin.logInfo("ADDED LIBRARIES: \n" + addedLibraries.toString());
         if (!addedLibraries.isEmpty()) {
             robotProject.clearConfiguration();
             robotProject.clearKwSources();
