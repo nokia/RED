@@ -14,6 +14,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 /**
  * @author mmarzec
@@ -27,6 +28,8 @@ public class TestRunnerAgentHandler implements Runnable {
 
     private BufferedWriter agentWriter;
     
+    private final Semaphore writerSemaphore = new Semaphore(0);
+
     public TestRunnerAgentHandler(final int port) {
         listeners = new ArrayList<>();
         this.port = port;
@@ -35,20 +38,20 @@ public class TestRunnerAgentHandler implements Runnable {
     @Override
     public void run() {
         try (ServerSocket socket = new ServerSocket(port)) {
-            final BufferedReader reader;
-            synchronized (this) {
-                socket.setReuseAddress(true);
-                final Socket client = socket.accept();
+            socket.setReuseAddress(true);
+            final Socket client = socket.accept();
 
-                agentWriter = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-                reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            }
-            
-            String line;
-            while ((line = reader.readLine()) != null) {
+            agentWriter = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
+            writerSemaphore.release();
+
+            String line = reader.readLine();
+            while (line != null) {
                 for (final ILineHandler listener : listeners) {
                     listener.processLine(line);
                 }
+                line = reader.readLine();
             }
         } catch (final IOException e) {
             e.printStackTrace();
@@ -68,7 +71,12 @@ public class TestRunnerAgentHandler implements Runnable {
         listeners.remove(listener);
     }
     
-    public synchronized void startTests() throws IOException {
+    public void startTests() throws IOException {
+        try {
+            writerSemaphore.acquire();
+        } catch (final InterruptedException e) {
+            throw new IllegalStateException("Interrupted when waiting for agent stream!", e);
+        }
         agentWriter.write("do start");
         agentWriter.flush();
     }
