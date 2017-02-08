@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +33,7 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -299,6 +302,10 @@ public class RobotLaunchConfiguration {
         }
     }
 
+    public boolean isGeneralPurposeConfiguration() throws CoreException {
+        return configuration.getAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, false);
+    }
+
     public boolean isUsingInterpreterFromProject() throws CoreException {
         return configuration.getAttribute(USE_PROJECT_EXECUTOR, true);
     }
@@ -435,10 +442,6 @@ public class RobotLaunchConfiguration {
         return project;
     }
 
-    private static CoreException newCoreException(final String message, final Throwable cause) {
-        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
-    }
-
     public boolean isSuitableFor(final List<IResource> resources) {
         try {
             for (final IResource resource : resources) {
@@ -464,11 +467,82 @@ public class RobotLaunchConfiguration {
         }
     }
 
-    public boolean isGeneralPurposeConfiguration() throws CoreException {
-        return configuration.getAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, false);
-    }
-
     public String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
         return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getExecutor().executableName();
     }
+
+    public String createExecutorVersion(final RobotRuntimeEnvironment env)
+            throws RobotEnvironmentException, CoreException {
+        return isUsingInterpreterFromProject() ? env.getVersion() : RobotRuntimeEnvironment.getVersion(getExecutor());
+    }
+
+    public List<String> getSuitesToRun() throws CoreException {
+        final Collection<IResource> suites = getSuiteResources();
+
+        final List<String> suiteNames = new ArrayList<>();
+        for (final IResource suite : suites) {
+            suiteNames.add(RobotSuitesAndTestsNaming.createSuiteName(suite));
+        }
+        return suiteNames;
+    }
+
+    Collection<IResource> getSuiteResources() throws CoreException {
+        final Collection<String> suitePaths = getSuitePaths().keySet();
+
+        final Map<String, IResource> resources = Maps.asMap(newHashSet(suitePaths), new Function<String, IResource>() {
+
+            @Override
+            public IResource apply(final String suitePath) {
+                try {
+                    return getProject().findMember(Path.fromPortableString(suitePath));
+                } catch (final CoreException e) {
+                    return null;
+                }
+            }
+        });
+
+        final List<String> problems = new ArrayList<>();
+        for (final Entry<String, IResource> entry : resources.entrySet()) {
+            if (entry.getValue() == null || !entry.getValue().exists()) {
+                problems.add(
+                        "Suite '" + entry.getKey() + "' does not exist in project '" + getProject().getName() + "'");
+            }
+        }
+        if (!problems.isEmpty()) {
+            throw newCoreException(Joiner.on('\n').join(problems));
+        }
+        return resources.values();
+    }
+
+    public List<IResource> getResourcesUnderDebug() throws CoreException {
+        final List<IResource> suiteResources = newArrayList(getSuiteResources());
+        if (suiteResources.isEmpty()) {
+            suiteResources.add(getProject());
+        }
+        return suiteResources;
+    }
+
+    public Collection<String> getTestsToRun() throws CoreException {
+        final List<String> tests = new ArrayList<>();
+        for (final Entry<String, List<String>> entries : getSuitePaths().entrySet()) {
+            for (final String testName : entries.getValue()) {
+                tests.add(RobotSuitesAndTestsNaming.createSuiteName(getProject(), Path.fromPortableString(entries.getKey())) + "."
+                        + testName);
+            }
+        }
+        return tests;
+    }
+
+    public boolean isRemoteDefined() throws CoreException {
+        return getRemoteDebugPort().isPresent() && !getRemoteDebugHost().isEmpty();
+    }
+
+    private static CoreException newCoreException(final String message) {
+        return newCoreException(message, null);
+    }
+
+    private static CoreException newCoreException(final String message, final Throwable cause) {
+        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
+    }
+
 }
