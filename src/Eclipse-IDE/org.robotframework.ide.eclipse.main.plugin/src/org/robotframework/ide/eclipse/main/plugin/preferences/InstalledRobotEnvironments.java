@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -111,13 +113,15 @@ public class InstalledRobotEnvironments {
         final Map<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>> envs = Collections
                 .synchronizedMap(new LinkedHashMap<InterpreterWithLocation, Supplier<RobotRuntimeEnvironment>>());
 
-        final String[] paths = allPaths.split(";");
-        final String[] execs = allExecs.isEmpty() ? new String[0] : allExecs.split(";");
-        for (int i = 0; i < paths.length; i++) {
-            final String path = paths[i];
+        final List<String> paths = Splitter.on(';').splitToList(allPaths);
+        final List<String> execs = allExecs.isEmpty() ? new ArrayList<String>()
+                : Splitter.on(';').splitToList(allExecs);
+
+        for (int i = 0; i < paths.size(); i++) {
+            final String path = paths.get(i);
             final File location = new File(path);
 
-            final String exec = execs.length == 0 ? "" : execs[i];
+            final String exec = execs.size() == 0 ? "" : execs.get(i);
             final SuiteExecutor executor = exec.isEmpty() ? null : SuiteExecutor.fromName(exec);
 
             final InterpreterWithLocation key = InterpreterWithLocation.create(location, executor);
