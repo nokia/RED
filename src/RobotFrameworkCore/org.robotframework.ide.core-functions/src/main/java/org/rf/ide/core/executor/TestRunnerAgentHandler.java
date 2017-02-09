@@ -15,6 +15,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Supplier;
 
 /**
  * @author mmarzec
@@ -22,7 +25,7 @@ import java.util.concurrent.Semaphore;
  */
 public class TestRunnerAgentHandler implements Runnable {
 
-    private static final int TIMEOUT = 5_000;
+    private static final int TIMEOUT = 60_000;
 
     private final List<ILineHandler> listeners;
     
@@ -30,7 +33,7 @@ public class TestRunnerAgentHandler implements Runnable {
 
     private BufferedWriter agentWriter;
     
-    private final Semaphore writerSemaphore = new Semaphore(0);
+    private final Semaphore writerSemaphore = new Semaphore(0, true);
 
     public TestRunnerAgentHandler(final int port) {
         listeners = new ArrayList<>();
@@ -78,11 +81,13 @@ public class TestRunnerAgentHandler implements Runnable {
         listeners.remove(listener);
     }
     
-    public void startTests() throws IOException {
+    public void startTests(final Supplier<Boolean> shouldNotWaitMoreCondition) throws IOException {
         try {
-            writerSemaphore.acquire();
+            while (!writerSemaphore.tryAcquire(1_000, TimeUnit.MILLISECONDS) && !shouldNotWaitMoreCondition.get()) {
+                // do nothing, waiting is done in tryAcquire
+            }
         } catch (final InterruptedException e) {
-            throw new IllegalStateException("Interrupted when waiting for agent stream!", e);
+            throw new IllegalStateException("Interrupted when waiting for agent connection!", e);
         }
         if (agentWriter != null) {
             agentWriter.write("do start");
