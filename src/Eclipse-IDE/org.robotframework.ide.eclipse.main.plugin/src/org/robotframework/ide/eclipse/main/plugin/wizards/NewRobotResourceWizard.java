@@ -15,6 +15,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 
 public class NewRobotResourceWizard extends BasicNewResourceWizard {
 
@@ -54,13 +55,6 @@ public class NewRobotResourceWizard extends BasicNewResourceWizard {
             throw new RobotEditorOpeningException("Unable to open editor for file: " + newFile.getName(), e);
         }
         return true;
-    }
-
-    private static class RobotEditorOpeningException extends RuntimeException {
-
-        public RobotEditorOpeningException(final String msg, final PartInitException cause) {
-            super(msg, cause);
-        }
     }
 
 }
