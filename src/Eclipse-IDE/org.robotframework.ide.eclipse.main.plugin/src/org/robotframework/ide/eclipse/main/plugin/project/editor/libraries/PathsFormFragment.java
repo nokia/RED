@@ -162,7 +162,7 @@ class PathsFormFragment implements ISectionFormFragment {
     private RowExposingTableViewer createPathViewer(final Composite parent, final ViewerConfiguration config) {
         toolkit.createFormText(parent, false)
                 .setText("<form><li>" + config.getVariableName() + "</li></form>", true, false);
-        RowExposingTableViewer viewer = createViewer(parent, config);
+        final RowExposingTableViewer viewer = createViewer(parent, config);
         createColumns(viewer, config);
         createContextMenu(viewer, config);
         return viewer;
@@ -308,9 +308,10 @@ class PathsFormFragment implements ISectionFormFragment {
 
         if (!projectIsInterpretedByJython) {
             decoration = new ControlDecoration(classPathViewer.getTable(), SWT.LEFT | SWT.TOP);
-            decoration.setDescriptionText(
-                    "Project is configured to use " + envs.getActiveEnvironment().getInterpreter().toString()
-                            + " interpreter, but Jython is needed to use CLASSPATH entries.");
+            final SuiteExecutor executor = envs.getActiveEnvironment().getInterpreter();
+            final String interpreter = executor == null ? "unknown" : executor.toString();
+            decoration.setDescriptionText("Project is configured to use " + interpreter
+                    + " interpreter, but Jython is needed to use CLASSPATH entries.");
             decoration.setImage(FieldDecorationRegistry.getDefault()
                     .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
                     .getImage());
