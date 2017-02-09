@@ -432,7 +432,7 @@ public class RobotProjectConfig {
         }
 
         public void setInterpreter(final SuiteExecutor executor) {
-            this.interpreter = executor.name();
+            this.interpreter = executor == null ? null : executor.name();
         }
 
         public SuiteExecutor getInterpreter() {
