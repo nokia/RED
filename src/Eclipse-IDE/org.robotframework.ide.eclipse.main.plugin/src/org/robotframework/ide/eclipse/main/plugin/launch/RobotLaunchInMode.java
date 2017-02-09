@@ -25,8 +25,8 @@ abstract class RobotLaunchInMode {
     protected void launch(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException, IOException {
 
-        final Process process = launchAndAttachToProcess(robotConfig, launch, monitor);
         try {
+            final Process process = launchAndAttachToProcess(robotConfig, launch, monitor);
             if (process != null) {
                 // TODO : after migration to Java 1.8 this can be changed to a loop using
                 // waitFor(timeout, unit) method in order to periodically check for monitor
@@ -35,6 +35,8 @@ abstract class RobotLaunchInMode {
             }
         } catch (final InterruptedException e) {
             throw newCoreException("Robot process was interrupted", e);
+        } catch (final Exception e) {
+            throw newCoreException("Tests cannot be launched", e);
         }
     }
 

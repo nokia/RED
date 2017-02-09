@@ -201,7 +201,7 @@ public class RobotLaunchConfiguration {
     public void setExecutor(final SuiteExecutor executor) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
-            launchCopy.setAttribute(EXECUTOR_NAME, executor.name());
+            launchCopy.setAttribute(EXECUTOR_NAME, executor == null ? "" : executor.name());
         }
     }
 

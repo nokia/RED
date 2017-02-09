@@ -19,6 +19,8 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.TestRunnerAgentHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
+import com.google.common.base.Supplier;
+
 class RobotLaunchInRunMode extends RobotLaunchInMode {
 
     private final RobotEventBroker robotEventBroker;
@@ -53,7 +55,13 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         final RobotConsoleFacade consoleFacade = new RobotConsoleFacade();
         consoleFacade.connect(robotConfig, runtimeEnvironment, cmdLine, version);
 
-        agentHandler.startTests();
+        agentHandler.startTests(new Supplier<Boolean>() {
+
+            @Override
+            public Boolean get() {
+                return !process.isAlive();
+            }
+        });
         return process;
     }
 
