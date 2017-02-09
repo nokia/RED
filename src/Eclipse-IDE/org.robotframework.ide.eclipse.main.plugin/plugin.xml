@@ -5111,11 +5111,9 @@
 			name="org.eclipse.debug.core.robot.breakpoint">
 		</type>
 	  <type
-         markerType="org.robotframework.ide.texteditor.occurrencesMark"
          name="org.robotframework.ide.texteditor.occurrencesMark">
 	  </type>
    <type
-         markerType="org.robotframework.red.cellHighlighting"
          name="org.robotframework.red.cellHighlighting">
    </type>
 	</extension>	
