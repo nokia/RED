@@ -30,7 +30,7 @@ class MyTestSuiteBuilder(TestSuiteBuilder):
 
 
 class SuiteVisitorImportProxy(SuiteVisitor):
-    def __init__(self, lib_import_timeout=5):
+    def __init__(self, lib_import_timeout=60):
         self.lib_import_timeout = int(lib_import_timeout)
         robot.running.namespace.IMPORTER = MyIMPORTER(robot.running.namespace.IMPORTER, self.lib_import_timeout)
         self.options, self.arguments = RobotFramework().parse_arguments(sys.argv[1:])
@@ -132,7 +132,6 @@ class MyIMPORTER(object):
     def _wrap(self, func, argser, kwargs):
         if type(func) == MethodType:
             if func.__name__ == 'import_library':
-                # print str(argser)
                 q = []
                 errors = []
                 lib_cached = self.get_from_cache(argser[0], argser[1])
