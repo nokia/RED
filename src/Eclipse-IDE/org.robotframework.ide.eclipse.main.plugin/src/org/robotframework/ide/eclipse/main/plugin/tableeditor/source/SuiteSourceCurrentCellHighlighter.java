@@ -5,27 +5,29 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.source.Annotation;
+import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 /**
@@ -33,27 +35,28 @@ import com.google.common.base.Optional;
  */
 class SuiteSourceCurrentCellHighlighter {
 
-    private static final String MARKER_ID = "org.robotframework.red.cellHighlighting";
+    private static final String ANNOTATION_ID = "org.robotframework.red.cellHighlighting";
 
     private final SuiteSourceEditor editor;
 
-    private final IFile file;
+    private final RobotSuiteFile fileModel;
 
     private final IDocument document;
 
     private IRegion currentCell;
 
-    SuiteSourceCurrentCellHighlighter(final SuiteSourceEditor editor, final IFile file, final IDocument document) {
+    private IAnnotationModel annotationModel;
+
+    SuiteSourceCurrentCellHighlighter(final SuiteSourceEditor editor, final RobotSuiteFile fileModel,
+            final IDocument document) {
         this.editor = editor;
-        this.file = file;
+        this.fileModel = fileModel;
         this.document = document;
         this.currentCell = null;
     }
 
     void install(final SourceViewer viewer) {
-        if (file == null) {
-            return;
-        }
+        annotationModel = viewer.getAnnotationModel();
         viewer.getTextWidget().addCaretListener(new CaretListener() {
 
             @Override
@@ -70,64 +73,53 @@ class SuiteSourceCurrentCellHighlighter {
         });
     }
 
-    private void refreshCurrentCell(final int offset) {
+    @VisibleForTesting
+    void refreshCurrentCell(final int offset) {
         try {
             final Optional<IRegion> newRegion = offset == -1 ? Optional.<IRegion> absent()
-                    : DocumentUtilities.findCellRegion(document, isTsv(), offset);
+                    : DocumentUtilities.findCellRegion(document, fileModel.isTsvFile(), offset);
+
+            final Annotation[] annotationsToRemove;
+            final Map<? extends Annotation, ? extends Position> annotationsToAdd;
             if (!newRegion.isPresent()) {
-                removeCellHighlighting();
+
+                annotationsToRemove = getAnnotationsToRemove();
+                annotationsToAdd = new HashMap<>();
                 currentCell = null;
                 editor.notifyDocSelectionChangedListener(new Region(offset, 1), false);
+
+                ((IAnnotationModelExtension) annotationModel).replaceAnnotations(annotationsToRemove, annotationsToAdd);
+
             } else if (!Objects.equals(currentCell, newRegion.get())) {
-                removeCellHighlighting();
-                highlightCell(newRegion.get());
+
+                annotationsToRemove = getAnnotationsToRemove();
+                annotationsToAdd = getAnnotationsToAdd(newRegion.get());
                 currentCell = newRegion.get();
                 editor.notifyDocSelectionChangedListener(currentCell, false);
+
+                ((IAnnotationModelExtension) annotationModel).replaceAnnotations(annotationsToRemove, annotationsToAdd);
             }
-        } catch (final BadLocationException | InterruptedException e) {
-            RedPlugin.logError("Unable to create cell highlight markers", e);
+        } catch (final BadLocationException e) {
+            // silently ignore this
         }
     }
 
-    private boolean isTsv() {
-        return file.getFileExtension().equals("tsv");
-    }
-
-    private void removeCellHighlighting() {
-        try {
-            if (file.exists()) {
-                file.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
+    private Annotation[] getAnnotationsToRemove() {
+        final List<Annotation> annotationsToRemove = new ArrayList<>();
+        final Iterator<Annotation> annotationsIterator = annotationModel.getAnnotationIterator();
+        while (annotationsIterator.hasNext()) {
+            final Annotation annotation = annotationsIterator.next();
+            if (ANNOTATION_ID.equals(annotation.getType())) {
+                annotationsToRemove.add(annotation);
             }
-        } catch (final CoreException e) {
-            RedPlugin.logError("Unable to remove cell highlight markers", e);
         }
+        return annotationsToRemove.toArray(new Annotation[0]);
     }
 
-    private void highlightCell(final IRegion newRegion) throws BadLocationException, InterruptedException {
-        final String cellContent = document.get(newRegion.getOffset(), newRegion.getLength());
-        final WorkspaceJob wsJob = new WorkspaceJob("Creating cell highlight marker") {
-
-            @Override
-            public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                createMarker(newRegion, cellContent);
-                return Status.OK_STATUS;
-            }
-        };
-        wsJob.setSystem(true);
-        wsJob.schedule();
-        wsJob.join();
-    }
-
-    private void createMarker(final IRegion region, final String selectedText) {
-        try {
-            if (file.exists()) {
-                final IMarker marker = file.createMarker(MARKER_ID);
-                marker.setAttribute(IMarker.TRANSIENT, true);
-                marker.setAttribute(IMarker.CHAR_START, region.getOffset());
-                marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
-            }
-        } catch (final CoreException e) {
-            RedPlugin.logError("Unable to create cell highlighting marker for '" + selectedText + "'", e);
-        }
+    private Map<Annotation, Position> getAnnotationsToAdd(final IRegion region) {
+        final Map<Annotation, Position> annotationsToAdd = new HashMap<>();
+        annotationsToAdd.put(new Annotation(ANNOTATION_ID, false, ""),
+                new Position(region.getOffset(), region.getLength()));
+        return annotationsToAdd;
     }
 }

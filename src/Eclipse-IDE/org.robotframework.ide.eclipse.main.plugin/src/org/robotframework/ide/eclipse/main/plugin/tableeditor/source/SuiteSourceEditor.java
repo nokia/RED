@@ -111,8 +111,11 @@ public class SuiteSourceEditor extends TextEditor {
         final ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
 
         installProjectionAndFolding(viewer);
-        new SuiteSourceCurrentCellHighlighter(this, fileModel.getFile(), viewer.getDocument()).install(viewer);
-        new SuiteSourceOccurrenceMarksHighlighter(fileModel.getFile(), viewer.getDocument()).install(viewer);
+
+        if (fileModel.getFile() != null) {
+            new SuiteSourceCurrentCellHighlighter(this, fileModel, viewer.getDocument()).install(viewer);
+            new SuiteSourceOccurrenceMarksHighlighter(fileModel, viewer.getDocument()).install(viewer);
+        }
         installBreakpointTogglingOnDoubleClick();
         installStatusBarUpdater(viewer);
 
@@ -351,10 +354,6 @@ public class SuiteSourceEditor extends TextEditor {
         this.sourceDocSelectionChangedListener = listener;
     }
     
-    public SourceDocumentationSelectionChangedListener getSourceDocSelectionChangedListener() {
-        return sourceDocSelectionChangedListener;
-    }
-
     public void removeSourceDocSelectionChangedListener() {
         this.sourceDocSelectionChangedListener = null;
     }
