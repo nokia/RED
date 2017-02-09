@@ -22,6 +22,8 @@ import java.util.concurrent.Semaphore;
  */
 public class TestRunnerAgentHandler implements Runnable {
 
+    private static final int TIMEOUT = 5_000;
+
     private final List<ILineHandler> listeners;
     
     private final int port;
@@ -39,6 +41,7 @@ public class TestRunnerAgentHandler implements Runnable {
     public void run() {
         try (ServerSocket socket = new ServerSocket(port)) {
             socket.setReuseAddress(true);
+            socket.setSoTimeout(TIMEOUT);
             final Socket client = socket.accept();
 
             agentWriter = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
@@ -54,10 +57,14 @@ public class TestRunnerAgentHandler implements Runnable {
                 line = reader.readLine();
             }
         } catch (final IOException e) {
-            e.printStackTrace();
         } finally {
+            if (writerSemaphore.availablePermits() == 0) {
+                writerSemaphore.release();
+            }
             try {
-                agentWriter.close();
+                if (agentWriter != null) {
+                    agentWriter.close();
+                }
             } catch (final IOException e) {
             }
         }
@@ -77,7 +84,9 @@ public class TestRunnerAgentHandler implements Runnable {
         } catch (final InterruptedException e) {
             throw new IllegalStateException("Interrupted when waiting for agent stream!", e);
         }
-        agentWriter.write("do start");
-        agentWriter.flush();
+        if (agentWriter != null) {
+            agentWriter.write("do start");
+            agentWriter.flush();
+        }
     }
 }
