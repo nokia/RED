@@ -35,8 +35,6 @@ abstract class RobotLaunchInMode {
             }
         } catch (final InterruptedException e) {
             throw newCoreException("Robot process was interrupted", e);
-        } catch (final Exception e) {
-            throw newCoreException("Tests cannot be launched", e);
         }
     }
 
