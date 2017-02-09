@@ -28,11 +28,11 @@ public class TestRunnerAgentHandler implements Runnable {
     private static final int TIMEOUT = 60_000;
 
     private final List<ILineHandler> listeners;
-    
+
     private final int port;
 
     private BufferedWriter agentWriter;
-    
+
     private final Semaphore writerSemaphore = new Semaphore(0, true);
 
     public TestRunnerAgentHandler(final int port) {
@@ -80,7 +80,7 @@ public class TestRunnerAgentHandler implements Runnable {
     public void removeListener(final ILineHandler listener) {
         listeners.remove(listener);
     }
-    
+
     public void startTests(final Supplier<Boolean> shouldNotWaitMoreCondition) throws IOException {
         try {
             while (!writerSemaphore.tryAcquire(1_000, TimeUnit.MILLISECONDS) && !shouldNotWaitMoreCondition.get()) {
