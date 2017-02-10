@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/22/16 7:51 PM
+Save-Time: 2/10/17 10:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -43,16 +43,10 @@ with [get-window "Add new search path"] {
     }
     get-button OK | click
 }
-
+wait 200
 get-editor "RobotProject/red.xml" | get-section Paths | get-table | key-type "M1+s"
-
-with [get-editor "RobotProject/red.xml"] {
-    maximize
-    restore
-}
-
-
-
+wait 200
+get-editor "RobotProject/red.xml"|  maximize
 
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
 	
@@ -63,6 +57,8 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    get-item "\\/linux_path\\/tests" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
 	    get-item "\\win_path\\/addons" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
 	}
+	get-editor "RobotProject/red.xml"| restore
+	
 	//check warnings
 	with [get-view Problems | get-tree] {
 	    get-item "Warnings \\(4 items\\)" | get-property childCount | equals 4 | verify-true
@@ -85,6 +81,8 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    get-item "\\/linux_path\\/tests" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
 	    get-item "\\win_path\\/addons" | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
 	}
+	get-editor "RobotProject/red.xml"| restore
+	
 	//check warnings and errors
 	with [get-view Problems | get-tree] {
 	    get-item "Warnings \\(2 items\\)/The path '\\/linux_path\\/tests' points to non-existing location" 
@@ -99,10 +97,6 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    get-item "Errors \\(.* items\\)/The path 'D:\\folder\\folder2' is invalid" | get-property caption 
 	        | equals "The path 'D:\\folder\\folder2' is invalid" | verify-true
 	}
-}
-
-with [get-editor "RobotProject/red.xml"] {
-    restore
 }
 
 //add lib to test
