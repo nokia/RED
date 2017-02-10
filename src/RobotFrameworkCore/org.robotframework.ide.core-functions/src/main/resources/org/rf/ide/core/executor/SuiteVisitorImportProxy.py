@@ -176,7 +176,7 @@ class MyIMPORTER(object):
         else:
             result = func(self.obj, *argser, **kwargs)
 
-        self._handle_keywords(result)
+#         self._handle_keywords(result)
 
         return result
 
