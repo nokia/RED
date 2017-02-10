@@ -36,13 +36,13 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         // possibility
 
         final RobotProject robotProject = robotConfig.getRobotProject();
+        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
         final RunCommandLine cmdLine = prepareCommandLineBuilder(robotConfig).enableDebug(false).build();
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port");
         }
 
-        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
         final TestRunnerAgentHandler agentHandler = runtimeEnvironment.startTestRunnerAgentHandler(cmdLine.getPort(), createMessagesLineHandler(),
                 createExecutionEventsHandler());
 
