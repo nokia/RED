@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _QxfxAKjOEeWg6OFh_tHgTw
-Element-Name: ExcludingAfterProjectModifications
+Element-Name: ExcudingAfterProjectModifications
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _HsmIwA05EeaptdkdtUhWcw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/6/17 12:28 PM
+Save-Time: 2/6/17 3:44 PM
 Testcase-Type: ecl
 Verifications: _f4ZB4BzxEeabY7GTJGe_uw
 
