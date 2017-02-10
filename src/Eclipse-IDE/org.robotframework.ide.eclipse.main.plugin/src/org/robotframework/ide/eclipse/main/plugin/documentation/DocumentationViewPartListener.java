@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.documentation;
 
+import org.eclipse.jface.dialogs.IPageChangedListener;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -14,18 +16,15 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsE
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
-public class DocumentationViewPartListener implements IPartListener {
+public class DocumentationViewPartListener implements IPartListener, IPageChangedListener {
 
-    private SourceDocumentationSelectionChangedListener sourceDocSelectionChangedListener;
+    private final SourceDocumentationSelectionChangedListener sourceDocSelectionChangedListener;
 
-    private TableDocumentationSelectionChangedListener tableDocSelectionChangedListener;
+    private final TableDocumentationSelectionChangedListener tableDocSelectionChangedListener;
     
-    private DocumentationView view;
-
     private IEditorPart currentlyActiveEditor;
 
     public DocumentationViewPartListener(final DocumentationView view) {
-        this.view = view;
         this.sourceDocSelectionChangedListener = new SourceDocumentationSelectionChangedListener(view);
         this.tableDocSelectionChangedListener = new TableDocumentationSelectionChangedListener(view);
     }
@@ -34,7 +33,7 @@ public class DocumentationViewPartListener implements IPartListener {
     public void partActivated(final IWorkbenchPart part) {
         if (part.getSite().getId().equals(RobotFormEditor.ID)) {
             final RobotFormEditor editor = (RobotFormEditor) part;
-            editor.setDocumentationViewPartListener(this);
+            editor.addPageChangedListener(this);
             addDocSelectionChangedListenerToActiveEditor(editor.getActiveEditor());
         }
     }
@@ -43,7 +42,7 @@ public class DocumentationViewPartListener implements IPartListener {
     public void partDeactivated(final IWorkbenchPart part) {
         if (part.getSite().getId().equals(RobotFormEditor.ID)) {
             final RobotFormEditor editor = (RobotFormEditor) part;
-            editor.removeDocumentationViewPartListener();
+            editor.removePageChangedListener(this);
             currentlyActiveEditor = null;
             removeDocSelectionChangedListenerFromActiveEditor(editor.getActiveEditor());
         }
@@ -61,13 +60,13 @@ public class DocumentationViewPartListener implements IPartListener {
     public void partBroughtToTop(final IWorkbenchPart part) {
     }
 
-
-    public void pageChanged(final IEditorPart activeEditor) {
-        // TODO: IPageChangedListener should be added
+    @Override
+    public void pageChanged(final PageChangedEvent event) {
         if (currentlyActiveEditor != null) {
             removeDocSelectionChangedListenerFromActiveEditor(currentlyActiveEditor);
         }
-        addDocSelectionChangedListenerToActiveEditor(activeEditor);
+        addDocSelectionChangedListenerToActiveEditor((IEditorPart) event.getSelectedPage());
+
     }
 
     public void dispose() {
@@ -97,9 +96,4 @@ public class DocumentationViewPartListener implements IPartListener {
                     .removeSelectionChangedListener(tableDocSelectionChangedListener);
         }
     }
-
-    public DocumentationView getView() {
-        return view;
-    }
-
 }
