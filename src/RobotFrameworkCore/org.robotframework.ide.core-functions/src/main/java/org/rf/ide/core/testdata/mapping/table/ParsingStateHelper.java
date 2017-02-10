@@ -101,23 +101,21 @@ public class ParsingStateHelper {
         return (status == ParsingState.KEYWORD_DECLARATION);
     }
 
-    public boolean isTableInsideStateInHierarchy(ParsingState state) {
-        boolean result = false;
-        if (!isTableInsideState(state)) {
-            ParsingState parent = null;
-            while ((parent = state.getPreviousState()) != null) {
-                if (isTableInsideState(parent)) {
-                    result = true;
-                    break;
-                } else {
-                    state = parent;
+    public boolean isTableInsideStateInHierarchy(final ParsingState state) {
+        ParsingState currentState = state;
+        if (!isTableInsideState(currentState)) {
+            ParsingState parentState = currentState.getPreviousState();
+            while (parentState != null) {
+                if (isTableInsideState(parentState)) {
+                    return true;
                 }
+                currentState = parentState;
+                parentState = currentState.getPreviousState();
             }
         } else {
-            result = true;
+            return true;
         }
-
-        return result;
+        return false;
     }
 
     public boolean isTableState(final ParsingState state) {

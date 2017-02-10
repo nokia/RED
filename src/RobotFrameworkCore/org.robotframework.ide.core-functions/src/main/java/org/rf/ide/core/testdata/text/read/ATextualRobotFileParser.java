@@ -522,7 +522,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
             if (useMapper) {
                 robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput,
-                        fp, text, fileName, robotToken);
+                        fp, text, robotToken);
             }
         }
 
@@ -559,7 +559,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     private RobotToken mapToCorrectTokenAndPutInCorrectPlaceInModel(final RobotLine currentLine,
             final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput, final FilePosition fp,
-            final String text, final String fileName, RobotToken robotToken) {
+            final String text, final RobotToken robotToken) {
         final List<IParsingMapper> matchedMappers = new ArrayList<>();
         for (final IParsingMapper mapper : mappers) {
             if (mapper.checkIfCanBeMapped(robotFileOutput, currentLine, robotToken, text, processingState)) {
@@ -579,7 +579,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
         size = matchedMappers.size();
         if (size == 1) {
-            robotToken = matchedMappers.get(0).map(currentLine, processingState, robotFileOutput, robotToken, fp, text);
+            return matchedMappers.get(0).map(currentLine, processingState, robotFileOutput, robotToken, fp, text);
         }
         return robotToken;
     }
