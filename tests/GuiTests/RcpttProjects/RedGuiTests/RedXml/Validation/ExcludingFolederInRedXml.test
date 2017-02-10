@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _QxfxAKjOEeWg6OFh_tHgTw
-Element-Name: ExcudingFolederInRedXml
+Element-Name: ExcludingFolederInRedXml
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-2m5wKjCEeWg6OFh_tHgTw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/6/17 3:45 PM
+Save-Time: 2/10/17 10:16 AM
 Testcase-Type: ecl
 Verifications: _m9LPkKj7EeW6oYCgHZ503g,_rI-sMKj8EeW6oYCgHZ503g,_lJPcoLh5EeWzJthH3JoEWQ
 
