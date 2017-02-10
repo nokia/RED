@@ -83,10 +83,8 @@ public class RobotDryRunHandler {
 
     public File createTempSuiteFile(final List<String> resourcesPaths, final List<String> libraryNames) {
         File file = null;
-        PrintWriter printWriter = null;
-        try {
+        try (PrintWriter printWriter = new PrintWriter(file)) {
             file = RobotRuntimeEnvironment.copyResourceFile("DryRunTempSuite.robot");
-            printWriter = new PrintWriter(file);
             printWriter.println("*** Test Cases ***");
             printWriter.println("T1");
             printWriter.println("*** Settings ***");
@@ -98,10 +96,6 @@ public class RobotDryRunHandler {
             }
         } catch (final IOException e) {
             // nothing to do
-        } finally {
-            if (printWriter != null) {
-                printWriter.close();
-            }
         }
         return file;
     }

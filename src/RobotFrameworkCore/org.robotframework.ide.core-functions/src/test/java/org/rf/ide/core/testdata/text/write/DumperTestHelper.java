@@ -7,7 +7,6 @@ package org.rf.ide.core.testdata.text.write;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -31,38 +30,27 @@ public class DumperTestHelper {
     }
 
     public Path getFile(final String path) throws URISyntaxException {
-        URL resource = this.getClass().getResource(path);
+        final URL resource = this.getClass().getResource(path);
         return Paths.get(resource.toURI());
     }
 
     public String readWithLineSeparatorPresave(final Path file) throws Exception {
-        String text = null;
-
-        InputStreamReader fisReader = null;
-        try {
-            fisReader = new InputStreamReader(new FileInputStream(file.toFile()));
-            StringBuilder str = new StringBuilder();
-            char buff[] = new char[4096];
+        try (InputStreamReader fisReader = new InputStreamReader(new FileInputStream(file.toFile()))) {
+            final StringBuilder str = new StringBuilder();
+            final char buff[] = new char[4096];
             int length = -1;
             while ((length = fisReader.read(buff)) != -1) {
                 str.append(Arrays.copyOf(buff, length));
             }
-
-            text = str.toString();
-        } finally {
-            if (fisReader != null) {
-                fisReader.close();
-            }
+            return str.toString();
         }
-
-        return text;
     }
 
     public TextCompareResult compare(final String text1, final String text2) {
-        TextCompareResult cmpResult = new TextCompareResult(text1, text2);
+        final TextCompareResult cmpResult = new TextCompareResult(text1, text2);
 
-        int text1Len = text1.length();
-        int text2Len = text2.length();
+        final int text1Len = text1.length();
+        final int text2Len = text2.length();
         int differenceOffset = FilePosition.NOT_SET;
         if (text1Len > text2Len) {
             differenceOffset = indexOfTheFirstDifference(text1.substring(0, text2Len), text2);
@@ -115,7 +103,7 @@ public class DumperTestHelper {
 
         final char text1CharArray[] = text1.toCharArray();
         final char text2CharArray[] = text2.toCharArray();
-        int len = text1CharArray.length;
+        final int len = text1CharArray.length;
         for (int charIndex = 0; charIndex < len; charIndex++) {
             if (text1CharArray[charIndex] != text2CharArray[charIndex]) {
                 differenceIndex = charIndex;
@@ -179,26 +167,16 @@ public class DumperTestHelper {
 
     private List<FileRegion> getEndOfLinesRegions(final String text) {
         List<FileRegion> eols = new ArrayList<>();
-        final LineReader lineReader = new LineReader(new StringReader(text));
-        final BufferedReader bufferedReader = new BufferedReader(lineReader);
 
-        try {
-            @SuppressWarnings("unused")
-            String lineText = null;
-            while ((lineText = bufferedReader.readLine()) != null) {
+        try (final LineReader lineReader = new LineReader(new StringReader(text));
+                final BufferedReader bufferedReader = new BufferedReader(lineReader);) {
+            while (bufferedReader.readLine() != null) {
+                // do nothing
             }
-
             eols = lineReader.getLinesRegion();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // is not I/O will not happen
-        } finally {
-            try {
-                bufferedReader.close();
-            } catch (final IOException e) {
-                // is not I/O will not happen
-            }
         }
-
         return eols;
     }
 }
