@@ -31,13 +31,13 @@ public class RobotLaunchInDebugMode extends RobotLaunchInMode {
             final IProgressMonitor monitor) throws CoreException, IOException {
 
         final RobotProject robotProject = robotConfig.getRobotProject();
+        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
         final RunCommandLine cmdLine = prepareCommandLineBuilder(robotConfig).enableDebug(true).build();
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port");
         }
 
-        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
         final DebugSocketManager socketManager = new DebugSocketManager("localhost", cmdLine.getPort());
         new Thread(socketManager).start();
