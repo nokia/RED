@@ -14,7 +14,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
@@ -30,7 +29,6 @@ import org.robotframework.red.junit.ProjectProvider;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-@Ignore
 public class KeywordsAutoDiscovererTest {
 
     @Rule
