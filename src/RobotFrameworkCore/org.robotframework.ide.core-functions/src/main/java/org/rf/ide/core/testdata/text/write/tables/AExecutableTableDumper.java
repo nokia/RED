@@ -70,7 +70,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
         if (!sorted.isEmpty()) {
             final List<Section> execUnits = SectionType.filterByType(sections, sectionWithHeaderPos, getSectionType());
             final int lastIndexToDump = getDumperHelper().getLastSortedToDump(model, execUnits,
-                    new ArrayList<AModelElement<ARobotSectionTable>>(sorted));
+                    new ArrayList<>(sorted));
 
             AModelElement<?> last = null;
             for (int execUnitIndex = 0; execUnitIndex <= lastIndexToDump; execUnitIndex++) {
@@ -92,7 +92,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     fileOffset = filePosition.getOffset();
                 }
 
-                RobotLine currentLine = getLineForToken(model, fileOffset);
+                final RobotLine currentLine = getLineForToken(model, fileOffset);
 
                 addSeparatorInTheBeginning(model, lines, elemDeclaration, currentLine);
 
@@ -104,7 +104,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                 }
 
                 final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits = getSortedUnits(execHolder);
-                int sortedUnitsSize = sortedUnits.size();
+                final int sortedUnitsSize = sortedUnits.size();
                 for (int sortedUnitId = 0; sortedUnitId < sortedUnitsSize; sortedUnitId++) {
                     final AModelElement<? extends IExecutableStepsHolder<?>> execElement = sortedUnits
                             .get(sortedUnitId);
@@ -146,16 +146,15 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
     }
 
     private void addLineSeparatorIfIsRequiredAfterExecElement(final RobotFile model, final List<RobotLine> lines,
-            final IExecutableStepsHolder execHolder,
+            final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execHolder,
             final AModelElement<? extends IExecutableStepsHolder<?>> execElement) {
         if (!lines.isEmpty()) {
-            RobotLine lastLine = lines.get(lines.size() - 1);
-            IRobotLineElement endOfLine = lastLine.getEndOfLine();
+            final RobotLine lastLine = lines.get(lines.size() - 1);
+            final IRobotLineElement endOfLine = lastLine.getEndOfLine();
             if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                     || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
-                    && !lastLine.getLineElements().isEmpty()) {
-                boolean shouldSeparateLine = shouldSeparateLine(execHolder, execElement);
+                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF)) && !lastLine.getLineElements().isEmpty()) {
+                final boolean shouldSeparateLine = shouldSeparateLine(execHolder, execElement);
 
                 if (shouldSeparateLine) {
                     final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
@@ -166,7 +165,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
     }
 
     private void addSuffixAfterTokenDeclaration(final RobotFile model, final List<RobotLine> lines,
-            final RobotToken elemDeclaration, RobotLine currentLine) {
+            final RobotToken elemDeclaration, final RobotLine currentLine) {
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         final int tokenPosIndex = lineElements.indexOf(elemDeclaration);
         if (lineElements.size() - 1 > tokenPosIndex + 1) {
@@ -184,14 +183,14 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
     }
 
     private void addSeparatorInTheBeginning(final RobotFile model, final List<RobotLine> lines,
-            final RobotToken elemDeclaration, RobotLine currentLine) {
+            final RobotToken elemDeclaration, final RobotLine currentLine) {
         if (currentLine != null) {
             getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine,
                     elemDeclaration, lines);
         } else if (getDumperHelper().isSeparatorForExecutableUnitName(
                 getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration))) {
             if (!getDumperHelper().wasSeparatorBefore(lines)) {
-                Separator sep = getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration);
+                final Separator sep = getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration);
                 if (sep.getText().equals(" | ")) {
                     sep.setText("| ");
                     sep.setRaw("| ");
@@ -201,10 +200,10 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
         }
     }
 
-    private RobotLine getLineForToken(final RobotFile model, int fileOffset) {
+    private RobotLine getLineForToken(final RobotFile model, final int fileOffset) {
         RobotLine currentLine = null;
         if (fileOffset >= 0) {
-            Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
+            final Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
             if (lineIndex.isPresent()) {
                 currentLine = model.getFileContent().get(lineIndex.get());
             }
@@ -214,8 +213,8 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
     private void addLineSeperatorIfIsRequired(final RobotFile model, final List<RobotLine> lines) {
         if (!lines.isEmpty()) {
-            RobotLine lastLine = lines.get(lines.size() - 1);
-            IRobotLineElement endOfLine = lastLine.getEndOfLine();
+            final RobotLine lastLine = lines.get(lines.size() - 1);
+            final IRobotLineElement endOfLine = lastLine.getEndOfLine();
             if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                     || endOfLine.getTypes().contains(EndOfLineTypes.NON)
                     || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
@@ -234,7 +233,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
         final IRobotLineElement execUnitDec = execUnit.getHolder().getDeclaration();
         if (execUnitDec.getStartOffset() >= 0) {
             final RobotFile model = execUnit.getHolder().getParent().getParent();
-            Optional<Integer> robotLineIndexBy = model.getRobotLineIndexBy(execUnitDec.getStartOffset());
+            final Optional<Integer> robotLineIndexBy = model.getRobotLineIndexBy(execUnitDec.getStartOffset());
             if (robotLineIndexBy.isPresent()) {
                 final RobotLine lastLine = model.getFileContent().get(robotLineIndexBy.get());
                 final Optional<Integer> execUnitPos = lastLine.getElementPositionInLine(execUnitDec);
@@ -260,10 +259,10 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
         if (execHolder.getExecutionContext().isEmpty()) {
             return;
         }
-        int size = sortedUnits.size();
+        final int size = sortedUnits.size();
         int indexInExec = 0;
         for (int i = 0; i < size; i++) {
-            AModelElement<? extends IExecutableStepsHolder<?>> elem = sortedUnits.get(i);
+            final AModelElement<? extends IExecutableStepsHolder<?>> elem = sortedUnits.get(i);
             if (elem instanceof RobotExecutableRow) {
                 sortedUnits.set(i, (RobotExecutableRow) execHolder.getExecutionContext().get(indexInExec++));
             }

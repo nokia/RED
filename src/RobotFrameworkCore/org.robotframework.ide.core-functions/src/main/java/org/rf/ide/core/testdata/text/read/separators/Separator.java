@@ -56,7 +56,7 @@ public class Separator implements IRobotLineElement {
         }
 
         private SeparatorType(final VersionAvailabilityInfo... representations) {
-            for (VersionAvailabilityInfo vInfo : representations) {
+            for (final VersionAvailabilityInfo vInfo : representations) {
                 representation.add(vInfo);
                 text.add(vInfo.getRepresentation());
             }
@@ -68,9 +68,9 @@ public class Separator implements IRobotLineElement {
         }
 
         @Override
-        public VersionAvailabilityInfo findVersionAvailablilityInfo(String text) {
+        public VersionAvailabilityInfo findVersionAvailablilityInfo(final String text) {
             VersionAvailabilityInfo vaiResult = null;
-            for (VersionAvailabilityInfo vInfo : representation) {
+            for (final VersionAvailabilityInfo vInfo : representation) {
                 if (vInfo.getRepresentation().equals(text)) {
                     vaiResult = vInfo;
                     break;
@@ -189,8 +189,8 @@ public class Separator implements IRobotLineElement {
         }
 
         Separator separator = null;
-        for (SeparatorType sep : SeparatorType.values()) {
-            VersionAvailabilityInfo info = sep.findVersionAvailablilityInfo(toCheck);
+        for (final SeparatorType sep : SeparatorType.values()) {
+            final VersionAvailabilityInfo info = sep.findVersionAvailablilityInfo(toCheck);
 
             if (info != null) {
                 separator = new Separator();
@@ -206,23 +206,25 @@ public class Separator implements IRobotLineElement {
 
     @Override
     public VersionAvailabilityInfo getVersionInformation() {
-        VersionAvailabilityInfo vai = null;
+        final VersionAvailabilityInfo vai = null;
         if (type != null) {
             type.getVersionAvailabilityInfos();
         }
         return vai;
     }
 
+    @Override
     public Separator copyWithoutPosition() {
         return copy(false);
     }
 
+    @Override
     public Separator copy() {
         return copy(true);
     }
 
     private Separator copy(final boolean posInclude) {
-        Separator t = new Separator();
+        final Separator t = new Separator();
         t.setText(getText());
         t.setRaw(getRaw());
         t.type = this.type;
