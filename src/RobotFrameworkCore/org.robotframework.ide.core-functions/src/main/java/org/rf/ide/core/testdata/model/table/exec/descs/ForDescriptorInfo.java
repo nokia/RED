@@ -22,21 +22,21 @@ public class ForDescriptorInfo {
     private int forInIndex = -1;
 
     public static ForDescriptorInfo build(final List<IRobotLineElement> elements) {
-        ForDescriptorInfo info = new ForDescriptorInfo();
+        final ForDescriptorInfo info = new ForDescriptorInfo();
 
         int separatorsNumbers = 0;
         SeparatorType separatorType = SeparatorType.TABULATOR_OR_DOUBLE_SPACE;
-        int numberOfElements = elements.size();
+        final int numberOfElements = elements.size();
         for (int elementIndex = 0; elementIndex < numberOfElements; elementIndex++) {
-            IRobotLineElement elem = elements.get(elementIndex);
+            final IRobotLineElement elem = elements.get(elementIndex);
             if (elem instanceof RobotToken) {
-                RobotToken token = (RobotToken) elem;
+                final RobotToken token = (RobotToken) elem;
                 if (separatorType == SeparatorType.PIPE) {
                     if (separatorsNumbers == 2) {
                         tryToFindFor(info, elementIndex, token);
                     } else if (separatorsNumbers > 2) {
-                        String text = token.getText().toString();
-                        boolean shouldBreak = tryToFindPreviousLineContinoue(info, elementIndex, text);
+                        final String text = token.getText().toString();
+                        final boolean shouldBreak = tryToFindPreviousLineContinoue(info, elementIndex, text);
 
                         if (shouldBreak) {
                             break;
@@ -46,8 +46,8 @@ public class ForDescriptorInfo {
                     if (separatorsNumbers == 1) {
                         tryToFindFor(info, elementIndex, token);
                     } else if (separatorsNumbers > 1) {
-                        String text = token.getText().toString();
-                        boolean shouldBreak = tryToFindPreviousLineContinoue(info, elementIndex, text);
+                        final String text = token.getText().toString();
+                        final boolean shouldBreak = tryToFindPreviousLineContinoue(info, elementIndex, text);
 
                         if (shouldBreak) {
                             break;
@@ -55,7 +55,7 @@ public class ForDescriptorInfo {
                     }
                 }
             } else {
-                Separator sep = (Separator) elem;
+                final Separator sep = (Separator) elem;
                 if (sep.getTypes().contains(SeparatorType.PIPE) && separatorsNumbers == 0) {
                     separatorType = SeparatorType.PIPE;
                 }
@@ -66,14 +66,14 @@ public class ForDescriptorInfo {
         return info;
     }
 
-    private static void tryToFindFor(ForDescriptorInfo info, int elementIndex, RobotToken token) {
+    private static void tryToFindFor(final ForDescriptorInfo info, final int elementIndex, final RobotToken token) {
         if (isForToken(token)) {
             info.setForStartIndex(elementIndex);
         }
     }
 
     public static boolean isForToken(final RobotToken token) {
-        String text = trimWhitespaces(token.getText().toString());
+        final String text = trimWhitespaces(token.getText().toString());
         return ":for".equalsIgnoreCase(text);
     }
 
@@ -96,14 +96,15 @@ public class ForDescriptorInfo {
         return isInToken;
     }
 
-    private static boolean tryToFindPreviousLineContinoue(ForDescriptorInfo info, int elementIndex, String text) {
+    private static boolean tryToFindPreviousLineContinoue(final ForDescriptorInfo info, final int elementIndex,
+            final String text) {
         boolean shouldBreak = false;
         if (text != null) {
-            text = text.trim().toLowerCase();
-            if (isInToken(text)) {
+            final String normalizedText = text.trim().toLowerCase();
+            if (isInToken(normalizedText)) {
                 info.setForInIndex(elementIndex);
                 shouldBreak = true;
-            } else if (RobotTokenType.PREVIOUS_LINE_CONTINUE.getRepresentation().get(0).equals(text)) {
+            } else if (RobotTokenType.PREVIOUS_LINE_CONTINUE.getRepresentation().get(0).equals(normalizedText)) {
                 if (info.getForLineContinueInlineIndex() == -1) {
                     info.setForLineContinueInlineIndex(elementIndex);
                 }
@@ -137,10 +138,10 @@ public class ForDescriptorInfo {
     }
 
     private static String trimWhitespaces(final String text) {
-        StringBuilder builder = new StringBuilder("");
+        final StringBuilder builder = new StringBuilder("");
         if (text != null) {
-            char[] tChars = text.toCharArray();
-            for (char c : tChars) {
+            final char[] tChars = text.toCharArray();
+            for (final char c : tChars) {
                 if (c != ' ' && c != '\t' && c != '\f') {
                     builder.append(c);
                 }

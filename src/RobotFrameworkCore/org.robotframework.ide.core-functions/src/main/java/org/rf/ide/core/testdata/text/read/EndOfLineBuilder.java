@@ -223,16 +223,18 @@ public class EndOfLineBuilder {
             return var;
         }
 
+        @Override
         public AEndOfLine copyWithoutPosition() {
             return copy(false);
         }
 
+        @Override
         public AEndOfLine copy() {
             return copy(true);
         }
 
         private AEndOfLine copy(final boolean posInclude) {
-            EndOfLineBuilder builder = EndOfLineBuilder.newInstance().setEndOfLines(LineReader.Constant.get(this));
+            final EndOfLineBuilder builder = EndOfLineBuilder.newInstance().setEndOfLines(LineReader.Constant.get(this));
             if (posInclude) {
                 builder.setLineNumber(this.getLineNumber());
                 builder.setStartColumn(this.getStartColumn());
@@ -277,7 +279,7 @@ public class EndOfLineBuilder {
         private final List<VersionAvailabilityInfo> representation = new ArrayList<>(0);
 
         private EndOfLineTypes(final VersionAvailabilityInfo... representations) {
-            for (VersionAvailabilityInfo vInfo : representations) {
+            for (final VersionAvailabilityInfo vInfo : representations) {
                 representation.add(vInfo);
                 text.add(vInfo.getRepresentation());
             }
@@ -294,9 +296,9 @@ public class EndOfLineBuilder {
         }
 
         @Override
-        public VersionAvailabilityInfo findVersionAvailablilityInfo(String text) {
+        public VersionAvailabilityInfo findVersionAvailablilityInfo(final String text) {
             VersionAvailabilityInfo vaiResult = null;
-            for (VersionAvailabilityInfo vai : representation) {
+            for (final VersionAvailabilityInfo vai : representation) {
                 if (vai.getRepresentation().equals(text)) {
                     vaiResult = vai;
                     break;
