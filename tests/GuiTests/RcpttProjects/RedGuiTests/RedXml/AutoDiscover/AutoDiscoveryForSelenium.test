@@ -1,0 +1,76 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Element-Name: AutoDiscoveryForSelenium
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _jZaVsO-kEeaEfJH5Ahap2w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/10/17 4:44 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//-------- ------------------------- Importent !!!! -------------------------------------
+//
+//
+//  To run this test you must have installed libraries:
+//
+//
+// pip install robotframework-requests
+// pip install robotframework-databaselibrary
+// pip install robotframework-extendedselenium2library
+// pip install robotframework-selenium2library
+//
+//
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | double-click
+
+//add test with robot libraries 
+get-editor "lib_with_variable.robot" | get-text-viewer | set-text  "*** Settings ***\n"
+    + "Library    multiply.py\n\n"
+    + "library  ExtendedSelenium2Library\n"
+    + "Library    Selenium2Library\n"
+    + "library  RequestsLibrary\n"
+    + "library  DatabaseLibrary\n"
+    + "Library    libs/add.py\n\n \n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  67\n"
+    + "    ExtendedSelenium2Library.Choose File    locator    file_path\n"
+    + "    ExtendedSelenium2Library.Drag And Drop    source    target\n"
+    + "    Post    alias    uri    \n"
+    + "    Add\n"
+    + "    Execute Sql Script    sqlScriptFileName" 
+    
+    
+    
+get-editor "lib_with_variable.robot" | get-text-viewer |  key-type "M1+s"
+
+wait-for-no-progressbar
+
+
+//check if all were added
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item add | get-property "image.path" 
+        | equals ".*success_big.png" | verify-true
+    get-item DatabaseLibrary | get-property "image.path" 
+        | equals ".*success_big.png" | verify-true
+    get-item ExtendedSelenium2Library | get-property "image.path" 
+        | equals ".*success_big.png" | verify-true
+    get-item multiply | get-property "image.path" 
+        | equals ".*success_big.png" | verify-true
+    get-item RequestsLibrary | get-property "image.path" 
+        | equals ".*success_big.png" | verify-true
+    get-item Selenium2Library | get-property "image.path" 
+        | equals ".*success_big.png" | verify-true    
+}
+get-window "Discovering libraries summary" | get-button OK | click
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
