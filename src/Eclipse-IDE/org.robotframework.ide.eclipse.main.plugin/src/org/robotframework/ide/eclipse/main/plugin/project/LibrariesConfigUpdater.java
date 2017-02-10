@@ -23,14 +23,14 @@ public class LibrariesConfigUpdater {
 
     protected final RobotProjectConfig config;
 
-    private final boolean isEditorOpened;
+    private final boolean isConfigClosed;
 
     private final List<ReferencedLibrary> addedLibraries;
 
     public LibrariesConfigUpdater(final RobotProject robotProject) {
         this.robotProject = robotProject;
         RobotProjectConfig config = robotProject.getOpenedProjectConfig();
-        this.isEditorOpened = config == null;
+        this.isConfigClosed = config == null;
         if (config == null) {
             config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
         }
@@ -52,9 +52,9 @@ public class LibrariesConfigUpdater {
 
     public void finalizeLibrariesAdding(final IEventBroker eventBroker) {
         if (!addedLibraries.isEmpty()) {
-            robotProject.clearConfiguration();
-            robotProject.clearKwSources();
-            if (isEditorOpened) {
+            if (isConfigClosed) {
+                robotProject.clearConfiguration();
+                robotProject.clearKwSources();
                 new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
             }
             fireEvents(eventBroker);
