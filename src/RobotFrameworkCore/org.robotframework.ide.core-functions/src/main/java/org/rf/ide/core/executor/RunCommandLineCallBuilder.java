@@ -313,13 +313,7 @@ public class RunCommandLineCallBuilder {
     }
 
     public static IRunCommandLineBuilder forEnvironment(final RobotRuntimeEnvironment env) {
-        if (env.isValidPythonInstallation()) {
-            return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), -1);
-        } else {
-            throw new IllegalArgumentException(
-                    "Unable to run tests. It seems there is no python interpreter defined in '"
-                            + env.getFile().getAbsolutePath() + "'");
-        }
+        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), -1);
     }
 
     public static IRunCommandLineBuilder forExecutor(final SuiteExecutor executor) {
@@ -327,13 +321,7 @@ public class RunCommandLineCallBuilder {
     }
 
     public static IRemoteRunCommandLineBuilder forRemoteEnvironment(final RobotRuntimeEnvironment env, final int port) {
-        if (env.isValidPythonInstallation()) {
-            return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), port);
-        } else {
-            throw new IllegalArgumentException(
-                    "Unable to run tests. It seems there is no python interpreter defined in '"
-                            + env.getFile().getAbsolutePath() + "'");
-        }
+        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), port);
     }
 
     public static class RunCommandLine {
