@@ -20,8 +20,8 @@ public class LineReaderTest {
     @Test
     public void test_differentLineEnds() {
         // prepare
-        StringReader textReader = new StringReader("test\rData\r\n");
-        LineReader lineReader = new LineReader(textReader);
+        final StringReader textReader = new StringReader("test\rData\r\n");
+        final LineReader lineReader = new LineReader(textReader);
         flushAllDataToReader(lineReader);
 
         // execute
@@ -43,8 +43,8 @@ public class LineReaderTest {
     @Test
     public void test_emptyLine_andAfterLineAndEOF() {
         // prepare
-        StringReader textReader = new StringReader("\r\nData");
-        LineReader lineReader = new LineReader(textReader);
+        final StringReader textReader = new StringReader("\r\nData");
+        final LineReader lineReader = new LineReader(textReader);
         flushAllDataToReader(lineReader);
 
         // execute
@@ -60,8 +60,8 @@ public class LineReaderTest {
     @Test
     public void test_emptyLine() {
         // prepare
-        StringReader textReader = new StringReader("");
-        LineReader lineReader = new LineReader(textReader);
+        final StringReader textReader = new StringReader("");
+        final LineReader lineReader = new LineReader(textReader);
         flushAllDataToReader(lineReader);
 
         // execute
@@ -75,21 +75,12 @@ public class LineReaderTest {
     }
 
     private void flushAllDataToReader(final LineReader lineReader) {
-        BufferedReader br = new BufferedReader(lineReader);
-        try {
-            @SuppressWarnings("unused")
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                line = null;
+        try (BufferedReader br = new BufferedReader(lineReader)) {
+            while (br.readLine() != null) {
+                // do nothing
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // is not I/O
-        } finally {
-            try {
-                br.close();
-            } catch (Exception e) {
-                // will not happen
-            }
         }
     }
 }
