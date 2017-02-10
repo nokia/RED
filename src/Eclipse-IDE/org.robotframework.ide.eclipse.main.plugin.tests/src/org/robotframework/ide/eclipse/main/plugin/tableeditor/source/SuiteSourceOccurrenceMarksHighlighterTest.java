@@ -51,7 +51,7 @@ public class SuiteSourceOccurrenceMarksHighlighterTest {
         highlighter.install(viewer);
         highlighter.refreshOccurrences(1);
 
-        assertThat(annotationModel.getPositions()).containsExactly(new Position(0, 3));
+        assertThat(annotationModel.getPositions()).containsOnly(new Position(0, 3));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class SuiteSourceOccurrenceMarksHighlighterTest {
         highlighter.install(viewer);
         highlighter.refreshOccurrences(5);
 
-        assertThat(annotationModel.getPositions()).containsExactly(new Position(5, 3));
+        assertThat(annotationModel.getPositions()).containsOnly(new Position(5, 3));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class SuiteSourceOccurrenceMarksHighlighterTest {
         highlighter.install(viewer);
         highlighter.refreshOccurrences(8);
 
-        assertThat(annotationModel.getPositions()).containsExactly(new Position(5, 3));
+        assertThat(annotationModel.getPositions()).containsOnly(new Position(5, 3));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class SuiteSourceOccurrenceMarksHighlighterTest {
         highlighter.install(viewer);
         highlighter.refreshOccurrences(1);
 
-        assertThat(annotationModel.getPositions()).containsExactly(new Position(0, 3), new Position(19, 3));
+        assertThat(annotationModel.getPositions()).containsOnly(new Position(0, 3), new Position(19, 3));
     }
 
     @Test
@@ -143,7 +143,7 @@ public class SuiteSourceOccurrenceMarksHighlighterTest {
         highlighter.refreshOccurrences(4);
         highlighter.refreshOccurrences(2);
 
-        assertThat(annotationModel.getPositions()).containsExactly(new Position(0, 3));
+        assertThat(annotationModel.getPositions()).containsOnly(new Position(0, 3));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class SuiteSourceOccurrenceMarksHighlighterTest {
         highlighter.refreshOccurrences(1);
         highlighter.refreshOccurrences(2);
 
-        assertThat(annotationModel.getPositions()).containsExactly(new Position(0, 3));
+        assertThat(annotationModel.getPositions()).containsOnly(new Position(0, 3));
     }
 
     private SourceViewer prepareViewer(final MockAnnotationModel annotationModel) {
