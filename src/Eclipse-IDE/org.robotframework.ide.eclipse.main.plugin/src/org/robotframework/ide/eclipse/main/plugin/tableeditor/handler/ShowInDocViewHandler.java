@@ -21,7 +21,6 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.documentation.DocumentationViewPartListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -32,6 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ShowInDocViewHandler.E4ShowInDocViewHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
+import org.robotframework.ide.eclipse.main.plugin.views.DocumentationViewWrapper;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -52,14 +52,7 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel) {
 
-            initDocumentationView();
-
-            final DocumentationViewPartListener documentationViewPartListener = editor
-                    .getDocumentationViewPartListener();
-            if (documentationViewPartListener == null) {
-                return;
-            }
-            final DocumentationView view = documentationViewPartListener.getView();
+            final DocumentationView view = initDocumentationView();
             if (view == null) {
                 return;
             }
@@ -112,29 +105,28 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
             }
         }
 
-        private void initDocumentationView() {
+        @SuppressWarnings("restriction")
+        private DocumentationView initDocumentationView() {
             final IWorkbench workbench = PlatformUI.getWorkbench();
-            workbench.getDisplay().syncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    final IWorkbenchWindow activeWorkbenchWindow = workbench.getActiveWorkbenchWindow();
-                    if (activeWorkbenchWindow != null) {
-                        final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
-                        if (page != null) {
-                            final IViewPart docViewPart = page.findView(DocumentationView.ID);
-                            if (docViewPart == null || !page.isPartVisible(docViewPart)) {
-                                try {
-                                    page.showView(DocumentationView.ID);
-                                    page.activate(page.getActiveEditor()); // activate current RobotFormEditor to reset DocViewPartListener instance, partActivated method will be invoked 
-                                } catch (final PartInitException e) {
-                                    RedPlugin.logError("Unable to show Documentation View.", e);
-                                }
-                            }
-                        }
-                    }
+            final IWorkbenchWindow activeWorkbenchWindow = workbench.getActiveWorkbenchWindow();
+            if (activeWorkbenchWindow == null) {
+                return null;
+            }
+            final IWorkbenchPage page = activeWorkbenchWindow.getActivePage();
+            if (page == null) {
+                return null;
+            }
+            final IViewPart docViewPart = page.findView(DocumentationView.ID);
+            if (docViewPart == null || !page.isPartVisible(docViewPart)) {
+                try {
+                    return ((DocumentationViewWrapper) page.showView(DocumentationView.ID)).getComponent();
+                } catch (final PartInitException e) {
+                    RedPlugin.logError("Unable to show Documentation View.", e);
+                    return null;
                 }
-            });
+            } else {
+                return ((DocumentationViewWrapper) docViewPart).getComponent();
+            }
         }
     }
 }
