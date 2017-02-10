@@ -101,16 +101,15 @@ public class RobotDryRunHandler {
     }
 
     private void drainProcessOutputAndErrorStreams(final Process process) {
-        startStdOutReadingThread(process);
-        startStdErrReadingThread(process);
+        new Thread(createStreamDrainRunnable(process.getInputStream())).start();
+        new Thread(createStreamDrainRunnable(process.getErrorStream())).start();
     }
 
-    private void startStdErrReadingThread(final Process process) {
-        new Thread(new Runnable() {
+    private Runnable createStreamDrainRunnable(final InputStream inputStream) {
+        return new Runnable() {
 
             @Override
             public void run() {
-                final InputStream inputStream = process.getErrorStream();
                 try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line = reader.readLine();
                     while (line != null) {
@@ -120,25 +119,6 @@ public class RobotDryRunHandler {
                     // nothing to do
                 }
             }
-        }).start();
-    }
-
-    private void startStdOutReadingThread(final Process process) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                final InputStream inputStream = process.getInputStream();
-                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        line = reader.readLine();
-                    }
-                } catch (final IOException e) {
-                    // nothing to do
-                }
-            }
-        }).start();
+        };
     }
 }

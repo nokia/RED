@@ -19,7 +19,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
@@ -119,7 +118,6 @@ public class SourceOpeningSupportTest {
         verifySelection("testlib.py", 1, 13, "defined_kw");
     }
 
-    @Ignore
     @Test
     public void testIfLibraryIsOpenedAndTextIsSelected_whenKeywordFoundByAutoDiscoverer() throws Exception {
         assertThat(page.getEditorReferences()).isEmpty();

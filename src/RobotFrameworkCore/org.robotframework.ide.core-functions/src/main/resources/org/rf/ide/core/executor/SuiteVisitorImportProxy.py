@@ -31,8 +31,7 @@ class MyTestSuiteBuilder(TestSuiteBuilder):
 
 class SuiteVisitorImportProxy(SuiteVisitor):
     def __init__(self, lib_import_timeout=60):
-        self.lib_import_timeout = int(lib_import_timeout)
-        robot.running.namespace.IMPORTER = MyIMPORTER(robot.running.namespace.IMPORTER, self.lib_import_timeout)
+        robot.running.namespace.IMPORTER = MyIMPORTER(robot.running.namespace.IMPORTER, lib_import_timeout)
         self.options, self.arguments = RobotFramework().parse_arguments(sys.argv[1:])
         self.settings = RobotSettings(**self.options)
         self.f_suites = self.settings.suite_config['include_suites']
@@ -143,7 +142,7 @@ class MyIMPORTER(object):
                         t = threading.Thread(target=self._imp, args=(func, q, errors, argser), kwargs=kwargs)
                         t.setDaemon(True)
                         t.start()
-                        t.join(timeout=int(self.lib_import_timeout))
+                        t.join(timeout=self.lib_import_timeout)
                     except:
                         errors.append(sys.exc_info())
                 if len(q) > 0:
@@ -176,7 +175,7 @@ class MyIMPORTER(object):
         else:
             result = func(self.obj, *argser, **kwargs)
 
-#         self._handle_keywords(result)
+        self._handle_keywords(result)
 
         return result
 
@@ -206,14 +205,13 @@ class PythonKeywordSource(object):
     def __init__(self, keyword):
         self.name = keyword.name
         self.libraryName = keyword.library.name
-        source = self._find_source(keyword)
+        source = self._find_source(self._resolve_function(keyword))
         self.filePath = source[0]
         self.line = source[1]
         self.offset = source[2]
         self.length = source[3]
 
-    def _find_source(self, keyword):
-        function = self._resolve_function(keyword)
+    def _find_source(self, function):
         path = inspect.getfile(function)
         source = inspect.getsourcelines(function)
         for lineIdx, line in enumerate(source[0]):
