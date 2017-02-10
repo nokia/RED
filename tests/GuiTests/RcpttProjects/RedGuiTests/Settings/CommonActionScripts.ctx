@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/10/17 5:31 PM
+Save-Time: 2/8/17 10:35 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -37,6 +37,7 @@ proc "restore-interpreters"{
 }
 restore-interpreters
 
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 proc "run-process-and-trim"  [val process ""] [val arg1 ""] [val arg2 ""] [val ignoreStderr false ] [val ignoreExitCode false] {
 	exec-process  $process $arg1 $arg2  -ignoreStderr $ignoreStderr -ignoreExitCode $ignoreExitCode|  get stdout  |invoke trim 
 }
@@ -147,4 +148,9 @@ proc "compare-message-log2" [val ref_content]{
 
 }
 
+proc "wait-for-no-progressbar"{
+	try -times 10 -delay 1000 -command{
+		verify-error {get-control Any -after [get-label LF] -index 4 | get-property enablement | equals true | verify-true}
+	}
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
