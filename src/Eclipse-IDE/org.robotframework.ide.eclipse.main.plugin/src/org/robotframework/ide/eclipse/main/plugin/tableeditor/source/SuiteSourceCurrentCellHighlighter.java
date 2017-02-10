@@ -23,8 +23,6 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -64,20 +62,13 @@ class SuiteSourceCurrentCellHighlighter {
                 refreshCurrentCell(event.caretOffset);
             }
         });
-        viewer.getTextWidget().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                refreshCurrentCell(-1);
-            }
-        });
     }
 
     @VisibleForTesting
     void refreshCurrentCell(final int offset) {
         try {
-            final Optional<IRegion> newRegion = offset == -1 ? Optional.<IRegion> absent()
-                    : DocumentUtilities.findCellRegion(document, fileModel.isTsvFile(), offset);
+            final Optional<IRegion> newRegion = DocumentUtilities.findCellRegion(document, fileModel.isTsvFile(),
+                    offset);
 
             final Annotation[] annotationsToRemove;
             final Map<? extends Annotation, ? extends Position> annotationsToAdd;
