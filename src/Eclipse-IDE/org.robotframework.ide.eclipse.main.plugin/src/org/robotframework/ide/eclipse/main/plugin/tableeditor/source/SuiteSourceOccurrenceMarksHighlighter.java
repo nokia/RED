@@ -31,8 +31,6 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -70,12 +68,6 @@ class SuiteSourceOccurrenceMarksHighlighter {
                 scheduleRefresh(event.caretOffset);
             }
         });
-        viewer.getTextWidget().addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                scheduleRefresh(-1);
-            }
-        });
     }
 
     private void scheduleRefresh(final int offset) {
@@ -97,8 +89,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
     @VisibleForTesting
     void refreshOccurrences(final int offset) {
         try {
-            final Optional<IRegion> currentRegion = offset == -1 ? Optional.<IRegion> absent()
-                    : getCurrentRegion(offset);
+            final Optional<IRegion> currentRegion = getCurrentRegion(offset);
 
             final Annotation[] annotationsToRemove;
             final Map<? extends Annotation, ? extends Position> annotationsToAdd;
