@@ -25,7 +25,6 @@ import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordInLibrarySourceHyperlinkTest;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
@@ -35,7 +34,7 @@ import com.google.common.collect.ImmutableMap;
 public class SourceOpeningSupportTest {
 
     @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(KeywordInLibrarySourceHyperlinkTest.class);
+    public ProjectProvider projectProvider = new ProjectProvider(SourceOpeningSupportTest.class);
 
     private final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
