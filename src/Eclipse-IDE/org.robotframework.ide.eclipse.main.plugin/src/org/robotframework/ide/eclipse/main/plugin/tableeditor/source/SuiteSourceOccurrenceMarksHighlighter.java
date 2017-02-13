@@ -92,7 +92,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
             final Optional<IRegion> currentRegion = getCurrentRegion(offset);
 
             final Annotation[] annotationsToRemove;
-            final Map<? extends Annotation, ? extends Position> annotationsToAdd;
+            final Map<Annotation, Position> annotationsToAdd;
             if (!currentRegion.isPresent()) {
                 annotationsToRemove = getAnnotationsToRemove();
                 annotationsToAdd = new HashMap<>();

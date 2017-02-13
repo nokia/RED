@@ -71,7 +71,7 @@ class SuiteSourceCurrentCellHighlighter {
                     offset);
 
             final Annotation[] annotationsToRemove;
-            final Map<? extends Annotation, ? extends Position> annotationsToAdd;
+            final Map<Annotation, Position> annotationsToAdd;
             if (!newRegion.isPresent()) {
 
                 annotationsToRemove = getAnnotationsToRemove();
