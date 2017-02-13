@@ -83,8 +83,10 @@ public class RobotDryRunHandler {
 
     public File createTempSuiteFile(final List<String> resourcesPaths, final List<String> libraryNames) {
         File file = null;
-        try (PrintWriter printWriter = new PrintWriter(file)) {
+        PrintWriter printWriter = null;
+        try {
             file = RobotRuntimeEnvironment.copyResourceFile("DryRunTempSuite.robot");
+            printWriter = new PrintWriter(file);
             printWriter.println("*** Test Cases ***");
             printWriter.println("T1");
             printWriter.println("*** Settings ***");
@@ -96,21 +98,24 @@ public class RobotDryRunHandler {
             }
         } catch (final IOException e) {
             // nothing to do
+        } finally {
+            if (printWriter != null) {
+                printWriter.close();
+            }
         }
         return file;
     }
 
     private void drainProcessOutputAndErrorStreams(final Process process) {
-        startStdOutReadingThread(process);
-        startStdErrReadingThread(process);
+        new Thread(createStreamDrainRunnable(process.getInputStream())).start();
+        new Thread(createStreamDrainRunnable(process.getErrorStream())).start();
     }
 
-    private void startStdErrReadingThread(final Process process) {
-        new Thread(new Runnable() {
+    private Runnable createStreamDrainRunnable(final InputStream inputStream) {
+        return new Runnable() {
 
             @Override
             public void run() {
-                final InputStream inputStream = process.getErrorStream();
                 try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line = reader.readLine();
                     while (line != null) {
@@ -120,25 +125,6 @@ public class RobotDryRunHandler {
                     // nothing to do
                 }
             }
-        }).start();
-    }
-
-    private void startStdOutReadingThread(final Process process) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-
-                final InputStream inputStream = process.getInputStream();
-                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        line = reader.readLine();
-                    }
-                } catch (final IOException e) {
-                    // nothing to do
-                }
-            }
-        }).start();
+        };
     }
 }
