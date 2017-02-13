@@ -30,7 +30,7 @@ public class RedSessionConsoleParticipant implements IConsolePageParticipant {
     private ActionsUpdater actionsUpdater;
 
     @Override
-    public Object getAdapter(final Class adapter) {
+    public <T> T getAdapter(Class<T> adapter) {
         return null;
     }
 
@@ -46,7 +46,7 @@ public class RedSessionConsoleParticipant implements IConsolePageParticipant {
                 RedImages.getActivateOnStdOutImage());
         activateOnStdErrChangeAction = new ActivateOnInputChangeAction(sessionConsole.getStdErrStream(),
                 "standard error", RedImages.getActivateOnStdErrImage());
-        
+
         final IActionBars actionBars = page.getSite().getActionBars();
         configureToolBar(actionBars.getToolBarManager());
 
