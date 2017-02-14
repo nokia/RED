@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _weV9oNy2Eea53q6vmC55pw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/25/17 4:06 PM
+Save-Time: 2/14/17 1:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -122,19 +122,20 @@ with [get-window "New Robot python file"] {
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
 get-window "New Robot python file" | get-editbox -after [get-label "File name:"] | set-text "new.py"
 check-error-and-Finish-button -file_name "new.py" -window_name "python file"
+get-window "New Robot python file" | get-button Cancel | click
 
-//with [get-window "New Robot python file"] {
-//    get-editbox -after [get-label "Robot python file"] | get-property text | equals "'new.py' already exists." 
-//        | verify-true
-//    get-button Finish | get-property enablement | equals false | verify-true
-//}
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+get-window "New Robot python file" | get-editbox -after [get-label "File name:"] | set-text "NEW.py"
+check-error-and-Finish-button -file_name "NEW.py" -window_name "python file"
 
-//change to other name
+//change name by adding "1"
 with [get-window "New Robot python file" | get-editbox -after [get-label "File name:"]] {
     click-text 1
     key-type Left
     set-text "new1.py"
 }
+
+//check that is no error
 get-window "New Robot python file" | get-editbox -after [get-label "Robot python file"] | get-property text 
     | equals "Create new Robot python file (variable/library)" | verify-true
     
@@ -147,9 +148,11 @@ with [get-window "New Robot python file"] {
     }
     get-button "Variables file" | click
 }
+
+//check that error is shown
 check-error-and-Finish-button -file_name "new.py" -window_name "python file"
 
-
+//change to other pythons file types
 get-window "New Robot python file" | get-button Library | click
 check-error-and-Finish-button -file_name "new.py" -window_name "python file"
 
