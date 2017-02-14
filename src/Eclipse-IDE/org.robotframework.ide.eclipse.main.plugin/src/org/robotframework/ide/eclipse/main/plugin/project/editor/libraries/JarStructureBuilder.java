@@ -25,7 +25,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 
 public class JarStructureBuilder {
 
@@ -77,12 +76,11 @@ public class JarStructureBuilder {
     private Collection<JarClass> providePythonEntriesFromJarFile(final File file) throws RobotEnvironmentException {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
-        final Collection<ILibraryClass> entriesFromFile = pythonLibStructureBuilder.provideEntriesFromFile(
-                file.getPath(),
-                Optional.<String> absent(), false);
+        final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder
+                .provideEntriesFromFile(file.getPath());
 
         final List<JarClass> jarClasses = newArrayList();
-        for (final ILibraryClass pythonClass : entriesFromFile) {
+        for (final ILibraryClass pythonClass : pythonClasses) {
             jarClasses.add(JarClass.createFromZipPythonEntry(pythonClass.getQualifiedName()));
         }
 
