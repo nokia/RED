@@ -18,8 +18,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction.Mode;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunSelectedTestCasesAction;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunSelectedTestCasesAction.Mode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestHandler.E4RunTestHandler;
@@ -49,7 +49,7 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
             final RobotCase testCase = getTestCase(suiteModel, selection.getOffset());
 
             if (testCase != null) {
-                RunTestCaseAction.runSelectedTestCases(new StructuredSelection(Arrays.asList(testCase)),
+                RunSelectedTestCasesAction.runSelectedTestCases(new StructuredSelection(Arrays.asList(testCase)),
                         Mode.valueOf(mode));
             }
         }

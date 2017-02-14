@@ -18,16 +18,16 @@ import org.eclipse.ui.navigator.ICommonMenuConstants;
 import org.eclipse.ui.navigator.ICommonViewerSite;
 import org.eclipse.ui.navigator.ICommonViewerWorkbenchSite;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.OpenAction;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction.Mode;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunSelectedTestCasesAction;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunSelectedTestCasesAction.Mode;
 
 public class NavigatorActionsProvider extends CommonActionProvider {
 
     private ISelectionProvider selectionProvider;
 
     private OpenAction openAction;
-    private RunTestCaseAction runTestCaseAction;
-    private RunTestCaseAction debugTestCaseAction;
+    private RunSelectedTestCasesAction runSelectedTestCasesAction;
+    private RunSelectedTestCasesAction debugTestCaseAction;
 
     private ISelectionChangedListener listener;
 
@@ -42,8 +42,8 @@ public class NavigatorActionsProvider extends CommonActionProvider {
             selectionProvider.addSelectionChangedListener(listener);
 
             openAction = new OpenAction(workbenchSite.getPage(), selectionProvider);
-            runTestCaseAction = new RunTestCaseAction(selectionProvider, Mode.RUN);
-            debugTestCaseAction = new RunTestCaseAction(selectionProvider, Mode.DEBUG);
+            runSelectedTestCasesAction = new RunSelectedTestCasesAction(selectionProvider, Mode.RUN);
+            debugTestCaseAction = new RunSelectedTestCasesAction(selectionProvider, Mode.DEBUG);
 
             updateElements((IStructuredSelection) selectionProvider.getSelection());
         }
@@ -51,7 +51,7 @@ public class NavigatorActionsProvider extends CommonActionProvider {
 
     private void updateElements(IStructuredSelection selection) {
         openAction.updateEnablement(selection);
-        runTestCaseAction.updateEnablement(selection);
+        runSelectedTestCasesAction.updateEnablement(selection);
         debugTestCaseAction.updateEnablement(selection);
     }
 
@@ -78,7 +78,7 @@ public class NavigatorActionsProvider extends CommonActionProvider {
     @Override
     public void fillContextMenu(final IMenuManager menu) {
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, openAction);
-        menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, runTestCaseAction);
+        menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, runSelectedTestCasesAction);
         menu.appendToGroup(ICommonMenuConstants.GROUP_OPEN, debugTestCaseAction);
     }
 }
