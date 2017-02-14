@@ -43,9 +43,17 @@ public class PythonLibStructureBuilder {
         this.additionalSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(project);
     }
 
-    public Collection<ILibraryClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,
-            final boolean allowDuplicationOfFileAndClassName) throws RobotEnvironmentException {
+    public Collection<ILibraryClass> provideEntriesFromFile(final String path, final String moduleName)
+            throws RobotEnvironmentException {
+        return provideEntriesFromFile(path, Optional.of(moduleName), true);
+    }
 
+    public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
+        return provideEntriesFromFile(path, Optional.<String> absent(), false);
+    }
+
+    private Collection<ILibraryClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,
+            final boolean allowDuplicationOfFileAndClassName) throws RobotEnvironmentException {
         final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName,
                 additionalSearchPaths);
         return newLinkedHashSet(transform(classes, new Function<String, ILibraryClass>() {

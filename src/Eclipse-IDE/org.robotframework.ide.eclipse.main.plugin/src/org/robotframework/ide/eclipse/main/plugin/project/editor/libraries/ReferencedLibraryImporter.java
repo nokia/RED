@@ -39,8 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Pytho
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
-import com.google.common.base.Optional;
-
 /**
  * @author Michal Anglart
  */
@@ -60,8 +58,7 @@ public class ReferencedLibraryImporter {
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
                     try {
-                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath,
-                                Optional.<String> absent(), false));
+                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath));
                     } catch (final RobotEnvironmentException e) {
                         throw new InvocationTargetException(e);
                     }
