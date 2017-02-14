@@ -5,37 +5,40 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _er2QoJmnEeWwXrMNKVDTwg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/3/15 12:51 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/14/17 1:23 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-
-
 //set exact project name 
 get-menu "File/New/Robot Project" | click
 with [get-window "New Robot project" | get-editbox -after [get-label "Project name:"]] {
     set-text RobotProject
 }
+
+//error is show in Wizard
 with [get-window "New Robot project"] {
     get-editbox -after [get-label "Robot Project"] | get-property text 
         | equals "A project with that name already exists in the workspace." | verify-true
     get-button Finish | get-property enablement | equals false | verify-true
 }
 //set lowercase name
-//with [get-window "New Robot project"] {
-//    with [get-editbox -after [get-label "Project name:"]] {
-//        set-text robotproject
-//    }
-//}
-//with [get-window "New Robot project"] {
-//    get-editbox -after [get-label "Robot Project"] | get-property text 
-//        | equals "A project with that name already exists in the workspace." | verify-true
-//    get-button Finish | get-property enablement | equals false | verify-true
-//}
+get-menu "File/New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text robotproject
+    get-button Finish | click
+}
+
+//error is shown in new window
+get-window "New Robot project" | get-window Error | get-label "Project \"robotproject\" already exists!" 
+    | get-property caption | equals "Project \"robotproject\" already exists!" | verify-true
+with [get-window "New Robot project"] {
+    get-window Error | get-button OK | click
+    get-button Cancel | click
+}
 
 //set exact name in other than workspace path
 with [get-window "New Robot project"] {
@@ -45,16 +48,15 @@ with [get-window "New Robot project"] {
 
 }
 
-get-java-property "user.home" |let [val user_home -input]{
-	with [get-window "New Robot project"] {
-	    get-button "Use default location" | uncheck
-	    with [get-editbox -after [get-label "Location:"]] {
-	        set-text $user_home
-	  
-	    }
-	}
+with [get-window "New Robot project"] {
+    get-button "Use default location" | uncheck
+    with [get-editbox -after [get-label "Location:"]] {
+        set-text $user_folder
+  
+    }
 }
 
+//error is shown in Wizard
 with [get-window "New Robot project"] {
     get-editbox -after [get-label "Robot Project"] | get-property text 
         | equals "A project with that name already exists in the workspace." | verify-true
@@ -62,5 +64,20 @@ with [get-window "New Robot project"] {
 }
 get-window "New Robot project" | get-button Cancel | click
 
+
+//set uppercase name
+get-menu "File/New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text ROBOTPROJECT
+    get-button Finish | click
+}
+
+//error is shown in new window
+get-window "New Robot project" | get-window Error | get-label "Project \"ROBOTPROJECT\" already exists!" 
+    | get-property caption | equals "Project \"ROBOTPROJECT\" already exists!" | verify-true
+with [get-window "New Robot project"] {
+    get-window Error | get-button OK | click
+    get-button Cancel | click
+}
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
