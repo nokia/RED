@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 
-public class RobotLaunchInRemoteDebugMode extends RobotLaunchInMode {
+class RobotLaunchInRemoteDebugMode extends RobotLaunchInMode {
 
     private final RobotEventBroker robotEventBroker;
 
