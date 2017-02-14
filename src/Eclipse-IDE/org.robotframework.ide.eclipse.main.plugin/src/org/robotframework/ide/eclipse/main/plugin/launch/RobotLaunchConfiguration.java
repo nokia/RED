@@ -38,8 +38,8 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -73,6 +73,13 @@ public class RobotLaunchConfiguration {
     static ILaunchConfigurationWorkingCopy createDefault(final ILaunchConfigurationType launchConfigurationType,
             final List<IResource> resources) throws CoreException {
 
+        final ILaunchConfigurationWorkingCopy configuration = prepareDefault(launchConfigurationType, resources);
+        configuration.doSave();
+        return configuration;
+    }
+
+    public static ILaunchConfigurationWorkingCopy prepareDefault(final ILaunchConfigurationType launchConfigurationType,
+            final List<IResource> resources) throws CoreException {
         final String name = resources.size() == 1 ? resources.get(0).getName() : resources.get(0).getProject()
                 .getName();
         final String configurationName = DebugPlugin.getDefault().getLaunchManager()
@@ -84,24 +91,28 @@ public class RobotLaunchConfiguration {
             resourcesMapping.put(resource, new ArrayList<String>());
         }
         fillDefaults(configuration, resourcesMapping);
-        configuration.doSave();
         return configuration;
     }
 
     public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        robotConfig.setExecutor(SuiteExecutor.Python);
-        robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
-        robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
-        robotConfig.setProjectName("");
-        robotConfig.setSuitePaths(new HashMap<String, List<String>>());
-        robotConfig.setIsIncludeTagsEnabled(false);
-        robotConfig.setIsExcludeTagsEnabled(false);
-        robotConfig.setIncludedTags(new ArrayList<String>());
-        robotConfig.setExcludedTags(new ArrayList<String>());
-        robotConfig.setRemoteDebugHost("");
-        robotConfig.setIsGeneralPurposeEnabled(true);
+        try {
+            robotConfig.setExecutor(SuiteExecutor.Python);
+            robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
+            robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
+            robotConfig.setProjectName("");
+            robotConfig.setSuitePaths(new HashMap<String, List<String>>());
+            robotConfig.setIsIncludeTagsEnabled(false);
+            robotConfig.setIsExcludeTagsEnabled(false);
+            robotConfig.setIncludedTags(new ArrayList<String>());
+            robotConfig.setExcludedTags(new ArrayList<String>());
+            robotConfig.setRemoteDebugHost("");
+            robotConfig.setIsGeneralPurposeEnabled(true);
+        } catch (final CoreException e) {
+            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
+                    "RED was unable to load the working copy of Launch Configuration.");
+        }
     }
 
     public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
@@ -109,15 +120,32 @@ public class RobotLaunchConfiguration {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        if (robotProject.getRuntimeEnvironment() != null) {
-            final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
-            robotConfig.setExecutor(interpreter);
-        }
-        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
-        robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
-        robotConfig.setProjectName(project.getName());
+        try {
+            if (robotProject.getRuntimeEnvironment() != null) {
+                final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
+                robotConfig.setExecutor(interpreter);
+            }
+            final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+            robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
+            robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
+            robotConfig.setProjectName(project.getName());
         
+            robotConfig.updateTestCases(suitesMapping);
+
+            robotConfig.setIsIncludeTagsEnabled(false);
+            robotConfig.setIsExcludeTagsEnabled(false);
+            robotConfig.setIncludedTags(new ArrayList<String>());
+            robotConfig.setExcludedTags(new ArrayList<String>());
+            robotConfig.setRemoteDebugHost("");
+            robotConfig.setIsGeneralPurposeEnabled(true);
+        } catch (final CoreException e) {
+            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
+                    "RED was unable to load the working copy of Launch Configuration.");
+        }
+    }
+
+    public void updateTestCases(final Map<IResource, List<String>> suitesMapping) throws CoreException {
+
         final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
         for (final IResource resource : suitesMapping.keySet()) {
             if (!(resource instanceof IProject)) {
@@ -125,14 +153,7 @@ public class RobotLaunchConfiguration {
                         suitesMapping.get(resource));
             }
         }
-        robotConfig.setSuitePaths(suitesNamesMapping);
-        
-        robotConfig.setIsIncludeTagsEnabled(false);
-        robotConfig.setIsExcludeTagsEnabled(false);
-        robotConfig.setIncludedTags(new ArrayList<String>());
-        robotConfig.setExcludedTags(new ArrayList<String>());
-        robotConfig.setRemoteDebugHost("");
-        robotConfig.setIsGeneralPurposeEnabled(true);
+        setSuitePaths(suitesNamesMapping);
     }
     
     public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
@@ -142,7 +163,7 @@ public class RobotLaunchConfiguration {
         robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
     }
 
-    public static ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelectedTestCases(
+    public static ILaunchConfigurationWorkingCopy prepareLaunchConfigurationForSelectedTestCases(
             final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
 
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
@@ -185,121 +206,92 @@ public class RobotLaunchConfiguration {
         return configuration.getName();
     }
 
-    @VisibleForTesting
-    ILaunchConfigurationWorkingCopy asWorkingCopy() {
-        return configuration instanceof ILaunchConfigurationWorkingCopy ? (ILaunchConfigurationWorkingCopy) configuration
-                : null;
+    ILaunchConfigurationWorkingCopy asWorkingCopy() throws CoreException {
+        return configuration instanceof ILaunchConfigurationWorkingCopy
+                ? (ILaunchConfigurationWorkingCopy) configuration : configuration.getWorkingCopy();
     }
 
-    public void setUsingInterpreterFromProject(final boolean usesProjectExecutor) {
+    public void setUsingInterpreterFromProject(final boolean usesProjectExecutor) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(USE_PROJECT_EXECUTOR, usesProjectExecutor);
-        }
+        launchCopy.setAttribute(USE_PROJECT_EXECUTOR, usesProjectExecutor);
     }
     
-    public void setExecutor(final SuiteExecutor executor) {
+    public void setExecutor(final SuiteExecutor executor) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(EXECUTOR_NAME, executor == null ? "" : executor.name());
-        }
+        launchCopy.setAttribute(EXECUTOR_NAME, executor == null ? "" : executor.name());
     }
 
-    public void setExecutorArguments(final String arguments) {
+    public void setExecutorArguments(final String arguments) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, arguments);
-        }
+        launchCopy.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, arguments);
     }
 
-    public void setInterpeterArguments(final String arguments) {
+    public void setInterpeterArguments(final String arguments) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, arguments);
-        }
+        launchCopy.setAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, arguments);
     }
 
-    public void setProjectName(final String projectName) {
+    public void setProjectName(final String projectName) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(PROJECT_NAME_ATTRIBUTE, projectName);
-        }
+        launchCopy.setAttribute(PROJECT_NAME_ATTRIBUTE, projectName);
     }
 
-    public void setSuitePaths(final Map<String, List<String>> suitesToCases) {
+    public void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException {
         // test case names should be always in lower case
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), new Function<String, String>() {
+        final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), new Function<String, String>() {
 
-                @Override
-                public String apply(final String path) {
-                    final List<String> testSuites = new ArrayList<>();
-                    final Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
-                    for (final String s : temp) {
-                        testSuites.add(s.toLowerCase());
-                    }
-                    return Joiner.on("::").join(testSuites);
+            @Override
+            public String apply(final String path) {
+                final List<String> testSuites = new ArrayList<>();
+                final Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
+                for (final String s : temp) {
+                    testSuites.add(s.toLowerCase());
                 }
-            });
-            launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
-        }
+                return Joiner.on("::").join(testSuites);
+            }
+        });
+        launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
     }
     
-    public void setIsIncludeTagsEnabled(final boolean isIncludeTagsEnabled) {
+    public void setIsIncludeTagsEnabled(final boolean isIncludeTagsEnabled) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isIncludeTagsEnabled);
-        }
+        launchCopy.setAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isIncludeTagsEnabled);
     }
     
-    public void setIsGeneralPurposeEnabled(final boolean isGeneralPurposeEnabled) {
+    public void setIsGeneralPurposeEnabled(final boolean isGeneralPurposeEnabled) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, isGeneralPurposeEnabled);
-        }
+        launchCopy.setAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, isGeneralPurposeEnabled);
     }
 
-    public void setIncludedTags(final List<String> tags) {
+    public void setIncludedTags(final List<String> tags) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(INCLUDED_TAGS_ATTRIBUTE, tags);
-        }
+        launchCopy.setAttribute(INCLUDED_TAGS_ATTRIBUTE, tags);
     }
     
-    public void setIsExcludeTagsEnabled(final boolean isExcludeTagsEnabled) {
+    public void setIsExcludeTagsEnabled(final boolean isExcludeTagsEnabled) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isExcludeTagsEnabled);
-        }
+        launchCopy.setAttribute(EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isExcludeTagsEnabled);
     }
     
-    public void setExcludedTags(final List<String> tags) {
+    public void setExcludedTags(final List<String> tags) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(EXCLUDED_TAGS_ATTRIBUTE, tags);
-        }
+        launchCopy.setAttribute(EXCLUDED_TAGS_ATTRIBUTE, tags);
     }
     
-    public void setRemoteDebugHost(final String host) {
+    public void setRemoteDebugHost(final String host) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, host);
-        }
+        launchCopy.setAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, host);
     }
     
-    public void setRemoteDebugPort(final String port) {
+    public void setRemoteDebugPort(final String port) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, port);
-        }
+        launchCopy.setAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, port);
     }
     
-    public void setRemoteDebugTimeout(final String timeout) {
+    public void setRemoteDebugTimeout(final String timeout) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, timeout);
-        }
+        launchCopy.setAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, timeout);
     }
 
     public boolean isGeneralPurposeConfiguration() throws CoreException {

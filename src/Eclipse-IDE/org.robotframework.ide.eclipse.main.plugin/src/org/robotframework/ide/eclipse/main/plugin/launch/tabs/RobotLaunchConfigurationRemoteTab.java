@@ -33,6 +33,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
@@ -185,9 +186,14 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        robotConfig.setRemoteDebugHost(hostTxt.getText().trim());
-        robotConfig.setRemoteDebugPort(portTxt.getText().trim());
-        robotConfig.setRemoteDebugTimeout(timeoutTxt.getText().trim());
+        try {
+            robotConfig.setRemoteDebugHost(hostTxt.getText().trim());
+            robotConfig.setRemoteDebugPort(portTxt.getText().trim());
+            robotConfig.setRemoteDebugTimeout(timeoutTxt.getText().trim());
+        } catch (final CoreException e) {
+            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
+                    "RED was unable to load the working copy of Launch Configuration.");
+        }
     }
     
     @Override

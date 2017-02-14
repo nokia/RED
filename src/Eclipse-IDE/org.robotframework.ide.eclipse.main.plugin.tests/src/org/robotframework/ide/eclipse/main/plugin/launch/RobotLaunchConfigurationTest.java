@@ -166,7 +166,7 @@ public class RobotLaunchConfigurationTest {
         resourcesToTestCases.put(res, casesForRes);
         resourcesToTestCases.put(res2, casesForRes2);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+                .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
