@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbench;
@@ -30,6 +31,8 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
 
     private WizardNewProjectCreationPage mainPage;
 
+    private boolean isValid = false;
+
 	@Override
 	public void init(final IWorkbench workbench,
 			final IStructuredSelection currentSelection) {
@@ -41,7 +44,6 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
 	@Override
 	public void addPages() {
 		super.addPages();
-
         mainPage = new WizardNewProjectCreationPage("New Robot Project");
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Project");
@@ -52,10 +54,27 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
 
 	@Override
 	public boolean performFinish() {
-        selectAndReveal(createNewProject());
+        validatePage();
+        if (isValid) {
+            selectAndReveal(createNewProject());
+            return true;
+        }
+            return false;
+    }
 
-		return true;
+    protected boolean validatePage() {
+        isValid = true;
+        String name=mainPage.getProjectHandle().getName();
+        IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+        for (IProject pro : projects) {
+            if (name.equalsIgnoreCase(pro.getName())) {
+                MessageDialog.openError(getShell(), "Error", String.format("Project \"%s\" already exists!", name));
+                isValid = false;
+            }
+        }
+        return isValid;
 	}
+
 
     private IResource createNewProject() {
         final IProject newProjectHandle = mainPage.getProjectHandle();
@@ -71,7 +90,6 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
         description.setLocationURI(location);
 
         final IRunnableWithProgress op = new CreateNewRobotProjectRunnable(newProjectHandle, description);
-
         try {
             getContainer().run(true, true, op);
         } catch (InterruptedException | InvocationTargetException e) {

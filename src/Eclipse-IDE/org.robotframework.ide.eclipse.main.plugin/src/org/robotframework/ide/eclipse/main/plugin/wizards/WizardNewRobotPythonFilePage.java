@@ -13,6 +13,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -62,6 +68,36 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
         buttons.get(Template.EMPTY).setSelection(true);
 
         super.createAdvancedControls(parent);
+    }
+
+    @Override
+    protected boolean validatePage() {
+        final boolean isValid = super.validatePage();
+        if (!isValid) {
+            return false;
+        }
+        String name = getFileName().contains(".py") ? getFileName() : getFileName().concat(".py");
+
+        IPath resourcePath = getContainerFullPath().append(getFileName() + getFileExtension());
+        IFile file = createFileHandle(resourcePath);
+
+        final IContainer container = file.getParent();
+        if (!container.exists()) {
+            setErrorMessage("Folder '" + container.getFullPath().toString() + "' does not exists.");
+            return false;
+        }
+
+        try {
+            for (final IResource resource : container.members()) {
+                if (name.equalsIgnoreCase(resource.getName())) {
+                    setErrorMessage("'" + name + "' already exists.");
+                    return false;
+                }
+            }
+        } catch (final CoreException e) {
+            ErrorDialog.openError(getShell(), "Problem occurred", "Error when validating wizard page", e.getStatus());
+        }
+        return true;
     }
 
     private static enum Template {
