@@ -5,7 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -13,13 +16,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 
 public class RobotLaunchConfigurationFinder {
 
     public static final String SELECTED_TESTS_CONFIG_SUFFIX = " (Selected Test Cases)";
 
-    public static ILaunchConfiguration findLaunchConfiguration(final List<IResource> resources) throws CoreException {
+    public static ILaunchConfigurationWorkingCopy findLaunchConfiguration(final List<IResource> resources)
+            throws CoreException {
 
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationType launchConfigurationType = launchManager
@@ -31,20 +36,21 @@ public class RobotLaunchConfigurationFinder {
             for (final ILaunchConfiguration configuration : launchConfigs) {
                 if (configuration.getName().startsWith(resourceName)
                         && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
-                    return configuration;
+                    return asWorkingCopy(configuration);
                 }
             }
         }
         for (final ILaunchConfiguration configuration : launchConfigs) {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
             if (robotConfig.isSuitableFor(resources)) {
-                return configuration;
+                return asWorkingCopy(configuration);
             }
         }
         return null;
     }
 
-    public static ILaunchConfiguration findLaunchConfigurationSelectedTestCases(final List<IResource> resources)
+    public static ILaunchConfigurationWorkingCopy findLaunchConfigurationSelectedTestCases(
+            final List<IResource> resources)
             throws CoreException {
 
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
@@ -56,13 +62,14 @@ public class RobotLaunchConfigurationFinder {
         for (final ILaunchConfiguration configuration : launchConfigs) {
             if (configuration.getName().equals(configurationName)
                     && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
-                return configuration;
+                return asWorkingCopy(configuration);
             }
         }
         return null;
     }
 
-    public static ILaunchConfiguration findLaunchConfigurationExceptSelectedTestCases(final List<IResource> resources)
+    public static ILaunchConfigurationWorkingCopy findLaunchConfigurationExceptSelectedTestCases(
+            final List<IResource> resources)
             throws CoreException {
 
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
@@ -75,16 +82,63 @@ public class RobotLaunchConfigurationFinder {
             for (final ILaunchConfiguration configuration : launchConfigs) {
                 if (configuration.getName().equals(resourceName)
                         && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
-                    return configuration;
+                    return asWorkingCopy(configuration);
                 }
             }
         }
         for (final ILaunchConfiguration configuration : launchConfigs) {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
             if (robotConfig.isGeneralPurposeConfiguration() && robotConfig.isSuitableFor(resources)) {
-                return configuration;
+                return asWorkingCopy(configuration);
             }
         }
         return null;
+    }
+
+    public static ILaunchConfigurationWorkingCopy getLaunchConfiguration(final List<IResource> resources)
+            throws CoreException {
+        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType launchConfigurationType = launchManager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        ILaunchConfigurationWorkingCopy configuration = findLaunchConfiguration(resources);
+        if (configuration == null) {
+            configuration = RobotLaunchConfiguration.prepareDefault(launchConfigurationType, resources);
+        }
+        return configuration;
+    }
+
+    public static ILaunchConfigurationWorkingCopy getLaunchConfigurationExceptSelectedTestCases(
+            final List<IResource> resources)
+            throws CoreException {
+        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType launchConfigurationType = launchManager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        ILaunchConfigurationWorkingCopy configuration = findLaunchConfigurationExceptSelectedTestCases(resources);
+        if (configuration == null) {
+            configuration = RobotLaunchConfiguration.prepareDefault(launchConfigurationType, resources);
+        }
+        return configuration;
+    }
+
+    public static ILaunchConfigurationWorkingCopy getLaunchConfigurationForSelectedTestCases(
+            final Map<IResource, List<String>> resourcesToTests) throws CoreException {
+        ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfigurationFinder
+                .findLaunchConfigurationSelectedTestCases(newArrayList(resourcesToTests.keySet()));
+        if (configuration == null) {
+            configuration = RobotLaunchConfiguration.prepareLaunchConfigurationForSelectedTestCases(resourcesToTests);
+        }
+        return configuration;
+    }
+
+    private static ILaunchConfigurationWorkingCopy asWorkingCopy(final ILaunchConfiguration config) {
+        if (config instanceof ILaunchConfigurationWorkingCopy) {
+            return (ILaunchConfigurationWorkingCopy) config;
+        } else {
+            try {
+                return config.getWorkingCopy();
+            } catch (final CoreException e) {
+                return null;
+            }
+        }
     }
 }

@@ -44,6 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigu
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuitesListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.TagsListener;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 import com.google.common.base.Optional;
 
@@ -104,18 +105,23 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
-        robotConfig.setUsingInterpreterFromProject(interpretersComposite.isUsingProjectInterpreter());
-        robotConfig.setExecutor(interpretersComposite.getChosenSystemExecutor());
-        robotConfig.setProjectName(projectText.getText());
-        robotConfig.setExecutorArguments(argumentsText.getText());
-        robotConfig.setInterpeterArguments(interpreterArgumentsText.getText());
+        try {
+            robotConfig.setUsingInterpreterFromProject(interpretersComposite.isUsingProjectInterpreter());
+            robotConfig.setExecutor(interpretersComposite.getChosenSystemExecutor());
+            robotConfig.setProjectName(projectText.getText());
+            robotConfig.setExecutorArguments(argumentsText.getText());
+            robotConfig.setInterpeterArguments(interpreterArgumentsText.getText());
         
-        robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
+            robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
         
-        robotConfig.setIsIncludeTagsEnabled(includeTagsBtn.getSelection());
-        robotConfig.setIncludedTags(includedTagsComposite.getInput());
-        robotConfig.setIsExcludeTagsEnabled(excludeTagsBtn.getSelection());
-        robotConfig.setExcludedTags(excludedTagsComposite.getInput());
+            robotConfig.setIsIncludeTagsEnabled(includeTagsBtn.getSelection());
+            robotConfig.setIncludedTags(includedTagsComposite.getInput());
+            robotConfig.setIsExcludeTagsEnabled(excludeTagsBtn.getSelection());
+            robotConfig.setExcludedTags(excludedTagsComposite.getInput());
+        } catch (final CoreException e) {
+            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
+                    "RED was unable to load the working copy of Launch Configuration.");
+        }
     }
     
     @Override

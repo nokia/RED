@@ -433,6 +433,32 @@
             </enablement>
         </contextualLaunch>
     </shortcut>
+    <shortcut
+          class="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+          icon="resources/robot.png"
+          id="org.robotframework.ide.robotLaunchShortcutConfiguration"
+          label="Robot Test Case(s)"
+          modes="run,debug">
+       <contextualLaunch>
+          <enablement>
+             <with
+                   variable="selection">
+                <iterate
+                      ifEmpty="false"
+                      operator="and">
+                   <or>
+	                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
+    	               </instanceof>
+                       <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                       </instanceof>
+                   </or>
+                </iterate>
+             </with>
+          </enablement>
+       </contextualLaunch>
+    </shortcut>
  </extension>
  <extension
        point="org.eclipse.ui.navigator.viewer">
@@ -2782,9 +2808,14 @@
                   <iterate
                         ifEmpty="false"
                         operator="and">
-                     <instanceof
-                           value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
-                     </instanceof>
+                     <or>
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
+                        </instanceof>
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                        </instanceof>
+                     </or>
                   </iterate>
                </with>
             </enabledWhen>
@@ -5488,9 +5519,14 @@
                      <iterate
                            ifEmpty="false"
                            operator="and">
-                        <instanceof
-                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
-                        </instanceof>
+                        <or>
+                           <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
+                           </instanceof>
+                           <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                           </instanceof>
+                        </or>
                      </iterate>
                      <and>
                         <test
@@ -5517,9 +5553,14 @@
                      <iterate
                            ifEmpty="false"
                            operator="and">
-                        <instanceof
-                              value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
-                        </instanceof>
+                        <or>
+                           <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotCase">
+                           </instanceof>
+                           <instanceof
+                                 value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                           </instanceof>
+                        </or>
                      </iterate>
                      <and>
                         <test
