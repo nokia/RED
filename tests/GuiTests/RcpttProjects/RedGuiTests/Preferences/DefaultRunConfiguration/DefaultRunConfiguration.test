@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/6/17 12:07 PM
+Save-Time: 2/14/17 10:06 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -139,11 +139,20 @@ get-view Outline | get-tree | select "test_for_run_config.robot/Test Cases/def" 
 wait-for-console
 
 //no test should be run but args should be added
-get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
+if [not [get-view Console | get-text-viewer | get-property text -raw
+    | matches "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
-    + "Try --help for usage information." | verify-true
+    + "Try --help for usage information." ]]{
+    
+    //check if order is different in linux sometimes
+    get-view Console | get-text-viewer | get-property text 
+    	|equals "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
+    + "Try --help for usage information."
+    + "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
+    + "Suite Executor: Robot Framework .*\n" | verify-true 
+    
+}
   
 //check if run config for selected test was created
 get-menu "Run/Run Configurations..." | click
