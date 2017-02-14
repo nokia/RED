@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
@@ -101,9 +100,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                             showSummary(parent, libraryImports);
                         }
                     } catch (final InvocationTargetException e) {
-                        MessageDialog.openError(parent, "Discovering libraries",
-                                "Problems occurred during discovering libraries: " + e.getCause().getMessage());
-                        return Status.CANCEL_STATUS;
+                        throw new AutoDiscovererException("Problems occurred during discovering libraries.", e);
                     } finally {
                         monitor.done();
                         stopDryRun();
