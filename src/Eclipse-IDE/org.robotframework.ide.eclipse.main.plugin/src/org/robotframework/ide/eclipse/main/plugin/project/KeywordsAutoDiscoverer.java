@@ -16,7 +16,6 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
@@ -57,8 +56,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                     }
                 });
             } catch (final InvocationTargetException e) {
-                MessageDialog.openError(parent, "Discovering keywords",
-                        "Problems occurred during discovering keywords: " + e.getCause().getMessage());
+                throw new AutoDiscovererException("Problems occurred during discovering keywords.", e);
             } catch (final InterruptedException e) {
                 dryRunHandler.destroyDryRunProcess();
             }

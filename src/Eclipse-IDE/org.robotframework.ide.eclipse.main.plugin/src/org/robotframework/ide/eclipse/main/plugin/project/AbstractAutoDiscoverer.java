@@ -37,20 +37,19 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 /**
  * @author bembenek
  */
-public abstract class AbstractAutoDiscoverer {
+abstract class AbstractAutoDiscoverer {
 
     private static final AtomicBoolean isDryRunRunning = new AtomicBoolean(false);
 
-    protected final RobotProject robotProject;
+    final RobotProject robotProject;
 
-    protected final RobotDryRunOutputParser dryRunOutputParser;
+    final RobotDryRunOutputParser dryRunOutputParser;
 
-    protected final RobotDryRunHandler dryRunHandler;
+    final RobotDryRunHandler dryRunHandler;
 
-    protected final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
+    final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
 
-    protected AbstractAutoDiscoverer(final RobotProject robotProject,
-            final Collection<? extends IResource> suiteFiles) {
+    AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles) {
         this.robotProject = robotProject;
         this.dryRunOutputParser = new RobotDryRunOutputParser();
         this.dryRunOutputParser.setupRobotDryRunLibraryImportCollector(robotProject.getStandardLibraries().keySet());
@@ -65,18 +64,18 @@ public abstract class AbstractAutoDiscoverer {
         start(parent);
     }
 
-    protected abstract void start(final Shell parent);
+    abstract void start(final Shell parent);
 
-    protected synchronized final boolean startDryRun() {
+    synchronized final boolean startDryRun() {
         return isDryRunRunning.compareAndSet(false, true);
     }
 
-    protected synchronized final void stopDryRun() {
+    synchronized final void stopDryRun() {
         isDryRunRunning.set(false);
     }
 
-    protected void startDiscovering(final IProgressMonitor monitor,
-            final IDryRunTargetsCollector dryRunTargetsCollector) throws InvocationTargetException {
+    void startDiscovering(final IProgressMonitor monitor, final IDryRunTargetsCollector dryRunTargetsCollector)
+            throws InvocationTargetException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");
         subMonitor.setWorkRemaining(4);
@@ -155,13 +154,22 @@ public abstract class AbstractAutoDiscoverer {
         return file;
     }
 
-    protected interface IDryRunTargetsCollector {
+    interface IDryRunTargetsCollector {
 
         void collectSuiteNamesAndAdditionalProjectsLocations();
 
         List<String> getSuiteNames();
 
         List<String> getAdditionalProjectsLocations();
+    }
+
+    static class AutoDiscovererException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public AutoDiscovererException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
     }
 
 }
