@@ -38,9 +38,13 @@ public class AssistProposals {
         return new RedSectionProposal("*** " + sectionName + " ***", match);
     }
 
+    static RedFileLocationProposal createFileLocationProposal(final String content, final IFile toFile,
+            final ProposalMatch match) {
+        return new RedFileLocationProposal(content, content, toFile, match);
+    }
+
     static RedFileLocationProposal createFileLocationProposal(final IFile fromFile, final IFile toFile,
             final ProposalMatch match) {
-        
         final String content;
         if (RedSystemProperties.isWindowsPlatform()
                 && !fromFile.getLocation().getDevice().equals(toFile.getLocation().getDevice())) {
