@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _kJ0i8BXWEeW05sQKg0mypw
+Contexts: _kJ0i8BXWEeW05sQKg0mypw,_d8aMACuvEeW667Afdo4DcA
 Element-Name: DebugConfigurationTabCheck
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _gCszcJREEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/30/16 1:44 PM
+Save-Time: 2/15/17 2:44 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -65,7 +65,8 @@ with [get-window "Debug Configurations"] {
     get-button Close | click
 }
 // run and verify if 2 tests were run
-get-eclipse-window | key-type "F11"
+
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | key-type "F11"
 try -times 4 -delay 1000 -command{
 	get-view Console | get-text-viewer | get-property text |  matches "2 critical test, 2 passed"
 }
@@ -83,6 +84,8 @@ with [get-editor "Script.robot"] {
  }
  // limit tests to run only with OnliThis tag
 get-menu "Run/Debug Configurations..." | click
+//remove her after bug with hestory
+get-window "Debug Configurations" | get-tree | select "Robot/Script.robot"
 with [get-window "Debug Configurations"] {
     with [get-group Tags] {
         get-button "Only run tests with these tags:" | check
