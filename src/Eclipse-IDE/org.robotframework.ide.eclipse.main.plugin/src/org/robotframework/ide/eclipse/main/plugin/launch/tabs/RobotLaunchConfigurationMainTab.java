@@ -57,12 +57,12 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     private IntepretersComposite interpretersComposite;
     private Text argumentsText;
     private Text interpreterArgumentsText;
-    
+
     private TagsProposalsSupport tagsSupport;
 
     private Button includeTagsBtn;
     private TagsComposite includedTagsComposite;
-    
+
     private Button excludeTagsBtn;
     private TagsComposite excludedTagsComposite;
 
@@ -83,7 +83,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
             interpretersComposite.setInput(robotConfig.isUsingInterpreterFromProject(), robotConfig.getExecutor());
             argumentsText.setText(robotConfig.getExecutorArguments());
-            interpreterArgumentsText.setText(robotConfig.getInterpeterArguments());
+            interpreterArgumentsText.setText(robotConfig.getInterpreterArguments());
 
             includeTagsBtn.setSelection(robotConfig.isIncludeTagsEnabled());
             includedTagsComposite.setInput(robotConfig.getIncludedTags());
@@ -110,10 +110,10 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             robotConfig.setExecutor(interpretersComposite.getChosenSystemExecutor());
             robotConfig.setProjectName(projectText.getText());
             robotConfig.setExecutorArguments(argumentsText.getText());
-            robotConfig.setInterpeterArguments(interpreterArgumentsText.getText());
-        
+            robotConfig.setInterpreterArguments(interpreterArgumentsText.getText());
+
             robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
-        
+
             robotConfig.setIsIncludeTagsEnabled(includeTagsBtn.getSelection());
             robotConfig.setIncludedTags(includedTagsComposite.getInput());
             robotConfig.setIsExcludeTagsEnabled(excludeTagsBtn.getSelection());
@@ -123,7 +123,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                     "RED was unable to load the working copy of Launch Configuration.");
         }
     }
-    
+
     @Override
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
@@ -259,7 +259,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).grab(true, true).span(2, 1).applyTo(composite);
         return composite;
     }
-    
+
     private void createProjectGroup(final Composite composite) {
         final Group projectGroup = new Group(composite, SWT.NONE);
         projectGroup.setText("Project");
