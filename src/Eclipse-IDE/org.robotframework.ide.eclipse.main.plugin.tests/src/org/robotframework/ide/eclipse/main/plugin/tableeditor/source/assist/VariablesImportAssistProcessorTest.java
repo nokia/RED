@@ -52,7 +52,7 @@ public class VariablesImportAssistProcessorTest {
                 "Library   cell",
                 "Variables  ",
                 "Variables  cell1  cell2",
-                "Variables  " + projectProvider.getProject().getName() + "/dir1cell");
+                "Variables  dir1cell");
         projectProvider.createFile("dir1/res1.robot", "*** Variables ***");
         projectProvider.createFile("dir1_1/vars.py");
         projectProvider.createFile("dir2/lib.py");
@@ -136,7 +136,6 @@ public class VariablesImportAssistProcessorTest {
 
     @Test
     public void allProposalsAreProvided_whenAtTheEndOfVariablesSettingLine() throws Exception {
-        final String projectName = projectProvider.getProject().getName();
         final int offset = 43;
 
         final ITextViewer viewer = mock(ITextViewer.class);
@@ -156,9 +155,9 @@ public class VariablesImportAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Settings ***", "Library   cell", "Variables  dir1_1/vars.py",
-                        "Variables  cell1  cell2", "Variables  " + projectName + "/dir1cell"),
+                        "Variables  cell1  cell2", "Variables  dir1cell"),
                 new Document("*** Settings ***", "Library   cell", "Variables  dir2/lib.py", "Variables  cell1  cell2",
-                        "Variables  " + projectName + "/dir1cell"));
+                        "Variables  dir1cell"));
     }
 
     @Test
@@ -189,8 +188,7 @@ public class VariablesImportAssistProcessorTest {
 
     @Test
     public void onlyMatchingProposalsAreProvided_whenAtInsideTheSecondCellInVariablesSettingLine() throws Exception {
-        final String projectName = projectProvider.getProject().getName();
-        final int offset = 84 + projectName.length();
+        final int offset = 83;
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(documentFromImportingFile());
