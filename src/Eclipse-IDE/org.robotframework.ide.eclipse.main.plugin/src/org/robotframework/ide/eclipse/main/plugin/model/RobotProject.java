@@ -13,10 +13,10 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -73,7 +73,7 @@ public class RobotProject extends RobotContainer {
 
     private final LibrariesWatchHandler librariesWatchHandler;
 
-    private final Map<String, RobotDryRunKeywordSource> kwSources = new HashMap<>();
+    private final Map<String, RobotDryRunKeywordSource> kwSources = new ConcurrentHashMap<>();
 
     RobotProject(final RobotModel model, final IProject project) {
         super(model, project);
