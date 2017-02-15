@@ -54,4 +54,22 @@ public class ProposalMatchers {
             }
         };
     }
+
+    public static ProposalMatcher pathsMatcher() {
+        return new ProposalMatcher() {
+
+            @Override
+            public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
+                if (proposalContent.toLowerCase().startsWith(userContent.toLowerCase())) {
+                    return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
+                }
+                final int index = proposalContent.toLowerCase().indexOf("/" + userContent.toLowerCase());
+                if (index >= 0) {
+                    return Optional
+                            .of(new ProposalMatch(Range.closedOpen(index + 1, index + 1 + userContent.length())));
+                }
+                return Optional.absent();
+            }
+        };
+    }
 }

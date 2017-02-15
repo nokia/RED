@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
@@ -33,7 +34,7 @@ public abstract class RedFileLocationProposals {
     }
 
     public static RedFileLocationProposals create(final SettingsGroup importType, final RobotSuiteFile suiteFile) {
-        return create(importType, suiteFile, ProposalMatchers.prefixesMatcher());
+        return create(importType, suiteFile, ProposalMatchers.pathsMatcher());
     }
 
     public static RedFileLocationProposals create(final SettingsGroup importType, final RobotSuiteFile suiteFile,
@@ -62,14 +63,26 @@ public abstract class RedFileLocationProposals {
         Collections.sort(files, comparator);
 
         for (final IFile varFile : files) {
-            final String resourcePath = varFile.getFullPath().makeRelative().toString();
-            final Optional<ProposalMatch> match = matcher.matches(userContent, resourcePath);
+
+            final IFile fromFile = suiteFile.getFile();
+            final String content;
+            if (RedSystemProperties.isWindowsPlatform()
+                    && !fromFile.getLocation().getDevice().equals(varFile.getLocation().getDevice())) {
+                content = varFile.getLocation().toString();
+            } else {
+                content = createCurrentFileRelativePath(fromFile, varFile);
+            }
+            final Optional<ProposalMatch> match = matcher.matches(userContent, content);
 
             if (match.isPresent()) {
-                proposals.add(AssistProposals.createFileLocationProposal(suiteFile.getFile(), varFile, match.get()));
+                proposals.add(AssistProposals.createFileLocationProposal(content, varFile, match.get()));
             }
         }
         return proposals;
+    }
+
+    private static String createCurrentFileRelativePath(final IFile from, final IFile to) {
+        return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1).toString();
     }
 
     private static class RedPythonFileLocationsProposals extends RedFileLocationProposals {
