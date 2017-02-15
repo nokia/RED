@@ -76,7 +76,7 @@ abstract class RobotLaunchInMode {
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
         builder.addLocationsToPythonPath(robotProject.getPythonpath());
-        builder.addUserArgumentsForInterpreter(robotConfig.getInterpeterArguments());
+        builder.addUserArgumentsForInterpreter(robotConfig.getInterpreterArguments());
         builder.addUserArgumentsForRobot(robotConfig.getExecutorArguments());
 
         builder.addVariableFiles(robotProject.getVariableFilePaths());

@@ -100,7 +100,7 @@ public class RobotLaunchConfiguration {
         try {
             robotConfig.setExecutor(SuiteExecutor.Python);
             robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
-            robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
+            robotConfig.setInterpreterArguments(preferences.getAdditionalInterpreterArguments());
             robotConfig.setProjectName("");
             robotConfig.setSuitePaths(new HashMap<String, List<String>>());
             robotConfig.setIsIncludeTagsEnabled(false);
@@ -127,7 +127,7 @@ public class RobotLaunchConfiguration {
             }
             final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
             robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
-            robotConfig.setInterpeterArguments(preferences.getAdditionalInterpreterArguments());
+            robotConfig.setInterpreterArguments(preferences.getAdditionalInterpreterArguments());
             robotConfig.setProjectName(project.getName());
         
             robotConfig.updateTestCases(suitesMapping);
@@ -226,7 +226,7 @@ public class RobotLaunchConfiguration {
         launchCopy.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, arguments);
     }
 
-    public void setInterpeterArguments(final String arguments) throws CoreException {
+    public void setInterpreterArguments(final String arguments) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, arguments);
     }
@@ -310,7 +310,7 @@ public class RobotLaunchConfiguration {
         return configuration.getAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
     }
 
-    public String getInterpeterArguments() throws CoreException {
+    public String getInterpreterArguments() throws CoreException {
         return configuration.getAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, "");
     }
 
