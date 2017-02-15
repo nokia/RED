@@ -65,7 +65,7 @@ public class RobotLaunchConfigurationMock extends RobotLaunchConfiguration {
     }
 
     @Override
-    public String getInterpeterArguments() throws CoreException {
+    public String getInterpreterArguments() throws CoreException {
         return "";
     }
 
