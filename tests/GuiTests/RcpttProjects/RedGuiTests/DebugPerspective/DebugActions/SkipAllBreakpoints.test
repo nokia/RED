@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA
 Element-Name: SkipAllBreakpoints
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _OdaRMJbhEeaa4JtzzKMFzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/12/17 3:48 PM
+Save-Time: 2/15/17 3:01 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -18,7 +18,7 @@ Entry-Name: .content
 proc "wait-for-thread"{
 	wait 1000
 	try -times 5 -delay 1000 -command{
-		get-view Debug | get-tree | get-item "BigScript.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
+		get-view Debug | get-tree | get-item "BigScript.robot .*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
 		    | get-property childCount -raw | int| gt 0 | verify-true
 		}
 }
@@ -93,6 +93,8 @@ with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column Annotatio
 //now skipp all BP
 skip-all-bp-and-check-selection 
 
+///set focus on editor to have focus and could run test
+get-editor "BigScript.robot" | get-text-viewer | set-caret-pos 37 1
 get-button "Debug.*" | click
 
 wait 3000
