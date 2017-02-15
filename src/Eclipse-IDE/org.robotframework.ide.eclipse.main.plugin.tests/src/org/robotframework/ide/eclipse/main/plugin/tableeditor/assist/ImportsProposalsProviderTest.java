@@ -78,7 +78,6 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreNoResourcesProposalsProvided_whenInAnyColumnNotAResourceSetting() {
-        final String projectName = projectProvider.getProject().getName();
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
@@ -93,15 +92,13 @@ public class ImportsProposalsProviderTest {
 
         for (int column = 0; column < 10; column++) {
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals(projectName + "/a_bc",
-                    projectName.length() + 2, context);
+            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
             assertThat(proposals).isEmpty();
         }
     }
 
     @Test
     public void thereAreNoResourcesProposalsProvided_whenInColumnOtherThanFirstOfResourceSetting() {
-        final String projectName = projectProvider.getProject().getName();
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
@@ -119,17 +116,15 @@ public class ImportsProposalsProviderTest {
                 continue;
             }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals(projectName + "/a_bc",
-                    projectName.length() + 2, context);
+            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
             assertThat(proposals).isEmpty();
         }
     }
 
     @Test
     public void thereAreResourcesProposalsProvided_whenInFirstColumnOfResourceSetting() {
-        final String projectName = projectProvider.getProject().getName();
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
-        text.setText(projectName + "/a_bc");
+        text.setText("a_bc");
 
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
@@ -143,7 +138,7 @@ public class ImportsProposalsProviderTest {
         final ResourceFileLocationsProposalsProvider provider = new ResourceFileLocationsProposalsProvider(model, dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), projectName.length() + 2, context);
+        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
         assertThat(proposals).hasSize(1);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
@@ -171,7 +166,6 @@ public class ImportsProposalsProviderTest {
 
     @Test
     public void thereAreNoVariablesProposalsProvided_whenInAnyColumnNotAVariablesSetting() {
-        final String projectName = projectProvider.getProject().getName();
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
@@ -186,15 +180,13 @@ public class ImportsProposalsProviderTest {
 
         for (int column = 0; column < 10; column++) {
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals(projectName + "/a_bc",
-                    projectName.length() + 2, context);
+            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
             assertThat(proposals).isEmpty();
         }
     }
 
     @Test
     public void thereAreNoVariablesProposalsProvided_whenInColumnOtherThanFirstOfVariablesSetting() {
-        final String projectName = projectProvider.getProject().getName();
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
@@ -212,17 +204,15 @@ public class ImportsProposalsProviderTest {
                 continue;
             }
             final AssistantContext context = new NatTableAssistantContext(column, 0);
-            final RedContentProposal[] proposals = provider.getProposals(projectName + "/a_bc",
-                    projectName.length() + 2, context);
+            final RedContentProposal[] proposals = provider.getProposals("a_bc", 2, context);
             assertThat(proposals).isEmpty();
         }
     }
 
     @Test
     public void thereAreVariablesProposalsProvided_whenInFirstColumnOfVariablesSetting() {
-        final String projectName = projectProvider.getProject().getName();
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
-        text.setText(projectName + "/a_bc");
+        text.setText("a_bc");
 
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
@@ -237,7 +227,7 @@ public class ImportsProposalsProviderTest {
                 dataProvider);
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
-        final RedContentProposal[] proposals = provider.getProposals(text.getText(), projectName.length() + 2, context);
+        final RedContentProposal[] proposals = provider.getProposals(text.getText(), 2, context);
         assertThat(proposals).hasSize(1);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);

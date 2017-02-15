@@ -82,7 +82,7 @@ public class RedFileLocationProposalsTest {
                 model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider
-                .getFilesLocationsProposals(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1");
+                .getFilesLocationsProposals("dir1");
         assertThat(transform(proposals, toLabels()))
                 .containsExactly("dir1/res1.robot");
     }
@@ -148,7 +148,7 @@ public class RedFileLocationProposalsTest {
                 model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider
-                .getFilesLocationsProposals(RedFileLocationProposalsTest.class.getSimpleName() + "/dir1_1/l");
+                .getFilesLocationsProposals("dir1_1/l");
         assertThat(transform(proposals, toLabels()))
                 .containsExactly("dir1_1/lib.py");
     }
