@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _j2wUgCr0EeW667Afdo4DcA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/8/16 4:17 PM
+Save-Time: 2/15/17 3:19 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,6 +29,14 @@ proc "check-and-clean-console"{
 	get-view Console | get-text-viewer  | get-property "getLineCount()" | equals 23 | verify-true
 	get-view Console | get-button "Clear Console" | click
 }
+
+proc "check-error-window-and-close-it"{
+	get-window "Unable To Launch" | get-label "The selection cannot be launched, and there are no recent launches." 
+	    | get-property caption | equals "The selection cannot be launched, and there are no recent launches." | verify-true
+	    
+	get-window "Unable To Launch" | get-button OK | click
+}
+
 //open editor and run test
 with [get-view "Project Explorer" | get-tree] {
     select REDProject | double-click
@@ -48,28 +56,25 @@ compare-message-log
 check-and-clean-console
 
 //run test from project explorer
-get-button "Run.*" -index 0 | click
 get-view "Project Explorer" | get-tree | select "REDProject/new_test.robot" | get-menu "Run As/1 Robot Test" | click
 compare-message-log
 check-and-clean-console
 
-//run test from run button (last run configuration)
-get-button "Run.*" -index 0 | click -arrow
-get-menu "1 new_test.robot" | click
-compare-message-log
-check-and-clean-console
+////run test from run button (last run configuration)
+//get-button "Run.*" -index 0 | click -arrow
+//get-menu "1 new_test.robot" | click
+//compare-message-log
+//check-and-clean-console
 
-//set focus on Outline and run test
+//set focus on Outline and run test - test will be not run 
 get-view Outline | get-tree | select "new_test.robot/Variables/x"
 get-button "Run.*" -index 0 | click
-compare-message-log
-check-and-clean-console
+check-error-window-and-close-it
 
 //set focus on Message log and run test by button
 get-view "Message Log" | get-editbox | set-text-offset 39 8
 get-button "Run.*" -index 0 | click
-compare-message-log
-check-and-clean-console
+check-error-window-and-close-it
 
 //run test using keys (focus is on Source tab on editor)
 with [get-editor "new_test.robot" | get-text-viewer] {
@@ -125,40 +130,34 @@ check-and-clean-console
 
 //run test using keys (focus is on Outline)
 get-view Outline | get-tree | key-type "M1+F11"
-compare-message-log
-check-and-clean-console
+check-error-window-and-close-it
 
 //run from Message view
 with [get-view "Message Log" | get-editbox] {
     set-text-offset 16 13
     key-type "M1+F11"
 }
-compare-message-log
-check-and-clean-console
+check-error-window-and-close-it
 
 //run test using keys (focus is on Console)
 with [get-view Console | get-text-viewer] {
     set-caret-pos 18 34
     key-type "M1+F11"
 }
-compare-message-log
-check-and-clean-console
+check-error-window-and-close-it
 
 //close editor and run test using keys
 get-editor "new_test.robot" | close
-get-view "Project Explorer" | get-tree | key-type "M1+F11"
+get-view "Project Explorer" | get-tree | select REDProject | key-type "M1+F11"
 compare-message-log
 check-and-clean-console
 
 //run using button
+get-view "Project Explorer" | get-tree | select REDProject
 get-button "Run.*" -index 0 | click
 compare-message-log
 check-and-clean-console
 
-//run for project explorer
-get-view "Project Explorer" | get-tree | key-type "M1+F11"
-compare-message-log
-check-and-clean-console
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
