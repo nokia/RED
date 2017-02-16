@@ -92,9 +92,16 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 .getLaunchManager()
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         try {
-            final ILaunchConfiguration config = RobotLaunchConfiguration.createDefault(launchConfigurationType,
+            final ILaunchConfigurationWorkingCopy config = RobotLaunchConfiguration.prepareDefault(
+                    launchConfigurationType,
                     resources);
-            doLaunchConfiguration(config, mode);
+            final ILaunchConfiguration sameConfig = RobotLaunchConfigurationFinder.findSameAs(config);
+            if (sameConfig != null) {
+                doLaunchConfiguration(sameConfig, mode);
+            } else {
+                config.doSave();
+                doLaunchConfiguration(config, mode);
+            }
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Cannot generate Robot Launch Configuration",
                     "RED was unable to create Robot Launch Configuration from selection.");
@@ -108,7 +115,12 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             try {
                 final ILaunchConfiguration config = RobotLaunchConfiguration
                         .prepareLaunchConfigurationForSelectedTestCases(resourcesToTests.get());
-                doLaunchConfiguration(config, mode);
+                final ILaunchConfiguration sameConfig = RobotLaunchConfigurationFinder.findSameAs(config);
+                if (sameConfig != null) {
+                    doLaunchConfiguration(sameConfig, mode);
+                } else {
+                    doLaunchConfiguration(config, mode);
+                }
             } catch (final CoreException e) {
                 DetailedErrorDialog.openErrorDialog("Cannot generate Robot Launch Configuration",
                         "RED was unable to create Robot Launch Configuration from selection.");
@@ -138,37 +150,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final IEditorInput input = editor.getEditorInput();
         if (input instanceof FileEditorInput) {
             final IResource file = ((FileEditorInput) input).getFile();
-            launch(newArrayList(file), mode, false);
+            createAndLaunchConfiguration(newArrayList(file), mode);
         }
-    }
-
-    private void launch(final List<IResource> resources, final String mode, final boolean generalOnly) {
-        if (resources.isEmpty()) {
-            throw new IllegalStateException("There should be at least one suite selected for launching");
-        }
-        final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
-            @Override
-            public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-
-                ILaunchConfiguration config = null;
-                if (generalOnly) {
-                    config = RobotLaunchConfigurationFinder.findLaunchConfigurationExceptSelectedTestCases(resources);
-                } else {
-                    config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
-                }
-                if (config == null) {
-                    final ILaunchConfigurationType launchConfigurationType = DebugPlugin.getDefault()
-                            .getLaunchManager()
-                            .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-                    config = RobotLaunchConfiguration.createDefault(launchConfigurationType, resources);
-                }
-                config.launch(mode, monitor);
-
-                return Status.OK_STATUS;
-            }
-        };
-        job.setUser(false);
-        job.schedule();
     }
 
     @Override
@@ -267,33 +250,26 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
     @Override
     public ILaunchConfiguration[] getLaunchConfigurations(final ISelection selection) {
+        ILaunchConfiguration config = null;
         if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-            final IStructuredSelection ss = (IStructuredSelection) selection;
-            final List<IResource> resources = Selections.getAdaptableElements(ss, IResource.class);
-            if (!resources.isEmpty()) {
-                try {
-                    return new ILaunchConfiguration[] { RobotLaunchConfigurationFinder
-                            .getLaunchConfigurationExceptSelectedTestCases(resources) };
-                } catch (final CoreException e) {
-                    // fine, will return null
+            try {
+                final IStructuredSelection ss = (IStructuredSelection) selection;
+                final List<IResource> resources = Selections.getAdaptableElements(ss, IResource.class);
+                if (!resources.isEmpty()) {
+                    config = RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(resources);
+                } else {
+                    final Optional<Map<IResource, List<String>>> resourcesToTests = mapResourcesToTestCases(ss);
+                    if (resourcesToTests.isPresent()) {
+                        config = RobotLaunchConfigurationFinder
+                                .getLaunchConfigurationForSelectedTestCases(resourcesToTests.get());
+                        new RobotLaunchConfiguration(config).updateTestCases(resourcesToTests.get());
+                    }
                 }
-            } else {
-                final Optional<Map<IResource, List<String>>> resourcesToTests = mapResourcesToTestCases(ss);
-                if (!resourcesToTests.isPresent()) {
-                    return null;
-                }
-                try {
-                    final ILaunchConfiguration config = RobotLaunchConfigurationFinder
-                            .getLaunchConfigurationForSelectedTestCases(resourcesToTests.get());
-                    final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
-                    robotConfig.updateTestCases(resourcesToTests.get());
-                    return new ILaunchConfiguration[] { config };
-                } catch (final CoreException e) {
-                    // fine, will return null
-                }
+            } catch (final CoreException e) {
+                // nothing to do
             }
         }
-        return null;
+        return config == null ? null : new ILaunchConfiguration[] { config };
     }
 
     private static Optional<Map<IResource, List<String>>> mapResourcesToTestCases(
