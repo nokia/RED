@@ -375,6 +375,14 @@
           modes="run,debug"
           name="Robot">
     </launchConfigurationType>
+    <launchConfigurationType
+          delegate="org.robotframework.ide.eclipse.main.plugin.launch.RemoteRobotLaunchConfigurationDelegate"
+          id="org.robotframework.ide.remoteRobotLaunchConfiguration"
+          modes="run,debug"
+          name="Remote Robot"
+          sourceLocatorId="org.eclipse.debug.robot.sourceLookupDirector"
+          sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer">
+    </launchConfigurationType>
  </extension>
  <extension
        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
@@ -382,6 +390,11 @@
           class="org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationTabGroup"
           id="org.robotframework.ide.robotLaunchConfigurationTabGroup"
           type="org.robotframework.ide.robotLaunchConfiguration">
+    </launchConfigurationTabGroup>
+    <launchConfigurationTabGroup
+          class="org.robotframework.ide.eclipse.main.plugin.launch.tabs.RemoteRobotLaunchConfigurationTabGroup"
+          id="org.robotframework.ide.remoteRobotLaunchConfigurationTabGroup"
+          type="org.robotframework.ide.remoteRobotLaunchConfiguration">
     </launchConfigurationTabGroup>
  </extension>
  <extension
@@ -391,14 +404,20 @@
           icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchConfigurationImage">
     </launchConfigurationTypeImage>
+    <launchConfigurationTypeImage
+          configTypeID="org.robotframework.ide.remoteRobotLaunchConfiguration"
+          icon="resources/robot_remote.png"
+          id="org.robotframework.ide.remoteRobotLaunchConfigurationImage">
+    </launchConfigurationTypeImage>
  </extension>
  <extension point="org.eclipse.debug.ui.launchShortcuts">
     <shortcut
-            class="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
-            id="org.robotframework.ide.robotLaunchShortcutConfiguration"
-            label="Robot Test"
-            icon="resources/robot.png"
-            modes="run,debug">
+          class="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+          icon="resources/robot.png"
+          id="org.robotframework.ide.robotLaunchShortcutConfiguration"
+          label="Robot Test"
+          modes="run,debug"
+          path="main">
         <contextualLaunch>
             <enablement>
                 <with variable="selection">
@@ -438,7 +457,8 @@
           icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Robot Test Case(s)"
-          modes="run,debug">
+          modes="run,debug"
+          path="main">
        <contextualLaunch>
           <enablement>
              <with
@@ -454,6 +474,48 @@
                          value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
                        </instanceof>
                    </or>
+                </iterate>
+             </with>
+          </enablement>
+       </contextualLaunch>
+    </shortcut>
+    <shortcut
+          class="org.robotframework.ide.eclipse.main.plugin.launch.RemoteRobotLaunchConfigurationDelegate"
+          icon="resources/robot_remote.png"
+          id="org.robotframework.ide.robotLaunchShortcutConfiguration"
+          label="Remote Robot Test"
+          modes="run,debug"
+          path="remote">
+       <contextualLaunch>
+          <enablement>
+             <with
+                   variable="selection">
+                <iterate
+                      ifEmpty="false"
+                      operator="and">
+                   <adapt
+                         type="org.eclipse.core.resources.IResource">
+                      <or>
+                         <instanceof
+                               value="org.eclipse.core.resources.IContainer">
+                         </instanceof>
+                         <and>
+                            <instanceof
+                                  value="org.eclipse.core.resources.IFile">
+                            </instanceof>
+                            <or>
+                               <test
+                                     property="org.eclipse.core.resources.contentTypeId"
+                                     value="org.robotframework.red.robotsuitefile_robot">
+                               </test>
+                               <test
+                                     property="org.eclipse.core.resources.contentTypeId"
+                                     value="org.robotframework.red.robotsuitefile_tsv">
+                               </test>
+                            </or>
+                         </and>
+                      </or>
+                   </adapt>
                 </iterate>
              </with>
           </enablement>

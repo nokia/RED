@@ -16,6 +16,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -32,41 +33,72 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-class RobotLaunchConfigurationValidator {
+class LaunchConfigurationsValidator {
 
     private final RobotModel model;
 
-    RobotLaunchConfigurationValidator() {
+    LaunchConfigurationsValidator() {
         this(RedPlugin.getModelManager().getModel());
     }
 
     @VisibleForTesting
-    RobotLaunchConfigurationValidator(final RobotModel model) {
+    LaunchConfigurationsValidator(final RobotModel model) {
         this.model = model;
     }
 
-    void validate(final RobotLaunchConfiguration robotConfig) {
+    void validate(final IRemoteRobotLaunchConfiguration robotConfig)
+            throws LaunchConfigurationValidationFatalException {
+
+        try {
+            if (robotConfig.isDefiningProjectDirectly()) {
+                final String projectName = robotConfig.getProjectName();
+                final Optional<IProject> project = getProject(projectName);
+                if (!project.isPresent() || !project.get().exists()) {
+                    throw new LaunchConfigurationValidationFatalException(
+                            "Project '" + projectName + "' does not exist in workspace.");
+                }
+                if (!project.get().isOpen()) {
+                    throw new LaunchConfigurationValidationFatalException(
+                            "Project '" + projectName + "' is currently closed.");
+                }
+            }
+
+            try {
+                robotConfig.getRemoteDebugHost();
+                robotConfig.getRemoteDebugPort();
+                robotConfig.getRemoteDebugTimeout();
+            } catch (final CoreException e) {
+                throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
+            }
+        } catch (final CoreException e) {
+            throw new LaunchConfigurationValidationFatalException(
+                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
+        }
+    }
+
+    void validate(final RobotLaunchConfiguration robotConfig)
+            throws LaunchConfigurationValidationException, LaunchConfigurationValidationFatalException {
         try {
             final List<String> warnings = new ArrayList<>();
 
             final String projectName = robotConfig.getProjectName();
             final Optional<IProject> project = getProject(projectName);
             if (!project.isPresent() || !project.get().exists()) {
-                throw new RobotLaunchConfigurationValidationFatalException(
+                throw new LaunchConfigurationValidationFatalException(
                         "Project '" + projectName + "' does not exist in workspace.");
             }
             if (!project.get().isOpen()) {
-                throw new RobotLaunchConfigurationValidationFatalException(
+                throw new LaunchConfigurationValidationFatalException(
                         "Project '" + projectName + "' is currently closed.");
             }
             if (robotConfig.isUsingInterpreterFromProject()) {
                 final RobotProject robotProject = model.createRobotProject(project.get());
                 final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
                 if (env == null || !env.isValidPythonInstallation()) {
-                    throw new RobotLaunchConfigurationValidationFatalException(
+                    throw new LaunchConfigurationValidationFatalException(
                             "Project '" + projectName + "' is using invalid Python environment.");
                 } else if (!env.hasRobotInstalled()) {
-                    throw new RobotLaunchConfigurationValidationFatalException("Project '" + projectName
+                    throw new LaunchConfigurationValidationFatalException("Project '" + projectName
                             + "' is using invalid Python environment (missing Robot Framework).");
                 }
             } else {
@@ -82,11 +114,11 @@ class RobotLaunchConfigurationValidator {
             validateSuitesToRun(suitesToRun);
 
             if (!warnings.isEmpty()) {
-                throw new RobotLaunchConfigurationValidationException(Joiner.on('\n').join(warnings));
+                throw new LaunchConfigurationValidationException(Joiner.on('\n').join(warnings));
             }
 
         } catch (final CoreException e) {
-            throw new RobotLaunchConfigurationValidationFatalException(
+            throw new LaunchConfigurationValidationFatalException(
                     "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
         }
     }
@@ -124,26 +156,32 @@ class RobotLaunchConfigurationValidator {
             }
         }
         if (!problematicSuites.isEmpty()) {
-            throw new RobotLaunchConfigurationValidationFatalException(
+            throw new LaunchConfigurationValidationFatalException(
                     "Following suites does not exist: " + Joiner.on(", ").join(problematicSuites) + ".");
         }
         if (!problematicTests.isEmpty()) {
-            throw new RobotLaunchConfigurationValidationFatalException(
+            throw new LaunchConfigurationValidationFatalException(
                     "Following tests does not exist: " + Joiner.on(", ").join(problematicTests) + ".");
         }
     }
 
-    class RobotLaunchConfigurationValidationException extends RuntimeException {
-        public RobotLaunchConfigurationValidationException(final String message) {
+    class LaunchConfigurationValidationException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public LaunchConfigurationValidationException(final String message) {
             super(message);
         }
     }
 
-    class RobotLaunchConfigurationValidationFatalException extends RuntimeException {
-        public RobotLaunchConfigurationValidationFatalException(final String message) {
+    class LaunchConfigurationValidationFatalException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public LaunchConfigurationValidationFatalException(final String message) {
             super(message);
         }
-        public RobotLaunchConfigurationValidationFatalException(final String message, final Exception e) {
+        public LaunchConfigurationValidationFatalException(final String message, final Exception e) {
             super(message, e);
         }
     }

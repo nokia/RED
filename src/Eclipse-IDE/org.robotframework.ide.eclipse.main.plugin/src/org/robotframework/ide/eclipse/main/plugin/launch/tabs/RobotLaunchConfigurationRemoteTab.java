@@ -10,13 +10,21 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -29,15 +37,20 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.model.BaseWorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Range;
-import com.google.common.primitives.Ints;
+import com.google.common.base.CaseFormat;
 
 /**
  * @author mmarzec
@@ -46,26 +59,96 @@ import com.google.common.primitives.Ints;
 public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurationTab implements
         ILaunchConfigurationTab {
 
+    private final boolean isRunMode;
+
+    private Text projectTxt;
+
     private Text hostTxt;
 
     private Text portTxt;
     
     private Text timeoutTxt;
+
+    private Text commandLineArgument;
+
     
+    public RobotLaunchConfigurationRemoteTab(final boolean isRunMode) {
+        this.isRunMode = isRunMode;
+    }
+
     @Override
     public void createControl(final Composite parent) {
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(composite);
 
-        final Group remoteGroup = new Group(composite, SWT.NONE);
-        remoteGroup.setText("Remote Debugging");
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(remoteGroup);
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(remoteGroup);
+        createProjectGroup(composite);
+        createServerGroup(composite);
+        createClientGroup(composite);
+        
+        setControl(composite);
+    }
 
-        final Label hostLbl = new Label(remoteGroup, SWT.NONE);
+    private void createProjectGroup(final Composite composite) {
+        // FIXME : this duplicates the same group defined by Main tab; make this code common
+        final Group projectGroup = new Group(composite, SWT.NONE);
+        projectGroup.setText("Project");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectGroup);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(projectGroup);
+
+        projectTxt = new Text(projectGroup, SWT.BORDER);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectTxt);
+        projectTxt.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+
+        final Button browseProject = new Button(projectGroup, SWT.PUSH);
+        browseProject.setText("Browse...");
+        browseProject.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
+                        new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
+                dialog.setTitle("Select project");
+                dialog.setMessage("Select the project hosting your test suites:");
+                dialog.addFilter(new ViewerFilter() {
+
+                    @Override
+                    public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+                        return element instanceof IProject;
+                    }
+                });
+                dialog.setAllowMultiple(false);
+                dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+                if (dialog.open() == Window.OK) {
+                    final IProject project = (IProject) dialog.getFirstResult();
+                    projectTxt.setText(project.getName());
+                    updateLaunchConfigurationDialog();
+                }
+            }
+        });
+        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(browseProject);
+    }
+
+    private void createServerGroup(final Composite parent) {
+        final Group serverGroup = new Group(parent, SWT.NONE);
+        serverGroup.setText("RED Server");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(serverGroup);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(serverGroup);
+
+        final Label description = new Label(serverGroup, SWT.WRAP);
+        description
+                .setText("Setup server which will track execution of Robot tests running on remotely connected client");
+        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(description);
+
+        final Label hostLbl = new Label(serverGroup, SWT.NONE);
         hostLbl.setText("Local IP:");
 
-        hostTxt = new Text(remoteGroup, SWT.BORDER);
+        hostTxt = new Text(serverGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(hostTxt);
         hostTxt.addModifyListener(new ModifyListener() {
 
@@ -75,10 +158,13 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             }
         });
 
-        final Label portLbl = new Label(remoteGroup, SWT.NONE);
+        // spacer to occupy next grid cell
+        new Label(serverGroup, SWT.NONE);
+
+        final Label portLbl = new Label(serverGroup, SWT.NONE);
         portLbl.setText("Local port:");
 
-        portTxt = new Text(remoteGroup, SWT.BORDER);
+        portTxt = new Text(serverGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(portTxt);
         portTxt.addModifyListener(new ModifyListener() {
 
@@ -87,11 +173,14 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 updateLaunchConfigurationDialog();
             }
         });
+
+        // spacer to occupy next grid cell
+        new Label(serverGroup, SWT.NONE);
         
-        final Label timeoutLbl = new Label(remoteGroup, SWT.NONE);
+        final Label timeoutLbl = new Label(serverGroup, SWT.NONE);
         timeoutLbl.setText("Connection timeout [ms]:");
 
-        timeoutTxt = new Text(remoteGroup, SWT.BORDER);
+        timeoutTxt = new Text(serverGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(timeoutTxt);
         timeoutTxt.addModifyListener(new ModifyListener() {
 
@@ -100,15 +189,26 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 updateLaunchConfigurationDialog();
             }
         });
-        
-        final Button exportBtn = new Button(remoteGroup, SWT.PUSH);
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(exportBtn);
-        exportBtn.setText("Export Debug Script");
+    }
+
+    private void createClientGroup(final Composite parent) {
+        final Group clientGroup = new Group(parent, SWT.NONE);
+        clientGroup.setText("Remote Client");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(clientGroup);
+        GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(clientGroup);
+
+        final Label description = new Label(clientGroup, SWT.WRAP);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(description);
+        description.setText("Export script which should be added as listener of tests execution on client machine");
+
+        final Button exportBtn = new Button(clientGroup, SWT.PUSH);
+        GridDataFactory.swtDefaults().applyTo(exportBtn);
+        exportBtn.setText("Export Client Script");
         exportBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final DirectoryDialog dirDialog = new DirectoryDialog(parent.getShell());
+            public void widgetSelected(final SelectionEvent event) {
+                final DirectoryDialog dirDialog = new DirectoryDialog(getShell());
                 final String fileName = "TestRunnerAgent.py";
                 dirDialog.setMessage("Choose \"" + fileName + "\" export destination.");
                 final String dir = dirDialog.open();
@@ -117,14 +217,21 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                     try {
                         Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(fileName), scriptFile.toPath(),
                                 StandardCopyOption.REPLACE_EXISTING);
-                    } catch (final IOException e1) {
-                        e1.printStackTrace();
+                    } catch (final IOException e) {
+                        final String message = "Unable to copy file to " + scriptFile.getAbsolutePath();
+                        ErrorDialog.openError(getShell(), "File copy problem", message,
+                                new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
                     }
                 }
             }
         });
-        
-        setControl(composite);
+
+        final Label description2 = new Label(clientGroup, SWT.WRAP);
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).applyTo(description2);
+        description2.setText("Add following argument to command line when running tests on client side");
+
+        commandLineArgument = new Text(clientGroup, SWT.BORDER | SWT.READ_ONLY);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(commandLineArgument);
     }
 
     @Override
@@ -135,28 +242,46 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     @Override
     public void initializeFrom(final ILaunchConfiguration configuration) {
         try {
-            final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-            final Optional<Integer> port = robotConfig.getRemoteDebugPort();
-            final Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
+            final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
+                    .remoteLaunchConfiguration(configuration);
+            final String hostIp = robotConfig.getRemoteDebugHost();
+            final String port = robotConfig.getRemoteDebugPortValue();
+            final String timeout = robotConfig.getRemoteDebugTimeoutValue();
 
-            hostTxt.setText(robotConfig.getRemoteDebugHost());
-            portTxt.setText(port.isPresent() ? port.get().toString() : "");
-            timeoutTxt.setText(timeout.isPresent() ? timeout.get().toString() : "");
+            if (!robotConfig.isDefiningProjectDirectly()) {
+                final Composite projectGroup = projectTxt.getParent();
+                final Composite parent = projectGroup.getParent();
+                projectGroup.dispose();
+                parent.layout();
+            }
+
+            hostTxt.setText(hostIp);
+            portTxt.setText(port);
+            timeoutTxt.setText(timeout);
+
+            updateCommandLineArguments(hostIp, port);
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
+    }
+
+    private void updateCommandLineArguments(final String hostIp, final String portString) {
+        final String mode = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, Boolean.toString(!isRunMode));
+        commandLineArgument.setText("--listener TestRunnerAgent.py:" + portString + ":" + mode + ":" + hostIp);
     }
     
     @Override
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
         setWarningMessage(null);
-        if(!isPortValid()) {
-            setErrorMessage("Invalid port specified.");
-            return false;
-        }
-        if(!isConnectionTimeoutValid()) {
-            setErrorMessage("Invalid connection timeout specified.");
+
+        updateCommandLineArguments(hostTxt.getText(), portTxt.getText());
+
+        try {
+            new LaunchConfigurationsValidator()
+                    .validate(LaunchConfigurationsWrappers.remoteLaunchConfiguration(configuration));
+        } catch (final LaunchConfigurationValidationFatalException e) {
+            setErrorMessage(e.getMessage());
             return false;
         }
         return true;
@@ -164,32 +289,18 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     
     @Override
     public boolean canSave() {
-        return isDirty() && isPortValid() && isConnectionTimeoutValid();
-    }
-
-    private boolean isPortValid() {
-        if (!portTxt.getText().isEmpty()) {
-            final Integer port = Ints.tryParse(portTxt.getText());
-            return port != null && Range.closed(1, 65535).contains(port);
-        }
-        return true;
-    }
-
-    private boolean isConnectionTimeoutValid() {
-        if (!timeoutTxt.getText().isEmpty()) {
-            final Integer timeout = Ints.tryParse(timeoutTxt.getText());
-            return timeout != null && Range.atLeast(1).contains(timeout);
-        }
-        return true;
+        return projectTxt == null || projectTxt.isDisposed() || !projectTxt.getText().isEmpty();
     }
 
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
+                .remoteLaunchConfiguration(configuration);
         try {
-            robotConfig.setRemoteDebugHost(hostTxt.getText().trim());
-            robotConfig.setRemoteDebugPort(portTxt.getText().trim());
-            robotConfig.setRemoteDebugTimeout(timeoutTxt.getText().trim());
+            robotConfig.setProjectName(projectTxt.getText().trim());
+            robotConfig.setRemoteDebugHostValue(hostTxt.getText().trim());
+            robotConfig.setRemoteDebugPortValue(portTxt.getText().trim());
+            robotConfig.setRemoteDebugTimeoutValue(timeoutTxt.getText().trim());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
@@ -203,11 +314,11 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
     @Override
     public String getMessage() {
-        return "Create or edit a configuration to launch Robot Framework tests";
+        return "Create or edit a configuration to launch server for remotely running Robot Framework tests";
     }
 
     @Override
     public Image getImage() {
-        return ImagesManager.getImage(RedImages.getRobotImage());
+        return ImagesManager.getImage(RedImages.getRemoteRobotImage());
     }
 }
