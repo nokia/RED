@@ -231,11 +231,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if (ILaunchManager.RUN_MODE.equals(mode)) {
             launchMode = new RobotLaunchInRunMode(robotEventBroker);
 
-        } else if (ILaunchManager.DEBUG_MODE.equals(mode) && !robotConfig.isRemoteDefined()) {
-            launchMode = new RobotLaunchInDebugMode(robotEventBroker);
-
         } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-            launchMode = new RobotLaunchInRemoteDebugMode(robotEventBroker);
+            launchMode = new RobotLaunchInDebugMode(robotEventBroker);
         }
         launchMode.launch(robotConfig, launch, monitor);
     }

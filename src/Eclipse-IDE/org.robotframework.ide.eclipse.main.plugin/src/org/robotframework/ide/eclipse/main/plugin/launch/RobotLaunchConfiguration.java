@@ -42,12 +42,11 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
-public class RobotLaunchConfiguration {
+public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
 
     static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
@@ -61,9 +60,6 @@ public class RobotLaunchConfiguration {
     private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
-    private static final String REMOTE_DEBUG_HOST_ATTRIBUTE = "Remote debug host";
-    private static final String REMOTE_DEBUG_PORT_ATTRIBUTE = "Remote debug port";
-    private static final String REMOTE_DEBUG_TIMEOUT_ATTRIBUTE = "Remote debug timeout";
 
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
 
@@ -107,7 +103,6 @@ public class RobotLaunchConfiguration {
             robotConfig.setIsExcludeTagsEnabled(false);
             robotConfig.setIncludedTags(new ArrayList<String>());
             robotConfig.setExcludedTags(new ArrayList<String>());
-            robotConfig.setRemoteDebugHost("");
             robotConfig.setIsGeneralPurposeEnabled(true);
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
@@ -136,7 +131,6 @@ public class RobotLaunchConfiguration {
             robotConfig.setIsExcludeTagsEnabled(false);
             robotConfig.setIncludedTags(new ArrayList<String>());
             robotConfig.setExcludedTags(new ArrayList<String>());
-            robotConfig.setRemoteDebugHost("");
             robotConfig.setIsGeneralPurposeEnabled(true);
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
@@ -202,6 +196,7 @@ public class RobotLaunchConfiguration {
         this.configuration = config;
     }
 
+    @Override
     public String getName() {
         return configuration.getName();
     }
@@ -231,6 +226,7 @@ public class RobotLaunchConfiguration {
         launchCopy.setAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, arguments);
     }
 
+    @Override
     public void setProjectName(final String projectName) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(PROJECT_NAME_ATTRIBUTE, projectName);
@@ -278,21 +274,6 @@ public class RobotLaunchConfiguration {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(EXCLUDED_TAGS_ATTRIBUTE, tags);
     }
-    
-    public void setRemoteDebugHost(final String host) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, host);
-    }
-    
-    public void setRemoteDebugPort(final String port) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, port);
-    }
-    
-    public void setRemoteDebugTimeout(final String timeout) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, timeout);
-    }
 
     public boolean isGeneralPurposeConfiguration() throws CoreException {
         return configuration.getAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, false);
@@ -314,6 +295,7 @@ public class RobotLaunchConfiguration {
         return configuration.getAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, "");
     }
 
+    @Override
     public String getProjectName() throws CoreException {
         return configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
     }
@@ -391,30 +373,6 @@ public class RobotLaunchConfiguration {
     
     public List<String> getExcludedTags() throws CoreException {
         return configuration.getAttribute(EXCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
-    }
-    
-    public String getRemoteDebugHost() throws CoreException {
-        return configuration.getAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, "");
-    }
-    
-    public Optional<Integer> getRemoteDebugPort() throws CoreException {
-        if (configuration.hasAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE)) {
-            final String port = configuration.getAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, "");
-            if (!port.isEmpty()) {
-                return Optional.of(Integer.parseInt(port));
-            }
-        }
-        return Optional.absent();
-    }
-    
-    public Optional<Integer> getRemoteDebugTimeout() throws CoreException {
-        if (configuration.hasAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE)) {
-            final String timeout = configuration.getAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, "");
-            if (!timeout.isEmpty()) {
-                return Optional.of(Integer.parseInt(timeout));
-            }
-        }
-        return Optional.absent();
     }
 
     public RobotProject getRobotProject() throws CoreException {
@@ -560,10 +518,6 @@ public class RobotLaunchConfiguration {
             }
         }
         return tests;
-    }
-
-    public boolean isRemoteDefined() throws CoreException {
-        return getRemoteDebugPort().isPresent() && !getRemoteDebugHost().isEmpty();
     }
 
     static boolean contentEquals(final ILaunchConfiguration config1, final ILaunchConfiguration config2)

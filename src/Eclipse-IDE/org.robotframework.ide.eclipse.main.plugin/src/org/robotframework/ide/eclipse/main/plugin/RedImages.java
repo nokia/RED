@@ -64,6 +64,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/robot.png");
     }
 
+    public static ImageDescriptor getRemoteRobotImage() {
+        return RedPlugin.getImageDescriptor("resources/robot_remote.png");
+    }
+
     public static ImageDescriptor getRobotSuiteFolderDecoratorImage() {
         return RedPlugin.getImageDescriptor("resources/decorator_suite_folder.png");
     }
@@ -360,8 +364,8 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/edit.png");
     }
     
-    public static ImageDescriptor getImageForResource(IResource resource) {
-        return ((IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class)).getImageDescriptor(resource);
+    public static ImageDescriptor getImageForResource(final IResource resource) {
+        return resource.getAdapter(IWorkbenchAdapter.class).getImageDescriptor(resource);
     }
 
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {
