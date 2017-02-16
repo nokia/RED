@@ -1,0 +1,213 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: DebugInLoopWithList
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Fy_PcKTFEeW4l-rLhvMqpg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/16/17 5:12 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "wait-for-resume-is-enable"{
+	try -times 5 -delay 1000 -command{
+		get-button "Resume.*" | get-property enablement | equals true | verify-true
+		//get-view Variables | get-tree | get-property itemCount | equals 14 | verify-true
+	}
+} 
+
+proc "check-variables" [val var ""] [val text ""]{
+	with [get-view Variables | get-tree] {
+	    get-item "${var}" | get-property "values['Value']" | equals $var | verify-true
+	    get-item "${text}" | get-property "values['Value']" | equals $text| verify-true
+	}
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//add tests
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
+    + "@{NUMBERS}      ${1}    ${2}    ${5}\n"
+    + "@{NAMES}        one     two     five\n"
+    + "@{LIST}         a    b    c\n"
+    + "@{LIST2}       ${EMPTY}  \n"
+    + "*** Test Cases ***\n"
+    + "Continue Example\n"
+    + "    ${text} =    Set Variable    ${EMPTY}\n"
+    + "    :FOR    ${var}    IN    one    two    three\n"
+    + "    \\    Continue For Loop If    '${var}' == 'two'\n"
+    + "    \\    ${text} =    Set Variable    ${text}${var}\n"
+    + "    Should Be Equal    ${text}    onethree\n\n"
+    + "Exit Example\n"
+    + "    ${text} =    Set Variable    ${EMPTY}\n"
+    + "    :FOR    ${var}    IN    one    two\n"
+    + "    \\    Run Keyword If    '${var}' == 'two'    Exit For Loop\n"
+    + "    \\    ${text} =    Set Variable    ${text}${var}\n"
+    + "    Should Be Equal    ${text}    one\n"
+    + "    \n"
+    + "For-in-zip\n"
+    + "    : FOR    ${number}    ${name}    IN ZIP    ${NUMBERS}    ${NAMES}\n"
+    + "    \\    Number Should Be Named    ${number}    ${name}\n\n\n"
+    + "For-in-enumerate\n"
+    + "    : FOR    ${index}    ${item}    IN ENUMERATE    @{LIST}\n"
+    + "    \\    My Keyword    ${index}    ${item}\n"
+    + "    \\\n\n"
+    + "# for empty list\n"
+    + "    # : FOR    ${index}    ${item}    IN ENUMERATE    @{LIST2}\n"
+    + "    # \\    My Keyword    ${index}    ${item}\n"
+    + "    # \\\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "Number Should Be Named\n"
+    + "    [Arguments]    ${index}    ${item}\n"
+    + "    Log  ${index} and ${item}\n"
+    + "    \n"
+    + "my keyword\n"
+    + "    [Arguments]    ${index}    ${item}\n"
+    + "    Log  ${index} and ${item}"
+    
+get-button "Save (M1+S)" | click
+    
+//add breakpoints 
+with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+	double-click-ruler 10
+    double-click-ruler 18
+    double-click-ruler 23
+    double-click-ruler 28
+}
+
+//run test
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" 
+		    | get-menu "Debug As/1 Robot Test" | click
+	wait 3000
+	wait-for-resume-is-enable
+	
+	//line 10
+	check-debug-marker-on-ruler -line 10 -script_name "TestFile.robot"
+	with [get-view Debug | get-tree] {
+    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Continue For Loop If [line:10]" 
+        | verify-true
+    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+        | get-property "getItems().TreeItem[1].getText()" | equals "${var} = one [line:9]" | verify-true
+    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+        | get-property "getItems().TreeItem[2].getText()" | equals "${var} IN [ one | two | three ] [line:9]" 
+        | verify-true
+	}
+	//check variable
+	check-variables -var "one"
+
+	//go down
+	get-button "Step Into (F5)" | click
+	  
+    wait 1000
+    check-debug-marker-on-ruler -line 11 -script_name "TestFile.robot"
+    
+    //go into
+    get-button "Step Into (F5)" | click
+    wait 1000
+    check-debug-marker-on-ruler -line 9 -script_name "TestFile.robot"
+	
+	with [get-view Debug | get-tree] {
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "${var} = two [line:9]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals "${var} IN [ one | two | three ] [line:9]" 
+	        | verify-true
+	}
+	check-variables -var "two" -text "one"
+
+	//resume to go to next for loop
+	get-button "Resume (F8)" | click
+	    wait 1000
+	    check-debug-marker-on-ruler -line 10 -script_name "TestFile.robot"
+	get-button "Resume (F8)" | click
+	    wait
+	    check-debug-marker-on-ruler -line 10 -script_name "TestFile.robot"
+	get-button "Resume (F8)" | click
+	
+	
+	//line 18
+	check-debug-marker-on-ruler -line 18 -script_name "TestFile.robot"
+	with [get-view Debug | get-tree] {
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Set Variable [line:18]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals "${var} = one [line:16]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals "${var} IN [ one | two ] [line:16]" | verify-true
+	}
+	check-variables -var "one"
+
+	//resume loop with kw: Exit For Loop
+	get-button "Resume (F8)" | click
+	
+	//BP set in test wit loop and ZIP
+	with [get-view Debug | get-tree] {
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "Number Should Be Named [line:23]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals "${number} = 1, ${name} = one [line:22]" 
+	        | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "${number} | ${name} IN ZIP [ ${NUMBERS} | ${NAMES} ] [line:22]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItemCount()" | equals 3 | verify-true
+	}
+	with [get-view Variables | get-tree] {
+	    get-item "${name}" | get-property "values['Value']" | equals one | verify-true
+	    get-item "${number}" | get-property "values['Value']" | equals 1 | verify-true
+	}
+	
+	//go to kw set in test
+	get-button "Step Into (F5)" | click
+	
+	check-debug-marker-on-ruler -line 39 -script_name "TestFile.robot"
+	
+	
+	//go to test with IN ENUMERATE
+	with [get-button "Resume (F8)"] {
+	    click
+	    click
+	    click
+	}
+	with [get-view Debug | get-tree] {
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().length" | equals 3 | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "my keyword [line:28]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals "${index} = 0, ${item} = a [line:27]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
+	        | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "${index} | ${item} IN ENUMERATE [ @{LIST} ] [line:27]" | verify-true
+	}
+	with [get-view Variables | get-tree] {
+	    get-item "${index}" | get-property "values['Value']" | equals 0 | verify-true
+	    get-item "${item}" | get-property "values['Value']" | equals a | verify-true
+	}
+	with [get-button "Resume (F8)"] {
+	    click
+	    wait 300
+	    click
+	    wait 300
+	    click
+	}  
+} 
+
+get-view Console | get-text-viewer | get-property text 
+    | contains
+     "==============================================================================\n"
+    + "RobotProject                                                          | PASS |\n"
+    + "4 critical tests, 4 passed, 0 failed\n"
+    + "4 tests total, 4 passed, 0 failed\n"
+    + "==============================================================================\n" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
