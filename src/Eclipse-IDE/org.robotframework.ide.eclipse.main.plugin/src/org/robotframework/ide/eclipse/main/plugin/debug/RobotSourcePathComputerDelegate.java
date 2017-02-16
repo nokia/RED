@@ -14,7 +14,7 @@ import org.eclipse.debug.core.sourcelookup.ISourceContainer;
 import org.eclipse.debug.core.sourcelookup.ISourcePathComputerDelegate;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 
 public class RobotSourcePathComputerDelegate implements ISourcePathComputerDelegate {
 
@@ -22,7 +22,12 @@ public class RobotSourcePathComputerDelegate implements ISourcePathComputerDeleg
     public ISourceContainer[] computeSourceContainers(final ILaunchConfiguration configuration, final IProgressMonitor monitor)
             throws CoreException {
 
-        final String projectName = new RobotLaunchConfiguration(configuration).getProjectName();
+        final String projectName = LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration)
+                .getProjectName();
+        if (projectName.isEmpty()) {
+            return new ISourceContainer[0];
+        }
+
         final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
         final ISourceContainer container = project.exists() ? new ProjectSourceContainer(project, true)
                 : new WorkspaceSourceContainer();

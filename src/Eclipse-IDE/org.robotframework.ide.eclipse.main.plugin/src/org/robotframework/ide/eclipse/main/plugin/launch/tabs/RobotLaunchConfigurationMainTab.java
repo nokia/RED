@@ -39,8 +39,8 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.InterpretersComposite.InterpreterListener;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationValidator.RobotLaunchConfigurationValidationException;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationValidator.RobotLaunchConfigurationValidationFatalException;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationException;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuitesListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.TagsListener;
 import org.robotframework.red.graphics.ImagesManager;
@@ -133,13 +133,13 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         try {
             suitesToRunComposite.switchTo(robotConfig.getProjectName());
-            new RobotLaunchConfigurationValidator().validate(robotConfig);
+            new LaunchConfigurationsValidator().validate(robotConfig);
 
             return userDoNotWriteNewTagCurrently();
-        } catch (final RobotLaunchConfigurationValidationException e) {
+        } catch (final LaunchConfigurationValidationException e) {
             setWarningMessage(e.getMessage());
             return userDoNotWriteNewTagCurrently();
-        } catch (final RobotLaunchConfigurationValidationFatalException e) {
+        } catch (final LaunchConfigurationValidationFatalException e) {
             setErrorMessage(e.getMessage());
             return false;
         } catch (final CoreException e) {
