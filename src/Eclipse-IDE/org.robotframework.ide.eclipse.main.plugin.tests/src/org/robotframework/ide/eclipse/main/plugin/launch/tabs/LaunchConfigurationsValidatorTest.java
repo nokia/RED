@@ -166,8 +166,8 @@ public class LaunchConfigurationsValidatorTest {
     public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage(CoreMatchers
-                .either(CoreMatchers.equalTo("Following suites does not exist: /" + PROJECT_NAME + "/file2.robot, /"
-                        + PROJECT_NAME + "/suite/dir."))
+                .<String> either(CoreMatchers.equalTo("Following suites does not exist: /" + PROJECT_NAME
+                        + "/file2.robot, /" + PROJECT_NAME + "/suite/dir."))
                 .or(CoreMatchers.equalTo("Following suites does not exist: /" + PROJECT_NAME + "/suite/dir, /"
                         + PROJECT_NAME + "/file2.robot.")));
 
