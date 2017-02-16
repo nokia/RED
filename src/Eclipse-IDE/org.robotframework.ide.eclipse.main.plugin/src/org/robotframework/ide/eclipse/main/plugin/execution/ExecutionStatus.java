@@ -8,14 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.execution;
 import java.util.List;
 
 import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
+import org.rf.ide.core.execution.Status;
 
 public class ExecutionStatus {
-
-    public enum Status {
-        PASS,
-        FAIL,
-        RUNNING
-    }
 
     private final String name;
 

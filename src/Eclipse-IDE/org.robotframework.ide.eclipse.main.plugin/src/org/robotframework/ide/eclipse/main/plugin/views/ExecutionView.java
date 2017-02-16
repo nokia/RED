@@ -53,11 +53,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
-import org.rf.ide.core.execution.ExecutionElementsParser;
+import org.rf.ide.core.execution.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.execution.CollapseAllAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus;
-import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Status;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewContentProvider;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
@@ -357,7 +356,7 @@ public class ExecutionView {
         } else {
             final ExecutionStatus lastSuite = suitesStack.getLast();
             newSuiteExecutionStatus.setParent(lastSuite);
-            newSuiteExecutionStatus.setSource(executionElement.getSource());
+            newSuiteExecutionStatus.setSource(executionElement.getSource().getAbsolutePath());
             lastSuite.addChildren(newSuiteExecutionStatus);
             suitesStack.addLast(newSuiteExecutionStatus);
         }
@@ -381,7 +380,7 @@ public class ExecutionView {
             final ExecutionStatus lastSuite = suitesStack.getLast();
             final int elapsedTime = executionElement.getElapsedTime();
             lastSuite.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
-            final Status status = getStatus(executionElement);
+            final Status status = executionElement.getStatus();
             lastSuite.setStatus(status);
             if (suitesStack.size() > 1) {
                 suitesStack.removeLast();
@@ -396,7 +395,7 @@ public class ExecutionView {
         if (!suitesStack.isEmpty()) {
             final ExecutionStatus lastSuite = suitesStack.getLast();
             final List<ExecutionStatus> lastSuiteChildren = lastSuite.getChildren();
-            final Status status = getStatus(executionElement);
+            final Status status = executionElement.getStatus();
             final int elapsedTime = executionElement.getElapsedTime();
             for (final ExecutionStatus executionStatus : lastSuiteChildren) {
                 if (executionStatus.getName().equals(executionElement.getName()) && executionStatus.getStatus() == Status.RUNNING) {
@@ -421,11 +420,6 @@ public class ExecutionView {
     
     private void handleOutputFileEvent(final ExecutionElement executionElement) {
         rerunFailedOnlyAction.setOutputFilePath(executionElement.getName());
-    }
-    
-    private Status getStatus(final ExecutionElement executionElement) {
-        return executionElement.getStatus().equals(ExecutionElementsParser.ROBOT_EXECUTION_PASS_STATUS) ? Status.PASS
-                : Status.FAIL;
     }
     
     private void setViewerInput() {
