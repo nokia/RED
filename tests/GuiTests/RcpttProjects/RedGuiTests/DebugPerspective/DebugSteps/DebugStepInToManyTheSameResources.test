@@ -1,34 +1,19 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_DRQBQH8PEeW0tcB67YpNxw
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_DRQBQH8PEeW0tcB67YpNxw,_2Q6oEPOSEeaWpbE3jg39cA
 Element-Name: DebugStepInToManyTheSameResources
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _1GCpAILuEeW3Y6KfPyHe6A
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/15/16 5:13 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/16/17 5:43 PM
 Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
-
-proc "wait-for-threads" [val nr_items_in_thread 3]{	
-	try -times 8 -delay 1000 -command{
-		get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
-    		| get-property childCount | equals $nr_items_in_thread | verify-true
-    
-	}
-	try -times 3 -delay 1000 -command{
-		with [get-view Debug | get-tree] {
-		   get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
-		        | get-property [format "getItems().TreeItem[%s].getText()" [minus $nr_items_in_thread 1]] -raw|  not-eq "" | verify-true
-		}
-	}
-	
-}
 
 with [get-view "Project Explorer" | get-tree] {
     select "MediumRobotTest/Script.robot" | select "MediumRobotTest/Script.robot" | double-click
@@ -58,7 +43,7 @@ exec-with-options -disableJobWaiting -command {
 	}
 	
 	get-button "Step Into (F5)" | click
-	wait-for-threads -nr_items_in_thread 2
+	wait-for-specific-nr-of-threads -nr_items_in_thread 2
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
@@ -80,7 +65,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-property tabCount | equals 2 | verify-true
 	}
 	get-button "Step Into (F5)" | click
-	wait-for-threads - -nr_items_in_thread 2 
+	wait-for-specific-nr-of-threads - -nr_items_in_thread 2 
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
@@ -93,7 +78,7 @@ exec-with-options -disableJobWaiting -command {
 	    + "from res 2\n"
 	    + "    Log  ${a}" | verify-true
 	get-button "Step Into (F5)" | click
-	wait-for-threads -nr_items_in_thread 1
+	wait-for-specific-nr-of-threads -nr_items_in_thread 1
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
@@ -101,7 +86,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-property tabCount | equals 2 | verify-true
 	}
 	get-button "Step Into (F5)" | click
-	wait-for-threads -nr_items_in_thread 2
+	wait-for-specific-nr-of-threads -nr_items_in_thread 2
 	with [get-tab-folder -index 2] {
 	    get-property "pages[0]" | equals "Script.robot" | verify-true
 	    get-property "pages[1]" | equals "res.robot" | verify-true
