@@ -459,6 +459,43 @@ public class RobotLaunchConfiguration {
         }
     }
 
+    public boolean isSuitableForOnly(final List<IResource> resources) {
+        try {
+            final List<IResource> toCall = newArrayList();
+            toCall.addAll(resources);
+            final Set<String> canCall = getSuitePaths().keySet();
+            if (toCall.size() != canCall.size()) {
+                return false;
+            }
+            for (final IResource resource : resources) {
+                final IProject project = resource.getProject();
+                if (!getProjectName().equals(project.getName())) {
+                    return false;
+                }
+                boolean exists = false;
+                for (final String path : getSuitePaths().keySet()) {
+                    final IResource res = project.findMember(Path.fromPortableString(path));
+                    if (res != null && res.equals(resource)) {
+                        exists = true;
+                        toCall.remove(res);
+                        canCall.remove(path);
+                        break;
+                    }
+                }
+                if (!exists) {
+                    return false;
+                }
+            }
+            if (toCall.size() == 0 && canCall.size() == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (final CoreException e) {
+            return false;
+        }
+    }
+
     public String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
         return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getExecutor().executableName();
     }
@@ -527,6 +564,23 @@ public class RobotLaunchConfiguration {
 
     public boolean isRemoteDefined() throws CoreException {
         return getRemoteDebugPort().isPresent() && !getRemoteDebugHost().isEmpty();
+    }
+
+    static boolean contentEquals(final ILaunchConfiguration config1, final ILaunchConfiguration config2)
+            throws CoreException {
+        final RobotLaunchConfiguration rConfig1 = new RobotLaunchConfiguration(config1);
+        final RobotLaunchConfiguration rConfig2 = new RobotLaunchConfiguration(config2);
+        return rConfig1.getExecutor().equals(rConfig2.getExecutor())
+                && rConfig1.getExecutorArguments().equals(rConfig2.getExecutorArguments())
+                && rConfig1.getProjectName().equals(rConfig2.getProjectName())
+                && rConfig1.isUsingInterpreterFromProject() == rConfig2.isUsingInterpreterFromProject()
+                && rConfig1.getInterpreterArguments().equals(rConfig2.getInterpreterArguments())
+                && rConfig1.isExcludeTagsEnabled() == rConfig2.isExcludeTagsEnabled()
+                && rConfig1.isIncludeTagsEnabled() == rConfig2.isIncludeTagsEnabled()
+                && rConfig1.isGeneralPurposeConfiguration() == rConfig2.isGeneralPurposeConfiguration()
+                && rConfig1.getExcludedTags().equals(rConfig2.getExcludedTags())
+                && rConfig1.getIncludedTags().equals(rConfig2.getIncludedTags())
+                && rConfig1.getSuitePaths().equals(rConfig2.getSuitePaths());
     }
 
     private static CoreException newCoreException(final String message) {

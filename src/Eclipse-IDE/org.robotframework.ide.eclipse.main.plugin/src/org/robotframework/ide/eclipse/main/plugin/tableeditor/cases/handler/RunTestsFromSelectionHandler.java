@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
 import javax.inject.Named;
@@ -34,14 +32,7 @@ public class RunTestsFromSelectionHandler extends DIParameterizedHandler<E4RunTe
                 @Named(RunTestFromTableDynamicMenuItem.RUN_TEST_COMMAND_MODE_PARAMETER) final String mode) {
 
             if (!selection.isEmpty()) {
-                final List<RobotCasesSection> testSuites = newArrayList();
-                for (final Object o : selection.toList()) {
-                    RobotCasesSection section = null;
-                    if (o instanceof RobotCasesSection) {
-                        section = (RobotCasesSection) o;
-                        testSuites.add(section);
-                    }
-                }
+                final List<RobotCasesSection> testSuites = Selections.getElements(selection, RobotCasesSection.class);
                 RunTestSuiteAction.runTestSuite(new StructuredSelection(testSuites), Mode.valueOf(mode));
             }
 
