@@ -47,7 +47,7 @@ public class RobotDryRunLibraryImport {
             this.importersPaths.add(importerPath);
         }
         this.args.addAll(args);
-        this.status = DryRunLibraryImportStatus.NOT_ADDED;
+        this.status = DryRunLibraryImportStatus.ADDED;
         this.additionalInfo = "";
     }
 
