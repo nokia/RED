@@ -1,0 +1,211 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: ConditionalBreakpointsInDebug
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _S92Q4PQzEeaWpbE3jg39cA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/16/17 2:28 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add test to file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  9\n"
+    + "    log  10\n"
+    + "    \n"
+    + "test 2\n"
+    + "    log  7  \n"
+    + "    second kw  \n\n"
+    + "*** Keywords ***\n"
+    + "my keyword\n"
+    + "    Fail  \"Special filing kw\"\n"
+    + "    \n"
+    + "second kw\n"
+    + "    Should Be Equal    1    1\n"
+    + "    \n"
+    + "my kw with args\n"
+    + "    [Arguments]    ${x}\n"
+    + "    Fail  \"this will fail too\"    \n"
+    + "    \n"
+    + "this will pass\n"
+    + "    log  8" 
+
+get-button "Save \((Ctrl|M1)\+S\)" | click
+    
+//set BP in test and in kw
+with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+    double-click-ruler 3
+    double-click-ruler 15
+}
+//add to line 3 conditional
+get-button "Open Perspective" | click
+get-window "Open Perspective" | get-table | select Debug | double-click
+
+with [get-view Breakpoints] {
+    get-tree | select "TestFile.robot [line: 3]"
+    get-button Conditional | check
+    with [get-editbox -index 1] {
+        set-text "my keyword"
+        key-type "M1+s"
+    }
+    //add to line 15 conditional - test that will fail and has arg
+    get-tree | select "TestFile.robot \\[line: 15\\]" | double-click
+    get-button Conditional | check
+    with [get-editbox -index 1] {
+        set-text "my kw with args  text"
+        key-type "M1+s"
+    }
+}
+//run test - it should be not stopped
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 15 30
+get-button "Debug.*" | click
+
+//add 1 arg more (incorrect value)
+with [get-view Breakpoints | get-editbox -index 1] {
+    set-text "my kw with args  text  9"
+    key-type "M1+s"
+}
+
+//run test
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 15 30
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	
+	try -times 4 -delay 1000 -command{
+		//error
+		get-window "Conditional Breakpoint Error" | get-label "Reason:Keyword 'my kw with args' expected 1 argument, got 2." 
+		    | get-property caption | equals "Reason:\n"
+		    + "Keyword 'my kw with args' expected 1 argument, got 2." | verify-true
+	}	    
+	get-window "Conditional Breakpoint Error" | get-button OK | click
+	
+	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
+	get-button "Resume (F8)" | click
+}
+//remove all args	
+with [get-view Breakpoints | get-editbox -index 1] {
+    set-text "my kw with args"
+    key-type "M1+s"
+}
+
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 13 5
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	
+	//error
+	try -times 4 -delay 1000 -command{
+		get-window "Conditional Breakpoint Error" | get-label "Reason:Keyword 'my kw with args' expected 1 argument, got 0." 
+		    | get-property caption | equals "Reason:\n"
+		    + "Keyword 'my kw with args' expected 1 argument, got 0." | verify-true
+	}	    
+	get-window "Conditional Breakpoint Error" | get-button OK | click
+	
+	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
+	get-button "Resume (F8)" | click
+}	
+
+//set built-in kw Should be equal with result = True
+with [get-view Breakpoints] {
+    with [get-editbox -index 1] {
+        click-text 1
+        set-text "Should be equal  1  1"
+        key-type "M1+s"
+    }
+    
+    //set user kw with result = True
+    get-tree | select "TestFile.robot [line: 3] [conditional]"
+    with [get-editbox -index 1] {
+        set-text "this will pass"
+        key-type "M1+s"
+    }
+}
+
+
+//run test
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 10 17
+
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	
+	check-debug-marker-on-ruler -line 3 -script_name "TestFile.robot"
+	get-button "Resume (F8)" | click
+	
+	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
+	get-button "Resume (F8)" | click
+	
+	
+}
+
+
+//set kw that not exist
+with [get-view Breakpoints | get-editbox -index 1] {
+    set-text "no kw"
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 5 5
+
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	
+	try -times 4 -delay 1000 -command{
+		get-window "Conditional Breakpoint Error" | get-label "Reason:No keyword with name 'no kw' found." 
+		    | get-property caption | equals "Reason:\n"
+		    + "No keyword with name 'no kw' found." | verify-true
+	}		    
+	get-window "Conditional Breakpoint Error" | get-button OK | click
+	with [get-button "Resume (F8)"] {
+	    click
+	    wait 500
+	    click
+	}
+}	
+
+
+//uncheck failing BP
+get-view Breakpoints | get-tree | select "TestFile.robot [line: 3] [conditional]" 
+    | get-item "TestFile.robot \\[line: 3\\] \\[conditional\\]" | uncheck
+
+//run test
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 11 11
+
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	get-button "Terminate (M1+F2)" | click
+}	
+
+//remove failing BP
+with [get-view Breakpoints] {
+    get-tree | select "TestFile.robot [line: 3] [conditional]"
+    get-button "Remove Selected Breakpoints (Delete)" | click
+    
+    //set empty BP in line 15
+    with [get-editbox -index 1] {
+        set-text ""
+        key-type "M1+s"
+    }
+}
+
+//add new BP and run test
+get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 8
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug TestFile.robot" | click
+	wait-for-thread -file "TestFile.robot"
+	
+	with [get-button "Resume (F8)"] {
+	    click
+	    wait 500
+	    click
+	}
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
