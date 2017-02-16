@@ -5,14 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +34,15 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.rf.ide.core.execution.RedToAgentMessage;
+import org.rf.ide.core.execution.RobotAgentEventListener;
+import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
-import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher.ExecutionEvent;
+import org.robotframework.ide.eclipse.main.plugin.debug.DebugExecutionEventsListener;
+import org.robotframework.ide.eclipse.main.plugin.debug.ExecutionTrackerForExecutionView;
+import org.robotframework.ide.eclipse.main.plugin.debug.MessagesTrackerForLogView;
+import org.robotframework.ide.eclipse.main.plugin.debug.RemoteMessagesConsoleWriter;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotAgentEventsJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugStackFrameManager;
@@ -43,7 +51,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariable
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
-import com.google.common.base.Optional;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 
 /**
@@ -155,10 +163,21 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         
         robotDebugStackFrameManager = new RobotDebugStackFrameManager(thread);
 
-        final RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, suiteResources,
-                robotEventBroker,
-                isRemoteDebugging ? Optional.of(consoleFacade) : Optional.<RobotConsoleFacade> absent());
-        eventDispatcher.schedule();
+        final RobotDebugExecutionContext executionContext = new RobotDebugExecutionContext();
+        final List<RobotAgentEventListener> listeners = new ArrayList<>();
+        listeners.add(new DebugExecutionEventsListener(this, suiteResources, executionContext));
+        if (isRemoteDebugging) {
+            listeners.add(new RemoteMessagesConsoleWriter(executionContext, consoleFacade));
+        }
+        listeners.add(new MessagesTrackerForLogView(robotEventBroker));
+        listeners.add(new ExecutionTrackerForExecutionView(robotEventBroker));
+        final RobotAgentEventsJob eventsJob = new RobotAgentEventsJob(new Supplier<BufferedReader>() {
+            @Override
+            public BufferedReader get() {
+                return getEventReader();
+            }
+        }, listeners.toArray(new RobotAgentEventListener[0]));
+        eventsJob.schedule();
 
         DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
     }
@@ -225,7 +244,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public void terminate() throws DebugException {
         if (eventSocket != null) {
-            sendExecutionEventToAgent(RobotDebugEventDispatcher.ExecutionEvent.INTERRUPT_EXECUTION);
+            sendMessageToAgent(RedToAgentMessage.INTERRUPT_EXECUTION);
         }
         terminated();
     }
@@ -253,13 +272,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public void resume() throws DebugException {
         thread.setStepping(false);
-        sendExecutionEventToAgent(RobotDebugEventDispatcher.ExecutionEvent.RESUME_EXECUTION);
+        sendMessageToAgent(RedToAgentMessage.RESUME_EXECUTION);
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
     protected void step() {
         thread.setStepping(true);
-        sendExecutionEventToAgent(RobotDebugEventDispatcher.ExecutionEvent.RESUME_EXECUTION);
+        sendMessageToAgent(RedToAgentMessage.RESUME_EXECUTION);
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
@@ -409,59 +428,31 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    /**
-     * Sends a message to the TestRunnerAgent
-     * 
-     * @param event
-     */
-    public void sendEventToAgent(final String event) {
+    public void sendMessageToAgent(final RedToAgentMessage message, final String... arguments) {
+        final String msg = message.createMessage(arguments);
         synchronized (eventSocket) {
-            eventWriter.print(event);
+            eventWriter.print(msg);
             eventWriter.flush();
         }
     }
-    
-    public void sendExecutionEventToAgent(final ExecutionEvent event) {
-        sendEventToAgent(event.getMessage());
-    }
 
-    /**
-     * Sends a message with change variable request to the TestRunnerAgent
-     * 
-     * @param variable
-     * @param value
-     */
-    public void sendChangeVariableRequest(final String variable, final String value) {
-        sendEventToAgent("{\"" + variable + "\":[\"" + value + "\"]}");
-    }
-    
-    /**
-     * Sends a message with change variable request to the TestRunnerAgent
-     * 
-     * @param variable
-     * @param childList
-     * @param value
-     */
-    public void sendChangeCollectionRequest(final String variable, final List<String> childList, final String value) {
-        final StringBuilder requestJson = new StringBuilder();
-        requestJson.append("{\"" + variable + "\":[");
-        for (int i = 0; i < childList.size(); i++) {
-            requestJson.append("\"" + childList.get(i) + "\",");
-        }
-        requestJson.append("\"" + value + "\"]}");
-        sendEventToAgent(requestJson.toString());
-    }
-    
     public void sendChangeRequest(final String expression, final String variableName, final RobotDebugVariable parent) {
         if (parent != null) {
-            final LinkedList<String> childNameList = new LinkedList<String>();
+            final List<String> childNameList = new ArrayList<>();
             final String root = robotVariablesManager.extractVariableRootAndChilds(parent, childNameList, variableName);
-            sendChangeCollectionRequest(root, childNameList, expression);
+
+            final List<String> arguments = newArrayList();
+            arguments.add(root);
+            arguments.addAll(childNameList);
+            arguments.add(expression);
+
+            sendMessageToAgent(RedToAgentMessage.VARIABLE_CHANGE_REQUEST, arguments.toArray(new String[0]));
+
         } else {
-            sendChangeVariableRequest(variableName, expression);
+            sendMessageToAgent(RedToAgentMessage.VARIABLE_CHANGE_REQUEST, variableName, expression);
         }
     }
-
+    
     public boolean hasStepOver() {
         return thread.isSteppingOver() && currentStepOverLevel <= currentKeywordDebugContextMap.size();
     }

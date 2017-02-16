@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.execution;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Status;
+import org.rf.ide.core.execution.Status;
 import org.robotframework.red.viewers.TreeContentProvider;
 
 public class ExecutionViewContentProvider extends TreeContentProvider {
@@ -27,7 +27,7 @@ public class ExecutionViewContentProvider extends TreeContentProvider {
             final List<ExecutionStatus> children = ((ExecutionStatus) parentElement).getChildren();
 
             if (isFailedFilterEnabled) {
-                final List<ExecutionStatus> failedChildren = new ArrayList<ExecutionStatus>();
+                final List<ExecutionStatus> failedChildren = new ArrayList<>();
                 for (final ExecutionStatus executionStatus : children) {
                     if (executionStatus.getStatus() == Status.FAIL) {
                         failedChildren.add(executionStatus);

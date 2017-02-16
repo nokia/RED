@@ -12,15 +12,12 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
+import org.rf.ide.core.execution.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
-import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus.Status;
 import org.robotframework.red.graphics.ImagesManager;
 
 public class ExecutionViewLabelProvider extends StyledCellLabelProvider {
-
-    public ExecutionViewLabelProvider() {
-    }
 
     @Override
     public void update(final ViewerCell cell) {

@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -28,8 +26,6 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
-
-import com.google.common.base.Joiner;
 
 public class KeywordExecutionManager {
 
@@ -121,17 +117,6 @@ public class KeywordExecutionManager {
             }
         }
         return hasBreakpoint;
-    }
-
-    public String createJsonFromBreakpointCondition() {
-        final List<String> conditionElements = newArrayList(breakpointCondition.split("(\\s{2,}|\t)"));// two or more spaces or tab
-        if (conditionElements.isEmpty()) {
-            return "{\"keywordCondition\":[]}";
-        }
-
-        final String keywordName = conditionElements.remove(0);
-        return "{\"keywordCondition\":[\"" + keywordName + "\", [\"" + Joiner.on("\", \"").join(conditionElements)
-                + "\"]]}";
     }
 
     private boolean isBreakpointSourceFileInCurrentExecutionContext(final IResource breakpointSourceFile,
@@ -251,14 +236,6 @@ public class KeywordExecutionManager {
         this.currentResourceFile = currentResourceFile;
     }
 
-    public String getBreakpointCondition() {
-        return breakpointCondition;
-    }
-
-    public void setBreakpointCondition(final String breakpointCondition) {
-        this.breakpointCondition = breakpointCondition;
-    }
-
     public IPath getCurrentSuiteLocation() {
         return currentSuiteLocation;
     }
@@ -267,4 +244,15 @@ public class KeywordExecutionManager {
         this.currentSuiteParent = currentSuiteParent;
     }
 
+    public boolean hasBreakpointCondition() {
+        return !breakpointCondition.isEmpty();
+    }
+
+    public String[] getBreakpointConditionCall() {
+        return breakpointCondition.split("(\\s{2,}|\t)");
+    }
+
+    public void resetBreakpointCondition() {
+        this.breakpointCondition = "";
+    }
 }
