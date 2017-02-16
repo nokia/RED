@@ -272,8 +272,8 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     final ReferencedLibrary newLibrary = ReferencedLibrary.create(LibraryType.PYTHON,
                             libraryImport.getName(), path.toPortableString());
                     addLibraries(Collections.singletonList(newLibrary));
-                    libraryImport.setStatus(DryRunLibraryImportStatus.ADDED);
                 } else {
+                    libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                     libraryImport.setAdditionalInfo(e.getMessage());
                 }
             }
@@ -298,6 +298,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         .provideEntriesFromFile(libraryImport.getSourcePath());
                 addReferencedLibrariesFromClasses(libraryImport, libraryClasses);
             } catch (final RobotEnvironmentException e) {
+                libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                 libraryImport.setAdditionalInfo(e.getMessage());
             }
         }
@@ -312,8 +313,8 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             }
             if (!librariesToAdd.isEmpty()) {
                 addLibraries(librariesToAdd);
-                libraryImport.setStatus(DryRunLibraryImportStatus.ADDED);
             } else {
+                libraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                 libraryImport.setAdditionalInfo("RED was unable to find class '" + libraryImport.getName()
                         + "' inside '" + libraryImport.getSourcePath() + "' module.");
             }
