@@ -96,8 +96,7 @@ public class ResourceImporter {
         return Optional.absent();
     }
 
-    public void importDebugResource(final RobotFileOutput robotFile, final String path) {
-        final File toImport = new File(path);
+    public void importDebugResource(final RobotFileOutput robotFile, final File toImport) {
         final List<RobotFileOutput> parsedFiles = parser.parse(toImport);
         if (parsedFiles.isEmpty()) {
             robotFile.addBuildMessage(

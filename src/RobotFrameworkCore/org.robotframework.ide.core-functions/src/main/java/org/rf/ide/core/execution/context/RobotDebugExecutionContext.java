@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.execution.context;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class RobotDebugExecutionContext {
 
     private RobotParser robotParser;
 
-    private final List<String> resourceImportPaths;
+    private final List<File> resourceImportPaths;
 
     private final List<KeywordContext> currentKeywords;
 
@@ -49,7 +50,7 @@ public class RobotDebugExecutionContext {
         resourceImportPaths = new ArrayList<>();
     }
 
-    public void resourceImport(final String path) {
+    public void resourceImport(final File path) {
         if (isInSuite()) { // import during suite execution
             new ResourceImporter(robotParser).importDebugResource(currentModel.getParent(), path);
             executableRowFindersManager
@@ -63,7 +64,7 @@ public class RobotDebugExecutionContext {
         this.currentModel = robotFileOutput.getFileModel();
         this.robotParser = robotParser;
 
-        for (final String path : resourceImportPaths) {
+        for (final File path : resourceImportPaths) {
             new ResourceImporter(robotParser).importDebugResource(robotFileOutput, path);
         }
         resourceImportPaths.clear();
@@ -186,6 +187,10 @@ public class RobotDebugExecutionContext {
         return currentModel != null;
     }
 
+    public boolean isInTest() {
+        return executableRowFindersManager.hasCurrentTestCase();
+    }
+
     protected static class TestCaseExecutionRowCounter {
 
         private int counter = 0;
@@ -203,7 +208,7 @@ public class RobotDebugExecutionContext {
         }
     }
 
-    protected enum ForLoopKeywordTypes {
+    private enum ForLoopKeywordTypes {
         NEW_FOR("For"), // since Robot 3.0 a2
         TEST_FOR("Test For"),
         SUITE_FOR("Suite For");

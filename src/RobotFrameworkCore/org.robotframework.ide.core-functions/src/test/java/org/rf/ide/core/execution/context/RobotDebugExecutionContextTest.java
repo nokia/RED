@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -769,7 +768,7 @@ public class RobotDebugExecutionContextTest {
         final RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_10.robot", parser);
 
         debugExecutionContext
-                .resourceImport(Paths.get(this.getClass().getResource("resources/resource1.robot").toURI()).toString());
+                .resourceImport(new File(getClass().getResource("resources/resource1.robot").toURI()));
 
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
@@ -822,7 +821,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword("Keyword");
 
         debugExecutionContext
-                .resourceImport(Paths.get(this.getClass().getResource("resources/resource1.robot").toURI()).toString());
+                .resourceImport(new File(getClass().getResource("resources/resource1.robot").toURI()));
 
         debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword", Arrays.asList(""));
         checkKeywordLine8();

@@ -158,9 +158,9 @@ class TestRunnerAgent:
         if len(args) >= 3 and args[2].lower() == 'no_wait' or len(args) >= 4 and args[3].lower() == 'no_wait':
             return 
         
-        self._send_socket('ready to start')
+        self._send_socket('ready_to_start')
         data = ''
-        while data != 'do start':
+        while data != 'do_start':
             data = self.sock.recv(4096).decode('utf-8')
 
     def _create_debugger(self, pause_on_failure):
@@ -302,7 +302,7 @@ class TestRunnerAgent:
         while data != 'stop' and data != 'continue' and data != 'interrupt':
             data = self.sock.recv(4096).decode('utf-8')
             if data != 'stop' and data != 'continue' and data != 'interrupt':
-                self._run_keyword(data)
+                self._run_condition_keyword(data)
         if data == 'stop':
             return True
         if data == 'continue':
@@ -310,30 +310,27 @@ class TestRunnerAgent:
         if data == 'interrupt':
             sys.exit()
 
-    def _run_keyword(self, data):
+    def _run_condition_keyword(self, data):
         if _JSONAVAIL:
             json_decoder = json.JSONDecoder(strict=False).decode
             try:
                 condition = json_decoder(data)
-                list = condition['keywordCondition']
-                keywordName = list[0]
-                if len(list) == 1:
-                    argList = []
-                else:
-                    argList = list[1]
+                elements = condition['keyword_condition']
+                keywordName, argList = elements[0], elements[1:]
+                
                 from robot.libraries.BuiltIn import BuiltIn
                 result = BuiltIn().run_keyword_and_return_status(keywordName, *argList)
+                
                 self._send_socket('condition_result', result)
             except Exception as e:
                 self._send_socket('condition_error', str(e))
-                pass
         self._send_socket('condition_checked')
 
     def _check_changed_variable(self, data):
         if _JSONAVAIL:
             json_decoder = json.JSONDecoder(strict=False).decode
             try:
-                js = json_decoder(data)
+                js = json_decoder(data)['variable_change']
                 from robot.libraries.BuiltIn import BuiltIn
                 vars = BuiltIn().get_variables()
                 for key in js.keys():
