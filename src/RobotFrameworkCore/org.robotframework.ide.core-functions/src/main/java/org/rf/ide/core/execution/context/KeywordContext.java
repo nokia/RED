@@ -29,6 +29,10 @@ public class KeywordContext {
         return name;
     }
 
+    public String getType() {
+        return type;
+    }
+
     public int getKeywordExecutableRowCounter() {
         return keywordExecutableRowCounter;
     }
@@ -52,9 +56,4 @@ public class KeywordContext {
     public void setUserKeyword(final UserKeyword userKeyword) {
         this.userKeyword = userKeyword;
     }
-
-    public String getType() {
-        return type;
-    }
-
 }

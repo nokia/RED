@@ -90,7 +90,7 @@ public class TestRunnerAgentHandler implements Runnable {
             throw new IllegalStateException("Interrupted when waiting for agent connection!", e);
         }
         if (agentWriter != null) {
-            agentWriter.write("do start");
+            agentWriter.write("do_start");
             agentWriter.flush();
         }
     }
