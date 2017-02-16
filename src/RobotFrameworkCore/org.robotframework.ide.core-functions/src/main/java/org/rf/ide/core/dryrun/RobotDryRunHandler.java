@@ -47,13 +47,12 @@ public class RobotDryRunHandler {
         return builder.build();
     }
 
-    public void startDryRunHandlerThread(final int port, final List<ILineHandler> listeners) {
+    public Thread createDryRunHandlerThread(final int port, final List<ILineHandler> listeners) {
         final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
         for (final ILineHandler listener : listeners) {
             testRunnerAgentHandler.addListener(listener);
         }
-        final Thread handlerThread = new Thread(testRunnerAgentHandler);
-        handlerThread.start();
+        return new Thread(testRunnerAgentHandler);
     }
 
     public void executeDryRunProcess(final RunCommandLine dryRunCommandLine, final File projectDir)
