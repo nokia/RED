@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
+
 import com.google.common.io.Files;
 
 /**
@@ -62,9 +64,11 @@ public class RobotDryRunLibraryImportCollector {
                 final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName);
                 final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
                 if (libIndex < 0) {
+                    dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                     dryRunLibraryImport.setAdditionalInfo(failReason);
                     importedLibraries.add(dryRunLibraryImport);
                 } else {
+                    importedLibraries.get(libIndex).setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                     importedLibraries.get(libIndex).setAdditionalInfo(failReason);
                 }
                 currentLibraryImportWithFail = dryRunLibraryImport;
@@ -84,10 +88,12 @@ public class RobotDryRunLibraryImportCollector {
                 final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
                 if (libIndex < 0) {
                     dryRunLibraryImport.addImporterPath(importer);
+                    dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                     dryRunLibraryImport.setAdditionalInfo(message);
                     importedLibraries.add(dryRunLibraryImport);
                 } else {
                     importedLibraries.get(libIndex).addImporterPath(importer);
+                    importedLibraries.get(libIndex).setStatus(DryRunLibraryImportStatus.NOT_ADDED);
                     importedLibraries.get(libIndex).setAdditionalInfo(message);
                 }
             }
