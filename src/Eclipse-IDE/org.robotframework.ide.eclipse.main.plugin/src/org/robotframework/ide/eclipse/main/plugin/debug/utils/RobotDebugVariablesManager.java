@@ -9,6 +9,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -47,7 +48,7 @@ public class RobotDebugVariablesManager {
         this.previousVariables = new ConcurrentLinkedDeque<>();
         this.globalVariables = new HashMap<>();
         this.nestedGlobalVars = new LinkedHashMap<>();
-        this.sortedVariablesNames = new LinkedList<String>();
+        this.sortedVariablesNames = new LinkedList<>();
     }
 
     /**
@@ -65,7 +66,7 @@ public class RobotDebugVariablesManager {
     public IVariable[] extractRobotDebugVariables(final int stackTraceId, final Map<String, Object> newVariables) {
 
         final RobotDebugVariablesContext currentVariablesContext = findCurrentVariablesContext(stackTraceId);
-        Map<String, IVariable> previousVariablesMap = initPreviousVariablesState(currentVariablesContext);
+        final Map<String, IVariable> previousVariablesMap = initPreviousVariablesState(currentVariablesContext);
 
         final Map<String, IVariable> nonGlobalVariablesMap = new LinkedHashMap<>();
         if (previousVariablesMap == null) {
@@ -113,7 +114,7 @@ public class RobotDebugVariablesManager {
     }
 
     private void initVariablesComparingWithPreviousState(final Map<String, Object> newVariables,
-            Map<String, IVariable> previousVariablesMap, final Map<String, IVariable> nonGlobalVariablesMap) {
+            final Map<String, IVariable> previousVariablesMap, final Map<String, IVariable> nonGlobalVariablesMap) {
         for (final String variableName : sortedVariablesNames) {
             if (newVariables.containsKey(variableName)) {
                 if (!globalVariables.containsKey(variableName)) {
@@ -183,7 +184,7 @@ public class RobotDebugVariablesManager {
     }
 
     private LinkedList<IVariable> createCurrentVariablesList(final Map<String, IVariable> nonGlobalVariablesMap) {
-        final LinkedList<IVariable> currentVariablesList = new LinkedList<IVariable>();
+        final LinkedList<IVariable> currentVariablesList = new LinkedList<>();
         currentVariablesList.addAll(nonGlobalVariablesMap.values());
         currentVariablesList.addLast(createGlobalVariable());
         return currentVariablesList;
@@ -247,7 +248,7 @@ public class RobotDebugVariablesManager {
         return variable;
     }
 
-    public String extractVariableRootAndChilds(final RobotDebugVariable parent, final LinkedList<String> childNameList,
+    public String extractVariableRootAndChilds(final RobotDebugVariable parent, final List<String> childNameList,
             final String variableName) {
         String parentName = "";
         try {
@@ -259,7 +260,7 @@ public class RobotDebugVariablesManager {
             childNameList.add(extractChildName(variableName));
             return parentName;
         } else {
-            childNameList.addFirst(extractChildName(parentName));
+            childNameList.add(0, extractChildName(parentName));
             return extractVariableRootAndChilds(parent.getParent(), childNameList, variableName);
         }
     }
