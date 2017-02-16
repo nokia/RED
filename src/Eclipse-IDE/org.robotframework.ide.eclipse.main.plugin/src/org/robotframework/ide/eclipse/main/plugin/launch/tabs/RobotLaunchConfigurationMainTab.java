@@ -38,7 +38,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.IntepretersComposite.InterpreterListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.InterpretersComposite.InterpreterListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationValidator.RobotLaunchConfigurationValidationException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.RobotLaunchConfigurationValidator.RobotLaunchConfigurationValidationFatalException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuitesListener;
@@ -54,7 +54,7 @@ import com.google.common.base.Optional;
  */
 public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
-    private IntepretersComposite interpretersComposite;
+    private InterpretersComposite interpretersComposite;
     private Text argumentsText;
     private Text interpreterArgumentsText;
 
@@ -198,7 +198,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorGroup);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(executorGroup);
 
-        interpretersComposite = new IntepretersComposite(executorGroup, new InterpreterListener() {
+        interpretersComposite = new InterpretersComposite(executorGroup, new InterpreterListener() {
             @Override
             public void interpreterChanged(final Optional<SuiteExecutor> newExecutor) {
                 updateLaunchConfigurationDialog();

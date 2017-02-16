@@ -133,7 +133,7 @@ public class RobotLaunchConfigurationValidatorTest {
     }
 
     @Test
-    public void whenSystemIntepreterIsUsed_warningExceptionIsThrown() throws Exception {
+    public void whenSystemInterpreterIsUsed_warningExceptionIsThrown() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationException.class);
         thrown.expectMessage(CoreMatchers
                 .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable."));
