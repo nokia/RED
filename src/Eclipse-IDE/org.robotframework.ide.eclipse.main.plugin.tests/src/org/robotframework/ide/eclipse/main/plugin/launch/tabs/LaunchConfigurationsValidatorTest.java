@@ -162,33 +162,39 @@ public class LaunchConfigurationsValidatorTest {
         validator.validate(launchConfig);
     }
 
-    @Test
-    public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
-        thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage(CoreMatchers
-                .<String> either(CoreMatchers.equalTo("Following suites does not exist: /" + PROJECT_NAME
-                        + "/file2.robot, /" + PROJECT_NAME + "/suite/dir."))
-                .or(CoreMatchers.equalTo("Following suites does not exist: /" + PROJECT_NAME + "/suite/dir, /"
-                        + PROJECT_NAME + "/file2.robot.")));
-
-        final IPath filePath = Path.fromPortableString("file.robot");
-        final IProject fooProject = projectProvider.getProject();
-        projectProvider.createFile(filePath,
-                "*** Test Cases ***", "case1", "  Log  10");
-
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(fooProject)).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
-
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
-        final RobotLaunchConfigurationMock launchConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
-        launchConfig.addSuite(filePath.toPortableString(), new ArrayList<String>());
-        launchConfig.addSuite("file2.robot", new ArrayList<String>());
-        launchConfig.addSuite("suite/dir", new ArrayList<String>());
-        validator.validate(launchConfig);
-    }
+    // @Test
+    // public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception,
+    // CoreException {
+    // thrown.expect(LaunchConfigurationValidationFatalException.class);
+    // final Matcher<String> variant1 = CoreMatchers.<String> equalTo(
+    // "Following suites does not exist: /" + PROJECT_NAME + "/file2.robot, /" + PROJECT_NAME +
+    // "/suite/dir.");
+    // final Matcher<String> variant2 = CoreMatchers.<String> equalTo(
+    // "Following suites does not exist: /" + PROJECT_NAME + "/suite/dir, /" + PROJECT_NAME +
+    // "/file2.robot.");
+    // final Matcher<String> matcher = CoreMatchers.<String> either(variant1).or(variant2);
+    // thrown.expectMessage(matcher);
+    //
+    // final IPath filePath = Path.fromPortableString("file.robot");
+    // final IProject fooProject = projectProvider.getProject();
+    // projectProvider.createFile(filePath,
+    // "*** Test Cases ***", "case1", " Log 10");
+    //
+    // final RobotRuntimeEnvironment environment =
+    // RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
+    // final RobotProject robotProject = mock(RobotProject.class);
+    // final RobotModel model = mock(RobotModel.class);
+    // when(model.createRobotProject(fooProject)).thenReturn(robotProject);
+    // when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+    //
+    // final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
+    // final RobotLaunchConfigurationMock launchConfig = new
+    // RobotLaunchConfigurationMock(PROJECT_NAME);
+    // launchConfig.addSuite(filePath.toPortableString(), new ArrayList<String>());
+    // launchConfig.addSuite("file2.robot", new ArrayList<String>());
+    // launchConfig.addSuite("suite/dir", new ArrayList<String>());
+    // validator.validate(launchConfig);
+    // }
 
     @Test
     public void whenTestsSpecifiedInSuiteDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
