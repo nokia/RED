@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/8/17 10:35 AM
+Save-Time: 2/15/17 4:26 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -106,28 +106,6 @@ proc concat_str_with_regex [val log_list]
 	}] 
 
 }
-
-
-proc "check-debug-marker-on-ruler" [val line] [val script_name]{
-	get-tab-folder -index 2 | get-property activePage | equals $script_name | verify-true
- 	loop [val index 0]{
-	 	try -times 1 -command{
-			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].text" $line $index] -raw
-			| let [val marker -input]{
-				if [ $marker | not-eq "Debug Current Instruction Pointer" ] {  
-					recur [$index | plus 1]
-				}
-	
-			}
- 		}-catch{
- 			str "a" | equals "b" |assert-true -message [format "There was no debug marker in line %s!! " $line]
- 		}
-	}
-
-}
-
-
-
 
 proc "compare-message-log2" [val ref_content]{
 	get-view "Message Log" | get-editbox | get-property text -raw| let [val original_content -input]
