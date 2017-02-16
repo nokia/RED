@@ -36,9 +36,8 @@ import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
- *
  */
-class IntepretersComposite extends Composite {
+class InterpretersComposite extends Composite {
 
     private final InterpreterListener listener;
 
@@ -47,7 +46,7 @@ class IntepretersComposite extends Composite {
     private Combo comboExecutorName;
     private Button checkEnvironmentBtn;
 
-    IntepretersComposite(final Composite parent, final InterpreterListener listener) {
+    InterpretersComposite(final Composite parent, final InterpreterListener listener) {
         super(parent, SWT.NONE);
         this.listener = listener;
 
@@ -153,8 +152,7 @@ class IntepretersComposite extends Composite {
         }
 
         @Override
-        public void run(final IProgressMonitor monitor)
-                throws InvocationTargetException, InterruptedException {
+        public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
             final SuiteExecutor executor = SuiteExecutor.fromName(chosenExecutorName);
             final String version = RobotRuntimeEnvironment.getVersion(executor);
             if (version == null) {

@@ -56,7 +56,7 @@ class TagsComposite extends Composite {
         this.tagsSupport = tagsSupport;
 
         RowLayoutFactory.fillDefaults().fill(true).type(SWT.HORIZONTAL).spacing(2).wrap(true).applyTo(this);
-        createTagsConstrols(new ArrayList<String>());
+        createTagsControls(new ArrayList<String>());
         createDefinitionText();
         createAddingButton();
     }
@@ -81,7 +81,7 @@ class TagsComposite extends Composite {
         tagsSupport.install(tagNameText);
     }
 
-    private void createTagsConstrols(final Collection<String> tags) {
+    private void createTagsControls(final Collection<String> tags) {
         for (final String tag : tags) {
             tagComposites.put(tag, createTagControlFor(tag));
         }
@@ -138,10 +138,10 @@ class TagsComposite extends Composite {
                 tagComp.dispose();
             }
             tagComposites.clear();
-            createTagsConstrols(tags);
-            
-            final Control[] childrens = getChildren();
-            final Control currentLast = childrens[childrens.length - 1];
+            createTagsControls(tags);
+
+            final Control[] children = getChildren();
+            final Control currentLast = children[children.length - 1];
 
             tagNameText.moveBelow(currentLast);
             addTagButton.moveBelow(tagNameText);
@@ -168,8 +168,8 @@ class TagsComposite extends Composite {
             setRedraw(false);
             tagComposites.put(text, createTagControlFor(text));
 
-            final Control[] childrens = getChildren();
-            final Control currentLast = childrens[childrens.length - 1];
+            final Control[] children = getChildren();
+            final Control currentLast = children[children.length - 1];
 
             tagNameText.moveBelow(currentLast);
             addTagButton.moveBelow(tagNameText);
