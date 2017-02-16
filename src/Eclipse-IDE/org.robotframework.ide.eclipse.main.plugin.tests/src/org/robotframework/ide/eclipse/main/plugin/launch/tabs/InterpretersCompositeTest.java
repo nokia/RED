@@ -20,19 +20,19 @@ import org.eclipse.swt.widgets.Event;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.IntepretersComposite.InterpreterListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.InterpretersComposite.InterpreterListener;
 import org.robotframework.red.junit.ShellProvider;
 
 import com.google.common.base.Optional;
 
-public class IntepretersCompositeTest {
+public class InterpretersCompositeTest {
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
     @Test
-    public void interpretesComposite_inputSettingTest1() {
-        final IntepretersComposite composite = new IntepretersComposite(shellProvider.getShell(),
+    public void interpretersComposite_inputSettingTest1() {
+        final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(),
                 mock(InterpreterListener.class));
         composite.setInput(true, SuiteExecutor.IronPython);
 
@@ -50,8 +50,8 @@ public class IntepretersCompositeTest {
     }
 
     @Test
-    public void interpretesComposite_inputSettingTest2() {
-        final IntepretersComposite composite = new IntepretersComposite(shellProvider.getShell(),
+    public void interpretersComposite_inputSettingTest2() {
+        final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(),
                 mock(InterpreterListener.class));
         composite.setInput(false, SuiteExecutor.PyPy);
 
@@ -78,7 +78,7 @@ public class IntepretersCompositeTest {
             }
         };
 
-        final IntepretersComposite composite = new IntepretersComposite(shellProvider.getShell(), listener);
+        final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(), listener);
         composite.setInput(true, SuiteExecutor.Jython);
 
         projectInterpreterButton(composite).setSelection(false);
@@ -111,7 +111,7 @@ public class IntepretersCompositeTest {
             }
         };
 
-        final IntepretersComposite composite = new IntepretersComposite(shellProvider.getShell(), listener);
+        final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(), listener);
         composite.setInput(false, SuiteExecutor.PyPy);
 
         systemInterpreterButton(composite).setSelection(false);
@@ -144,7 +144,7 @@ public class IntepretersCompositeTest {
             }
         };
 
-        final IntepretersComposite composite = new IntepretersComposite(shellProvider.getShell(), listener);
+        final InterpretersComposite composite = new InterpretersComposite(shellProvider.getShell(), listener);
         composite.setInput(false, SuiteExecutor.PyPy);
 
         executorsCombo(composite).select(SuiteExecutor.allExecutorNames().indexOf(SuiteExecutor.Jython.name()));
