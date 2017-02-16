@@ -1,27 +1,19 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _znjMEBtDEeWSh6BKjAxDIw,_OCxtEBRGEeWWV9IuysVI_A,_XOrCoJYJEeaa4JtzzKMFzw,_d8aMACuvEeW667Afdo4DcA
+Contexts: _znjMEBtDEeWSh6BKjAxDIw,_OCxtEBRGEeWWV9IuysVI_A,_XOrCoJYJEeaa4JtzzKMFzw,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA
 Element-Name: DebugingInitInRootFolder
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Jc9QEJbWEeaa4JtzzKMFzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 2:57 PM
+Save-Time: 2/16/17 5:39 PM
 Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
-
-proc "wait-for-thread"{
-	wait 1000
-	try -times 5 -delay 1000 -command{
-		get-view Debug | get-tree | get-item "DataTest.robot .*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-		    | get-property childCount -raw | int| gt 0 | verify-true
-		}
-}
 
 //open 3 files
 with [get-view "Project Explorer" | get-tree] {
@@ -45,7 +37,7 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "DebugWithInitinroot/DataTest.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
 	wait 2000
-	wait-for-thread
+	wait-for-thread -file "DataTest.robot"
 	
 	//check every step including getting to loop
 	check-debug-marker-on-ruler -line 10 -script_name "common_resource.robot" 
@@ -97,7 +89,7 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "DebugWithInitinroot/DataTest.robot" | get-menu "Debug As/1 Robot Test" 
     | click
 	wait 2000
-	wait-for-thread
+	wait-for-thread -file "DataTest.robot"
 	
 	//check if test was stopped on BP
 	check-debug-marker-on-ruler -line 14 -script_name "common_resource.robot" 
@@ -122,7 +114,7 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "DebugWithInitinroot/DataTest.robot" | get-menu "Debug As/1 Robot Test" 
     | click
 	wait 3000
-	wait-for-thread
+	wait-for-thread -file "DataTest.robot"
 	
 	//check if test was stopped on BP in __init__ file
 	check-debug-marker-on-ruler -line 3 -script_name "__init__.robot" 

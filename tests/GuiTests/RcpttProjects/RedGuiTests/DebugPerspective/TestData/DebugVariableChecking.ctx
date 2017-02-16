@@ -1,0 +1,125 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: DebugVariableChecking
+Element-Type: context
+Element-Version: 2.0
+Id: _TbZGMInnEeWHhtZu19MBKw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 12/9/15 3:49 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "check-yellow-background-color" [val changed_lines]{
+	$changed_lines | each [val element]{
+	 	with [get-view Variables | get-tree] {
+		  	get-item ".*" -index $element | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
+		}
+	}
+
+}
+
+proc "check-normal-background-color"{
+	get-view Variables | get-tree | get-property itemCount -raw |int |let [val line_number -input]{
+		repeat [val index] -times $line_number -command{
+			 with [get-view Variables | get-tree] {
+				  get-item ".*" -index $index | get-property "columnsBackgroundColor[0]" | equals "#FFFFFF" | verify-true
+			}
+		}	
+	}
+}
+
+
+proc "check-order-of-variables" [val new_variables] [val start_const_param] [val itemCount]{
+	//check amount of items	
+	with [get-view Variables | get-tree] {
+    	get-property itemCount | equals $itemCount | verify-true
+    }
+    
+    $new_variables |each [val element] [val index] {
+    	with [get-view Variables | get-tree] {
+	    	get-property [format "getItems().TreeItem[%s].getText()"  $index]  | equals $element | verify-true
+    	}
+    
+    }
+    
+    //check order of const values
+    list  "@{list_for_res}" "@{list_from_test}" "@{TEST_TAGS}" "&{SUITE_METADATA}" "${TEST_NAME}" "${TEST_DOCUMENTATION}" "${SUITE_SOURCE}" "${SUITE_NAME}" "${SUITE_DOCUMENTATION}"  "Global Variables" 
+    | each [val element] [val index] {
+    	with [get-view Variables | get-tree] {
+	    	get-property [format "getItems().TreeItem[%s].getText()"  [plus $start_const_param $index]]  | equals $element | verify-true
+    	}
+	}
+	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
+}
+
+
+proc "check-values-of-variables" [val changed_var]{
+
+	$changed_var | each [val v] [val k]{
+		with [get-view Variables | get-tree] {
+			get-item $k | get-property "values['Value']" | equals $v| verify-true
+		} 
+ 	}
+
+    with [get-view Variables | get-tree] {	    
+	    //const values
+	    get-item "${from_resource}" | get-property "values['Value']" | equals 3 | verify-true
+	    get-item "${booleas_arg}" | get-property "values['Value']" | equals True | verify-true
+	    get-item "@{TEST_TAGS}" | get-property childCount | equals 0 | verify-true
+    	get-item "@{TEST_TAGS}" | get-property "values['Value']" | equals "List[0]" | verify-true
+	    get-item "&{SUITE_METADATA}" | get-property "values['Value']" | equals "{}" | verify-true
+	    get-item "${TEST_DOCUMENTATION}" | get-property "values['Value']" | equals "" | verify-true
+	    get-item "${SUITE_SOURCE}" | get-property "values['Value']" 
+	        | contains "MediumRobotTest\\\\OnlyVariables.robot" | verify-true 
+	    
+	    get-item "${SUITE_NAME}" | get-property "values['Value']" | equals "MediumRobotTest.OnlyVariables" | verify-true
+	    get-item "${SUITE_DOCUMENTATION}" | get-property "values['Value']" | equals "" 
+	        | verify-true
+  
+	}
+	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
+}
+
+
+
+proc "check-list-items" [val list_items 3]{
+	
+    //list from resource
+	with [get-view Variables | get-tree] {
+	    get-item "@{list_for_res}/\\[0\\]" | get-property "values['Value']" | equals 1 | verify-true
+	    get-item "@{list_for_res}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{list_for_res}/\\[1\\]" | get-property "values['Value']" | equals 2 | verify-true
+	    get-item "@{list_for_res}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{list_for_res}/\\[2\\]" | get-property "values['Value']" | equals 3 | verify-true    
+	    
+	    
+	    //list from test
+	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Value']" | equals 7 | verify-true
+	    get-item "@{list_from_test}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{list_from_test}/\\[1\\]" | get-property "values['Value']" | equals 8 | verify-true
+	    get-item "@{list_from_test}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{list_from_test}/\\[2\\]" | get-property "values['Value']" | equals 9 | verify-true
+	    
+	    if [$list_items | eq 4]{
+		    get-item "@{list_for_res}/\\[3\\]" | get-property "values['Name']" | equals "[4]" | verify-true
+		    get-item "@{list_for_res}/\\[3\\]" | get-property "values['Value']" | equals 4 | verify-true  
+		    get-item "@{list_for_res}" | get-property "values['Value']" | equals "List[4]" | verify-true
+	    	get-item "@{list_for_res}"  | get-property childCount | equals 4 | verify-true  
+	    }-else{
+	    	//list_for_res
+	    	get-item "@{list_for_res}" | get-property "values['Value']" | equals "List[3]" | verify-true
+	    	get-item "@{list_for_res}"  | get-property childCount | equals 3 | verify-true
+	    	
+	    	//list_from_test
+	    	get-item "@{list_from_test}" | get-property "values['Value']" | equals "List[3]" | verify-true
+	    	get-item "@{list_from_test}"  | get-property childCount | equals 3 | verify-true
+	    }
+	}    
+
+}
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

@@ -1,34 +1,19 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_lEyEsIMWEeW3Y6KfPyHe6A,_d8aMACuvEeW667Afdo4DcA
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_lEyEsIMWEeW3Y6KfPyHe6A,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA
 Element-Name: StepReturn
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Jh43wIMTEeW3Y6KfPyHe6A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 3:02 PM
+Save-Time: 2/16/17 5:30 PM
 Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
-
-proc "wait-for-thread" [val nr_items_in_thread 3]{	
-	try -times 3 -delay 1000 -command{
-		get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
-    		| get-property childCount | equals $nr_items_in_thread | verify-true
-    
-	}
-	try -times 3 -delay 1000 -command{
-		with [get-view Debug | get-tree] {
-		   get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
-		        | get-property [format "getItems().TreeItem[%s].getText()" [minus $nr_items_in_thread 1]] -raw|  not-eq "" | verify-true
-		}
-	}
-	
-}
 
 with [get-view "Project Explorer" | get-tree] {
     select ScriptWithResource | select ScriptWithResource | double-click
@@ -54,25 +39,25 @@ exec-with-options -disableJobWaiting -command {
 	
 	//go to keyword
 	get-button "Step Into (F5)" | click
-	wait-for-thread -nr_items_in_thread 2
+	wait-for-specific-nr-of-threads -nr_items_in_thread 2
 	check-debug-marker-on-ruler -line 97 -script_name "BigScript.robot"
 	
 	//return to test (this is last line so go back to Teardown)
 	get-button "Step Return (F7)" | click
-	wait-for-thread -nr_items_in_thread 1
+	wait-for-specific-nr-of-threads -nr_items_in_thread 1
 	check-debug-marker-on-ruler -line 6  -script_name "BigScript.robot"
 	
 	//resume: go to next user keyword
 	get-button "Resume (F8)" | click
-	wait-for-thread -nr_items_in_thread 1
+	wait-for-specific-nr-of-threads -nr_items_in_thread 1
 	check-debug-marker-on-ruler -line 42  -script_name "BigScript.robot"
 	get-button "Step Into (F5)" | click
-	wait-for-thread -nr_items_in_thread 2
+	wait-for-specific-nr-of-threads -nr_items_in_thread 2
 	check-debug-marker-on-ruler -line 82  -script_name "BigScript.robot"
 	
 	//return - will go back to last line of test
 	get-button "Step Return (F7)" | click
-	wait-for-thread -nr_items_in_thread 1
+	wait-for-specific-nr-of-threads -nr_items_in_thread 1
 	check-debug-marker-on-ruler -line 43  -script_name "BigScript.robot"
 	
 	//check that Return is disabled

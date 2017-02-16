@@ -1,0 +1,55 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: DebugProcedures
+Element-Type: context
+Element-Version: 2.0
+Id: _2Q6oEPOSEeaWpbE3jg39cA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/16/17 5:32 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "wait-for-thread" [val file]{
+	try -times 8 -delay 1000 -command{
+		get-view Debug | get-tree |get-item [format "%s \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" $file ] | get-property childCount -raw | gt 0 | verify-true
+	}
+}
+
+
+proc "check-debug-marker-on-ruler" [val line] [val script_name]{
+	get-tab-folder -index 2 | get-property activePage | equals $script_name | verify-true
+ 	loop [val index 0]{
+	 	try -times 1 -command{
+			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].text" $line $index] -raw
+			| let [val marker -input]{
+				if [ $marker | not-eq "Debug Current Instruction Pointer" ] {  
+					recur [$index | plus 1]
+				}
+	
+			}
+ 		}-catch{
+ 			str "a" | equals "b" |assert-true -message [format "There was no debug marker in line %s!! " $line]
+ 		}
+	}
+
+}
+
+proc "wait-for-specific-nr-of-threads" [val nr_items_in_thread 3]{	
+	try -times 5 -delay 1000 -command{
+		get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
+    		| get-property childCount | equals $nr_items_in_thread | verify-true
+    
+	}
+	try -times 3 -delay 1000 -command{
+		with [get-view Debug | get-tree] {
+		   get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
+		        | get-property [format "getItems().TreeItem[%s].getText()" [minus $nr_items_in_thread 1]] -raw|  not-eq "" | verify-true
+		}
+	}
+	
+}
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
