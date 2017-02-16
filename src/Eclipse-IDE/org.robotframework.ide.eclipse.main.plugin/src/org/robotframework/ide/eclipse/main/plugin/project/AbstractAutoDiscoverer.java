@@ -75,7 +75,7 @@ abstract class AbstractAutoDiscoverer {
     }
 
     void startDiscovering(final IProgressMonitor monitor, final IDryRunTargetsCollector dryRunTargetsCollector)
-            throws InvocationTargetException {
+            throws InvocationTargetException, InterruptedException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");
         subMonitor.setWorkRemaining(4);
@@ -127,7 +127,7 @@ abstract class AbstractAutoDiscoverer {
     }
 
     private void executeDryRun(final RunCommandLine dryRunCommandLine, final SubMonitor subMonitor)
-            throws InvocationTargetException {
+            throws InvocationTargetException, InterruptedException {
         if (dryRunCommandLine != null && !subMonitor.isCanceled()) {
             dryRunOutputParser.setStartSuiteHandler(new IDryRunStartSuiteHandler() {
 
@@ -137,11 +137,13 @@ abstract class AbstractAutoDiscoverer {
                 }
             });
 
-            final List<ILineHandler> dryRunOutputListeners = newArrayList();
-            dryRunOutputListeners.add(dryRunOutputParser);
-            dryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputListeners);
-
+            final int port = dryRunCommandLine.getPort();
+            final List<ILineHandler> listeners = newArrayList();
+            listeners.add(dryRunOutputParser);
+            final Thread handlerThread = dryRunHandler.createDryRunHandlerThread(port, listeners);
+            handlerThread.start();
             dryRunHandler.executeDryRunProcess(dryRunCommandLine, getProjectLocationFile());
+            handlerThread.join();
         }
     }
 
