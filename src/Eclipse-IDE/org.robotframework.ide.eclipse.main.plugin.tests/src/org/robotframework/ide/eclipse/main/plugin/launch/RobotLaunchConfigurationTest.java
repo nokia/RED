@@ -35,7 +35,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfigurationTest {
@@ -68,7 +67,6 @@ public class RobotLaunchConfigurationTest {
         for (final ILaunchConfiguration config : launchConfigs) {
             config.delete();
         }
-
     }
 
     @Test
@@ -123,7 +121,6 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getSuitePaths().keySet()).containsExactly("Resource");
         assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);
         assertThat(robotConfig.getExecutorArguments()).isEqualTo("");
-        assertThat(robotConfig.getRemoteDebugHost()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
@@ -133,7 +130,7 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void defaultConfigurationObtained_whenCustomConfigurationFilledDefaults() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        final Map<String, List<String>> suites = new HashMap<String, List<String>>();
+        final Map<String, List<String>> suites = new HashMap<>();
         suites.put("key", newArrayList("value"));
         robotConfig.setExecutor(SuiteExecutor.PyPy);
         robotConfig.setExecutorArguments("arguments");
@@ -143,13 +140,11 @@ public class RobotLaunchConfigurationTest {
         robotConfig.setIsExcludeTagsEnabled(true);
         robotConfig.setExcludedTags(newArrayList("excluded"));
         robotConfig.setIncludedTags(newArrayList("included"));
-        robotConfig.setRemoteDebugHost("Host");
         RobotLaunchConfiguration.fillDefaults(robotConfig.asWorkingCopy());
         assertThat(robotConfig.getProjectName()).isEqualTo("");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
         assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);
         assertThat(robotConfig.getExecutorArguments()).isEqualTo("");
-        assertThat(robotConfig.getRemoteDebugHost()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
@@ -160,7 +155,7 @@ public class RobotLaunchConfigurationTest {
     public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
         final IResource res = project.getFile("Resource1");
         final IResource res2 = project.getFile("Resource2");
-        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         final List<String> casesForRes = newArrayList("case1", "case3");
         final List<String> casesForRes2 = newArrayList("case1");
         resourcesToTestCases.put(res, casesForRes);
@@ -175,7 +170,6 @@ public class RobotLaunchConfigurationTest {
         assertThat(suitePaths).containsEntry("Resource2", casesForRes2);
         assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);
         assertThat(robotConfig.getExecutorArguments()).isEqualTo("");
-        assertThat(robotConfig.getRemoteDebugHost()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
@@ -208,28 +202,6 @@ public class RobotLaunchConfigurationTest {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final RobotProject projectFromConfig = robotConfig.getRobotProject();
         assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
-    }
-
-    @Test
-    public void remoteDebugPortAndTimeoutAreCorrect_whenSet() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugPort("1234");
-        robotConfig.setRemoteDebugTimeout("9876");
-        final Optional<Integer> port = robotConfig.getRemoteDebugPort();
-        final Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
-        assertThat(port.isPresent()).isTrue();
-        assertThat(port.get()).isEqualTo(1234);
-        assertThat(timeout.isPresent()).isTrue();
-        assertThat(timeout.get()).isEqualTo(9876);
-    }
-
-    @Test
-    public void remoteDebugPortAndTimeoutAreAbsent_whenNotSet() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        final Optional<Integer> port = robotConfig.getRemoteDebugPort();
-        final Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
-        assertThat(port.isPresent()).isFalse();
-        assertThat(timeout.isPresent()).isFalse();
     }
 
     @Test
