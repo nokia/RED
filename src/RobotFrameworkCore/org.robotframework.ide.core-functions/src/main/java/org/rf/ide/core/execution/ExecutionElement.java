@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.execution;
 
+import java.io.File;
+
 /**
  * @author mmarzec
  */
@@ -16,65 +18,49 @@ public class ExecutionElement {
         OUTPUT_FILE
     }
 
-    private String name;
+    private final String name;
     
-    private ExecutionElementType type;
+    private final ExecutionElementType type;
     
-    private String status;
+    private final File source;
 
-    private String source;
+    private final int elapsedTime;
 
-    private String message;
+    private final Status status;
 
-    private int elapsedTime;
+    private final String message;
 
-    public ExecutionElement(String name, ExecutionElementType type) {
+    ExecutionElement(final String name, final ExecutionElementType type, final File source, final int elapsedTime,
+            final Status status, final String message) {
         this.name = name;
         this.type = type;
+        this.source = source;
+        this.elapsedTime = elapsedTime;
+        this.status = status;
+        this.message = message;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public ExecutionElementType getType() {
+        return type;
     }
 
-    public String getSource() {
+    public File getSource() {
         return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
     }
 
     public int getElapsedTime() {
         return elapsedTime;
     }
 
-    public void setElapsedTime(int elapsedTime) {
-        this.elapsedTime = elapsedTime;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public ExecutionElementType getType() {
-        return type;
-    }
-
 }

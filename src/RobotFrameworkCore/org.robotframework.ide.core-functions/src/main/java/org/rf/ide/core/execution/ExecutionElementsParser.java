@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.execution;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ public class ExecutionElementsParser implements ILineHandler {
 
     public ExecutionElementsParser(final IExecutionHandler executionHandler) {
         this.mapper = new ObjectMapper();
-        this.eventMap = new HashMap<String, List<?>>();
+        this.eventMap = new HashMap<>();
         this.executionHandler = executionHandler;
     }
 
@@ -99,9 +100,7 @@ public class ExecutionElementsParser implements ILineHandler {
     }
 
     public static ExecutionElement createStartSuiteExecutionElement(final String name, final String source) {
-        final ExecutionElement startElement = createNewExecutionElement(name, ExecutionElementType.SUITE);
-        startElement.setSource(source);
-        return startElement;
+        return new ExecutionElement(name, ExecutionElementType.SUITE, new File(source), -1, null, null);
     }
 
     public static ExecutionElement createStartTestExecutionElement(final String name) {
@@ -112,8 +111,18 @@ public class ExecutionElementsParser implements ILineHandler {
         return createEndExecutionElement(name, ExecutionElementType.TEST, endTestDetails);
     }
 
+    public static ExecutionElement createEndTestExecutionElement(final String name, final int elapsedTime,
+            final String message, final String status) {
+        return createEndExecutionElement(name, ExecutionElementType.TEST, elapsedTime, message, status);
+    }
+
     public static ExecutionElement createEndSuiteExecutionElement(final String name, final Map<?, ?> endSuiteDetails) {
         return createEndExecutionElement(name, ExecutionElementType.SUITE, endSuiteDetails);
+    }
+
+    public static ExecutionElement createEndSuiteExecutionElement(final String name, final int elapsedTime,
+            final String message, final String status) {
+        return createEndExecutionElement(name, ExecutionElementType.SUITE, elapsedTime, message, status);
     }
 
     public static ExecutionElement createOutputFileExecutionElement(final String name) {
@@ -122,15 +131,20 @@ public class ExecutionElementsParser implements ILineHandler {
 
     private static ExecutionElement createEndExecutionElement(final String name, final ExecutionElementType type,
             final Map<?, ?> details) {
-        final ExecutionElement endElement = createNewExecutionElement(name, type);
-        endElement.setElapsedTime((Integer) details.get("elapsedtime"));
-        endElement.setMessage((String) details.get("message"));
-        endElement.setStatus((String) details.get("status"));
-        return endElement;
+        final int elapsedTime = (Integer) details.get("elapsedtime");
+        final String message = (String) details.get("message");
+        final Status status = Status.valueOf(((String) details.get("status")).toUpperCase());
+        return new ExecutionElement(name, type, null, elapsedTime, status, message);
+    }
+
+    private static ExecutionElement createEndExecutionElement(final String name, final ExecutionElementType type,
+            final int elapsedTime, final String message, final String status) {
+        return new ExecutionElement(name, type, null, elapsedTime,
+                Status.valueOf(status.toUpperCase()), message);
     }
 
     private static ExecutionElement createNewExecutionElement(final String name, final ExecutionElementType type) {
-        return new ExecutionElement(name, type);
+        return new ExecutionElement(name, type, null, -1, null, null);
     }
 
     private String getEventType(final Map<?, ?> eventMap) {
