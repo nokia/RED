@@ -101,6 +101,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         }
                     } catch (final InvocationTargetException e) {
                         throw new AutoDiscovererException("Problems occurred during discovering libraries.", e);
+                    } catch (final InterruptedException e) {
                     } finally {
                         monitor.done();
                         stopDryRun();
