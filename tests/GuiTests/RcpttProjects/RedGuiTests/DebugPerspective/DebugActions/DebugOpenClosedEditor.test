@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_kJ0i8BXWEeW05sQKg0mypw,_d8aMACuvEeW667Afdo4DcA
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_kJ0i8BXWEeW05sQKg0mypw,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA
 Element-Name: DebugOpenClosedEditor
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _j4DzoBXNEeWWV9IuysVI_A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 2:51 PM
+Save-Time: 2/16/17 4:43 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -30,19 +30,13 @@ exec-with-options -disableJobWaiting -command {
 	//run test
 	get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
-	    
-	    
-	try -times 10 -delay 300 -command{
-		get-view Debug | get-tree |get-item "Script.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
-	}
 	
+	wait-for-thread -file "Script.robot"
 	   
 	//check if line is highlighted    
 	check-debug-marker-on-ruler -line 13 -script_name "Script.robot"
-	exec-with-options -disableJobWaiting -command {
-		get-button "Resume (F8)" | click
-	}
-	
+	get-button "Resume (F8)" | click
+
 	try -times 10 -delay 300 -command {
 		get-view Debug | get-tree | get-item "<terminated>Script.robot \\[Robot\\]" | get-property caption 
 		    | equals "<terminated>Script.robot [Robot]" | verify-true
