@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ersf0O-YEeaEfJH5Ahap2w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/10/17 3:11 PM
+Save-Time: 2/17/17 11:53 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -41,7 +41,7 @@ with [get-window "Discovering libraries summary" | get-tree] {
 }
 get-window "Discovering libraries summary" | get-button OK | click
 
-
+wait 1000
 //libs are added but are non-accessible
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries/add \\(non-accessible\\)" | get-property caption 
