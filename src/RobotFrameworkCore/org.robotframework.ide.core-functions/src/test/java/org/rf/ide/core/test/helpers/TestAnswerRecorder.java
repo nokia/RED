@@ -30,68 +30,64 @@ public class TestAnswerRecorder {
     @Test
     public void test_registeringParameters_andThrowsIllegalArgumentException() {
         // prepare
-        ThrowsExceptionClass otherAnswer = new ThrowsExceptionClass(
+        final ThrowsExceptionClass otherAnswer = new ThrowsExceptionClass(
                 IllegalArgumentException.class);
-        AnswerRecorder<Object> answer = new AnswerRecorder<>(otherAnswer);
-        TestHelper helper = mock(TestHelper.class);
+        final AnswerRecorder<Object> answer = new AnswerRecorder<>(otherAnswer);
+        final TestHelper helper = mock(TestHelper.class);
 
-        String name = "name";
-        String surename = "surename";
+        final String name = "name";
+        final String surename = "surename";
         when(helper.setId(name, surename)).then(answer);
 
         // execute
         try {
             helper.setId(name, surename);
             fail("Expected IllegalArgumentException to be thrown");
-        } catch (IllegalArgumentException iae) {
+        } catch (final IllegalArgumentException iae) {
         }
 
         // verify
         assertThat(answer.getOtherAnswer()).isEqualTo(otherAnswer);
         assertThat(answer.getInvocations()).hasSize(1);
-        InvocationOnMock invocationOnMock = answer.getInvocations().get(0);
+        final InvocationOnMock invocationOnMock = answer.getInvocations().get(0);
         assertThat(invocationOnMock).isNotNull();
         assertThat(invocationOnMock.getMock()).isEqualTo(helper);
         assertThat(invocationOnMock.getArguments()).hasSize(2);
-        assertThat(invocationOnMock.getArgumentAt(0, String.class)).isEqualTo(
-                name);
-        assertThat(invocationOnMock.getArgumentAt(1, String.class)).isEqualTo(
-                surename);
+        assertThat(invocationOnMock.getArgument(0)).isEqualTo(name);
+        assertThat(invocationOnMock.getArgument(1)).isEqualTo(surename);
     }
 
 
     @Test
     public void test_registeringParameters_andCallRealMethod() {
         // prepare
-        AnswerRecorder<Object> answer = new AnswerRecorder<>(
+        final AnswerRecorder<Object> answer = new AnswerRecorder<>(
                 Mockito.CALLS_REAL_METHODS);
-        TestHelper helper = mock(TestHelper.class);
+        final TestHelper helper = mock(TestHelper.class);
 
-        String name = "name";
-        String surename = "surename";
+        final String name = "name";
+        final String surename = "surename";
         when(helper.setId(name, surename)).then(answer);
 
         // execute
-        boolean result = helper.setId(name, surename);
+        final boolean result = helper.setId(name, surename);
 
         // verify
         assertThat(result).isTrue();
         assertThat(answer.getOtherAnswer()).isEqualTo(
                 Mockito.CALLS_REAL_METHODS);
         assertThat(answer.getInvocations()).hasSize(1);
-        InvocationOnMock invocationOnMock = answer.getInvocations().get(0);
+        final InvocationOnMock invocationOnMock = answer.getInvocations().get(0);
         assertThat(invocationOnMock).isNotNull();
         assertThat(invocationOnMock.getMock()).isEqualTo(helper);
         assertThat(invocationOnMock.getArguments()).hasSize(2);
-        assertThat(invocationOnMock.getArgumentAt(0, String.class)).isEqualTo(
-                name);
-        assertThat(invocationOnMock.getArgumentAt(1, String.class)).isEqualTo(
-                surename);
+        assertThat(invocationOnMock.getArgument(0)).isEqualTo(name);
+        assertThat(invocationOnMock.getArgument(1)).isEqualTo(surename);
     }
 
     private class TestHelper {
 
-        public boolean setId(String name, String surename) {
+        public boolean setId(final String name, final String surename) {
             return true;
         }
     }
