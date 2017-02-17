@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import static com.google.common.collect.Iterables.all;
-import static com.google.common.collect.Iterables.any;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
@@ -63,7 +61,6 @@ import org.robotframework.red.viewers.TreeContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 /**
  * @author mmarzec
@@ -353,7 +350,7 @@ class SuitesToRunComposite extends Composite {
 
         for (final SuiteLaunchElement suite : suitesToLaunch) {
             if (suite.isChecked()) {
-                final ArrayList<String> tests = new ArrayList<String>();
+                final ArrayList<String> tests = new ArrayList<>();
                 if (!suite.hasCheckedAllChildren()) {
                     for (final TestCaseLaunchElement test : suite.getChildren()) {
                         if (test.isChecked()) {
@@ -495,21 +492,11 @@ class SuitesToRunComposite extends Composite {
         }
 
         private boolean hasCheckedChild() {
-            return any(children, hasCheck());
+            return children.stream().anyMatch(test -> test.isChecked());
         }
 
         private boolean hasCheckedAllChildren() {
-            return all(children, hasCheck());
-        }
-
-        private static Predicate<TestCaseLaunchElement> hasCheck() {
-            return new Predicate<TestCaseLaunchElement>() {
-
-                @Override
-                public boolean apply(final TestCaseLaunchElement test) {
-                    return test.isChecked();
-                }
-            };
+            return children.stream().allMatch(test -> test.isChecked());
         }
 
         public void updateProject(final String projectName) {
