@@ -54,10 +54,9 @@ import com.google.common.base.CaseFormat;
 
 /**
  * @author mmarzec
- *
  */
-public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurationTab implements
-        ILaunchConfigurationTab {
+public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurationTab
+        implements ILaunchConfigurationTab {
 
     private final boolean isRunMode;
 
@@ -66,12 +65,11 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     private Text hostTxt;
 
     private Text portTxt;
-    
+
     private Text timeoutTxt;
 
     private Text commandLineArgument;
 
-    
     public RobotLaunchConfigurationRemoteTab(final boolean isRunMode) {
         this.isRunMode = isRunMode;
     }
@@ -84,7 +82,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         createProjectGroup(composite);
         createServerGroup(composite);
         createClientGroup(composite);
-        
+
         setControl(composite);
     }
 
@@ -127,7 +125,6 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 if (dialog.open() == Window.OK) {
                     final IProject project = (IProject) dialog.getFirstResult();
                     projectTxt.setText(project.getName());
-                    updateLaunchConfigurationDialog();
                 }
             }
         });
@@ -176,7 +173,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
         // spacer to occupy next grid cell
         new Label(serverGroup, SWT.NONE);
-        
+
         final Label timeoutLbl = new Label(serverGroup, SWT.NONE);
         timeoutLbl.setText("Connection timeout [ms]:");
 
@@ -269,7 +266,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         final String mode = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, Boolean.toString(!isRunMode));
         commandLineArgument.setText("--listener TestRunnerAgent.py:" + portString + ":" + mode + ":" + hostIp);
     }
-    
+
     @Override
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
@@ -286,7 +283,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         }
         return true;
     }
-    
+
     @Override
     public boolean canSave() {
         return projectTxt == null || projectTxt.isDisposed() || !projectTxt.getText().isEmpty();
@@ -306,7 +303,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                     "RED was unable to load the working copy of Launch Configuration.");
         }
     }
-    
+
     @Override
     public String getName() {
         return "Remote";
