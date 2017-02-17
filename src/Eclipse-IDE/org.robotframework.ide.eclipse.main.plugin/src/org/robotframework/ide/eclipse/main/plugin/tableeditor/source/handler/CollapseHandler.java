@@ -11,10 +11,11 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseHandler.E4CollapseHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
+import org.robotframework.red.jface.text.ProjectionViewerWrapper;
 
+import com.google.common.annotations.VisibleForTesting;
 
 public class CollapseHandler extends DIParameterizedHandler<E4CollapseHandler> {
 
@@ -26,12 +27,13 @@ public class CollapseHandler extends DIParameterizedHandler<E4CollapseHandler> {
 
         @Execute
         public void collapse(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
+            collapse(ProjectionViewerWrapper.from(editor));
+        }
 
-            final SuiteSourceEditor sourceEditor = editor.getSourceEditor();
-            final ProjectionViewer viewer = (ProjectionViewer) sourceEditor.getViewer();
-
-            if (viewer.canDoOperation(ProjectionViewer.COLLAPSE)) {
-                viewer.doOperation(ProjectionViewer.COLLAPSE);
+        @VisibleForTesting
+        void collapse(final ProjectionViewerWrapper projectionViewer) {
+            if (projectionViewer.canDoOperation(ProjectionViewer.COLLAPSE)) {
+                projectionViewer.doOperation(ProjectionViewer.COLLAPSE);
             }
         }
     }
