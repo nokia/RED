@@ -250,6 +250,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 final Composite parent = projectGroup.getParent();
                 projectGroup.dispose();
                 parent.layout();
+            } else {
+                projectTxt.setText(robotConfig.getProjectName());
             }
 
             hostTxt.setText(hostIp);
