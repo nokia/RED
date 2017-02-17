@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.argThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -24,15 +24,15 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentMatcher;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.swt.StyledTextWrapper;
 
 public class SuiteSourceEditorFoldingSupportTest {
 
@@ -118,10 +118,9 @@ public class SuiteSourceEditorFoldingSupportTest {
                 new Position(419, 44), new Position(187, 53), new Position(292, 51));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void allAnnotationsAreAddedInitially() {
-        final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -129,14 +128,14 @@ public class SuiteSourceEditorFoldingSupportTest {
 
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
 
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0), mapOfSize(2), arrayOfSize(0));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
         verifyNoMoreInteractions(annotationsModel);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenNoFoldingPositionAppearsOrDissappears_theAnnotationsAreSendAsChanged() {
-        final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -145,15 +144,16 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
 
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0), mapOfSize(2), arrayOfSize(0));
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0), mapOfSize(0), arrayOfSize(2));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(0), arrayOfSize(2));
         verifyNoMoreInteractions(annotationsModel);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenNewFoldingPositionAppears_itIsSendAsAddedWhileOtherAreChanged() {
-        final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -162,15 +162,16 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10), new Position(30, 10)));
 
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0), mapOfSize(2), arrayOfSize(0));
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0), mapOfSize(1), arrayOfSize(2));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(1), arrayOfSize(2));
         verifyNoMoreInteractions(annotationsModel);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenFoldingPositionDissappears_itIsSendAsRemovedWhileOtherAreChanged() {
-        final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -179,15 +180,16 @@ public class SuiteSourceEditorFoldingSupportTest {
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
         support.updateFoldingStructure(newArrayList(new Position(0, 10)));
 
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0), mapOfSize(2), arrayOfSize(0));
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(1), mapOfSize(0), arrayOfSize(1));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(1),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(0), arrayOfSize(1));
         verifyNoMoreInteractions(annotationsModel);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenFoldingPositionIsChanged_ItIsRemovedAndNewIsAdded() {
-        final StyledText textControl = new StyledText(shellProvider.getShell(), SWT.NONE);
+        final StyledTextWrapper textControl = new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -201,14 +203,17 @@ public class SuiteSourceEditorFoldingSupportTest {
         positionToModify.setLength(15);
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 15)));
 
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0), mapOfSize(2), arrayOfSize(0));
-        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(1), mapOfSize(1), arrayOfSize(1));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(0),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(2), arrayOfSize(0));
+        verify(annotationsModel, times(1)).modifyAnnotations(arrayOfSize(1),
+                SuiteSourceEditorFoldingSupportTest.<Annotation, Position> mapOfSize(1), arrayOfSize(1));
         verifyNoMoreInteractions(annotationsModel);
     }
 
     @Test
     public void textViewerRevealsSelection_whenAnnotationModelIsUpdated() {
-        final StyledText textControl = spy(new StyledText(shellProvider.getShell(), SWT.NONE));
+        final StyledTextWrapper textControl = spy(
+                new StyledTextWrapper(new StyledText(shellProvider.getShell(), SWT.NONE)));
         final ProjectionAnnotationModel annotationsModel = mock(ProjectionAnnotationModel.class);
 
         final SuiteSourceEditorFoldingSupport support = new SuiteSourceEditorFoldingSupport(textControl,
@@ -250,16 +255,15 @@ public class SuiteSourceEditorFoldingSupportTest {
                 .appendLine("@{list}  a  b  c");
     }
 
-    @SuppressWarnings("rawtypes")
-    private static Map mapOfSize(final int expectedSize) {
-        return argThat(new MapOfSizeMatcher<Map>(expectedSize));
+    private static <T1, T2> Map<T1, T2> mapOfSize(final int expectedSize) {
+        return argThat(new MapOfSizeMatcher<Map<T1, T2>>(expectedSize));
     }
 
     private static Annotation[] arrayOfSize(final int expectedSize) {
         return argThat(new ArrayOfSizeMatcher<Annotation[]>(expectedSize));
     }
 
-    private static class ArrayOfSizeMatcher<T> extends BaseMatcher<T> {
+    private static class ArrayOfSizeMatcher<T> implements ArgumentMatcher<T> {
 
         private final int expectedSize;
 
@@ -268,17 +272,12 @@ public class SuiteSourceEditorFoldingSupportTest {
         }
 
         @Override
-        public boolean matches(final Object item) {
+        public boolean matches(final T item) {
             return item != null && item.getClass().isArray() && ((Object[]) item).length == expectedSize;
-        }
-
-        @Override
-        public void describeTo(final Description description) {
-            // implement when needded
         }
     }
 
-    private static class MapOfSizeMatcher<T> extends BaseMatcher<T> {
+    private static class MapOfSizeMatcher<T> implements ArgumentMatcher<T> {
 
         private final int expectedSize;
 
@@ -287,13 +286,8 @@ public class SuiteSourceEditorFoldingSupportTest {
         }
 
         @Override
-        public boolean matches(final Object item) {
+        public boolean matches(final T item) {
             return item instanceof Map<?, ?> && ((Map<?, ?>) item).size() == expectedSize;
-        }
-
-        @Override
-        public void describeTo(final Description description) {
-            // implement when needded
         }
     }
 }

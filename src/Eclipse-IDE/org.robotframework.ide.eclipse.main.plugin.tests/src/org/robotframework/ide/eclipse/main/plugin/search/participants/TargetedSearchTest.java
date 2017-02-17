@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.search.participants;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -22,7 +23,6 @@ import org.eclipse.core.runtime.Path;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ProgressMonitorMock;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -60,11 +60,11 @@ public class TargetedSearchTest {
         assertThat(monitor.getTotalWorkToBeDone()).isEqualTo(3);
         assertThat(monitor.getWorkDone()).isEqualTo(3);
 
-        verify(targetedSearch, never()).locateMatchesInLibrarySpecification(Matchers.any(IProject.class),
-                Matchers.any(LibrarySpecification.class));
-        verify(targetedSearch, never()).locateMatchesInKeywordSpecification(Matchers.any(IProject.class),
-                Matchers.any(LibrarySpecification.class), Matchers.any(KeywordSpecification.class));
-        verify(targetedSearch, times(3)).locateMatchesInRobotFile(Matchers.any(RobotSuiteFile.class));
+        verify(targetedSearch, never()).locateMatchesInLibrarySpecification(any(IProject.class),
+                any(LibrarySpecification.class));
+        verify(targetedSearch, never()).locateMatchesInKeywordSpecification(any(IProject.class),
+                any(LibrarySpecification.class), any(KeywordSpecification.class));
+        verify(targetedSearch, times(3)).locateMatchesInRobotFile(any(RobotSuiteFile.class));
     }
 
     @Test(expected = OperationCanceledException.class)
@@ -107,11 +107,11 @@ public class TargetedSearchTest {
         assertThat(monitor.getTotalWorkToBeDone()).isEqualTo(2);
         assertThat(monitor.getWorkDone()).isEqualTo(2);
 
-        verify(targetedSearch, times(2)).locateMatchesInLibrarySpecification(Matchers.any(IProject.class),
-                Matchers.any(LibrarySpecification.class));
-        verify(targetedSearch, times(2)).locateMatchesInKeywordSpecification(Matchers.any(IProject.class),
-                Matchers.any(LibrarySpecification.class), Matchers.any(KeywordSpecification.class));
-        verify(targetedSearch, never()).locateMatchesInRobotFile(Matchers.any(RobotSuiteFile.class));
+        verify(targetedSearch, times(2)).locateMatchesInLibrarySpecification(any(IProject.class),
+                any(LibrarySpecification.class));
+        verify(targetedSearch, times(2)).locateMatchesInKeywordSpecification(any(IProject.class),
+                any(LibrarySpecification.class), any(KeywordSpecification.class));
+        verify(targetedSearch, never()).locateMatchesInRobotFile(any(RobotSuiteFile.class));
     }
 
     @Test(expected = OperationCanceledException.class)

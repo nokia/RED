@@ -5,9 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -24,6 +23,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -92,7 +92,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), anyListOf(IFile.class))).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
@@ -111,7 +111,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), anyListOf(IFile.class))).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
@@ -130,7 +130,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), anyListOf(IFile.class))).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
@@ -156,7 +156,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), anyListOf(IFile.class))).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger1 = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         final OnSaveLibrariesAutodiscoveryTrigger trigger2 = new OnSaveLibrariesAutodiscoveryTrigger(factory);

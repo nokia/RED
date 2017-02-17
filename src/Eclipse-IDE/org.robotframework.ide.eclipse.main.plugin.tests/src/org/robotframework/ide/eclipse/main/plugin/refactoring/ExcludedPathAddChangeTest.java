@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -16,7 +18,6 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
@@ -62,8 +63,8 @@ public class ExcludedPathAddChangeTest {
         assertThat(undoOperation).isInstanceOf(ExcludedPathRemoveChange.class);
         assertThat(config.getExcludedPath()).contains(ExcludedFolderPath.create("a/b/c"));
         verify(eventBroker, times(1)).send(
-                Matchers.eq(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED),
-                Matchers.any(RedProjectConfigEventData.class));
+                eq(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED),
+                any(RedProjectConfigEventData.class));
 
         undoOperation.perform(null);
         assertThat(config.getExcludedPath()).isEmpty();

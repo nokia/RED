@@ -2,7 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,9 +29,9 @@ public class TreeLayerAccessorTest {
 
     @Test
     public void testCollapseRowsAfterRowCountChange_whenOneRowAddedBetweenExpandedIndexes() {
-        List<Integer> expandedRowIndexes = newArrayList(0, 8);
-        int lastSelectedRowPosition = 7;
-        int rowCountChange = 1;
+        final List<Integer> expandedRowIndexes = newArrayList(0, 8);
+        final int lastSelectedRowPosition = 7;
+        final int rowCountChange = 1;
 
         treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
 
@@ -41,9 +41,9 @@ public class TreeLayerAccessorTest {
     
     @Test
     public void testCollapseRowsAfterRowCountChange_whenOneKeywordDefAddedBetweenExpandedIndexes() {
-        List<Integer> expandedRowIndexes = newArrayList(0, 4, 8);
-        int lastSelectedRowPosition = 4;
-        int rowCountChange = 2;
+        final List<Integer> expandedRowIndexes = newArrayList(0, 4, 8);
+        final int lastSelectedRowPosition = 4;
+        final int rowCountChange = 2;
 
         treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
 
@@ -54,9 +54,9 @@ public class TreeLayerAccessorTest {
     
     @Test
     public void testCollapseRowsAfterRowCountChange_whenOneRowRemovedBetweenExpandedIndexes() {
-        List<Integer> expandedRowIndexes = newArrayList(0, 8);
-        int lastSelectedRowPosition = 5;
-        int rowCountChange = -1;
+        final List<Integer> expandedRowIndexes = newArrayList(0, 8);
+        final int lastSelectedRowPosition = 5;
+        final int rowCountChange = -1;
 
         treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
 
@@ -66,9 +66,9 @@ public class TreeLayerAccessorTest {
     
     @Test
     public void testCollapseRowsAfterRowCountChange_whenOneKeywordDefRemovedBetweenExpandedIndexes() {
-        List<Integer> expandedRowIndexes = newArrayList(0, 8);
-        int lastSelectedRowPosition = 4;
-        int rowCountChange = -4;
+        final List<Integer> expandedRowIndexes = newArrayList(0, 8);
+        final int lastSelectedRowPosition = 4;
+        final int rowCountChange = -4;
 
         treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
 
@@ -78,9 +78,9 @@ public class TreeLayerAccessorTest {
     
     @Test
     public void testCollapseRowsAfterRowCountChange_whenFirstKeywordDefRemovedBeforeExpandedIndexes() {
-        List<Integer> expandedRowIndexes = newArrayList(0, 6, 10);
-        int lastSelectedRowPosition = 0;
-        int rowCountChange = -6;
+        final List<Integer> expandedRowIndexes = newArrayList(0, 6, 10);
+        final int lastSelectedRowPosition = 0;
+        final int rowCountChange = -6;
 
         treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
         
@@ -92,15 +92,15 @@ public class TreeLayerAccessorTest {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testExpandCollapsedRowsBeforeRowCountChange() {
-        ITreeRowModel treeModel = mock(ITreeRowModel.class);
+        final ITreeRowModel treeModel = mock(ITreeRowModel.class);
         when(treeLayer.getModel()).thenReturn(treeModel);
         when(treeModel.isCollapsed(0)).thenReturn(true);
         when(treeModel.isCollapsed(1)).thenReturn(false);
         when(treeModel.isCollapsed(2)).thenReturn(false);
         when(treeModel.isCollapsed(3)).thenReturn(true);
 
-        int rowCount = 4;
-        List<Integer> expandedRowsIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCount);
+        final int rowCount = 4;
+        final List<Integer> expandedRowsIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCount);
 
         assertTrue(expandedRowsIndexes.size() == 2);
         assertTrue(expandedRowsIndexes.contains(0));

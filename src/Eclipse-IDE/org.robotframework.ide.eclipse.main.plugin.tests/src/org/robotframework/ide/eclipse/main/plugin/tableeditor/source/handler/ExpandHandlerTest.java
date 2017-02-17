@@ -12,9 +12,8 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandHandler.E4ExpandHandler;
+import org.robotframework.red.jface.text.ProjectionViewerWrapper;
 
 public class ExpandHandlerTest {
 
@@ -22,37 +21,24 @@ public class ExpandHandlerTest {
 
     @Test
     public void expandIsNotExecuted_whenViewerSaysItIsImpossible() {
-        final ProjectionViewer viewer = mock(ProjectionViewer.class);
-        when(viewer.canDoOperation(ProjectionViewer.EXPAND)).thenReturn(false);
+        final ProjectionViewerWrapper projectionViewer = mock(ProjectionViewerWrapper.class);
+        when(projectionViewer.canDoOperation(ProjectionViewer.EXPAND)).thenReturn(false);
+        handler.expand(projectionViewer);
 
-        final SuiteSourceEditor sourceEditor = mock(SuiteSourceEditor.class);
-        when(sourceEditor.getViewer()).thenReturn(viewer);
-
-        final RobotFormEditor editor = mock(RobotFormEditor.class);
-        when(editor.getSourceEditor()).thenReturn(sourceEditor);
-
-        handler.expand(editor);
-
-        verify(viewer).canDoOperation(ProjectionViewer.EXPAND);
-        verifyNoMoreInteractions(viewer);
+        verify(projectionViewer).canDoOperation(ProjectionViewer.EXPAND);
+        verifyNoMoreInteractions(projectionViewer);
     }
 
     @Test
     public void expandIsExecuted_whenVieweSaysItIsPossible() {
-        final ProjectionViewer viewer = mock(ProjectionViewer.class);
-        when(viewer.canDoOperation(ProjectionViewer.EXPAND)).thenReturn(true);
+        final ProjectionViewerWrapper projectionViewer = mock(ProjectionViewerWrapper.class);
+        when(projectionViewer.canDoOperation(ProjectionViewer.EXPAND)).thenReturn(true);
 
-        final SuiteSourceEditor sourceEditor = mock(SuiteSourceEditor.class);
-        when(sourceEditor.getViewer()).thenReturn(viewer);
+        handler.expand(projectionViewer);
 
-        final RobotFormEditor editor = mock(RobotFormEditor.class);
-        when(editor.getSourceEditor()).thenReturn(sourceEditor);
-
-        handler.expand(editor);
-
-        verify(viewer).canDoOperation(ProjectionViewer.EXPAND);
-        verify(viewer).doOperation(ProjectionViewer.EXPAND);
-        verifyNoMoreInteractions(viewer);
+        verify(projectionViewer).canDoOperation(ProjectionViewer.EXPAND);
+        verify(projectionViewer).doOperation(ProjectionViewer.EXPAND);
+        verifyNoMoreInteractions(projectionViewer);
     }
 
 }

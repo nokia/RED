@@ -6,7 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.isA;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -15,7 +16,6 @@ import static org.mockito.Mockito.verify;
 import java.util.List;
 
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -140,7 +140,7 @@ public class VariableColumnsPropertyAccessorTest {
         accessor.setDataValue(variables.get(3), 1, "1729");
         accessor.setDataValue(variables.get(4), 1, "1729");
 
-        verify(stack, never()).execute(Matchers.<EditorCommand> any());
+        verify(stack, never()).execute(any(EditorCommand.class));
     }
 
     @Test
