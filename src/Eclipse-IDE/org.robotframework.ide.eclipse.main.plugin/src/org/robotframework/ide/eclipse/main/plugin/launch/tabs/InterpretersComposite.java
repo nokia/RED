@@ -156,7 +156,7 @@ class InterpretersComposite extends Composite {
             final SuiteExecutor executor = SuiteExecutor.fromName(chosenExecutorName);
             final String version = RobotRuntimeEnvironment.getVersion(executor);
             if (version == null) {
-                throw new IllegalStateException(
+                MessageDialog.openError(null, "Interpreter checked",
                         "The " + executor.name() + " interpreter has no Robot installed");
             } else {
                 MessageDialog.openInformation(null, "Interpreter checked",
