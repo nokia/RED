@@ -10,7 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-		<jdk.version>1.7</jdk.version>
+		<jdk.version>1.8</jdk.version>
 		<pmd.file>../../PMD/pegasus-pmd.xml</pmd.file>
 	</properties>
 
@@ -101,7 +101,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.1</version>
+				<version>2.4.3</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -145,7 +145,14 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.6.1</version>
+		       <dependencies>
+		            <dependency>
+		                <groupId>org.codehaus.plexus</groupId>
+		                <artifactId>plexus-utils</artifactId>
+		                <version>3.0.24</version>
+		            </dependency>
+		        </dependencies>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
@@ -157,7 +164,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.1</version>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>

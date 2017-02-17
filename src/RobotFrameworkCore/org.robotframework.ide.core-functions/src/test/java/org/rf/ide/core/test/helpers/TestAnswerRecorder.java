@@ -19,8 +19,6 @@ import org.mockito.invocation.InvocationOnMock;
 /**
  * 
  * @author wypych
- * @since JDK 1.7 update 74
- * @version Robot Framework 2.9 alpha 2
  * 
  * @see AnswerRecorder
  */
@@ -53,8 +51,8 @@ public class TestAnswerRecorder {
         assertThat(invocationOnMock).isNotNull();
         assertThat(invocationOnMock.getMock()).isEqualTo(helper);
         assertThat(invocationOnMock.getArguments()).hasSize(2);
-        assertThat(invocationOnMock.getArgument(0)).isEqualTo(name);
-        assertThat(invocationOnMock.getArgument(1)).isEqualTo(surename);
+        assertThat((String) invocationOnMock.getArgument(0)).isEqualTo(name);
+        assertThat((String) invocationOnMock.getArgument(1)).isEqualTo(surename);
     }
 
 
@@ -81,8 +79,8 @@ public class TestAnswerRecorder {
         assertThat(invocationOnMock).isNotNull();
         assertThat(invocationOnMock.getMock()).isEqualTo(helper);
         assertThat(invocationOnMock.getArguments()).hasSize(2);
-        assertThat(invocationOnMock.getArgument(0)).isEqualTo(name);
-        assertThat(invocationOnMock.getArgument(1)).isEqualTo(surename);
+        assertThat((String) invocationOnMock.getArgument(0)).isEqualTo(name);
+        assertThat((String) invocationOnMock.getArgument(1)).isEqualTo(surename);
     }
 
     private class TestHelper {
