@@ -1,7 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -91,8 +91,11 @@ public class RobotEditorPropertyTesterTest {
         final DISectionEditorPart sectionEditorPartWithoutSection = mock(DISectionEditorPart.class);
 
         when(editorOnSourcePage.getActiveEditor()).thenReturn(sourceEditorPart);
+        when(editorOnSourcePage.provideSuiteModel()).thenReturn(new RobotSuiteFileCreator().build());
         when(editorOnSectionPageWithSection.getActiveEditor()).thenReturn(sectionEditorPartWithSection);
+        when(editorOnSectionPageWithSection.provideSuiteModel()).thenReturn(new RobotSuiteFileCreator().build());
         when(editorOnSectionPageWithoutSection.getActiveEditor()).thenReturn(sectionEditorPartWithoutSection);
+        when(editorOnSectionPageWithoutSection.provideSuiteModel()).thenReturn(new RobotSuiteFileCreator().build());
         
         when(sectionEditorPartWithSection.provideSection(any(RobotSuiteFile.class)))
                 .thenReturn(Optional.of(mock(RobotSuiteFileSection.class)));

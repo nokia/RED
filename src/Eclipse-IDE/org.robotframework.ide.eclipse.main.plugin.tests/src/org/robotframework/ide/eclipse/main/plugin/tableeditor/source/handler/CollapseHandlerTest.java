@@ -12,9 +12,8 @@ import static org.mockito.Mockito.when;
 
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseHandler.E4CollapseHandler;
+import org.robotframework.red.jface.text.ProjectionViewerWrapper;
 
 public class CollapseHandlerTest {
 
@@ -22,37 +21,23 @@ public class CollapseHandlerTest {
 
     @Test
     public void collapseIsNotExecuted_whenViewerSaysItIsImpossible() {
-        final ProjectionViewer viewer = mock(ProjectionViewer.class);
-        when(viewer.canDoOperation(ProjectionViewer.COLLAPSE)).thenReturn(false);
+        final ProjectionViewerWrapper projectionViewer = mock(ProjectionViewerWrapper.class);
+        when(projectionViewer.canDoOperation(ProjectionViewer.COLLAPSE)).thenReturn(false);
+        handler.collapse(projectionViewer);
 
-        final SuiteSourceEditor sourceEditor = mock(SuiteSourceEditor.class);
-        when(sourceEditor.getViewer()).thenReturn(viewer);
-
-        final RobotFormEditor editor = mock(RobotFormEditor.class);
-        when(editor.getSourceEditor()).thenReturn(sourceEditor);
-
-        handler.collapse(editor);
-
-        verify(viewer).canDoOperation(ProjectionViewer.COLLAPSE);
-        verifyNoMoreInteractions(viewer);
+        verify(projectionViewer).canDoOperation(ProjectionViewer.COLLAPSE);
+        verifyNoMoreInteractions(projectionViewer);
     }
 
     @Test
     public void collapseIsExecuted_whenVieweSaysItIsPossible() {
-        final ProjectionViewer viewer = mock(ProjectionViewer.class);
-        when(viewer.canDoOperation(ProjectionViewer.COLLAPSE)).thenReturn(true);
+        final ProjectionViewerWrapper projectionViewer = mock(ProjectionViewerWrapper.class);
+        when(projectionViewer.canDoOperation(ProjectionViewer.COLLAPSE)).thenReturn(true);
 
-        final SuiteSourceEditor sourceEditor = mock(SuiteSourceEditor.class);
-        when(sourceEditor.getViewer()).thenReturn(viewer);
+        handler.collapse(projectionViewer);
 
-        final RobotFormEditor editor = mock(RobotFormEditor.class);
-        when(editor.getSourceEditor()).thenReturn(sourceEditor);
-
-        handler.collapse(editor);
-
-        verify(viewer).canDoOperation(ProjectionViewer.COLLAPSE);
-        verify(viewer).doOperation(ProjectionViewer.COLLAPSE);
-        verifyNoMoreInteractions(viewer);
+        verify(projectionViewer).canDoOperation(ProjectionViewer.COLLAPSE);
+        verify(projectionViewer).doOperation(ProjectionViewer.COLLAPSE);
+        verifyNoMoreInteractions(projectionViewer);
     }
-
 }

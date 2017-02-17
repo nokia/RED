@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -17,7 +19,6 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -103,8 +104,8 @@ public class ReferencedLibrariesEditingSupportTest {
         support.setValue(location, "http://some.other.uri.com");
 
         assertThat(location.getUri()).isEqualTo("http://some.other.uri.com");
-        verify(eventBroker).send(Matchers.eq(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED),
-                Matchers.any(RedProjectConfigEventData.class));
+        verify(eventBroker).send(eq(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED),
+                any(RedProjectConfigEventData.class));
     }
 
     @Test

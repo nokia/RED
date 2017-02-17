@@ -6,8 +6,8 @@
 package org.robotframework.red.nattable.edit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +51,7 @@ public class CellEditorValueValidationListenerTest {
         final String errorMessage = "an error";
 
         final IJobChangeEvent jobChangeEvent = mock(IJobChangeEvent.class);
-        Job b = new MockJob("my mock job");
+        final Job b = new MockJob("my mock job");
         b.setProperty(MockJob.getLockPropertyName(), Boolean.TRUE);
         b.setProperty(MockJob.getErrorMessagePropertyName(), errorMessage);
         b.schedule();
@@ -75,7 +75,7 @@ public class CellEditorValueValidationListenerTest {
             throws InterruptedException {
         // given
         final IJobChangeEvent jobChangeEvent = mock(IJobChangeEvent.class);
-        Job b = new MockJob("my mock job");
+        final Job b = new MockJob("my mock job");
         b.schedule();
         b.join();
 
@@ -92,7 +92,7 @@ public class CellEditorValueValidationListenerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        Composite composite = mock(Composite.class);
+        final Composite composite = mock(Composite.class);
         when(composite.toDisplay(any(Point.class))).thenReturn(new Point(0, 0));
         when(composite.toDisplay(anyInt(), anyInt())).thenReturn(new Point(0, 0));
         when(control.getShell()).thenReturn(shell.getShell());
@@ -100,13 +100,13 @@ public class CellEditorValueValidationListenerTest {
         when(composite.toDisplay(any(Point.class))).thenReturn(new Point(0, 0));
         when(control.getBounds()).thenReturn(new Rectangle(0, 0, 0, 0));
         when(control.toControl(any(Point.class))).thenReturn(new Point(0, 0));
-        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<Object>(null);
+        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(null);
         this.cellValidationListener = validationJobScheduler.new CellEditorValueValidationListener<>(control);
     }
 
     private static class MockJob extends Job {
 
-        public MockJob(String name) {
+        public MockJob(final String name) {
             super(name);
         }
 
@@ -119,7 +119,7 @@ public class CellEditorValueValidationListenerTest {
         }
 
         @Override
-        protected IStatus run(IProgressMonitor monitor) {
+        protected IStatus run(final IProgressMonitor monitor) {
             return Status.OK_STATUS;
         }
     }

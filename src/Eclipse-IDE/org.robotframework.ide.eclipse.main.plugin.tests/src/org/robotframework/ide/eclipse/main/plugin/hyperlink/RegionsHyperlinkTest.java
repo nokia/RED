@@ -84,7 +84,6 @@ public class RegionsHyperlinkTest {
         assertThat(textControl.getSelectionText()).isEqualTo("fff");
     }
 
-    @SuppressWarnings("unchecked")
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIsThrown_whenTryingToGetLineOfInvalidOffset() throws Exception {
         final int targetOffset = -10;

@@ -7,9 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyMapOf;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +29,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -74,8 +74,8 @@ public class RobotLaunchConfigurationTest {
         // this mean that the process will inherit environment variables from parent process
 
         final ILaunchConfiguration config = mock(ILaunchConfiguration.class);
-        when(config.getAttribute(eq(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES), anyMapOf(String.class, String.class)))
-                .thenReturn(null);
+        when(config.getAttribute(eq(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES),
+                ArgumentMatchers.<Map<String, String>> isNull())).thenReturn(null);
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
 
@@ -87,8 +87,8 @@ public class RobotLaunchConfigurationTest {
         final Map<String, String> vars = ImmutableMap.of("VAR1", "x", "VAR2", "y", "VAR3", "z");
 
         final ILaunchConfiguration config = mock(ILaunchConfiguration.class);
-        when(config.getAttribute(eq(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES), anyMapOf(String.class, String.class)))
-                .thenReturn(vars);
+        when(config.getAttribute(eq(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES),
+                ArgumentMatchers.<Map<String, String>> isNull())).thenReturn(vars);
         when(config.getAttribute(eq(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES), anyBoolean())).thenReturn(false);
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
@@ -102,8 +102,8 @@ public class RobotLaunchConfigurationTest {
         final Map<String, String> vars = ImmutableMap.of("VAR1", "x", "VAR2", "y", "VAR3", "z");
 
         final ILaunchConfiguration config = mock(ILaunchConfiguration.class);
-        when(config.getAttribute(eq(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES), anyMapOf(String.class, String.class)))
-                .thenReturn(vars);
+        when(config.getAttribute(eq(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES),
+                ArgumentMatchers.<Map<String, String>> isNull())).thenReturn(vars);
         when(config.getAttribute(eq(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES), anyBoolean())).thenReturn(true);
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(config);
