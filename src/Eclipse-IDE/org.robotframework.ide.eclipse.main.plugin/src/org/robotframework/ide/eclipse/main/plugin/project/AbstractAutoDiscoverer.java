@@ -37,7 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 /**
  * @author bembenek
  */
-abstract class AbstractAutoDiscoverer {
+public abstract class AbstractAutoDiscoverer {
 
     private static final AtomicBoolean isDryRunRunning = new AtomicBoolean(false);
 
@@ -156,7 +156,7 @@ abstract class AbstractAutoDiscoverer {
         return file;
     }
 
-    interface IDryRunTargetsCollector {
+    public interface IDryRunTargetsCollector {
 
         void collectSuiteNamesAndAdditionalProjectsLocations();
 
@@ -165,7 +165,7 @@ abstract class AbstractAutoDiscoverer {
         List<String> getAdditionalProjectsLocations();
     }
 
-    static class AutoDiscovererException extends RuntimeException {
+    public static class AutoDiscovererException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
 

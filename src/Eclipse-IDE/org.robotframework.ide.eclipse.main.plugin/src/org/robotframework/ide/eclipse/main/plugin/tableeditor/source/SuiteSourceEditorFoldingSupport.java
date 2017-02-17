@@ -27,7 +27,6 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotation;
 import org.eclipse.jface.text.source.projection.ProjectionAnnotationModel;
-import org.eclipse.swt.custom.StyledText;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -43,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.red.swt.StyledTextWrapper;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -54,17 +54,18 @@ class SuiteSourceEditorFoldingSupport {
 
     private final RedPreferences preferences;
 
-    private final StyledText textControl;
+    private final StyledTextWrapper textControl;
     private final ProjectionAnnotationModel annotationsModel;
 
     private Map<Position, Annotation> oldFoldingAnnotations;
 
     @VisibleForTesting
-    SuiteSourceEditorFoldingSupport(final StyledText textControl, final ProjectionAnnotationModel annotationsModel) {
+    SuiteSourceEditorFoldingSupport(final StyledTextWrapper textControl,
+            final ProjectionAnnotationModel annotationsModel) {
         this(RedPlugin.getDefault().getPreferences(), textControl, annotationsModel);
     }
 
-    SuiteSourceEditorFoldingSupport(final RedPreferences preferences, final StyledText textControl,
+    SuiteSourceEditorFoldingSupport(final RedPreferences preferences, final StyledTextWrapper textControl,
             final ProjectionAnnotationModel annotationsModel) {
         this.preferences = preferences;
         this.textControl = textControl;
@@ -315,18 +316,18 @@ class SuiteSourceEditorFoldingSupport {
         }
 
         try {
-            if (textControl != null && !textControl.isDisposed()) {
+            if (!textControl.isDisposed()) {
                 textControl.setRedraw(false);
             }
             annotationsModel.modifyAnnotations(annotationsToRemove.toArray(new Annotation[0]), annotationsToAdd,
                     annotationsToChange.toArray(new Annotation[0]));
             // workaround : without this the horizontal scrollbar is reset to 0 position when
             // writing at the end of long line
-            if (textControl != null && !textControl.isDisposed()) {
+            if (!textControl.isDisposed()) {
                 textControl.showSelection();
             }
         } finally {
-            if (textControl != null && !textControl.isDisposed()) {
+            if (!textControl.isDisposed()) {
                 textControl.setRedraw(true);
             }
             oldFoldingAnnotations = newFoldingAnnotations;
