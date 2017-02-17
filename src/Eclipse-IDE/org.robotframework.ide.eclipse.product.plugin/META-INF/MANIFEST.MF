@@ -4,5 +4,5 @@ Bundle-Name: RED Product plugin
 Bundle-SymbolicName: org.robotframework.ide.eclipse.product.plugin;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Nokia Solutions and Networks
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
