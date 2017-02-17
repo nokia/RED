@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.robotframework.red.junit.Conditions.absent;
@@ -23,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 public class SectionHeaderRuleTest {
 
@@ -116,16 +116,6 @@ public class SectionHeaderRuleTest {
         for (final RobotLine line : lines) {
             tokens.addAll(newArrayList(filter(line.getLineElements(), RobotToken.class)));
         }
-        return newArrayList(filter(tokens, contains("*")));
-    }
-
-    private static Predicate<RobotToken> contains(final String substring) {
-        return new Predicate<RobotToken>() {
-
-            @Override
-            public boolean apply(final RobotToken element) {
-                return element.getText().contains(substring);
-            }
-        };
+        return tokens.stream().filter(token -> token.getText().contains("*")).collect(toList());
     }
 }
