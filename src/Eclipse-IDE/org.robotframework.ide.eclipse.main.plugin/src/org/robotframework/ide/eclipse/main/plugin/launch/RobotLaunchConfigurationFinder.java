@@ -23,34 +23,6 @@ public class RobotLaunchConfigurationFinder {
 
     public static final String SELECTED_TESTS_CONFIG_SUFFIX = " (Selected Test Cases)";
 
-    // public static ILaunchConfigurationWorkingCopy findLaunchConfiguration(final List<IResource>
-    // resources)
-    // throws CoreException {
-    //
-    // final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-    // final ILaunchConfigurationType launchConfigurationType = launchManager
-    // .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-    // final ILaunchConfiguration[] launchConfigs =
-    // launchManager.getLaunchConfigurations(launchConfigurationType);
-    // if (resources.size() == 1 && (resources.get(0) instanceof IContainer)) {
-    // final String resourceName = resources.get(0).getName();
-    // final String projectName = resources.get(0).getProject().getName();
-    // for (final ILaunchConfiguration configuration : launchConfigs) {
-    // if (configuration.getName().startsWith(resourceName)
-    // && new RobotLaunchConfiguration(configuration).getProjectName().equals(projectName)) {
-    // return asWorkingCopy(configuration);
-    // }
-    // }
-    // }
-    // for (final ILaunchConfiguration configuration : launchConfigs) {
-    // final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-    // if (robotConfig.isSuitableFor(resources)) {
-    // return asWorkingCopy(configuration);
-    // }
-    // }
-    // return null;
-    // }
-
     public static ILaunchConfigurationWorkingCopy findLaunchConfiguration(final List<IResource> resources)
             throws CoreException {
 
