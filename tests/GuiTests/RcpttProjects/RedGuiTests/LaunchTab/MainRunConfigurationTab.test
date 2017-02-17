@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9aBo4JQ7EeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/31/17 3:44 PM
+Save-Time: 2/17/17 1:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -28,12 +28,11 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
 with [get-window "Run Configurations"] {
     with [get-tab-folder] {
         get-property "pages[0]" | equals Main | verify-true
-        get-property "pages[1]" | equals Remote | verify-true
-        get-property "pages[2]" | equals Source | verify-true
-        get-property "pages[3]" | equals Environment | verify-true
-        get-property "pages[4]" | equals "&Common" | verify-true
+        get-property "pages[1]" | equals Source | verify-true
+        get-property "pages[2]" | equals Environment | verify-true
+        get-property "pages[3]" | equals "&Common" | verify-true
         get-property activePage | equals Main | verify-true
-        get-property tabCount | equals 5 | verify-true
+        get-property tabCount | equals 4 | verify-true
     }
     
     //check test name
