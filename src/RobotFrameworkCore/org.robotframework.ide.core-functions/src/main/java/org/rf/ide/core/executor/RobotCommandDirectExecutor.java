@@ -12,18 +12,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 /**
@@ -32,7 +30,7 @@ import com.google.common.collect.Maps;
  */
 class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
-    private static final TypeReference<Map<String, Object>> STRING_TO_OBJECT_MAPPING_TYPE = 
+    private static final TypeReference<Map<String, Object>> STRING_TO_OBJECT_MAPPING_TYPE =
             new TypeReference<Map<String, Object>>() { };
 
     private static final TypeReference<List<String>> STRING_LIST_TYPE =
@@ -227,18 +225,10 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             }
             final List<String> pathsFromJson = new ObjectMapper().readValue(jsonEncodedOutput.toString(),
                     STRING_LIST_TYPE);
-            final List<String> paths = newArrayList(Iterables.filter(pathsFromJson, new Predicate<String>() {
-                @Override
-                public boolean apply(final String input) {
-                    return !("".equals(input) || ".".equals(input));
-                }
-            }));
-            return newArrayList(Iterables.transform(paths, new Function<String, File>() {
-                @Override
-                public File apply(final String path) {
-                    return new File(path);
-                }
-            }));
+            return pathsFromJson.stream()
+                    .filter(input -> !"".equals(input) && !".".equals(input))
+                    .map(path -> new File(path))
+                    .collect(Collectors.<File> toList());
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to obtain modules search paths", e);
         }
