@@ -53,6 +53,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
+import org.robotframework.red.swt.StyledTextWrapper;
 
 import com.google.common.base.Supplier;
 
@@ -100,7 +101,7 @@ public class SuiteSourceEditor extends TextEditor {
         super.doSetInput(input);
         if (input.getAdapter(IStorage.class) != null) {
             fileModel.reparseEverything(getDocument().get());
-            final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
             eventBroker.post(RobotModelEvents.REPARSING_DONE, fileModel);
         }
     }
@@ -148,7 +149,7 @@ public class SuiteSourceEditor extends TextEditor {
         // turn projection mode on
         new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors()).install();
         viewer.doOperation(ProjectionViewer.TOGGLE);
-        foldingSupport = new SuiteSourceEditorFoldingSupport(viewer.getTextWidget(),
+        foldingSupport = new SuiteSourceEditorFoldingSupport(new StyledTextWrapper(viewer.getTextWidget()),
                 viewer.getProjectionAnnotationModel());
     }
 
@@ -221,7 +222,7 @@ public class SuiteSourceEditor extends TextEditor {
     }
 
     private void activateContext() {
-        final IContextService service = (IContextService) getSite().getService(IContextService.class);
+        final IContextService service = getSite().getService(IContextService.class);
         service.activateContext(SOURCE_PART_CONTEXT_ID);
     }
 

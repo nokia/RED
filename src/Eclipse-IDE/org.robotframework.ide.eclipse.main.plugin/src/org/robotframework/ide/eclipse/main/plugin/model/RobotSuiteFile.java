@@ -513,7 +513,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 : new ArrayList<VariablesFileImportReference>();
     }
 
-    interface ParsingStrategy {
+    public interface ParsingStrategy {
 
         RobotFileOutput parse();
     }

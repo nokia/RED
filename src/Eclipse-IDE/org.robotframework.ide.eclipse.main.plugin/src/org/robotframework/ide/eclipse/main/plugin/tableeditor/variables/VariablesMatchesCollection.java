@@ -52,7 +52,7 @@ class VariablesMatchesCollection extends HeaderFilterMatchesCollection {
         return variable.getComment();
     }
 
-    static class VariableFilter {
+    public static class VariableFilter {
 
         private final HeaderFilterMatchesCollection matches;
 
