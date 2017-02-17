@@ -4,6 +4,9 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src/"/>
 	<classpathentry exported="true" kind="lib" path="lib/assertj-core-2.6.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.10.19.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mockito-core-2.7.7.jar" sourcepath="lib/mockito-core-2.7.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/objenesis-2.5.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-1.6.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/byte-buddy-agent-1.6.8.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

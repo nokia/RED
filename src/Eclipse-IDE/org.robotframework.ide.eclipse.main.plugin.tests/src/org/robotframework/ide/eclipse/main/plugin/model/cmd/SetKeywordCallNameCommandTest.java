@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -605,7 +605,7 @@ public class SetKeywordCallNameCommandTest {
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
         
         List<EditorCommand> undoCommands = command.getUndoCommands();
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
         
@@ -615,11 +615,11 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterUndo.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        List<EditorCommand> redoCommands = new ArrayList<>();
-        for (EditorCommand undoCommand : undoCommands) {
+        final List<EditorCommand> redoCommands = new ArrayList<>();
+        for (final EditorCommand undoCommand : undoCommands) {
             redoCommands.addAll(0, undoCommand.getUndoCommands());
         }
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             redoCommand.execute();
         }
         
@@ -629,10 +629,10 @@ public class SetKeywordCallNameCommandTest {
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
         
         undoCommands = new ArrayList<>();
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             undoCommands.addAll(0, redoCommand.getUndoCommands());
         }
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
         

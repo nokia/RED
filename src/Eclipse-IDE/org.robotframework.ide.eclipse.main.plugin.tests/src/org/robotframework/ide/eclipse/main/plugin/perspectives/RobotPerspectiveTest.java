@@ -7,9 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.perspectives;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyFloat;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyFloat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -138,6 +138,8 @@ public class RobotPerspectiveTest {
         final IFolderLayout folderLayout2 = mock(IFolderLayout.class);
         final IFolderLayout folderLayout3 = mock(IFolderLayout.class);
         final IFolderLayout folderLayout4 = mock(IFolderLayout.class);
+
+        when(layout.getEditorArea()).thenReturn("editor_area");
         when(layout.createFolder(anyString(), anyInt(), anyFloat(), anyString())).thenReturn(folderLayout1,
                 folderLayout2, folderLayout3, folderLayout4);
         

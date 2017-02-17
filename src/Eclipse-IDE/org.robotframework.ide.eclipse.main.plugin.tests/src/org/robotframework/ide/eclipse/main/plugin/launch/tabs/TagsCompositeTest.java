@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.TagsListener;
 import org.robotframework.red.junit.ShellProvider;
 
@@ -109,7 +109,7 @@ public class TagsCompositeTest {
         assertThat(composite).has(tagControls("tag1", "tag2"));
         assertThat(composite.getInput()).containsExactly("tag1", "tag2");
         assertThat(tagsText(composite).getText()).isEmpty();
-        verify(listener, never()).tagAdded(Matchers.anyString());
+        verify(listener, never()).tagAdded(ArgumentMatchers.anyString());
     }
 
     @Test
@@ -125,7 +125,7 @@ public class TagsCompositeTest {
         assertThat(composite).has(tagControls("tag1", "tag2"));
         assertThat(composite.getInput()).containsExactly("tag1", "tag2");
         assertThat(tagsText(composite).getText()).isEmpty();
-        verify(listener, never()).tagAdded(Matchers.anyString());
+        verify(listener, never()).tagAdded(ArgumentMatchers.anyString());
     }
 
     @Test
