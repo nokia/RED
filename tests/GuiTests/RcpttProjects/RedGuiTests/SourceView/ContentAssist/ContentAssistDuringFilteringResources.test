@@ -1,0 +1,124 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _ECH_IISiEeWImNPXuPy_LQ
+Element-Name: ContentAssistDuringFilteringResources
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JlES0PUTEeaWpbE3jg39cA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/17/17 3:12 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | double-click
+get-editor "Script.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Resource     " 
+
+//open CA and type res - many hints
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 2 12
+    key-type "M1+SPACE"
+    wait 300
+    type-text res
+}  
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "res1/res.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "res1/simple_res.robot" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "res1/res3/deep_res.robot" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "res1/res3/res.robot" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "res2/another_res.robot" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "res2/res.robot" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "../SecondProject/res1/res.robot" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "../SecondProject/res1/res3/RES.ROBOT" | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals "../SecondProject/res1/res3/second project res.robot" 
+        | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "../SecondProject/res2/res.robot" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "${/}" | verify-true
+}
+
+//close window
+get-editor "Script.robot" | get-canvas | key-type "TRAVERSE_ESCAPE"
+
+//set caret and type "\t"
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 2 15
+    key-type BackSpace -times 3
+    key-type "M1+SPACE"
+    wait 300
+    type-text "t/"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "t/n.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+}
+
+//close window
+get-editor "Script.robot" | get-canvas | key-type "TRAVERSE_ESCAPE"
+
+
+//set "../" to filter second project
+with [get-editor "Script.robot" | get-text-viewer] {
+    key-type BackSpace -times 2
+    key-type "M1+SPACE"
+    wait 300
+    type-text "../"
+    key-type BackSpace
+}
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "../SecondProject/res1/res.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "../SecondProject/res1/res3/RES.ROBOT" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "../SecondProject/res1/res3/second project res.robot" 
+        | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "../SecondProject/res2/res.robot" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
+}
+
+//check file with space in name
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 2 14
+    key-type BackSpace -times 2
+    key-type "M1+SPACE"
+    wait 300
+    type-text "second "
+}
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "../SecondProject/res1/res3/second project res.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+}    
+
+//type file that not exist
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 2 18
+    key-type BackSpace -times 6
+    key-type "M1+SPACE"
+    wait 300
+    type-text "no f"
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals "${/}" | verify-true
+    
+//type special characters    
+with [get-editor "Script.robot" | get-text-viewer] {
+    set-caret-pos 2 19
+    key-type BackSpace -times 7
+    key-type "M1+SPACE"
+    wait 300
+    type-text "!@"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "special letters/!@#$%^&()_;.robot" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "@{EMPTY}" | verify-true
+}   
+
+get-editor "Script.robot" | get-canvas | key-type "TRAVERSE_ESCAPE"
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
