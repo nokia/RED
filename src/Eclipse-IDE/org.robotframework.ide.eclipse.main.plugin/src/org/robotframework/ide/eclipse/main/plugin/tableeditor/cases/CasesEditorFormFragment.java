@@ -150,6 +150,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     private TreeLayerAccessor treeLayerAccessor;
 
+    private TableHyperlinksSupport detector;
+
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
@@ -281,7 +283,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // hyperlinks configuration
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
         detector.addDetectors(new TableHyperlinksToKeywordsDetector(dataProvider),
                 new TableHyperlinksToVariablesDetector(dataProvider));
 
@@ -375,6 +377,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final CasesMatchesCollection casesMatches = new CasesMatchesCollection();
         casesMatches.collect(dataProvider.getInput(), filter);
         return casesMatches;
+    }
+
+    public TableHyperlinksSupport getDetector() {
+        return detector;
     }
 
     @Inject

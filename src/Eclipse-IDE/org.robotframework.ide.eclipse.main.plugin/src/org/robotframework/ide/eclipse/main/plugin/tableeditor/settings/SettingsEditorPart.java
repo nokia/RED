@@ -14,6 +14,7 @@ import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -31,6 +32,7 @@ import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
 
+@SuppressWarnings("restriction")
 public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
     public SettingsEditorPart() {
@@ -115,7 +117,6 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             return suiteModel.findSection(RobotSettingsSection.class);
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             generalFragment = new GeneralSettingsFormFragment();
@@ -194,6 +195,11 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
             final IDirtyProviderService dirtyProviderService = getContext().getActive(IDirtyProviderService.class);
             dirtyProviderService.setDirtyState(false);
+        }
+
+        @Override
+        public TableHyperlinksSupport getDetector() {
+            return null;
         }
     }
 }

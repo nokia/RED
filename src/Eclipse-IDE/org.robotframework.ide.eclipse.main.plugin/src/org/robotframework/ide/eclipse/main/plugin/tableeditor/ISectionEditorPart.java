@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -31,6 +32,8 @@ public interface ISectionEditorPart {
 
     SelectionLayerAccessor getSelectionLayerAccessor();
     
+    TableHyperlinksSupport getDetector();
+
     com.google.common.base.Optional<TreeLayerAccessor> getTreeLayerAccessor();
 
     void waitForPendingJobs();

@@ -6,12 +6,14 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import org.eclipse.e4.tools.compat.parts.DIEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 
 import com.google.common.base.Optional;
 
+@SuppressWarnings("restriction")
 public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorPart<C> implements ISectionEditorPart {
 
     public DISectionEditorPart(final Class<C> clazz) {
@@ -71,5 +73,10 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     @Override
     public void waitForPendingJobs() {
         getComponent().waitForPendingJobs();
+    }
+
+    @Override
+    public TableHyperlinksSupport getDetector() {
+        return getComponent().getDetector();
     }
 }

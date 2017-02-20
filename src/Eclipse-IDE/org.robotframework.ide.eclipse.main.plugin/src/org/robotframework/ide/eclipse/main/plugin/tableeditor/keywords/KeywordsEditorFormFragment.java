@@ -150,6 +150,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private SelectionLayerAccessor selectionLayerAccessor;
 
     private TreeLayerAccessor treeLayerAccessor;
+    
+    private TableHyperlinksSupport detector;
 
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -281,7 +283,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
         detector.addDetectors(new TableHyperlinksToKeywordsDetector(dataProvider),
                 new TableHyperlinksToVariablesDetector(dataProvider));
 
@@ -659,5 +661,9 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             super(site, table, selectionProvider, "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu",
                     "Robot suite editor keywords context menu");
         }
+    }
+
+    public TableHyperlinksSupport getDetector() {
+        return detector;
     }
 }
