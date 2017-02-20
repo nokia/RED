@@ -1,0 +1,121 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9twu0PUsEeaWpbE3jg39cA,_d8aMACuvEeW667Afdo4DcA
+Element-Name: LaunchPreviousConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _IufRUPUtEeaWpbE3jg39cA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/20/17 1:32 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-console-log-and-clear-it"{
+	get-view Console | get-text-viewer | get-property text | contains 
+     "LaunchesTests.FirstFile                                                       \n"
+    + "==============================================================================\n"
+    + "test 1                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "test 2                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "test 3                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "LaunchesTests.FirstFile                                               | PASS |\n"
+    + "3 critical tests, 3 passed, 0 failed\n"
+    + "3 tests total, 3 passed, 0 failed\n"  | verify-true
+    
+    get-view Console | get-button "Clear Console" | click
+}	
+
+//set preference to run previous config
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Run\\/Debug/Launching"
+    get-group "Launch Operation" | get-button "Always launch the previously launched application" | click
+    get-button OK | click
+}
+//run test
+get-view "Project Explorer" | get-tree | select "LaunchesTests/FirstFile.robot" | get-menu "Run As/1 Robot Test" | click
+check-console-log-and-clear-it
+
+//click on Outline and press Run button
+get-view "Project Explorer" | get-tree | select "LaunchesTests/FirstFile.robot" | double-click
+get-view Outline | get-tree | select "FirstFile.robot/Variables"
+get-button "Run.*" -index 0 | click
+
+//tu otwiera sie okinko
+get-window "Run Configurations" | get-tree | select "Robot/FirstFile.robot" | double-click
+check-console-log-and-clear-it
+
+//run test when focus is on other test
+get-view "Project Explorer" | get-tree | select "LaunchesTests/SecondTest.robot" | click
+get-button "Run.*" -index 0 | click
+check-console-log-and-clear-it
+
+//set focus on Message log and run test
+get-view "Message Log" | get-editbox | set-text-offset 37 6
+get-button "Run.*" -index 0 | click
+check-console-log-and-clear-it
+
+//run test when focus is set onsingle test case
+get-view "Project Explorer" | get-tree | select "LaunchesTests/FirstFile.robot/Test Cases/test 1"
+get-button "Run.*" -index 0 | click
+check-console-log-and-clear-it
+
+
+//run single test from second project
+get-view "Project Explorer" | get-tree | select "LaunchesTests/SecondTest.robot/Test Cases/test 6" | get-menu Run 
+    | click
+    
+//check log in message log    
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.SecondTest.test 6\n"
+    + ".* : INFO : 6\n"
+    + "Ending test: LaunchesTests.SecondTest.test 6" | verify-true
+    
+//set focus on test 1 in firts file    
+get-view Outline | get-tree | select "FirstFile.robot/Test Cases/test 1"
+
+//run test
+get-button "Run.*" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.SecondTest.test 6\n"
+    + ".* : INFO : 6\n"
+    + "Ending test: LaunchesTests.SecondTest.test 6" | verify-true
+    
+//set focus on file and run test - new rn config will be created    
+get-view "Project Explorer" | get-tree | select "LaunchesTests/SecondTest.robot" | get-menu "Run As/1 Robot Test" 
+    | click
+    
+get-view Console | get-text-viewer | get-property text 
+    | contains 
+     "test 5                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "test 6                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "test 7                                                                | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "LaunchesTests.SecondTest                                              | PASS |\n"
+    + "3 critical tests, 3 passed, 0 failed\n" | verify-true
+  
+//set focus in editor and run test    
+get-editor "FirstFile.robot" | get-text-viewer | set-caret-pos 13 5
+
+//tu blad - test 6 powinien byc odpalony
+get-button "Run*" | click
+
+//    
+//get-view Console | get-text-viewer | get-property text 
+//    | contains 
+//     "test 5                                                                | PASS |\n"
+//    + "------------------------------------------------------------------------------\n"
+//    + "test 6                                                                | PASS |\n"
+//    + "------------------------------------------------------------------------------\n"
+//    + "test 7                                                                | PASS |\n"
+//    + "------------------------------------------------------------------------------\n"
+//    + "LaunchesTests.SecondTest                                              | PASS |\n"
+//    + "3 critical tests, 3 passed, 0 failed\n" | verify-true
+//    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
