@@ -1,0 +1,251 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_9twu0PUsEeaWpbE3jg39cA
+Element-Name: RunSelectedTestsFromExplorer
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _7wTjoPUsEeaWpbE3jg39cA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/20/17 4:06 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//run tests when focus is set on Test Cases sections in PE for 2 files
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/FirstFile.robot/Test Cases" "LaunchesTests/SecondTest.robot/Test Cases"
+    get-menu Run | click
+}    
+wait 1000 
+//check message log    
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 1\n"
+    + ".* : INFO : 1\n"
+    + "Ending test: LaunchesTests.FirstFile.test 1\n\n"
+    + "Starting test: LaunchesTests.FirstFile.test 2\n"
+    + ".* : INFO : 2\n"
+    + "Ending test: LaunchesTests.FirstFile.test 2\n\n"
+    + "Starting test: LaunchesTests.FirstFile.test 3\n"
+    + ".* : INFO : 3\n"
+    + "Ending test: LaunchesTests.FirstFile.test 3\n\n"
+    + "Starting test: LaunchesTests.SecondTest.test 5\n"
+    + ".* : INFO : 5\n"
+    + "Ending test: LaunchesTests.SecondTest.test 5\n\n"
+    + "Starting test: LaunchesTests.SecondTest.test 6\n"
+    + ".* : INFO : 6\n"
+    + "Ending test: LaunchesTests.SecondTest.test 6\n\n"
+    + "Starting test: LaunchesTests.SecondTest.test 7\n"
+    + ".* : INFO : 7\n"
+    + "Ending test: LaunchesTests.SecondTest.test 7"
+     | verify-true
+
+//select on case form First test and one case from Second test     
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/FirstFile.robot/Test Cases/test 3" "LaunchesTests/SecondTest.robot/Test Cases/test 6"
+    get-menu Run | click
+}
+
+//check Messgae log
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 3\n"
+    + ".* : INFO : 3\n"
+    + "Ending test: LaunchesTests.FirstFile.test 3\n\n"
+    + "Starting test: LaunchesTests.SecondTest.test 6\n"
+    + ".* : INFO : 6\n"
+    + "Ending test: LaunchesTests.SecondTest.test 6" | verify-true
+    
+
+//check run configs
+get-button "Run.*" | click -arrow
+get-menu "Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests (Selected Test Cases)"
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-property itemCount | equals 2 | verify-true
+//run config for 2 selected tests
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SecondTest.robot/test 5" | get-property checked | equals false | verify-true
+    get-item "SecondTest.robot/test 6" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 7" | get-property checked | equals  false | verify-true
+    get-item "FirstFile.robot/test 1" | get-property checked | equals false | verify-true
+    get-item "FirstFile.robot/test 2" | get-property checked | equals false | verify-true
+    get-item "FirstFile.robot/test 3" | get-property checked | equals true | verify-true
+}
+
+//run config for entire test cases sections
+get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests"
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-property itemCount | equals 2 | verify-true
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SecondTest.robot/test 5" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 6" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 7" | get-property checked | equals true | verify-true
+    get-item "FirstFile.robot/test 1" | get-property checked | equals true | verify-true
+    get-item "FirstFile.robot/test 2" | get-property checked | equals true | verify-true
+    get-item "FirstFile.robot/test 3" | get-property checked | equals true | verify-true
+}
+get-window "Run Configurations" | get-button Close | click
+  
+  
+//select 2 file with the same name but different extension    
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/tsv_test/FirstFile.tsv" "LaunchesTests/FirstFile.robot"
+    get-menu "Run As/1 Robot Test" | click
+}
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 1\n"
+    + ".* : INFO : 1\n"
+    + "Ending test: LaunchesTests.FirstFile.test 1\n\n"
+    + "Starting test: LaunchesTests.FirstFile.test 2\n"
+    + ".* : INFO : 2\n"
+    + "Ending test: LaunchesTests.FirstFile.test 2\n\n"
+    + "Starting test: LaunchesTests.FirstFile.test 3\n"
+    + ".* : INFO : 3\n"
+    + "Ending test: LaunchesTests.FirstFile.test 3\n\n"
+    + "Starting test: LaunchesTests.Tsv Test.FirstFile.tsv tst\n"
+    + ".* : INFO : 123\n"
+    + "Ending test: LaunchesTests.Tsv Test.FirstFile.tsv tst" | verify-true
+  
+      
+//select Variables section and one test from other file - one test is run
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/tests/FirstFile.robot/Variables" "LaunchesTests/FirstFile.robot/Test Cases/test 1"
+    get-menu Run | click
+}
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 1\n"
+    + ".* : INFO : 1\n"
+    + "Ending test: LaunchesTests.FirstFile.test 1" | verify-true
+    
+
+//check run configs
+get-menu "Run/Run Configurations..." | click
+
+//config for Variables and one test
+get-window "Run Configurations" | get-tree | select "Robot/FirstFile.robot (Selected Test Cases)"
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-property itemCount | equals 1 | verify-true
+    get-item "FirstFile.robot/test 1" | get-property checked | equals true | verify-true
+    get-item "FirstFile.robot/test 2" | get-property checked | equals false | verify-true
+    get-item "FirstFile.robot/test 3" | get-property checked | equals false | verify-true
+    get-item "FirstFile.robot" | get-property childCount | equals 3 | verify-true
+}
+
+// 
+get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests"
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-property itemCount | equals 2 | verify-true
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SecondTest.robot/test 5" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 6" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 7" | get-property checked | equals true | verify-true
+    get-item "FirstFile.robot/test 1" | get-property checked | equals true | verify-true
+    get-item "FirstFile.robot/test 2" | get-property checked | equals true | verify-true
+    get-item "FirstFile.robot/test 3" | get-property checked | equals true | verify-true
+}
+
+
+get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests (1)"
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "tsv_test/FirstFile.tsv" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "FirstFile.robot" | verify-true
+}
+get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests (Selected Test Cases)"
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().length" | equals 2 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "SecondTest.robot" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals "FirstFile.robot" | verify-true
+}
+
+get-window "Run Configurations" | get-button Close | click
+
+//select 2 folders - one with init only    
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/tests" "LaunchesTests/TestSuiteFolder"
+    get-menu "Run As/1 Robot Test" | click
+}
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.Tests.FirstFile.test 1\n"
+    + ".* : INFO : 1a\n"
+    + "Ending test: LaunchesTests.Tests.FirstFile.test 1\n\n"
+    + "Starting test: LaunchesTests.Tests.FirstFile.test 2\n"
+    + ".* : INFO : 2a\n"
+    + "Ending test: LaunchesTests.Tests.FirstFile.test 2\n\n"
+    + "Starting test: LaunchesTests.Tests.FirstFile.test 4\n"
+    + ".* : INFO : 4a\n"
+    + "Ending test: LaunchesTests.Tests.FirstFile.test 4" | verify-true
+    
+    
+//select 2 folders with tests    
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/tests" "LaunchesTests/tsv_test"
+    get-menu "Run As/1 Robot Test" | click
+}
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.Tests.FirstFile.test 1\n"
+    + ".* : INFO : 1a\n"
+    + "Ending test: LaunchesTests.Tests.FirstFile.test 1\n\n"
+    + "Starting test: LaunchesTests.Tests.FirstFile.test 2\n"
+    + ".* : INFO : 2a\n"
+    + "Ending test: LaunchesTests.Tests.FirstFile.test 2\n\n"
+    + "Starting test: LaunchesTests.Tests.FirstFile.test 4\n"
+    + ".* : INFO : 4a\n"
+    + "Ending test: LaunchesTests.Tests.FirstFile.test 4\n\n"
+    + "Starting test: LaunchesTests.Tsv Test.FirstFile.tsv tst\n"
+    + ".* : INFO : 123\n"
+    + "Ending test: LaunchesTests.Tsv Test.FirstFile.tsv tst" | verify-true
+    
+//check new run configs fro folders    
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests (2)"
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-property itemCount | equals 2 | verify-true
+    get-item tests | get-property checked | equals true | verify-true
+    get-item tests | get-property childCount | equals 0 | verify-true
+    get-item TestSuiteFolder | get-property checked | equals true | verify-true
+    get-item TestSuiteFolder | get-property childCount | equals 0 | verify-true
+}
+get-window "Run Configurations" | get-tree | select "Robot/LaunchesTests (3)"
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item tests | get-property selected | equals false | verify-true
+    get-item tests | get-property childCount | equals 0 | verify-true
+    get-item "tsv_test" | get-property checked | equals true | verify-true
+    get-item "tsv_test" | get-property childCount | equals 0 | verify-true
+}    
+    
+//--------------------------------------- duplicated run config problem -------------------------------------
+
+
+//this is to check if run config is cretaed mulitply times for the same file
+
+with [get-window "Run Configurations"] {
+    with [get-tree] {
+   		//select all configs and remove them
+        select "Robot/FirstFile.robot (Selected Test Cases)" "Robot/LaunchesTests" "Robot/LaunchesTests (1)" "Robot/LaunchesTests (2)" "Robot/LaunchesTests (3)" "Robot/LaunchesTests (Selected Test Cases)"
+        key-type Del
+    }
+    get-window "Confirm Launch Configuration Deletion" | get-button Yes | click
+    get-button Close | click
+}
+
+//run test twice
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/SecondTest.robot" | get-menu "Run As/1 Robot Test" | click
+    wait 1000
+    select "LaunchesTests/SecondTest.robot" | get-menu "Run As/1 Robot Test" | click
+}
+
+//run test from top menu
+get-button "Run.*" | click -arrow
+get-menu "Run As/1 Robot Test" | click
+
+//chceck if only one run config is
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/SecondTest.robot"
+get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 1 | verify-true
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SecondTest.robot/test 5" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 6" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 7" | get-property checked | equals true | verify-true
+} 
+
+get-window "Run Configurations" | get-button Close | click   
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
