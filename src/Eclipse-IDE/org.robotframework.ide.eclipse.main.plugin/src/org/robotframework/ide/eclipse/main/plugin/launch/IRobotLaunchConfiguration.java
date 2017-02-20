@@ -13,6 +13,6 @@ public interface IRobotLaunchConfiguration {
 
     String getProjectName() throws CoreException;
 
-    void setProjectName(String text) throws CoreException;
+    void setProjectName(String projectName) throws CoreException;
 
 }

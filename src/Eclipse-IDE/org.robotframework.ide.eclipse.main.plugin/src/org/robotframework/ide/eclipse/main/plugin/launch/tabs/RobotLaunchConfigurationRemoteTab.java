@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -22,9 +20,6 @@ import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -37,9 +32,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
-import org.eclipse.ui.model.BaseWorkbenchContentProvider;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -60,7 +52,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
     private final boolean isRunMode;
 
-    private Text projectTxt;
+    private ProjectComposite projectComposite;
 
     private Text hostTxt;
 
@@ -86,49 +78,19 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         setControl(composite);
     }
 
-    private void createProjectGroup(final Composite composite) {
-        // FIXME : this duplicates the same group defined by Main tab; make this code common
-        final Group projectGroup = new Group(composite, SWT.NONE);
+    private void createProjectGroup(final Composite parent) {
+        final Group projectGroup = new Group(parent, SWT.NONE);
         projectGroup.setText("Project");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(projectGroup);
         GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(projectGroup);
 
-        projectTxt = new Text(projectGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectTxt);
-        projectTxt.addModifyListener(new ModifyListener() {
+        projectComposite = new ProjectComposite(projectGroup, new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
-
-        final Button browseProject = new Button(projectGroup, SWT.PUSH);
-        browseProject.setText("Browse...");
-        browseProject.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
-                        new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
-                dialog.setTitle("Select project");
-                dialog.setMessage("Select the project hosting your test suites:");
-                dialog.addFilter(new ViewerFilter() {
-
-                    @Override
-                    public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-                        return element instanceof IProject;
-                    }
-                });
-                dialog.setAllowMultiple(false);
-                dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-                if (dialog.open() == Window.OK) {
-                    final IProject project = (IProject) dialog.getFirstResult();
-                    projectTxt.setText(project.getName());
-                }
-            }
-        });
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(browseProject);
     }
 
     private void createServerGroup(final Composite parent) {
@@ -245,13 +207,10 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             final String port = robotConfig.getRemoteDebugPortValue();
             final String timeout = robotConfig.getRemoteDebugTimeoutValue();
 
-            if (!robotConfig.isDefiningProjectDirectly()) {
-                final Composite projectGroup = projectTxt.getParent();
-                final Composite parent = projectGroup.getParent();
-                projectGroup.dispose();
-                parent.layout();
+            if (robotConfig.isDefiningProjectDirectly()) {
+                projectComposite.setInput(robotConfig.getProjectName());
             } else {
-                projectTxt.setText(robotConfig.getProjectName());
+                projectComposite.disposeGroup();
             }
 
             hostTxt.setText(hostIp);
@@ -288,7 +247,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
     @Override
     public boolean canSave() {
-        return projectTxt == null || projectTxt.isDisposed() || !projectTxt.getText().isEmpty();
+        return projectComposite.isDisposedOrFilled();
     }
 
     @Override
@@ -296,7 +255,9 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                 .remoteLaunchConfiguration(configuration);
         try {
-            robotConfig.setProjectName(projectTxt.getText().trim());
+            if (robotConfig.isDefiningProjectDirectly()) {
+                robotConfig.setProjectName(projectComposite.getSelectedProjectName());
+            }
             robotConfig.setRemoteDebugHostValue(hostTxt.getText().trim());
             robotConfig.setRemoteDebugPortValue(portTxt.getText().trim());
             robotConfig.setRemoteDebugTimeoutValue(timeoutTxt.getText().trim());

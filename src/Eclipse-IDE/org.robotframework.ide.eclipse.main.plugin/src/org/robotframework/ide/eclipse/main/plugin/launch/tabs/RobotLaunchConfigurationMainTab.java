@@ -8,9 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -18,9 +16,6 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -32,9 +27,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
-import org.eclipse.ui.model.BaseWorkbenchContentProvider;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
@@ -69,7 +61,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     private TagsComposite excludedTagsComposite;
 
-    private Text projectText;
+    private ProjectComposite projectComposite;
 
     private SuitesToRunComposite suitesToRunComposite;
 
@@ -94,7 +86,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             excludeTagsBtn.setSelection(robotConfig.isExcludeTagsEnabled());
             excludedTagsComposite.setInput(robotConfig.getExcludedTags());
 
-            projectText.setText(projectName);
+            projectComposite.setInput(projectName);
             suitesToRunComposite.initialize(projectName, robotConfig.getSuitePaths());
 
             tagsSupport.switchTo(projectName, robotConfig.collectSuitesToRun());
@@ -111,7 +103,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         try {
             robotConfig.setUsingInterpreterFromProject(interpretersComposite.isUsingProjectInterpreter());
             robotConfig.setExecutor(interpretersComposite.getChosenSystemExecutor());
-            robotConfig.setProjectName(projectText.getText());
+            robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             robotConfig.setExecutorArguments(argumentsText.getText());
             robotConfig.setInterpreterArguments(interpreterArgumentsText.getText());
 
@@ -174,7 +166,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public boolean canSave() {
-        return !projectText.getText().isEmpty();
+        return projectComposite.isDisposedOrFilled();
     }
 
     @Override
@@ -266,47 +258,18 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     }
 
     private void createProjectGroup(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Project");
-        GridDataFactory.fillDefaults().applyTo(group);
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(2, 1).applyTo(group);
+        final Group projectGroup = new Group(parent, SWT.NONE);
+        projectGroup.setText("Project");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectGroup);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(projectGroup);
 
-        projectText = new Text(group, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectText);
-        projectText.addModifyListener(new ModifyListener() {
+        projectComposite = new ProjectComposite(projectGroup, new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
-
-        final Button browseProject = new Button(group, SWT.NONE);
-        browseProject.setText("Browse...");
-        browseProject.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
-                        new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
-                dialog.setTitle("Select project");
-                dialog.setMessage("Select the project hosting your test suites:");
-                dialog.addFilter(new ViewerFilter() {
-
-                    @Override
-                    public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-                        return element instanceof IProject;
-                    }
-                });
-                dialog.setAllowMultiple(false);
-                dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
-                if (dialog.open() == Window.OK) {
-                    final IProject project = (IProject) dialog.getFirstResult();
-                    projectText.setText(project.getName());
-                }
-            }
-        });
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(browseProject);
     }
 
     private void createSuitesGroup(final Composite parent) {
