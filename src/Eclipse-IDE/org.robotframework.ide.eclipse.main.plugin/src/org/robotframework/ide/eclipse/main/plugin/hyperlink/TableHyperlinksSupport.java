@@ -127,6 +127,10 @@ public class TableHyperlinksSupport {
         });
     }
 
+    public List<ITableHyperlinksDetector> getDetectors() {
+        return detectors;
+    }
+
     @VisibleForTesting
     static Optional<IRegion> getMergedHyperlinkRegion(final Collection<IHyperlink> hyperlinks) {
         if (hyperlinks.isEmpty()) {

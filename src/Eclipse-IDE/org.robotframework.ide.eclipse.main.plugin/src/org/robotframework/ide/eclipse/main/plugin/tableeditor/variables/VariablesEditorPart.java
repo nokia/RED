@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -112,6 +113,11 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
         @Override
         public void waitForPendingJobs() {
             return;
+        }
+
+        @Override
+        public TableHyperlinksSupport getDetector() {
+            return null;
         }
     }
 }

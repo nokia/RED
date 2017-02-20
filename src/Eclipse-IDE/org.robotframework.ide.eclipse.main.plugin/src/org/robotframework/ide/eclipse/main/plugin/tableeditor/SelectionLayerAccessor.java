@@ -140,6 +140,10 @@ public class SelectionLayerAccessor {
         }
     }
 
+    public String getLabelFromCell(final int row, final int column) {
+        return (String) dataProvider.getDataValue(column, row);
+    }
+
     public void preserveSelectionWhen(final Runnable operation) {
         preserveSelectionWhen(operation, Functions.<PositionCoordinate> identity());
     }

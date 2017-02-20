@@ -1224,6 +1224,11 @@
              optional="false">
        </commandParameter>
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.openDeclarationForTables"
+          name="Open Declaration For Tables">
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -1543,6 +1548,29 @@
                 </and>
              </with>
           </and>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.OpenDeclarationForTablesHandler"
+          commandId="org.robotframework.ide.eclipse.openDeclarationForTables">
+       <activeWhen>
+          <with
+                variable="activePartId">
+             <or>
+                <reference
+                      definitionId="org.robotframework.casesPartIsActive">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.keywordsPartIsActive">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.settingsPartIsActive">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.variablesPartIsActive">
+                </reference>
+             </or>
+          </with>
        </activeWhen>
     </handler>
     <handler
@@ -3010,6 +3038,12 @@
     <key
           commandId="org.robotframework.ide.eclipse.openDeclaration"
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="F3">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.openDeclarationForTables"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="F3">
     </key>
