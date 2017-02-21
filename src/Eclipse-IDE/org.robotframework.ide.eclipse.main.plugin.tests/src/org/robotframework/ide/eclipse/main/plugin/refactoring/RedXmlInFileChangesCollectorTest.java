@@ -31,7 +31,6 @@ public class RedXmlInFileChangesCollectorTest {
 
     @Before
     public void beforeTest() throws Exception {
-        projectProvider.addRobotNature();
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("a");
         config.addExcludedPath("a/b");

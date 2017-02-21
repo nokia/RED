@@ -31,7 +31,6 @@ public class ExcludedPathModifyChangeTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.addRobotNature();
         projectProvider.configure();
     }
 
