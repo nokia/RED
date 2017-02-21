@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9aBo4JQ7EeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/20/17 5:45 PM
+Save-Time: 2/21/17 4:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -84,17 +84,36 @@ with [get-window "Run Configurations"] {
     
     //check Tags
     with [get-group Tags] {
-        get-property childCount | equals 4 | verify-true
-        with [get-button "Only run tests with these tags:"] {
-            get-property caption | equals "Only run tests with these tags:" | verify-true
-            get-property selected | equals false | verify-true
-        }
-        get-editbox | get-property text | equals "" | verify-true
-        with [get-button "Skip tests with these tags:"] {
-            get-property selected | equals false | verify-true
-            get-property kind | equals Check | verify-true
-        }
-        get-editbox -index 1 | get-property text | equals "" | verify-true
+    	//one group
+    	get-property childCount | equals 1 | verify-true
+    	
+    	//one composite wit 4 elements
+    	get-property "getChildren().length" | equals 1 | verify-true
+    	get-property "getChildren().Control[0].getChildren().length" | equals 4 | verify-true
+		
+		//run tags
+	    get-button "Only run tests with these tags:" | get-property selected | equals false | verify-true
+	    get-editbox | get-property text | equals "" | verify-true
+	    
+	    //button
+	    with [get-button "Add new tag"] {
+	        get-property tooltip | equals "Add new tag" | verify-true
+	        get-property selected | equals false | verify-true
+	    }
+	    
+	    //skip tests
+	    get-button "Skip tests with these tags:" | get-property selected | equals false | verify-true
+	    
+	    //text
+	    with [get-editbox -index 1] {
+	        get-property text | equals "" | verify-true
+	        get-property "getEditable()" | equals true | verify-true
+	    }
+	    //button
+	    with [get-button "Add new tag" -index 1] {
+	        get-property enablement | equals true | verify-true
+	        get-property tooltip | equals "Add new tag" | verify-true
+    	}
     }
     
     //check Project
