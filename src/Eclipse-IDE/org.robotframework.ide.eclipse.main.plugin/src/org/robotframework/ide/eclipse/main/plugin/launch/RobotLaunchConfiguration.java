@@ -38,8 +38,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
     private static final String USE_PROJECT_EXECUTOR = "Project executor";
+
     private static final String EXECUTOR_NAME = "Executor";
+
     private static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
+
     private static final String INTERPRETER_ARGUMENTS_ATTRIBUTE = "Interpreter arguments";
 
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
@@ -51,11 +54,12 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return configuration;
     }
 
-    public static ILaunchConfigurationWorkingCopy prepareDefault(final ILaunchConfigurationType launchConfigurationType,
+    static ILaunchConfigurationWorkingCopy prepareDefault(final ILaunchConfigurationType launchConfigurationType,
             final List<IResource> resources) throws CoreException {
-        final String name = resources.size() == 1 ? resources.get(0).getName() : resources.get(0).getProject()
-                .getName();
-        final String configurationName = DebugPlugin.getDefault().getLaunchManager()
+        final String name = resources.size() == 1 ? resources.get(0).getName()
+                : resources.get(0).getProject().getName();
+        final String configurationName = DebugPlugin.getDefault()
+                .getLaunchManager()
                 .generateLaunchConfigurationName(name);
         final ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null,
                 configurationName);
@@ -87,7 +91,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         }
     }
 
-    public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
+    static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
             final Map<IResource, List<String>> suitesMapping) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
@@ -122,7 +126,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
     }
 
-    public static ILaunchConfigurationWorkingCopy prepareLaunchConfigurationForSelectedTestCases(
+    static ILaunchConfigurationWorkingCopy prepareLaunchConfigurationForSelectedTestCases(
             final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final String name = getNameForSelectedTestCasesConfiguration(resourcesToTestCases.keySet());
@@ -138,7 +142,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return configuration;
     }
 
-    public static String getNameForSelectedTestCasesConfiguration(final Collection<IResource> resources) {
+    static String getNameForSelectedTestCasesConfiguration(final Collection<IResource> resources) {
         if (resources.size() == 1) {
             return getFirst(resources, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
         }
@@ -154,6 +158,23 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             return getFirst(projects, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
         }
         return "New Configuration";
+    }
+
+    static boolean contentEquals(final ILaunchConfiguration config1, final ILaunchConfiguration config2)
+            throws CoreException {
+        final RobotLaunchConfiguration rConfig1 = new RobotLaunchConfiguration(config1);
+        final RobotLaunchConfiguration rConfig2 = new RobotLaunchConfiguration(config2);
+        return rConfig1.getExecutor().equals(rConfig2.getExecutor())
+                && rConfig1.getExecutorArguments().equals(rConfig2.getExecutorArguments())
+                && rConfig1.getProjectName().equals(rConfig2.getProjectName())
+                && rConfig1.isUsingInterpreterFromProject() == rConfig2.isUsingInterpreterFromProject()
+                && rConfig1.getInterpreterArguments().equals(rConfig2.getInterpreterArguments())
+                && rConfig1.isExcludeTagsEnabled() == rConfig2.isExcludeTagsEnabled()
+                && rConfig1.isIncludeTagsEnabled() == rConfig2.isIncludeTagsEnabled()
+                && rConfig1.isGeneralPurposeConfiguration() == rConfig2.isGeneralPurposeConfiguration()
+                && rConfig1.getExcludedTags().equals(rConfig2.getExcludedTags())
+                && rConfig1.getIncludedTags().equals(rConfig2.getIncludedTags())
+                && rConfig1.getSuitePaths().equals(rConfig2.getSuitePaths());
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -205,7 +226,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return configuration.getAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, "");
     }
 
-    public boolean isSuitableFor(final List<IResource> resources) {
+    boolean isSuitableFor(final List<IResource> resources) {
         try {
             for (final IResource resource : resources) {
                 final IProject project = resource.getProject();
@@ -230,7 +251,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         }
     }
 
-    public boolean isSuitableForOnly(final List<IResource> resources) {
+    boolean isSuitableForOnly(final List<IResource> resources) {
         try {
             final List<IResource> toCall = newArrayList();
             toCall.addAll(resources);
@@ -267,30 +288,12 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         }
     }
 
-    public String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
+    String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
         return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getExecutor().executableName();
     }
 
-    public String createExecutorVersion(final RobotRuntimeEnvironment env)
-            throws RobotEnvironmentException, CoreException {
+    String createExecutorVersion(final RobotRuntimeEnvironment env) throws RobotEnvironmentException, CoreException {
         return isUsingInterpreterFromProject() ? env.getVersion() : RobotRuntimeEnvironment.getVersion(getExecutor());
-    }
-
-    static boolean contentEquals(final ILaunchConfiguration config1, final ILaunchConfiguration config2)
-            throws CoreException {
-        final RobotLaunchConfiguration rConfig1 = new RobotLaunchConfiguration(config1);
-        final RobotLaunchConfiguration rConfig2 = new RobotLaunchConfiguration(config2);
-        return rConfig1.getExecutor().equals(rConfig2.getExecutor())
-                && rConfig1.getExecutorArguments().equals(rConfig2.getExecutorArguments())
-                && rConfig1.getProjectName().equals(rConfig2.getProjectName())
-                && rConfig1.isUsingInterpreterFromProject() == rConfig2.isUsingInterpreterFromProject()
-                && rConfig1.getInterpreterArguments().equals(rConfig2.getInterpreterArguments())
-                && rConfig1.isExcludeTagsEnabled() == rConfig2.isExcludeTagsEnabled()
-                && rConfig1.isIncludeTagsEnabled() == rConfig2.isIncludeTagsEnabled()
-                && rConfig1.isGeneralPurposeConfiguration() == rConfig2.isGeneralPurposeConfiguration()
-                && rConfig1.getExcludedTags().equals(rConfig2.getExcludedTags())
-                && rConfig1.getIncludedTags().equals(rConfig2.getIncludedTags())
-                && rConfig1.getSuitePaths().equals(rConfig2.getSuitePaths());
     }
 
 }
