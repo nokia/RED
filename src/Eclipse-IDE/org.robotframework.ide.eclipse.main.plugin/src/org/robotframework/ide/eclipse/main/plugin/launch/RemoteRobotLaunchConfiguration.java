@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
@@ -20,6 +21,16 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
     static final String TYPE_ID = "org.robotframework.ide.remoteRobotLaunchConfiguration";
 
     private final ILaunchConfiguration configuration;
+
+    public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
+        final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(launchConfig);
+        try {
+            robotConfig.setProjectName("");
+        } catch (final CoreException e) {
+            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
+                    "RED was unable to load the working copy of Launch Configuration.");
+        }
+    }
 
     public RemoteRobotLaunchConfiguration(final ILaunchConfiguration config) {
         this.configuration = config;
