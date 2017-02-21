@@ -169,7 +169,7 @@ class InterpretersComposite extends Composite {
         }
     }
 
-    interface InterpreterListener {
+    public interface InterpreterListener {
 
         void interpreterChanged(Optional<SuiteExecutor> newExecutor);
     }
