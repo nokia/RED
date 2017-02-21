@@ -37,7 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.RemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
@@ -196,7 +196,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
     @Override
     public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
-        RobotLaunchConfiguration.fillDefaults(configuration);
+        RemoteRobotLaunchConfiguration.fillDefaults(configuration);
     }
 
     @Override
