@@ -40,8 +40,10 @@ public class RobotSpecialTokens {
     private static class ForInActionLiteral extends ATokenRecognizer {
 
         protected ForInActionLiteral() {
-            super(Pattern.compile("^(\\s)*" + "([i|I](\\s)*[n|N]|" + createUpperLowerCaseWord("in range") + "|"
-                    + createUpperLowerCaseWord("in zip") + "|" + createUpperLowerCaseWord("in enumerate") + ")"
+            super(Pattern.compile(
+                    "^(\\s)*" + "([i|I](\\s)*[n|N]|" + createUpperLowerCaseWordWithOptionalSpaceInside("in range") + "|"
+                            + createUpperLowerCaseWordWithOptionalSpaceInside("in zip") + "|"
+                            + createUpperLowerCaseWordWithOptionalSpaceInside("in enumerate") + ")"
                     + "(\\s)*$"),
                     RobotTokenType.IN_TOKEN);
         }
