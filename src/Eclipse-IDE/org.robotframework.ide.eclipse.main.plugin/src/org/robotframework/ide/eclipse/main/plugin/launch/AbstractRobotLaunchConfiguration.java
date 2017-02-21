@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Nokia Solutions and Networks
+ * Copyright 2017 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -31,7 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -118,7 +117,7 @@ abstract class AbstractRobotLaunchConfiguration
                 for (final String s : temp) {
                     testSuites.add(s.toLowerCase());
                 }
-                return Joiner.on("::").join(testSuites);
+                return String.join("::", testSuites);
             }
         });
         launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
@@ -176,45 +175,6 @@ abstract class AbstractRobotLaunchConfiguration
         return suitesToRun;
     }
 
-    public String[] getEnvironmentVariables() throws CoreException {
-        final Map<String, String> vars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
-                (Map<String, String>) null);
-        if (vars == null) {
-            return null;
-        }
-        final boolean shouldAppendVars = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES,
-                true);
-        final List<String> varMappings = new ArrayList<>();
-        if (shouldAppendVars) {
-            appendVariables(varMappings, System.getenv());
-        }
-        appendVariables(varMappings, vars);
-        return varMappings.toArray(new String[0]);
-    }
-
-    private void appendVariables(final List<String> varMappings, final Map<String, String> vars) {
-        for (final Entry<String, String> entry : vars.entrySet()) {
-            varMappings.add(entry.getKey() + "=" + entry.getValue());
-        }
-    }
-
-    public RobotProject getRobotProject() throws CoreException {
-        final IProject project = getProject();
-        return RedPlugin.getModelManager().getModel().createRobotProject(project);
-    }
-
-    IProject getProject() throws CoreException {
-        final String projectName = getProjectName();
-        if (projectName.isEmpty()) {
-            return null;
-        }
-        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-        if (!project.exists()) {
-            throw newCoreException("Project '" + projectName + "' cannot be found in workspace", null);
-        }
-        return project;
-    }
-
     @Override
     public List<String> getSuitesToRun() throws CoreException {
         final Collection<IResource> suites = getSuiteResources();
@@ -258,7 +218,7 @@ abstract class AbstractRobotLaunchConfiguration
             }
         }
         if (!problems.isEmpty()) {
-            throw newCoreException(Joiner.on('\n').join(problems));
+            throw newCoreException(String.join("\n", problems));
         }
         return resources.values();
     }
@@ -273,6 +233,45 @@ abstract class AbstractRobotLaunchConfiguration
             }
         }
         return tests;
+    }
+
+    public String[] getEnvironmentVariables() throws CoreException {
+        final Map<String, String> vars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
+                (Map<String, String>) null);
+        if (vars == null) {
+            return null;
+        }
+        final boolean shouldAppendVars = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES,
+                true);
+        final List<String> varMappings = new ArrayList<>();
+        if (shouldAppendVars) {
+            appendVariables(varMappings, System.getenv());
+        }
+        appendVariables(varMappings, vars);
+        return varMappings.toArray(new String[0]);
+    }
+
+    private void appendVariables(final List<String> varMappings, final Map<String, String> vars) {
+        for (final Entry<String, String> entry : vars.entrySet()) {
+            varMappings.add(entry.getKey() + "=" + entry.getValue());
+        }
+    }
+
+    public RobotProject getRobotProject() throws CoreException {
+        final IProject project = getProject();
+        return RedPlugin.getModelManager().getModel().createRobotProject(project);
+    }
+
+    private IProject getProject() throws CoreException {
+        final String projectName = getProjectName();
+        if (projectName.isEmpty()) {
+            return null;
+        }
+        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        if (!project.exists()) {
+            throw newCoreException("Project '" + projectName + "' cannot be found in workspace", null);
+        }
+        return project;
     }
 
     ILaunchConfigurationWorkingCopy asWorkingCopy() throws CoreException {
