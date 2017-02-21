@@ -19,11 +19,6 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
 
     static final String TYPE_ID = "org.robotframework.ide.remoteRobotLaunchConfiguration";
 
-    private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
-    private static final String REMOTE_DEBUG_HOST_ATTRIBUTE = "Remote debug host";
-    private static final String REMOTE_DEBUG_PORT_ATTRIBUTE = "Remote debug port";
-    private static final String REMOTE_DEBUG_TIMEOUT_ATTRIBUTE = "Remote debug timeout";
-
     private final ILaunchConfiguration configuration;
 
     public RemoteRobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -82,35 +77,35 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
 
     @Override
     public String getRemoteDebugHostValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, "127.0.0.1");
+        return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "127.0.0.1");
     }
 
     @Override
     public String getRemoteDebugPortValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, "12354");
+        return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "12354");
     }
 
     @Override
     public String getRemoteDebugTimeoutValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, "30000");
+        return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "30000");
     }
 
     @Override
     public void setRemoteDebugHostValue(final String host) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, host);
+        launchCopy.setAttribute(REMOTE_HOST_ATTRIBUTE, host);
     }
 
     @Override
     public void setRemoteDebugPortValue(final String port) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, port);
+        launchCopy.setAttribute(REMOTE_PORT_ATTRIBUTE, port);
     }
 
     @Override
     public void setRemoteDebugTimeoutValue(final String timeout) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, timeout);
+        launchCopy.setAttribute(REMOTE_TIMEOUT_ATTRIBUTE, timeout);
     }
 
     private ILaunchConfigurationWorkingCopy asWorkingCopy() throws CoreException {

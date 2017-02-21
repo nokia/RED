@@ -33,7 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Optional;
 
-
 /**
  * @author Michal Anglart
  */
@@ -42,8 +41,11 @@ class InterpretersComposite extends Composite {
     private final InterpreterListener listener;
 
     private Button useProjectExecutorButton;
+
     private Button useSystemExecutorButton;
+
     private Combo comboExecutorName;
+
     private Button checkEnvironmentBtn;
 
     InterpretersComposite(final Composite parent, final InterpreterListener listener) {
@@ -89,6 +91,7 @@ class InterpretersComposite extends Composite {
         comboExecutorName = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
         comboExecutorName.setItems(SuiteExecutor.allExecutorNames().toArray(new String[0]));
         comboExecutorName.addModifyListener(new ModifyListener() {
+
             @Override
             public void modifyText(final ModifyEvent e) {
                 listener.interpreterChanged(Optional
@@ -116,10 +119,11 @@ class InterpretersComposite extends Composite {
                     StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e),
                             StatusManager.BLOCK);
                 } catch (final InvocationTargetException e) {
-                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                    StatusManager.getManager().handle(
+                            new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                                     "Unable to find " + SuiteExecutor.fromName(chosenExecutorName).executableName()
                                             + " executable in the system.",
-                            e.getTargetException()),
+                                    e.getTargetException()),
                             StatusManager.BLOCK);
                 }
             }
@@ -165,7 +169,7 @@ class InterpretersComposite extends Composite {
         }
     }
 
-    public interface InterpreterListener {
+    interface InterpreterListener {
 
         void interpreterChanged(Optional<SuiteExecutor> newExecutor);
     }

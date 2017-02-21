@@ -24,12 +24,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.InterpretersComposite.InterpreterListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuitesListener;
@@ -37,18 +34,13 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.Tags
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
-import com.google.common.base.Optional;
-
 /**
- * @author mmarzec
+ * @author bembenek
  */
-public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
+public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurationTab
+        implements ILaunchConfigurationTab {
 
-    private InterpretersComposite interpretersComposite;
-
-    private Text executorArgumentsText;
-
-    private Text interpreterArgumentsText;
+    private ExecutorScriptComposite executorScriptComposite;
 
     private IncludeExcludeTagsComposite includeExcludeTagsComposite;
 
@@ -63,12 +55,9 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public void initializeFrom(final ILaunchConfiguration configuration) {
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
 
         try {
-            interpretersComposite.setInput(robotConfig.isUsingInterpreterFromProject(), robotConfig.getExecutor());
-            executorArgumentsText.setText(robotConfig.getExecutorArguments());
-            interpreterArgumentsText.setText(robotConfig.getInterpreterArguments());
             includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
                     robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
             projectComposite.setInput(robotConfig.getProjectName());
@@ -82,13 +71,9 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
 
         try {
-            robotConfig.setUsingInterpreterFromProject(interpretersComposite.isUsingProjectInterpreter());
-            robotConfig.setExecutor(interpretersComposite.getChosenSystemExecutor());
-            robotConfig.setExecutorArguments(executorArgumentsText.getText());
-            robotConfig.setInterpreterArguments(interpreterArgumentsText.getText());
             robotConfig.setIsIncludeTagsEnabled(includeExcludeTagsComposite.isIncludeTagsEnabled());
             robotConfig.setIncludedTags(includeExcludeTagsComposite.getIncludedTags());
             robotConfig.setIsExcludeTagsEnabled(includeExcludeTagsComposite.isExcludeTagsEnabled());
@@ -107,7 +92,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         setWarningMessage(null);
         includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
 
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
         try {
             suitesToRunComposite.switchTo(robotConfig.getProjectName());
             new LaunchConfigurationsValidator().validate(robotConfig);
@@ -133,12 +118,12 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public String getName() {
-        return "Main";
+        return "Script";
     }
 
     @Override
     public Image getImage() {
-        return ImagesManager.getImage(RedImages.getRobotImage());
+        return ImagesManager.getImage(RedImages.getScriptRobotImage());
     }
 
     @Override
@@ -148,7 +133,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public String getMessage() {
-        return "Create or edit a configuration to launch Robot Framework tests";
+        return "Create or edit a configuration to launch Robot Framework tests with custom script";
     }
 
     @Override
@@ -156,7 +141,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(composite);
 
-        createExecutorGroup(composite);
+        createExecutorScriptGroup(composite);
         createTagsGroup(composite);
         createProjectGroup(composite);
         createSuitesGroup(composite);
@@ -164,40 +149,20 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         setControl(composite);
     }
 
-    private void createExecutorGroup(final Composite parent) {
+    private void createExecutorScriptGroup(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
-        group.setText("Executor");
+        group.setText("Executor Script");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
-        interpretersComposite = new InterpretersComposite(group, new InterpreterListener() {
-
-            @Override
-            public void interpreterChanged(final Optional<SuiteExecutor> newExecutor) {
-                updateLaunchConfigurationDialog();
-            }
-        });
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(interpretersComposite);
-
-        interpreterArgumentsText = createLabeledText(group, "Additional interpreter arguments:");
-        executorArgumentsText = createLabeledText(group, "Additional Robot Framework arguments:");
-    }
-
-    private Text createLabeledText(final Composite parent, final String label) {
-        final Label lbl = new Label(parent, SWT.NONE);
-        lbl.setText(label);
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(lbl);
-
-        final Text txt = new Text(parent, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(txt);
-        txt.addModifyListener(new ModifyListener() {
+        executorScriptComposite = new ExecutorScriptComposite(group, new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
-        return txt;
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(executorScriptComposite);
     }
 
     private void createTagsGroup(final Composite parent) {
