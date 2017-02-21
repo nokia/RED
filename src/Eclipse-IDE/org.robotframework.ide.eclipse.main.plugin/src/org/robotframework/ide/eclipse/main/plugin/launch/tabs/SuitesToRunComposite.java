@@ -584,7 +584,7 @@ class SuitesToRunComposite extends Composite {
         DESELECT_ALL;
     }
 
-    interface SuitesListener {
+    public interface SuitesListener {
 
         void suitesChanged();
     }
