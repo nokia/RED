@@ -143,6 +143,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     private SelectionLayerAccessor selectionLayerAccessor;
 
+    private TableHyperlinksSupport detector;
+
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -281,7 +283,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
         detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
                 new TableHyperlinksToFilesDetector(dataProvider));
 
@@ -379,6 +381,11 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         settings.addAll(dataProvider.getInput().getImportSettings());
         settingsMatches.collect(settings, filter);
         return settingsMatches;
+    }
+
+    @Override
+    public TableHyperlinksSupport getDetector() {
+        return detector;
     }
 
     @Inject

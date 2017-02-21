@@ -117,7 +117,7 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
 
         @Override
         public TableHyperlinksSupport getDetector() {
-            return null;
+            return variablesFragment.getDetector();
         }
     }
 }

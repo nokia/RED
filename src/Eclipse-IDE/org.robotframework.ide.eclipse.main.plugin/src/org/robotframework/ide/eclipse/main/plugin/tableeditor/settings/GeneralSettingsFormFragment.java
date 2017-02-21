@@ -204,6 +204,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private final Object DOCUMENTATION_LOCK = new Object();
 
+    private TableHyperlinksSupport detector;
+
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -622,7 +624,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
         detector.addDetectors(new TableHyperlinksToKeywordsDetector(dataProvider),
                 new TableHyperlinksToVariablesDetector(dataProvider));
 
@@ -816,6 +818,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         } catch (final InterruptedException e) {
             RedPlugin.logError("Documentation change job was interrupted", e);
         }
+    }
+
+    @Override
+    public TableHyperlinksSupport getDetector() {
+        return detector;
     }
 
     @Inject

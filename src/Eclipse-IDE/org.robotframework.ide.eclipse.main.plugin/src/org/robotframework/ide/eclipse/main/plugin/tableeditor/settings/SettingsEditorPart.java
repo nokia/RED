@@ -199,6 +199,13 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public TableHyperlinksSupport getDetector() {
+            final ISelection selection = settingsEditorPageSelectionProvider.getSelection();
+
+            if (selection != null && !selection.isEmpty()) {
+                final ISettingsFormFragment activeFormFragment = settingsEditorPageSelectionProvider
+                        .getActiveFormFragment();
+                return activeFormFragment.getDetector();
+            }
             return null;
         }
     }

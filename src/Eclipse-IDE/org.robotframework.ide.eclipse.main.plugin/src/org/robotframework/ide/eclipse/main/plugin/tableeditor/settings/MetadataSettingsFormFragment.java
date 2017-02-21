@@ -149,6 +149,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
     private SelectionLayerAccessor selectionLayerAccessor;
 
+    private TableHyperlinksSupport detector;
+
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -281,7 +283,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
         detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider));
 
         // sorting
@@ -374,6 +376,11 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         settings.addAll(dataProvider.getInput().getMetadataSettings());
         settingsMatches.collect(settings, filter);
         return settingsMatches;
+    }
+
+    @Override
+    public TableHyperlinksSupport getDetector() {
+        return detector;
     }
 
     @Inject
