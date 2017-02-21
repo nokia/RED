@@ -84,10 +84,6 @@ class ProjectComposite extends Composite {
         return projectText.getText().trim();
     }
 
-    boolean isDisposedOrFilled() {
-        return projectText == null || projectText.isDisposed() || !getSelectedProjectName().isEmpty();
-    }
-
     void disposeGroup() {
         if (!this.isDisposed()) {
             final Composite group = this.getParent();

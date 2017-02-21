@@ -127,7 +127,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     @Override
     public boolean canSave() {
-        return projectComposite.isDisposedOrFilled();
+        return !projectComposite.getSelectedProjectName().isEmpty();
     }
 
     @Override
