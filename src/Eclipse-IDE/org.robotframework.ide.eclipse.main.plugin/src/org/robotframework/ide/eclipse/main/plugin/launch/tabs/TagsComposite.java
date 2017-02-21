@@ -193,7 +193,7 @@ class TagsComposite extends Composite {
         return tagNameText.isFocusControl() && !tagNameText.getText().isEmpty();
     }
 
-    public interface TagsListener {
+    interface TagsListener {
 
         void newTagIsEdited();
 

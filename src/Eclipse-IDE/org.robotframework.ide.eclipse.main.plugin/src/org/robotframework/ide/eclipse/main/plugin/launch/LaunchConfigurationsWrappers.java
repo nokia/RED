@@ -14,6 +14,8 @@ public class LaunchConfigurationsWrappers {
         try {
             if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
                 return new RemoteRobotLaunchConfiguration(config);
+            } else if (ScriptRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
+                return new ScriptRobotLaunchConfiguration(config);
             } else if (RobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
                 return new RobotLaunchConfiguration(config);
             }
@@ -27,6 +29,8 @@ public class LaunchConfigurationsWrappers {
         try {
             if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
                 return new RemoteRobotLaunchConfiguration(config);
+            } else if (ScriptRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
+                return new ScriptRobotLaunchConfiguration(config);
             }
         } catch (final CoreException e) {
             throw new IllegalArgumentException("Unrecognized configuration type", e);

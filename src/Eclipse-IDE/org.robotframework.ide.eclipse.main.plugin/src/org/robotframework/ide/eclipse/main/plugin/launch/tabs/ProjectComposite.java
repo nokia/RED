@@ -25,16 +25,15 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 class ProjectComposite extends Composite {
 
-    private Text projectText;
-
     private final ModifyListener listener;
+
+    private Text projectText;
 
     ProjectComposite(final Composite parent, final ModifyListener listener) {
         super(parent, SWT.NONE);
         this.listener = listener;
 
         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(this);
 
         createProjectText();
         createBrowseButton();
@@ -81,15 +80,15 @@ class ProjectComposite extends Composite {
         }
     }
 
-    public String getSelectedProjectName() {
+    String getSelectedProjectName() {
         return projectText.getText().trim();
     }
 
-    public boolean isDisposedOrFilled() {
+    boolean isDisposedOrFilled() {
         return projectText == null || projectText.isDisposed() || !getSelectedProjectName().isEmpty();
     }
 
-    public void disposeGroup() {
+    void disposeGroup() {
         if (!this.isDisposed()) {
             final Composite group = this.getParent();
             final Composite parent = group.getParent();
