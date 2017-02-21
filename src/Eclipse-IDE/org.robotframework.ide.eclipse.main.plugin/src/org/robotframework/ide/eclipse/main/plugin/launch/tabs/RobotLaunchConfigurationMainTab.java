@@ -143,7 +143,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public boolean canSave() {
-        return projectComposite.isDisposedOrFilled();
+        return !projectComposite.getSelectedProjectName().isEmpty();
     }
 
     @Override
