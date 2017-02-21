@@ -18,6 +18,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -121,6 +122,11 @@ class LaunchConfigurationsValidator {
             throw new LaunchConfigurationValidationFatalException(
                     "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
         }
+    }
+
+    void validate(final ScriptRobotLaunchConfiguration robotConfig) {
+        // TODO Auto-generated method stub
+
     }
 
     private Optional<IProject> getProject(final String projectName) {

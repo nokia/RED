@@ -68,6 +68,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/robot_remote.png");
     }
 
+    public static ImageDescriptor getScriptRobotImage() {
+        return RedPlugin.getImageDescriptor("resources/robot_script.png");
+    }
+
     public static ImageDescriptor getRobotSuiteFolderDecoratorImage() {
         return RedPlugin.getImageDescriptor("resources/decorator_suite_folder.png");
     }
@@ -359,11 +363,11 @@ public class RedImages {
     public static ImageDescriptor getShowWhitespaceCharImage() {
         return RedPlugin.getImageDescriptor("resources/show_whitespace_chars.png");
     }
-    
+
     public static ImageDescriptor getEditImage() {
         return RedPlugin.getImageDescriptor("resources/edit.png");
     }
-    
+
     public static ImageDescriptor getImageForResource(final IResource resource) {
         return resource.getAdapter(IWorkbenchAdapter.class).getImageDescriptor(resource);
     }

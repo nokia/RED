@@ -290,7 +290,7 @@ class SuitesToRunComposite extends Composite {
         }
     }
 
-    void initialize(final String projectName, final Map<String, List<String>> map) {
+    void setInput(final String projectName, final Map<String, List<String>> map) {
         this.projectName = projectName;
         suitesToLaunch.clear();
         viewer.setInput(suitesToLaunch);
@@ -350,7 +350,7 @@ class SuitesToRunComposite extends Composite {
 
         for (final SuiteLaunchElement suite : suitesToLaunch) {
             if (suite.isChecked()) {
-                final ArrayList<String> tests = new ArrayList<>();
+                final List<String> tests = new ArrayList<>();
                 if (!suite.hasCheckedAllChildren()) {
                     for (final TestCaseLaunchElement test : suite.getChildren()) {
                         if (test.isChecked()) {

@@ -91,6 +91,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 updateLaunchConfigurationDialog();
             }
         });
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectComposite);
     }
 
     private void createServerGroup(final Composite parent) {

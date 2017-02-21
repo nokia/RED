@@ -383,6 +383,14 @@
           sourceLocatorId="org.eclipse.debug.robot.sourceLookupDirector"
           sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer">
     </launchConfigurationType>
+    <launchConfigurationType
+          delegate="org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfigurationDelegate"
+          sourceLocatorId="org.eclipse.debug.robot.sourceLookupDirector"
+          sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer"
+          id="org.robotframework.ide.scriptRobotLaunchConfiguration"
+          modes="run,debug"
+          name="Script Robot">
+    </launchConfigurationType>
  </extension>
  <extension
        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
@@ -396,6 +404,11 @@
           id="org.robotframework.ide.remoteRobotLaunchConfigurationTabGroup"
           type="org.robotframework.ide.remoteRobotLaunchConfiguration">
     </launchConfigurationTabGroup>
+    <launchConfigurationTabGroup
+          class="org.robotframework.ide.eclipse.main.plugin.launch.tabs.ScriptRobotLaunchConfigurationTabGroup"
+          id="org.robotframework.ide.scriptRobotLaunchConfigurationTabGroup"
+          type="org.robotframework.ide.scriptRobotLaunchConfiguration">
+    </launchConfigurationTabGroup>
  </extension>
  <extension
        point="org.eclipse.debug.ui.launchConfigurationTypeImages">
@@ -408,6 +421,11 @@
           configTypeID="org.robotframework.ide.remoteRobotLaunchConfiguration"
           icon="resources/robot_remote.png"
           id="org.robotframework.ide.remoteRobotLaunchConfigurationImage">
+    </launchConfigurationTypeImage>
+    <launchConfigurationTypeImage
+          configTypeID="org.robotframework.ide.scriptRobotLaunchConfiguration"
+          icon="resources/robot_script.png"
+          id="org.robotframework.ide.scriptRobotLaunchConfigurationImage">
     </launchConfigurationTypeImage>
  </extension>
  <extension point="org.eclipse.debug.ui.launchShortcuts">
@@ -486,6 +504,48 @@
           label="Remote Robot Test"
           modes="run,debug"
           path="remote">
+       <contextualLaunch>
+          <enablement>
+             <with
+                   variable="selection">
+                <iterate
+                      ifEmpty="false"
+                      operator="and">
+                   <adapt
+                         type="org.eclipse.core.resources.IResource">
+                      <or>
+                         <instanceof
+                               value="org.eclipse.core.resources.IContainer">
+                         </instanceof>
+                         <and>
+                            <instanceof
+                                  value="org.eclipse.core.resources.IFile">
+                            </instanceof>
+                            <or>
+                               <test
+                                     property="org.eclipse.core.resources.contentTypeId"
+                                     value="org.robotframework.red.robotsuitefile_robot">
+                               </test>
+                               <test
+                                     property="org.eclipse.core.resources.contentTypeId"
+                                     value="org.robotframework.red.robotsuitefile_tsv">
+                               </test>
+                            </or>
+                         </and>
+                      </or>
+                   </adapt>
+                </iterate>
+             </with>
+          </enablement>
+       </contextualLaunch>
+    </shortcut>
+    <shortcut
+          class="org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfigurationDelegate"
+          icon="resources/robot_script.png"
+          id="org.robotframework.ide.robotLaunchShortcutConfiguration"
+          label="Script Robot Test"
+          modes="run,debug"
+          path="script">
        <contextualLaunch>
           <enablement>
              <with

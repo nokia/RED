@@ -5,10 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,17 +14,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -40,13 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Predicates;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Maps;
-
-public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
+public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
@@ -54,21 +41,11 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
     private static final String EXECUTOR_NAME = "Executor";
     private static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
     private static final String INTERPRETER_ARGUMENTS_ATTRIBUTE = "Interpreter arguments";
-    private static final String INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Include option enabled";
-    private static final String INCLUDED_TAGS_ATTRIBUTE = "Included tags";
-    private static final String EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Exclude option enabled";
-    private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
-    private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
-    private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
 
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
 
-
-    private final ILaunchConfiguration configuration;
-    
     static ILaunchConfigurationWorkingCopy createDefault(final ILaunchConfigurationType launchConfigurationType,
             final List<IResource> resources) throws CoreException {
-
         final ILaunchConfigurationWorkingCopy configuration = prepareDefault(launchConfigurationType, resources);
         configuration.doSave();
         return configuration;
@@ -124,7 +101,7 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
             robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
             robotConfig.setInterpreterArguments(preferences.getAdditionalInterpreterArguments());
             robotConfig.setProjectName(project.getName());
-        
+
             robotConfig.updateTestCases(suitesMapping);
 
             robotConfig.setIsIncludeTagsEnabled(false);
@@ -138,18 +115,6 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
         }
     }
 
-    public void updateTestCases(final Map<IResource, List<String>> suitesMapping) throws CoreException {
-
-        final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
-        for (final IResource resource : suitesMapping.keySet()) {
-            if (!(resource instanceof IProject)) {
-                suitesNamesMapping.put(resource.getProjectRelativePath().toPortableString(),
-                        suitesMapping.get(resource));
-            }
-        }
-        setSuitePaths(suitesNamesMapping);
-    }
-    
     public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
             final String outputFilePath) throws CoreException {
         final RobotLaunchConfiguration robotLaunchConfig = new RobotLaunchConfiguration(launchCopy);
@@ -159,7 +124,6 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
 
     public static ILaunchConfigurationWorkingCopy prepareLaunchConfigurationForSelectedTestCases(
             final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
-
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final String name = getNameForSelectedTestCasesConfiguration(resourcesToTestCases.keySet());
         final String configurationName = manager.generateLaunchConfigurationName(name);
@@ -193,24 +157,14 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
     }
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
-        this.configuration = config;
-    }
-
-    @Override
-    public String getName() {
-        return configuration.getName();
-    }
-
-    ILaunchConfigurationWorkingCopy asWorkingCopy() throws CoreException {
-        return configuration instanceof ILaunchConfigurationWorkingCopy
-                ? (ILaunchConfigurationWorkingCopy) configuration : configuration.getWorkingCopy();
+        super(config);
     }
 
     public void setUsingInterpreterFromProject(final boolean usesProjectExecutor) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(USE_PROJECT_EXECUTOR, usesProjectExecutor);
     }
-    
+
     public void setExecutor(final SuiteExecutor executor) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(EXECUTOR_NAME, executor == null ? "" : executor.name());
@@ -226,53 +180,9 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
         launchCopy.setAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, arguments);
     }
 
-    @Override
-    public void setProjectName(final String projectName) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(PROJECT_NAME_ATTRIBUTE, projectName);
-    }
-
-    public void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException {
-        // test case names should be always in lower case
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), new Function<String, String>() {
-
-            @Override
-            public String apply(final String path) {
-                final List<String> testSuites = new ArrayList<>();
-                final Iterable<String> temp = filter(suitesToCases.get(path), Predicates.notNull());
-                for (final String s : temp) {
-                    testSuites.add(s.toLowerCase());
-                }
-                return Joiner.on("::").join(testSuites);
-            }
-        });
-        launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
-    }
-    
-    public void setIsIncludeTagsEnabled(final boolean isIncludeTagsEnabled) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isIncludeTagsEnabled);
-    }
-    
     public void setIsGeneralPurposeEnabled(final boolean isGeneralPurposeEnabled) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, isGeneralPurposeEnabled);
-    }
-
-    public void setIncludedTags(final List<String> tags) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(INCLUDED_TAGS_ATTRIBUTE, tags);
-    }
-    
-    public void setIsExcludeTagsEnabled(final boolean isExcludeTagsEnabled) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isExcludeTagsEnabled);
-    }
-    
-    public void setExcludedTags(final List<String> tags) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(EXCLUDED_TAGS_ATTRIBUTE, tags);
     }
 
     public boolean isGeneralPurposeConfiguration() throws CoreException {
@@ -293,103 +203,6 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
 
     public String getInterpreterArguments() throws CoreException {
         return configuration.getAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, "");
-    }
-
-    @Override
-    public String getProjectName() throws CoreException {
-        return configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
-    }
-
-    public String[] getEnvironmentVariables() throws CoreException {
-        final Map<String, String> vars = configuration.getAttribute(ILaunchManager.ATTR_ENVIRONMENT_VARIABLES,
-                (Map<String, String>) null);
-        if (vars == null) {
-            return null;
-        }
-        final boolean shouldAppendVars = configuration.getAttribute(ILaunchManager.ATTR_APPEND_ENVIRONMENT_VARIABLES,
-                true);
-        final List<String> varMappings = new ArrayList<>();
-        if (shouldAppendVars) {
-            append(varMappings, System.getenv());
-        }
-        append(varMappings, vars);
-        return varMappings.toArray(new String[0]);
-    }
-
-    private void append(final List<String> varMappings, final Map<String, String> vars) {
-        for (final Entry<String, String> entry : vars.entrySet()) {
-            varMappings.add(entry.getKey() + "=" + entry.getValue());
-        }
-    }
-
-    public Map<String, List<String>> getSuitePaths() throws CoreException {
-        final Map<String, String> mapping = configuration.getAttribute(TEST_SUITES_ATTRIBUTE,
-                new HashMap<String, String>());
-        final Map<String, List<String>> suitesToTestsMapping = new HashMap<>();
-        for (final Entry<String, String> entry : mapping.entrySet()) {
-            final List<String> splittedTestNames = Splitter.on("::").omitEmptyStrings().splitToList(entry.getValue());
-            suitesToTestsMapping.put(entry.getKey(), splittedTestNames);
-        }
-        return suitesToTestsMapping;
-    }
-
-    public Map<IResource, List<String>> collectSuitesToRun() throws CoreException {
-        IProject project;
-        final String projectName = getProjectName();
-        if (projectName.isEmpty()) {
-            project = null;
-        } else {
-            project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-            if (!project.exists()) {
-                project = null;
-            }
-        }
-        final Map<IResource, List<String>> suitesToRun = new HashMap<>();
-        if (project == null) {
-            return suitesToRun;
-        }
-
-        final Map<String, List<String>> suitePaths = getSuitePaths();
-        for (final Entry<String, List<String>> entry : suitePaths.entrySet()) {
-            final IPath path = Path.fromPortableString(entry.getKey());
-            final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
-                    : project.getFile(path);
-            suitesToRun.put(resource, entry.getValue());
-        }
-        return suitesToRun;
-    }
-
-    public boolean isIncludeTagsEnabled() throws CoreException {
-        return configuration.getAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, false);
-    }
-    
-    public List<String> getIncludedTags() throws CoreException {
-        return configuration.getAttribute(INCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
-    }
-    
-    public boolean isExcludeTagsEnabled() throws CoreException {
-        return configuration.getAttribute(EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, false);
-    }
-    
-    public List<String> getExcludedTags() throws CoreException {
-        return configuration.getAttribute(EXCLUDED_TAGS_ATTRIBUTE, new ArrayList<String>());
-    }
-
-    public RobotProject getRobotProject() throws CoreException {
-        final IProject project = getProject();
-        return RedPlugin.getModelManager().getModel().createRobotProject(project);
-    }
-
-    private IProject getProject() throws CoreException {
-        final String projectName = getProjectName();
-        if (projectName.isEmpty()) {
-            return null;
-        }
-        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-        if (!project.exists()) {
-            throw newCoreException("Project '" + projectName + "' cannot be found in workspace", null);
-        }
-        return project;
     }
 
     public boolean isSuitableFor(final List<IResource> resources) {
@@ -463,63 +276,6 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
         return isUsingInterpreterFromProject() ? env.getVersion() : RobotRuntimeEnvironment.getVersion(getExecutor());
     }
 
-    public List<String> getSuitesToRun() throws CoreException {
-        final Collection<IResource> suites = getSuiteResources();
-
-        final List<String> suiteNames = new ArrayList<>();
-        for (final IResource suite : suites) {
-            suiteNames.add(RobotSuitesNaming.createSuiteName(suite));
-        }
-        return suiteNames;
-    }
-
-    Collection<IResource> getSuiteResources() throws CoreException {
-        final Collection<String> suitePaths = getSuitePaths().keySet();
-
-        final Map<String, IResource> resources = Maps.asMap(newHashSet(suitePaths), new Function<String, IResource>() {
-
-            @Override
-            public IResource apply(final String suitePath) {
-                try {
-                    return getProject().findMember(Path.fromPortableString(suitePath));
-                } catch (final CoreException e) {
-                    return null;
-                }
-            }
-        });
-
-        final List<String> problems = new ArrayList<>();
-        for (final Entry<String, IResource> entry : resources.entrySet()) {
-            if (entry.getValue() == null || !entry.getValue().exists()) {
-                problems.add(
-                        "Suite '" + entry.getKey() + "' does not exist in project '" + getProject().getName() + "'");
-            }
-        }
-        if (!problems.isEmpty()) {
-            throw newCoreException(Joiner.on('\n').join(problems));
-        }
-        return resources.values();
-    }
-
-    public List<IResource> getResourcesUnderDebug() throws CoreException {
-        final List<IResource> suiteResources = newArrayList(getSuiteResources());
-        if (suiteResources.isEmpty()) {
-            suiteResources.add(getProject());
-        }
-        return suiteResources;
-    }
-
-    public Collection<String> getTestsToRun() throws CoreException {
-        final List<String> tests = new ArrayList<>();
-        for (final Entry<String, List<String>> entries : getSuitePaths().entrySet()) {
-            for (final String testName : entries.getValue()) {
-                tests.add(RobotSuitesNaming.createSuiteName(getProject(), Path.fromPortableString(entries.getKey())) + "."
-                        + testName);
-            }
-        }
-        return tests;
-    }
-
     static boolean contentEquals(final ILaunchConfiguration config1, final ILaunchConfiguration config2)
             throws CoreException {
         final RobotLaunchConfiguration rConfig1 = new RobotLaunchConfiguration(config1);
@@ -535,14 +291,6 @@ public class RobotLaunchConfiguration implements IRobotLaunchConfiguration {
                 && rConfig1.getExcludedTags().equals(rConfig2.getExcludedTags())
                 && rConfig1.getIncludedTags().equals(rConfig2.getIncludedTags())
                 && rConfig1.getSuitePaths().equals(rConfig2.getSuitePaths());
-    }
-
-    private static CoreException newCoreException(final String message) {
-        return newCoreException(message, null);
-    }
-
-    private static CoreException newCoreException(final String message, final Throwable cause) {
-        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
     }
 
 }

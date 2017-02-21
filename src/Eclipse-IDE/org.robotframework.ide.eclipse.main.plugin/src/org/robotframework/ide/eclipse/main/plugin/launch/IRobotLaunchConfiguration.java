@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.CoreException;
 
 public interface IRobotLaunchConfiguration {
 
+    String PROJECT_NAME_ATTRIBUTE = "Project name";
+
     String getName();
 
     String getProjectName() throws CoreException;

@@ -9,6 +9,12 @@ import org.eclipse.core.runtime.CoreException;
 
 public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfiguration {
 
+    String REMOTE_HOST_ATTRIBUTE = "Remote host";
+
+    String REMOTE_PORT_ATTRIBUTE = "Remote port";
+
+    String REMOTE_TIMEOUT_ATTRIBUTE = "Remote timeout";
+
     boolean isDefiningProjectDirectly();
 
     int getRemoteDebugPort() throws CoreException;
