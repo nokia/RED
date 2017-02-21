@@ -91,7 +91,6 @@ public class RobotLaunchInModeTest {
         config.addPythonPath(searchPath1);
         config.addPythonPath(searchPath2);
         config.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
-        projectProvider.addRobotNature();
         projectProvider.configure(config);
 
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
@@ -116,7 +115,6 @@ public class RobotLaunchInModeTest {
         config.addPythonPath(searchPath1);
         config.addPythonPath(searchPath2);
         config.setRelativityPoint(RelativityPoint.create(RelativeTo.WORKSPACE));
-        projectProvider.addRobotNature();
         projectProvider.configure(config);
 
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");

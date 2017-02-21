@@ -33,7 +33,6 @@ public class RedXmlEditsCollectorTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        projectProvider.addRobotNature();
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("a");
         config.addExcludedPath("a/b");

@@ -30,11 +30,9 @@ public class RedXmlForNavigatorPropertyTesterTest {
         projectProvider.createDir(Path.fromPortableString("excluded_dir"));
         projectProvider.createDir(Path.fromPortableString("included_dir"));
 
-        projectProvider.addRobotNature();
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addExcludedPath("excluded_dir");
         projectProvider.configure(config);
-
     }
 
     @Test
