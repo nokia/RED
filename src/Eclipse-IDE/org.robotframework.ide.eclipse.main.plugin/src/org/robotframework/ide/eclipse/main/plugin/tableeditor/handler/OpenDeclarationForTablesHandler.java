@@ -43,7 +43,7 @@ public class OpenDeclarationForTablesHandler extends DIParameterizedHandler<E4Op
                 final SelectionLayerAccessor accessor = part.getSelectionLayerAccessor();
                 final PositionCoordinate[] positions = accessor.getSelectedPositions();
                 if (tableHyperlinksSupporter != null && positions.length == 1) {
-                    final List<ITableHyperlinksDetector> detectors = part.getDetector().getDetectors();
+                    final List<ITableHyperlinksDetector> detectors = tableHyperlinksSupporter.getDetectors();
                     final int row = positions[0].getRowPosition();
                     final int column = positions[0].getColumnPosition();
                     final String label = accessor.getLabelFromCell(row, column);

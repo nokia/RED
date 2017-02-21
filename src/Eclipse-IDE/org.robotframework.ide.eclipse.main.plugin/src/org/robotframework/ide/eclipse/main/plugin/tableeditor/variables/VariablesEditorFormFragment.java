@@ -128,6 +128,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     private ISortModel sortModel;
 
+    private TableHyperlinksSupport detector;
+
     ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
@@ -241,7 +243,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
-        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
         detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider));
 
         // sorting
@@ -320,6 +322,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final VariablesMatchesCollection variablesMatches = new VariablesMatchesCollection();
         variablesMatches.collect(dataProvider.getInput(), filter);
         return variablesMatches;
+    }
+
+    public TableHyperlinksSupport getDetector() {
+        return detector;
     }
 
     @Inject

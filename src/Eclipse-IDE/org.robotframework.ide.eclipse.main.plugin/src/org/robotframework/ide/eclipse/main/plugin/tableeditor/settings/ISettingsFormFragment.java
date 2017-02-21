@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 
 public interface ISettingsFormFragment {
@@ -18,4 +19,6 @@ public interface ISettingsFormFragment {
     NatTable getTable();
 
     void invokeSaveAction();
+
+    TableHyperlinksSupport getDetector();
 }
