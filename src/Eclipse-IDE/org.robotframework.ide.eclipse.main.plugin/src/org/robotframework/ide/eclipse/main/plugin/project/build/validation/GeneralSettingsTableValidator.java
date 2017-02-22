@@ -35,10 +35,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setti
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DocumentationDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.LibraryAliasesDeclarationUpperCaseValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.MetaDeclarationSettingValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePostconditionDeclarationExistanceValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePreconditionDeclarationExistanceValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPostconditionDeclarationExistanceValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPreconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePostconditionDeclarationExistenceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePreconditionDeclarationExistenceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPostconditionDeclarationExistenceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPreconditionDeclarationExistenceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
@@ -102,13 +102,13 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             throws CoreException {
         new MetaDeclarationSettingValidator(validationContext.getFile(), section, reporter).validate(monitor);
         new DocumentationDeclarationSettingValidator(validationContext.getFile(), section, reporter).validate(monitor);
-        new SuitePreconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+        new SuitePreconditionDeclarationExistenceValidator(validationContext.getFile(), reporter, section)
                 .validate(monitor);
-        new SuitePostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+        new SuitePostconditionDeclarationExistenceValidator(validationContext.getFile(), reporter, section)
                 .validate(monitor);
-        new TestPreconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+        new TestPreconditionDeclarationExistenceValidator(validationContext.getFile(), reporter, section)
                 .validate(monitor);
-        new TestPostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+        new TestPostconditionDeclarationExistenceValidator(validationContext.getFile(), reporter, section)
                 .validate(monitor);
         new DeprecatedSettingHeaderAlias(validationContext.getFile(), reporter, section).validate(monitor);
         new LibraryAliasesDeclarationUpperCaseValidator(validationContext.getFile(), reporter, section)

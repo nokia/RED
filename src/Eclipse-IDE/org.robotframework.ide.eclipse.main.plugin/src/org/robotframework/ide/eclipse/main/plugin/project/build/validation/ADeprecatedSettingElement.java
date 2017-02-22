@@ -34,9 +34,9 @@ public abstract class ADeprecatedSettingElement implements ModelUnitValidator {
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         for (final RobotToken docToken : getDeclaration()) {
-            String raw = docToken.getRaw();
-            final String rawWihtoutWithspaces = raw.replaceAll("\\s", "");
-            if (rawWihtoutWithspaces.toLowerCase().contains(representation)) {
+            final String raw = docToken.getRaw();
+            final String rawWithoutWhiteSpaces = raw.replaceAll("\\s", "");
+            if (rawWithoutWhiteSpaces.toLowerCase().contains(representation)) {
                 reporter.handleProblem(RobotProblem.causedBy(getProblemId()).formatMessageWith(raw), file, docToken);
             }
         }

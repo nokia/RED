@@ -40,9 +40,9 @@ public class DeprecatedSettingHeaderAlias implements ModelUnitValidator {
             for (final TableHeader<? extends ARobotSectionTable> th : settings.getHeaders()) {
                 final RobotToken declaration = th.getDeclaration();
                 final String raw = declaration.getRaw();
-                final String rawWihtoutWithspaces = raw.toLowerCase().replaceAll("\\s", "");
-                if (rawWihtoutWithspaces.toLowerCase().contains("metadata")) {
-                    reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.METADATA_TABLE_HEADER_SYNONIM)
+                final String rawWithoutWhiteSpaces = raw.toLowerCase().replaceAll("\\s", "");
+                if (rawWithoutWhiteSpaces.toLowerCase().contains("metadata")) {
+                    reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.METADATA_TABLE_HEADER_SYNONYM)
                             .formatMessageWith(raw), file, declaration);
                 }
             }

@@ -17,9 +17,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDepracatedDeclarationValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDeprecatedDeclarationValidator;
 
-public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentDepracatedDeclarationValidator {
+public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentDeprecatedDeclarationValidator {
 
     private final RobotCasesSection section;
 
@@ -31,7 +31,7 @@ public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentD
 
     @Override
     public IProblemCause getSettingProblemId() {
-        return TestCasesProblem.DOCUMENT_SYNONIM;
+        return TestCasesProblem.DOCUMENT_SYNONYM;
     }
 
     @Override

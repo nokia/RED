@@ -11,7 +11,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
+import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -19,19 +19,19 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADeprecatedSettingElement;
 
-public class PreconditionDeclarationExistanceValidator extends ADeprecatedSettingElement {
+public class PostconditionDeclarationExistenceValidator extends ADeprecatedSettingElement {
 
     private final RobotCasesSection section;
 
-    public PreconditionDeclarationExistanceValidator(final IFile file, final ProblemsReportingStrategy reporter,
+    public PostconditionDeclarationExistenceValidator(final IFile file, final ProblemsReportingStrategy reporter,
             final RobotCasesSection section) {
-        super(file, reporter, "Precondition");
+        super(file, reporter, "Postcondition");
         this.section = section;
     }
 
     @Override
     public IProblemCause getProblemId() {
-        return TestCasesProblem.PRECONDITION_SYNONIM;
+        return TestCasesProblem.POSTCONDITION_SYNONYM;
     }
 
     @Override
@@ -40,8 +40,8 @@ public class PreconditionDeclarationExistanceValidator extends ADeprecatedSettin
         final TestCaseTable testCaseTable = section.getLinkedElement();
         if (testCaseTable.isPresent()) {
             for (final TestCase tc : testCaseTable.getTestCases()) {
-                for (final TestCaseSetup setup : tc.getSetups()) {
-                    declarations.add(setup.getDeclaration());
+                for (final TestCaseTeardown teardown : tc.getTeardowns()) {
+                    declarations.add(teardown.getDeclaration());
                 }
             }
         }

@@ -53,8 +53,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.DocumentationTestCaseDeclarationSettingValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PostconditionDeclarationExistanceValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PreconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PostconditionDeclarationExistenceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PreconditionDeclarationExistenceValidator;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -102,8 +102,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
             throws CoreException {
         new DocumentationTestCaseDeclarationSettingValidator(validationContext.getFile(), section, reporter)
                 .validate(monitor);
-        new PreconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section).validate(monitor);
-        new PostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+        new PreconditionDeclarationExistenceValidator(validationContext.getFile(), reporter, section).validate(monitor);
+        new PostconditionDeclarationExistenceValidator(validationContext.getFile(), reporter, section)
                 .validate(monitor);
     }
 
