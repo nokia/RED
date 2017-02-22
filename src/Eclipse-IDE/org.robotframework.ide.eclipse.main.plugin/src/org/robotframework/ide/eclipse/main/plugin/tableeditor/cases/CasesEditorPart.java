@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -111,8 +111,8 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         }
 
         @Override
-        public TableHyperlinksSupport getDetector() {
-            return casesFragment.getDetector();
+        public List<ITableHyperlinksDetector> getDetectors() {
+            return casesFragment.getDetectors();
         }
     }
 }

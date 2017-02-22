@@ -5,8 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import java.util.List;
+
 import org.eclipse.e4.tools.compat.parts.DIEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -76,7 +78,7 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     }
 
     @Override
-    public TableHyperlinksSupport getDetector() {
-        return getComponent().getDetector();
+    public List<ITableHyperlinksDetector> getDetectors() {
+        return getComponent().getDetectors();
     }
 }
