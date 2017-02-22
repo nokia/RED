@@ -144,7 +144,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
     }
 
-    private void link(final RobotFile model) {
+    private synchronized void link(final RobotFile model) {
         sections = Collections.synchronizedList(new ArrayList<RobotSuiteFileSection>());
         if (model.getKeywordTable().isPresent()) {
             final RobotKeywordsSection section = new RobotKeywordsSection(this, model.getKeywordTable());
@@ -179,7 +179,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return parsingStrategy.parse();
     }
 
-    public void dispose() {
+    public synchronized void dispose() {
         if (fileOutput != null) {
             // this is required because we want to reparse file output when user did some changes
             // to the model, but those changes were discarded (editor wasn't saved)
@@ -190,7 +190,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         fileOutput = null;
     }
 
-    public void reparseEverything(final String newContent) {
+    public synchronized void reparseEverything(final String newContent) {
         contentTypeId = null;
         sections = null;
         fileOutput = null;
@@ -229,7 +229,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         };
     }
 
-    protected void refreshOnFileChange() {
+    protected synchronized void refreshOnFileChange() {
         contentTypeId = null;
         sections = null;
         fileOutput = null;
@@ -396,14 +396,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             if (candidate.isPresent()) {
                 return candidate;
             }
-            // final Position position = section.getPosition();
-            // if (position.getOffset() <= offset && offset <= position.getOffset() +
-            // position.getLength()) {
-            // final Optional<? extends RobotElement> candidate = section.findElement(offset);
-            // if (candidate.isPresent()) {
-            // return candidate;
-            // }
-            // }
         }
         return Optional.of(this);
     }
