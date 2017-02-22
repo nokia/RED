@@ -92,8 +92,10 @@ public class AssistProposalPredicates {
                 } else {
                     // line starts with :FOR and we're in at least 4th cell
                     return cellIndex >= 3 && firstTokenInLine.isPresent()
-                            && (RedCodeReservedWordProposals.FOR_LOOP_1.equals(firstTokenInLine.get().getText())
-                            || RedCodeReservedWordProposals.FOR_LOOP_2.equals(firstTokenInLine.get().getText()));
+                            && (RedCodeReservedWordProposals.FOR_LOOP_1
+                                    .equalsIgnoreCase(firstTokenInLine.get().getText())
+                                    || RedCodeReservedWordProposals.FOR_LOOP_2
+                                            .equalsIgnoreCase(firstTokenInLine.get().getText()));
                 }
             }
         };
