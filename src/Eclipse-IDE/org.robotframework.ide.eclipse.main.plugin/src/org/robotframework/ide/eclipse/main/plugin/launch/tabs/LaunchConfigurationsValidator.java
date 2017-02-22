@@ -27,12 +27,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
- *
  */
 class LaunchConfigurationsValidator {
 
@@ -53,15 +51,7 @@ class LaunchConfigurationsValidator {
         try {
             if (robotConfig.isDefiningProjectDirectly()) {
                 final String projectName = robotConfig.getProjectName();
-                final Optional<IProject> project = getProject(projectName);
-                if (!project.isPresent() || !project.get().exists()) {
-                    throw new LaunchConfigurationValidationFatalException(
-                            "Project '" + projectName + "' does not exist in workspace.");
-                }
-                if (!project.get().isOpen()) {
-                    throw new LaunchConfigurationValidationFatalException(
-                            "Project '" + projectName + "' is currently closed.");
-                }
+                validateProject(projectName);
             }
 
             try {
@@ -83,30 +73,14 @@ class LaunchConfigurationsValidator {
             final List<String> warnings = new ArrayList<>();
 
             final String projectName = robotConfig.getProjectName();
-            final Optional<IProject> project = getProject(projectName);
-            if (!project.isPresent() || !project.get().exists()) {
-                throw new LaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' does not exist in workspace.");
-            }
-            if (!project.get().isOpen()) {
-                throw new LaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' is currently closed.");
-            }
+            validateProject(projectName);
+
             if (robotConfig.isUsingInterpreterFromProject()) {
-                final RobotProject robotProject = model.createRobotProject(project.get());
-                final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
-                if (env == null || !env.isValidPythonInstallation()) {
-                    throw new LaunchConfigurationValidationFatalException(
-                            "Project '" + projectName + "' is using invalid Python environment.");
-                } else if (!env.hasRobotInstalled()) {
-                    throw new LaunchConfigurationValidationFatalException("Project '" + projectName
-                            + "' is using invalid Python environment (missing Robot Framework).");
-                }
+                validateRuntimeEnvironment(projectName);
             } else {
                 warnings.add("Tests will be launched using '" + robotConfig.getExecutor().name()
                         + "' interpreter as defined in PATH environment variable.");
             }
-
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
             if (suitesToRun.isEmpty()) {
@@ -115,7 +89,7 @@ class LaunchConfigurationsValidator {
             validateSuitesToRun(suitesToRun);
 
             if (!warnings.isEmpty()) {
-                throw new LaunchConfigurationValidationException(Joiner.on('\n').join(warnings));
+                throw new LaunchConfigurationValidationException(String.join("\n", warnings));
             }
 
         } catch (final CoreException e) {
@@ -125,8 +99,50 @@ class LaunchConfigurationsValidator {
     }
 
     void validate(final ScriptRobotLaunchConfiguration robotConfig) {
-        // TODO Auto-generated method stub
+        try {
+            final List<String> warnings = new ArrayList<>();
 
+            final String projectName = robotConfig.getProjectName();
+            validateProject(projectName);
+
+            final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
+            if (suitesToRun.isEmpty()) {
+                warnings.add("There are no suites specified. All suites in '" + projectName + "' will be executed.");
+            }
+            validateSuitesToRun(suitesToRun);
+
+            if (!warnings.isEmpty()) {
+                throw new LaunchConfigurationValidationException(String.join("\n", warnings));
+            }
+
+        } catch (final CoreException e) {
+            throw new LaunchConfigurationValidationFatalException(
+                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
+        }
+    }
+
+    private void validateProject(final String projectName) throws CoreException {
+        final Optional<IProject> project = getProject(projectName);
+        if (!project.isPresent() || !project.get().exists()) {
+            throw new LaunchConfigurationValidationFatalException(
+                    "Project '" + projectName + "' does not exist in workspace.");
+        }
+        if (!project.get().isOpen()) {
+            throw new LaunchConfigurationValidationFatalException("Project '" + projectName + "' is currently closed.");
+        }
+    }
+
+    private void validateRuntimeEnvironment(final String projectName) {
+        final IProject project = getProject(projectName).get();
+        final RobotProject robotProject = model.createRobotProject(project);
+        final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
+        if (env == null || !env.isValidPythonInstallation()) {
+            throw new LaunchConfigurationValidationFatalException(
+                    "Project '" + projectName + "' is using invalid Python environment.");
+        } else if (!env.hasRobotInstalled()) {
+            throw new LaunchConfigurationValidationFatalException(
+                    "Project '" + projectName + "' is using invalid Python environment (missing Robot Framework).");
+        }
     }
 
     private Optional<IProject> getProject(final String projectName) {
@@ -163,11 +179,11 @@ class LaunchConfigurationsValidator {
         }
         if (!problematicSuites.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following suites does not exist: " + Joiner.on(", ").join(problematicSuites) + ".");
+                    "Following suites does not exist: " + String.join(", ", problematicSuites) + ".");
         }
         if (!problematicTests.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following tests does not exist: " + Joiner.on(", ").join(problematicTests) + ".");
+                    "Following tests does not exist: " + String.join(", ", problematicTests) + ".");
         }
     }
 
@@ -187,6 +203,7 @@ class LaunchConfigurationsValidator {
         public LaunchConfigurationValidationFatalException(final String message) {
             super(message);
         }
+
         public LaunchConfigurationValidationFatalException(final String message, final Exception e) {
             super(message, e);
         }

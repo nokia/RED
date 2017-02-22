@@ -89,6 +89,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
         setWarningMessage(null);
+
         includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
 
         final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
