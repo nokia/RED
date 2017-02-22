@@ -37,13 +37,11 @@ class ExecutorScriptComposite extends Composite {
 
         GridLayoutFactory.fillDefaults().numColumns(2).spacing(2, 2).margins(0, 3).applyTo(this);
 
-        final ScriptExecutorSettings settings = ScriptExecutorSettings.create();
         createScriptPathText();
-        createBrowseButton(parent.getShell(), settings);
+        createBrowseButton(parent.getShell());
 
         scriptArgumentsText = createLabeledText("Additional script arguments:");
         scriptRunCommandText = createLabeledText("Script run command:");
-        scriptRunCommandText.setText(settings.getScriptRunCommand());
     }
 
     private void createScriptPathText() {
@@ -52,7 +50,7 @@ class ExecutorScriptComposite extends Composite {
         scriptPathText.addModifyListener(listener);
     }
 
-    private void createBrowseButton(final Shell shell, final ScriptExecutorSettings settings) {
+    private void createBrowseButton(final Shell shell) {
         final Button button = new Button(this, SWT.PUSH);
         button.setText("Browse...");
         button.addSelectionListener(new SelectionAdapter() {
@@ -60,24 +58,39 @@ class ExecutorScriptComposite extends Composite {
             @Override
             public void widgetSelected(final SelectionEvent event) {
                 final FileDialog dialog = createScriptFileDialog(shell);
-                dialog.setFilterExtensions(settings.getFilterExtensions());
+                dialog.setFilterExtensions(getFilterExtensions());
 
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
                     scriptPathText.setText(chosenFilePath);
                 }
             }
+
+            private String[] getFilterExtensions() {
+                return System.getProperty("os.name").startsWith("Windows") ? new String[] { "*.bat", "*.*" }
+                        : new String[] { "*.sh", "*.*" };
+            }
         });
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(button);
     }
 
     private FileDialog createScriptFileDialog(final Shell shell) {
-        final String selectedPath = scriptPathText.getText().trim();
-        final IPath startingPath = selectedPath.isEmpty() ? ResourcesPlugin.getWorkspace().getRoot().getLocation()
-                : new Path(selectedPath);
+        final IPath startingPath = getStartingPath();
         final FileDialog dialog = new FileDialog(shell, SWT.OPEN | SWT.MULTI);
         dialog.setFilterPath(startingPath.toOSString());
         return dialog;
+    }
+
+    private IPath getStartingPath() {
+        final String selectedPath = scriptPathText.getText().trim();
+        if (selectedPath.isEmpty()) {
+            return ResourcesPlugin.getWorkspace().getRoot().getLocation();
+        }
+        final Path path = new Path(selectedPath);
+        if (path.toFile().isFile()) {
+            return path.removeLastSegments(1);
+        }
+        return path;
     }
 
     private Text createLabeledText(final String label) {
@@ -91,10 +104,10 @@ class ExecutorScriptComposite extends Composite {
         return txt;
     }
 
-    void setInput(final String scriptPath) {
-        if (!scriptPathText.isDisposed()) {
-            scriptPathText.setText(scriptPath);
-        }
+    void setInput(final String scriptPath, final String scriptArguments, final String scriptRunCommand) {
+        scriptPathText.setText(scriptPath);
+        scriptArgumentsText.setText(scriptArguments);
+        scriptRunCommandText.setText(scriptRunCommand);
     }
 
     String getSelectedScriptPath() {
@@ -111,32 +124,6 @@ class ExecutorScriptComposite extends Composite {
 
     boolean isDisposedOrFilled() {
         return scriptPathText == null || scriptPathText.isDisposed() || !getSelectedScriptPath().isEmpty();
-    }
-
-    private enum ScriptExecutorSettings {
-        WINDOWS("cmd /c start", new String[] { "*.bat", "*.*" }),
-        NOT_WINDOWS("", new String[] { "*.sh", "*.*" });
-
-        private final String scriptRunCommand;
-
-        private final String[] filterExtensions;
-
-        public static ScriptExecutorSettings create() {
-            return System.getProperty("os.name").startsWith("Windows") ? WINDOWS : NOT_WINDOWS;
-        }
-
-        private ScriptExecutorSettings(final String scriptRunCommand, final String[] filterExtensions) {
-            this.scriptRunCommand = scriptRunCommand;
-            this.filterExtensions = filterExtensions;
-        }
-
-        public String getScriptRunCommand() {
-            return scriptRunCommand;
-        }
-
-        public String[] getFilterExtensions() {
-            return filterExtensions;
-        }
     }
 
 }

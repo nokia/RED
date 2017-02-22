@@ -22,9 +22,16 @@ public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     static final String TYPE_ID = "org.robotframework.ide.scriptRobotLaunchConfiguration";
 
+    private static final String SCRIPT_PATH_ATTRIBUTE = "Script path";
+
+    private static final String SCRIPT_ARGUMENTS_ATTRIBUTE = "Script arguments";
+
+    private static final String SCRIPT_RUN_COMMAND_ATTRIBUTE = "Script run command";
+
     public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
         final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(launchConfig);
         try {
+            robotConfig.setScriptRunCommand(System.getProperty("os.name").startsWith("Windows") ? "cmd /c start" : "");
             robotConfig.setProjectName("");
             robotConfig.setSuitePaths(new HashMap<String, List<String>>());
             robotConfig.setIsIncludeTagsEnabled(false);
@@ -106,6 +113,33 @@ public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
     public void setRemoteDebugTimeoutValue(final String timeout) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(REMOTE_TIMEOUT_ATTRIBUTE, timeout);
+    }
+
+    public String getScriptPath() throws CoreException {
+        return configuration.getAttribute(SCRIPT_PATH_ATTRIBUTE, "");
+    }
+
+    public String getScriptArguments() throws CoreException {
+        return configuration.getAttribute(SCRIPT_ARGUMENTS_ATTRIBUTE, "");
+    }
+
+    public String getScriptRunCommand() throws CoreException {
+        return configuration.getAttribute(SCRIPT_RUN_COMMAND_ATTRIBUTE, "");
+    }
+
+    public void setScriptPath(final String path) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(SCRIPT_PATH_ATTRIBUTE, path);
+    }
+
+    public void setScriptArguments(final String arguments) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(SCRIPT_ARGUMENTS_ATTRIBUTE, arguments);
+    }
+
+    public void setScriptRunCommand(final String command) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(SCRIPT_RUN_COMMAND_ATTRIBUTE, command);
     }
 
 }
