@@ -34,7 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
-    static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
+    public static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
     private static final String USE_PROJECT_EXECUTOR = "Project executor";
 

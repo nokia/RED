@@ -15,7 +15,7 @@ import com.google.common.primitives.Ints;
 public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfiguration
         implements IRemoteRobotLaunchConfiguration {
 
-    static final String TYPE_ID = "org.robotframework.ide.scriptRobotLaunchConfiguration";
+    public static final String TYPE_ID = "org.robotframework.ide.scriptRobotLaunchConfiguration";
 
     private static final String SCRIPT_PATH_ATTRIBUTE = "Script path";
 
