@@ -31,7 +31,6 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
@@ -67,56 +66,24 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         for (final IResource resource : resources) {
             resourcesMapping.put(resource, new ArrayList<String>());
         }
-        fillDefaults(configuration, resourcesMapping);
+        fillDefaults(configuration, resourcesMapping, true);
         return configuration;
     }
 
-    public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        try {
-            robotConfig.setExecutor(SuiteExecutor.Python);
-            robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
-            robotConfig.setInterpreterArguments(preferences.getAdditionalInterpreterArguments());
-            robotConfig.setProjectName("");
-            robotConfig.setSuitePaths(new HashMap<String, List<String>>());
-            robotConfig.setIsIncludeTagsEnabled(false);
-            robotConfig.setIsExcludeTagsEnabled(false);
-            robotConfig.setIncludedTags(new ArrayList<String>());
-            robotConfig.setExcludedTags(new ArrayList<String>());
-            robotConfig.setIsGeneralPurposeEnabled(true);
-        } catch (final CoreException e) {
-            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
-                    "RED was unable to load the working copy of Launch Configuration.");
-        }
-    }
-
-    static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
-            final Map<IResource, List<String>> suitesMapping) {
+    private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
+            final Map<IResource, List<String>> suitesMapping, final boolean isGeneralPurposeEnabled)
+            throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        try {
-            if (robotProject.getRuntimeEnvironment() != null) {
-                final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
-                robotConfig.setExecutor(interpreter);
-            }
-            final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-            robotConfig.setExecutorArguments(preferences.getAdditionalRobotArguments());
-            robotConfig.setInterpreterArguments(preferences.getAdditionalInterpreterArguments());
-            robotConfig.setProjectName(project.getName());
-
-            robotConfig.updateTestCases(suitesMapping);
-
-            robotConfig.setIsIncludeTagsEnabled(false);
-            robotConfig.setIsExcludeTagsEnabled(false);
-            robotConfig.setIncludedTags(new ArrayList<String>());
-            robotConfig.setExcludedTags(new ArrayList<String>());
-            robotConfig.setIsGeneralPurposeEnabled(true);
-        } catch (final CoreException e) {
-            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
-                    "RED was unable to load the working copy of Launch Configuration.");
+        robotConfig.fillDefaults();
+        if (robotProject.getRuntimeEnvironment() != null) {
+            final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
+            robotConfig.setExecutor(interpreter);
         }
+        robotConfig.setProjectName(project.getName());
+        robotConfig.updateTestCases(suitesMapping);
+        robotConfig.setIsGeneralPurposeEnabled(isGeneralPurposeEnabled);
     }
 
     public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
@@ -134,11 +101,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
                 .newInstance(null, configurationName);
 
-        fillDefaults(configuration, resourcesToTestCases);
-
-        final RobotLaunchConfiguration robotConfiguration = new RobotLaunchConfiguration(configuration);
-        robotConfiguration.setIsGeneralPurposeEnabled(false);
-
+        fillDefaults(configuration, resourcesToTestCases, false);
         return configuration;
     }
 
@@ -179,6 +142,16 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
         super(config);
+    }
+
+    @Override
+    public void fillDefaults() throws CoreException {
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        setExecutor(SuiteExecutor.Python);
+        setExecutorArguments(preferences.getAdditionalRobotArguments());
+        setInterpreterArguments(preferences.getAdditionalInterpreterArguments());
+        setIsGeneralPurposeEnabled(true);
+        super.fillDefaults();
     }
 
     public void setUsingInterpreterFromProject(final boolean usesProjectExecutor) throws CoreException {

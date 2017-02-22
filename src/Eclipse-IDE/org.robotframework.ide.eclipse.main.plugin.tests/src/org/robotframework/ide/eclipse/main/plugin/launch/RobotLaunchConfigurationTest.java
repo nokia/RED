@@ -140,7 +140,7 @@ public class RobotLaunchConfigurationTest {
         robotConfig.setIsExcludeTagsEnabled(true);
         robotConfig.setExcludedTags(newArrayList("excluded"));
         robotConfig.setIncludedTags(newArrayList("included"));
-        RobotLaunchConfiguration.fillDefaults(robotConfig.asWorkingCopy());
+        robotConfig.fillDefaults();
         assertThat(robotConfig.getProjectName()).isEqualTo("");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
         assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);

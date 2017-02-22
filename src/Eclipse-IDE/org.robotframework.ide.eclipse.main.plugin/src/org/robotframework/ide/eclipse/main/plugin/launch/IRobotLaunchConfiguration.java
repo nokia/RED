@@ -17,4 +17,6 @@ public interface IRobotLaunchConfiguration {
 
     void setProjectName(String projectName) throws CoreException;
 
+    void fillDefaults() throws CoreException;
+
 }
