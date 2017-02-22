@@ -39,10 +39,12 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
         // nothing to do here
     }
 
-    private void removeMarkers(IResource resource) {
+    private void removeMarkers(final IResource resource) {
         try {
-            resource.deleteMarkers(null, true, IResource.DEPTH_INFINITE);
-        } catch (CoreException e) {
+            if (resource.exists()) {
+                resource.deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+            }
+        } catch (final CoreException e) {
             e.printStackTrace();
         }
 
