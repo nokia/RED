@@ -67,7 +67,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
                             return dir.getInterpreter().name();
                         }
                     }));
-            
+
             preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
             preferences.put(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
             preferences.put(RedPreferences.OTHER_RUNTIMES, allPaths);
@@ -77,7 +77,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
 
     private void initializeEditorPreferences(final IEclipsePreferences preferences) {
         preferences.put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
-        preferences.put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILETYPE_DEPENDENT.name());
+        preferences.put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILE_TYPE_DEPENDENT.name());
         preferences.put(RedPreferences.SEPARATOR_TO_USE, "ssss");
         preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
         preferences.put(RedPreferences.BEHAVIOR_ON_CELL_COMMIT, CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name());
@@ -113,7 +113,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
             preferences.putInt(getBlueFactorIdentifierFor(category), defaultPref.getRgb().blue);
         }
     }
-    
+
     private void initializeAutodiscoveringPreferences(final IEclipsePreferences preferences) {
         preferences.putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
     }

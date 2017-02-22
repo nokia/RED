@@ -72,7 +72,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
     ENVIRONMENT_HAS_NO_ROBOT {
         @Override
         public String getProblemDescription() {
-            return "FATAL: Python instalation %s has no Robot installed. Fix this problem to build project";
+            return "FATAL: Python installation %s has no Robot installed. Fix this problem to build project";
         }
 
         @Override

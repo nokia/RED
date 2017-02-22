@@ -210,8 +210,8 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                final RobotRuntimeEnvironment selectedInstalation = getSelectedInstalation();
-                removeButton.setEnabled(selectedInstalation != null);
+                final RobotRuntimeEnvironment selectedInstallation = getSelectedInstallation();
+                removeButton.setEnabled(selectedInstallation != null);
             }
         };
         final ICheckStateListener checkListener = new ICheckStateListener() {
@@ -290,7 +290,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         job.schedule();
     }
 
-    private RobotRuntimeEnvironment getSelectedInstalation() {
+    private RobotRuntimeEnvironment getSelectedInstallation() {
         // multiselection is not possible
         final List<RobotRuntimeEnvironment> elements = Selections.getElements(
                 (IStructuredSelection) viewer.getSelection(), RobotRuntimeEnvironment.class);
@@ -347,7 +347,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         return new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent event) {
-                final RobotRuntimeEnvironment env = getSelectedInstalation();
+                final RobotRuntimeEnvironment env = getSelectedInstallation();
                 installations.remove(env);
 
                 dirty = true;
