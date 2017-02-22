@@ -13,7 +13,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
@@ -26,8 +27,15 @@ public class RedXmlInFileChangesCollectorTest {
 
     private static final String PROJECT_NAME = RedXmlInFileChangesCollectorTest.class.getSimpleName();
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
+        projectProvider.createDir(new Path("a"));
+        projectProvider.createDir(new Path("a/b"));
+        projectProvider.createDir(new Path("c"));
+    }
 
     @Before
     public void beforeTest() throws Exception {
@@ -36,10 +44,6 @@ public class RedXmlInFileChangesCollectorTest {
         config.addExcludedPath("a/b");
         config.addExcludedPath("c");
         projectProvider.configure(config);
-
-        projectProvider.createDir(new Path("a"));
-        projectProvider.createDir(new Path("a/b"));
-        projectProvider.createDir(new Path("c"));
     }
 
     @Test
