@@ -61,6 +61,16 @@ abstract class AbstractRobotLaunchConfiguration
     }
 
     @Override
+    public void fillDefaults() throws CoreException {
+        setProjectName("");
+        setSuitePaths(new HashMap<String, List<String>>());
+        setIsIncludeTagsEnabled(false);
+        setIsExcludeTagsEnabled(false);
+        setIncludedTags(new ArrayList<String>());
+        setExcludedTags(new ArrayList<String>());
+    }
+
+    @Override
     public void setIsIncludeTagsEnabled(final boolean isIncludeTagsEnabled) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, isIncludeTagsEnabled);

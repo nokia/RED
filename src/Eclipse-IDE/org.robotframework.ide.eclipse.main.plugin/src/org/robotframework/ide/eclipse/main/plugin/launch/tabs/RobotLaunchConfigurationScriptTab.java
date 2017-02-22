@@ -25,6 +25,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
@@ -49,7 +50,12 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     @Override
     public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
-        ScriptRobotLaunchConfiguration.fillDefaults(configuration);
+        try {
+            LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).fillDefaults();
+        } catch (final CoreException e) {
+            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
+                    "RED was unable to load the working copy of Launch Configuration.");
+        }
     }
 
     @Override
