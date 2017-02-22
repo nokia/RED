@@ -33,11 +33,11 @@ import com.google.common.base.Optional;
 /**
  * @author Michal Anglart
  */
-class LaunchConfigurationsValidator {
+public class LaunchConfigurationsValidator {
 
     private final RobotModel model;
 
-    LaunchConfigurationsValidator() {
+    public LaunchConfigurationsValidator() {
         this(RedPlugin.getModelManager().getModel());
     }
 
@@ -46,7 +46,7 @@ class LaunchConfigurationsValidator {
         this.model = model;
     }
 
-    void validate(final IRemoteRobotLaunchConfiguration robotConfig)
+    public void validate(final IRemoteRobotLaunchConfiguration robotConfig)
             throws LaunchConfigurationValidationFatalException {
 
         try {
