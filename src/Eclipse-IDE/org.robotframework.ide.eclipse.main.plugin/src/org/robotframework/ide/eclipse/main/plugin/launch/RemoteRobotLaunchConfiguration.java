@@ -5,19 +5,22 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 
 public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfiguration {
 
-    static final String TYPE_ID = "org.robotframework.ide.remoteRobotLaunchConfiguration";
+    public static final String TYPE_ID = "org.robotframework.ide.remoteRobotLaunchConfiguration";
 
     private final ILaunchConfiguration configuration;
 
@@ -43,6 +46,24 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
     @Override
     public String getProjectName() throws CoreException {
         return configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
+    }
+
+    @Override
+    public RobotProject getRobotProject() throws CoreException {
+        final IProject project = getProject();
+        return RedPlugin.getModelManager().getModel().createRobotProject(project);
+    }
+
+    private IProject getProject() throws CoreException {
+        final String projectName = getProjectName();
+        if (projectName.isEmpty()) {
+            return null;
+        }
+        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        if (!project.exists()) {
+            throw newCoreException("Project '" + projectName + "' cannot be found in workspace");
+        }
+        return project;
     }
 
     @Override
