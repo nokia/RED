@@ -267,6 +267,7 @@ abstract class AbstractRobotLaunchConfiguration
         }
     }
 
+    @Override
     public RobotProject getRobotProject() throws CoreException {
         final IProject project = getProject();
         return RedPlugin.getModelManager().getModel().createRobotProject(project);

@@ -5,18 +5,33 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.eclipse.core.runtime.CoreException;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public interface IRobotLaunchConfiguration {
+
+    static final AtomicBoolean IS_CONFIGURATION_RUNNING = new AtomicBoolean(false);
 
     String PROJECT_NAME_ATTRIBUTE = "Project name";
 
     String getName();
 
+    void fillDefaults() throws CoreException;
+
     String getProjectName() throws CoreException;
 
     void setProjectName(String projectName) throws CoreException;
 
-    void fillDefaults() throws CoreException;
+    RobotProject getRobotProject() throws CoreException;
+
+    public static boolean lockConfigurationLaunches() {
+        return IS_CONFIGURATION_RUNNING.getAndSet(true);
+    }
+
+    public static void unlockConfigurationLaunches() {
+        IS_CONFIGURATION_RUNNING.set(false);
+    }
 
 }
