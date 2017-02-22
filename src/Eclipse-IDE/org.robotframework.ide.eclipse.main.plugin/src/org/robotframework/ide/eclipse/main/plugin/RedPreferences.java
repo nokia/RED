@@ -23,7 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 import org.robotframework.red.graphics.ColorsManager;
 
 public class RedPreferences {
-    
+
     private final IPreferenceStore store;
 
     protected RedPreferences(final IPreferenceStore store) {
@@ -40,7 +40,7 @@ public class RedPreferences {
     public static final String SEPARATOR_TO_USE = "separatorToUse";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
     public static final String BEHAVIOR_ON_CELL_COMMIT = "cellCommitBehavior";
-    
+
     public static final String FOLDABLE_SECTIONS = "foldableSections";
     public static final String FOLDABLE_CASES = "foldableCases";
     public static final String FOLDABLE_KEYWORDS = "foldableKeywords";
@@ -51,7 +51,7 @@ public class RedPreferences {
     public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "assistantAutoActivationDelay";
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
     public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
-    
+
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
 
     public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
@@ -67,11 +67,11 @@ public class RedPreferences {
     public String getActiveRuntimeExec() {
         return getStringPreferenceOrEmptyIfOnlyDependentDefined(ACTIVE_RUNTIME, ACTIVE_RUNTIME_EXEC);
     }
-    
+
     public String getAllRuntimes() {
         return store.getString(OTHER_RUNTIMES);
     }
-    
+
     public String getAllRuntimesExecs() {
         return getStringPreferenceOrEmptyIfOnlyDependentDefined(OTHER_RUNTIMES, OTHER_RUNTIMES_EXECS);
     }
@@ -107,7 +107,7 @@ public class RedPreferences {
                 return "\t";
             case ALWAYS_USER_DEFINED_SEPARATOR:
                 return store.getString(SEPARATOR_TO_USE).replaceAll("t", "\t").replaceAll("s", " ");
-            case FILETYPE_DEPENDENT:
+            case FILE_TYPE_DEPENDENT:
                 if (isTsvFile) {
                     return "\t";
                 } else {
@@ -118,7 +118,7 @@ public class RedPreferences {
         }
     }
 
-    public int getMimalNumberOfArgumentColumns() {
+    public int getMinimalNumberOfArgumentColumns() {
         return store.getInt(MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS);
     }
 
@@ -137,11 +137,11 @@ public class RedPreferences {
     public char[] getAssistantAutoActivationChars() {
         return store.getString(ASSISTANT_AUTO_ACTIVATION_CHARS).toCharArray();
     }
-    
+
     public boolean isAssistantKeywordPrefixAutoAdditionEnabled() {
         return store.getBoolean(ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
     }
-    
+
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
         return store.getBoolean(PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
     }
@@ -214,7 +214,7 @@ public class RedPreferences {
     public enum SeparatorsMode {
         ALWAYS_TABS,
         ALWAYS_USER_DEFINED_SEPARATOR,
-        FILETYPE_DEPENDENT
+        FILE_TYPE_DEPENDENT
     }
 
     public enum CellCommitBehavior {

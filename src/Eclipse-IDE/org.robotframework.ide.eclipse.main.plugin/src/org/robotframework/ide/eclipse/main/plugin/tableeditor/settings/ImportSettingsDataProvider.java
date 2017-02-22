@@ -50,7 +50,7 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
     }
 
     private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        int max = RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         if (filteredImports != null) {
             for (final Object element : filteredImports) {
                 final RobotSetting setting = (RobotSetting) element;

@@ -74,7 +74,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
             AModelElement<?> last = null;
             for (int execUnitIndex = 0; execUnitIndex <= lastIndexToDump; execUnitIndex++) {
-                addLineSeperatorIfIsRequired(model, lines);
+                addLineSeparatorIfIsRequired(model, lines);
 
                 final AModelElement<ARobotSectionTable> execUnit = sorted.get(execUnitIndex);
                 if (execUnitIndex > 0) {
@@ -211,7 +211,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
         return currentLine;
     }
 
-    private void addLineSeperatorIfIsRequired(final RobotFile model, final List<RobotLine> lines) {
+    private void addLineSeparatorIfIsRequired(final RobotFile model, final List<RobotLine> lines) {
         if (!lines.isEmpty()) {
             final RobotLine lastLine = lines.get(lines.size() - 1);
             final IRobotLineElement endOfLine = lastLine.getEndOfLine();

@@ -173,8 +173,8 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                 new String[] { "user defined separator should be used",
                         SeparatorsMode.ALWAYS_USER_DEFINED_SEPARATOR.name() },
                 new String[] {
-                        "file dependent seperator should be used ('\\t' for *.tsv files, user defined for *.robot)",
-                        SeparatorsMode.FILETYPE_DEPENDENT.name() } };
+                        "file dependent separator should be used ('\\t' for *.tsv files, user defined for *.robot)",
+                        SeparatorsMode.FILE_TYPE_DEPENDENT.name() } };
     }
 
     @Override

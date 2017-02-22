@@ -139,7 +139,7 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        int max = RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         final List<?> elements = (List<?>) viewer.getInput();
         if (elements != null) {
             for (final Object element : elements) {
