@@ -57,7 +57,7 @@ public class RobotTokensCollectorTest {
         // verify
         assertThat(toksExtracted.asMap()).isEmpty();
         assertThat(toksExtracted).isInstanceOf(ArrayListMultimap.class);
-        InOrder order = inOrder(genCollector, collectorOne, collectorTwo);
+        final InOrder order = inOrder(genCollector, collectorOne, collectorTwo);
         order.verify(collectorOne, times(1)).collect(tokensHolder);
         order.verify(genCollector, times(1)).update(colOneToks, toksExtracted);
         order.verify(collectorTwo, times(1)).collect(tokensHolder);
@@ -66,18 +66,16 @@ public class RobotTokensCollectorTest {
     }
 
     @Test
-    public void test_update_forThreeTypesTokensAndThreeOfThem() {
+    public void test_update_forTwoTypesTokensAndTwoOfThem() {
         // prepare
         final RobotTokenType typeOne = RobotTokenType.START_HASH_COMMENT;
         final RobotTokenType typeTwo = RobotTokenType.COMMENT_CONTINUE;
-        final RobotTokenType typeThree = RobotTokenType.COMMENT_TOKEN;
 
-        final List<RobotToken> listTypeOne = createTokensOf(typeOne, 3);
-        final List<RobotToken> listTypeTwo = createTokensOf(typeTwo, 3);
-        final List<RobotToken> listTypeThree = createTokensOf(typeThree, 3);
+        final List<RobotToken> listTypeOne = createTokensOf(typeOne, 2);
+        final List<RobotToken> listTypeTwo = createTokensOf(typeTwo, 2);
 
         @SuppressWarnings("unchecked")
-        final List<RobotToken> listWithAllMixed = mixTypes(listTypeOne, listTypeTwo, listTypeThree);
+        final List<RobotToken> listWithAllMixed = mixTypes(listTypeOne, listTypeTwo);
         final RobotTokensCollector genCollector = new RobotTokensCollector();
         final ListMultimap<RobotTokenType, RobotToken> tokensPerType = ArrayListMultimap.create();
 
@@ -86,16 +84,15 @@ public class RobotTokensCollectorTest {
 
         // verify
         final Map<RobotTokenType, Collection<RobotToken>> asMap = tokensPerType.asMap();
-        assertThat(asMap).containsOnlyKeys(typeOne, typeTwo, typeThree);
+        assertThat(asMap).containsOnlyKeys(typeOne, typeTwo);
         assertThat(asMap.get(typeOne)).containsExactlyElementsOf(listTypeOne);
         assertThat(asMap.get(typeTwo)).containsExactlyElementsOf(listTypeTwo);
-        assertThat(asMap.get(typeThree)).containsExactlyElementsOf(listTypeThree);
 
     }
 
     
     private List<RobotToken> mixTypes(@SuppressWarnings("unchecked") final List<RobotToken>... typed) {
-        List<RobotToken> joined = new ArrayList<>(0);
+        final List<RobotToken> joined = new ArrayList<>(0);
 
         int maxSize = 0;
         for (final List<RobotToken> p : typed) {
@@ -113,11 +110,11 @@ public class RobotTokensCollectorTest {
         return joined;
     }
 
-    private List<RobotToken> createTokensOf(final RobotTokenType type, int times) {
+    private List<RobotToken> createTokensOf(final RobotTokenType type, final int times) {
         final List<RobotToken> product = new ArrayList<>(times);
 
         for (int i = 0; i < times; i++) {
-            RobotToken tok = new RobotToken();
+            final RobotToken tok = new RobotToken();
             tok.setType(type);
             product.add(tok);
         }
