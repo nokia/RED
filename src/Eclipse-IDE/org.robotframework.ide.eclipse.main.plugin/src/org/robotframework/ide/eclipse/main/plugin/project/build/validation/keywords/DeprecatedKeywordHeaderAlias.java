@@ -40,9 +40,9 @@ public class DeprecatedKeywordHeaderAlias implements ModelUnitValidator {
             for (final TableHeader<? extends ARobotSectionTable> th : keywords.getHeaders()) {
                 final RobotToken declaration = th.getDeclaration();
                 final String raw = declaration.getRaw();
-                final String rawWihtoutWithspaces = raw.toLowerCase().replaceAll("\\s", "");
-                if (rawWihtoutWithspaces.toLowerCase().contains("userkeyword")) {
-                    reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONIM)
+                final String rawWithoutWhiteSpaces = raw.toLowerCase().replaceAll("\\s", "");
+                if (rawWithoutWhiteSpaces.toLowerCase().contains("userkeyword")) {
+                    reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONYM)
                             .formatMessageWith(raw), file, declaration);
                 }
             }

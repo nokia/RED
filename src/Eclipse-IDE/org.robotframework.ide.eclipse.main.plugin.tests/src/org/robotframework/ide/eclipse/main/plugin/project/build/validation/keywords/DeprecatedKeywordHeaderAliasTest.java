@@ -28,7 +28,7 @@ public class DeprecatedKeywordHeaderAliasTest {
     public void beforeTest() {
         reporter = new MockReporter();
     }
-    
+
     @Test
     public void sectionHeaderIsReported_whenDeprecatedWordIsUsed() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -36,16 +36,16 @@ public class DeprecatedKeywordHeaderAliasTest {
                 .appendLine("kw")
                 .appendLine("    [Return]    1")
                 .build();
-        
+
         final RobotKeywordsSection section = file.findSection(RobotKeywordsSection.class).get();
 
         new DeprecatedKeywordHeaderAlias(file.getFile(), reporter, section).validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONIM, new ProblemPosition(1, Range.closed(0, 21))));
+                KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONYM, new ProblemPosition(1, Range.closed(0, 21))));
     }
-    
+
     @Test
     public void nothingIsReported_whenSectionHeaderUsesKeywordsWord() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -53,7 +53,7 @@ public class DeprecatedKeywordHeaderAliasTest {
                 .appendLine("kw")
                 .appendLine("    [Return]    1")
                 .build();
-        
+
         final RobotKeywordsSection section = file.findSection(RobotKeywordsSection.class).get();
 
         new DeprecatedKeywordHeaderAlias(file.getFile(), reporter, section).validate(null);

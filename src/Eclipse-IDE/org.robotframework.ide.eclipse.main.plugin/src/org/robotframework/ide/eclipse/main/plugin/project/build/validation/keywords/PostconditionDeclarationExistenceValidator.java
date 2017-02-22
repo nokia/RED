@@ -19,11 +19,11 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADeprecatedSettingElement;
 
-public class PostconditionDeclarationExistanceValidator extends ADeprecatedSettingElement {
+public class PostconditionDeclarationExistenceValidator extends ADeprecatedSettingElement {
 
     private final RobotKeywordsSection section;
 
-    public PostconditionDeclarationExistanceValidator(final IFile file, final ProblemsReportingStrategy reporter,
+    public PostconditionDeclarationExistenceValidator(final IFile file, final ProblemsReportingStrategy reporter,
             final RobotKeywordsSection section) {
         super(file, reporter, "Postcondition");
         this.section = section;
@@ -31,7 +31,7 @@ public class PostconditionDeclarationExistanceValidator extends ADeprecatedSetti
 
     @Override
     public IProblemCause getProblemId() {
-        return KeywordsProblem.POSTCONDITION_SYNONIM;
+        return KeywordsProblem.POSTCONDITION_SYNONYM;
     }
 
     @Override

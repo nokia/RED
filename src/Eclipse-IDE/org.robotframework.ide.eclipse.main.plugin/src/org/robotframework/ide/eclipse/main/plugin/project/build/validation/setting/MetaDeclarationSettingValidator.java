@@ -45,7 +45,7 @@ public class MetaDeclarationSettingValidator implements ModelUnitValidator {
                 final String settingPrepared = raw.replaceAll("\\s", "").toLowerCase();
                 if (settingPrepared.equals("meta") || settingPrepared.equals("meta:")) {
                     reporter.handleProblem(
-                            RobotProblem.causedBy(GeneralSettingsProblem.META_SYNONIM).formatMessageWith(raw), file,
+                            RobotProblem.causedBy(GeneralSettingsProblem.META_SYNONYM).formatMessageWith(raw), file,
                             metaToken);
                 }
             }

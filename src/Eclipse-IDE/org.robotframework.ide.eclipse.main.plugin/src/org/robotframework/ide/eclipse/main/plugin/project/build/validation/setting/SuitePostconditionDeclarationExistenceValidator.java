@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
+import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -18,19 +18,19 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADeprecatedSettingElement;
 
-public class TestPostconditionDeclarationExistanceValidator extends ADeprecatedSettingElement {
+public class SuitePostconditionDeclarationExistenceValidator extends ADeprecatedSettingElement {
 
     private final RobotSettingsSection section;
 
-    public TestPostconditionDeclarationExistanceValidator(final IFile file, final ProblemsReportingStrategy reporter,
+    public SuitePostconditionDeclarationExistenceValidator(final IFile file, final ProblemsReportingStrategy reporter,
             final RobotSettingsSection section) {
-        super(file, reporter, "Test Postcondition");
+        super(file, reporter, "Suite Postcondition");
         this.section = section;
     }
 
     @Override
     public IProblemCause getProblemId() {
-        return GeneralSettingsProblem.TEST_POSTCONDITION_SYNONIM;
+        return GeneralSettingsProblem.SUITE_POSTCONDITION_SYNONYM;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class TestPostconditionDeclarationExistanceValidator extends ADeprecatedS
         final List<RobotToken> declarations = new ArrayList<>(0);
         final SettingTable settingTable = section.getLinkedElement();
         if (settingTable.isPresent()) {
-            for (final TestTeardown teardown : settingTable.getTestTeardowns()) {
+            for (final SuiteTeardown teardown : settingTable.getSuiteTeardowns()) {
                 declarations.add(teardown.getDeclaration());
             }
         }

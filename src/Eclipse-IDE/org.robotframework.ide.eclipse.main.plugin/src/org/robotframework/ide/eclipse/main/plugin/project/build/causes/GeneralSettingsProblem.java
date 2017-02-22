@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -26,7 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResour
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonimFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonymFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.TableHeaderDepracatedAliasesReplacer;
 
@@ -90,7 +91,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "The import name/path '%s' is parameterized. Some of used parameters cannot be resolved."
-                    + " Use Variable mappings in red.xml for parameter resolution";
+                    + " Use Variable mappings in " + RobotProjectConfig.FILENAME + " for parameter resolution";
         }
 
         @Override
@@ -146,7 +147,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Unknown '%s' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation";
+            return "Unknown '%s' library. Try to use Quick Fix (Ctrl+1) or add library to "
+                    + RobotProjectConfig.FILENAME + " for proper validation";
         }
 
         @Override
@@ -377,7 +379,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return newArrayList(new MetadataKeyInSameColumnFixer());
         }
     },
-    META_SYNONIM {
+    META_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -396,10 +398,10 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new SettingMetaSynonimFixer());
+            return newArrayList(new SettingMetaSynonymFixer());
         }
     },
-    DOCUMENT_SYNONIM {
+    DOCUMENT_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -421,7 +423,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
         }
     },
-    SUITE_PRECONDITION_SYNONIM {
+    SUITE_PRECONDITION_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -444,7 +446,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
                     new SettingSimpleWordReplacer(RobotSettingsSection.class, "Suite Precondition", "Suite Setup"));
         }
     },
-    SUITE_POSTCONDITION_SYNONIM {
+    SUITE_POSTCONDITION_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -467,7 +469,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
                     new SettingSimpleWordReplacer(RobotSettingsSection.class, "Suite Postcondition", "Suite Teardown"));
         }
     },
-    TEST_PRECONDITION_SYNONIM {
+    TEST_PRECONDITION_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -490,7 +492,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
                     new SettingSimpleWordReplacer(RobotSettingsSection.class, "Test Precondition", "Test Setup"));
         }
     },
-    TEST_POSTCONDITION_SYNONIM {
+    TEST_POSTCONDITION_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -513,7 +515,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
                     new SettingSimpleWordReplacer(RobotSettingsSection.class, "Test Postcondition", "Test Teardown"));
         }
     },
-    METADATA_TABLE_HEADER_SYNONIM {
+    METADATA_TABLE_HEADER_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {

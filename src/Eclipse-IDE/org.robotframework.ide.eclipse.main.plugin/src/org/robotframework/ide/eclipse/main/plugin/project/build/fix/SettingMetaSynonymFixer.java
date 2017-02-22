@@ -24,9 +24,9 @@ import org.robotframework.red.graphics.ImagesManager;
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
-public class SettingMetaSynonimFixer extends RedSuiteMarkerResolution {
+public class SettingMetaSynonymFixer extends RedSuiteMarkerResolution {
 
-    public SettingMetaSynonimFixer() {
+    public SettingMetaSynonymFixer() {
     }
 
     @Override

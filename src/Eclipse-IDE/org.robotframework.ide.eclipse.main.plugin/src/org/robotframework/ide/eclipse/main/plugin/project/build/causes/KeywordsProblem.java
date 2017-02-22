@@ -232,7 +232,7 @@ public enum KeywordsProblem implements IProblemCause {
                     + "Use '%s' in this suite file if the latter is desired";
         }
     },
-    DOCUMENT_SYNONIM {
+    DOCUMENT_SYNONYM {
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.REMOVED_API;
@@ -253,7 +253,7 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(new DocumentToDocumentationWordFixer(RobotKeywordsSection.class));
         }
     },
-    POSTCONDITION_SYNONIM {
+    POSTCONDITION_SYNONYM {
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.REMOVED_API;
@@ -274,7 +274,7 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(new SettingSimpleWordReplacer(RobotKeywordsSection.class, "Postcondition", "Teardown"));
         }
     },
-    USER_KEYWORD_TABLE_HEADER_SYNONIM {
+    USER_KEYWORD_TABLE_HEADER_SYNONYM {
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.REMOVED_API;

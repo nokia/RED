@@ -16,9 +16,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDepracatedDeclarationValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDeprecatedDeclarationValidator;
 
-public class DocumentationDeclarationSettingValidator extends ADocumentDepracatedDeclarationValidator {
+public class DocumentationDeclarationSettingValidator extends ADocumentDeprecatedDeclarationValidator {
 
     private final RobotSettingsSection section;
 
@@ -30,7 +30,7 @@ public class DocumentationDeclarationSettingValidator extends ADocumentDepracate
 
     @Override
     public IProblemCause getSettingProblemId() {
-        return GeneralSettingsProblem.DOCUMENT_SYNONIM;
+        return GeneralSettingsProblem.DOCUMENT_SYNONYM;
     }
 
     @Override
