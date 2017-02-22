@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _on4EgF4VEeWeit3EM6sPPA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/14/17 2:27 PM
+Save-Time: 2/22/17 1:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -63,11 +63,21 @@ get-view "Project Explorer" | get-tree | select "Empty_project" | select "Empty_
     | get-menu "Run As/1 Robot Test" | click
     
 //check console    
-get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .*Empty_project\n"
-    + "Suite Executor: Robot Framework .*\n"
-    + "\[ ERROR \] Suite 'Empty project' contains no tests.\n\n"
-    + "Try --help for usage information." | verify-true
+if [not [get-view Console | get-text-viewer | get-property text -raw
+	    | matches "Command: .*Empty_project\n"
+	    + "Suite Executor: Robot Framework .*\n"
+	    + "\[ ERROR \] Suite 'Empty project' contains no tests.\n\n"
+	    + "Try --help for usage information." ]]{
+	    
+    //different order on linux sometimes:
+    get-view Console | get-text-viewer | get-property text 
+	    | equals "\[ ERROR \] Suite 'Empty project' contains no tests.\n\n"
+	    + "Try --help for usage information.\n"
+	    + "Command: .*Empty_project\n"
+	    + "Suite Executor: Robot Framework .*"
+	     | verify-true
+
+}
 
 wait 500     
 //check that execution view is empty 
