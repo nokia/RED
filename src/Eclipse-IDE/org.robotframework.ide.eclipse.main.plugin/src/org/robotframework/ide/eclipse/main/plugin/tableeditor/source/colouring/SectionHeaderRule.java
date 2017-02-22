@@ -26,7 +26,7 @@ public class SectionHeaderRule extends TokenTypeBasedRule {
             final List<IRobotLineElement> analyzedTokens) {
         final List<IRobotTokenType> tokenTypes = token.getTypes();
 
-        if (tokenTypes.contains(RobotTokenType.START_HASH_COMMENT) || tokenTypes.contains(RobotTokenType.COMMENT_TOKEN)
+        if (tokenTypes.contains(RobotTokenType.START_HASH_COMMENT)
                 || tokenTypes.contains(RobotTokenType.COMMENT_CONTINUE)) {
             return Optional.absent();
         }

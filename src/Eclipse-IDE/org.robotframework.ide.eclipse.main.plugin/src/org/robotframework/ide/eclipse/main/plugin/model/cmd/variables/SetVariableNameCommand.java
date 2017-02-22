@@ -92,7 +92,7 @@ public class SetVariableNameCommand extends EditorCommand {
         }
 
         final Iterable<RobotToken> commentTokens = filter(elementTokens, containingOneOf(
-                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_TOKEN, RobotTokenType.COMMENT_CONTINUE));
+                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE));
         for (final RobotToken commentToken : commentTokens) {
             newHolder.addCommentPart(commentToken);
         }
