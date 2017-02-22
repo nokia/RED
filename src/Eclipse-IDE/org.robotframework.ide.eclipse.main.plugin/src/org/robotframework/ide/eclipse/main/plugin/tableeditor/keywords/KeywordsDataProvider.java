@@ -102,7 +102,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
 
     private int countColumnsNumber() {
         // add 1 for name column
-        int max = 1 + RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        int max = 1 + RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         if (keywords != null) {
             for (final Object element : keywords) {
                 if (element instanceof RobotKeywordDefinition) {

@@ -53,7 +53,7 @@ public class GeneralSettingsDataProvider
     }
 
     private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        int max = RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         if (generalSettings != null) {
             for (final Entry<String, RobotElement> element : generalSettings) {
                 final RobotSetting setting = (RobotSetting) element.getValue();

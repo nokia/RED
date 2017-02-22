@@ -64,7 +64,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
 
     private int countColumnsNumber() {
         // add 1 for name column
-        int max = 1 + RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        int max = 1 + RedPlugin.getDefault().getPreferences().getMinimalNumberOfArgumentColumns();
         if (cases != null) {
             for (final Object element : cases) {
                 if (element instanceof RobotKeywordCall) {
