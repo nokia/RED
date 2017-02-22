@@ -5,14 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
@@ -28,24 +23,14 @@ public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     private static final String SCRIPT_RUN_COMMAND_ATTRIBUTE = "Script run command";
 
-    public static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig) {
-        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(launchConfig);
-        try {
-            robotConfig.setScriptRunCommand(System.getProperty("os.name").startsWith("Windows") ? "cmd /c start" : "");
-            robotConfig.setProjectName("");
-            robotConfig.setSuitePaths(new HashMap<String, List<String>>());
-            robotConfig.setIsIncludeTagsEnabled(false);
-            robotConfig.setIsExcludeTagsEnabled(false);
-            robotConfig.setIncludedTags(new ArrayList<String>());
-            robotConfig.setExcludedTags(new ArrayList<String>());
-        } catch (final CoreException e) {
-            DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
-                    "RED was unable to load the working copy of Launch Configuration.");
-        }
-    }
-
     public ScriptRobotLaunchConfiguration(final ILaunchConfiguration config) {
         super(config);
+    }
+
+    @Override
+    public void fillDefaults() throws CoreException {
+        setScriptRunCommand(System.getProperty("os.name").startsWith("Windows") ? "cmd /c start" : "");
+        super.fillDefaults();
     }
 
     @Override
