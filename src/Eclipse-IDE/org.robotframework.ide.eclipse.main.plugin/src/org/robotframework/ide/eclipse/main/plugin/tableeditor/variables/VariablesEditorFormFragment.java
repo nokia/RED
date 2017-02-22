@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,6 +44,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -324,8 +326,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         return variablesMatches;
     }
 
-    public TableHyperlinksSupport getDetector() {
-        return detector;
+    public List<ITableHyperlinksDetector> getDetectors() {
+        return detector.getDetectors();
     }
 
     @Inject
