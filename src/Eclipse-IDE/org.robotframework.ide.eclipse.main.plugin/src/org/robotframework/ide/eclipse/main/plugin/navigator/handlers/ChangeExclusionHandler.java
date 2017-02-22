@@ -58,9 +58,11 @@ abstract class ChangeExclusionHandler {
                     groupingProject.getFile(RobotProjectConfig.FILENAME), groupedPaths.get(groupingProject));
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
             final Collection<RobotSuiteFile> suiteModels = grouped.get(groupingProject);
+            if (suiteModels != null) {
             final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
             final Job validationJob = RobotArtifactsValidator.createValidationJob(groupingProject, validatorConfig);
             validationJob.schedule(REVALIDATE_JOB_DELAY);
+            }
 
         }
        

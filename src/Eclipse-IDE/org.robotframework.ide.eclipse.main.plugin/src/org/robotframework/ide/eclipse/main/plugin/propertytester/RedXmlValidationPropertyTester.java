@@ -19,6 +19,9 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
     @VisibleForTesting static final String IS_FILE = "isFile";
     @VisibleForTesting static final String PARENT_EXCLUDED = "isExcludedViaInheritance";
 
+    @VisibleForTesting
+    static final String IS_PROJECT = "isProject";
+
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
         Preconditions.checkArgument(receiver instanceof ProjectTreeElement,
@@ -45,6 +48,8 @@ public class RedXmlValidationPropertyTester extends PropertyTester {
             return projectElement.isFile() == expected;
         } else if (PARENT_EXCLUDED.equals(property)) {
             return projectElement.isExcludedViaInheritance() == expected;
+        } else if (IS_PROJECT.equals(property)) {
+            return projectElement.isProject() == expected;
         }
         return false;
     }

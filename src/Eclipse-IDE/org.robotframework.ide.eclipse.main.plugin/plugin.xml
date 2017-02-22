@@ -758,7 +758,8 @@
              <equals
                    value="org.eclipse.ui.perspectives.RobotPerspective">
              </equals>
-          </with></enablement>
+          </with>
+       </enablement>
     </commonWizard>
     <commonWizard
           type="new"
@@ -769,7 +770,33 @@
              <equals
                    value="org.eclipse.ui.perspectives.RobotPerspective">
              </equals>
-          </with></enablement>
+          </with>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false">
+                <adapt
+                      type="org.eclipse.core.resources.IResource">
+                   <or>
+                      <and>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                         <test
+                               property="org.eclipse.core.resources.open"
+                               value="open">
+                         </test>
+                      </and>
+                      <not>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                      </not>
+                   </or>
+                </adapt>
+             </iterate>
+          </with>
+       </enablement>
     </commonWizard>
     <commonWizard
           type="new"
@@ -780,6 +807,31 @@
              <equals
                    value="org.eclipse.ui.perspectives.RobotPerspective">
              </equals>
+          </with>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false">
+                <adapt
+                      type="org.eclipse.core.resources.IResource">
+                   <or>
+                      <and>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                         <test
+                               property="org.eclipse.core.resources.open"
+                               value="open">
+                         </test>
+                      </and>
+                      <not>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                      </not>
+                   </or>
+                </adapt>
+             </iterate>
           </with>
        </enablement>
     </commonWizard>
@@ -804,6 +856,31 @@
              <equals
                    value="org.eclipse.ui.perspectives.RobotPerspective">
              </equals>
+          </with>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false">
+                <adapt
+                      type="org.eclipse.core.resources.IResource">
+                   <or>
+                      <and>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                         <test
+                               property="org.eclipse.core.resources.open"
+                               value="open">
+                         </test>
+                      </and>
+                      <not>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                      </not>
+                   </or>
+                </adapt>
+             </iterate>
           </with>
        </enablement>
     </commonWizard>
@@ -2894,10 +2971,16 @@
                          property="org.robotframework.redxml.validation.isFile"
                          value="true">
                   	 </test>
+                  	  <test
+                         property="org.robotframework.redxml.validation.isProject"
+                         value="true">
+                         </test>
                    </or>
                    <test
                          property="org.robotframework.redxml.validation.isExcluded"
                          value="true">
+
+                         
                    </test>
                 </and>
              </iterate>
@@ -2928,6 +3011,10 @@
                         	 property="org.robotframework.redxml.validation.isFile"
                         	 value="true">
                   		</test>
+          			  <test
+                         property="org.robotframework.redxml.validation.isProject"
+                         value="true">
+                         </test>
                    </or>
                   	<test
                          property="org.robotframework.redxml.validation.isIncluded"
@@ -4429,7 +4516,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlValidationPropertyTester"
           id="org.robotframework.redxml.validationConfigPropertyTester"
           namespace="org.robotframework.redxml.validation"
-          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance"
+          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance, isProject"
           type="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
     </propertyTester>
     <propertyTester
@@ -4443,7 +4530,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"
           id="org.robotframework.redxml.navigatorProjectConfigPropertyTester"
           namespace="org.robotframework.redxml.navigator"
-          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance"
+          properties="isInternalFolder, isExcluded, isIncluded, isFile, isExcludedViaInheritance, isProject"
           type="org.eclipse.core.resources.IResource">
     </propertyTester>
     <propertyTester

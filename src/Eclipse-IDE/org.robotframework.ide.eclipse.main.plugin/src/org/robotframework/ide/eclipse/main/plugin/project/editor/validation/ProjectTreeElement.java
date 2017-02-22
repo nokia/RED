@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
@@ -235,6 +236,11 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
         public int hashCode() {
             return Objects.hashCode(path);
         }
+    }
+
+    public boolean isProject() {
+        return resource instanceof IProject;
+
     }
 
 }
