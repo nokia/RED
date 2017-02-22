@@ -30,7 +30,6 @@ public class CommentRule implements ISyntaxColouringRule {
         final List<IRobotTokenType> tokenTypes = token.getTypes();
 
         if (tokenTypes.contains(RobotTokenType.START_HASH_COMMENT)
-                || tokenTypes.contains(RobotTokenType.COMMENT_TOKEN)
                 || tokenTypes.contains(RobotTokenType.COMMENT_CONTINUE)) {
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
         }
