@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 4:26 PM
+Save-Time: 2/22/17 11:34 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -131,4 +131,11 @@ proc "wait-for-no-progressbar"{
 		verify-error {get-control Any -after [get-label LF] -index 4 | get-property enablement | equals true | verify-true}
 	}
 }
+
+proc "wait-for-loading-red-xml" [val editor_name]{
+	try -times 10 -delay 1000 -command{
+		get-editor $editor_name | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
+	    | verify-true
+	}
+} 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
