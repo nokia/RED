@@ -14,8 +14,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class LibraryAliasRecognizer extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern
-            .compile(createUpperLowerCaseWord("WITH") + "[\\s]+"
-                    + createUpperLowerCaseWord("NAME"));
+            .compile("^(\\s)*" + createUpperLowerCaseWord("WITH") + "[\\s]+" + createUpperLowerCaseWord("NAME")
+                    + "(\\s)*$");
 
 
     public LibraryAliasRecognizer() {
