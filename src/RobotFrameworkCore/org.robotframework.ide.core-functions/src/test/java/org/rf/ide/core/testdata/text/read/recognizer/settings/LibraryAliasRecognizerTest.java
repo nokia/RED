@@ -27,13 +27,13 @@ public class LibraryAliasRecognizerTest {
 
     @Test
     public void test_withNameWords_allCombinations() {
-        List<String> combinations = new CombinationGenerator().combinations("with name");
+        final List<String> combinations = new CombinationGenerator().combinations("with name");
 
-        for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder(comb);
+        for (final String comb : combinations) {
+            final StringBuilder textOfHeader = new StringBuilder(comb);
 
             assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
-            RobotToken token = rec.next();
+            final RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
@@ -44,38 +44,23 @@ public class LibraryAliasRecognizerTest {
 
     @Test
     public void test_twoSpacesAnd_WITH_NAME_ThanWord() {
-        StringBuilder text = new StringBuilder(" WITH NAME");
-        StringBuilder d = new StringBuilder(" ").append(text);
+        final StringBuilder text = new StringBuilder(" WITH NAME");
+        final StringBuilder d = new StringBuilder(" ").append(text);
         assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(2);
+        final RobotToken token = rec.next();
+        assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(d.length());
-        assertThat(token.getText().toString()).isEqualTo(text.substring(1));
+        assertThat(token.getText().toString()).isEqualTo(d.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
     @Test
-    public void test_singleSpaceAndWITH_NAMEThanWord() {
-        StringBuilder text = new StringBuilder(" WITH NAME");
-        StringBuilder d = new StringBuilder(text).append("C");
+    public void test_singleSpaceAndWITH_NAME() {
+        final StringBuilder text = new StringBuilder(" WITH NAME");
 
-        assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
-        assertThat(token.getStartColumn()).isEqualTo(1);
-        assertThat(token.getLineNumber()).isEqualTo(1);
-        assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString()).isEqualTo(text.substring(1));
-        assertThat(token.getTypes()).containsExactly(rec.getProducedType());
-    }
-
-    @Test
-    public void test_singleAliasThanLetterCWord() {
-        StringBuilder text = new StringBuilder("WITH NAME");
-        StringBuilder d = new StringBuilder(text).append("C");
-
-        assertThat(rec.hasNext(d, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -84,11 +69,24 @@ public class LibraryAliasRecognizerTest {
     }
 
     @Test
+    public void test_singleAliasThanLetterCWord() {
+        final StringBuilder text = new StringBuilder("WITH NAMEC");
+
+        assertThat(rec.hasNext(text, 1, 0)).isFalse();
+        // final RobotToken token = rec.next();
+        // assertThat(token.getStartColumn()).isEqualTo(0);
+        // assertThat(token.getLineNumber()).isEqualTo(1);
+        // assertThat(token.getEndColumn()).isEqualTo(text.length());
+        // assertThat(token.getText().toString()).isEqualTo(text.toString());
+        // assertThat(token.getTypes()).containsExactly(rec.getProducedType());
+    }
+
+    @Test
     public void test_singleAliasWord() {
-        StringBuilder text = new StringBuilder("WITH NAME");
+        final StringBuilder text = new StringBuilder("WITH NAME");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -98,8 +96,8 @@ public class LibraryAliasRecognizerTest {
 
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(ATokenRecognizer.createUpperLowerCaseWord("WITH") + "[\\s]+"
-                + ATokenRecognizer.createUpperLowerCaseWord("NAME"));
+        assertThat(rec.getPattern().pattern()).isEqualTo("^(\\s)*" + ATokenRecognizer.createUpperLowerCaseWord("WITH")
+                + "[\\s]+" + ATokenRecognizer.createUpperLowerCaseWord("NAME") + "(\\s)*$");
     }
 
     @Test
