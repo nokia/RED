@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -26,6 +27,9 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
     @VisibleForTesting static final String IS_INTERNAL_FOLDER = "isInternalFolder";
 
     @VisibleForTesting static final String IS_FILE = "isFile";
+
+    @VisibleForTesting
+    static final String IS_PROJECT = "isFile";
 
     @VisibleForTesting static final String PARENT_EXCLUDED = "isExcludedViaInheritance";
 
@@ -55,6 +59,8 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
             return projectElement instanceof IFile == expected;
         } else if (PARENT_EXCLUDED.equals(property)) {
             return isExcludedViaInheritance(projectElement) == expected;
+        } else if (IS_PROJECT.equals(property)) {
+            return projectElement instanceof IProject == expected;
         } else {
             return false;
         }
