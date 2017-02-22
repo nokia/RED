@@ -56,6 +56,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -379,8 +380,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     }
 
     @Override
-    public TableHyperlinksSupport getDetector() {
-        return detector;
+    public List<ITableHyperlinksDetector> getDetectors() {
+        return detector.getDetectors();
     }
 
     @Inject

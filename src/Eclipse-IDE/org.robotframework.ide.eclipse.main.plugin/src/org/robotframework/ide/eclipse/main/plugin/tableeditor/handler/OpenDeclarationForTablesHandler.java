@@ -14,7 +14,6 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
@@ -39,11 +38,10 @@ public class OpenDeclarationForTablesHandler extends DIParameterizedHandler<E4Op
             if (editorPart instanceof DISectionEditorPart) {
                 @SuppressWarnings("unchecked")
                 final DISectionEditorPart<ISectionEditorPart> part = (DISectionEditorPart<ISectionEditorPart>) editorPart;
-                final TableHyperlinksSupport tableHyperlinksSupporter = part.getDetector();
+                final List<ITableHyperlinksDetector> detectors = part.getDetectors();
                 final SelectionLayerAccessor accessor = part.getSelectionLayerAccessor();
                 final PositionCoordinate[] positions = accessor.getSelectedPositions();
-                if (tableHyperlinksSupporter != null && positions.length == 1) {
-                    final List<ITableHyperlinksDetector> detectors = tableHyperlinksSupporter.getDetectors();
+                if (positions.length == 1) {
                     final int row = positions[0].getRowPosition();
                     final int column = positions[0].getColumnPosition();
                     final String label = accessor.getLabelFromCell(row, column);

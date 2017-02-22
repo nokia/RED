@@ -51,6 +51,7 @@ import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -379,6 +380,10 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         return keywordMatches;
     }
 
+    public List<ITableHyperlinksDetector> getDetectors() {
+        return detector.getDetectors();
+    }
+
     @Inject
     @Optional
     private void whenUserRequestedFilteringEnabled(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC
@@ -661,9 +666,5 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             super(site, table, selectionProvider, "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu",
                     "Robot suite editor keywords context menu");
         }
-    }
-
-    public TableHyperlinksSupport getDetector() {
-        return detector;
     }
 }

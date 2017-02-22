@@ -51,6 +51,7 @@ import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -379,8 +380,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         return casesMatches;
     }
 
-    public TableHyperlinksSupport getDetector() {
-        return detector;
+    public List<ITableHyperlinksDetector> getDetectors() {
+        return detector.getDetectors();
     }
 
     @Inject

@@ -91,6 +91,7 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -821,8 +822,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     @Override
-    public TableHyperlinksSupport getDetector() {
-        return detector;
+    public List<ITableHyperlinksDetector> getDetectors() {
+        return detector.getDetectors();
     }
 
     @Inject

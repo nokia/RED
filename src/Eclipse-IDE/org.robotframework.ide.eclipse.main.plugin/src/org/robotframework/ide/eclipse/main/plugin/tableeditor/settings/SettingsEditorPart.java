@@ -14,7 +14,7 @@ import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -198,15 +198,15 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         }
 
         @Override
-        public TableHyperlinksSupport getDetector() {
+        public List<ITableHyperlinksDetector> getDetectors() {
             final ISelection selection = settingsEditorPageSelectionProvider.getSelection();
 
             if (selection != null && !selection.isEmpty()) {
                 final ISettingsFormFragment activeFormFragment = settingsEditorPageSelectionProvider
                         .getActiveFormFragment();
-                return activeFormFragment.getDetector();
+                return activeFormFragment.getDetectors();
             }
-            return null;
+            return newArrayList();
         }
     }
 }
