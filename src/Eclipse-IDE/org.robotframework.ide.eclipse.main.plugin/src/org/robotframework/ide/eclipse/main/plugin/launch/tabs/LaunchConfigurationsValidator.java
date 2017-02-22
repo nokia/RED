@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +106,8 @@ class LaunchConfigurationsValidator {
             final String projectName = robotConfig.getProjectName();
             validateProject(projectName);
 
+            validateExecutorScript(robotConfig.getScriptPath());
+
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
             if (suitesToRun.isEmpty()) {
                 warnings.add("There are no suites specified. All suites in '" + projectName + "' will be executed.");
@@ -142,6 +145,16 @@ class LaunchConfigurationsValidator {
         } else if (!env.hasRobotInstalled()) {
             throw new LaunchConfigurationValidationFatalException(
                     "Project '" + projectName + "' is using invalid Python environment (missing Robot Framework).");
+        }
+    }
+
+    private void validateExecutorScript(final String filePath) {
+        if (filePath.isEmpty()) {
+            throw new LaunchConfigurationValidationFatalException("Executor script file path is not defined.");
+        }
+        final File file = new File(filePath);
+        if (!file.exists()) {
+            throw new LaunchConfigurationValidationFatalException("Executor script file does not exist.");
         }
     }
 
