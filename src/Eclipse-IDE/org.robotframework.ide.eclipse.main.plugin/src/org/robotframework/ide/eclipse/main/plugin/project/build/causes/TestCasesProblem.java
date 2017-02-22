@@ -45,7 +45,7 @@ public enum TestCasesProblem implements IProblemCause {
             return "Test case '%s' contains no keywords to execute";
         }
     },
-    DOCUMENT_SYNONIM {
+    DOCUMENT_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -67,7 +67,7 @@ public enum TestCasesProblem implements IProblemCause {
             return newArrayList(new DocumentToDocumentationWordFixer(RobotCasesSection.class));
         }
     },
-    PRECONDITION_SYNONIM {
+    PRECONDITION_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {
@@ -89,7 +89,7 @@ public enum TestCasesProblem implements IProblemCause {
             return newArrayList(new SettingSimpleWordReplacer(RobotCasesSection.class, "Precondition", "Setup"));
         }
     },
-    POSTCONDITION_SYNONIM {
+    POSTCONDITION_SYNONYM {
 
         @Override
         public ProblemCategory getProblemCategory() {

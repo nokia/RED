@@ -17,9 +17,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDepracatedDeclarationValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDeprecatedDeclarationValidator;
 
-public class DocumentationUserKeywordDeclarationSettingValidator extends ADocumentDepracatedDeclarationValidator {
+public class DocumentationUserKeywordDeclarationSettingValidator extends ADocumentDeprecatedDeclarationValidator {
 
     private final RobotKeywordsSection section;
 
@@ -31,7 +31,7 @@ public class DocumentationUserKeywordDeclarationSettingValidator extends ADocume
 
     @Override
     public IProblemCause getSettingProblemId() {
-        return KeywordsProblem.DOCUMENT_SYNONIM;
+        return KeywordsProblem.DOCUMENT_SYNONYM;
     }
 
     @Override

@@ -39,7 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DeprecatedKeywordHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistenceValidator;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -85,7 +85,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             throws CoreException {
         new DocumentationUserKeywordDeclarationSettingValidator(validationContext.getFile(), section, reporter)
                 .validate(monitor);
-        new PostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+        new PostconditionDeclarationExistenceValidator(validationContext.getFile(), reporter, section)
                 .validate(monitor);
         new DeprecatedKeywordHeaderAlias(validationContext.getFile(), reporter, section).validate(monitor);
     }

@@ -16,13 +16,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
-public abstract class ADocumentDepracatedDeclarationValidator implements ModelUnitValidator {
+public abstract class ADocumentDeprecatedDeclarationValidator implements ModelUnitValidator {
 
     private final IFile file;
 
     private final ProblemsReportingStrategy reporter;
 
-    public ADocumentDepracatedDeclarationValidator(final IFile file, ProblemsReportingStrategy reporter) {
+    public ADocumentDeprecatedDeclarationValidator(final IFile file, final ProblemsReportingStrategy reporter) {
         this.file = file;
         this.reporter = reporter;
     }
@@ -30,9 +30,9 @@ public abstract class ADocumentDepracatedDeclarationValidator implements ModelUn
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         for (final RobotToken docToken : getDocumentationDeclaration()) {
-            String raw = docToken.getRaw();
-            final String rawWihtoutWithspaces = raw.replaceAll("\\s", "");
-            if (!rawWihtoutWithspaces.toLowerCase().contains("documentation")) {
+            final String raw = docToken.getRaw();
+            final String rawWithoutWhiteSpaces = raw.replaceAll("\\s", "");
+            if (!rawWithoutWhiteSpaces.toLowerCase().contains("documentation")) {
                 reporter.handleProblem(RobotProblem.causedBy(getSettingProblemId()).formatMessageWith(raw), file,
                         docToken);
             }
