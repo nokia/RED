@@ -19,7 +19,6 @@ public class RobotSpecialTokens {
     private static final List<ATokenRecognizer> SPECIAL_RECOGNIZERS = new ArrayList<>();
 
     static {
-        SPECIAL_RECOGNIZERS.add(new CommentActionLiteral());
         SPECIAL_RECOGNIZERS.add(new ForActionLiteral());
         SPECIAL_RECOGNIZERS.add(new ForInActionLiteral());
         SPECIAL_RECOGNIZERS.add(new ForContinueToken());
@@ -64,18 +63,6 @@ public class RobotSpecialTokens {
         @Override
         public ATokenRecognizer newInstance() {
             return new ForActionLiteral();
-        }
-    }
-
-    private static class CommentActionLiteral extends ATokenRecognizer {
-
-        protected CommentActionLiteral() {
-            super(Pattern.compile("^[ ]?" + createUpperLowerCaseWord("comment") + "$"), RobotTokenType.COMMENT_TOKEN);
-        }
-
-        @Override
-        public ATokenRecognizer newInstance() {
-            return new CommentActionLiteral();
         }
     }
 
