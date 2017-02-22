@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/21/17 5:53 PM
+Save-Time: 2/22/17 11:47 AM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -40,11 +40,7 @@ with [get-window "Quick Fix"] {
     get-button Finish | click
 }
     
-try -times 10 -delay 1000 -command{
-	get-editor "RobotProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
-    | verify-true
-}    
-
+wait-for-loading-red-xml "RobotProject/red.xml" 
 //check libspec
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
