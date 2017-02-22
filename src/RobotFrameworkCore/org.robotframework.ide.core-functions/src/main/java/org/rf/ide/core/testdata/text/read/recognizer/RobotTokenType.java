@@ -494,11 +494,6 @@ public enum RobotTokenType implements IRobotTokenType {
     KEYWORD_ACTION_ARGUMENT(TableType.KEYWORDS),
     /**
      */
-    COMMENT_TOKEN(
-            TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("Comment").build()),
-    /**
-     */
     FOR_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
             VersionAvailabilityInfoBuilder.create().addRepresentation(": FOR").build(),
@@ -548,7 +543,7 @@ public enum RobotTokenType implements IRobotTokenType {
             final VersionAvailabilityInfo... representations) {
         this.type = type;
         this.settingDeclaration = settingDeclaration;
-        for (VersionAvailabilityInfo vInfo : representations) {
+        for (final VersionAvailabilityInfo vInfo : representations) {
             representation.add(vInfo);
             text.add(vInfo.getRepresentation());
         }
@@ -631,9 +626,9 @@ public enum RobotTokenType implements IRobotTokenType {
     }
 
     @Override
-    public VersionAvailabilityInfo findVersionAvailablilityInfo(String text) {
+    public VersionAvailabilityInfo findVersionAvailablilityInfo(final String text) {
         VersionAvailabilityInfo vaiResult = null;
-        for (VersionAvailabilityInfo vInfo : representation) {
+        for (final VersionAvailabilityInfo vInfo : representation) {
             if (vInfo.getRepresentation().equalsIgnoreCase(text)) {
                 vaiResult = vInfo;
                 break;
