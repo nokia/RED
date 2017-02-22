@@ -105,6 +105,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     public boolean isValid(final ILaunchConfiguration configuration) {
         setErrorMessage(null);
         setWarningMessage(null);
+
         includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
