@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Nokia Solutions and Networks
+ * Copyright 2017 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -57,6 +57,8 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
 
         try {
+            executorScriptComposite.setInput(robotConfig.getScriptPath(), robotConfig.getScriptArguments(),
+                    robotConfig.getScriptRunCommand());
             includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
                     robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
             projectComposite.setInput(robotConfig.getProjectName());
@@ -73,6 +75,9 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
 
         try {
+            robotConfig.setScriptPath(executorScriptComposite.getSelectedScriptPath());
+            robotConfig.setScriptArguments(executorScriptComposite.getScriptArguments());
+            robotConfig.setScriptRunCommand(executorScriptComposite.getScriptRunCommand());
             robotConfig.setIsIncludeTagsEnabled(includeExcludeTagsComposite.isIncludeTagsEnabled());
             robotConfig.setIncludedTags(includeExcludeTagsComposite.getIncludedTags());
             robotConfig.setIsExcludeTagsEnabled(includeExcludeTagsComposite.isExcludeTagsEnabled());
