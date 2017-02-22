@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -53,8 +52,6 @@ import com.google.common.base.Optional;
 public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements ILaunchShortcut2 {
 
     private final RobotEventBroker robotEventBroker;
-    
-    private final AtomicBoolean isConfigurationRunning = new AtomicBoolean(false);
     
     private boolean hasViewsInitialized;
     
@@ -161,7 +158,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             throw newCoreException("Unrecognized launch mode: '" + mode + "'");
         }
 
-        if (isConfigurationRunning.getAndSet(true)) {
+        if (IRobotLaunchConfiguration.lockConfigurationLaunches()) {
             return;
         }
         try {
@@ -173,7 +170,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
         } finally {
-            isConfigurationRunning.set(false);
+            IRobotLaunchConfiguration.unlockConfigurationLaunches();
         }
     }
     
