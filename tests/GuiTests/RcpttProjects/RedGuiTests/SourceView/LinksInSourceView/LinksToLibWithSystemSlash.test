@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4p6MQKS3EeWCSZzk3osblg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/21/16 1:36 PM
+Save-Time: 2/22/17 11:51 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -31,10 +31,7 @@ with [get-editor "Script.robot" | get-text-viewer] {
 // discover lib, add to red.xml, save red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 
-try -times 10 -delay 1000 -command{
-	get-editor "RobotProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
-    	| verify-true
-}
+wait-for-loading-red-xml "RobotProject/red.xml"
 
 //add libs for kw: sum
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click

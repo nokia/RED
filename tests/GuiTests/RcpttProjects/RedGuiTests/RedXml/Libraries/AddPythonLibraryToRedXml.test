@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _RTKmUJNnEeWXp4iZQnTw0A
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/26/16 4:08 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/22/17 11:49 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -45,11 +45,7 @@ with [get-view Problems | get-tree] {
 // open red.xml and add CalculatorLibrary to Python libs by button
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
 
-try -times 10 -delay 1000 -command{
-	get-editor "ProjectWithResource/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
-    | verify-true
-}    
-
+wait-for-loading-red-xml "ProjectWithResource/red.xml" 
 with [get-editor "ProjectWithResource/red.xml" | get-tab-folder] {
     get-property "pages[0]" | equals General | verify-true
     get-property "pages[1]" | equals "Referenced libraries" | verify-true

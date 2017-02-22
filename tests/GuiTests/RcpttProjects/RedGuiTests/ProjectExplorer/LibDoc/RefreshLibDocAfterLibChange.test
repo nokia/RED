@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qW9rQKJrEeWiTrudgyrHcQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/12/17 4:26 PM
+Save-Time: 2/22/17 11:37 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -30,10 +30,8 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table
 
 
 //check if lib was added to red.xml
-try -times 10 -delay 1000 -command{
-	get-editor "RobotProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
-    | verify-true
-}
+wait-for-loading-red-xml -editor_name "RobotProject/red.xml" 
+
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
     get-property itemCount | equals 1 | verify-true
