@@ -148,6 +148,8 @@ class TestRunnerAgent:
         self.streamhandler = None
         self._connect()
         self._send_pid()
+        self._send_version()
+        self._send_global_variables()
         self._create_debugger(args[1].lower() == 'true')
         self._create_kill_server()
         self._is_robot_paused = False
@@ -177,6 +179,14 @@ class TestRunnerAgent:
     def _send_pid(self):
         self._send_socket("start agent", "")
         self._send_socket("pid", os.getpid())
+        
+    def _send_version(self):
+        from robot import version
+        robot_version = "Robot Framework " + version.get_full_version()
+        versions = {"python" : sys.version, "robot" : robot_version}
+        self._send_socket("version", versions)
+        
+    def _send_global_variables(self):
         variables = {}
         try:
             try:
@@ -198,7 +208,6 @@ class TestRunnerAgent:
         except Exception as e:
             self.print_error_message(
                 'Global variables sending error: ' + str(e) + ' Global variables: ' + str(variables))
-            pass
 
     def _send_server_port(self, port):
         self._send_socket("port", port)

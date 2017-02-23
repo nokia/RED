@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.server.AgentClient;
 
 import com.google.common.collect.Iterables;
 
@@ -27,15 +28,18 @@ public class RobotAgentEventDispatcher {
 
     private final List<RobotAgentEventListener> eventsListeners;
 
-    public RobotAgentEventDispatcher(final RobotAgentEventListener... eventsListeners) {
+    public RobotAgentEventDispatcher(final AgentClient client, final RobotAgentEventListener... eventsListeners) {
         this.eventsListeners = Collections.synchronizedList(newArrayList(eventsListeners));
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.setClient(client);
+        }
     }
 
     public void addEventsListener(final RobotAgentEventListener listener) {
         eventsListeners.add(listener);
     }
 
-    public void removeEventsListner(final RobotAgentEventListener listener) {
+    public void removeEventsListener(final RobotAgentEventListener listener) {
         eventsListeners.remove(listener);
     }
 
@@ -58,6 +62,9 @@ public class RobotAgentEventDispatcher {
                     break;
                 case "pid":
                     handlePid();
+                    break;
+                case "version":
+                    handleVersion(eventMap);
                     break;
                 case "resource_import":
                     handleResourceImport(eventMap);
@@ -130,10 +137,21 @@ public class RobotAgentEventDispatcher {
         }
     }
 
+    private void handleVersion(final Map<String, Object> eventMap) {
+        final List<?> arguments = (List<?>) eventMap.get("version");
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
+        final String pythonVersion = (String) attributes.get("python");
+        final String robotVersion = (String) attributes.get("robot");
+
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleVersions(pythonVersion, robotVersion);
+        }
+    }
+
     private void handleResourceImport(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("resource_import");
-        final Map<?, ?> attirbutes = (Map<?, ?>) arguments.get(1);
-        final File resourceFilePath = new File((String) attirbutes.get("source"));
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
+        final File resourceFilePath = new File((String) attributes.get("source"));
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleResourceImport(resourceFilePath);

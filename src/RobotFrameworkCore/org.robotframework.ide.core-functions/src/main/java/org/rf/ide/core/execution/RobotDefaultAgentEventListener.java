@@ -9,16 +9,18 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.execution.server.AgentClient;
+
 public abstract class RobotDefaultAgentEventListener implements RobotAgentEventListener {
 
     @Override
+    public void setClient(final AgentClient client) {
+        // those listeners which want to talk back to client should use given object for this purposes
+    }
+    
+    @Override
     public boolean isHandlingEvents() {
         return false;
-    }
-
-    @Override
-    public void terminated() {
-        // implement in subclasses
     }
 
     @Override
@@ -28,6 +30,11 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
 
     @Override
     public void handlePid() {
+        // implement in subclasses
+    }
+
+    @Override
+    public void handleVersions(final String pythonVersion, final String robotVersion) {
         // implement in subclasses
     }
 

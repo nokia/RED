@@ -6,11 +6,11 @@
 package org.rf.ide.core.execution;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.BufferedReader;
@@ -21,15 +21,15 @@ import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
+import org.rf.ide.core.execution.server.AgentClient;
 
 import com.google.common.collect.ImmutableMap;
 
 public class RobotAgentEventDispatcherTest {
 
-    @SuppressWarnings("unchecked")
     @Test(expected = IOException.class)
     public void exceptionIsRethrown_whenReaderThrowsIOException() throws Exception {
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher();
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null);
 
         final BufferedReader reader = mock(BufferedReader.class);
         when(reader.readLine()).thenThrow(IOException.class);
@@ -40,11 +40,12 @@ public class RobotAgentEventDispatcherTest {
     @Test
     public void listenerIsNotNotified_whenThereAreNoEvents() throws Exception {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         dispatcher.runEventsLoop(readerFor(""));
 
-        verifyZeroInteractions(listener);
+        verify(listener).setClient(nullable(AgentClient.class));
+        verifyNoMoreInteractions(listener);
     }
 
     @Test
@@ -52,11 +53,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("some_event", "val"));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verifyNoMoreInteractions(listener);
     }
@@ -66,11 +68,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(false);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("pid", 1));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verifyNoMoreInteractions(listener);
     }
@@ -84,19 +87,23 @@ public class RobotAgentEventDispatcherTest {
         when(listener2.isHandlingEvents()).thenReturn(true);
         when(listener3.isHandlingEvents()).thenReturn(false);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener1, listener2, listener3);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener1, listener2,
+                listener3);
 
         final String json = toJson(ImmutableMap.of("pid", 1));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener1).setClient(nullable(AgentClient.class));
         verify(listener1, atLeast(0)).isHandlingEvents();
         verify(listener1).handlePid();
         verifyNoMoreInteractions(listener1);
 
+        verify(listener2).setClient(nullable(AgentClient.class));
         verify(listener2, atLeast(1)).isHandlingEvents();
         verify(listener2).handlePid();
         verifyNoMoreInteractions(listener2);
 
+        verify(listener3).setClient(nullable(AgentClient.class));
         verify(listener3, atLeast(0)).isHandlingEvents();
         verify(listener3).handlePid();
         verifyNoMoreInteractions(listener3);
@@ -107,11 +114,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("ready_to_start", 0));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleAgentIsReadyToStart();
         verifyNoMoreInteractions(listener);
@@ -122,13 +130,31 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("pid", 1));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handlePid();
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void listenerIsNotifiedAboutVersionEvent() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final Map<String, String> attributes = ImmutableMap.of("python", "py3", "robot", "1.2.3");
+        final String json = toJson(ImmutableMap.of("version", newArrayList(attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener).setClient(nullable(AgentClient.class));
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleVersions("py3", "1.2.3");
         verifyNoMoreInteractions(listener);
     }
 
@@ -137,12 +163,13 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, String> attributes = ImmutableMap.of("source", "/a/b/file.robot");
         final String json = toJson(ImmutableMap.of("resource_import", newArrayList("file", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleResourceImport(new File("/a/b/file.robot"));
         verifyNoMoreInteractions(listener);
@@ -153,12 +180,13 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, String> attributes = ImmutableMap.of("source", "/a/b/suite.robot");
         final String json = toJson(ImmutableMap.of("start_suite", newArrayList("suite", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleSuiteStarted("suite", new File("/a/b/suite.robot"));
         verifyNoMoreInteractions(listener);
@@ -169,13 +197,14 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of("elapsedtime", 10, "message", "msg",
                 "status", "PASS");
         final String json = toJson(ImmutableMap.of("end_suite", newArrayList("suite", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleSuiteEnded("suite", 10, Status.PASS, "msg");
         verifyNoMoreInteractions(listener);
@@ -186,12 +215,13 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, String> attributes = ImmutableMap.of("longname", "suite-a-b-test");
         final String json = toJson(ImmutableMap.of("start_test", newArrayList("test", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleTestStarted("test", "suite-a-b-test");
         verifyNoMoreInteractions(listener);
@@ -202,13 +232,14 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of("longname", "suite-a-b-test",
                 "elapsedtime", 10, "message", "msg", "status", "FAIL");
         final String json = toJson(ImmutableMap.of("end_test", newArrayList("test", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleTestEnded("test", "suite-a-b-test", 10, Status.FAIL, "msg");
         verifyNoMoreInteractions(listener);
@@ -219,13 +250,14 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of("type", "Keyword",
                 "args", newArrayList("1", "2"));
         final String json = toJson(ImmutableMap.of("start_keyword", newArrayList("kw", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleKeywordStarted("kw", "Keyword", newArrayList("1", "2"));
         verifyNoMoreInteractions(listener);
@@ -236,12 +268,13 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of("type", "Setup");
         final String json = toJson(ImmutableMap.of("end_keyword", newArrayList("kw", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleKeywordEnded("kw", "Setup");
         verifyNoMoreInteractions(listener);
@@ -252,13 +285,14 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of("a", "value", "b",
                 newArrayList("1", "2"));
         final String json = toJson(ImmutableMap.of("vars", newArrayList("_", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleVariables(ImmutableMap.<String, Object> of("a", "value", "b", newArrayList("1", "2")));
         verifyNoMoreInteractions(listener);
@@ -269,12 +303,13 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Map<String, String> attributes = ImmutableMap.of("a", "value", "b", "other_value");
         final String json = toJson(ImmutableMap.of("global_vars", newArrayList("_", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleGlobalVariables(ImmutableMap.of("a", "value", "b", "other_value"));
         verifyNoMoreInteractions(listener);
@@ -285,11 +320,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("check_condition", 0));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleCheckCondition();
         verifyNoMoreInteractions(listener);
@@ -300,11 +336,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("condition_result", newArrayList(true)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleConditionResult(true);
         verifyNoMoreInteractions(listener);
@@ -315,11 +352,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("condition_error", newArrayList("error message")));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleConditionError("error message");
         verifyNoMoreInteractions(listener);
@@ -330,11 +368,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("condition_checked", 0));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleConditionChecked();
         verifyNoMoreInteractions(listener);
@@ -345,11 +384,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("paused", 0));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handlePaused();
         verifyNoMoreInteractions(listener);
@@ -360,11 +400,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("close", 0));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleClosed();
         verifyNoMoreInteractions(listener);
@@ -375,12 +416,13 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Object attributes = ImmutableMap.of("message", "msg", "timestamp", "time", "level", "INFO");
         final String json = toJson(ImmutableMap.of("log_message", newArrayList(attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleLogMessage("msg", LogLevel.INFO, "time");
         verifyNoMoreInteractions(listener);
@@ -391,11 +433,12 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final String json = toJson(ImmutableMap.of("output_file", newArrayList("/a/b/file.xml")));
         dispatcher.runEventsLoop(readerFor(json));
 
+        verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleOutputFile(new File("/a/b/file.xml"));
         verifyNoMoreInteractions(listener);
