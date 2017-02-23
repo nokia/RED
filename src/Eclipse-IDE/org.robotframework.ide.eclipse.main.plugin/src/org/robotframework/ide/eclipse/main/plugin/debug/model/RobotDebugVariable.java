@@ -101,12 +101,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return parent;
     }
 
-    public boolean isValueModificationEnabled() {
-        return isValueModificationEnabled;
-    }
-
     public void setValueModificationEnabled(final boolean isValueModificationEnabled) {
         this.isValueModificationEnabled = isValueModificationEnabled;
     }
-
 }

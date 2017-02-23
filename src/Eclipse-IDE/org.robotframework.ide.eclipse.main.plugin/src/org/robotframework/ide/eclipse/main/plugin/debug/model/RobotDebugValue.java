@@ -29,15 +29,19 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
     public String getReferenceTypeName() throws DebugException {
         try {
             Integer.parseInt(value);
+            return "integer";
         } catch (final NumberFormatException e) {
             return "text";
         }
-        return "integer";
     }
 
     @Override
     public String getValueString() throws DebugException {
         return value;
+    }
+
+    public void setValue(final String value) {
+        this.value = value;
     }
 
     @Override
@@ -54,9 +58,4 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
     public boolean hasVariables() throws DebugException {
         return nestedVariables.length > 0;
     }
-
-    public void setValue(final String value) {
-        this.value = value;
-    }
-
 }

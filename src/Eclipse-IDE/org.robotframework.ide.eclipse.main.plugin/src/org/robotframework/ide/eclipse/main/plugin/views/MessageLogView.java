@@ -16,7 +16,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.debug.MessagesTrackerForLogView;
 
 
 /**
@@ -41,7 +41,7 @@ public class MessageLogView {
         styledText.setFont(JFaceResources.getTextFont());
         styledText.setEditable(false);
         
-        styledText.setText(RobotEventBroker.getMessageLogViewContent());
+        styledText.setText(MessagesTrackerForLogView.getMessageLogViewContent());
     }
     
     @Focus

@@ -21,7 +21,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
 
 public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage {

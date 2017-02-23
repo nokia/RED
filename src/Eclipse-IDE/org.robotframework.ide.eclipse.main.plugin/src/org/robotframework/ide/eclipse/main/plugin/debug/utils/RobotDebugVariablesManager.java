@@ -145,7 +145,7 @@ public class RobotDebugVariablesManager {
                 final String variablePreviousValue = previousVariable.getValue().getValueString();
                 final String variableNewValue = newVariable.getValue().getValueString();
                 if (variablePreviousValue != null && !variablePreviousValue.equals(variableNewValue)
-                        && previousVariable.isValueModificationEnabled()) {
+                        && previousVariable.supportsValueModification()) {
                     return true;
                 }
             } catch (final DebugException e) {
