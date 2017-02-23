@@ -44,7 +44,7 @@ public class RedSystemProperties {
     }
 
     public static boolean isWindowsPlatform() {
-        return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
+        return System.getProperty("os.name").toLowerCase().contains("win");
     }
 
     public static String getPathsSeparator() {

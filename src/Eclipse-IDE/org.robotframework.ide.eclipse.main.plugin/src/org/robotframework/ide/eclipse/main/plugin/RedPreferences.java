@@ -56,9 +56,21 @@ public class RedPreferences {
 
     public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
 
-    public static final String ADDITIONAL_INTERPRETER_ARGUMENTS = "red.additionalInterpreterArguments";
+    public static final String LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS = "red.launch.additionalInterpreterArguments";
 
-    public static final String ADDITIONAL_ROBOT_ARGUMENTS = "red.additionalRobotArguments";
+    public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
+
+    public static final String LAUNCH_REMOTE_HOST = "red.launch.host";
+
+    public static final String LAUNCH_REMOTE_PORT = "red.launch.port";
+
+    public static final String LAUNCH_REMOTE_TIMEOUT = "red.launch.timeout";
+
+    public static final String LAUNCH_SCRIPT_PATH = "red.launch.scriptPath";
+
+    public static final String LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS = "red.launch.additionalscriptArguments";
+
+    public static final String LAUNCH_SCRIPT_RUN_COMMAND = "red.launch.scriptRunCommand";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -167,12 +179,36 @@ public class RedPreferences {
         return store.getInt(FOLDING_LINE_LIMIT);
     }
 
-    public String getAdditionalInterpreterArguments() {
-        return store.getString(ADDITIONAL_INTERPRETER_ARGUMENTS);
+    public String getLaunchAdditionalInterpreterArguments() {
+        return store.getString(LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS);
     }
 
-    public String getAdditionalRobotArguments() {
-        return store.getString(ADDITIONAL_ROBOT_ARGUMENTS);
+    public String getLaunchAdditionalRobotArguments() {
+        return store.getString(LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS);
+    }
+
+    public String getLaunchRemoteHost() {
+        return store.getString(LAUNCH_REMOTE_HOST);
+    }
+
+    public String getLaunchRemotePort() {
+        return store.getString(LAUNCH_REMOTE_PORT);
+    }
+
+    public String getLaunchRemoteTimeout() {
+        return store.getString(LAUNCH_REMOTE_TIMEOUT);
+    }
+
+    public String getLaunchScriptPath() {
+        return store.getString(LAUNCH_SCRIPT_PATH);
+    }
+
+    public String getLaunchAdditionalScriptArguments() {
+        return store.getString(LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
+    }
+
+    public String getLaunchScriptRunCommand() {
+        return store.getString(LAUNCH_SCRIPT_RUN_COMMAND);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {

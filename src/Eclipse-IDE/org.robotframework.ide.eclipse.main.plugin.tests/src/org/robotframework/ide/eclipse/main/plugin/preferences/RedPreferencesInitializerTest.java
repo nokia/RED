@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.junit.Test;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
@@ -64,5 +65,22 @@ public class RedPreferencesInitializerTest {
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
         verify(preferences).put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
+    }
+
+    @Test
+    public void byDefaultLaunchConfigurationPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).put(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "");
+        verify(preferences).put(RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "");
+        verify(preferences).put(RedPreferences.LAUNCH_REMOTE_HOST, "127.0.0.1");
+        verify(preferences).put(RedPreferences.LAUNCH_REMOTE_PORT, "12345");
+        verify(preferences).put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30000");
+        verify(preferences).put(RedPreferences.LAUNCH_SCRIPT_PATH, "");
+        verify(preferences).put(RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS, "");
+        verify(preferences).put(RedPreferences.LAUNCH_SCRIPT_RUN_COMMAND,
+                RedSystemProperties.isWindowsPlatform() ? "cmd /c start" : "");
     }
 }

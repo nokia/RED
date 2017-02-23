@@ -148,8 +148,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         setExecutor(SuiteExecutor.Python);
-        setExecutorArguments(preferences.getAdditionalRobotArguments());
-        setInterpreterArguments(preferences.getAdditionalInterpreterArguments());
+        setExecutorArguments(preferences.getLaunchAdditionalRobotArguments());
+        setInterpreterArguments(preferences.getLaunchAdditionalInterpreterArguments());
         setIsGeneralPurposeEnabled(true);
         super.fillDefaults();
     }

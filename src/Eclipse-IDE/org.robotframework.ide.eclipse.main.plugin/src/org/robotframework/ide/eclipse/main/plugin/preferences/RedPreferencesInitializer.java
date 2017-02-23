@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
+import org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 
@@ -92,8 +93,15 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
-        preferences.put(RedPreferences.ADDITIONAL_INTERPRETER_ARGUMENTS, "");
-        preferences.put(RedPreferences.ADDITIONAL_ROBOT_ARGUMENTS, "");
+        preferences.put(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "");
+        preferences.put(RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "");
+        preferences.put(RedPreferences.LAUNCH_REMOTE_HOST, "127.0.0.1");
+        preferences.put(RedPreferences.LAUNCH_REMOTE_PORT, "12345");
+        preferences.put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30000");
+        preferences.put(RedPreferences.LAUNCH_SCRIPT_PATH, "");
+        preferences.put(RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS, "");
+        preferences.put(RedPreferences.LAUNCH_SCRIPT_RUN_COMMAND,
+                ScriptRobotLaunchConfiguration.getSystemDependentScriptRunCommand());
     }
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
