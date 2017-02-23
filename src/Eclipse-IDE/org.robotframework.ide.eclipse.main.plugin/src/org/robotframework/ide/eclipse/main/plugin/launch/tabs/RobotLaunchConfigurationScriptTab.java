@@ -172,7 +172,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
-        });
+        }, ScriptRobotLaunchConfiguration.getSystemDependentScriptExtensions());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorScriptComposite);
     }
 

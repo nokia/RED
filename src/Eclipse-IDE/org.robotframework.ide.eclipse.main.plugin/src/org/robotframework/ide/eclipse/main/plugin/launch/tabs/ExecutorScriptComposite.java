@@ -25,17 +25,20 @@ class ExecutorScriptComposite extends Composite {
 
     private final ModifyListener listener;
 
+    private final String[] filterExtensions;
+
     private Text scriptPathText;
 
     private final Text scriptArgumentsText;
 
     private final Text scriptRunCommandText;
 
-    ExecutorScriptComposite(final Composite parent, final ModifyListener listener) {
+    ExecutorScriptComposite(final Composite parent, final ModifyListener listener, final String[] filterExtensions) {
         super(parent, SWT.NONE);
         this.listener = listener;
+        this.filterExtensions = filterExtensions;
 
-        GridLayoutFactory.fillDefaults().numColumns(2).spacing(2, 2).margins(0, 3).applyTo(this);
+        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
 
         createScriptPathText();
         createBrowseButton(parent.getShell());
@@ -58,17 +61,12 @@ class ExecutorScriptComposite extends Composite {
             @Override
             public void widgetSelected(final SelectionEvent event) {
                 final FileDialog dialog = createScriptFileDialog(shell);
-                dialog.setFilterExtensions(getFilterExtensions());
+                dialog.setFilterExtensions(filterExtensions);
 
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
                     scriptPathText.setText(chosenFilePath);
                 }
-            }
-
-            private String[] getFilterExtensions() {
-                return System.getProperty("os.name").startsWith("Windows") ? new String[] { "*.bat", "*.*" }
-                        : new String[] { "*.sh", "*.*" };
             }
         });
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(button);

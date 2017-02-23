@@ -8,6 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.rf.ide.core.executor.RedSystemProperties;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
@@ -23,13 +26,28 @@ public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     private static final String SCRIPT_RUN_COMMAND_ATTRIBUTE = "Script run command";
 
+    public static String[] getSystemDependentScriptExtensions() {
+        return RedSystemProperties.isWindowsPlatform() ? new String[] { "*.bat", "*.*" }
+                : new String[] { "*.sh", "*.*" };
+    }
+
+    public static String getSystemDependentScriptRunCommand() {
+        return RedSystemProperties.isWindowsPlatform() ? "cmd /c start" : "";
+    }
+
     public ScriptRobotLaunchConfiguration(final ILaunchConfiguration config) {
         super(config);
     }
 
     @Override
     public void fillDefaults() throws CoreException {
-        setScriptRunCommand(System.getProperty("os.name").startsWith("Windows") ? "cmd /c start" : "");
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        setScriptPath(preferences.getLaunchScriptPath());
+        setScriptArguments(preferences.getLaunchAdditionalScriptArguments());
+        setScriptRunCommand(preferences.getLaunchScriptRunCommand());
+        setRemoteDebugHostValue(preferences.getLaunchRemoteHost());
+        setRemoteDebugPortValue(preferences.getLaunchRemotePort());
+        setRemoteDebugTimeoutValue(preferences.getLaunchRemoteTimeout());
         super.fillDefaults();
     }
 
@@ -69,17 +87,17 @@ public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     @Override
     public String getRemoteDebugHostValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "127.0.0.1");
+        return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "");
     }
 
     @Override
     public String getRemoteDebugPortValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "12354");
+        return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "");
     }
 
     @Override
     public String getRemoteDebugTimeoutValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "30000");
+        return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "");
     }
 
     @Override
