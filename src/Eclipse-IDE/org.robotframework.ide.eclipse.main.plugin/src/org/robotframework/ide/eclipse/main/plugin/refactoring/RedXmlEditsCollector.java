@@ -5,14 +5,19 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.text.edits.DeleteEdit;
@@ -21,6 +26,7 @@ import org.eclipse.text.edits.TextEdit;
 import org.robotframework.ide.eclipse.main.plugin.refactoring.MatchingEngine.MatchAccess;
 
 import com.google.common.base.Optional;
+import com.google.common.io.CharStreams;
 
 /**
  * @author Michal Anglart
@@ -42,7 +48,13 @@ class RedXmlEditsCollector {
     }
 
     List<TextEdit> collectEditsInExcludedPaths(final String projectName, final IFile redXmlFile) {
-        return collectEditsInExcludedPaths(projectName, new MatchesInFileEngine(redXmlFile));
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(redXmlFile.getContents()))) {
+
+            final IDocument document = new Document(CharStreams.toString(fileReader));
+            return collectEditsInExcludedPaths(projectName, new MatchesInDocumentEngine(document));
+        } catch (IOException | CoreException e) {
+            return new ArrayList<>();
+        }
     }
 
     private List<TextEdit> collectEditsInExcludedPaths(final String projectName, final MatchingEngine engine) {
