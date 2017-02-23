@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch;
+package org.robotframework.ide.eclipse.main.plugin.launch.script;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -11,6 +11,8 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;

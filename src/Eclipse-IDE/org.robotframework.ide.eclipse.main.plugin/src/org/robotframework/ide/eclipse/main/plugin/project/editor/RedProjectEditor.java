@@ -85,7 +85,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                     new RedEclipseProjectConfigReader().readConfigurationWithLines(file));
             installResourceListener();
         } else {
-            final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
+            final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
@@ -123,7 +123,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
     }
 
     private IEclipseContext prepareContext() {
-        final IEclipseContext parentContext = (IEclipseContext) getSite().getService(IEclipseContext.class);
+        final IEclipseContext parentContext = getSite().getService(IEclipseContext.class);
         final IEclipseContext context = parentContext.getActiveLeaf();
         context.set(RedProjectEditorInput.class, editorInput);
         context.set(IEditorSite.class, getEditorSite());
@@ -198,8 +198,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED,
-                        editorInput.getProjectConfiguration());
+                SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED,
+                        editorInput.getProjectConfiguration()));
 
                 final RobotRuntimeEnvironment activeEnvironment = project == null ? null
                         : project.getRuntimeEnvironment();
@@ -315,7 +315,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
     @Override
     public void dispose() {
-        final IEclipseContext parentContext = (IEclipseContext) getEditorSite().getService(IEclipseContext.class);
+        final IEclipseContext parentContext = getEditorSite().getService(IEclipseContext.class);
         final IEclipseContext context = parentContext.getActiveLeaf();
         for (final IEditorPart part : parts) {
             ContextInjectionFactory.uninject(part, context);

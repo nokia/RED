@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch;
+package org.robotframework.ide.eclipse.main.plugin.launch.script;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;

@@ -18,11 +18,12 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
-abstract class RobotLaunchInMode {
+public abstract class RobotLaunchInMode {
 
-    protected void launch(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
+    public void launch(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException, IOException {
 
         try {

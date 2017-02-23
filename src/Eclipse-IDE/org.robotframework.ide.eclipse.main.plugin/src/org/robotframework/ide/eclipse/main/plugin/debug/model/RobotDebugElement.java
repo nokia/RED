@@ -18,12 +18,12 @@ import org.eclipse.debug.core.model.IDebugTarget;
  */
 public class RobotDebugElement extends PlatformObject implements IDebugElement {
 
-    protected RobotDebugTarget target;
-
     public static final String DEBUG_MODEL_ID = "org.eclipse.debug.robot";
 
-    public RobotDebugElement(final RobotDebugTarget t) {
-        target = t;
+    private final RobotDebugTarget target;
+
+    public RobotDebugElement(final RobotDebugTarget target) {
+        this.target = target;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
 
     @Override
     public IDebugTarget getDebugTarget() {
-        return target;
+        return this instanceof IDebugTarget ? (IDebugTarget) this : target;
     }
 
     @Override

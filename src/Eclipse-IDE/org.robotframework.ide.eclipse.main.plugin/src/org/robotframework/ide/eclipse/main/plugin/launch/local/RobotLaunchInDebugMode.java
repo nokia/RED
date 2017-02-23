@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch;
+package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import java.io.IOException;
 
@@ -11,11 +11,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.model.IProcess;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchInMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 class RobotLaunchInDebugMode extends RobotLaunchInMode {
@@ -43,17 +47,19 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
         new Thread(socketManager).start();
         socketManager.waitForDebugServerSocket();
 
-        final String description = robotConfig.createConsoleDescription(runtimeEnvironment);
+        final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
         final String version = robotConfig.createExecutorVersion(runtimeEnvironment);
 
         final Process process = execProcess(cmdLine, robotConfig);
-        final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
+        final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
 
-        final RobotConsoleFacade consoleFacade = new RobotConsoleFacade();
-        consoleFacade.connect(robotConfig, runtimeEnvironment, cmdLine, version);
+        final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
+        redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
+        redConsole.writeLine("Command: " + cmdLine.show());
+        redConsole.writeLine("Suite Executor: " + version);
 
         try {
-            final RobotDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, consoleFacade, false);
+            final RobotDebugTarget target = new RobotDebugTarget(launch, robotProcess);
             target.connect(robotConfig.getResourcesUnderDebug(), robotEventBroker, socketManager);
             launch.addDebugTarget(target);
         } catch (final CoreException e) {

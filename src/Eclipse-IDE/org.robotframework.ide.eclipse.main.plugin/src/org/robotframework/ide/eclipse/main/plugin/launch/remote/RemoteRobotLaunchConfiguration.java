@@ -3,17 +3,20 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch;
+package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.collect.Range;
@@ -33,14 +36,29 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         setProjectName("");
+        setProcessFactory(LaunchConfigurationsWrappers.FACTORY_ID);
         setRemoteDebugHostValue(preferences.getLaunchRemoteHost());
         setRemoteDebugPortValue(preferences.getLaunchRemotePort());
         setRemoteDebugTimeoutValue(preferences.getLaunchRemoteTimeout());
     }
 
+    private void setProcessFactory(final String id) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, id);
+    }
+
     @Override
     public String getName() {
         return configuration.getName();
+    }
+
+    @Override
+    public String getTypeName() {
+        try {
+            return configuration.getType().getName();
+        } catch (final CoreException e) {
+            return null;
+        }
     }
 
     @Override

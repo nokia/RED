@@ -5,7 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +24,16 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.RedToAgentMessage;
 import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.Status;
 import org.rf.ide.core.execution.context.KeywordPosition;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
+import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.server.response.ContinueExecution;
+import org.rf.ide.core.execution.server.response.EvaluateCondition;
+import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
+import org.rf.ide.core.execution.server.response.StartExecution;
+import org.rf.ide.core.execution.server.response.StopExecution;
 import org.rf.ide.core.testdata.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -37,6 +45,8 @@ import com.google.common.base.Optional;
 
 
 public class DebugExecutionEventsListener implements RobotAgentEventListener {
+
+    private AgentClient client;
 
     private final RobotDebugTarget debugTarget;
 
@@ -57,23 +67,36 @@ public class DebugExecutionEventsListener implements RobotAgentEventListener {
     }
 
     @Override
+    public void setClient(final AgentClient client) {
+        this.client = client;
+    }
+
+    @Override
     public boolean isHandlingEvents() {
         return !debugTarget.isTerminated();
     }
 
-    @Override
     public void terminated() {
         debugTarget.terminated();
     }
 
     @Override
     public void handleAgentIsReadyToStart() {
-        debugTarget.sendMessageToAgent(RedToAgentMessage.START_EXECUTION);
+        try {
+            client.send(new StartExecution());
+        } catch (ResponseException | IOException e) {
+            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        }
     }
 
     @Override
     public void handlePid() {
         debugTarget.started();
+    }
+
+    @Override
+    public void handleVersions(final String pythonVersion, final String robotVersion) {
+        // handle
     }
 
     @Override
@@ -261,12 +284,16 @@ public class DebugExecutionEventsListener implements RobotAgentEventListener {
 
     @Override
     public void handleCheckCondition() {
-        if (keywordExecutionManager.hasBreakpointCondition()) {
-            debugTarget.sendMessageToAgent(RedToAgentMessage.EVALUATE_CONDITION,
-                    keywordExecutionManager.getBreakpointConditionCall());
-        } else {
-            debugTarget.sendMessageToAgent(
-                    isStopping ? RedToAgentMessage.STOP_EXECUTION : RedToAgentMessage.CONTINUE_EXECUTION);
+        try {
+            if (keywordExecutionManager.hasBreakpointCondition()) {
+                client.send(new EvaluateCondition(newArrayList(keywordExecutionManager.getBreakpointConditionCall())));
+            } else if (isStopping) {
+                client.send(new StopExecution());
+            } else {
+                client.send(new ContinueExecution());
+            }
+        } catch (ResponseException | IOException e) {
+            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
         }
     }
 
@@ -283,12 +310,17 @@ public class DebugExecutionEventsListener implements RobotAgentEventListener {
 
     @Override
     public void handleConditionChecked() {
-        final RedToAgentMessage message = isStopping && isBreakpointConditionFulfilled
-                ? RedToAgentMessage.STOP_EXECUTION
-                : RedToAgentMessage.CONTINUE_EXECUTION;
-        debugTarget.sendMessageToAgent(message);
-        isBreakpointConditionFulfilled = false;
-        keywordExecutionManager.resetBreakpointCondition();
+        try {
+            if (isStopping && isBreakpointConditionFulfilled) {
+                client.send(new StopExecution());
+            } else {
+                client.send(new ContinueExecution());
+            }
+            isBreakpointConditionFulfilled = false;
+            keywordExecutionManager.resetBreakpointCondition();
+        } catch (ResponseException | IOException e) {
+            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        }
     }
 
     @Override

@@ -40,7 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
  * @author Michal Anglart
  *
  */
-class RobotConsolePatternsListener implements IPatternMatchListener {
+public class RobotConsolePatternsListener implements IPatternMatchListener {
 
     private TextConsole console;
 

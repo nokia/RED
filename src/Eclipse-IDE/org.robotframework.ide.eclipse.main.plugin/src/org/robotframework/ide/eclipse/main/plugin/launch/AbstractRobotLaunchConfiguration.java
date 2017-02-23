@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
@@ -35,18 +36,27 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
-abstract class AbstractRobotLaunchConfiguration
+public abstract class AbstractRobotLaunchConfiguration
         implements ITagsRobotLaunchConfiguration, ISuitesRobotLaunchConfiguration {
 
-    final ILaunchConfiguration configuration;
+    protected final ILaunchConfiguration configuration;
 
-    AbstractRobotLaunchConfiguration(final ILaunchConfiguration config) {
+    protected AbstractRobotLaunchConfiguration(final ILaunchConfiguration config) {
         this.configuration = config;
     }
 
     @Override
     public String getName() {
         return configuration.getName();
+    }
+
+    @Override
+    public String getTypeName() {
+        try {
+            return configuration.getType().getName();
+        } catch (final CoreException e) {
+            return null;
+        }
     }
 
     @Override
@@ -63,11 +73,17 @@ abstract class AbstractRobotLaunchConfiguration
     @Override
     public void fillDefaults() throws CoreException {
         setProjectName("");
+        setProcessFactory(LaunchConfigurationsWrappers.FACTORY_ID);
         setSuitePaths(new HashMap<String, List<String>>());
         setIsIncludeTagsEnabled(false);
         setIsExcludeTagsEnabled(false);
         setIncludedTags(new ArrayList<String>());
         setExcludedTags(new ArrayList<String>());
+    }
+
+    private void setProcessFactory(final String id) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, id);
     }
 
     @Override
@@ -285,16 +301,16 @@ abstract class AbstractRobotLaunchConfiguration
         return project;
     }
 
-    ILaunchConfigurationWorkingCopy asWorkingCopy() throws CoreException {
+    public ILaunchConfigurationWorkingCopy asWorkingCopy() throws CoreException {
         return configuration instanceof ILaunchConfigurationWorkingCopy
                 ? (ILaunchConfigurationWorkingCopy) configuration : configuration.getWorkingCopy();
     }
 
-    static CoreException newCoreException(final String message) {
+    protected static CoreException newCoreException(final String message) {
         return newCoreException(message, null);
     }
 
-    static CoreException newCoreException(final String message, final Throwable cause) {
+    protected static CoreException newCoreException(final String message, final Throwable cause) {
         return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
     }
 
