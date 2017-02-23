@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +31,8 @@ public class RobotFileDumper {
         this.ctx = ctx;
     }
 
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    public void dump(final File file, final RobotFileOutput output) throws Exception {
-        IRobotFileDumper dumperToUse = getDumper(file);
+    public void dump(final File file, final RobotFileOutput output) throws IOException {
+        final IRobotFileDumper dumperToUse = getDumper(file);
         dumperToUse.setContext(ctx);
         dumperToUse.dump(file, output.getFileModel());
     }
