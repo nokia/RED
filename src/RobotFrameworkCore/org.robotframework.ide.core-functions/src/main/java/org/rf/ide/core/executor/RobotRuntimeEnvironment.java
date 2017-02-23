@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.rf.ide.core.execution.ExecutionElementsParser;
-import org.rf.ide.core.execution.IExecutionHandler;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
@@ -516,16 +513,6 @@ public class RobotRuntimeEnvironment {
             }
         }
         return false;
-    }
-
-    public TestRunnerAgentHandler startTestRunnerAgentHandler(final int port, final ILineHandler lineHandler,
-            final IExecutionHandler executionHandler) {
-        final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
-        testRunnerAgentHandler.addListener(new MessageLogParser(lineHandler));
-        testRunnerAgentHandler.addListener(new ExecutionElementsParser(executionHandler));
-        final Thread handlerThread = new Thread(testRunnerAgentHandler);
-        handlerThread.start();
-        return testRunnerAgentHandler;
     }
 
     @Override
