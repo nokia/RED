@@ -9,15 +9,19 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.execution.server.AgentClient;
+
 public interface RobotAgentEventListener {
 
-    boolean isHandlingEvents();
+    void setClient(AgentClient client);
 
-    void terminated();
+    boolean isHandlingEvents();
 
     void handleAgentIsReadyToStart();
 
     void handlePid();
+
+    void handleVersions(String pythonVersion, String robotVersion);
 
     void handleSuiteStarted(String suiteName, File suiteFilePath);
 

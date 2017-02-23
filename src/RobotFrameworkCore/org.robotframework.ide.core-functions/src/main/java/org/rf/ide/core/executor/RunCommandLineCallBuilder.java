@@ -13,7 +13,6 @@ import java.net.ServerSocket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,11 +24,6 @@ import com.google.common.base.Joiner;
  * @author Michal Anglart
  */
 public class RunCommandLineCallBuilder {
-
-    public static interface IRemoteRunCommandLineBuilder {
-
-        public RunCommandLine build() throws IOException;
-    }
 
     public static interface IRunCommandLineBuilder {
 
@@ -63,7 +57,7 @@ public class RunCommandLineCallBuilder {
         public RunCommandLine build() throws IOException;
     }
 
-    private static class Builder implements IRemoteRunCommandLineBuilder, IRunCommandLineBuilder {
+    private static class Builder implements IRunCommandLineBuilder {
 
         private final SuiteExecutor executor;
 
@@ -95,12 +89,9 @@ public class RunCommandLineCallBuilder {
 
         private String interpreterUserArgs = "";
 
-        private final int remotePort;
-
-        private Builder(final SuiteExecutor executor, final String executable, final int port) {
+        private Builder(final SuiteExecutor executor, final String executable) {
             this.executor = executor;
             this.executablePath = executable;
-            this.remotePort = port;
         }
 
         @Override
@@ -199,23 +190,11 @@ public class RunCommandLineCallBuilder {
 
         @Override
         public RunCommandLine build() throws IOException {
-            return remotePort != -1 ? buildRemoteCmdLine() : buildCmdLine();
-        }
-
-        private RunCommandLine buildRemoteCmdLine() throws IOException {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("RemoteDebugTempScript.py");
-            if (scriptFile != null) {
-                return new RunCommandLine(Arrays.asList(executablePath, scriptFile.getAbsolutePath()), remotePort);
-            }
-            return new RunCommandLine(new ArrayList<String>(), -1);
-        }
-
-        private RunCommandLine buildCmdLine() throws IOException {
             final String debugInfo = enableDebug ? "True" : "False";
             final int port = findFreePort();
-
+            
             final List<String> cmdLine = new ArrayList<>();
-
+            
             cmdLine.add(executablePath);
             if (executor == SuiteExecutor.Jython) {
                 final String additionalPythonPathLocationForJython = extractAdditionalPythonPathLocationForJython();
@@ -313,15 +292,11 @@ public class RunCommandLineCallBuilder {
     }
 
     public static IRunCommandLineBuilder forEnvironment(final RobotRuntimeEnvironment env) {
-        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), -1);
+        return new Builder(env.getInterpreter(), env.getPythonExecutablePath());
     }
 
     public static IRunCommandLineBuilder forExecutor(final SuiteExecutor executor) {
-        return new Builder(executor, executor.executableName(), -1);
-    }
-
-    public static IRemoteRunCommandLineBuilder forRemoteEnvironment(final RobotRuntimeEnvironment env, final int port) {
-        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), port);
+        return new Builder(executor, executor.executableName());
     }
 
     public static class RunCommandLine {
