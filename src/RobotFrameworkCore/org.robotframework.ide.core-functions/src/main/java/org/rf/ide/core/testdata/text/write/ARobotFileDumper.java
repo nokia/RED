@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.text.write;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +65,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @Override
-    public void dump(final File robotFile, final RobotFile model) throws Exception {
+    public void dump(final File robotFile, final RobotFile model) throws IOException {
         Files.write(dump(model), robotFile, Charset.forName("utf-8"));
     }
 
@@ -107,7 +108,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
         for (final TableHeader<? extends ARobotSectionTable> th : headers) {
             List<AModelElement<ARobotSectionTable>> sorted = null;
-            int sectionWithHeader = getSectionWithHeader(sections, th);
+            final int sectionWithHeader = getSectionWithHeader(sections, th);
 
             ISectionTableDumper dumperToUse = null;
             for (final ISectionTableDumper dumper : tableDumpers) {
@@ -215,7 +216,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @SuppressWarnings("unchecked")
-    private List<AModelElement<SettingTable>> copyUpSettings(List<AModelElement<ARobotSectionTable>> elems) {
+    private List<AModelElement<SettingTable>> copyUpSettings(final List<AModelElement<ARobotSectionTable>> elems) {
         final List<AModelElement<SettingTable>> copied = new ArrayList<>();
         for (final AModelElement<?> stE : elems) {
             copied.add(((AModelElement<SettingTable>) stE));
@@ -225,7 +226,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @SuppressWarnings("unchecked")
-    private List<AModelElement<VariableTable>> copyUpVariables(List<AModelElement<ARobotSectionTable>> elems) {
+    private List<AModelElement<VariableTable>> copyUpVariables(final List<AModelElement<ARobotSectionTable>> elems) {
         final List<AModelElement<VariableTable>> copied = new ArrayList<>();
         for (final AModelElement<?> stE : elems) {
             copied.add(((AModelElement<VariableTable>) stE));
@@ -235,7 +236,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @SuppressWarnings("unchecked")
-    private List<AModelElement<TestCaseTable>> copyUpTestCases(List<AModelElement<ARobotSectionTable>> elems) {
+    private List<AModelElement<TestCaseTable>> copyUpTestCases(final List<AModelElement<ARobotSectionTable>> elems) {
         final List<AModelElement<TestCaseTable>> copied = new ArrayList<>();
         for (final AModelElement<?> stE : elems) {
             copied.add(((AModelElement<TestCaseTable>) stE));
@@ -245,7 +246,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @SuppressWarnings("unchecked")
-    private List<AModelElement<KeywordTable>> copyUpKeywords(List<AModelElement<ARobotSectionTable>> elems) {
+    private List<AModelElement<KeywordTable>> copyUpKeywords(final List<AModelElement<ARobotSectionTable>> elems) {
         final List<AModelElement<KeywordTable>> copied = new ArrayList<>();
         for (final AModelElement<?> stE : elems) {
             copied.add(((AModelElement<KeywordTable>) stE));
@@ -255,7 +256,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     private List<AModelElement<KeywordTable>> getKeywords(final KeywordTable keywordTable) {
-        List<AModelElement<KeywordTable>> list = new ArrayList<>();
+        final List<AModelElement<KeywordTable>> list = new ArrayList<>();
 
         for (final UserKeyword uk : keywordTable.getKeywords()) {
             list.add(uk);
@@ -265,7 +266,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     private List<AModelElement<TestCaseTable>> getTestCases(final TestCaseTable testCaseTable) {
-        List<AModelElement<TestCaseTable>> list = new ArrayList<>();
+        final List<AModelElement<TestCaseTable>> list = new ArrayList<>();
 
         for (final TestCase tc : testCaseTable.getTestCases()) {
             list.add(tc);
@@ -275,7 +276,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     private List<AModelElement<SettingTable>> sortSettings(final SettingTable settingTable) {
-        List<AModelElement<SettingTable>> list = new ArrayList<>();
+        final List<AModelElement<SettingTable>> list = new ArrayList<>();
 
         list.addAll(settingTable.getDefaultTags());
         list.addAll(settingTable.getDocumentation());
@@ -306,7 +307,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
             AModelElement<SettingTable> currentCorrector = correctors.get(hitCorrectors);
             for (int i = 0; i < src.size(); i++) {
-                AModelElement<SettingTable> m = src.get(i);
+                final AModelElement<SettingTable> m = src.get(i);
                 if (correctors.contains(m)) {
                     if (currentCorrector == m) {
                         hitCorrectors++;
@@ -342,12 +343,12 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
     @VisibleForTesting
     protected boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
-            final AModelElement<SettingTable> m, int currentIndex) {
+            final AModelElement<SettingTable> m, final int currentIndex) {
         return (currentIndex + 1 < src.size() && m == src.get(currentIndex + 1));
     }
 
     private List<AModelElement<VariableTable>> sortVariables(final VariableTable variableTable) {
-        List<AModelElement<VariableTable>> list = new ArrayList<>();
+        final List<AModelElement<VariableTable>> list = new ArrayList<>();
         for (final AVariable var : variableTable.getVariables()) {
             list.add(var);
         }
@@ -356,9 +357,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     private List<Section> filterUserTableHeadersOnly(final List<Section> sections) {
-        List<Section> userSections = new ArrayList<>(0);
+        final List<Section> userSections = new ArrayList<>(0);
         for (final Section section : sections) {
-            SectionType type = section.getType();
+            final SectionType type = section.getType();
             if (type == SectionType.TRASH || type == SectionType.USER_TABLE) {
                 userSections.add(section);
             }
@@ -371,10 +372,10 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
             final int currentSection, final List<RobotLine> outLines) {
         int removedIndex = -1;
 
-        int sectionSize = sections.size();
+        final int sectionSize = sections.size();
         for (int sectionId = currentSection; sectionId < sectionSize; sectionId++) {
             final Section section = sections.get(sectionId);
-            SectionType type = section.getType();
+            final SectionType type = section.getType();
             if (type == SectionType.TRASH || type == SectionType.USER_TABLE) {
                 dumpFromTo(model, section.getStart(), section.getEnd(), outLines);
                 removedIndex++;
@@ -439,8 +440,8 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     public Separator getSeparator(final RobotFile model, final List<RobotLine> lines, final IRobotLineElement lastToken,
             final IRobotLineElement currentToken) {
         Separator sep = null;
-        FilePosition fp = lastToken.getFilePosition();
-        FilePosition fpTok = currentToken.getFilePosition();
+        final FilePosition fp = lastToken.getFilePosition();
+        final FilePosition fpTok = currentToken.getFilePosition();
 
         boolean wasLastToken = false;
         IRobotLineElement tokenToSearch = null;
@@ -473,10 +474,10 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         final List<IRobotLineElement> elems = line.getLineElements();
         final Optional<Integer> tokenPos = line.getElementPositionInLine(tokenToSearch);
         if (tokenPos.isPresent()) {
-            Integer tokPos = tokenPos.get();
-            int start = (wasLastToken) ? tokPos + 1 : tokPos - 1;
+            final Integer tokPos = tokenPos.get();
+            final int start = (wasLastToken) ? tokPos + 1 : tokPos - 1;
             for (int index = start; index < elems.size() && index >= 0; index--) {
-                IRobotLineElement elem = elems.get(index);
+                final IRobotLineElement elem = elems.get(index);
                 if (elem instanceof RobotToken) {
                     break;
                 } else if (elem instanceof Separator) {
@@ -492,7 +493,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                 if (separatorForLine.isPresent()) {
                     if (sep.getTypes().get(0) != separatorForLine.get()) {
                         if (separatorForLine.get() == SeparatorType.PIPE) {
-                            List<Separator> seps = new ArrayList<>(0);
+                            final List<Separator> seps = new ArrayList<>(0);
                             for (final IRobotLineElement e : elems) {
                                 if (e instanceof Separator) {
                                     seps.add((Separator) e);
@@ -522,7 +523,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         }
 
         if (sep != null) {
-            Optional<SeparatorType> sepInLine = line.getSeparatorForLine();
+            final Optional<SeparatorType> sepInLine = line.getSeparatorForLine();
             if (sepInLine.isPresent()) {
                 if (sepInLine.get() != sep.getTypes().get(0)) {
                     if (sepInLine.get() == SeparatorType.PIPE) {
