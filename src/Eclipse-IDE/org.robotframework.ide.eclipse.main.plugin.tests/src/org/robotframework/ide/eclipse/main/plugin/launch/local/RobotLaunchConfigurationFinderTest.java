@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch;
+package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +51,7 @@ public class RobotLaunchConfigurationFinderTest {
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {
         manager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        resources = new ArrayList<IResource>();
+        resources = new ArrayList<>();
         project = projectProvider.getProject();
         for (final String name : resourceNames) {
             resources.add(projectProvider.createFile(name, ""));
@@ -91,7 +91,7 @@ public class RobotLaunchConfigurationFinderTest {
     public void configurationForSelectedTestCasesIsReturned_whenThereIsValidConfiguration() throws CoreException {
         final IResource res = resources.get(0);
         final List<IResource> resources = newArrayList(res);
-        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         resourcesToTestCases.put(res, newArrayList("t1", "t3"));
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
@@ -148,7 +148,7 @@ public class RobotLaunchConfigurationFinderTest {
             throws CoreException {
         final IResource res = project;
         final List<IResource> resources = newArrayList(res);
-        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         resourcesToTestCases.put(res, newArrayList("t1", "t3"));
         final ILaunchConfigurationWorkingCopy configTemp = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationSelectedTestCases(resources);
@@ -166,7 +166,7 @@ public class RobotLaunchConfigurationFinderTest {
     public void nullConfigurationIsReturned_whenThereIsOnlySelectedTestCasesConfiguration() throws CoreException {
         final IResource res = resources.get(0);
         final List<IResource> resources = newArrayList(res);
-        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         resourcesToTestCases.put(res, newArrayList("t1", "t3"));
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
@@ -194,7 +194,7 @@ public class RobotLaunchConfigurationFinderTest {
             throws CoreException {
         final IResource res = project;
         final List<IResource> resources = newArrayList(res);
-        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<IResource, List<String>>();
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         resourcesToTestCases.put(res, newArrayList("t1", "t3"));
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
