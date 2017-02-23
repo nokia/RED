@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.collect.Range;
@@ -30,7 +31,11 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
 
     @Override
     public void fillDefaults() throws CoreException {
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         setProjectName("");
+        setRemoteDebugHostValue(preferences.getLaunchRemoteHost());
+        setRemoteDebugPortValue(preferences.getLaunchRemotePort());
+        setRemoteDebugTimeoutValue(preferences.getLaunchRemoteTimeout());
     }
 
     @Override
@@ -103,17 +108,17 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
 
     @Override
     public String getRemoteDebugHostValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "127.0.0.1");
+        return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "");
     }
 
     @Override
     public String getRemoteDebugPortValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "12354");
+        return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "");
     }
 
     @Override
     public String getRemoteDebugTimeoutValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "30000");
+        return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "");
     }
 
     @Override

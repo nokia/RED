@@ -5500,7 +5500,7 @@
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.DefaultLaunchConfigurationPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.launch.default"
-            name="Default Launch Configuration">
+            name="Default Launch Configurations">
       </page>
    </extension>
    <extension
