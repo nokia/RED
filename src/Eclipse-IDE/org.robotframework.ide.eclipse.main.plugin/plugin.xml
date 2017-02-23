@@ -368,7 +368,7 @@
  <extension
        point="org.eclipse.debug.core.launchConfigurationTypes">
     <launchConfigurationType
-          delegate="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+          delegate="org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationDelegate"
           sourceLocatorId="org.eclipse.debug.robot.sourceLookupDirector"
           sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer"
           id="org.robotframework.ide.robotLaunchConfiguration"
@@ -376,7 +376,7 @@
           name="Robot">
     </launchConfigurationType>
     <launchConfigurationType
-          delegate="org.robotframework.ide.eclipse.main.plugin.launch.RemoteRobotLaunchConfigurationDelegate"
+          delegate="org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfigurationDelegate"
           id="org.robotframework.ide.remoteRobotLaunchConfiguration"
           modes="run,debug"
           name="Remote Robot"
@@ -384,13 +384,20 @@
           sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer">
     </launchConfigurationType>
     <launchConfigurationType
-          delegate="org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfigurationDelegate"
+          delegate="org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfigurationDelegate"
           sourceLocatorId="org.eclipse.debug.robot.sourceLookupDirector"
           sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer"
           id="org.robotframework.ide.scriptRobotLaunchConfiguration"
           modes="run,debug"
           name="Script Robot">
     </launchConfigurationType>
+ </extension>
+ <extension
+       point="org.eclipse.debug.core.processFactories">
+    <processFactory
+          class="org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers"
+          id="org.robotframework.ide.launch.process.factory">
+    </processFactory>
  </extension>
  <extension
        point="org.eclipse.debug.ui.launchConfigurationTabGroups">
@@ -430,7 +437,7 @@
  </extension>
  <extension point="org.eclipse.debug.ui.launchShortcuts">
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationDelegate"
           icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Robot Test"
@@ -471,7 +478,7 @@
         </contextualLaunch>
     </shortcut>
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationDelegate"
           icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Robot Test Case(s)"
@@ -498,7 +505,7 @@
        </contextualLaunch>
     </shortcut>
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.RemoteRobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfigurationDelegate"
           icon="resources/robot_remote.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Remote Robot Test"
@@ -540,7 +547,7 @@
        </contextualLaunch>
     </shortcut>
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.ScriptRobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfigurationDelegate"
           icon="resources/robot_script.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Script Robot Test"
@@ -5417,15 +5424,6 @@
       </debugModelPresentation>
    </extension>
    <extension
-         point="org.eclipse.ui.contexts">
-      <context
-            name="Debugging Robot"
-            description="Debugging Robot"
-            id="org.robotframework.ide.eclipse.main.plugin.ui.robot.debugging"
-            parentId="org.eclipse.debug.ui.debugging">
-      </context>
-   </extension>
-   <extension
          point="org.eclipse.debug.ui.debugModelContextBindings">
       <modelContextBinding
             debugModelId="org.eclipse.debug.robot"
@@ -5446,6 +5444,15 @@
             class="org.robotframework.ide.eclipse.main.plugin.debug.RobotSourcePathComputerDelegate"
             id="org.eclipse.debug.robot.sourcePathComputer">
       </sourcePathComputer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            name="Debugging Robot"
+            description="Debugging Robot"
+            id="org.robotframework.ide.eclipse.main.plugin.ui.robot.debugging"
+            parentId="org.eclipse.debug.ui.debugging">
+      </context>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

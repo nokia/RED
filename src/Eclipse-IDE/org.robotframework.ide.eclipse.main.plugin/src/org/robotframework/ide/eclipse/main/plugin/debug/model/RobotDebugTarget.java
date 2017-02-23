@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,24 +32,21 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.rf.ide.core.execution.RedToAgentMessage;
 import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
+import org.rf.ide.core.execution.server.AgentClient;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.DebugExecutionEventsListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.debug.MessagesTrackerForLogView;
-import org.robotframework.ide.eclipse.main.plugin.debug.RemoteMessagesConsoleWriter;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotAgentEventsJob;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugStackFrameManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 
 /**
@@ -98,17 +93,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private RobotDebugStackFrameManager robotDebugStackFrameManager;
     
-    private RobotConsoleFacade consoleFacade;
-    
-    private final boolean isRemoteDebugging;
+    private UserController userController;
 
-    public RobotDebugTarget(final ILaunch launch, final IProcess process, final RobotConsoleFacade consoleFacade,
-            final boolean isRemoteDebugging) {
+    public RobotDebugTarget(final ILaunch launch, final IProcess process) {
         super(null);
-        super.target = this;
         this.launch = launch;
         this.process = process;
-        this.consoleFacade = consoleFacade;
         this.currentKeywordDebugContextMap = new LinkedHashMap<>();
         this.robotVariablesManager = new RobotDebugVariablesManager(this);
         this.robotDebugValueManager = new RobotDebugValueManager();
@@ -116,7 +106,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         this.thread = null;
         this.threads = null;
 
-        this.isRemoteDebugging = isRemoteDebugging;
         this.isSuspended = false;
         this.currentStepOverLevel = 0;
         this.currentStepReturnLevel = 0;
@@ -137,21 +126,15 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                 }
                 retryCounter++;
                 if(process.isTerminated()) {
-                    consoleFacade.writeLine("Debug server terminated by user");
                     throw new CoreException(Status.CANCEL_STATUS);
                 }
                 if(retryCounter > socketManager.getRetryCounterMaxValue()) {
-                    consoleFacade.writeLine("A timeout was reached while waiting for a remote connection");
                     process.terminate();
                     throw new CoreException(Status.CANCEL_STATUS);
                 }
             }
             serverSocket = socketManager.getServerSocket();
             eventSocket = socketManager.getEventSocket();
-            if (eventSocket != null && isRemoteDebugging) {
-                consoleFacade.writeLine("\nRemote connection from " + eventSocket.getInetAddress().getHostAddress()
-                        + ":" + eventSocket.getLocalPort() + " established");
-            }
             eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
         } catch (final IOException e) {
             throw new CoreException(
@@ -166,17 +149,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         final RobotDebugExecutionContext executionContext = new RobotDebugExecutionContext();
         final List<RobotAgentEventListener> listeners = new ArrayList<>();
         listeners.add(new DebugExecutionEventsListener(this, suiteResources, executionContext));
-        if (isRemoteDebugging) {
-            listeners.add(new RemoteMessagesConsoleWriter(executionContext, consoleFacade));
-        }
-        listeners.add(new MessagesTrackerForLogView(robotEventBroker));
+        listeners.add(new MessagesTrackerForLogView());
         listeners.add(new ExecutionTrackerForExecutionView(robotEventBroker));
-        final RobotAgentEventsJob eventsJob = new RobotAgentEventsJob(new Supplier<BufferedReader>() {
-            @Override
-            public BufferedReader get() {
-                return getEventReader();
-            }
-        }, listeners.toArray(new RobotAgentEventListener[0]));
+        final AgentClient agentClient = new AgentClient(0, eventWriter);
+        userController = new UserController(robotVariablesManager, agentClient);
+        final RobotAgentEventsJob eventsJob = new RobotAgentEventsJob(eventReader, agentClient,
+                listeners.toArray(new RobotAgentEventListener[0]));
         eventsJob.schedule();
 
         DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
@@ -200,8 +178,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public String getName() throws DebugException {
         if (name == null) {
-            final String prefix = isRemoteDebugging ? "Robot Remote Test" : "Robot Test";
-            name = prefix + " at " + eventSocket.getInetAddress().getHostAddress() + ":" + eventSocket.getLocalPort();
+            name = "Robot Test at " + eventSocket.getInetAddress().getHostAddress() + ":" + eventSocket.getLocalPort();
         }
         return name;
     }
@@ -244,7 +221,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public void terminate() throws DebugException {
         if (eventSocket != null) {
-            sendMessageToAgent(RedToAgentMessage.INTERRUPT_EXECUTION);
+            userController.interrupt();
         }
         terminated();
     }
@@ -272,13 +249,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public void resume() throws DebugException {
         thread.setStepping(false);
-        sendMessageToAgent(RedToAgentMessage.RESUME_EXECUTION);
+        userController.resume();
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
     protected void step() {
         thread.setStepping(true);
-        sendMessageToAgent(RedToAgentMessage.RESUME_EXECUTION);
+        userController.resume();
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
@@ -298,7 +275,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param detail
      *            reason for the resume
      */
-    public void resumed(final int detail) {
+    private void resumed(final int detail) {
         isSuspended = false;
         thread.fireResumeEvent(detail);
     }
@@ -341,12 +318,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             }
             if (serverSocket != null) {
                 serverSocket.close();
-            }
-            if (consoleFacade != null) {
-                if (isRemoteDebugging) {
-                    consoleFacade.writeLine("Remote connection closed");
-                }
-                consoleFacade = null;
             }
         } catch (final IOException e) {
             e.printStackTrace();
@@ -428,29 +399,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    public void sendMessageToAgent(final RedToAgentMessage message, final String... arguments) {
-        final String msg = message.createMessage(arguments);
-        synchronized (eventSocket) {
-            eventWriter.print(msg);
-            eventWriter.flush();
-        }
-    }
-
     public void sendChangeRequest(final String expression, final String variableName, final RobotDebugVariable parent) {
-        if (parent != null) {
-            final List<String> childNameList = new ArrayList<>();
-            final String root = robotVariablesManager.extractVariableRootAndChilds(parent, childNameList, variableName);
-
-            final List<String> arguments = newArrayList();
-            arguments.add(root);
-            arguments.addAll(childNameList);
-            arguments.add(expression);
-
-            sendMessageToAgent(RedToAgentMessage.VARIABLE_CHANGE_REQUEST, arguments.toArray(new String[0]));
-
-        } else {
-            sendMessageToAgent(RedToAgentMessage.VARIABLE_CHANGE_REQUEST, variableName, expression);
-        }
+        userController.changeVariable(expression, variableName, parent);
     }
     
     public boolean hasStepOver() {

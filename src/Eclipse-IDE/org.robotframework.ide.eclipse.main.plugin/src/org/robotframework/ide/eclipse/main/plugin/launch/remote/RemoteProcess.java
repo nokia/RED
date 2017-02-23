@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch;
+package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,9 +20,10 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.debug.core.model.IStreamsProxy2;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 
-
-public class RemoteProcess implements IProcess {
+public class RemoteProcess implements IRobotProcess {
 
     private Map<String, String> attributes;
 
@@ -34,14 +35,22 @@ public class RemoteProcess implements IProcess {
 
     private boolean isTerminated;
 
-    public RemoteProcess(final ILaunch launch, final String label) {
+    private final Runnable serverCloser;
+
+    public RemoteProcess(final ILaunch launch, final Runnable serverCloser, final String label) {
         this.launch = launch;
+        this.serverCloser = serverCloser;
         this.label = label;
         this.streamsProxy = new NullStreamsProxy();
         this.isTerminated = false;
 
         launch.addProcess(this);
         fireEvent(new DebugEvent(this, DebugEvent.CREATE));
+    }
+
+    @Override
+    public RobotConsoleFacade provideConsoleFacade(final String consoleDescription) {
+        return RobotConsoleFacade.provide(launch.getLaunchConfiguration(), consoleDescription);
     }
 
     @Override
@@ -55,7 +64,12 @@ public class RemoteProcess implements IProcess {
     }
 
     @Override
-    public void terminate() throws DebugException {
+    public void terminate() {
+        serverCloser.run();
+        terminated();
+    }
+
+    void terminated() {
         if (!isTerminated) {
             isTerminated = true;
 

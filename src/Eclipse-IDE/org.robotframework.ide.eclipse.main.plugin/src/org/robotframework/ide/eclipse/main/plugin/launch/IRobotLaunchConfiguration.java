@@ -18,6 +18,8 @@ public interface IRobotLaunchConfiguration {
 
     String getName();
 
+    String getTypeName();
+
     void fillDefaults() throws CoreException;
 
     String getProjectName() throws CoreException;

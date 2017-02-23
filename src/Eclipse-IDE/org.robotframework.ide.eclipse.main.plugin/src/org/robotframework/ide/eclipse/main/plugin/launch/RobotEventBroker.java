@@ -23,17 +23,13 @@ public class RobotEventBroker {
         this.broker = broker;
     }
 
-    public void sendAppendLineEventToMessageLogView(final String line) {
-        broker.send("MessageLogView/AppendLine", line);
-        messageLogViewContent.append(line);
-    }
-
     public void sendClearEventToMessageLogView() {
         broker.send("MessageLogView/Clear", "");
         if(messageLogViewContent.length() > 0) {
             messageLogViewContent.setLength(0);
         }
     }
+
 
     public void sendExecutionEventToExecutionView(final ExecutionElement executionElement) {
         broker.send("ExecutionView/ExecutionEvent", executionElement);
@@ -43,10 +39,6 @@ public class RobotEventBroker {
     public void sendClearEventToExecutionView() {
         broker.send("ExecutionView/ClearEvent", "");
         executionViewContent.clear();
-    }
-    
-    public static String getMessageLogViewContent() {
-        return messageLogViewContent.toString();
     }
 
     public static List<ExecutionElement> getExecutionViewContent() {
