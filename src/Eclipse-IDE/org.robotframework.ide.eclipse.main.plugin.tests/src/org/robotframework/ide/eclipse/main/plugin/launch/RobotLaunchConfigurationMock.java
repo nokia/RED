@@ -11,6 +11,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 
 /**
  * @author Michal Anglart
