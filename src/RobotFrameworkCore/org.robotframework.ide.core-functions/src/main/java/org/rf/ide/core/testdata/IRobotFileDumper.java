@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -14,8 +15,7 @@ public interface IRobotFileDumper {
 
     boolean canDumpFile(final File file);
 
-    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    void dump(final File robotFile, final RobotFile model) throws Exception;
+    void dump(final File robotFile, final RobotFile model) throws IOException;
 
     String dump(final RobotFile model);
 
