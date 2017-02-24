@@ -63,7 +63,7 @@ else:
 from robot.running.signalhandler import STOP_SIGNAL_MONITOR
 from robot.errors import ExecutionFailed
 
-if sys.hexversion > 0x2060000:
+if sys.version_info > (2, 6, 0):
     import json
 
     _JSONAVAIL = True
@@ -177,7 +177,7 @@ class TestRunnerAgent:
         self._send_server_port(self._killer.server_address[1])
 
     def _send_pid(self):
-        self._send_socket("start agent", "")
+        self._send_socket("start_agent", "")
         self._send_socket("pid", os.getpid())
         
     def _send_version(self):
