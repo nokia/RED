@@ -17,7 +17,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -29,10 +28,6 @@ class ExecutorScriptComposite extends Composite {
 
     private Text scriptPathText;
 
-    private final Text scriptArgumentsText;
-
-    private final Text scriptRunCommandText;
-
     ExecutorScriptComposite(final Composite parent, final ModifyListener listener, final String[] filterExtensions) {
         super(parent, SWT.NONE);
         this.listener = listener;
@@ -42,9 +37,6 @@ class ExecutorScriptComposite extends Composite {
 
         createScriptPathText();
         createBrowseButton(parent.getShell());
-
-        scriptArgumentsText = createLabeledText("Additional script arguments:");
-        scriptRunCommandText = createLabeledText("Script run command:");
     }
 
     private void createScriptPathText() {
@@ -74,7 +66,7 @@ class ExecutorScriptComposite extends Composite {
 
     private FileDialog createScriptFileDialog(final Shell shell) {
         final IPath startingPath = getStartingPath();
-        final FileDialog dialog = new FileDialog(shell, SWT.OPEN | SWT.MULTI);
+        final FileDialog dialog = new FileDialog(shell, SWT.OPEN);
         dialog.setFilterPath(startingPath.toOSString());
         return dialog;
     }
@@ -91,37 +83,12 @@ class ExecutorScriptComposite extends Composite {
         return path;
     }
 
-    private Text createLabeledText(final String label) {
-        final Label lbl = new Label(this, SWT.NONE);
-        lbl.setText(label);
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(lbl);
-
-        final Text txt = new Text(this, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(txt);
-        txt.addModifyListener(listener);
-        return txt;
-    }
-
-    void setInput(final String scriptPath, final String scriptArguments, final String scriptRunCommand) {
+    void setInput(final String scriptPath) {
         scriptPathText.setText(scriptPath);
-        scriptArgumentsText.setText(scriptArguments);
-        scriptRunCommandText.setText(scriptRunCommand);
     }
 
     String getSelectedScriptPath() {
         return scriptPathText.getText().trim();
-    }
-
-    String getScriptArguments() {
-        return scriptArgumentsText.getText().trim();
-    }
-
-    String getScriptRunCommand() {
-        return scriptRunCommandText.getText().trim();
-    }
-
-    boolean isDisposedOrFilled() {
-        return scriptPathText == null || scriptPathText.isDisposed() || !getSelectedScriptPath().isEmpty();
     }
 
 }

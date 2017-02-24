@@ -24,6 +24,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
@@ -41,6 +43,10 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         implements ILaunchConfigurationTab {
 
     private ExecutorScriptComposite executorScriptComposite;
+
+    private Text scriptArgumentsText;
+
+    private Text scriptRunCommandText;
 
     private IncludeExcludeTagsComposite includeExcludeTagsComposite;
 
@@ -63,8 +69,9 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
 
         try {
-            executorScriptComposite.setInput(robotConfig.getScriptPath(), robotConfig.getScriptArguments(),
-                    robotConfig.getScriptRunCommand());
+            executorScriptComposite.setInput(robotConfig.getScriptPath());
+            scriptArgumentsText.setText(robotConfig.getScriptArguments());
+            scriptRunCommandText.setText(robotConfig.getScriptRunCommand());
             includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
                     robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
             projectComposite.setInput(robotConfig.getProjectName());
@@ -82,8 +89,8 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
         try {
             robotConfig.setScriptPath(executorScriptComposite.getSelectedScriptPath());
-            robotConfig.setScriptArguments(executorScriptComposite.getScriptArguments());
-            robotConfig.setScriptRunCommand(executorScriptComposite.getScriptRunCommand());
+            robotConfig.setScriptArguments(scriptArgumentsText.getText().trim());
+            robotConfig.setScriptRunCommand(scriptRunCommandText.getText().trim());
             robotConfig.setIsIncludeTagsEnabled(includeExcludeTagsComposite.isIncludeTagsEnabled());
             robotConfig.setIncludedTags(includeExcludeTagsComposite.getIncludedTags());
             robotConfig.setIsExcludeTagsEnabled(includeExcludeTagsComposite.isExcludeTagsEnabled());
@@ -174,6 +181,26 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
             }
         }, ScriptRobotLaunchConfiguration.getSystemDependentScriptExtensions());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorScriptComposite);
+
+        scriptArgumentsText = createLabeledText(group, "Additional script arguments:");
+        scriptRunCommandText = createLabeledText(group, "Script run command:");
+    }
+
+    private Text createLabeledText(final Composite parent, final String label) {
+        final Label lbl = new Label(parent, SWT.NONE);
+        lbl.setText(label);
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(lbl);
+
+        final Text txt = new Text(parent, SWT.BORDER);
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(txt);
+        txt.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        return txt;
     }
 
     private void createTagsGroup(final Composite parent) {
