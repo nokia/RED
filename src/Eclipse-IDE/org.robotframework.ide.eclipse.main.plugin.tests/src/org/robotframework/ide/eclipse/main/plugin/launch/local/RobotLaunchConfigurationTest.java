@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -162,7 +161,7 @@ public class RobotLaunchConfigurationTest {
         resourcesToTestCases.put(res, casesForRes);
         resourcesToTestCases.put(res2, casesForRes2);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+                .prepareForSelectedTestCases(resourcesToTestCases);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
@@ -184,8 +183,7 @@ public class RobotLaunchConfigurationTest {
             final IResource res = project.getFile("Resource " + i + ".fake");
             resources.add(res);
         }
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final Map<IResource, List<String>> obtainedSuites = robotConfig.collectSuitesToRun();
         assertThat(obtainedSuites).hasSameSizeAs(resources);
@@ -198,8 +196,7 @@ public class RobotLaunchConfigurationTest {
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
         final IResource res = project.getFile("Resource");
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final RobotProject projectFromConfig = robotConfig.getRobotProject();
         assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
@@ -209,8 +206,7 @@ public class RobotLaunchConfigurationTest {
     public void configurationSuitableForResources_whenApplicable() throws CoreException, IOException {
         final IResource res = projectProvider.createFile("Resource", "");
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         assertThat(robotConfig.isSuitableFor(resources)).isTrue();
     }
@@ -219,8 +215,7 @@ public class RobotLaunchConfigurationTest {
     public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException, IOException {
         final IResource res = projectProvider.createFile("Resource", "");
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         final IResource anotherRes = projectProvider.createFile("Another Resource", "");
@@ -231,7 +226,7 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void configuredForRerunFailedTests_whenAskedForRerun() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        RobotLaunchConfiguration.prepareRerunFailedTestsConfiguration(robotConfig.asWorkingCopy(), "path");
+        RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
         assertThat(robotConfig.getExecutorArguments()).isEqualTo("-R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
     }
@@ -239,8 +234,15 @@ public class RobotLaunchConfigurationTest {
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
         final IResource res = project.getFile("Resource");
         final List<IResource> resources = newArrayList(res);
+        return new RobotLaunchConfiguration(createDefault(resources));
+    }
+
+    private static ILaunchConfigurationWorkingCopy createDefault(final List<IResource> resources) throws CoreException {
+        final ILaunchConfigurationType launchConfigurationType = manager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
-        return new RobotLaunchConfiguration(configuration);
+                .prepareDefault(launchConfigurationType, resources);
+        configuration.doSave();
+        return configuration;
     }
 }

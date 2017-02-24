@@ -114,7 +114,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if (resourcesToTests.isPresent()) {
             try {
                 final ILaunchConfiguration config = RobotLaunchConfiguration
-                        .prepareLaunchConfigurationForSelectedTestCases(resourcesToTests.get());
+                        .prepareForSelectedTestCases(resourcesToTests.get());
                 final ILaunchConfiguration sameConfig = RobotLaunchConfigurationFinder.findSameAs(config);
                 if (sameConfig != null) {
                     doLaunchConfiguration(sameConfig, mode);
