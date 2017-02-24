@@ -44,7 +44,7 @@ public class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
                         final ILaunchConfiguration launchConfig = launches[0].getLaunchConfiguration();
                         if (launchConfig != null) {
                             final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
-                            RobotLaunchConfiguration.prepareRerunFailedTestsConfiguration(launchConfigCopy, outputFilePath);
+                            RobotLaunchConfiguration.fillForFailedTestsRerun(launchConfigCopy, outputFilePath);
                             if (launchConfigCopy != null) {
                                 launchConfigCopy.launch(ILaunchManager.RUN_MODE, monitor);
                             }

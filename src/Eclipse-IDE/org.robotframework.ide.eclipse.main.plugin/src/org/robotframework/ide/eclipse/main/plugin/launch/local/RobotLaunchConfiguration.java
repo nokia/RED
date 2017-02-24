@@ -47,13 +47,6 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
 
-    static ILaunchConfigurationWorkingCopy createDefault(final ILaunchConfigurationType launchConfigurationType,
-            final List<IResource> resources) throws CoreException {
-        final ILaunchConfigurationWorkingCopy configuration = prepareDefault(launchConfigurationType, resources);
-        configuration.doSave();
-        return configuration;
-    }
-
     static ILaunchConfigurationWorkingCopy prepareDefault(final ILaunchConfigurationType launchConfigurationType,
             final List<IResource> resources) throws CoreException {
         final String name = resources.size() == 1 ? resources.get(0).getName()
@@ -61,13 +54,26 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         final String configurationName = DebugPlugin.getDefault()
                 .getLaunchManager()
                 .generateLaunchConfigurationName(name);
-        final ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null,
-                configurationName);
         final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
         for (final IResource resource : resources) {
             resourcesMapping.put(resource, new ArrayList<String>());
         }
+
+        final ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null,
+                configurationName);
         fillDefaults(configuration, resourcesMapping, true);
+        return configuration;
+    }
+
+    static ILaunchConfigurationWorkingCopy prepareForSelectedTestCases(
+            final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final String name = getNameForSelectedTestCasesConfiguration(resourcesToTestCases.keySet());
+        final String configurationName = manager.generateLaunchConfigurationName(name);
+
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+                .newInstance(null, configurationName);
+        fillDefaults(configuration, resourcesToTestCases, false);
         return configuration;
     }
 
@@ -87,23 +93,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         robotConfig.setIsGeneralPurposeEnabled(isGeneralPurposeEnabled);
     }
 
-    public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
+    public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchCopy,
             final String outputFilePath) throws CoreException {
         final RobotLaunchConfiguration robotLaunchConfig = new RobotLaunchConfiguration(launchCopy);
         robotLaunchConfig.setExecutorArguments("-R " + outputFilePath);
         robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
-    }
-
-    static ILaunchConfigurationWorkingCopy prepareLaunchConfigurationForSelectedTestCases(
-            final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final String name = getNameForSelectedTestCasesConfiguration(resourcesToTestCases.keySet());
-        final String configurationName = manager.generateLaunchConfigurationName(name);
-        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
-                .newInstance(null, configurationName);
-
-        fillDefaults(configuration, resourcesToTestCases, false);
-        return configuration;
     }
 
     static String getNameForSelectedTestCasesConfiguration(final Collection<IResource> resources) {

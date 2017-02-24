@@ -46,7 +46,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-    
+
     @BeforeClass
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {
         manager = DebugPlugin.getDefault().getLaunchManager();
@@ -68,7 +68,7 @@ public class RobotLaunchConfigurationFinderTest {
             config.delete();
         }
     }
-    
+
     @Test
     public void nullConfigurationIsReturned_whenThereIsNoConfiguration() throws CoreException {
         ILaunchConfiguration config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
@@ -79,8 +79,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void configurationIsReturned_whenThereIsValidConfiguration() throws CoreException {
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
         assertThat(config).isNotNull();
         assertThat(config).isEqualToIgnoringGivenFields(configuration, "fOriginal");
@@ -94,7 +93,7 @@ public class RobotLaunchConfigurationFinderTest {
         final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         resourcesToTestCases.put(res, newArrayList("t1", "t3"));
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+                .prepareForSelectedTestCases(resourcesToTestCases);
         configuration.doSave();
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
         assertThat(config).isNotNull();
@@ -105,8 +104,7 @@ public class RobotLaunchConfigurationFinderTest {
     public void nullConfigurationIsReturned_whenThereIsConfigurationButNotForSelectedTestCases() throws CoreException {
         final IResource res = resources.get(0);
         final List<IResource> resources = newArrayList(res);
-        RobotLaunchConfiguration.createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID),
-                resources);
+        createDefault(resources);
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationSelectedTestCases(resources);
         assertThat(config).isNull();
@@ -116,8 +114,7 @@ public class RobotLaunchConfigurationFinderTest {
     public void configurationIsReturned_whenThereIsValidConfigurationForProject() throws CoreException {
         final IResource res = project;
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder.findLaunchConfiguration(resources);
         assertThat(config).isNotNull();
         assertThat(config).isEqualToIgnoringGivenFields(configuration, "fOriginal");
@@ -127,8 +124,7 @@ public class RobotLaunchConfigurationFinderTest {
     public void nullConfigurationIsReturned_whenThereIsNoConfigurationForThisProject() throws CoreException {
         final IResource res = project;
         List<IResource> resources = newArrayList(res);
-        RobotLaunchConfiguration.createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID),
-                resources);
+        createDefault(resources);
         final IProject anotherProject = ResourcesPlugin.getWorkspace().getRoot().getProject("Another one");
         if (anotherProject.exists()) {
             anotherProject.delete(false, null);
@@ -154,7 +150,7 @@ public class RobotLaunchConfigurationFinderTest {
                 .findLaunchConfigurationSelectedTestCases(resources);
         assertThat(configTemp).isNull();
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+                .prepareForSelectedTestCases(resourcesToTestCases);
         configuration.doSave();
         final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationSelectedTestCases(resources);
@@ -169,7 +165,7 @@ public class RobotLaunchConfigurationFinderTest {
         final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         resourcesToTestCases.put(res, newArrayList("t1", "t3"));
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+                .prepareForSelectedTestCases(resourcesToTestCases);
         configuration.doSave();
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationExceptSelectedTestCases(resources);
@@ -181,8 +177,7 @@ public class RobotLaunchConfigurationFinderTest {
             throws CoreException {
         final IResource res = project;
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationExceptSelectedTestCases(resources);
         assertThat(config).isNotNull();
@@ -197,7 +192,7 @@ public class RobotLaunchConfigurationFinderTest {
         final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         resourcesToTestCases.put(res, newArrayList("t1", "t3"));
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+                .prepareForSelectedTestCases(resourcesToTestCases);
         configuration.doSave();
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationSelectedTestCases(resources);
@@ -209,12 +204,17 @@ public class RobotLaunchConfigurationFinderTest {
     public void configurationReturned_whenThereIsValidConfiguration() throws CoreException {
         final IResource res = resources.get(0);
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .createDefault(manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID), resources);
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
         final ILaunchConfiguration config = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationExceptSelectedTestCases(resources);
         assertThat(config).isNotNull();
         assertThat(config).isEqualToIgnoringGivenFields(configuration, "fOriginal");
     }
 
+    private static ILaunchConfigurationWorkingCopy createDefault(final List<IResource> resources) throws CoreException {
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+                .prepareDefault(launchConfigurationType, resources);
+        configuration.doSave();
+        return configuration;
+    }
 }

@@ -134,7 +134,7 @@ public class RobotLaunchConfigurationFinder {
         ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfigurationFinder
                 .findLaunchConfigurationSelectedTestCases(newArrayList(resourcesToTests.keySet()));
         if (configuration == null) {
-            configuration = RobotLaunchConfiguration.prepareLaunchConfigurationForSelectedTestCases(resourcesToTests);
+            configuration = RobotLaunchConfiguration.prepareForSelectedTestCases(resourcesToTests);
         }
         return configuration;
     }
