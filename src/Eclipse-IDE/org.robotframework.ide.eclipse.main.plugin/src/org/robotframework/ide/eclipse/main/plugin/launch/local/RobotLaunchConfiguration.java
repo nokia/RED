@@ -49,31 +49,29 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     static ILaunchConfigurationWorkingCopy prepareDefault(final ILaunchConfigurationType launchConfigurationType,
             final List<IResource> resources) throws CoreException {
-        final String name = resources.size() == 1 ? resources.get(0).getName()
-                : resources.get(0).getProject().getName();
-        final String configurationName = DebugPlugin.getDefault()
-                .getLaunchManager()
-                .generateLaunchConfigurationName(name);
-        final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final String namePrefix = getLaunchConfigurationNamePrefix(resources, "");
+        final String name = manager.generateLaunchConfigurationName(namePrefix);
+        final Map<IResource, List<String>> suitesMapping = new HashMap<>();
         for (final IResource resource : resources) {
-            resourcesMapping.put(resource, new ArrayList<String>());
+            suitesMapping.put(resource, new ArrayList<String>());
         }
 
-        final ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null,
-                configurationName);
-        fillDefaults(configuration, resourcesMapping, true);
+        final ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null, name);
+        fillDefaults(configuration, suitesMapping, true);
         return configuration;
     }
 
-    static ILaunchConfigurationWorkingCopy prepareForSelectedTestCases(
-            final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
+    static ILaunchConfigurationWorkingCopy prepareForSelectedTestCases(final Map<IResource, List<String>> suitesMapping)
+            throws CoreException {
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final String name = getNameForSelectedTestCasesConfiguration(resourcesToTestCases.keySet());
-        final String configurationName = manager.generateLaunchConfigurationName(name);
+        final String namePrefix = getLaunchConfigurationNamePrefix(suitesMapping.keySet(),
+                RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX);
+        final String name = manager.generateLaunchConfigurationName(namePrefix);
 
         final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
-                .newInstance(null, configurationName);
-        fillDefaults(configuration, resourcesToTestCases, false);
+                .newInstance(null, name);
+        fillDefaults(configuration, suitesMapping, false);
         return configuration;
     }
 
@@ -95,14 +93,14 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchCopy,
             final String outputFilePath) throws CoreException {
-        final RobotLaunchConfiguration robotLaunchConfig = new RobotLaunchConfiguration(launchCopy);
-        robotLaunchConfig.setExecutorArguments("-R " + outputFilePath);
-        robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCopy);
+        robotConfig.setExecutorArguments("-R " + outputFilePath);
+        robotConfig.setSuitePaths(new HashMap<String, List<String>>());
     }
 
-    static String getNameForSelectedTestCasesConfiguration(final Collection<IResource> resources) {
+    static String getLaunchConfigurationNamePrefix(final Collection<IResource> resources, final String suffix) {
         if (resources.size() == 1) {
-            return getFirst(resources, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
+            return getFirst(resources, null).getName() + suffix;
         }
         final Set<IProject> projects = new HashSet<>();
         for (final IResource res : resources) {
@@ -113,7 +111,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             }
         }
         if (projects.size() == 1) {
-            return getFirst(projects, null).getName() + RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX;
+            return getFirst(projects, null).getName() + suffix;
         }
         return "New Configuration";
     }
