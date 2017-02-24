@@ -51,6 +51,10 @@ abstract class ChangeExclusionHandler {
                 .collectGroupedByProject(resourcesToChange);
         final Multimap<IProject, IPath> groupedPaths = groupByProject(resourcesToChange);
 
+        for (IResource res : resourcesToChange) {
+            removeMarkers(res);
+        }
+
         for (final IProject groupingProject : groupedPaths.keySet()) {
             changeExclusion(groupingProject, groupedPaths.get(groupingProject));
 
@@ -106,6 +110,17 @@ abstract class ChangeExclusionHandler {
         } catch (final CoreException e) {
             // nothing to do
         }
+    }
+
+    private void removeMarkers(final IResource resource) {
+        try {
+            if (resource.exists()) {
+                resource.deleteMarkers(null, true, IResource.DEPTH_INFINITE);
+            }
+        } catch (final CoreException e) {
+            e.printStackTrace();
+        }
+
     }
 
     protected abstract void changeExclusion(RobotProjectConfig config, IPath pathToChange);
