@@ -250,12 +250,7 @@ public class RobotDebugVariablesManager {
 
     public String extractVariableRootAndChilds(final RobotDebugVariable parent, final List<String> childNameList,
             final String variableName) {
-        String parentName = "";
-        try {
-            parentName = parent.getName();
-        } catch (final DebugException e) {
-            e.printStackTrace();
-        }
+        final String parentName = parent.getName();
         if (parent.getParent() == null) {
             childNameList.add(extractChildName(variableName));
             return parentName;
