@@ -579,9 +579,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
         size = matchedMappers.size();
 
-        if (robotToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-            robotToken.setType(RobotTokenType.START_HASH_COMMENT);
-        } else if (size == 1) {
+        if (size == 1) {
             return matchedMappers.get(0).map(currentLine, processingState, robotFileOutput, robotToken, fp, text);
         }
 
