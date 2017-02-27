@@ -61,7 +61,7 @@ public class RobotLaunchInModeTest {
         robotConfig.addSuite("001__suites_a", new ArrayList<String>());
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
+        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
     }
@@ -78,7 +78,7 @@ public class RobotLaunchInModeTest {
         robotConfig.addSuite("001__suites_a", newArrayList("001__case1"));
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
+        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
         assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
@@ -101,7 +101,7 @@ public class RobotLaunchInModeTest {
         final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
+        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
@@ -125,7 +125,7 @@ public class RobotLaunchInModeTest {
         final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLineBuilder(robotConfig).build();
+        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
