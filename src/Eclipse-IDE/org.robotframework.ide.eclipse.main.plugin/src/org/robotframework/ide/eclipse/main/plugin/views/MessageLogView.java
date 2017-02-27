@@ -16,7 +16,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.robotframework.ide.eclipse.main.plugin.debug.MessagesTrackerForLogView;
+import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogView;
 
 
 /**
