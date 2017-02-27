@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.debug;
+package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.io.File;
 
@@ -11,7 +11,6 @@ import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.ExecutionElementsFactory;
 import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.Status;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 
 public class ExecutionTrackerForExecutionView extends RobotDefaultAgentEventListener {
