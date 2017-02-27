@@ -40,17 +40,11 @@ public class RobotLaunchConfigurationFinderTest {
 
     private static List<IResource> resources;
 
-    private static ILaunchManager manager;
-
-    private static ILaunchConfigurationType launchConfigurationType;
-
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @BeforeClass
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {
-        manager = DebugPlugin.getDefault().getLaunchManager();
-        launchConfigurationType = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         resources = new ArrayList<>();
         project = projectProvider.getProject();
         for (final String name : resourceNames) {
@@ -63,7 +57,9 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Before
     public void removeAllConfigurations() throws CoreException {
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType type = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
         for (final ILaunchConfiguration config : launchConfigs) {
             config.delete();
         }
@@ -212,8 +208,7 @@ public class RobotLaunchConfigurationFinderTest {
     }
 
     private static ILaunchConfigurationWorkingCopy createDefault(final List<IResource> resources) throws CoreException {
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareDefault(launchConfigurationType, resources);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         configuration.doSave();
         return configuration;
     }

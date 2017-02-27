@@ -20,10 +20,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -55,9 +53,9 @@ import com.google.common.base.Optional;
 public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements ILaunchShortcut2 {
 
     private final RobotEventBroker robotEventBroker;
-    
+
     private boolean hasViewsInitialized;
-    
+
     public RobotLaunchConfigurationDelegate() {
         robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
@@ -88,13 +86,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     private void createAndLaunchConfiguration(final List<IResource> resources, final String mode) {
-        final ILaunchConfigurationType launchConfigurationType = DebugPlugin.getDefault()
-                .getLaunchManager()
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         try {
-            final ILaunchConfigurationWorkingCopy config = RobotLaunchConfiguration.prepareDefault(
-                    launchConfigurationType,
-                    resources);
+            final ILaunchConfigurationWorkingCopy config = RobotLaunchConfiguration.prepareDefault(resources);
             final ILaunchConfiguration sameConfig = RobotLaunchConfigurationFinder.findSameAs(config);
             if (sameConfig != null) {
                 doLaunchConfiguration(sameConfig, mode);
@@ -176,7 +169,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             IRobotLaunchConfiguration.unlockConfigurationLaunches();
         }
     }
-    
+
     private static void saveConfiguration(final ILaunchConfiguration configuration) throws CoreException {
         ILaunchConfigurationWorkingCopy toSave = null;
         if (configuration.isWorkingCopy()) {
