@@ -18,11 +18,9 @@ public class RobotLaunchConfigurationNaming {
 
     private static final String NEW_CONFIGURATION_NAME = "New Configuration";
 
-    public static final String SELECTED_TEST_CASES_SUFFIX = " (Selected Test Cases)";
-
-    public static String getNamePrefix(final Collection<IResource> resources, final String suffix) {
+    public static String getNamePrefix(final Collection<IResource> resources, final RobotLaunchConfigurationType type) {
         if (resources.size() == 1) {
-            return getFirst(resources, null).getName() + suffix;
+            return getFirst(resources, null).getName() + type.getNameSuffix();
         }
         final Set<IProject> projects = new HashSet<>();
         for (final IResource res : resources) {
@@ -33,8 +31,23 @@ public class RobotLaunchConfigurationNaming {
             }
         }
         if (projects.size() == 1) {
-            return getFirst(projects, null).getName() + suffix;
+            return getFirst(projects, null).getName() + type.getNameSuffix();
         }
         return NEW_CONFIGURATION_NAME;
+    }
+
+    public enum RobotLaunchConfigurationType {
+        GENERAL_PURPOSE(""),
+        SELECTED_TEST_CASES(" (Selected Test Cases)");
+
+        private final String nameSuffix;
+
+        private RobotLaunchConfigurationType(final String nameSuffix) {
+            this.nameSuffix = nameSuffix;
+        }
+
+        public String getNameSuffix() {
+            return nameSuffix;
+        }
     }
 }
