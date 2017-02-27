@@ -101,7 +101,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public IThread[] getThreads() throws DebugException {
+    public IThread[] getThreads() {
         return threads;
     }
 
@@ -110,12 +110,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public boolean hasThreads() throws DebugException {
+    public boolean hasThreads() {
         return true;
     }
 
     @Override
-    public String getName() throws DebugException {
+    public String getName() {
         return name;
     }
 
@@ -140,7 +140,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public void disconnect() throws DebugException {
+    public void disconnect() {
 
     }
 
@@ -155,7 +155,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public void terminate() throws DebugException {
+    public void terminate() {
         // if (eventSocket != null) {
         // userController.interrupt();
         // }
@@ -173,7 +173,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public void suspend() throws DebugException {
+    public void suspend() {
 
     }
 
@@ -183,7 +183,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public void resume() throws DebugException {
+    public void resume() {
         getThread().setStepping(false);
         userController.resume();
         resumed(DebugEvent.CLIENT_REQUEST);
@@ -286,7 +286,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public IMemoryBlock getMemoryBlock(final long startAddress, final long length) throws DebugException {
+    public IMemoryBlock getMemoryBlock(final long startAddress, final long length) {
         return null;
     }
 
@@ -314,7 +314,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      */
     public void breakpointHit(final IBreakpoint breakpoint) {
         if (breakpoint instanceof ILineBreakpoint) {
-            getThread().setBreakpoints(new IBreakpoint[] { breakpoint });
+            getThread().setSuspendedAt(breakpoint);
         }
     }
 

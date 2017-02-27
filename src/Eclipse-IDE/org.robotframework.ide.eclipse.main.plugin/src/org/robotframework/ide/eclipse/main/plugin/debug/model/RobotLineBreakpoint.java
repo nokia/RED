@@ -62,6 +62,7 @@ public class RobotLineBreakpoint extends LineBreakpoint {
         run(getMarkerRule(resource), runnable);
     }
 
+
     @Override
     public String getModelIdentifier() {
         return RobotDebugElement.DEBUG_MODEL_ID;

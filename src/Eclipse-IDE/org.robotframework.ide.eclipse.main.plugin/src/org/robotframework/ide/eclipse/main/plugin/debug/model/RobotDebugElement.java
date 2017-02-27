@@ -22,7 +22,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
 
     private final RobotDebugTarget target;
 
-    public RobotDebugElement(final RobotDebugTarget target) {
+    protected RobotDebugElement(final RobotDebugTarget target) {
         this.target = target;
     }
 
@@ -41,6 +41,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
         return getDebugTarget().getLaunch();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter == IDebugElement.class) {
@@ -51,49 +52,27 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
         return super.getAdapter(adapter);
     }
 
-    /**
-     * Fires a debug event
-     * 
-     * @param event
-     *            the event to be fired
-     */
-    protected void fireEvent(final DebugEvent event) {
-        DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
-    }
-
-    /**
-     * Fires a <code>CREATE</code> event for this element.
-     */
-    protected void fireCreationEvent() {
+    protected final void fireCreationEvent() {
         fireEvent(new DebugEvent(this, DebugEvent.CREATE));
     }
 
-    /**
-     * Fires a <code>RESUME</code> event for this element with
-     * the given detail.
-     * 
-     * @param detail
-     *            event detail code
-     */
-    public void fireResumeEvent(final int detail) {
+    protected final void fireResumeEvent(final int detail) {
         fireEvent(new DebugEvent(this, DebugEvent.RESUME, detail));
     }
 
-    /**
-     * Fires a <code>SUSPEND</code> event for this element with
-     * the given detail.
-     * 
-     * @param detail
-     *            event detail code
-     */
-    public void fireSuspendEvent(final int detail) {
+    protected final void fireSuspendEvent(final int detail) {
         fireEvent(new DebugEvent(this, DebugEvent.SUSPEND, detail));
     }
 
-    /**
-     * Fires a <code>TERMINATE</code> event for this element.
-     */
-    protected void fireTerminateEvent() {
+    protected final void fireChangeEvent(final int detail) {
+        fireEvent(new DebugEvent(this, DebugEvent.CHANGE, detail));
+    }
+
+    protected final void fireTerminateEvent() {
         fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
+    }
+
+    private void fireEvent(final DebugEvent event) {
+        DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
     }
 }

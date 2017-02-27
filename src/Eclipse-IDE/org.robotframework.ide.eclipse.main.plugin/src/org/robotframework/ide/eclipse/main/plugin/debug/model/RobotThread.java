@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
@@ -21,76 +20,53 @@ public class RobotThread extends RobotDebugElement implements IThread {
      */
     private IBreakpoint[] breakpoints;
 
-    /**
-     * Whether this thread is stepping
-     */
     private boolean isStepping = false;
-    
     private boolean isSteppingOver = false;
-    
     private boolean isSteppingReturn = false;
 
-    /**
-     * Constructs a new thread for the given target
-     * 
-     * @param target
-     * 
-     */
     public RobotThread(final RobotDebugTarget target) {
         super(target);
     }
 
     @Override
-    public IStackFrame[] getStackFrames() throws DebugException {
-
-        IStackFrame[] stackFrames = ((RobotDebugTarget) getDebugTarget()).getStackFrames();
-        if (stackFrames == null) {
-            return new IStackFrame[0];
-        }
-
-        return stackFrames;
+    public RobotDebugTarget getDebugTarget() {
+        return (RobotDebugTarget) super.getDebugTarget();
     }
 
     @Override
-    public boolean hasStackFrames() throws DebugException {
+    public IStackFrame[] getStackFrames() {
+        final IStackFrame[] stackFrames = getDebugTarget().getStackFrames();
+        return stackFrames == null ? new IStackFrame[0] : stackFrames;
+    }
+
+    @Override
+    public boolean hasStackFrames() {
         return isSuspended();
     }
 
     @Override
-    public int getPriority() throws DebugException {
+    public int getPriority() {
         return 0;
     }
 
     @Override
-    public IStackFrame getTopStackFrame() throws DebugException {
+    public IStackFrame getTopStackFrame() {
         final IStackFrame[] frames = getStackFrames();
-        if (frames.length > 0) {
-            return frames[0];
-        }
-        return null;
+        return frames.length > 0 ? frames[0] : null;
     }
 
     @Override
-    public String getName() throws DebugException {
+    public String getName() {
         return "Thread [main]";
     }
 
     @Override
     public IBreakpoint[] getBreakpoints() {
-        if (breakpoints == null) {
-            return new IBreakpoint[0];
-        }
-        return breakpoints;
+        return breakpoints == null ? new IBreakpoint[0] : breakpoints;
     }
 
-    /**
-     * Sets the breakpoints this thread is suspended at, or <code>null</code> if none.
-     * 
-     * @param breakpoints
-     *            the breakpoints this thread is suspended at, or <code>null</code> if none
-     */
-    public void setBreakpoints(final IBreakpoint[] breakpoints) {
-        this.breakpoints = breakpoints;
+    void setSuspendedAt(final IBreakpoint breakpoint) {
+        this.breakpoints = new IBreakpoint[] { breakpoint };
     }
 
     @Override
@@ -109,12 +85,12 @@ public class RobotThread extends RobotDebugElement implements IThread {
     }
 
     @Override
-    public void resume() throws DebugException {
+    public void resume() {
         getDebugTarget().resume();
     }
 
     @Override
-    public void suspend() throws DebugException {
+    public void suspend() {
         getDebugTarget().suspend();
     }
 
@@ -130,7 +106,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
 
     @Override
     public boolean canStepReturn() {
-        return isSuspended() && ((RobotDebugTarget) getDebugTarget()).getCurrentKeywordsContextMap().size() > 1;
+        return isSuspended() && getDebugTarget().getCurrentKeywordsContextMap().size() > 1;
     }
 
     @Override
@@ -138,21 +114,41 @@ public class RobotThread extends RobotDebugElement implements IThread {
         return isStepping;
     }
 
-    @Override
-    public void stepInto() throws DebugException {
-        ((RobotDebugTarget) getDebugTarget()).step();
+    void setStepping(final boolean stepping) {
+        isStepping = stepping;
+    }
+
+    public void setSteppingOver(final boolean stepping) {
+        isSteppingOver = stepping;
+    }
+
+    boolean isSteppingOver() {
+        return isSteppingOver;
+    }
+
+    public void setSteppingReturn(final boolean stepping) {
+        isSteppingReturn = stepping;
+    }
+
+    boolean isSteppingReturn() {
+        return isSteppingReturn;
     }
 
     @Override
-    public void stepOver() throws DebugException {
+    public void stepInto() {
+        getDebugTarget().step();
+    }
+
+    @Override
+    public void stepOver() {
         isSteppingOver = true;
-        ((RobotDebugTarget) getDebugTarget()).stepOver();
+        getDebugTarget().stepOver();
     }
 
     @Override
-    public void stepReturn() throws DebugException {
+    public void stepReturn() {
         isSteppingReturn = true;
-        ((RobotDebugTarget) getDebugTarget()).stepReturn();
+        getDebugTarget().stepReturn();
     }
 
     @Override
@@ -166,33 +162,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
     }
 
     @Override
-    public void terminate() throws DebugException {
+    public void terminate() {
         getDebugTarget().terminate();
-    }
-
-    /**
-     * Sets whether this thread is stepping
-     * 
-     * @param stepping
-     *            whether stepping
-     */
-    protected void setStepping(final boolean stepping) {
-        isStepping = stepping;
-    }
-    
-    public void setSteppingOver(final boolean stepping) {
-        isSteppingOver = stepping;
-    }
-    
-    public boolean isSteppingOver() {
-        return isSteppingOver;
-    }
-    
-    public void setSteppingReturn(final boolean stepping) {
-        isSteppingReturn = stepping;
-    }
-    
-    public boolean isSteppingReturn() {
-        return isSteppingReturn;
     }
 }

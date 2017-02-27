@@ -33,38 +33,39 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
      * @param value
      *            variable value
      */
-    public RobotDebugVariable(final RobotDebugTarget target, final String name, final Object value, final RobotDebugVariable parent) {
+    public RobotDebugVariable(final RobotDebugTarget target, final String name, final Object value,
+            final RobotDebugVariable parent) {
         super(target);
         this.name = name;
         this.parent = parent;
-        debugValue = target.getRobotDebugValueManager().createRobotDebugValue(value, this, target);
+        this.debugValue = target.getRobotDebugValueManager().createRobotDebugValue(value, this, target);
     }
 
     @Override
-    public IValue getValue() throws DebugException {
+    public IValue getValue() {
         return debugValue;
     }
 
     @Override
-    public String getName() throws DebugException {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String getReferenceTypeName() throws DebugException {
+    public String getReferenceTypeName() {
         return "RobotVariable";
     }
 
     @Override
-    public boolean hasValueChanged() throws DebugException {
+    public boolean hasValueChanged() {
         return hasValueChanged;
     }
 
     @Override
-    public void setValue(final String expression) throws DebugException {
+    public void setValue(final String expression) {
         debugValue.setValue(expression);
         hasValueChanged = true;
-        fireEvent(new DebugEvent(this, DebugEvent.CHANGE, DebugEvent.CLIENT_REQUEST));
+        fireChangeEvent(DebugEvent.CLIENT_REQUEST);
         ((RobotDebugTarget) this.getDebugTarget()).sendChangeRequest(expression, name, parent);
     }
 
@@ -80,12 +81,12 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     }
 
     @Override
-    public boolean verifyValue(final String expression) throws DebugException {
+    public boolean verifyValue(final String expression) {
         return true;
     }
 
     @Override
-    public boolean verifyValue(final IValue value) throws DebugException {
+    public boolean verifyValue(final IValue value) {
         return true;
     }
 
