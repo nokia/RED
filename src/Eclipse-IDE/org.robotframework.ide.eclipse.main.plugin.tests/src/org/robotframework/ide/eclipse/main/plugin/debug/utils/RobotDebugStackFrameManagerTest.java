@@ -95,7 +95,7 @@ public class RobotDebugStackFrameManagerTest {
         assertTrue(stackFrameManager.hasStackFramesCreated());
         assertTrue(currentKeywordsContextMap.size() == currentStackFrames.length);
         for (int i = 0; i < currentStackFrames.length; i++) {
-            assertTrue(((RobotStackFrame) currentStackFrames[i]).getId() == (currentStackFrames.length - i));
+            assertTrue(((RobotStackFrame) currentStackFrames[i]).getStackLevel() == (currentStackFrames.length - i));
             assertTrue(((RobotStackFrame) currentStackFrames[i]).getName()
                     .contains(currentKeywordNames[currentStackFrames.length - i - 1]));
         }
