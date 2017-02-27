@@ -6,11 +6,12 @@
 package org.rf.ide.core.execution.server.response;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.common.collect.ImmutableMap;
 
 public class ChangeVariable implements ServerResponse {
 
@@ -23,17 +24,14 @@ public class ChangeVariable implements ServerResponse {
     }
 
     @Override
-    public String toMessage() {
-        final Map<String, Object> inside = new HashMap<>();
-        inside.put(variableName, values);
-
-        final Map<String, Object> value = new HashMap<>();
-        value.put("variable_change", inside);
-        final ObjectMapper mapper = new ObjectMapper();
+    public String toMessage() throws ResponseException {
         try {
-            return mapper.writeValueAsString(value);
+            final Map<String, List<String>> arguments = ImmutableMap.of(variableName, values);
+            final Map<String, Object> value = ImmutableMap.of("variable_change", arguments);
+
+            return new ObjectMapper().writeValueAsString(value);
         } catch (final IOException e) {
-            throw new IllegalArgumentException("Unable to serialize breakpoint condition to json", e);
+            throw new ResponseException("Unable to serialize variable change response arguments to json", e);
         }
     }
 

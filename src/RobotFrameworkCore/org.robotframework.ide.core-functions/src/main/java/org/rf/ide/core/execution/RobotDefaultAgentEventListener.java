@@ -24,12 +24,12 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleAgentIsReadyToStart() {
+    public void handleAgentInitializing() {
         // implement in subclasses
     }
 
     @Override
-    public void handlePid() {
+    public void handleAgentIsReadyToStart() {
         // implement in subclasses
     }
 

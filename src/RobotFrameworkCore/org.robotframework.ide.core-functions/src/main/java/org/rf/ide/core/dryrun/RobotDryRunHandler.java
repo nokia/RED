@@ -15,7 +15,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 
-import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
@@ -40,16 +39,15 @@ public class RobotDryRunHandler {
         builder.suitesToRun(suites);
         builder.addLocationsToPythonPath(pythonPathLocations);
         builder.addLocationsToClassPath(classPathLocations);
-        builder.enableDebug(false);
         builder.enableDryRun(true);
         builder.withAdditionalProjectsLocations(additionalProjectsLocations);
 
         return builder.build();
     }
 
-    public Thread createDryRunHandlerThread(final int port, final List<ILineHandler> listeners) {
+    public Thread createDryRunHandlerThread(final int port, final List<IAgentMessageHandler> listeners) {
         final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
-        for (final ILineHandler listener : listeners) {
+        for (final IAgentMessageHandler listener : listeners) {
             testRunnerAgentHandler.addListener(listener);
         }
         return new Thread(testRunnerAgentHandler);

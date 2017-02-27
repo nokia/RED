@@ -6,18 +6,17 @@
 package org.rf.ide.core.executor;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Supplier;
+import org.rf.ide.core.dryrun.IAgentMessageHandler;
+import org.rf.ide.core.execution.server.AgentClient;
 
 /**
  * @author mmarzec
@@ -27,37 +26,37 @@ public class TestRunnerAgentHandler implements Runnable {
 
     private static final int TIMEOUT = 60_000;
 
-    private final List<ILineHandler> listeners;
+    private final List<IAgentMessageHandler> listeners;
 
     private final int port;
-
-    private BufferedWriter agentWriter;
 
     private final Semaphore writerSemaphore = new Semaphore(0, true);
 
     public TestRunnerAgentHandler(final int port) {
-        listeners = new ArrayList<>();
+        this.listeners = new ArrayList<>();
         this.port = port;
     }
 
     @Override
     public void run() {
+        PrintWriter eventsWriter = null;
+        BufferedReader eventsReader = null;
         try (ServerSocket socket = new ServerSocket(port)) {
             socket.setReuseAddress(true);
             socket.setSoTimeout(TIMEOUT);
             final Socket client = socket.accept();
 
-            agentWriter = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()));
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            eventsWriter = new PrintWriter(client.getOutputStream());
+            eventsReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
             writerSemaphore.release();
 
-            String line = reader.readLine();
+            String line = eventsReader.readLine();
             while (line != null) {
-                for (final ILineHandler listener : listeners) {
-                    listener.processLine(line);
+                for (final IAgentMessageHandler listener : listeners) {
+                    listener.processMessage(line, new AgentClient(0, eventsWriter));
                 }
-                line = reader.readLine();
+                line = eventsReader.readLine();
             }
         } catch (final IOException e) {
         } finally {
@@ -65,33 +64,22 @@ public class TestRunnerAgentHandler implements Runnable {
                 writerSemaphore.release();
             }
             try {
-                if (agentWriter != null) {
-                    agentWriter.close();
+                if (eventsWriter != null) {
+                    eventsWriter.close();
+                }
+                if (eventsReader != null) {
+                    eventsReader.close();
                 }
             } catch (final IOException e) {
             }
         }
     }
 
-    public void addListener(final ILineHandler listener) {
+    public void addListener(final IAgentMessageHandler listener) {
         listeners.add(listener);
     }
 
-    public void removeListener(final ILineHandler listener) {
+    public void removeListener(final IAgentMessageHandler listener) {
         listeners.remove(listener);
-    }
-
-    public void startTests(final Supplier<Boolean> shouldNotWaitMoreCondition) throws IOException {
-        try {
-            while (!writerSemaphore.tryAcquire(1_000, TimeUnit.MILLISECONDS) && !shouldNotWaitMoreCondition.get()) {
-                // do nothing, waiting is done in tryAcquire
-            }
-        } catch (final InterruptedException e) {
-            throw new IllegalStateException("Interrupted when waiting for agent connection!", e);
-        }
-        if (agentWriter != null) {
-            agentWriter.write("do_start");
-            agentWriter.flush();
-        }
     }
 }

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.execution;
+package org.rf.ide.core.execution.server;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -19,31 +19,33 @@ import java.util.Map.Entry;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.rf.ide.core.execution.LogLevel;
+import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
-import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.Status;
 
 import com.google.common.collect.Iterables;
 
-public class RobotAgentEventDispatcher {
+class RobotAgentEventDispatcher {
 
     private final List<RobotAgentEventListener> eventsListeners;
 
-    public RobotAgentEventDispatcher(final AgentClient client, final RobotAgentEventListener... eventsListeners) {
+    RobotAgentEventDispatcher(final AgentClient client, final RobotAgentEventListener... eventsListeners) {
         this.eventsListeners = Collections.synchronizedList(newArrayList(eventsListeners));
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.setClient(client);
         }
     }
 
-    public void addEventsListener(final RobotAgentEventListener listener) {
+    void addEventsListener(final RobotAgentEventListener listener) {
         eventsListeners.add(listener);
     }
 
-    public void removeEventsListener(final RobotAgentEventListener listener) {
+    void removeEventsListener(final RobotAgentEventListener listener) {
         eventsListeners.remove(listener);
     }
 
-    public void runEventsLoop(final BufferedReader eventReader) throws IOException, RobotAgentEventsListenerException {
+    void runEventsLoop(final BufferedReader eventReader) throws IOException, RobotAgentEventsListenerException {
         String event = eventReader.readLine();
         final ObjectMapper mapper = new ObjectMapper();
         while (event != null && anyListenerIsHandlingEvents()) {
@@ -60,8 +62,8 @@ public class RobotAgentEventDispatcher {
                 case "ready_to_start":
                     handleReadyToStart();
                     break;
-                case "pid":
-                    handlePid();
+                case "agent_initializing":
+                    handleAgentInitializing();
                     break;
                 case "version":
                     handleVersion(eventMap);
@@ -131,9 +133,9 @@ public class RobotAgentEventDispatcher {
         }
     }
 
-    private void handlePid() {
+    private void handleAgentInitializing() {
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handlePid();
+            listener.handleAgentInitializing();
         }
     }
 
@@ -142,6 +144,12 @@ public class RobotAgentEventDispatcher {
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
         final String pythonVersion = (String) attributes.get("python");
         final String robotVersion = (String) attributes.get("robot");
+        final int protocolVersion = (Integer) attributes.get("protocol");
+
+        if (protocolVersion != AgentConnectionServer.RED_AGENT_PROTOCOL_VERSION) {
+            throw new RobotAgentEventsListenerException("RED & Agent protocol mismatch. RED version: "
+                    + AgentConnectionServer.RED_AGENT_PROTOCOL_VERSION + ", Agent version: " + protocolVersion);
+        }
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleVersions(pythonVersion, robotVersion);

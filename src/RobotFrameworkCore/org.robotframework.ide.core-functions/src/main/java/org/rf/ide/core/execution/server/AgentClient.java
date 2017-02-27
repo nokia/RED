@@ -16,7 +16,7 @@ public class AgentClient {
     private final int clientId;
     private final PrintWriter writer;
 
-    // TODO : this should not be public
+    // FIXME : this should not be public - only server should create those objects
     public AgentClient(final int clientId, final PrintWriter writer) {
         this.clientId = clientId;
         this.writer = writer;
@@ -27,7 +27,7 @@ public class AgentClient {
     }
 
     public synchronized void send(final ServerResponse response) throws IOException, ResponseException {
-        writer.print(response.toMessage());
+        writer.print(response.toMessage() + '\n');
         writer.flush();
     }
 }

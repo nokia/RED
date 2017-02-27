@@ -12,7 +12,7 @@ import org.junit.Test;
 public class InterruptExecutionTest {
 
     @Test
-    public void properRequestIsConstructed_forInterruptExecutionMessage() {
-        assertThat(new InterruptExecution().toMessage()).isEqualTo("interrupt");
+    public void properMessageIsConstructed_forInterruptExecutionMessage() {
+        assertThat(new InterruptExecution().toMessage()).isEqualTo("{\"interrupt\":[]}");
     }
 }
