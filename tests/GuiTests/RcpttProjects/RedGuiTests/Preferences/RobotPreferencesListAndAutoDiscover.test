@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _srvewJQcEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/3/17 1:29 PM
+Save-Time: 2/27/17 4:53 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,10 +18,11 @@ get-window Preferences | get-tree | select "Robot Framework"
 
 get-window Preferences | get-tree | get-item "Robot Framework" | expand-all
 
+//check list of all Robot preferences
 with [get-window Preferences | get-tree] {
     get-item "Robot Framework" | get-property childCount | equals 5 | verify-true
     get-item "Robot Framework" | get-property "getItems().TreeItem[0].getText()" | equals Autodiscovering | verify-true
-    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getText()" | equals "Default Launch Configuration" | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getText()" | equals "Default Launch Configurations" | verify-true
     
     get-item "Robot Framework" | get-property "getItems().TreeItem[2].getText()" | equals Editor | verify-true
     get-item "Robot Framework" | get-property "getItems().TreeItem[2].getItemCount()" | equals 3 | verify-true
@@ -39,6 +40,8 @@ with [get-window Preferences | get-tree] {
         | verify-true
     get-item "Robot Framework" | get-property "getItems().TreeItem[4].getItemCount()" | equals 0 | verify-true
 }
+
+//check Autodiscovery prefernces
 get-window Preferences | get-tree | select "Robot Framework/Autodiscovering"
 with [get-window Preferences] {
     with [get-control Any -after [get-label Autodiscovering] -index 10] {
@@ -56,4 +59,5 @@ with [get-window Preferences] {
 }
 
 get-window Preferences | get-button Cancel | click
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
