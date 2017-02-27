@@ -82,7 +82,7 @@ public enum ConfigFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Missing excluded folder '%s'";
+            return "Missing excluded resource '%s'";
         }
     },
     JAVA_LIB_NOT_A_JAR_FILE {
