@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
@@ -42,7 +43,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
-        final RunCommandLine cmdLine = prepareCommandLineBuilder(robotConfig).enableDebug(false).build();
+        final RunCommandLine cmdLine = prepareCommandLine(robotConfig);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port");
         }
@@ -51,10 +52,10 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         final int port = cmdLine.getPort();
 
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
-        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter();
+        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
 
         try {
-            final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
+            AgentConnectionServerJob.setupServerAt(host, port)
                     .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
@@ -64,7 +65,6 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
                     .waitForServer();
 
             final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
-
             final String version = robotConfig.createExecutorVersion(runtimeEnvironment);
 
             final Process process = execProcess(cmdLine, robotConfig);

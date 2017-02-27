@@ -5,7 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -87,6 +92,11 @@ public class RemoteRobotLaunchConfiguration implements IRemoteRobotLaunchConfigu
             throw newCoreException("Project '" + projectName + "' cannot be found in workspace");
         }
         return project;
+    }
+
+    @Override
+    public List<IResource> getResourcesUnderDebug() throws CoreException {
+        return newArrayList(getProject());
     }
 
     @Override

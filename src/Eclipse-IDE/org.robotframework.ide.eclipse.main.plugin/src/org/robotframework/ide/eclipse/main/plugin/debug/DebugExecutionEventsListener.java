@@ -24,7 +24,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.RobotAgentEventListener;
+import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.Status;
 import org.rf.ide.core.execution.context.KeywordPosition;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
@@ -32,7 +32,6 @@ import org.rf.ide.core.execution.server.AgentClient;
 import org.rf.ide.core.execution.server.response.ContinueExecution;
 import org.rf.ide.core.execution.server.response.EvaluateCondition;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
-import org.rf.ide.core.execution.server.response.StartExecution;
 import org.rf.ide.core.execution.server.response.StopExecution;
 import org.rf.ide.core.testdata.RobotParser;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -44,7 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import com.google.common.base.Optional;
 
 
-public class DebugExecutionEventsListener implements RobotAgentEventListener {
+public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener {
 
     private AgentClient client;
 
@@ -58,22 +57,17 @@ public class DebugExecutionEventsListener implements RobotAgentEventListener {
 
     private boolean isBreakpointConditionFulfilled;
 
-    public DebugExecutionEventsListener(final RobotDebugTarget debugTarget, final List<IResource> suiteFilesToDebug,
-            final RobotDebugExecutionContext executionContext) {
+    public DebugExecutionEventsListener(final RobotDebugTarget debugTarget, final List<IResource> suiteFilesToDebug) {
         this.debugTarget = debugTarget;
 
-        this.executionContext = executionContext;
+        this.executionContext = new RobotDebugExecutionContext();
         this.keywordExecutionManager = new KeywordExecutionManager(suiteFilesToDebug);
     }
 
     @Override
     public void setClient(final AgentClient client) {
         this.client = client;
-    }
-
-    @Override
-    public boolean isHandlingEvents() {
-        return !debugTarget.isTerminated();
+        this.debugTarget.setClient(client);
     }
 
     public void terminated() {
@@ -81,22 +75,8 @@ public class DebugExecutionEventsListener implements RobotAgentEventListener {
     }
 
     @Override
-    public void handleAgentIsReadyToStart() {
-        try {
-            client.send(new StartExecution());
-        } catch (ResponseException | IOException e) {
-            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
-        }
-    }
-
-    @Override
-    public void handlePid() {
+    public void handleAgentInitializing() {
         debugTarget.started();
-    }
-
-    @Override
-    public void handleVersions(final String pythonVersion, final String robotVersion) {
-        // handle
     }
 
     @Override

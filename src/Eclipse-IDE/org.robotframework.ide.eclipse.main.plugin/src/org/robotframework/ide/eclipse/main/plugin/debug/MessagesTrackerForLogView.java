@@ -22,7 +22,7 @@ public class MessagesTrackerForLogView extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handlePid() {
+    public void handleAgentInitializing() {
         sendClearEventToMessageLogView();
     }
 
