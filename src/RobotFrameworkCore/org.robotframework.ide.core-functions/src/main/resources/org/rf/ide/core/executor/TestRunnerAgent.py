@@ -111,10 +111,12 @@ class TestRunnerAgent:
         self.decoder_encoder = None
         self._is_robot_paused = False
         
-        self._connect()
-        self._is_debug_enabled, wait_for_signal = self._send_agent_initializing()
-        self._send_version()
-        self._send_global_variables()
+        if self._connect():
+            self._is_debug_enabled, wait_for_signal = self._send_agent_initializing()
+            self._send_version()
+            self._send_global_variables()
+        else:
+            self._is_debug_enabled, wait_for_signal = False, False
         
         self._debugger = RobotDebugger(self._is_debug_enabled)
         self._create_kill_server()
@@ -400,11 +402,13 @@ class TestRunnerAgent:
             # IronPython does not return right object type if not binary mode
             self.filehandler = self.sock.makefile('wb')
             self.decoder_encoder = MessagesDecoderEncoder(self.filehandler)
+            return True
         except socket.error as e:
-            print('unable to open socket to "%s:%s" error: %s' % (self.host, self.port, str(e)))
+            print('TestRunnerAgent: unable to open socket to "%s:%s" error: %s' % (self.host, self.port, str(e)))
             self.sock = None
             self.filehandler = None
             self.decoder_encoder = None
+            return False
 
     def _send_to_server(self, name, *args):
         try:
