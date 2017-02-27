@@ -45,8 +45,6 @@ public class RunCommandLineCallBuilder {
 
         public IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
 
-        public IRunCommandLineBuilder enableDebug(final boolean shouldEnableDebug);
-
         public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun);
 
         public IRunCommandLineBuilder withProject(final File project);
@@ -80,8 +78,6 @@ public class RunCommandLineCallBuilder {
         private final List<String> additionalProjectsLocations = new ArrayList<>();
 
         private File project = null;
-
-        private boolean enableDebug = false;
 
         private boolean enableDryRun = false;
 
@@ -164,12 +160,6 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder enableDebug(final boolean shouldEnableDebug) {
-            this.enableDebug = shouldEnableDebug;
-            return this;
-        }
-
-        @Override
         public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun) {
             this.enableDryRun = shouldEnableDryRun;
             return this;
@@ -190,7 +180,6 @@ public class RunCommandLineCallBuilder {
 
         @Override
         public RunCommandLine build() throws IOException {
-            final String debugInfo = enableDebug ? "True" : "False";
             final int port = findFreePort();
             
             final List<String> cmdLine = new ArrayList<>();
@@ -217,8 +206,7 @@ public class RunCommandLineCallBuilder {
             cmdLine.addAll(tagsToInclude);
             cmdLine.addAll(tagsToExclude);
             cmdLine.add("--listener");
-            cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":"
-                    + debugInfo + (enableDryRun ? ":no_wait" : ""));
+            cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port);
             if (enableDryRun) {
                 cmdLine.add("--prerunmodifier");
                 cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("SuiteVisitorImportProxy.py").toPath().toString());

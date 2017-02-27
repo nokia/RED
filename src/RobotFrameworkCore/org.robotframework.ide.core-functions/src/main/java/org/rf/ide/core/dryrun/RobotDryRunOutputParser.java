@@ -14,12 +14,16 @@ import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.rf.ide.core.executor.ILineHandler;
+import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.TestsMode;
+import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.server.response.InitializeAgent;
+import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
 /**
  * @author mmarzec
  */
-public class RobotDryRunOutputParser implements ILineHandler {
+public class RobotDryRunOutputParser implements IAgentMessageHandler {
 
     private static final String MESSAGE_EVENT_NAME = "message";
 
@@ -39,20 +43,24 @@ public class RobotDryRunOutputParser implements ILineHandler {
 
     public RobotDryRunOutputParser() {
         this.mapper = new ObjectMapper();
-        this.eventMap = new HashMap<String, List<?>>();
+        this.eventMap = new HashMap<>();
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
-
-    @SuppressWarnings("unchecked")
     @Override
-    public void processLine(final String line) {
+    public void processMessage(final String line, final AgentClient client) {
         try {
             eventMap = mapper.readValue(line, new TypeReference<Map<String, List<?>>>() {
             });
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        if (eventMap.containsKey(LIBRARY_IMPORT_EVENT_NAME)) {
+        if (eventMap.containsKey("agent_initializing")) {
+            try {
+                client.send(new InitializeAgent(TestsMode.RUN, false));
+            } catch (ResponseException | IOException e) {
+                throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+            }
+        } else if (eventMap.containsKey(LIBRARY_IMPORT_EVENT_NAME)) {
             final List<?> libraryImportList = eventMap.get(LIBRARY_IMPORT_EVENT_NAME);
             final Map<String, Object> details = (Map<String, Object>) libraryImportList.get(1);
             String libraryName = (String) libraryImportList.get(0);
@@ -98,7 +106,7 @@ public class RobotDryRunOutputParser implements ILineHandler {
 
     public List<RobotDryRunLibraryImport> getImportedLibraries() {
         return dryRunLibraryImportCollector != null ? dryRunLibraryImportCollector.getImportedLibraries()
-                : new ArrayList<RobotDryRunLibraryImport>();
+                : new ArrayList<>();
     }
 
     public void setStartSuiteHandler(final IDryRunStartSuiteHandler startSuiteHandler) {

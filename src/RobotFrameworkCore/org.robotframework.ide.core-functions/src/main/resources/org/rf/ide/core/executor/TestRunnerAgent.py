@@ -41,12 +41,7 @@
 #
 
 
-'''A Robot Framework listener that sends information to a socket
-
-This uses a custom streamhandler module, preferring json but sending either
-json or pickle to send objects to the listening server. It should probably be
-refactored to call an XMLRPC server.
-'''
+'''A Robot Framework listener that sends information to a socket'''
 
 import os
 import sys
@@ -54,6 +49,7 @@ import socket
 import threading
 import inspect
 import copy
+import json
 
 if sys.version_info < (3, 0, 0):
     import SocketServer as socketserver
@@ -62,39 +58,6 @@ else:
 
 from robot.running.signalhandler import STOP_SIGNAL_MONITOR
 from robot.errors import ExecutionFailed
-
-if sys.version_info > (2, 6, 0):
-    import json
-
-    _JSONAVAIL = True
-else:
-    try:
-        import simplejson as json
-
-        _JSONAVAIL = True
-    except ImportError:
-        _JSONAVAIL = False
-
-if not _JSONAVAIL:
-    try:
-        import com.xhaus.jyson.JysonCodec as json
-
-        _JSONAVAIL = True
-    except ImportError:
-        _JSONAVAIL = False
-
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle as pickle
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    if sys.version_info < (3, 0, 0):
-        from StringIO import StringIO
-    else:
-        from io import StringIO
 
 try:
     # RF 2.7.5
@@ -123,7 +86,6 @@ except ImportError:
 # Setting Output encoding to UTF-8 and ignoring the platform specs
 # RIDE will expect UTF-8
 import robot.utils.encoding
-
 # Set output encoding to UTF-8 for piped output streams
 robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 # RF 2.6.3 and RF 2.5.7
@@ -137,36 +99,32 @@ class TestRunnerAgent:
     If called with two, the first is a hostname, the second is a port
     """
     ROBOT_LISTENER_API_VERSION = 2
-
+    RED_AGENT_PROTOCOL_VERSION = 1
+    MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
 
     def __init__(self, *args):
+        self.host = args[1] if len(args) > 1 else 'localhost'
         self.port = int(args[0])
-        self.MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
-        self.host = args[2] if len(args) >= 3 and args[2].lower() != 'no_wait' else 'localhost'
+        
         self.sock = None
         self.filehandler = None
-        self.streamhandler = None
+        self.decoder_encoder = None
+        self._is_robot_paused = False
+        
         self._connect()
-        self._send_pid()
+        self._is_debug_enabled, wait_for_signal = self._send_agent_initializing()
         self._send_version()
         self._send_global_variables()
-        self._create_debugger(args[1].lower() == 'true')
-        self._create_kill_server()
-        self._is_robot_paused = False
-        self._is_debug_enabled = (args[1].lower() == 'true')        
-        self._wait_for_requestor(*args)
-
-    def _wait_for_requestor(self, *args):
-        if len(args) >= 3 and args[2].lower() == 'no_wait' or len(args) >= 4 and args[3].lower() == 'no_wait':
-            return 
         
-        self._send_socket('ready_to_start')
-        data = ''
-        while data != 'do_start':
-            data = self.sock.recv(4096).decode('utf-8')
+        self._debugger = RobotDebugger(self._is_debug_enabled)
+        self._create_kill_server()
+        
+        self._wait_for_requestor(wait_for_signal)
 
-    def _create_debugger(self, pause_on_failure):
-        self._debugger = RobotDebugger(pause_on_failure)
+    def _wait_for_requestor(self, wait_for_signal):
+        if wait_for_signal:
+            self._send_to_server('ready_to_start')
+            response = self._wait_for_reponse('do_start')
 
     def _create_kill_server(self):
         self._killer = RobotKillerServer(self._debugger)
@@ -176,15 +134,20 @@ class TestRunnerAgent:
         self._server_thread.start()
         self._send_server_port(self._killer.server_address[1])
 
-    def _send_pid(self):
-        self._send_socket("start_agent", "")
-        self._send_socket("pid", os.getpid())
+    def _send_agent_initializing(self):
+        self._send_to_server('agent_initializing', '')
+        return self._receive_operating_mode()
+        
+    def _receive_operating_mode(self):
+        response = self._wait_for_reponse('operating_mode')
+        operating_mode = response['operating_mode']
+        return operating_mode['mode'].lower() == 'debug', operating_mode['wait_for_start_allowance']
         
     def _send_version(self):
         from robot import version
-        robot_version = "Robot Framework " + version.get_full_version()
-        versions = {"python" : sys.version, "robot" : robot_version}
-        self._send_socket("version", versions)
+        robot_version = 'Robot Framework ' + version.get_full_version()
+        info = {'python' : sys.version, 'robot' : robot_version, 'protocol' : self.RED_AGENT_PROTOCOL_VERSION}
+        self._send_to_server('version', info)
         
     def _send_global_variables(self):
         variables = {}
@@ -204,55 +167,47 @@ class TestRunnerAgent:
                 else:
                     key = k
                 data[key] = str(variables[k])
-            self._send_socket('global_vars', 'global_vars', data)
+            self._send_to_server('global_vars', 'global_vars', data)
         except Exception as e:
             self.print_error_message(
                 'Global variables sending error: ' + str(e) + ' Global variables: ' + str(variables))
 
     def _send_server_port(self, port):
-        self._send_socket("port", port)
+        self._send_to_server('port', port)
 
     def start_test(self, name, attrs):
-        self._send_socket("start_test", name, attrs)
+        self._send_to_server('start_test', name, attrs)
 
     def end_test(self, name, attrs):
-        self._send_socket("end_test", name, attrs)
+        self._send_to_server('end_test', name, attrs)
 
     def start_suite(self, name, attrs):
-        self._send_socket("start_suite", name, attrs)
+        self._send_to_server('start_suite', name, attrs)
 
     def end_suite(self, name, attrs):
-        self._send_socket("end_suite", name, attrs)
+        self._send_to_server('end_suite', name, attrs)
 
     def start_keyword(self, name, attrs):
         attrs_copy = copy.copy(attrs)
         attrs_copy['args'] = list()
-        self._send_socket("start_keyword", name, attrs_copy)
+        self._send_to_server('start_keyword', name, attrs_copy)
         if self._is_debug_enabled:
             self._send_vars()
         self._is_robot_paused = False
-        # if self._debugger.is_breakpoint(name, attrs_copy):
         if self._is_debug_enabled:
             if self._check_breakpoint():
                 self._is_robot_paused = True
-                # self._debugger.pause()
-        # self._wait_for_breakpoint_unlock()
-        # paused = self._debugger.is_paused()
         if self._is_robot_paused:
-            self._send_socket('paused')
+            self._send_to_server('paused')
             self._wait_for_resume()
-            # self._debugger.start_keyword()
-            # if paused:
-            #    self._send_socket('continue')
 
     def _wait_for_resume(self):
-        data = ''
-        while data != 'resume' and data != 'interrupt':
-            data = self.sock.recv(4096).decode('utf-8')
-            if self._is_debug_enabled and data != 'resume' and data != 'interrupt':
-                self._check_changed_variable(data)
-        if data == 'interrupt':
+        response = self._wait_for_reponse('resume', 'interrupt', 'variable_change')
+        
+        if response.keys()[0] == 'interrupt':
             sys.exit()
+        elif response.keys()[0] == 'variable_change':
+            self._check_changed_variable(response)
         self._debugger.resume()
 
     def _send_vars(self):
@@ -271,7 +226,7 @@ class TestRunnerAgent:
                             data[k] = str(self.fix_unicode(value))
                     except:
                         data[k] = 'None'
-            self._send_socket('vars', 'vars', data)
+            self._send_to_server('vars', 'vars', data)
         except Exception as e:
             self.print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
 
@@ -307,79 +262,72 @@ class TestRunnerAgent:
 
     def _check_breakpoint(self):
         data = ''
-        self._send_socket('check_condition')
-        while data != 'stop' and data != 'continue' and data != 'interrupt':
-            data = self.sock.recv(4096).decode('utf-8')
-            if data != 'stop' and data != 'continue' and data != 'interrupt':
-                self._run_condition_keyword(data)
-        if data == 'stop':
+        self._send_to_server('check_condition')
+        response = self._wait_for_reponse('stop', 'continue', 'interrupt', 'keyword_condition')
+        if response.keys()[0] == 'stop':
             return True
-        if data == 'continue':
+        elif response.keys()[0] == 'continue':
             return False
-        if data == 'interrupt':
+        elif response.keys()[0] == 'interrupt':
             sys.exit()
+        elif response.keys()[0] == 'keyword_condition':
+            self._run_condition_keyword(data)
 
-    def _run_condition_keyword(self, data):
-        if _JSONAVAIL:
-            json_decoder = json.JSONDecoder(strict=False).decode
-            try:
-                condition = json_decoder(data)
-                elements = condition['keyword_condition']
-                keywordName, argList = elements[0], elements[1:]
-                
-                from robot.libraries.BuiltIn import BuiltIn
-                result = BuiltIn().run_keyword_and_return_status(keywordName, *argList)
-                
-                self._send_socket('condition_result', result)
-            except Exception as e:
-                self._send_socket('condition_error', str(e))
-        self._send_socket('condition_checked')
+    def _run_condition_keyword(self, condition):
+        try:
+            elements = condition['keyword_condition']
+            keywordName, argList = elements[0], elements[1:]
+            
+            from robot.libraries.BuiltIn import BuiltIn
+            result = BuiltIn().run_keyword_and_return_status(keywordName, *argList)
+            
+            self._send_to_server('condition_result', result)
+        except Exception as e:
+            self._send_to_server('condition_error', str(e))
 
     def _check_changed_variable(self, data):
-        if _JSONAVAIL:
-            json_decoder = json.JSONDecoder(strict=False).decode
-            try:
-                js = json_decoder(data)['variable_change']
-                from robot.libraries.BuiltIn import BuiltIn
-                vars = BuiltIn().get_variables()
-                for key in js.keys():
-                    if key in vars:
-                        if len(js[key]) > 1:
-                            from robot.libraries.Collections import Collections
-                            if len(js[key]) == 2:
-                                if isinstance(vars[key], dict):
-                                    Collections().set_to_dictionary(vars[key], js[key][0], js[key][1])
-                                else:
-                                    Collections().set_list_value(vars[key], js[key][0], js[key][1])
+        try:
+            js = data['variable_change']
+            from robot.libraries.BuiltIn import BuiltIn
+            vars = BuiltIn().get_variables()
+            for key in js.keys():
+                if key in vars:
+                    if len(js[key]) > 1:
+                        from robot.libraries.Collections import Collections
+                        if len(js[key]) == 2:
+                            if isinstance(vars[key], dict):
+                                Collections().set_to_dictionary(vars[key], js[key][0], js[key][1])
                             else:
-                                nestedList = vars[key]
-                                newValue = ''
-                                newValueIndex = 0
-                                indexList = 1
-                                for value in js[key]:
-                                    if indexList < (len(js[key]) - 1):
-                                        nestedList = Collections().get_from_list(nestedList, int(value))
-                                        indexList = indexList + 1
-                                    elif indexList == (len(js[key]) - 1):
-                                        newValueIndex = int(value)
-                                        indexList = indexList + 1
-                                    elif indexList == len(js[key]):
-                                        newValue = value
-                                Collections().set_list_value(nestedList, newValueIndex, newValue)
+                                Collections().set_list_value(vars[key], js[key][0], js[key][1])
                         else:
-                            BuiltIn().set_test_variable(key, js[key][0])
-            except Exception as e:
-                self.print_error_message('Setting variables error: ' + str(e) + ' Received data:' + str(data))
-                pass
+                            nestedList = vars[key]
+                            newValue = ''
+                            newValueIndex = 0
+                            indexList = 1
+                            for value in js[key]:
+                                if indexList < (len(js[key]) - 1):
+                                    nestedList = Collections().get_from_list(nestedList, int(value))
+                                    indexList = indexList + 1
+                                elif indexList == (len(js[key]) - 1):
+                                    newValueIndex = int(value)
+                                    indexList = indexList + 1
+                                elif indexList == len(js[key]):
+                                    newValue = value
+                            Collections().set_list_value(nestedList, newValueIndex, newValue)
+                    else:
+                        BuiltIn().set_test_variable(key, js[key][0])
+        except Exception as e:
+            self.print_error_message('Setting variables error: ' + str(e) + ' Received data:' + str(data))
+            pass
 
     def end_keyword(self, name, attrs):
         attrs_copy = copy.copy(attrs)
         attrs_copy['args'] = list()
-        self._send_socket("end_keyword", name, attrs_copy)
+        self._send_to_server('end_keyword', name, attrs_copy)
         self._debugger.end_keyword(attrs['status'] == 'PASS')
 
     def resource_import(self, name, attributes):
-        self._send_socket("resource_import", name, attributes)
+        self._send_to_server('resource_import', name, attributes)
 
     def library_import(self, name, attributes):
         # equals org.python.core.ClasspathPyImporter.PYCLASSPATH_PREFIX
@@ -408,26 +356,26 @@ class TestRunnerAgent:
                     f = File(URL(path).getFile())
                     source_uri_txt = f.getAbsolutePath()
                 attributes['source'] = source_uri_txt
-        self._send_socket("library_import", name, attributes)
+        self._send_to_server('library_import', name, attributes)
 
     def message(self, message):
         if message['level'] in ('ERROR', 'FAIL', 'NONE'):
-            self._send_socket("message", message)
+            self._send_to_server('message', message)
 
     def log_message(self, message):
         if _is_logged(message['level']):
             if len(message['message']) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
                 message['message'] = message['message'][:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
-            self._send_socket("log_message", message)
+            self._send_to_server('log_message', message)
 
     def log_file(self, path):
-        self._send_socket("log_file", path)
+        self._send_to_server('log_file', path)
 
     def output_file(self, path):
-        self._send_socket("output_file", path)
+        self._send_to_server('output_file', path)
 
     def report_file(self, path):
-        self._send_socket("report_file", path)
+        self._send_to_server('report_file', path)
 
     def summary_file(self, path):
         pass
@@ -436,7 +384,7 @@ class TestRunnerAgent:
         pass
 
     def close(self):
-        self._send_socket("close")
+        self._send_to_server('close')
         if self.sock:
             self.filehandler.close()
             self.sock.close()
@@ -449,27 +397,63 @@ class TestRunnerAgent:
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((self.host, self.port))
-            # Iron python does not return right object type if not binary mode
+            # IronPython does not return right object type if not binary mode
             self.filehandler = self.sock.makefile('wb')
-            self.streamhandler = StreamHandler(self.filehandler)
+            self.decoder_encoder = MessagesDecoderEncoder(self.filehandler)
         except socket.error as e:
-            print('unable to open socket to "%s:%s" error: %s'
-                  % (self.host, self.port, str(e)))
+            print('unable to open socket to "%s:%s" error: %s' % (self.host, self.port, str(e)))
             self.sock = None
             self.filehandler = None
+            self.decoder_encoder = None
 
-    def _send_socket(self, name, *args):
+    def _send_to_server(self, name, *args):
         try:
             if self.filehandler:
                 packet = {name: args}
-                self.streamhandler.dump(packet)
-                self.filehandler.flush()
+                self.decoder_encoder.dump(packet)
         except Exception:
             import traceback
 
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
             raise
+        
+    def _wait_for_reponse(self, *args):
+        response = self._receive_from_server()
+        while not response.keys()[0] in args:
+            response = self._receive_from_server()
+        return response
+    
+    def _receive_from_server(self):
+        try:
+            if self.filehandler:
+                return self.decoder_encoder.load()
+        except Exception:
+            import traceback
+
+            traceback.print_exc(file=sys.stdout)
+            sys.stdout.flush()
+            raise
+
+
+class MessagesDecoderEncoder(object):
+    
+    def __init__(self, filehandler):
+        self._json_encoder = json.JSONEncoder(separators=(',', ':'), sort_keys=True).encode
+        self._json_decoder = json.JSONDecoder(strict=False).decode
+        self._filehandler = filehandler
+
+    def dump(self, obj):
+        json_string = self._json_encoder(obj) + '\n'
+        if sys.version_info < (3, 0, 0):
+            self._filehandler.write(json_string)
+        else:
+            self._filehandler.write(bytes(json_string, 'UTF-8'))
+        self._filehandler.flush()
+            
+    def load(self):
+        json_string = self._filehandler.readline();
+        return self._json_decoder(json_string)
 
 
 class RobotDebugger(object):
@@ -523,13 +507,13 @@ class RobotDebugger(object):
 
     def is_paused(self):
         return self._state == 'pause'
-
+        
 
 class RobotKillerServer(socketserver.TCPServer):
     allow_reuse_address = True
 
     def __init__(self, debugger):
-        socketserver.TCPServer.__init__(self, ("", 0), RobotKillerHandler)
+        socketserver.TCPServer.__init__(self, ('', 0), RobotKillerHandler)
         self.debugger = debugger
 
 
@@ -557,194 +541,3 @@ class RobotKillerHandler(socketserver.StreamRequestHandler):
             STOP_SIGNAL_MONITOR(1, '')
         except ExecutionFailed:
             pass
-
-
-# NOTE: Moved to bottom of TestRunnerAgent per feedback in pull request,
-#       so jybot doesn't encounter issues. Special imports at top of file.
-class StreamError(Exception):
-    """
-    Base class for EncodeError and DecodeError
-    """
-    pass
-
-
-class EncodeError(StreamError):
-    """
-    This exception is raised when an unencodable object is passed to the
-    dump() method or function.
-    """
-    wrapped_exceptions = (pickle.PicklingError,)
-
-
-class DecodeError(StreamError):
-    """
-    This exception is raised when there is a problem decoding an object,
-    such as a security violation.
-
-    Note that other exceptions may also be raised during decoding, including
-    AttributeError, EOFError, ImportError, and IndexError.
-    """
-    # NOTE: No JSONDecodeError in json in stdlib for python >= 2.6
-    wrapped_exceptions = (pickle.UnpicklingError,)
-    if _JSONAVAIL:
-        if hasattr(json, 'JSONDecodeError'):
-            wrapped_exceptions = (pickle.UnpicklingError, json.JSONDecodeError)
-
-
-def dump(obj, fp):
-    StreamHandler(fp).dump(obj)
-
-
-def load(fp):
-    return StreamHandler(fp).load()
-
-
-def dumps(obj):
-    """
-    Similar method to json dumps, prepending data with message length
-    header. Replaces pickle.dumps, so can be used in place without
-    the memory leaks on receiving side in pickle.loads (related to
-    memoization of data)
-    
-    NOTE: Protocol is ignored when json representation is used
-    """
-    fp = StringIO()
-    StreamHandler(fp).dump(obj)
-    return fp.getvalue()
-
-
-def loads(s):
-    """
-    Reads in json message or pickle message prepended with message length
-    header from a string. Message is expected to be encoded by this class as
-    well, to have same message length header type.
-    
-    Specifically replaces pickle.loads as that function/method has serious
-    memory leak issues with long term use of same Unpickler object for
-    encoding data to send, specifically related to memoization of data to
-    encode.
-    """
-    fp = StringIO(s)
-    return StreamHandler(fp).load()
-
-
-class StreamHandler(object):
-    '''
-    This class provides a common streaming approach for the purpose
-    of reliably sending data over a socket interface. Replaces usage of
-    Unpickler.load where possible with JSON format prepended by message length
-    header. Uses json in python stdlib (in python >= 2.6) or simplejson (in
-    python < 2.6). If neither are available, falls back to pickle.Pickler and
-    pickle.Unpickler, attempting to eliminate memory leakage where possible at
-    the expense of CPU usage (by not re-using Pickler or Unpickler objects).
-    
-    NOTE: StreamHandler currently assumes that same python version is installed
-    on both sides of reading/writing (or simplejson is loaded in case of one
-    side or other using python < 2.6). This could be resolved by requiring an
-    initial header with json vs pickle determination from the writing side, but
-    would considerably complicate the protocol(s) further (handshake would need
-    to occur at least, and assumes encoding is used over a socket, etc.)
-    
-    json.raw_decode could be used rather than prepending with a message header
-    in theory (assuming json is available), but performance of repeatedly
-    failing to parse written data would make this an unworkable solution in
-    many cases.
-    '''
-    loads = staticmethod(loads)
-    dumps = staticmethod(dumps)
-
-    def __init__(self, fp):
-        """
-        Stream handler that encodes objects as either JSON (if available) with
-        message length header prepended for sending over a socket, or as a
-        pickled object if using python < 2.6 and simplejson is not installed.
-        
-        Since pickle.load has memory leak issues with memoization (remembers
-        absolutely everything decoded since instantiation), json is a preferred
-        method to encode/decode for long running processes which pass large
-        amounts of data back and forth.
-        """
-        if _JSONAVAIL:
-            self._json_encoder = json.JSONEncoder(separators=(',', ':'),
-                                                  sort_keys=True).encode
-            self._json_decoder = json.JSONDecoder(strict=False).decode
-        else:
-            def json_not_impl(dummy):
-                raise NotImplementedError(
-                        'Python version < 2.6 and simplejson not installed. Please'
-                        ' install simplejson.')
-
-            self._json_decoder = staticmethod(json_not_impl)
-            self._json_encoder = staticmethod(json_not_impl)
-        self.fp = fp
-
-    def dump(self, obj):
-        """
-        Similar method to json dump, prepending data with message length
-        header. Replaces pickle.dump, so can be used in place without
-        the memory leaks on receiving side in pickle.load (related to
-        memoization of data)
-        
-        NOTE: Protocol is ignored when json representation is used
-        """
-        # NOTE: Slightly less efficient than doing iterencode directly into the
-        #       fp, however difference is negligable and reduces complexity of
-        #       of the StreamHandler class (treating pickle and json the same)
-        write_list = []
-        if _JSONAVAIL:
-            s = self._json_encoder(obj)
-            write_list.append(s)
-            write_list.append('\n')
-        else:
-            write_list.append('P')
-            s = pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)
-            write_list.extend([str(len(s)), '|', s])
-        if sys.version_info < (3, 0, 0):
-            self.fp.write(''.join(write_list))
-        else:
-            self.fp.write(bytes(''.join(write_list), 'UTF-8'))
-            # self.fp.flush()
-
-
-def load(self):
-    """
-        Reads in json message prepended with message length header from a file
-        (or socket, or other .read() enabled object). Message is expected to be
-        encoded by this class as well, to have same message length header type.
-        
-        Specifically replaces pickle.load as that function/method has serious
-        memory leak issues with long term use of same Unpickler object for
-        encoding data to send, specifically related to memoization of data to
-        encode.
-        """
-    header = self._load_header()
-    msgtype = header[0]
-    msglen = header[1:]
-    if not msglen.isdigit():
-        raise DecodeError('Message header not valid: %r' % header)
-    msglen = int(msglen)
-    buff = StringIO()
-    # Don't use StringIO.len for sizing, reports string len not bytes
-    buff.write(self.fp.read(msglen))
-    try:
-        if msgtype == 'J':
-            return self._json_decoder(buff.getvalue())
-        elif msgtype == 'P':
-            return pickle.loads(buff.getvalue())
-        else:
-            raise DecodeError("Message type %r not supported" % msgtype)
-    except DecodeError.wrapped_exceptions as e:
-        raise DecodeError(str(e))
-
-
-def _load_header(self):
-    """
-        Load in just the header bit from a socket/file pointer
-        """
-    buff = StringIO()
-    while len(buff.getvalue()) == 0 or buff.getvalue()[-1] != '|':
-        recv_char = self.fp.read(1)
-        if not recv_char:
-            raise EOFError('File/Socket closed while reading load header')
-        buff.write(recv_char)
-    return buff.getvalue()[:-1]

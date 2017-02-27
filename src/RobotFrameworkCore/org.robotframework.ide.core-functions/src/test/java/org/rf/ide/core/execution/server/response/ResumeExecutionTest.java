@@ -12,7 +12,7 @@ import org.junit.Test;
 public class ResumeExecutionTest {
 
     @Test
-    public void properRequestIsConstructed_forResumeExecutionMessage() {
-        assertThat(new ResumeExecution().toMessage()).isEqualTo("resume");
+    public void properMessageIsConstructed_forResumeExecutionMessage() {
+        assertThat(new ResumeExecution().toMessage()).isEqualTo("{\"resume\":[]}");
     }
 }

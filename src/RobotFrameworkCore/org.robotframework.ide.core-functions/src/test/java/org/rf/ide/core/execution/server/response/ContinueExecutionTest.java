@@ -12,7 +12,7 @@ import org.junit.Test;
 public class ContinueExecutionTest {
 
     @Test
-    public void properRequestIsConstructed_forContinueExecutionMessage() {
-        assertThat(new ContinueExecution().toMessage()).isEqualTo("continue");
+    public void properMessageIsConstructed_forContinueExecutionMessage() {
+        assertThat(new ContinueExecution().toMessage()).isEqualTo("{\"continue\":[]}");
     }
 }

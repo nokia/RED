@@ -12,7 +12,7 @@ import org.junit.Test;
 public class StartExecutionTest {
 
     @Test
-    public void properRequestIsConstructed_forStartExecutionMessage() {
-        assertThat(new StartExecution().toMessage()).isEqualTo("do_start");
+    public void properMessageIsConstructed_forStartExecutionMessage() {
+        assertThat(new StartExecution().toMessage()).isEqualTo("{\"do_start\":[]}");
     }
 }
