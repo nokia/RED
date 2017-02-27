@@ -5,8 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -27,6 +29,8 @@ public interface IRobotLaunchConfiguration {
     void setProjectName(String projectName) throws CoreException;
 
     RobotProject getRobotProject() throws CoreException;
+
+    List<IResource> getResourcesUnderDebug() throws CoreException;
 
     public static boolean lockConfigurationLaunches() {
         return IS_CONFIGURATION_RUNNING.getAndSet(true);

@@ -65,7 +65,7 @@ public abstract class RobotLaunchInMode {
         return runtimeEnvironment;
     }
 
-    protected final IRunCommandLineBuilder prepareCommandLineBuilder(final RobotLaunchConfiguration robotConfig)
+    protected final RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig)
             throws CoreException, IOException {
 
         final RobotProject robotProject = robotConfig.getRobotProject();
@@ -91,7 +91,7 @@ public abstract class RobotLaunchInMode {
         if (robotConfig.isExcludeTagsEnabled()) {
             builder.excludeTags(robotConfig.getExcludedTags());
         }
-        return builder;
+        return builder.build();
     }
 
     protected final CoreException newCoreException(final String message) {

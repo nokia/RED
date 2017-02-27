@@ -25,10 +25,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.dryrun.IAgentMessageHandler;
 import org.rf.ide.core.dryrun.IDryRunStartSuiteHandler;
 import org.rf.ide.core.dryrun.RobotDryRunHandler;
 import org.rf.ide.core.dryrun.RobotDryRunOutputParser;
-import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -138,8 +138,7 @@ public abstract class AbstractAutoDiscoverer {
             });
 
             final int port = dryRunCommandLine.getPort();
-            final List<ILineHandler> listeners = newArrayList();
-            listeners.add(dryRunOutputParser);
+            final List<IAgentMessageHandler> listeners = newArrayList(dryRunOutputParser);
             final Thread handlerThread = dryRunHandler.createDryRunHandlerThread(port, listeners);
             handlerThread.start();
             dryRunHandler.executeDryRunProcess(dryRunCommandLine, getProjectLocationFile());

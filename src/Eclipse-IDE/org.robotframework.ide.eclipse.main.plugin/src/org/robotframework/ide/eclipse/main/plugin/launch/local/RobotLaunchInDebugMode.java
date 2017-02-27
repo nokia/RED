@@ -6,15 +6,23 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.rf.ide.core.execution.TestsMode;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
+import org.rf.ide.core.execution.server.AgentServerKeepAlive;
+import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.robotframework.ide.eclipse.main.plugin.debug.DebugExecutionEventsListener;
+import org.robotframework.ide.eclipse.main.plugin.debug.ExecutionTrackerForExecutionView;
+import org.robotframework.ide.eclipse.main.plugin.debug.MessagesTrackerForLogView;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
+import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
@@ -37,35 +45,48 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
         final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
-        final RunCommandLine cmdLine = prepareCommandLineBuilder(robotConfig).enableDebug(true).build();
+        final RunCommandLine cmdLine = prepareCommandLine(robotConfig);
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port");
         }
+        
+        final String host = "127.0.0.1";
+        final int port = cmdLine.getPort();
 
+        final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
+        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.DEBUG);
 
-        final DebugSocketManager socketManager = new DebugSocketManager("localhost", cmdLine.getPort());
-        new Thread(socketManager).start();
-        socketManager.waitForDebugServerSocket();
-
-        final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
-        final String version = robotConfig.createExecutorVersion(runtimeEnvironment);
-
-        final Process process = execProcess(cmdLine, robotConfig);
-        final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
-
-        final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
-        redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
-        redConsole.writeLine("Command: " + cmdLine.show());
-        redConsole.writeLine("Suite Executor: " + version);
+        final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot test at " + host + ":" + port, launch);
 
         try {
-            final RobotDebugTarget target = new RobotDebugTarget(launch, robotProcess);
-            target.connect(robotConfig.getResourcesUnderDebug(), robotEventBroker, socketManager);
-            launch.addDebugTarget(target);
-        } catch (final CoreException e) {
-            socketManager.closeServerSocket();
-        }
+            AgentConnectionServerJob.setupServerAt(host, port)
+                    .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
+                    .agentEventsListenedBy(keepAliveListener)
+                    .agentEventsListenedBy(testsStarter)
+                    .agentEventsListenedBy(
+                            new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
+                    .agentEventsListenedBy(new MessagesTrackerForLogView())
+                    .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
+                    .start()
+                    .waitForServer();
 
-        return process;
+            final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
+            final String version = robotConfig.createExecutorVersion(runtimeEnvironment);
+
+            final Process process = execProcess(cmdLine, robotConfig);
+            final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
+
+            final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
+            redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
+            redConsole.writeLine("Command: " + cmdLine.show());
+            redConsole.writeLine("Suite Executor: " + version);
+
+            debugTarget.connectWith(robotProcess);
+
+            testsStarter.allowClientTestsStart();
+            return process;
+        } catch (final InterruptedException e) {
+            throw newCoreException("Interrupted when waiting for remote connection server", e);
+        }
     }
 }
