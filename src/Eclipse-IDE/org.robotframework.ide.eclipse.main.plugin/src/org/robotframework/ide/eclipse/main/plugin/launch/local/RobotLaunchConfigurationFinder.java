@@ -18,6 +18,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
 
 public class RobotLaunchConfigurationFinder {
 
@@ -64,8 +65,8 @@ public class RobotLaunchConfigurationFinder {
         final ILaunchConfigurationType launchConfigurationType = launchManager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
-        final String configurationName = RobotLaunchConfiguration.getLaunchConfigurationNamePrefix(resources,
-                RobotLaunchConfiguration.SELECTED_TEST_CASES_SUFFIX);
+        final String configurationName = RobotLaunchConfigurationNaming.getNamePrefix(resources,
+                RobotLaunchConfigurationNaming.SELECTED_TEST_CASES_SUFFIX);
         final String projectName = resources.get(0).getProject().getName();
         for (final ILaunchConfiguration configuration : launchConfigs) {
             if (configuration.getName().equals(configurationName)
@@ -139,11 +140,28 @@ public class RobotLaunchConfigurationFinder {
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
         for (final ILaunchConfiguration config : launchConfigs) {
-            if (RobotLaunchConfiguration.contentEquals(configuration, config)) {
+            if (contentEquals(configuration, config)) {
                 return asWorkingCopy(config);
             }
         }
         return null;
+    }
+
+    private static boolean contentEquals(final ILaunchConfiguration config1, final ILaunchConfiguration config2)
+            throws CoreException {
+        final RobotLaunchConfiguration rConfig1 = new RobotLaunchConfiguration(config1);
+        final RobotLaunchConfiguration rConfig2 = new RobotLaunchConfiguration(config2);
+        return rConfig1.getExecutor().equals(rConfig2.getExecutor())
+                && rConfig1.getExecutorArguments().equals(rConfig2.getExecutorArguments())
+                && rConfig1.getProjectName().equals(rConfig2.getProjectName())
+                && rConfig1.isUsingInterpreterFromProject() == rConfig2.isUsingInterpreterFromProject()
+                && rConfig1.getInterpreterArguments().equals(rConfig2.getInterpreterArguments())
+                && rConfig1.isExcludeTagsEnabled() == rConfig2.isExcludeTagsEnabled()
+                && rConfig1.isIncludeTagsEnabled() == rConfig2.isIncludeTagsEnabled()
+                && rConfig1.isGeneralPurposeConfiguration() == rConfig2.isGeneralPurposeConfiguration()
+                && rConfig1.getExcludedTags().equals(rConfig2.getExcludedTags())
+                && rConfig1.getIncludedTags().equals(rConfig2.getIncludedTags())
+                && rConfig1.getSuitePaths().equals(rConfig2.getSuitePaths());
     }
 
     private static ILaunchConfigurationWorkingCopy asWorkingCopy(final ILaunchConfiguration config) {
