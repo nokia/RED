@@ -73,12 +73,6 @@ public class LibraryAliasRecognizerTest {
         final StringBuilder text = new StringBuilder("WITH NAMEC");
 
         assertThat(rec.hasNext(text, 1, 0)).isFalse();
-        // final RobotToken token = rec.next();
-        // assertThat(token.getStartColumn()).isEqualTo(0);
-        // assertThat(token.getLineNumber()).isEqualTo(1);
-        // assertThat(token.getEndColumn()).isEqualTo(text.length());
-        // assertThat(token.getText().toString()).isEqualTo(text.toString());
-        // assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
     @Test
