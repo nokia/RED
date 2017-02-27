@@ -70,7 +70,7 @@ public abstract class ATokenRecognizer {
     }
 
     public static String createUpperLowerCaseWordWithSpacesInside(final String text) {
-        return createUpperLowerCaseWordWithPatternBetweenLetters(text, "([\\s]+)?");
+        return createUpperLowerCaseWordWithPatternBetweenLetters(text, "[\\s]*");
     }
 
     public static String createUpperLowerCaseWord(final String text) {
@@ -96,7 +96,7 @@ public abstract class ATokenRecognizer {
                 str.append(']');
 
                 if (patternBetweenChars != null && i + 1 < size) {
-                    str.append("([\\s]+)?");
+                    str.append(patternBetweenChars);
                 }
             }
         }
