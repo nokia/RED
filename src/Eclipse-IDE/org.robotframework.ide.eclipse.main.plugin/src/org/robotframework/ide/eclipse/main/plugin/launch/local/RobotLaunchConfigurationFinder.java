@@ -19,6 +19,7 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;;
 
 public class RobotLaunchConfigurationFinder {
 
@@ -66,7 +67,7 @@ public class RobotLaunchConfigurationFinder {
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
         final String configurationName = RobotLaunchConfigurationNaming.getNamePrefix(resources,
-                RobotLaunchConfigurationNaming.SELECTED_TEST_CASES_SUFFIX);
+                RobotLaunchConfigurationType.SELECTED_TEST_CASES);
         final String projectName = resources.get(0).getProject().getName();
         for (final ILaunchConfiguration configuration : launchConfigs) {
             if (configuration.getName().equals(configurationName)

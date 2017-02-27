@@ -5,19 +5,32 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.script;
 
+import static com.google.common.collect.Iterables.getFirst;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.AbstractTaggedSuitesRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 
-public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfiguration
+public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLaunchConfiguration
         implements IRemoteRobotLaunchConfiguration {
 
     public static final String TYPE_ID = "org.robotframework.ide.scriptRobotLaunchConfiguration";
@@ -35,6 +48,42 @@ public class ScriptRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     public static String getSystemDependentScriptRunCommand() {
         return RedSystemProperties.isWindowsPlatform() ? "cmd /c start" : "";
+    }
+
+    static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
+        final Map<IResource, List<String>> suitesMapping = new HashMap<>();
+        for (final IResource resource : resources) {
+            suitesMapping.put(resource, new ArrayList<String>());
+        }
+        return prepareCopy(suitesMapping, RobotLaunchConfigurationType.GENERAL_PURPOSE);
+    }
+
+    static ILaunchConfigurationWorkingCopy prepareForSelectedTestCases(final Map<IResource, List<String>> suitesMapping)
+            throws CoreException {
+        return prepareCopy(suitesMapping, RobotLaunchConfigurationType.SELECTED_TEST_CASES);
+    }
+
+    private static ILaunchConfigurationWorkingCopy prepareCopy(final Map<IResource, List<String>> suitesMapping,
+            final RobotLaunchConfigurationType type) throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final String namePrefix = RobotLaunchConfigurationNaming.getNamePrefix(suitesMapping.keySet(), type);
+        final String name = manager.generateLaunchConfigurationName(namePrefix);
+
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+                .newInstance(null, name);
+        fillDefaults(configuration, suitesMapping, type);
+        return configuration;
+    }
+
+    private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
+            final Map<IResource, List<String>> suitesMapping, final RobotLaunchConfigurationType type)
+            throws CoreException {
+        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(launchConfig);
+        robotConfig.fillDefaults();
+        final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
+        robotConfig.setProjectName(project.getName());
+        robotConfig.updateTestCases(suitesMapping);
+        robotConfig.setIsGeneralPurposeEnabled(type == RobotLaunchConfigurationType.GENERAL_PURPOSE);
     }
 
     public ScriptRobotLaunchConfiguration(final ILaunchConfiguration config) {
