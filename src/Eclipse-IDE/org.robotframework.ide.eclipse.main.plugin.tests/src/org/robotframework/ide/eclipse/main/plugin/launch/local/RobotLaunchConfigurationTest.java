@@ -39,8 +39,6 @@ import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfigurationTest {
 
-    private static ILaunchManager manager;
-
     private final static String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
     private IProject project;
 
@@ -50,7 +48,6 @@ public class RobotLaunchConfigurationTest {
 
     @Before
     public void setup() throws CoreException {
-        manager = DebugPlugin.getDefault().getLaunchManager();
         removeAllConfigurations();
         project = projectProvider.getProject();
     }
@@ -61,9 +58,9 @@ public class RobotLaunchConfigurationTest {
     }
 
     private static void removeAllConfigurations() throws CoreException {
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(launchConfigurationType);
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType type = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
         for (final ILaunchConfiguration config : launchConfigs) {
             config.delete();
         }
@@ -183,7 +180,7 @@ public class RobotLaunchConfigurationTest {
             final IResource res = project.getFile("Resource " + i + ".fake");
             resources.add(res);
         }
-        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final Map<IResource, List<String>> obtainedSuites = robotConfig.collectSuitesToRun();
         assertThat(obtainedSuites).hasSameSizeAs(resources);
@@ -196,7 +193,7 @@ public class RobotLaunchConfigurationTest {
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
         final IResource res = project.getFile("Resource");
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final RobotProject projectFromConfig = robotConfig.getRobotProject();
         assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
@@ -206,7 +203,7 @@ public class RobotLaunchConfigurationTest {
     public void configurationSuitableForResources_whenApplicable() throws CoreException, IOException {
         final IResource res = projectProvider.createFile("Resource", "");
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         assertThat(robotConfig.isSuitableFor(resources)).isTrue();
     }
@@ -215,7 +212,7 @@ public class RobotLaunchConfigurationTest {
     public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException, IOException {
         final IResource res = projectProvider.createFile("Resource", "");
         final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         final IResource anotherRes = projectProvider.createFile("Another Resource", "");
@@ -234,15 +231,6 @@ public class RobotLaunchConfigurationTest {
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
         final IResource res = project.getFile("Resource");
         final List<IResource> resources = newArrayList(res);
-        return new RobotLaunchConfiguration(createDefault(resources));
-    }
-
-    private static ILaunchConfigurationWorkingCopy createDefault(final List<IResource> resources) throws CoreException {
-        final ILaunchConfigurationType launchConfigurationType = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareDefault(launchConfigurationType, resources);
-        configuration.doSave();
-        return configuration;
+        return new RobotLaunchConfiguration(RobotLaunchConfiguration.prepareDefault(resources));
     }
 }

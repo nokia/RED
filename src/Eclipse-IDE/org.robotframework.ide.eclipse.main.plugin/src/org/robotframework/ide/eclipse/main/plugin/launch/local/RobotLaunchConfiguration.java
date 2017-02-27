@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
@@ -37,6 +36,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
+    public static final String SELECTED_TEST_CASES_SUFFIX = " (Selected Test Cases)";
+
     private static final String USE_PROJECT_EXECUTOR = "Project executor";
 
     private static final String EXECUTOR_NAME = "Executor";
@@ -47,8 +48,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
 
-    static ILaunchConfigurationWorkingCopy prepareDefault(final ILaunchConfigurationType launchConfigurationType,
-            final List<IResource> resources) throws CoreException {
+    static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final String namePrefix = getLaunchConfigurationNamePrefix(resources, "");
         final String name = manager.generateLaunchConfigurationName(namePrefix);
@@ -57,7 +57,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             suitesMapping.put(resource, new ArrayList<String>());
         }
 
-        final ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null, name);
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+                .newInstance(null, name);
         fillDefaults(configuration, suitesMapping, true);
         return configuration;
     }
@@ -65,8 +66,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     static ILaunchConfigurationWorkingCopy prepareForSelectedTestCases(final Map<IResource, List<String>> suitesMapping)
             throws CoreException {
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final String namePrefix = getLaunchConfigurationNamePrefix(suitesMapping.keySet(),
-                RobotLaunchConfigurationFinder.SELECTED_TESTS_CONFIG_SUFFIX);
+        final String namePrefix = getLaunchConfigurationNamePrefix(suitesMapping.keySet(), SELECTED_TEST_CASES_SUFFIX);
         final String name = manager.generateLaunchConfigurationName(namePrefix);
 
         final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
@@ -91,9 +91,9 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         robotConfig.setIsGeneralPurposeEnabled(isGeneralPurposeEnabled);
     }
 
-    public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchCopy,
+    public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
             final String outputFilePath) throws CoreException {
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchCopy);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         robotConfig.setExecutorArguments("-R " + outputFilePath);
         robotConfig.setSuitePaths(new HashMap<String, List<String>>());
     }

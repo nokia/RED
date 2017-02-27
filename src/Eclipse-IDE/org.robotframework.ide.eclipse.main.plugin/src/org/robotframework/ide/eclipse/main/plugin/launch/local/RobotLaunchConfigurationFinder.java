@@ -21,8 +21,6 @@ import org.eclipse.debug.core.ILaunchManager;
 
 public class RobotLaunchConfigurationFinder {
 
-    public static final String SELECTED_TESTS_CONFIG_SUFFIX = " (Selected Test Cases)";
-
     public static ILaunchConfigurationWorkingCopy findLaunchConfiguration(final List<IResource> resources)
             throws CoreException {
 
@@ -67,7 +65,7 @@ public class RobotLaunchConfigurationFinder {
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
         final String configurationName = RobotLaunchConfiguration.getLaunchConfigurationNamePrefix(resources,
-                SELECTED_TESTS_CONFIG_SUFFIX);
+                RobotLaunchConfiguration.SELECTED_TEST_CASES_SUFFIX);
         final String projectName = resources.get(0).getProject().getName();
         for (final ILaunchConfiguration configuration : launchConfigs) {
             if (configuration.getName().equals(configurationName)
@@ -107,12 +105,9 @@ public class RobotLaunchConfigurationFinder {
 
     public static ILaunchConfigurationWorkingCopy getLaunchConfiguration(final List<IResource> resources)
             throws CoreException {
-        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = launchManager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         ILaunchConfigurationWorkingCopy configuration = findLaunchConfiguration(resources);
         if (configuration == null) {
-            configuration = RobotLaunchConfiguration.prepareDefault(launchConfigurationType, resources);
+            configuration = RobotLaunchConfiguration.prepareDefault(resources);
         }
         return configuration;
     }
@@ -120,12 +115,9 @@ public class RobotLaunchConfigurationFinder {
     public static ILaunchConfigurationWorkingCopy getLaunchConfigurationExceptSelectedTestCases(
             final List<IResource> resources)
             throws CoreException {
-        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType launchConfigurationType = launchManager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         ILaunchConfigurationWorkingCopy configuration = findLaunchConfigurationExceptSelectedTestCases(resources);
         if (configuration == null) {
-            configuration = RobotLaunchConfiguration.prepareDefault(launchConfigurationType, resources);
+            configuration = RobotLaunchConfiguration.prepareDefault(resources);
         }
         return configuration;
     }
