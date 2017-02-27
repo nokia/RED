@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.text.read.recognizer.executables;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
@@ -39,12 +40,12 @@ public class RobotSpecialTokens {
     private static class ForInActionLiteral extends ATokenRecognizer {
 
         protected ForInActionLiteral() {
-            super(Pattern.compile(
-                    "^(\\s)*" + "([i|I](\\s)*[n|N]|" + createUpperLowerCaseWordWithOptionalSpaceInside("in range") + "|"
-                            + createUpperLowerCaseWordWithOptionalSpaceInside("in zip") + "|"
-                            + createUpperLowerCaseWordWithOptionalSpaceInside("in enumerate") + ")"
-                    + "(\\s)*$"),
-                    RobotTokenType.IN_TOKEN);
+            super(Pattern.compile("^(\\s)*" + "("
+                    + RobotTokenType.IN_TOKEN.getRepresentation()
+                            .stream()
+                            .map(ATokenRecognizer::createUpperLowerCaseWordWithOptionalSpaceInside)
+                            .collect(Collectors.joining("|"))
+                    + ")" + "(\\s)*$"), RobotTokenType.IN_TOKEN);
         }
 
         @Override
