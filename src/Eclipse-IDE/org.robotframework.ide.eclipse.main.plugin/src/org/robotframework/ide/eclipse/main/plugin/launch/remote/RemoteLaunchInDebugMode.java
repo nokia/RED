@@ -12,12 +12,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.debug.DebugExecutionEventsListener;
 import org.robotframework.ide.eclipse.main.plugin.debug.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.debug.MessagesTrackerForLogView;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RemoteRobotDebugTarget;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
@@ -42,8 +44,10 @@ class RemoteLaunchInDebugMode {
         final int timeout = robotConfig.getRemoteDebugTimeout();
         
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
-        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter();
+        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.DEBUG);
         final RemoteConnectionStatusTracker remoteConnectionStatusTracker = new RemoteConnectionStatusTracker();
+
+        final RobotDebugTarget debugTarget = new RobotDebugTarget("Remote Robot test at " + host + ":" + port, launch);
 
         try {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
@@ -52,6 +56,8 @@ class RemoteLaunchInDebugMode {
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(remoteConnectionStatusTracker)
+                    .agentEventsListenedBy(
+                            new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
                     .agentEventsListenedBy(new MessagesTrackerForLogView())
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
                     .start()
@@ -65,8 +71,7 @@ class RemoteLaunchInDebugMode {
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             remoteConnectionStatusTracker.startTrackingInto(redConsole);
 
-            final RemoteRobotDebugTarget debugTarget = new RemoteRobotDebugTarget("foo", launch, robotProcess);
-            launch.addDebugTarget(debugTarget);
+            debugTarget.connectWith(robotProcess);
 
             testsStarter.allowClientTestsStart();
             job.join();

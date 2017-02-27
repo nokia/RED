@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -41,7 +42,7 @@ class RemoteLaunchInRunMode {
         final int timeout = robotConfig.getRemoteDebugTimeout();
         
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
-        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter();
+        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
         final RemoteConnectionStatusTracker remoteConnectionStatusTracker = new RemoteConnectionStatusTracker();
 
         try {

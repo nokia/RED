@@ -26,8 +26,6 @@ public interface ISuitesRobotLaunchConfiguration extends IRobotLaunchConfigurati
 
     List<String> getSuitesToRun() throws CoreException;
 
-    List<IResource> getResourcesUnderDebug() throws CoreException;
-
     Collection<String> getTestsToRun() throws CoreException;
 
 }

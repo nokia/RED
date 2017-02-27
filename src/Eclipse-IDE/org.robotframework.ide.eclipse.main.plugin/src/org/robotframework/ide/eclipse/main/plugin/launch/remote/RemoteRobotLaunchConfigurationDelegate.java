@@ -102,12 +102,12 @@ public class RemoteRobotLaunchConfigurationDelegate implements ILaunchConfigurat
 
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(configuration);
 
-        // if (ILaunchManager.RUN_MODE.equals(mode)) {
-        new RemoteLaunchInRunMode(robotEventBroker).launch(robotConfig, launch);
+        if (ILaunchManager.RUN_MODE.equals(mode)) {
+            new RemoteLaunchInRunMode(robotEventBroker).launch(robotConfig, launch);
 
-        // } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-        // new RemoteLaunchInDebugMode(robotEventBroker).launch(robotConfig, launch);
-        // }
+        } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+            new RemoteLaunchInDebugMode(robotEventBroker).launch(robotConfig, launch);
+        }
     }
 
     @Override
