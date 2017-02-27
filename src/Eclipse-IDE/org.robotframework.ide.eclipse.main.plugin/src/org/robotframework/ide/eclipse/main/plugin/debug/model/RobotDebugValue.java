@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 
@@ -26,7 +25,7 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
     }
 
     @Override
-    public String getReferenceTypeName() throws DebugException {
+    public String getReferenceTypeName() {
         try {
             Integer.parseInt(value);
             return "integer";
@@ -36,26 +35,26 @@ public class RobotDebugValue extends RobotDebugElement implements IValue {
     }
 
     @Override
-    public String getValueString() throws DebugException {
+    public String getValueString() {
         return value;
     }
 
-    public void setValue(final String value) {
+    void setValue(final String value) {
         this.value = value;
     }
 
     @Override
-    public boolean isAllocated() throws DebugException {
+    public boolean isAllocated() {
         return true;
     }
 
     @Override
-    public IVariable[] getVariables() throws DebugException {
+    public IVariable[] getVariables() {
         return nestedVariables;
     }
 
     @Override
-    public boolean hasVariables() throws DebugException {
+    public boolean hasVariables() {
         return nestedVariables.length > 0;
     }
 }

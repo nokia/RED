@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -145,7 +144,7 @@ public class RemoteProcess implements IRobotProcess {
     }
 
     @Override
-    public int getExitValue() throws DebugException {
+    public int getExitValue() {
         return 0;
     }
 

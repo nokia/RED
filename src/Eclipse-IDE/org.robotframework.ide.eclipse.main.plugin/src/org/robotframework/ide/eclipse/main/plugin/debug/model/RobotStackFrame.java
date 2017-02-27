@@ -9,11 +9,10 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IVariable;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 
@@ -32,10 +31,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     private int lineNumber;
 
-    /**
-     * Level in stack.
-     */
-    private int id;
+    private int stackLevel;
 
     /**
      * Constructs a stack frame in the given thread with the given
@@ -46,90 +42,98 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
      *      stack frame id (1 is the bottom of the stack)
      * @param keywordName
      * @param keywordContext
-     *            
+     * 
      */
     public RobotStackFrame(final RobotThread thread, final int id, final String keywordName, final KeywordContext keywordContext) {
-        super((RobotDebugTarget) thread.getDebugTarget());
+        super(thread.getDebugTarget());
         this.thread = thread;
         setStackFrameData(id, keywordName, keywordContext);
     }
     
     public void setStackFrameData(final int id, final String keywordName, final KeywordContext keywordContext) {
-        this.id = id;
+        this.stackLevel = id;
         this.fileName = keywordContext.getFileName();
         this.lineNumber = keywordContext.getLineNumber();
-        name = keywordName + " [line:" + keywordContext.getLineNumber() + "]";
+        this.name = keywordName + " [line:" + keywordContext.getLineNumber() + "]";
         initVariables(keywordContext.getVariables());
     }
 
     private void initVariables(final Map<String, Object> vars) {
         if (vars != null) {
-            variables = ((RobotDebugTarget) thread.getDebugTarget()).getRobotVariablesManager()
-                    .extractRobotDebugVariables(id, vars);
+            variables = thread.getDebugTarget().getRobotVariablesManager()
+                    .extractRobotDebugVariables(stackLevel, vars);
         }
     }
 
+    /**
+     * Returns the name of the source file this stack frame is associated
+     * with.
+     * 
+     * @return the name of the source file this stack frame is associated
+     *         with
+     */
+    public String getSourceName() {
+        return fileName;
+    }
+
+    public int getStackLevel() {
+        return stackLevel;
+    }
+
     @Override
-    public IThread getThread() {
+    public RobotThread getThread() {
         return thread;
     }
 
     @Override
-    public IVariable[] getVariables() throws DebugException {
-        if(variables == null) {
-            return new IVariable[0];
-        }
-        return variables;
+    public IVariable[] getVariables() {
+        return variables == null ? new IVariable[0] : variables;
     }
 
     // gets nested variables too
-    public List<IVariable> getAllVariables() throws DebugException {
-        final List<IVariable> vars = newArrayList(variables);
+    public List<IVariable> getAllVariables() {
+        final List<IVariable> vars = newArrayList(getVariables());
         for (final IVariable var : variables) {
             final RobotDebugVariable robotVar = (RobotDebugVariable) var;
             final RobotDebugValue value = (RobotDebugValue) robotVar.getValue();
 
             vars.addAll(newArrayList(value.getVariables()));
         }
-        
         return vars;
     }
 
     @Override
-    public boolean hasVariables() throws DebugException {
-        if(variables == null) {
-            return false;
-        }
-        return variables.length > 0;
+    public boolean hasVariables() {
+        return variables != null && variables.length > 0;
     }
 
     @Override
-    public int getLineNumber() throws DebugException {
+    public int getLineNumber() {
         return lineNumber;
     }
 
     @Override
-    public int getCharStart() throws DebugException {
+    public int getCharStart() {
         return -1;
     }
 
     @Override
-    public int getCharEnd() throws DebugException {
+    public int getCharEnd() {
         return -1;
     }
 
     @Override
-    public String getName() throws DebugException {
+    public String getName() {
         return name;
     }
 
     @Override
-    public IRegisterGroup[] getRegisterGroups() throws DebugException {
+    public IRegisterGroup[] getRegisterGroups() {
         return null;
     }
 
     @Override
-    public boolean hasRegisterGroups() throws DebugException {
+    public boolean hasRegisterGroups() {
         return false;
     }
 
@@ -154,17 +158,17 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     }
 
     @Override
-    public void stepInto() throws DebugException {
+    public void stepInto() {
         getThread().stepInto();
     }
 
     @Override
-    public void stepOver() throws DebugException {
+    public void stepOver() {
         getThread().stepOver();
     }
 
     @Override
-    public void stepReturn() throws DebugException {
+    public void stepReturn() {
         getThread().stepReturn();
     }
 
@@ -184,12 +188,12 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     }
 
     @Override
-    public void resume() throws DebugException {
+    public void resume() {
         getThread().resume();
     }
 
     @Override
-    public void suspend() throws DebugException {
+    public void suspend() {
         getThread().suspend();
     }
 
@@ -204,61 +208,22 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     }
 
     @Override
-    public void terminate() throws DebugException {
+    public void terminate() {
         getThread().terminate();
-    }
-
-    /**
-     * Returns the name of the source file this stack frame is associated
-     * with.
-     * 
-     * @return the name of the source file this stack frame is associated
-     *         with
-     */
-    public String getSourceName() {
-        return fileName;
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (obj instanceof RobotStackFrame) {
-            final RobotStackFrame sf = (RobotStackFrame) obj;
-            try {
-                return sf.getSourceName().equals(getSourceName()) && sf.getLineNumber() == getLineNumber()
-                        && sf.id == id;
-            } catch (final DebugException e) {
-            }
+            final RobotStackFrame that = (RobotStackFrame) obj;
+            return that.getSourceName().equals(this.getSourceName()) && that.getLineNumber() == this.getLineNumber()
+                    && that.stackLevel == stackLevel;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return getSourceName().hashCode() + id;
+        return Objects.hash(getSourceName(), stackLevel);
     }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(final String fileName) {
-        this.fileName = fileName;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setLineNumber(final int lineNumber) {
-        this.lineNumber = lineNumber;
-    }
-
 }
