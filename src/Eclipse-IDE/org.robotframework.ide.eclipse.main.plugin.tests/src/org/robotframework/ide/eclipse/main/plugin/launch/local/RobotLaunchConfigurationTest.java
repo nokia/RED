@@ -28,10 +28,13 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -40,11 +43,16 @@ import com.google.common.collect.ImmutableMap;
 public class RobotLaunchConfigurationTest {
 
     private final static String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
+
+    private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+
     private IProject project;
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
-
 
     @Before
     public void setup() throws CoreException {
@@ -58,7 +66,6 @@ public class RobotLaunchConfigurationTest {
     }
 
     private static void removeAllConfigurations() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationType type = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
         for (final ILaunchConfiguration config : launchConfigs) {
@@ -191,12 +198,19 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
-        final IResource res = project.getFile("Resource");
-        final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         final RobotProject projectFromConfig = robotConfig.getRobotProject();
         assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
+    }
+
+    @Test
+    public void whenProjectNotInWorkspace_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Project 'not_existing' cannot be found in workspace");
+
+        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        robotConfig.setProjectName("not_existing");
+        robotConfig.getRobotProject();
     }
 
     @Test
