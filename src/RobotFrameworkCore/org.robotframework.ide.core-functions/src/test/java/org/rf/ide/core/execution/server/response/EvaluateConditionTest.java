@@ -13,7 +13,7 @@ import org.junit.Test;
 public class EvaluateConditionTest {
 
     @Test
-    public void properRequestIsConstructed_forKeywordConditionMessage() {
+    public void properMessageIsConstructed_forKeywordConditionMessage() {
         assertThat(new EvaluateCondition(newArrayList()).toMessage()).isEqualTo("{\"keyword_condition\":[]}");
         assertThat(new EvaluateCondition(newArrayList("a")).toMessage()).isEqualTo("{\"keyword_condition\":[\"a\"]}");
         assertThat(new EvaluateCondition(newArrayList("a", "b")).toMessage())

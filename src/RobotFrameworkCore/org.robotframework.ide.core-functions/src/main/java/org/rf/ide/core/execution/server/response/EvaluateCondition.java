@@ -6,11 +6,12 @@
 package org.rf.ide.core.execution.server.response;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.common.collect.ImmutableMap;
 
 public class EvaluateCondition implements ServerResponse {
 
@@ -22,13 +23,12 @@ public class EvaluateCondition implements ServerResponse {
 
     @Override
     public String toMessage() {
-        final Map<String, Object> value = new HashMap<>();
-        value.put("keyword_condition", conditionWithArguments);
-        final ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.writeValueAsString(value);
+            final Map<String, Object> value = ImmutableMap.of("keyword_condition", conditionWithArguments);
+
+            return new ObjectMapper().writeValueAsString(value);
         } catch (final IOException e) {
-            throw new ResponseException("Unable to serialize breakpoint condition to json", e);
+            throw new ResponseException("Unable to serialize breakpoint condition response arguments to json", e);
         }
     }
 }

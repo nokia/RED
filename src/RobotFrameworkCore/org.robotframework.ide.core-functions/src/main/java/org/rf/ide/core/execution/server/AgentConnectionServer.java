@@ -18,11 +18,12 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.rf.ide.core.execution.RobotAgentEventDispatcher;
 import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 
 public class AgentConnectionServer {
+
+    static final int RED_AGENT_PROTOCOL_VERSION = 1;
 
     public static final int CLIENT_CONNECTION_TIMEOUT = 30_000;
 

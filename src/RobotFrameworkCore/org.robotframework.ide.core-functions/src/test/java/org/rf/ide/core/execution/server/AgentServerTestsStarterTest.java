@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
+import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.rf.ide.core.execution.server.response.StartExecution;
@@ -29,7 +30,7 @@ public class AgentServerTestsStarterTest {
 
         final AgentClient client = mock(AgentClient.class);
 
-        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter());
+        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
         starter.setClient(client);
 
         final Thread serverThread = new Thread(() -> {
@@ -58,7 +59,7 @@ public class AgentServerTestsStarterTest {
         final AgentClient client = mock(AgentClient.class);
         doThrow(ResponseException.class).when(client).send(any(StartExecution.class));
 
-        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter());
+        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
         starter.setClient(client);
         
         final Thread serverThread = new Thread(() -> {
@@ -82,7 +83,7 @@ public class AgentServerTestsStarterTest {
         final AgentClient client = mock(AgentClient.class);
         doThrow(IOException.class).when(client).send(any(StartExecution.class));
 
-        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter());
+        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
         starter.setClient(client);
 
         final Thread serverThread = new Thread(() -> {
@@ -103,7 +104,7 @@ public class AgentServerTestsStarterTest {
     public void agentServerStarterSendsStartReponseToClient_whenItIsAllowedToStartTests() throws Exception {
         final AgentClient client = mock(AgentClient.class);
 
-        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter());
+        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
         starter.setClient(client);
 
         final Thread serverThread = new Thread(() -> starter.handleAgentIsReadyToStart());

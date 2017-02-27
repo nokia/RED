@@ -5,12 +5,26 @@
  */
 package org.rf.ide.core.execution.server.response;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.common.collect.ImmutableMap;
 
 public class StartExecution implements ServerResponse {
 
     @Override
     public String toMessage() {
-        return "do_start";
-    }
+        try {
+            final List<Object> arguments = new ArrayList<>();
+            final Map<String, Object> value = ImmutableMap.of("do_start", arguments);
 
+            return new ObjectMapper().writeValueAsString(value);
+        } catch (final IOException e) {
+            throw new ResponseException("Unable to serialize do_start response arguments to json", e);
+        }
+    }
 }

@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.execution.server.response;
 
+@FunctionalInterface
 public interface ServerResponse {
 
     String toMessage() throws ResponseException;

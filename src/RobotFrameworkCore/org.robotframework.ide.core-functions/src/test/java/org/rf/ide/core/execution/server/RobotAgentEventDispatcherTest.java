@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.execution;
+package org.rf.ide.core.execution.server;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -21,7 +21,9 @@ import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
-import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.LogLevel;
+import org.rf.ide.core.execution.RobotAgentEventListener;
+import org.rf.ide.core.execution.Status;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -90,22 +92,22 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener1, listener2,
                 listener3);
 
-        final String json = toJson(ImmutableMap.of("pid", 1));
+        final String json = toJson(ImmutableMap.of("ready_to_start", 1));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener1).setClient(nullable(AgentClient.class));
         verify(listener1, atLeast(0)).isHandlingEvents();
-        verify(listener1).handlePid();
+        verify(listener1).handleAgentIsReadyToStart();
         verifyNoMoreInteractions(listener1);
 
         verify(listener2).setClient(nullable(AgentClient.class));
         verify(listener2, atLeast(1)).isHandlingEvents();
-        verify(listener2).handlePid();
+        verify(listener2).handleAgentIsReadyToStart();
         verifyNoMoreInteractions(listener2);
 
         verify(listener3).setClient(nullable(AgentClient.class));
         verify(listener3, atLeast(0)).isHandlingEvents();
-        verify(listener3).handlePid();
+        verify(listener3).handleAgentIsReadyToStart();
         verifyNoMoreInteractions(listener3);
     }
 
@@ -126,18 +128,19 @@ public class RobotAgentEventDispatcherTest {
     }
 
     @Test
-    public void listenerIsNotifiedAboutPidEvent() throws Exception {
+    public void listenerIsNotifiedAboutAgentInitializingEvent() throws Exception {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final String json = toJson(ImmutableMap.of("pid", 1));
+        final Map<String, String> attributes = ImmutableMap.of("agent_mode", "debug");
+        final String json = toJson(ImmutableMap.of("agent_initializing", newArrayList(attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handlePid();
+        verify(listener).handleAgentInitializing();
         verifyNoMoreInteractions(listener);
     }
 
@@ -148,7 +151,7 @@ public class RobotAgentEventDispatcherTest {
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, String> attributes = ImmutableMap.of("python", "py3", "robot", "1.2.3");
+        final Map<String, Object> attributes = ImmutableMap.of("python", "py3", "robot", "1.2.3", "protocol", 1);
         final String json = toJson(ImmutableMap.of("version", newArrayList(attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 

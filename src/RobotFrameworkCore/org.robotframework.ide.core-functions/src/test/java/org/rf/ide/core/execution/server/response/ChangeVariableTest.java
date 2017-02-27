@@ -13,7 +13,7 @@ import org.junit.Test;
 public class ChangeVariableTest {
 
     @Test
-    public void properRequestIsConstructed_forVariableChangeMessage() {
+    public void properMessageIsConstructed_forVariableChangeMessage() {
         assertThat(new ChangeVariable("a", newArrayList()).toMessage())
                 .isEqualTo("{\"variable_change\":{\"a\":[]}}");
         assertThat(new ChangeVariable("a", newArrayList("b")).toMessage())

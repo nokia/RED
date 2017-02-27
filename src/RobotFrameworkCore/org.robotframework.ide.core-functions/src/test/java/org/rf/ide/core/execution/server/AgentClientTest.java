@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.server.response.ServerResponse;
 
 public class AgentClientTest {
 
@@ -20,10 +19,10 @@ public class AgentClientTest {
         try (final StringWriter stringWriter = new StringWriter();
                 final PrintWriter printWriter = new PrintWriter(stringWriter)) {
             final AgentClient client = new AgentClient(0, printWriter);
-            client.send(mockResponse(null));
+            client.send(() -> null);
 
             assertThat(client.getId()).isZero();
-            assertThat(stringWriter.toString()).isEqualTo("null");
+            assertThat(stringWriter.toString()).isEqualTo("null\n");
         }
     }
 
@@ -32,20 +31,10 @@ public class AgentClientTest {
         try (final StringWriter stringWriter = new StringWriter();
                 final PrintWriter printWriter = new PrintWriter(stringWriter)) {
             final AgentClient client = new AgentClient(1, printWriter);
-            client.send(mockResponse("message"));
+            client.send(() -> "message");
 
             assertThat(client.getId()).isEqualTo(1);
-            assertThat(stringWriter.toString()).isEqualTo("message");
+            assertThat(stringWriter.toString()).isEqualTo("message\n");
         }
-    }
-
-    private static ServerResponse mockResponse(final String message) {
-        return new ServerResponse() {
-
-            @Override
-            public String toMessage() throws ResponseException {
-                return message;
-            }
-        };
     }
 }

@@ -12,7 +12,7 @@ import org.junit.Test;
 public class StopExecutionTest {
 
     @Test
-    public void properRequestIsConstructed_forStopExecutionMessage() {
-        assertThat(new StopExecution().toMessage()).isEqualTo("stop");
+    public void properMessageIsConstructed_forStopExecutionMessage() {
+        assertThat(new StopExecution().toMessage()).isEqualTo("{\"stop\":[]}");
     }
 }

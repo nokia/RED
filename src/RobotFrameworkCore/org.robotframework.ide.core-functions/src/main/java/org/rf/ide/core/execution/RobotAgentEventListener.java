@@ -17,9 +17,9 @@ public interface RobotAgentEventListener {
 
     boolean isHandlingEvents();
 
-    void handleAgentIsReadyToStart();
+    void handleAgentInitializing();
 
-    void handlePid();
+    void handleAgentIsReadyToStart();
 
     void handleVersions(String pythonVersion, String robotVersion);
 

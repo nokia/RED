@@ -37,13 +37,13 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite.robot");
         String source = "testProject/lib1.py";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, source, DryRunLibraryType.PYTHON);
 
         libName = "lib2";
         source = "testProject/lib2.py";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
         verifyLibraryImport(dryRunOutputParser, 1, 2, libName, importers, args, source, DryRunLibraryType.PYTHON);
     }
 
@@ -54,7 +54,7 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite.robot");
         final String source = "testProject/lib1.pyc";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
 
         final String expectedSource = "testProject/lib1.py";
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, expectedSource,
@@ -68,7 +68,7 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite.robot");
         final String source = "testProject/lib1$py.class";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
 
         final String expectedSource = "testProject/lib1.py";
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, expectedSource,
@@ -83,9 +83,9 @@ public class RobotDryRunOutputParserTest {
                 "testProject/testSuite3.robot");
         final String source = "testProject/lib1.py";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(1), source));
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(2), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(1), source), null);
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(2), source), null);
 
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, source, DryRunLibraryType.PYTHON);
     }
@@ -97,12 +97,12 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite.robot");
         final String source = "testProject/lib1.py";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, source, DryRunLibraryType.PYTHON);
 
         libName = "lib1.class2";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
         verifyLibraryImport(dryRunOutputParser, 1, 2, libName, importers, args, source, DryRunLibraryType.PYTHON);
     }
 
@@ -113,7 +113,7 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList();
         final String source = null;
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, "", source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, "", source), null);
 
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, "", DryRunLibraryType.UNKNOWN);
     }
@@ -125,7 +125,7 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite.robot");
         final String source = "testProject/LibrarySource.jar";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
 
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, source, DryRunLibraryType.JAVA);
     }
@@ -133,7 +133,7 @@ public class RobotDryRunOutputParserTest {
     @Test
     public void testProcessLine_withStandardLibraryImport() {
         final String libName = "String";
-        final Set<String> standardLibs = new HashSet<String>();
+        final Set<String> standardLibs = new HashSet<>();
         standardLibs.add(libName);
         dryRunOutputParser = new RobotDryRunOutputParser();
         dryRunOutputParser.setupRobotDryRunLibraryImportCollector(standardLibs);
@@ -141,7 +141,7 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite.robot");
         final String source = "python/String.py";
 
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
 
         assertTrue(dryRunOutputParser.getImportedLibraries().isEmpty());
     }
@@ -151,14 +151,14 @@ public class RobotDryRunOutputParserTest {
         String libName = "lib1.py";
         final List<String> importers = newArrayList("testProject/testSuite1.robot", "testProject/testSuite2.robot");
 
-        dryRunOutputParser.processLine(createErrorMessageJSON(importers.get(0), libName));
-        dryRunOutputParser.processLine(createErrorMessageJSON(importers.get(1), libName));
+        dryRunOutputParser.processMessage(createErrorMessageJSON(importers.get(0), libName), null);
+        dryRunOutputParser.processMessage(createErrorMessageJSON(importers.get(1), libName), null);
 
         verifyMessage(dryRunOutputParser, 0, 1, libName, importers);
 
         libName = "lib2.py";
-        dryRunOutputParser.processLine(createErrorMessageJSON(importers.get(0), libName));
-        dryRunOutputParser.processLine(createErrorMessageJSON(importers.get(1), libName));
+        dryRunOutputParser.processMessage(createErrorMessageJSON(importers.get(0), libName), null);
+        dryRunOutputParser.processMessage(createErrorMessageJSON(importers.get(1), libName), null);
 
         verifyMessage(dryRunOutputParser, 1, 2, libName, importers);
     }
@@ -166,14 +166,14 @@ public class RobotDryRunOutputParserTest {
     @Test
     public void testProcessLine_withFailMessages() {
         String libName = "lib1";
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
 
         verifyMessage(dryRunOutputParser, 0, 1, libName, new ArrayList<String>());
 
         libName = "lib2";
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
 
         verifyMessage(dryRunOutputParser, 1, 2, libName, new ArrayList<String>());
     }
@@ -185,15 +185,15 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite1.robot", "testProject/testSuite2.robot");
         final String source = null;
 
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
         verifyMessage(dryRunOutputParser, 0, 1, libName, new ArrayList<String>());
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, newArrayList(importers.get(0)), args, "",
                 DryRunLibraryType.UNKNOWN);
 
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
         verifyMessage(dryRunOutputParser, 0, 1, libName, new ArrayList<String>());
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(1), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(1), source), null);
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, "", DryRunLibraryType.UNKNOWN);
     }
 
@@ -204,17 +204,17 @@ public class RobotDryRunOutputParserTest {
         final List<String> importers = newArrayList("testProject/testSuite1.robot");
         String source = "testProject/lib1.py";
 
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
         verifyMessage(dryRunOutputParser, 0, 1, libName, new ArrayList<String>());
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
         verifyLibraryImport(dryRunOutputParser, 0, 1, libName, importers, args, "", DryRunLibraryType.UNKNOWN);
 
         libName = "lib2";
         source = "testProject/lib2.py";
 
-        dryRunOutputParser.processLine(createFailMessageJSON(libName));
+        dryRunOutputParser.processMessage(createFailMessageJSON(libName), null);
         verifyMessage(dryRunOutputParser, 1, 2, libName, new ArrayList<String>());
-        dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
+        dryRunOutputParser.processMessage(createLibraryImportJSON(libName, args, importers.get(0), source), null);
         verifyLibraryImport(dryRunOutputParser, 1, 2, libName, importers, args, "", DryRunLibraryType.UNKNOWN);
     }
 
@@ -228,7 +228,7 @@ public class RobotDryRunOutputParserTest {
                 assertEquals(suiteName, name);
             }
         });
-        dryRunOutputParser.processLine(createStartSuiteJSON(suiteName));
+        dryRunOutputParser.processMessage(createStartSuiteJSON(suiteName), null);
     }
 
     @Test
@@ -241,7 +241,7 @@ public class RobotDryRunOutputParserTest {
         kwSource.setOffset(5);
         kwSource.setLength(7);
 
-        dryRunOutputParser.processLine(createKeywordMessageJSON(kwSource));
+        dryRunOutputParser.processMessage(createKeywordMessageJSON(kwSource), null);
         verifyKeywordMessage(dryRunOutputParser, 0, 1, kwSource);
 
         kwSource.setName("other_kw");
@@ -251,7 +251,7 @@ public class RobotDryRunOutputParserTest {
         kwSource.setOffset(4);
         kwSource.setLength(6);
 
-        dryRunOutputParser.processLine(createKeywordMessageJSON(kwSource));
+        dryRunOutputParser.processMessage(createKeywordMessageJSON(kwSource), null);
         verifyKeywordMessage(dryRunOutputParser, 1, 2, kwSource);
     }
 
@@ -265,10 +265,10 @@ public class RobotDryRunOutputParserTest {
         kwSource.setOffset(5);
         kwSource.setLength(7);
 
-        dryRunOutputParser.processLine(createKeywordMessageJSON(kwSource));
+        dryRunOutputParser.processMessage(createKeywordMessageJSON(kwSource), null);
         verifyKeywordMessage(dryRunOutputParser, 0, 1, kwSource);
 
-        dryRunOutputParser.processLine(createFailMessageJSON(kwSource.getLibraryName()));
+        dryRunOutputParser.processMessage(createFailMessageJSON(kwSource.getLibraryName()), null);
         verifyMessage(dryRunOutputParser, 0, 1, kwSource.getLibraryName(), new ArrayList<String>());
     }
 
