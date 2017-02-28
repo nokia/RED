@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/27/17 4:29 PM
+Save-Time: 2/28/17 10:37 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -100,7 +100,7 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     
     
 get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -i test 1 -o None -d None -l None -r None .*RobotProject\n"
+    | equals "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} -s RobotProject.Test_for_run_config -i test 1 -o None -d None -l None -r None .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "==============================================================================\n"
     + "RobotProject                                                                  \n"
@@ -125,7 +125,7 @@ wait-for-console
 
 //no test should be run but args should be added
 if [not [get-view Console | get-text-viewer | get-property text -raw
-    | matches "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
+    | matches "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
     + "Try --help for usage information." ]]{
