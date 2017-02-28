@@ -120,8 +120,8 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
     public int getRemoteDebugPort() throws CoreException {
         final String port = getRemoteDebugPortValue();
         final Integer portAsInt = Ints.tryParse(port);
-        if (portAsInt == null || !Range.closed(1, 65_535).contains(portAsInt)) {
-            throw newCoreException("Server port '" + port + "' should be a value from range [1, 65 535]");
+        if (portAsInt == null || !Range.closed(1, MAX_PORT).contains(portAsInt)) {
+            throw newCoreException("Server port '" + port + "' must be an Integer between 1 and 65,535");
         }
         return portAsInt;
     }
@@ -130,8 +130,8 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
     public int getRemoteDebugTimeout() throws CoreException {
         final String timeout = getRemoteDebugTimeoutValue();
         final Integer timeoutAsInt = Ints.tryParse(timeout);
-        if (timeoutAsInt == null || !Range.atLeast(1).contains(timeoutAsInt)) {
-            throw newCoreException("Connection timeout '" + timeout + "' should be a positive integer value");
+        if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
+            throw newCoreException("Connection timeout '" + timeout + "' must be an Integer between 1 and 3,600,000");
         }
         return timeoutAsInt;
     }
