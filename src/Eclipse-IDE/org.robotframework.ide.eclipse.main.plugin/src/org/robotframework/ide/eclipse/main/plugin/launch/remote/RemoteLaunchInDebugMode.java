@@ -47,7 +47,7 @@ class RemoteLaunchInDebugMode {
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.DEBUG);
         final RemoteConnectionStatusTracker remoteConnectionStatusTracker = new RemoteConnectionStatusTracker();
 
-        final RobotDebugTarget debugTarget = new RobotDebugTarget("Remote Robot test at " + host + ":" + port, launch);
+        final RobotDebugTarget debugTarget = new RobotDebugTarget("Remote Robot Test at " + host + ":" + port, launch);
 
         try {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
