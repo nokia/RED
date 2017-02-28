@@ -5,6 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
@@ -15,34 +22,47 @@ import org.eclipse.debug.core.model.IVariable;
  */
 public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
-    private final String name;
-
-    private RobotDebugValue debugValue;
-
     private final RobotDebugVariable parent;
 
-    private boolean isValueModificationEnabled = true;
+    private final String name;
+
+    private final RobotDebugValue debugValue;
 
     private boolean hasValueChanged;
+    private boolean isValueModificationSupported;
 
-    /**
-     * Constructs a variable
-     * 
-     * @param name
-     *            variable name
-     * @param value
-     *            variable value
-     */
-    public RobotDebugVariable(final RobotDebugTarget target, final String name, final Object value,
-            final RobotDebugVariable parent) {
+    public RobotDebugVariable(final RobotDebugTarget target, final String name, final Object value) {
         super(target);
+        this.parent = null;
         this.name = name;
+        this.debugValue = RobotDebugValue.createFromValue(this, value);
+
+        this.isValueModificationSupported = true;
+        this.hasValueChanged = false;
+    }
+
+    public RobotDebugVariable(final RobotDebugTarget target, final String name, final RobotDebugValue value) {
+        super(target);
+        this.parent = null;
+        this.name = name;
+        this.debugValue = value;
+
+        this.isValueModificationSupported = true;
+        this.hasValueChanged = false;
+    }
+
+    public RobotDebugVariable(final RobotDebugVariable parent, final String name, final Object value) {
+        super(parent.getDebugTarget());
         this.parent = parent;
-        this.debugValue = target.getRobotDebugValueManager().createRobotDebugValue(value, this, target);
+        this.name = name;
+        this.debugValue = RobotDebugValue.createFromValue(this, value);
+
+        this.isValueModificationSupported = true;
+        this.hasValueChanged = false;
     }
 
     @Override
-    public IValue getValue() {
+    public RobotDebugValue getValue() {
         return debugValue;
     }
 
@@ -65,8 +85,33 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     public void setValue(final String expression) {
         debugValue.setValue(expression);
         hasValueChanged = true;
+
         fireChangeEvent(DebugEvent.CLIENT_REQUEST);
-        ((RobotDebugTarget) this.getDebugTarget()).sendChangeRequest(expression, name, parent);
+
+        final List<String> path = getPath();
+        final String rootName = path.get(0);
+        final List<String> arguments = newArrayList(path.subList(1, path.size()));
+        arguments.add(expression);
+
+        getDebugTarget().sendChangeRequest(rootName, arguments);
+    }
+
+    private List<String> getPath() {
+        final List<String> allNames = new ArrayList<>();
+        RobotDebugVariable current = this;
+        while (current != null) {
+            allNames.add(current.getName());
+            current = current.parent;
+        }
+        Collections.reverse(allNames);
+        return allNames.stream().map(this::extractChildName).collect(toList());
+    }
+
+    private String extractChildName(final String variableName) {
+        if (variableName.startsWith("[") && variableName.endsWith("]")) {
+            return variableName.substring(1, variableName.length() - 1);
+        }
+        return variableName;
     }
 
     @Override
@@ -77,7 +122,11 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     @Override
     public boolean supportsValueModification() {
-        return isValueModificationEnabled;
+        return isValueModificationSupported && debugValue.supportsModification();
+    }
+
+    public void disableValueModificationSupport() {
+        this.isValueModificationSupported = false;
     }
 
     @Override
@@ -94,15 +143,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         hasValueChanged = valueChanged;
     }
 
-    public void setRobotDebugValue(final RobotDebugValue value) {
-        this.debugValue = value;
-    }
-
     public RobotDebugVariable getParent() {
         return parent;
-    }
-
-    public void setValueModificationEnabled(final boolean isValueModificationEnabled) {
-        this.isValueModificationEnabled = isValueModificationEnabled;
     }
 }

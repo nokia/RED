@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
@@ -21,10 +23,13 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.server.response.ChangeVariable;
+import org.rf.ide.core.execution.server.response.ResumeExecution;
+import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugStackFrameManager;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
 
 import com.google.common.collect.Iterables;
@@ -49,7 +54,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private IThread[] threads;
 
-    private final Map<String, KeywordContext> currentKeywordDebugContextMap;
+    private final Map<String, KeywordContext> currentKeywordsDebugContextMap;
 
     private int currentStepOverLevel;
     
@@ -57,19 +62,16 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     private final RobotDebugVariablesManager robotVariablesManager;
     
-    private final RobotDebugValueManager robotDebugValueManager;
-    
     private RobotDebugStackFrameManager robotDebugStackFrameManager;
     
-    private UserController userController;
+    private AgentClient client;
 
     public RobotDebugTarget(final String name, final ILaunch launch) {
         super(null);
         this.name = name;
         this.launch = launch;
-        this.currentKeywordDebugContextMap = new LinkedHashMap<>();
+        this.currentKeywordsDebugContextMap = new LinkedHashMap<>();
         this.robotVariablesManager = new RobotDebugVariablesManager(this);
-        this.robotDebugValueManager = new RobotDebugValueManager();
 
         this.threads = null;
 
@@ -92,7 +94,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     public void setClient(final AgentClient client) {
-        userController = new UserController(robotVariablesManager, client);
+        this.client = client;
     }
 
     @Override
@@ -117,11 +119,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    public IDebugTarget getDebugTarget() {
-        return this;
     }
 
     @Override
@@ -185,23 +182,33 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public void resume() {
         getThread().setStepping(false);
-        userController.resume();
+
+        try {
+            client.send(new ResumeExecution());
+        } catch (ResponseException | IOException e) {
+            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        }
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
     protected void step() {
         getThread().setStepping(true);
-        userController.resume();
+
+        try {
+            client.send(new ResumeExecution());
+        } catch (ResponseException | IOException e) {
+            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        }
         resumed(DebugEvent.CLIENT_REQUEST);
     }
 
     protected void stepOver() {
-        currentStepOverLevel = currentKeywordDebugContextMap.size();
+        currentStepOverLevel = currentKeywordsDebugContextMap.size();
         step();
     }
     
     protected void stepReturn() {
-        currentStepReturnLevel = currentKeywordDebugContextMap.size();
+        currentStepReturnLevel = currentKeywordsDebugContextMap.size();
         step();
     }
 
@@ -296,7 +303,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @return the current stack frames in the target
      */
     protected IStackFrame[] getStackFrames() {
-        return robotDebugStackFrameManager.getStackFrames(currentKeywordDebugContextMap);
+        return robotDebugStackFrameManager.getStackFrames(currentKeywordsDebugContextMap);
     }
 
     public void setHasStackFramesCreated(final boolean hasStackFramesCreated) {
@@ -318,38 +325,38 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         }
     }
 
-    public void sendChangeRequest(final String expression, final String variableName, final RobotDebugVariable parent) {
-        userController.changeVariable(expression, variableName, parent);
+    void sendChangeRequest(final String variableName, final List<String> values) {
+        try {
+            client.send(new ChangeVariable(variableName, values));
+        } catch (ResponseException | IOException e) {
+            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        }
     }
     
     public boolean hasStepOver() {
-        return getThread().isSteppingOver() && currentStepOverLevel <= currentKeywordDebugContextMap.size();
+        return getThread().isSteppingOver() && currentStepOverLevel <= currentKeywordsDebugContextMap.size();
     }
     
     public boolean hasStepReturn() {
-        return getThread().isSteppingReturn() && currentStepReturnLevel <= currentKeywordDebugContextMap.size() + 1;
+        return getThread().isSteppingReturn() && currentStepReturnLevel <= currentKeywordsDebugContextMap.size() + 1;
     }
 
     public RobotThread getRobotThread() {
         return getThread();
     }
 
-    public Map<String, KeywordContext> getCurrentKeywordsContextMap() {
-        return currentKeywordDebugContextMap;
+    public Map<String, KeywordContext> getCurrentKeywordsContext() {
+        return currentKeywordsDebugContextMap;
     }
 
-    public KeywordContext getLastKeywordFromCurrentContextMap() {
-        if(currentKeywordDebugContextMap.size() > 0) {
-            return Iterables.getLast(currentKeywordDebugContextMap.values());
+    public KeywordContext getLastKeywordFromCurrentContext() {
+        if(currentKeywordsDebugContextMap.size() > 0) {
+            return Iterables.getLast(currentKeywordsDebugContextMap.values());
         }
         return new KeywordContext();
     }
     
     public RobotDebugVariablesManager getRobotVariablesManager() {
         return robotVariablesManager;
-    }
-
-    public RobotDebugValueManager getRobotDebugValueManager() {
-        return robotDebugValueManager;
     }
 }

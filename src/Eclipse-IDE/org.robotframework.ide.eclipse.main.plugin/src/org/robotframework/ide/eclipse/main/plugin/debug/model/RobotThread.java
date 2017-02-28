@@ -29,11 +29,6 @@ public class RobotThread extends RobotDebugElement implements IThread {
     }
 
     @Override
-    public RobotDebugTarget getDebugTarget() {
-        return (RobotDebugTarget) super.getDebugTarget();
-    }
-
-    @Override
     public IStackFrame[] getStackFrames() {
         final IStackFrame[] stackFrames = getDebugTarget().getStackFrames();
         return stackFrames == null ? new IStackFrame[0] : stackFrames;
@@ -106,7 +101,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
 
     @Override
     public boolean canStepReturn() {
-        return isSuspended() && getDebugTarget().getCurrentKeywordsContextMap().size() > 1;
+        return isSuspended() && getDebugTarget().getCurrentKeywordsContext().size() > 1;
     }
 
     @Override
