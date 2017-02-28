@@ -38,11 +38,11 @@ class RemoteLaunchInDebugMode {
     void launch(final RemoteRobotLaunchConfiguration robotConfig, final ILaunch launch) throws CoreException {
 
         new LaunchConfigurationsValidator().validate(robotConfig);
-        
+
         final String host = robotConfig.getRemoteHost();
         final int port = robotConfig.getRemotePort();
         final int timeout = robotConfig.getRemoteTimeout();
-        
+
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.DEBUG);
         final RemoteConnectionStatusTracker remoteConnectionStatusTracker = new RemoteConnectionStatusTracker();
@@ -51,7 +51,7 @@ class RemoteLaunchInDebugMode {
 
         try {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
-                    .withConnectionTimeout(timeout, TimeUnit.MILLISECONDS)
+                    .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                     .serverStatusHandledBy(remoteConnectionStatusTracker)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)

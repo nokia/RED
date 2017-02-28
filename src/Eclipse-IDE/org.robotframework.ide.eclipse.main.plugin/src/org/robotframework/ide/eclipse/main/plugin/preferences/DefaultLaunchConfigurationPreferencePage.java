@@ -87,7 +87,7 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         addField(remotePort);
 
         final IntegerFieldEditor remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
-                "Connection timeout [ms]:", group);
+                "Connection timeout [s]:", group);
         remoteTimeout.setValidRange(1, IRemoteRobotLaunchConfiguration.MAX_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);

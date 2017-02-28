@@ -97,7 +97,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "");
         preferences.put(RedPreferences.LAUNCH_REMOTE_HOST, "127.0.0.1");
         preferences.put(RedPreferences.LAUNCH_REMOTE_PORT, "12345");
-        preferences.put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30000");
+        preferences.put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30");
         preferences.put(RedPreferences.LAUNCH_SCRIPT_PATH, "");
         preferences.put(RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS, "");
         preferences.put(RedPreferences.LAUNCH_SCRIPT_RUN_COMMAND,

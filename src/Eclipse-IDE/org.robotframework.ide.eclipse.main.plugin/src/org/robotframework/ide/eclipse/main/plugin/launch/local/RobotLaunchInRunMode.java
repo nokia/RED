@@ -56,7 +56,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
 
         try {
             AgentConnectionServerJob.setupServerAt(host, port)
-                    .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
+                    .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(new MessagesTrackerForLogView())

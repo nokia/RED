@@ -11,7 +11,7 @@ public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfigurati
 
     int MAX_PORT = 65_535;
 
-    int MAX_TIMEOUT = 3_600_000;
+    int MAX_TIMEOUT = 3_600;
 
     String REMOTE_HOST_ATTRIBUTE = "Remote host";
 
