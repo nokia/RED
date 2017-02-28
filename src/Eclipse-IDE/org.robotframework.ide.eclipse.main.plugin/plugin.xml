@@ -437,7 +437,7 @@
  </extension>
  <extension point="org.eclipse.debug.ui.launchShortcuts">
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationShortcut"
           icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Robot Test"
@@ -478,7 +478,7 @@
         </contextualLaunch>
     </shortcut>
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationShortcut"
           icon="resources/robot.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Robot Test Case(s)"
@@ -505,7 +505,7 @@
        </contextualLaunch>
     </shortcut>
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfigurationShortcut"
           icon="resources/robot_remote.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Robot Remote Test"
@@ -547,7 +547,7 @@
        </contextualLaunch>
     </shortcut>
     <shortcut
-          class="org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfigurationDelegate"
+          class="org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfigurationShortcut"
           icon="resources/robot_script.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
           label="Robot Script Test"
