@@ -48,7 +48,6 @@ public class LaunchConfigurationsValidator {
 
     public void validate(final IRemoteRobotLaunchConfiguration robotConfig)
             throws LaunchConfigurationValidationFatalException {
-
         try {
             if (robotConfig.isDefiningProjectDirectly()) {
                 final String projectName = robotConfig.getProjectName();
@@ -56,9 +55,9 @@ public class LaunchConfigurationsValidator {
             }
 
             try {
-                robotConfig.getRemoteDebugHost();
-                robotConfig.getRemoteDebugPort();
-                robotConfig.getRemoteDebugTimeout();
+                robotConfig.getRemoteHost();
+                robotConfig.getRemotePort();
+                robotConfig.getRemoteTimeout();
             } catch (final CoreException e) {
                 throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
             }

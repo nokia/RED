@@ -47,7 +47,7 @@ public class LaunchConfigurationsValidatorTest {
 
         validator.validate(new RobotLaunchConfigurationMock(""));
     }
-    
+
     @Test
     public void whenProjectDoesNotExist_fatalExceptionIsThrown() throws CoreException {
         projectProvider.getProject().delete(true, null);
@@ -139,8 +139,7 @@ public class LaunchConfigurationsValidatorTest {
                 .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable."));
 
         final IPath filePath = Path.fromPortableString("file.robot");
-        projectProvider.createFile(filePath,
-                "*** Test Cases ***", "case1", "  Log  10");
+        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10");
 
         final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator();
         final RobotLaunchConfigurationMock launchConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
@@ -165,9 +164,11 @@ public class LaunchConfigurationsValidatorTest {
     @Test
     public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage(CoreMatchers.<String> either(CoreMatchers.<String> equalTo(
-                "Following suites does not exist: /" + PROJECT_NAME + "/file2.robot, /" + PROJECT_NAME + "/suite/dir.")).or(CoreMatchers.<String> equalTo(
-                "Following suites does not exist: /" + PROJECT_NAME + "/suite/dir, /" + PROJECT_NAME + "/file2.robot.")));
+        thrown.expectMessage(CoreMatchers
+                .<String> either(CoreMatchers.<String> equalTo("Following suites does not exist: /" + PROJECT_NAME
+                        + "/file2.robot, /" + PROJECT_NAME + "/suite/dir."))
+                .or(CoreMatchers.<String> equalTo("Following suites does not exist: /" + PROJECT_NAME + "/suite/dir, /"
+                        + PROJECT_NAME + "/file2.robot.")));
 
         final IPath filePath = Path.fromPortableString("file.robot");
         final IProject fooProject = projectProvider.getProject();
@@ -194,11 +195,8 @@ public class LaunchConfigurationsValidatorTest {
 
         final IPath filePath = Path.fromPortableString("file.robot");
         final IProject fooProject = projectProvider.getProject();
-        projectProvider.createFile(filePath,
-                        "*** Test Cases ***",
-                        "case1", "  Log  10",
-                        "case2", "  Log  20",
-                        "case3", "  Log  30");
+        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20", "case3",
+                "  Log  30");
 
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
         final RobotProject robotProject = mock(RobotProject.class);
@@ -216,11 +214,8 @@ public class LaunchConfigurationsValidatorTest {
     public void nothingIsThrown_whenEverythingIsOkWithGivenConfiguration() throws Exception, CoreException {
         final IPath filePath = Path.fromPortableString("file.robot");
         final IProject fooProject = projectProvider.getProject();
-        projectProvider.createFile(filePath,
-                        "*** Test Cases ***",
-                        "case1", "  Log  10",
-                        "case2", "  Log  20",
-                        "case3", "  Log  30");
+        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20", "case3",
+                "  Log  30");
 
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3.0");
         final RobotProject robotProject = mock(RobotProject.class);
