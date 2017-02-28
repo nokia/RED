@@ -206,13 +206,17 @@ class TestRunnerAgent:
             self._wait_for_resume()
 
     def _wait_for_resume(self):
-        response = self._wait_for_reponse('resume', 'interrupt', 'variable_change')
+        resumed = False
+        while not resumed:
+            response = self._wait_for_reponse('resume', 'interrupt', 'variable_change')
         
-        if response.keys()[0] == 'interrupt':
-            sys.exit()
-        elif response.keys()[0] == 'variable_change':
-            self._check_changed_variable(response)
-        self._debugger.resume()
+            if response.keys()[0] == 'interrupt':
+                sys.exit()
+            elif response.keys()[0] == 'variable_change':
+                self._check_changed_variable(response)
+            else:
+                self._debugger.resume()
+                resumed = True
 
     def _send_vars(self):
         vars = {}
