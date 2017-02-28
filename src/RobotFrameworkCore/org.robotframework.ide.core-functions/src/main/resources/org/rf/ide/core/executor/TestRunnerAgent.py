@@ -103,8 +103,10 @@ class TestRunnerAgent:
     MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
 
     def __init__(self, *args):
-        self.host = args[1] if len(args) > 1 else 'localhost'
-        self.port = int(args[0])
+        if len(args) == 1:
+            self.host, self.port = 'localhost', int(args[0])
+        else:
+            self.host, self.port = args[0], int(args[1])
         
         self.sock = None
         self.filehandler = None
