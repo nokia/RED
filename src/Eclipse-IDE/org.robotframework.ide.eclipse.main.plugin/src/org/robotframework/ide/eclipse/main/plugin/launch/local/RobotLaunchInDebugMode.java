@@ -56,7 +56,7 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.DEBUG);
 
-        final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot test at " + host + ":" + port, launch);
+        final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot Test at " + host + ":" + port, launch);
 
         try {
             AgentConnectionServerJob.setupServerAt(host, port)
