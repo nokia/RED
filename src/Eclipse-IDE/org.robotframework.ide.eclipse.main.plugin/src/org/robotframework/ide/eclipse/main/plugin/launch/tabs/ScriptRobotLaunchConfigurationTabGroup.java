@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
@@ -20,7 +19,7 @@ public class ScriptRobotLaunchConfigurationTabGroup extends AbstractLaunchConfig
     public void createTabs(final ILaunchConfigurationDialog dialog, final String mode) {
         setTabs(new ILaunchConfigurationTab[] {
                 new RobotLaunchConfigurationScriptTab(),
-                new RobotLaunchConfigurationRemoteTab(ILaunchManager.RUN_MODE.equals(mode)),
+                new RobotLaunchConfigurationRemoteTab(),
                 new SourceLookupTab(),
                 new EnvironmentTab(),
                 new CommonTab()
