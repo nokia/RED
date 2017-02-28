@@ -100,7 +100,7 @@ public class AgentConnectionServerJob extends Job {
             this.host = host;
             this.port = port;
             this.timeout = AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT;
-            this.timeoutUnit = TimeUnit.MILLISECONDS;
+            this.timeoutUnit = TimeUnit.SECONDS;
         }
 
         public AgentConnectionServerJobBuilder withConnectionTimeout(final int timeout, final TimeUnit timeoutUnit) {

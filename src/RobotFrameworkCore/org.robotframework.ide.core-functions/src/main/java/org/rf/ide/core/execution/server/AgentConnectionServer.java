@@ -25,7 +25,7 @@ public class AgentConnectionServer {
 
     static final int RED_AGENT_PROTOCOL_VERSION = 1;
 
-    public static final int CLIENT_CONNECTION_TIMEOUT = 30_000;
+    public static final int CLIENT_CONNECTION_TIMEOUT = 30;
 
     private final int port;
 
@@ -40,7 +40,7 @@ public class AgentConnectionServer {
     private ServerSocket serverSocket;
 
     public AgentConnectionServer(final String host, final int port) {
-        this(host, port, CLIENT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS);
+        this(host, port, CLIENT_CONNECTION_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public AgentConnectionServer(final String host, final int port, final int timeout, final TimeUnit timeoutUnit) {

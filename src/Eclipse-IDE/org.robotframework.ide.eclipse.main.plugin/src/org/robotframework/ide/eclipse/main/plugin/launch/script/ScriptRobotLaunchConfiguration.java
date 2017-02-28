@@ -121,7 +121,8 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
         final String port = getRemotePortValue();
         final Integer portAsInt = Ints.tryParse(port);
         if (portAsInt == null || !Range.closed(1, MAX_PORT).contains(portAsInt)) {
-            throw newCoreException("Server port '" + port + "' must be an Integer between 1 and 65,535");
+            throw newCoreException(
+                    String.format("Server port '%s' must be an Integer between 1 and %,d", port, MAX_PORT));
         }
         return portAsInt;
     }
@@ -131,7 +132,8 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
         final String timeout = getRemoteTimeoutValue();
         final Integer timeoutAsInt = Ints.tryParse(timeout);
         if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
-            throw newCoreException("Connection timeout '" + timeout + "' must be an Integer between 1 and 3,600,000");
+            throw newCoreException(String.format("Connection timeout '%s' must be an Integer between 1 and %,d",
+                    timeout, MAX_TIMEOUT));
         }
         return timeoutAsInt;
     }

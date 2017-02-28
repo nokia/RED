@@ -49,7 +49,7 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port");
         }
-        
+
         final String host = "127.0.0.1";
         final int port = cmdLine.getPort();
 
@@ -60,7 +60,7 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
 
         try {
             AgentConnectionServerJob.setupServerAt(host, port)
-                    .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.MILLISECONDS)
+                    .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(
