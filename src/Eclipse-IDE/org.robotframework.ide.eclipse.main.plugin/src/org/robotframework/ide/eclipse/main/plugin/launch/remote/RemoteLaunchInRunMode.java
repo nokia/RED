@@ -37,9 +37,9 @@ class RemoteLaunchInRunMode {
 
         new LaunchConfigurationsValidator().validate(robotConfig);
         
-        final String host = robotConfig.getRemoteDebugHost();
-        final int port = robotConfig.getRemoteDebugPort();
-        final int timeout = robotConfig.getRemoteDebugTimeout();
+        final String host = robotConfig.getRemoteHost();
+        final int port = robotConfig.getRemotePort();
+        final int timeout = robotConfig.getRemoteTimeout();
         
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);

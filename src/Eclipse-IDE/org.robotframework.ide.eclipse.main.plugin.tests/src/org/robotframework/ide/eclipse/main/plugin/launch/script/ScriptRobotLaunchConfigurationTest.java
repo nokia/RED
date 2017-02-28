@@ -92,9 +92,9 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
-        assertThat(robotConfig.getRemoteDebugHost()).isEqualTo("127.0.0.1");
-        assertThat(robotConfig.getRemoteDebugPort()).isEqualTo(12345);
-        assertThat(robotConfig.getRemoteDebugTimeout()).isEqualTo(30_000);
+        assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getRemotePort()).isEqualTo(12345);
+        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30_000);
     }
 
     @Test
@@ -111,9 +111,9 @@ public class ScriptRobotLaunchConfigurationTest {
         robotConfig.setIsExcludeTagsEnabled(true);
         robotConfig.setExcludedTags(newArrayList("excluded"));
         robotConfig.setIncludedTags(newArrayList("included"));
-        robotConfig.setRemoteDebugHostValue("1.2.3.4");
-        robotConfig.setRemoteDebugPortValue("987");
-        robotConfig.setRemoteDebugTimeoutValue("123");
+        robotConfig.setRemoteHostValue("1.2.3.4");
+        robotConfig.setRemotePortValue("987");
+        robotConfig.setRemoteTimeoutValue("123");
         robotConfig.fillDefaults();
         assertThat(robotConfig.getProjectName()).isEqualTo("");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
@@ -125,9 +125,9 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
-        assertThat(robotConfig.getRemoteDebugHost()).isEqualTo("127.0.0.1");
-        assertThat(robotConfig.getRemoteDebugPort()).isEqualTo(12345);
-        assertThat(robotConfig.getRemoteDebugTimeout()).isEqualTo(30_000);
+        assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getRemotePort()).isEqualTo(12345);
+        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30_000);
     }
 
     @Test
@@ -181,8 +181,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Server IP cannot be empty");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugHostValue("");
-        robotConfig.getRemoteDebugHost();
+        robotConfig.setRemoteHostValue("");
+        robotConfig.getRemoteHost();
     }
 
     @Test
@@ -191,8 +191,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port '' must be an Integer between 1 and 65,535");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugPortValue("");
-        robotConfig.getRemoteDebugPort();
+        robotConfig.setRemotePortValue("");
+        robotConfig.getRemotePort();
     }
 
     @Test
@@ -201,8 +201,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port 'abc' must be an Integer between 1 and 65,535");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugPortValue("abc");
-        robotConfig.getRemoteDebugPort();
+        robotConfig.setRemotePortValue("abc");
+        robotConfig.getRemotePort();
     }
 
     @Test
@@ -211,8 +211,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port '0' must be an Integer between 1 and 65,535");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugPortValue("0");
-        robotConfig.getRemoteDebugPort();
+        robotConfig.setRemotePortValue("0");
+        robotConfig.getRemotePort();
     }
 
     @Test
@@ -221,8 +221,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port '65536' must be an Integer between 1 and 65,535");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugPortValue("65536");
-        robotConfig.getRemoteDebugPort();
+        robotConfig.setRemotePortValue("65536");
+        robotConfig.getRemotePort();
     }
 
     @Test
@@ -231,8 +231,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600,000");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugTimeoutValue("");
-        robotConfig.getRemoteDebugTimeout();
+        robotConfig.setRemoteTimeoutValue("");
+        robotConfig.getRemoteTimeout();
     }
 
     @Test
@@ -241,8 +241,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout 'abc' must be an Integer between 1 and 3,600,000");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugTimeoutValue("abc");
-        robotConfig.getRemoteDebugTimeout();
+        robotConfig.setRemoteTimeoutValue("abc");
+        robotConfig.getRemoteTimeout();
     }
 
     @Test
@@ -251,8 +251,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout '0' must be an Integer between 1 and 3,600,000");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugTimeoutValue("0");
-        robotConfig.getRemoteDebugTimeout();
+        robotConfig.setRemoteTimeoutValue("0");
+        robotConfig.getRemoteTimeout();
     }
 
     @Test
@@ -261,8 +261,8 @@ public class ScriptRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout '3600001' must be an Integer between 1 and 3,600,000");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteDebugTimeoutValue("3600001");
-        robotConfig.getRemoteDebugTimeout();
+        robotConfig.setRemoteTimeoutValue("3600001");
+        robotConfig.getRemoteTimeout();
     }
 
     @Test

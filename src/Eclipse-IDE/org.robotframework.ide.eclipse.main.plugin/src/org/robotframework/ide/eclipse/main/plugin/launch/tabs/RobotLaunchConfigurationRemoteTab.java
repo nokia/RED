@@ -208,9 +208,9 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         try {
             final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                     .remoteLaunchConfiguration(configuration);
-            final String hostIp = robotConfig.getRemoteDebugHost();
-            final String port = robotConfig.getRemoteDebugPortValue();
-            final String timeout = robotConfig.getRemoteDebugTimeoutValue();
+            final String hostIp = robotConfig.getRemoteHost();
+            final String port = robotConfig.getRemotePortValue();
+            final String timeout = robotConfig.getRemoteTimeoutValue();
 
             if (robotConfig.isDefiningProjectDirectly()) {
                 projectComposite.setInput(robotConfig.getProjectName());
@@ -263,9 +263,9 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             if (robotConfig.isDefiningProjectDirectly()) {
                 robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             }
-            robotConfig.setRemoteDebugHostValue(hostTxt.getText().trim());
-            robotConfig.setRemoteDebugPortValue(portTxt.getText().trim());
-            robotConfig.setRemoteDebugTimeoutValue(timeoutTxt.getText().trim());
+            robotConfig.setRemoteHostValue(hostTxt.getText().trim());
+            robotConfig.setRemotePortValue(portTxt.getText().trim());
+            robotConfig.setRemoteTimeoutValue(timeoutTxt.getText().trim());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
