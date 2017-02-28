@@ -12,12 +12,14 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -33,9 +35,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
+import com.google.common.collect.ImmutableMap;
+
 public class RobotLaunchInModeTest {
 
     private static final String PROJECT_NAME = RobotLaunchInModeTest.class.getSimpleName();
+
+    private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
@@ -57,8 +63,8 @@ public class RobotLaunchInModeTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
-        robotConfig.addSuite("001__suites_a", new ArrayList<String>());
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList()));
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
         final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
@@ -74,8 +80,8 @@ public class RobotLaunchInModeTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
-        robotConfig.addSuite("001__suites_a", newArrayList("001__case1"));
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList("001__case1")));
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
         final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
@@ -98,7 +104,7 @@ public class RobotLaunchInModeTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
         final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
@@ -122,7 +128,7 @@ public class RobotLaunchInModeTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
         final RobotLaunchInMode launchMode = createModeUnderTest();
         final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig);
@@ -141,5 +147,14 @@ public class RobotLaunchInModeTest {
                 return null;
             }
         };
+    }
+
+    private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
+        final ILaunchConfigurationWorkingCopy configuration = manager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID).newInstance(null, "robot");
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.fillDefaults();
+        robotConfig.setProjectName(projectName);
+        return robotConfig;
     }
 }
