@@ -13,12 +13,6 @@ public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfigurati
 
     int MAX_TIMEOUT = 3_600;
 
-    String REMOTE_HOST_ATTRIBUTE = "Remote host";
-
-    String REMOTE_PORT_ATTRIBUTE = "Remote port";
-
-    String REMOTE_TIMEOUT_ATTRIBUTE = "Remote timeout";
-
     boolean isDefiningProjectDirectly();
 
     int getRemotePort() throws CoreException;

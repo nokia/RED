@@ -14,8 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 
 public interface ISuitesRobotLaunchConfiguration extends IRobotLaunchConfiguration {
 
-    String TEST_SUITES_ATTRIBUTE = "Test suites";
-
     void setSuitePaths(final Map<String, List<String>> suitesToCases) throws CoreException;
 
     Map<String, List<String>> getSuitePaths() throws CoreException;
