@@ -379,7 +379,7 @@
           delegate="org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfigurationDelegate"
           id="org.robotframework.ide.remoteRobotLaunchConfiguration"
           modes="run,debug"
-          name="Remote Robot"
+          name="Robot Remote"
           sourceLocatorId="org.eclipse.debug.robot.sourceLookupDirector"
           sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer">
     </launchConfigurationType>
@@ -389,7 +389,7 @@
           sourcePathComputerId="org.eclipse.debug.robot.sourcePathComputer"
           id="org.robotframework.ide.scriptRobotLaunchConfiguration"
           modes="run,debug"
-          name="Script Robot">
+          name="Robot Script">
     </launchConfigurationType>
  </extension>
  <extension
@@ -508,7 +508,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfigurationDelegate"
           icon="resources/robot_remote.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
-          label="Remote Robot Test"
+          label="Robot Remote Test"
           modes="run,debug"
           path="remote">
        <contextualLaunch>
@@ -550,7 +550,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfigurationDelegate"
           icon="resources/robot_script.png"
           id="org.robotframework.ide.robotLaunchShortcutConfiguration"
-          label="Script Robot Test"
+          label="Robot Script Test"
           modes="run,debug"
           path="script">
        <contextualLaunch>
