@@ -1,0 +1,252 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA
+Element-Name: DefaultValuesInRemoteConfig
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _HO73kPzXEeaFC_dPBuoMWQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 2/28/17 2:39 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-label-for-no-error"{
+	get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+    	| get-property text 
+    	| equals "Create or edit a configuration to launch server for remotely running Robot Framework tests" | verify-true
+}   
+
+proc "check-label-for-error" [val val] [val errorType]{
+	if [$errorType | eq IP]{
+		get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+	    	| get-property text | equals $val | verify-true
+	}
+	if [$errorType | eq port]{
+		get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+	    	| get-property text | equals [format "Server port '%s' must be an Integer between 1 and 65,535" $val] | verify-true
+	}
+	if [$errorType | eq timeout]{
+		get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+	    	| get-property text | equals [format "Connection timeout '%s' must be an Integer between 1 and 3,600" $val] | verify-true
+	}
+	
+	
+	    	
+} 
+
+proc "check-command-line" [val text]{
+	get-window "Run Configurations" | get-group "Remote Client" | get-editbox 
+   		 -after [get-label "Add following argument to command line when running tests on client side"] | get-property text 
+   		| equals $text | verify-true
+}    
+get-menu "Run/Run Configurations..." | click
+
+//add new run config by clicking in Run Config.. panel
+get-window "Run Configurations" | get-tree | select "Remote Robot" | double-click
+with [get-window "Run Configurations" | get-tree] {
+    get-item "Remote Robot" | get-property childCount | equals 1 | verify-true
+    get-item "Remote Robot" | get-property "getText()" | equals "Remote Robot" | verify-true
+}
+
+//check if project is not selected
+get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration"
+with [get-window "Run Configurations"] {
+    get-editbox -after [get-label "Name:"] | get-property text | equals "New_configuration" | verify-true
+    with [get-group Project] {
+        get-editbox | get-property text | equals "" | verify-true
+        get-property "getChildren().Control[0].getChildren().length" | equals 2 | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getText()" | equals "" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[1].getText()" | equals "Browse..." | verify-true
+    }
+    
+    //check deafult values for IP, port
+    with [get-group "RED Server"] {
+        get-property caption | equals "RED Server" | verify-true
+        get-property "getChildren().length" | equals 9 | verify-true
+        get-property "getChildren().Control[0].getText()" 
+            | equals "Setup server which will track execution of Robot tests running on remotely connected client" 
+            | verify-true
+        get-property "getChildren().Control[1].getText()" | equals "Local IP:" | verify-true
+        get-property "getChildren().Control[2].getText()" | equals "127.0.0.1" | verify-true
+        get-property "getChildren().Control[4].getText()" | equals "Local port:" | verify-true
+        get-property "getChildren().Control[5].getText()" | equals 12345 | verify-true
+        get-property "getChildren().Control[7].getText()" | equals "Connection timeout [s]:" | verify-true
+        get-property "getChildren().Control[8].getText()" | equals 30 | verify-true
+    }
+    
+    //remote script
+    with [get-group "Remote Client"] {
+        get-property caption | equals "Remote Client" | verify-true
+        get-property "getChildren().length" | equals 4 | verify-true
+        get-property "getChildren().Control[0].getText()" 
+            | equals "Export script which should be added as listener of tests execution on client machine" 
+            | verify-true
+        get-property "getChildren().Control[1].getText()" | equals "Export Client Script" | verify-true
+        get-property "getChildren().Control[2].getText()" 
+            | equals "Add following argument to command line when running tests on client side" | verify-true
+        get-property "getChildren().Control[3].getText()" 
+            | equals "--listener TestRunnerAgent.py:12345:False:127.0.0.1" | verify-true
+        get-property "getChildren().Control[3].getEditable()" | equals false | verify-true
+    }
+}
+
+
+//check if now buttons are not enabled
+with [get-window "Run Configurations"] {
+    with [get-button Revert] {
+        get-property enablement | equals false | verify-true
+    }
+    get-button Apply | get-property enablement | equals false | verify-true
+}
+
+//select project
+with [get-window "Run Configurations"] {
+    get-group Project | get-button "Browse..." | click
+    with [get-window "Select project"] {
+        get-tree | select RobotProject
+        get-button OK | click
+    }
+}
+
+//check if now buttons are enabled
+with [get-window "Run Configurations"] {
+    with [get-button Revert] {
+        get-property enablement | equals true | verify-true
+    }
+    get-button Apply | get-property enablement | equals true | verify-true
+}
+
+
+with [get-window "Run Configurations"] {
+    get-group "RED Server" | get-editbox -after [get-label "Local IP:"] | set-text "not ip"
+    get-button Apply | click
+}
+
+check-label-for-no-error
+
+//------------------------------------------- IP -----------------------------------------------------------------------
+//add empty IP
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local IP:"] | set-text ""
+check-label-for-error -val "Server IP cannot be empty" -errorType IP
+
+//add correct IP
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local IP:"] 
+    | set-text "10.154.2.3"
+check-label-for-no-error
+check-command-line "--listener TestRunnerAgent.py:12345:False:10.154.2.3"
+//set onet.pl
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local IP:"] 
+    | set-text "www.onet.pl"
+check-label-for-no-error
+check-command-line "--listener TestRunnerAgent.py:12345:False:www.onet.pl"
+
+// ------------------------------- port ----------------------------------------------------------------------------------
+
+//add 0 as port
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 0
+check-label-for-error -val "0" -errorType "port"
+check-command-line "--listener TestRunnerAgent.py:0:False:www.onet.pl"
+
+//add max port
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 65535
+check-label-for-no-error
+check-command-line "--listener TestRunnerAgent.py:65535:False:www.onet.pl"
+
+//add min port
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 1
+check-label-for-no-error
+check-command-line "--listener TestRunnerAgent.py:1:False:www.onet.pl"
+
+//add negative port
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text "-1"
+check-label-for-error -val "-1" -errorType "port"
+
+
+//add port with space
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text "55 99"
+check-label-for-error -val "55 99" -errorType "port"
+
+//set correct port
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text "4569"
+// --------------------------------------------- connection timout --------------------------------------------------
+
+//set 0
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] 
+    | set-text 0
+check-label-for-error -val "0" -errorType "timeout"
+
+//set minimal value = 1    
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] 
+    | set-text 1
+check-label-for-no-error
+    
+//set  string    
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] 
+    | set-text "apple"
+check-label-for-error -val "apple" -errorType "timeout"    
+check-command-line "--listener TestRunnerAgent.py:4569:False:www.onet.pl"    
+
+//set maximal value    
+get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] 
+    | set-text 3600
+check-label-for-no-error
+check-command-line "--listener TestRunnerAgent.py:4569:False:www.onet.pl"        
+
+
+//save changed and add new config
+with [get-window "Run Configurations"] {
+    get-button Apply | click
+}
+
+//add new
+get-window "Run Configurations" | get-tree | select "Remote Robot" | double-click
+with [get-window "Run Configurations" | get-tree] {
+    get-item "Remote Robot" | get-property childCount | equals 2 | verify-true
+    get-item "Remote Robot" | get-property "getItems().TreeItem[0].getText()" | equals "New_configuration" | verify-true
+    get-item "Remote Robot" | get-property "getItems().TreeItem[1].getText()" | equals "New_configuration (1)" 
+        | verify-true
+}
+get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration"
+with [get-window "Run Configurations" | get-group "RED Server"] {
+    get-editbox -after [get-label "Local IP:"] | get-property text | equals "www.onet.pl" | verify-true
+    get-editbox -after [get-label "Local port:"] | get-property text | equals 4569 | verify-true
+    get-editbox -after [get-label "Connection timeout [s]:"] | get-property text | equals 3600 | verify-true
+}
+
+//check second config if it has no copied fields
+get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration (1)"
+with [get-window "Run Configurations"] {
+    get-group Project | get-editbox | get-property text | equals "" | verify-true
+    with [get-group "RED Server"] {
+        get-editbox -after [get-label "Local IP:"] | get-property text | equals "127.0.0.1" | verify-true
+        get-editbox -after [get-label "Local port:"] | get-property text | equals 12345 | verify-true
+        get-editbox -after [get-label "Connection timeout [s]:"] | get-property text | equals 30 | verify-true
+    }
+}
+//close window
+get-window "Run Configurations" | get-button Close | click
+
+//open again and export python script
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration"
+set-dialog-result Folder $RED_workspace_path
+get-window "Run Configurations" | get-group "Remote Client" | get-button "Export Client Script" | click
+get-window "Run Configurations" | get-button Close | click
+
+
+get-file [uri-from-path [concat $RED_workspace_path "/TestRunnerAgent.py"]] |get exists |verify-true
+
+//remove folder
+if [get-file [uri-from-path [concat $RED_workspace_path "/TestRunnerAgent.py"]] | get exists ]{
+   uri-from-path [concat $RED_workspace_path "/TestRunnerAgent.py"] | delete-file
+}
+//check if was deleted
+get-file [uri-from-path [concat $RED_workspace_path "/TestRunnerAgent.py"]] | get exists |verify-false
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
