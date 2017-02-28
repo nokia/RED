@@ -94,7 +94,7 @@ public class ElementsUtility {
 
         RobotToken correct = null;
 
-        List<VariableDeclaration> correctVariables = varExtractor.extract(FilePosition.createNotSet(), text, "fake")
+        final List<VariableDeclaration> correctVariables = varExtractor.extract(FilePosition.createNotSet(), text, "fake")
                 .getCorrectVariables();
 
         if (robotTokens.size() > 1) {
@@ -122,7 +122,7 @@ public class ElementsUtility {
                         }
                     }
 
-                    TableType tableType = state.getTable();
+                    final TableType tableType = state.getTable();
                     if (correct == null && (tableType == TableType.KEYWORD || tableType == TableType.TEST_CASE)) {
                         final ParsingState expected;
                         if (tableType == TableType.KEYWORD) {
@@ -130,18 +130,18 @@ public class ElementsUtility {
                         } else {
                             expected = ParsingState.TEST_CASE_DECLARATION;
                         }
-                        if (meatsState(state, expected) && tokensExactlyOnPosition.size() == 1) {
-                            RobotToken exactlyOne = tokensExactlyOnPosition.get(0);
+                        if (meetsState(state, expected) && tokensExactlyOnPosition.size() == 1) {
+                            final RobotToken exactlyOne = tokensExactlyOnPosition.get(0);
                             final List<RobotTokenType> typesForVariablesTable = RobotTokenType
                                     .getTypesForVariablesTable();
                             boolean isVarDec = false;
                             for (final IRobotTokenType type : exactlyOne.getTypes()) {
                                 if (type instanceof RobotTokenType) {
-                                    RobotTokenType tokenType = (RobotTokenType) type;
+                                    final RobotTokenType tokenType = (RobotTokenType) type;
                                     if (typesForVariablesTable.contains(tokenType)
                                             && tokenType.isSettingDeclaration()) {
                                         if (!correctVariables.isEmpty()) {
-                                            VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
+                                            final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
                                             if (typeByTokenType.getIdentificator()
                                                     .equals(correctVariables.get(0).getTypeIdentificator().getText())) {
                                                 isVarDec = true;
@@ -237,11 +237,11 @@ public class ElementsUtility {
                     final List<RobotTokenType> typesForVariablesTable = RobotTokenType.getTypesForVariablesTable();
                     for (final IRobotTokenType type : token.getTypes()) {
                         if (type instanceof RobotTokenType) {
-                            RobotTokenType tokenType = (RobotTokenType) type;
+                            final RobotTokenType tokenType = (RobotTokenType) type;
                             if (typesForVariablesTable.contains(tokenType) && tokenType.isSettingDeclaration()) {
                                 boolean notValidVar = true;
                                 if (!correctVariables.isEmpty()) {
-                                    VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
+                                    final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
                                     for (final VariableDeclaration vd : correctVariables) {
                                         if (typeByTokenType.getIdentificator()
                                                 .equals(vd.getTypeIdentificator().getText())) {
@@ -281,7 +281,7 @@ public class ElementsUtility {
                         || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
                         || type == RobotTokenType.VARIABLES_LIST_DECLARATION) {
                     if (!correctVariables.isEmpty()) {
-                        VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
+                        final VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
                         if (typeByTokenType.getIdentificator()
                                 .equals(correctVariables.get(0).getTypeIdentificator().getText())) {
                             hasAnyProposalVariableInside = true;
@@ -299,7 +299,7 @@ public class ElementsUtility {
         return correct;
     }
 
-    private boolean meatsState(final ParsingState state, final ParsingState expected) {
+    private boolean meetsState(final ParsingState state, final ParsingState expected) {
         boolean result = false;
         ParsingState currentState = state;
         while (currentState.getPreviousState() != null) {
