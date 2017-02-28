@@ -33,6 +33,16 @@ import com.google.common.collect.Maps;
 public abstract class AbstractTaggedSuitesRobotLaunchConfiguration extends AbstractRobotLaunchConfiguration
         implements ITagsRobotLaunchConfiguration, ISuitesRobotLaunchConfiguration {
 
+    private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
+
+    private static final String INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Include option enabled";
+
+    private static final String INCLUDED_TAGS_ATTRIBUTE = "Included tags";
+
+    private static final String EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Exclude option enabled";
+
+    private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
+
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
 
     protected AbstractTaggedSuitesRobotLaunchConfiguration(final ILaunchConfiguration config) {

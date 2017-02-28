@@ -35,6 +35,12 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
 
     public static final String TYPE_ID = "org.robotframework.ide.scriptRobotLaunchConfiguration";
 
+    private static final String REMOTE_HOST_ATTRIBUTE = "Remote host";
+
+    private static final String REMOTE_PORT_ATTRIBUTE = "Remote port";
+
+    private static final String REMOTE_TIMEOUT_ATTRIBUTE = "Remote timeout";
+
     private static final String SCRIPT_PATH_ATTRIBUTE = "Script path";
 
     private static final String SCRIPT_ARGUMENTS_ATTRIBUTE = "Script arguments";

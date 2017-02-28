@@ -26,6 +26,12 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     public static final String TYPE_ID = "org.robotframework.ide.remoteRobotLaunchConfiguration";
 
+    private static final String REMOTE_HOST_ATTRIBUTE = "Remote host";
+
+    private static final String REMOTE_PORT_ATTRIBUTE = "Remote port";
+
+    private static final String REMOTE_TIMEOUT_ATTRIBUTE = "Remote timeout";
+
     public RemoteRobotLaunchConfiguration(final ILaunchConfiguration config) {
         super(config);
     }

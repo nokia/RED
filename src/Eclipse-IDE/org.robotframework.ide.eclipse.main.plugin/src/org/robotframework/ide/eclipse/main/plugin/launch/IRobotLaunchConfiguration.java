@@ -16,8 +16,6 @@ public interface IRobotLaunchConfiguration {
 
     static final AtomicBoolean IS_CONFIGURATION_RUNNING = new AtomicBoolean(false);
 
-    String PROJECT_NAME_ATTRIBUTE = "Project name";
-
     String getName();
 
     String getTypeName();
