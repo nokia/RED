@@ -18,6 +18,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchConfiguration {
 
+    private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
+
     protected final ILaunchConfiguration configuration;
 
     protected AbstractRobotLaunchConfiguration(final ILaunchConfiguration config) {
