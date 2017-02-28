@@ -94,7 +94,7 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getRemotePort()).isEqualTo(12345);
-        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30_000);
+        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getRemotePort()).isEqualTo(12345);
-        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30_000);
+        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
     }
 
     @Test
@@ -228,7 +228,7 @@ public class ScriptRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsEmpty_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600,000");
+        thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemoteTimeoutValue("");
@@ -238,7 +238,7 @@ public class ScriptRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsNotANumber_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout 'abc' must be an Integer between 1 and 3,600,000");
+        thrown.expectMessage("Connection timeout 'abc' must be an Integer between 1 and 3,600");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemoteTimeoutValue("abc");
@@ -248,7 +248,7 @@ public class ScriptRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsBelowRange_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '0' must be an Integer between 1 and 3,600,000");
+        thrown.expectMessage("Connection timeout '0' must be an Integer between 1 and 3,600");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemoteTimeoutValue("0");
@@ -258,10 +258,10 @@ public class ScriptRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsAboveRange_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '3600001' must be an Integer between 1 and 3,600,000");
+        thrown.expectMessage("Connection timeout '3601' must be an Integer between 1 and 3,600");
 
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
-        robotConfig.setRemoteTimeoutValue("3600001");
+        robotConfig.setRemoteTimeoutValue("3601");
         robotConfig.getRemoteTimeout();
     }
 
