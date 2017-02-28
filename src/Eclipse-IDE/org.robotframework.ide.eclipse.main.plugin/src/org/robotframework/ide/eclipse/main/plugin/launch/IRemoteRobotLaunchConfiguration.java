@@ -9,6 +9,10 @@ import org.eclipse.core.runtime.CoreException;
 
 public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfiguration {
 
+    int MAX_PORT = 65_535;
+
+    int MAX_TIMEOUT = 3_600_000;
+
     String REMOTE_HOST_ATTRIBUTE = "Remote host";
 
     String REMOTE_PORT_ATTRIBUTE = "Remote port";
@@ -34,4 +38,5 @@ public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfigurati
     void setRemoteDebugPortValue(String port) throws CoreException;
 
     void setRemoteDebugTimeoutValue(String timeout) throws CoreException;
+
 }
