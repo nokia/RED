@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/24/17 4:07 PM
+Save-Time: 2/28/17 2:04 PM
 Testcase-Type: ecl
 Verifications: _XqT4gPqgEeaJ8_kc5pFRQQ
 
@@ -223,7 +223,7 @@ get-view Console | get-text-viewer | get-property text
 
 //run test from Outline - now existing config is used
 get-view Outline | get-tree | select "tsv_file.tsv/Test Cases/embeded kw" | get-menu Run | click
-wait-for-no-progressbar
+wait-for-console
 
 get-view "Message Log" | get-editbox | get-property text 
     | equals "" | verify-true
@@ -248,7 +248,7 @@ measure-time "MyCounterName" {
 	get-view Outline | get-tree | select "TestFile.robot/Test Cases" | get-menu Run | click
 } | constrain-max duration 2000 
 
-wait-for-no-progressbar
+wait-for-console
 get-view Console | get-text-viewer | get-property text 
     | contains 
      "RunTestFromOutline.TestFile                                                   \n"
