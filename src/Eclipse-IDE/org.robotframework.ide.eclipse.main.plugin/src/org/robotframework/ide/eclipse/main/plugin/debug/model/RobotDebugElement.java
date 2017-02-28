@@ -10,7 +10,6 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
-import org.eclipse.debug.core.model.IDebugTarget;
 
 /**
  * @author mmarzec
@@ -32,8 +31,8 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
     }
 
     @Override
-    public IDebugTarget getDebugTarget() {
-        return this instanceof IDebugTarget ? (IDebugTarget) this : target;
+    public RobotDebugTarget getDebugTarget() {
+        return this instanceof RobotDebugTarget ? (RobotDebugTarget) this : target;
     }
 
     @Override

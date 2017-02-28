@@ -95,7 +95,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
         final List<IVariable> vars = newArrayList(getVariables());
         for (final IVariable var : variables) {
             final RobotDebugVariable robotVar = (RobotDebugVariable) var;
-            final RobotDebugValue value = (RobotDebugValue) robotVar.getValue();
+            final RobotDebugValue value = robotVar.getValue();
 
             vars.addAll(newArrayList(value.getVariables()));
         }
