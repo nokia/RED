@@ -21,22 +21,22 @@ public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfigurati
 
     boolean isDefiningProjectDirectly();
 
-    int getRemoteDebugPort() throws CoreException;
+    int getRemotePort() throws CoreException;
 
-    int getRemoteDebugTimeout() throws CoreException;
+    int getRemoteTimeout() throws CoreException;
 
-    String getRemoteDebugHost() throws CoreException;
+    String getRemoteHost() throws CoreException;
 
-    String getRemoteDebugPortValue() throws CoreException;
+    String getRemotePortValue() throws CoreException;
 
-    String getRemoteDebugTimeoutValue() throws CoreException;
+    String getRemoteTimeoutValue() throws CoreException;
 
-    String getRemoteDebugHostValue() throws CoreException;
+    String getRemoteHostValue() throws CoreException;
 
-    void setRemoteDebugHostValue(String host) throws CoreException;
+    void setRemoteHostValue(String host) throws CoreException;
 
-    void setRemoteDebugPortValue(String port) throws CoreException;
+    void setRemotePortValue(String port) throws CoreException;
 
-    void setRemoteDebugTimeoutValue(String timeout) throws CoreException;
+    void setRemoteTimeoutValue(String timeout) throws CoreException;
 
 }

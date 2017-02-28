@@ -96,9 +96,9 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
         setScriptPath(preferences.getLaunchScriptPath());
         setScriptArguments(preferences.getLaunchAdditionalScriptArguments());
         setScriptRunCommand(preferences.getLaunchScriptRunCommand());
-        setRemoteDebugHostValue(preferences.getLaunchRemoteHost());
-        setRemoteDebugPortValue(preferences.getLaunchRemotePort());
-        setRemoteDebugTimeoutValue(preferences.getLaunchRemoteTimeout());
+        setRemoteHostValue(preferences.getLaunchRemoteHost());
+        setRemotePortValue(preferences.getLaunchRemotePort());
+        setRemoteTimeoutValue(preferences.getLaunchRemoteTimeout());
         super.fillDefaults();
     }
 
@@ -108,8 +108,8 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
     }
 
     @Override
-    public String getRemoteDebugHost() throws CoreException {
-        final String host = getRemoteDebugHostValue();
+    public String getRemoteHost() throws CoreException {
+        final String host = getRemoteHostValue();
         if (host.isEmpty()) {
             throw newCoreException("Server IP cannot be empty");
         }
@@ -117,8 +117,8 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
     }
 
     @Override
-    public int getRemoteDebugPort() throws CoreException {
-        final String port = getRemoteDebugPortValue();
+    public int getRemotePort() throws CoreException {
+        final String port = getRemotePortValue();
         final Integer portAsInt = Ints.tryParse(port);
         if (portAsInt == null || !Range.closed(1, MAX_PORT).contains(portAsInt)) {
             throw newCoreException("Server port '" + port + "' must be an Integer between 1 and 65,535");
@@ -127,8 +127,8 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
     }
 
     @Override
-    public int getRemoteDebugTimeout() throws CoreException {
-        final String timeout = getRemoteDebugTimeoutValue();
+    public int getRemoteTimeout() throws CoreException {
+        final String timeout = getRemoteTimeoutValue();
         final Integer timeoutAsInt = Ints.tryParse(timeout);
         if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
             throw newCoreException("Connection timeout '" + timeout + "' must be an Integer between 1 and 3,600,000");
@@ -137,34 +137,34 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
     }
 
     @Override
-    public String getRemoteDebugHostValue() throws CoreException {
+    public String getRemoteHostValue() throws CoreException {
         return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "");
     }
 
     @Override
-    public String getRemoteDebugPortValue() throws CoreException {
+    public String getRemotePortValue() throws CoreException {
         return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "");
     }
 
     @Override
-    public String getRemoteDebugTimeoutValue() throws CoreException {
+    public String getRemoteTimeoutValue() throws CoreException {
         return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "");
     }
 
     @Override
-    public void setRemoteDebugHostValue(final String host) throws CoreException {
+    public void setRemoteHostValue(final String host) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(REMOTE_HOST_ATTRIBUTE, host);
     }
 
     @Override
-    public void setRemoteDebugPortValue(final String port) throws CoreException {
+    public void setRemotePortValue(final String port) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(REMOTE_PORT_ATTRIBUTE, port);
     }
 
     @Override
-    public void setRemoteDebugTimeoutValue(final String timeout) throws CoreException {
+    public void setRemoteTimeoutValue(final String timeout) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(REMOTE_TIMEOUT_ATTRIBUTE, timeout);
     }
