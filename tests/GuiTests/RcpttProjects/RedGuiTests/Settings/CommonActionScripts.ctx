@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:44 AM
+Save-Time: 2/28/17 1:45 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -126,9 +126,9 @@ proc "compare-message-log2" [val ref_content]{
 
 }
 
-proc "wait-for-no-progressbar"{
+proc "wait-for-console"{
 	try -times 10 -delay 1000 -command{
-		verify-error {get-control Any -after [get-label LF] -index 4 | get-property enablement | equals true | verify-true}
+		get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
 	}
 }
 
