@@ -41,15 +41,11 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfiguratio
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
-import com.google.common.base.CaseFormat;
-
 /**
  * @author mmarzec
  */
 public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurationTab
         implements ILaunchConfigurationTab {
-
-    private final boolean isRunMode;
 
     private ProjectComposite projectComposite;
 
@@ -60,10 +56,6 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     private Text timeoutTxt;
 
     private Text commandLineArgument;
-
-    public RobotLaunchConfigurationRemoteTab(final boolean isRunMode) {
-        this.isRunMode = isRunMode;
-    }
 
     @Override
     public void createControl(final Composite parent) {
@@ -228,9 +220,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         }
     }
 
-    private void updateCommandLineArguments(final String hostIp, final String portString) {
-        final String mode = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, Boolean.toString(!isRunMode));
-        commandLineArgument.setText("--listener TestRunnerAgent.py:" + portString + ":" + mode + ":" + hostIp);
+    private void updateCommandLineArguments(final String hostIp, final String port) {
+        commandLineArgument.setText("--listener TestRunnerAgent.py:" + hostIp + ":" + port);
     }
 
     @Override
