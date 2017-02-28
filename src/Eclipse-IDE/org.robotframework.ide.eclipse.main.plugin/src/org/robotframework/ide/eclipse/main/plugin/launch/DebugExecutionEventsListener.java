@@ -139,7 +139,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         final KeywordContext newKeywordContext = new KeywordContext(
                 keywordExecutionManager.extractExecutedFileNameWithParentFolderInfo(executedFileName),
                 keywordLineNumber, null);
-        debugTarget.getCurrentKeywordsContextMap().put(name, newKeywordContext);
+        debugTarget.getCurrentKeywordsContext().put(name, newKeywordContext);
     }
 
     private void checkKeywordBeforeStart(final String name, final String type, final List<String> args) {
@@ -234,7 +234,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
 
     @Override
     public void handleKeywordEnded(final String name, final String type) {
-        debugTarget.getCurrentKeywordsContextMap().remove(name);
+        debugTarget.getCurrentKeywordsContext().remove(name);
         executionContext.endKeyword(type);
     }
 
@@ -250,7 +250,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
 
     @Override
     public void handleVariables(final Map<String, Object> vars) {
-        debugTarget.getLastKeywordFromCurrentContextMap().setVariables(vars);
+        debugTarget.getLastKeywordFromCurrentContext().setVariables(vars);
         debugTarget.getRobotVariablesManager().sortVariablesNames(vars);
     }
 

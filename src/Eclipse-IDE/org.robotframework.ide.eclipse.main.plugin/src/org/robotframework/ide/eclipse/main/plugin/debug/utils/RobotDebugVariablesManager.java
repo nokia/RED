@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.debug.core.DebugException;
@@ -19,6 +19,7 @@ import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValueOfDictionary;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
 
 /**
@@ -39,7 +40,7 @@ public class RobotDebugVariablesManager {
 
     private Map<String, String> globalVariables;
 
-    private final Map<String, IVariable> nestedGlobalVars;
+    private final Map<String, RobotDebugVariable> nestedGlobalVars;
 
     private final LinkedList<String> sortedVariablesNames;
 
@@ -106,9 +107,8 @@ public class RobotDebugVariablesManager {
             final Map<String, IVariable> nonGlobalVariablesMap) {
         for (final String variableName : sortedVariablesNames) {
             if (!globalVariables.containsKey(variableName) && newVariables.containsKey(variableName)) {
-                final RobotDebugVariable newVariable = new RobotDebugVariable(target, variableName,
-                        newVariables.get(variableName), null);
-                nonGlobalVariablesMap.put(variableName, newVariable);
+                nonGlobalVariablesMap.put(variableName,
+                        new RobotDebugVariable(target, variableName, newVariables.get(variableName)));
             }
         }
     }
@@ -119,13 +119,13 @@ public class RobotDebugVariablesManager {
             if (newVariables.containsKey(variableName)) {
                 if (!globalVariables.containsKey(variableName)) {
                     final RobotDebugVariable newVariable = new RobotDebugVariable(target, variableName,
-                            newVariables.get(variableName), null);
+                            newVariables.get(variableName));
                     newVariable.setHasValueChanged(hasValueChanged(variableName, newVariable, previousVariablesMap));
                     nonGlobalVariablesMap.put(variableName, newVariable);
                 } else {
                     if (isNewGlobalVariable(newVariables, variableName)) {
                         nestedGlobalVars.put(variableName,
-                                new RobotDebugVariable(target, variableName, newVariables.get(variableName), null));
+                                new RobotDebugVariable(target, variableName, newVariables.get(variableName)));
                     }
                 }
             }
@@ -136,20 +136,16 @@ public class RobotDebugVariablesManager {
             final Map<String, IVariable> previousVariablesMap) {
 
         if (previousVariablesMap.containsKey(newVarName)) {
-            try {
-                final RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
-                if (newVariable.getValue().hasVariables() && previousVariable.getValue().hasVariables()) {
-                    return compareNestedVariables(newVariable.getValue().getVariables(),
-                            previousVariable.getValue().getVariables());
-                }
-                final String variablePreviousValue = previousVariable.getValue().getValueString();
-                final String variableNewValue = newVariable.getValue().getValueString();
-                if (variablePreviousValue != null && !variablePreviousValue.equals(variableNewValue)
-                        && previousVariable.supportsValueModification()) {
-                    return true;
-                }
-            } catch (final DebugException e) {
-                e.printStackTrace();
+            final RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
+            if (newVariable.getValue().hasVariables() && previousVariable.getValue().hasVariables()) {
+                return compareNestedVariables(newVariable.getValue().getVariables(),
+                        previousVariable.getValue().getVariables());
+            }
+            final String variablePreviousValue = previousVariable.getValue().getValueString();
+            final String variableNewValue = newVariable.getValue().getValueString();
+            if (variablePreviousValue != null && !variablePreviousValue.equals(variableNewValue)
+                    && previousVariable.supportsValueModification()) {
+                return true;
             }
         }
         return false;
@@ -228,43 +224,19 @@ public class RobotDebugVariablesManager {
     public void setGlobalVariables(final Map<String, String> globalVariables) {
         if (globalVariables != null) {
             this.globalVariables = globalVariables;
-            final Set<String> set = globalVariables.keySet();
-            for (final String key : set) {
-                final RobotDebugVariable globalVar = new RobotDebugVariable(target, key, globalVariables.get(key),
-                        null);
-                globalVar.setValueModificationEnabled(false);
-                nestedGlobalVars.put(key, globalVar);
+            for (final String key : globalVariables.keySet()) {
+                final RobotDebugVariable variable = new RobotDebugVariable(target, key, globalVariables.get(key));
+                variable.disableValueModificationSupport();
+                nestedGlobalVars.put(key, variable);
             }
         }
     }
 
     private RobotDebugVariable createGlobalVariable() {
-        final RobotDebugVariable variable = new RobotDebugVariable(target, GLOBAL_VARIABLE_NAME, "", null);
-        variable.setValueModificationEnabled(false);
-        final RobotDebugValue value = new RobotDebugValue(target, "",
-                nestedGlobalVars.values().toArray(new IVariable[nestedGlobalVars.size()]));
-        variable.setRobotDebugValue(value);
-
+        final RobotDebugValue value = new RobotDebugValueOfDictionary(target, "",
+                newArrayList(nestedGlobalVars.values()));
+        final RobotDebugVariable variable = new RobotDebugVariable(target, GLOBAL_VARIABLE_NAME, value);
+        variable.disableValueModificationSupport();
         return variable;
     }
-
-    public String extractVariableRootAndChilds(final RobotDebugVariable parent, final List<String> childNameList,
-            final String variableName) {
-        final String parentName = parent.getName();
-        if (parent.getParent() == null) {
-            childNameList.add(extractChildName(variableName));
-            return parentName;
-        } else {
-            childNameList.add(0, extractChildName(parentName));
-            return extractVariableRootAndChilds(parent.getParent(), childNameList, variableName);
-        }
-    }
-
-    private String extractChildName(final String variableName) {
-        if (variableName.indexOf("[") >= 0 && variableName.indexOf("]") >= 0) {
-            return variableName.substring(1, variableName.indexOf("]"));
-        }
-        return variableName;
-    }
-
 }

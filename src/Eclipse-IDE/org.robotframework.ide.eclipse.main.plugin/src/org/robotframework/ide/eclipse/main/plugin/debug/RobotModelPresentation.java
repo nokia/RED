@@ -19,8 +19,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValue;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueManager;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 /**
@@ -71,7 +71,9 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
 
     @Override
     public void computeDetail(final IValue value, final IValueDetailListener listener) {
-        listener.detailComputed(value, RobotDebugValueManager.extractValueDetail(value));
+        if (value instanceof RobotDebugValue) {
+            listener.detailComputed(value, ((RobotDebugValue) value).getDetailedValue());
+        }
     }
     
     @Override
