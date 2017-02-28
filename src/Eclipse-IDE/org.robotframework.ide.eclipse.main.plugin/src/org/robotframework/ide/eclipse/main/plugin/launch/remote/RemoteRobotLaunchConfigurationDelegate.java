@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import java.io.IOException;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -15,41 +15,27 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
-import org.eclipse.debug.ui.ILaunchShortcut2;
+import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 import org.robotframework.red.swt.SwtThread;
 
 
-public class RemoteRobotLaunchConfigurationDelegate implements ILaunchConfigurationDelegate, ILaunchShortcut2 {
+public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
     private final RobotEventBroker robotEventBroker;
 
     public RemoteRobotLaunchConfigurationDelegate() {
         this.robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
-    }
-
-    @Override
-    public void launch(final ISelection selection, final String mode) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void launch(final IEditorPart editor, final String mode) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -111,23 +97,10 @@ public class RemoteRobotLaunchConfigurationDelegate implements ILaunchConfigurat
     }
 
     @Override
-    public ILaunchConfiguration[] getLaunchConfigurations(final ISelection selection) {
-        return null;
-    }
-
-    @Override
-    public ILaunchConfiguration[] getLaunchConfigurations(final IEditorPart editorpart) {
-        return null;
-    }
-
-    @Override
-    public IResource getLaunchableResource(final ISelection selection) {
-        return null;
-    }
-
-    @Override
-    public IResource getLaunchableResource(final IEditorPart editorpart) {
-        return null;
+    protected IProject[] getProjectsForProblemSearch(final ILaunchConfiguration configuration, final String mode)
+            throws CoreException {
+        return new IProject[] {
+                LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getRobotProject().getProject() };
     }
 
     private static CoreException newCoreException(final String message) {
