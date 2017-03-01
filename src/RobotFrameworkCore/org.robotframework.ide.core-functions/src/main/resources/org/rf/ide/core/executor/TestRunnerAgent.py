@@ -111,7 +111,6 @@ class TestRunnerAgent:
         self.sock = None
         self.filehandler = None
         self.decoder_encoder = None
-        self._is_robot_paused = False
         
         if self._connect():
             self._is_debug_enabled, wait_for_signal = self._send_agent_initializing()
@@ -165,12 +164,9 @@ class TestRunnerAgent:
                 variables = GlobalVariables(RobotSettings()).as_dict()
 
             data = {}
-            for k in variables.keys():
-                if not (k.startswith('${') or k.startswith('@{')):
-                    key = '${' + k + '}'
-                else:
-                    key = k
-                data[key] = str(variables[k])
+            for key in variables.keys():
+                new_key = '${' + key + '}' if not key.startswith('${') and not key.startswith('@{') else key
+                data[new_key] = str(variables[key])
             self._send_to_server('global_vars', 'global_vars', data)
         except Exception as e:
             self.print_error_message(
@@ -197,11 +193,11 @@ class TestRunnerAgent:
         self._send_to_server('start_keyword', name, attrs_copy)
         if self._is_debug_enabled:
             self._send_vars()
-        self._is_robot_paused = False
+        is_robot_paused = False
         if self._is_debug_enabled:
             if self._check_breakpoint():
-                self._is_robot_paused = True
-        if self._is_robot_paused:
+                is_robot_paused = True
+        if is_robot_paused:
             self._send_to_server('paused')
             self._wait_for_resume()
 
@@ -229,16 +225,16 @@ class TestRunnerAgent:
                 if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
                     try:
                         if (type(value) is list) or (isinstance(value, dict)):
-                            data[k] = self.fix_unicode(copy.copy(value))
+                            data[k] = self._fix_unicode(copy.copy(value))
                         else:
-                            data[k] = str(self.fix_unicode(value))
+                            data[k] = str(self._fix_unicode(value))
                     except:
                         data[k] = 'None'
             self._send_to_server('vars', 'vars', data)
         except Exception as e:
             self.print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
 
-    def fix_unicode(self, data):
+    def _fix_unicode(self, data):
         if sys.version_info < (3, 0, 0) and isinstance(data, unicode):
             v = data.encode('utf-8')
             if len(v) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
@@ -255,31 +251,31 @@ class TestRunnerAgent:
                 v = v[:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
             return v
         elif isinstance(data, dict):
-            data = dict((self.fix_unicode(k), self.fix_unicode(data[k])) for k in data)
+            data = dict((self._fix_unicode(k), self._fix_unicode(data[k])) for k in data)
         elif isinstance(data, list):
             range_fun = xrange if sys.version_info < (3, 0, 0) else range
             for i in range_fun(0, len(data)):
-                data[i] = self.fix_unicode(data[i])
+                data[i] = self._fix_unicode(data[i])
         elif inspect.ismodule(data) or inspect.isfunction(data) or inspect.isclass(data):
-            data = self.fix_unicode(str(data))
+            data = self._fix_unicode(str(data))
         elif data is None:
-            data = self.fix_unicode('None')
+            data = self._fix_unicode('None')
         else:
-            data = self.fix_unicode(str(data))
+            data = self._fix_unicode(str(data))
         return data
 
     def _check_breakpoint(self):
-        data = ''
         self._send_to_server('check_condition')
-        response = self._wait_for_reponse('stop', 'continue', 'interrupt', 'keyword_condition')
-        if response.keys()[0] == 'stop':
-            return True
-        elif response.keys()[0] == 'continue':
-            return False
-        elif response.keys()[0] == 'interrupt':
-            sys.exit()
-        elif response.keys()[0] == 'keyword_condition':
-            self._run_condition_keyword(data)
+        while True:
+            response = self._wait_for_reponse('stop', 'continue', 'interrupt', 'keyword_condition')
+            if response.keys()[0] == 'stop':
+                return True
+            elif response.keys()[0] == 'continue':
+                return False
+            elif response.keys()[0] == 'interrupt':
+                sys.exit()
+            elif response.keys()[0] == 'keyword_condition':
+                self._run_condition_keyword(response)
 
     def _run_condition_keyword(self, condition):
         try:
@@ -292,6 +288,7 @@ class TestRunnerAgent:
             self._send_to_server('condition_result', result)
         except Exception as e:
             self._send_to_server('condition_error', str(e))
+        self._send_to_server('condition_checked')
 
     def _check_changed_variable(self, data):
         try:
