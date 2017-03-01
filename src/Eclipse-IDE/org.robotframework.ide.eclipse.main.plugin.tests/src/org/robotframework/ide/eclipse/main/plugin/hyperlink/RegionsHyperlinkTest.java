@@ -39,7 +39,7 @@ public class RegionsHyperlinkTest {
         assertThat(link.getTypeLabel()).isNull();
         assertThat(link.getHyperlinkRegion()).isEqualTo(new Region(20, 50));
         assertThat(link.getDestinationRegion()).isEqualTo(new Region(100, 10));
-        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition");
+        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition ");
         assertThat(link.getLabelForCompoundHyperlinksDialog()).isEqualTo("[local definition in current file]");
         assertThat(link.additionalLabelDecoration()).isEmpty();
         assertThat(link.getImage()).isEqualTo(RedImages.getImageForFileWithExtension(""));
@@ -51,11 +51,11 @@ public class RegionsHyperlinkTest {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
 
         final RegionsHyperlink link = new RegionsHyperlink(textViewer, suiteFile, new Region(20, 50),
-                new Region(100, 10), "decoration");
+                new Region(100, 10), "decoration", "element");
         assertThat(link.getTypeLabel()).isNull();
         assertThat(link.getHyperlinkRegion()).isEqualTo(new Region(20, 50));
         assertThat(link.getDestinationRegion()).isEqualTo(new Region(100, 10));
-        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition");
+        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition element");
         assertThat(link.getLabelForCompoundHyperlinksDialog()).isEqualTo("file.robot");
         assertThat(link.additionalLabelDecoration()).isEqualTo("decoration");
         assertThat(link.getImage()).isEqualTo(RedImages.getImageForFileWithExtension("robot"));

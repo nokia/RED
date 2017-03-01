@@ -67,7 +67,12 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return "Open Definition";
+        return "Open Definition " + elementName();
+    }
+
+    @Override
+    public String elementName() {
+        return kwSpec.getName();
     }
 
     @Override
