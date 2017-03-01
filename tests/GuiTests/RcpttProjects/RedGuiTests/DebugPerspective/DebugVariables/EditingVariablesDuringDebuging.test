@@ -1,0 +1,218 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: EditingVariablesDuringDebuging
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Z2XpsP28EeaFC_dPBuoMWQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/1/17 7:51 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "change-value" [val var_name] [val value]{
+	with [get-view Variables | get-tree] {
+	    select $var_name | activate-cell-edit -column 1
+	    with [get-editbox] {
+	        set-text $value
+	        key-type Enter
+	    }
+	    apply-cell-edit -deactivate
+	}
+}
+
+proc "move-focus-up"{
+	wait 500
+	with [get-view Variables | get-tree] {
+	    select "${TEST_DOCUMENTATION}" | key-type Home
+	    wait 500
+	    select "${a}"
+    }
+    wait 1000
+}
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+
+//set test
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
+    + "${a}    text with space\n"
+    + "@{my list}    1  2  3   here is string        \n"
+    + "&{browsers}    IE=InternetExpl    ff=firefox    chrome= chrome\n"
+    + "@{has list and variable}    ${a}   @{my list}      \n"
+    + "&{empty_dict}    \n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  12\n"
+    + "    log  ${example}\n"
+    + "    log  ${a}\n"
+    + "    log  13\n"
+    + "    Log many  @{my list}\n"
+    + "    log many  &{browsers}\n"
+    + "    ${new}=  Set Variable    flower\n"
+    + "    &{abc}=  Create Dictionary  1=\"abba\"   var=${a}      \n"
+    + "    log  ${new}" 
+    
+get-editor "TestFile.robot" | get-text-viewer |  key-type "M1+s"
+
+//run to create run config
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/TestFile.robot"
+    with [get-group Executor | get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
+        set-text "-v example:90"
+    }
+    get-button Apply | click
+    get-button Close | click
+}
+//set breakpoint
+with [get-editor "TestFile.robot"] {
+    with [get-left-ruler | get-ruler-column AnnotationColumn] {
+        double-click-ruler 9
+    }
+}
+
+exec-with-options -disableJobWaiting -command {
+	//get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
+	get-menu "Run/Debug Configurations..." | click
+	with [get-window "Debug Configurations"] {
+	    get-tree | select "Robot/TestFile.robot"
+	    get-button Debug | click
+	}
+	wait-for-thread -file "TestFile.robot"
+
+	//set value to var from arg
+	change-value -var_name "${example}" -value "var form arg"
+	
+	// go to line that prints this var
+	with [get-button "Step Into (F5)"] {
+	    click
+	    wait 500
+	    click
+	}
+	//change value of simple variable
+	change-value -var_name "${a}" -value "1  2 "
+	
+	get-button "Step Into (F5)" | click
+	
+	//check if list has chnaged fisr value (because parm $a was changed)
+	get-view Variables | get-tree | get-item "@{has list and variable}" | expand-all
+	with [get-view Variables | get-tree] {
+	    get-item "@{has list and variable}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{has list and variable}/\\[0\\]" | get-property "values['Value']" | equals "text with space" 
+	        | verify-true
+	    get-item "@{has list and variable}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{has list and variable}/\\[1\\]" | get-property "values['Value']" | equals 1 | verify-true
+	    get-item "@{has list and variable}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{has list and variable}/\\[2\\]" | get-property "values['Value']" | equals 2 | verify-true
+	    get-item "@{has list and variable}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
+	    get-item "@{has list and variable}/\\[3\\]" | get-property "values['Value']" | equals 3 | verify-true
+	    get-item "@{has list and variable}/\\[4\\]" | get-property "values['Name']" | equals "[4]" | verify-true
+	    get-item "@{has list and variable}/\\[4\\]" | get-property "values['Value']" | equals "here is string" | verify-true
+	    get-item "${a}" | get-property "values['Name']" | equals "${a}" | verify-true
+	    get-item "${a}" | get-property "values['Value']" | equals "1  2 " | verify-true
+	    get-item "${example}" | get-property "values['Name']" | equals "${example}" | verify-true
+	    get-item "${example}" | get-property "values['Value']" | equals "var form arg" | verify-true
+	}
+	
+	//change item in list that is other list
+	change-value -var_name "@{has list and variable}/\\[2\\]" -value "here was \"two\""
+	
+	//change value in simple list (last value is param)
+	get-view Variables | get-tree | get-item "@{my list}" | expand-all
+	change-value -var_name "@{my list}/\\[0\\]" -value "first item"
+	with [get-view Variables | get-tree] {
+	    get-item "@{my list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{my list}/\\[0\\]" | get-property "values['Value']" | equals "first item" | verify-true
+	    get-item "@{my list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{my list}/\\[1\\]" | get-property "values['Value']" | equals 2 | verify-true
+	    get-item "@{my list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{my list}/\\[2\\]" | get-property "values['Value']" | equals 3 | verify-true
+	    get-item "@{my list}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
+	    get-item "@{my list}/\\[3\\]" | get-property "values['Value']" | equals "here is string" | verify-true
+	}
+
+	with [get-button "Step Into (F5)"] {
+	    click
+	    wait 500
+	    click
+	}
+	move-focus-up
+	//change value in list to empty
+	change-value -var_name "&{browsers}/chrome" -value ""
+	
+	with [get-button "Step Into (F5)"] {
+	    click
+	    wait 500
+	    click
+	}
+	move-focus-up
+	//change vlaue of creted var in test
+	change-value -var_name"${new}" -value "animal"
+
+	get-button "Step Into (F5)" | click
+	move-focus-up
+	
+	//check if dict cretaed by command has updated value from param
+	with [get-view Variables | get-tree] {
+	    get-item "&{abc}/1" | get-property "values['Name']" | equals 1 | verify-true
+	    get-item "&{abc}/1" | get-property "values['Value']" | equals "\"abba\"" | verify-true
+	    get-item "&{abc}/var" | get-property "values['Name']" | equals var | verify-true
+	    get-item "&{abc}/var" | get-property "values['Value']" | equals "1  2 " | verify-true
+	}
+
+
+	
+	with [get-view Variables | get-tree] {
+	    get-item "${example}" | get-property "values['Value']" | equals "var form arg" | verify-true
+	    get-item "&{browsers}/IE" | get-property "values['Value']" | equals InternetExpl | verify-true
+	    get-item "&{browsers}/chrome" | get-property "values['Value']" | equals "" | verify-true
+	    get-item "&{browsers}/ff" | get-property "values['Name']" | equals ff | verify-true
+	    get-item "&{browsers}/ff" | get-property "values['Value']" | equals firefox | verify-true
+	    get-item "&{empty_dict}" | get-property "values['Name']" | equals "&{empty_dict}" | verify-true
+	    get-item "&{empty_dict}" | get-property "values['Value']" | equals "Dictionary[0]" | verify-true
+	}
+	with [get-view Variables | get-tree] {
+	    get-item "@{my list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{my list}/\\[0\\]" | get-property "values['Value']" | equals "first item" | verify-true
+	    get-item "@{my list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{my list}/\\[1\\]" | get-property "values['Value']" | equals 2 | verify-true
+	    get-item "@{my list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{my list}/\\[2\\]" | get-property "values['Value']" | equals 3 | verify-true
+	    get-item "@{my list}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
+	    get-item "@{my list}/\\[3\\]" | get-property "values['Value']" | equals "here is string" | verify-true
+	    
+	  
+	    get-item "${a}" | get-property "values['Name']" | equals "${a}" | verify-true
+	    get-item "${a}" | get-property "values['Value']" | equals "1  2 " | verify-true
+	    
+	    get-item "${example}" | get-property "values['Value']" | equals "var form arg" | verify-true
+	}
+	get-button "Resume (F8)" | click
+
+}
+
+get-view "Message Log" | get-editbox | get-property text | matches "Starting test: RobotProject.TestFile.test\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : 12\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : var form arg\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : 1  2 \n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : 13\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : first item\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : 2\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : 3\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : here is string\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : IE=InternetExpl\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : ff=firefox\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : chrome=\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : \$\{new\} = flower\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : &\{abc\} = \{ 1=\"abba\" \| var=1  2  \}\n"
+    + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : animal\n"
+    + "Ending test: RobotProject.TestFile.test" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
