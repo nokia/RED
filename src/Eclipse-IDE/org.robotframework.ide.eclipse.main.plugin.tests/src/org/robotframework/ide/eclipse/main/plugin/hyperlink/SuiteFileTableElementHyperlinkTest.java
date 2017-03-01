@@ -60,7 +60,7 @@ public class SuiteFileTableElementHyperlinkTest {
         assertThat(link.getHyperlinkRegion()).isEqualTo(new Region(20, 10));
         assertThat(link.getDestinationFile()).isSameAs(sourceModel);
         assertThat(link.getDestinationElement()).isSameAs(element);
-        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition");
+        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition label");
         assertThat(link.getLabelForCompoundHyperlinksDialog()).isEqualTo("file.robot");
         assertThat(link.additionalLabelDecoration()).isEmpty();
         assertThat(link.getImage()).isEqualTo(RedImages.getImageForFileWithExtension("robot"));

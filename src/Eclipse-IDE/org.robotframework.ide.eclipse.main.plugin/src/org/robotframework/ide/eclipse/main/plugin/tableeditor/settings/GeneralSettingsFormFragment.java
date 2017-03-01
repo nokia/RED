@@ -626,8 +626,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
         detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
-        detector.addDetectors(new TableHyperlinksToKeywordsDetector(dataProvider),
-                new TableHyperlinksToVariablesDetector(dataProvider));
+        detector.addDetectors(new TableHyperlinksToVariablesDetector(dataProvider),
+                new TableHyperlinksToKeywordsDetector(dataProvider));
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());

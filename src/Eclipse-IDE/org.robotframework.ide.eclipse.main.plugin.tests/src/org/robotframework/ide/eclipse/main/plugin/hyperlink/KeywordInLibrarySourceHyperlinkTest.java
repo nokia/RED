@@ -80,7 +80,7 @@ public class KeywordInLibrarySourceHyperlinkTest {
                 projectProvider.getProject(), libSpec, kwSpec);
         assertThat(link.getTypeLabel()).isNull();
         assertThat(link.getHyperlinkRegion()).isEqualTo(new Region(20, 50));
-        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition");
+        assertThat(link.getHyperlinkText()).isEqualTo("Open Definition keyword");
         assertThat(link.getLabelForCompoundHyperlinksDialog()).isEqualTo("testlib");
         assertThat(link.additionalLabelDecoration())
                 .isEqualTo("[" + projectProvider.getFile("testlib.py").getLocation().toString() + "]");

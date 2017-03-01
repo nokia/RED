@@ -58,7 +58,12 @@ public class SuiteFileTableElementHyperlink extends RedClipboard implements RedH
 
     @Override
     public String getHyperlinkText() {
-        return "Open Definition";
+        return "Open Definition " + elementName();
+    }
+
+    @Override
+    public String elementName() {
+        return labelPart == null ? targetElement.getName() : labelPart;
     }
 
     @Override

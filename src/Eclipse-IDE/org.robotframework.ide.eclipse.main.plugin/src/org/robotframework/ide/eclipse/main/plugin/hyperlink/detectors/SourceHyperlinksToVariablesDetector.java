@@ -76,13 +76,13 @@ public class SourceHyperlinksToVariablesDetector extends HyperlinksToVariablesDe
     @Override
     protected IHyperlink createLocalVariableHyperlink(final RobotFileInternalElement element, final String varName,
             final IRegion fromRegion, final RobotSuiteFile suiteFile, final IRegion destination) {
-        return new RegionsHyperlink(textViewer, fromRegion, destination);
+        return new RegionsHyperlink(textViewer, null, fromRegion, destination, "", varName);
     }
 
     @Override
     protected IHyperlink createResourceVariableHyperlink(final RobotFileInternalElement element, final String varName,
             final IRegion fromRegion, final RobotSuiteFile suiteFile, final IRegion destination) {
-        return new SuiteFileSourceRegionHyperlink(fromRegion, suiteFile, destination);
+        return new SuiteFileSourceRegionHyperlink(fromRegion, suiteFile, destination, "", varName);
     }
 
 }

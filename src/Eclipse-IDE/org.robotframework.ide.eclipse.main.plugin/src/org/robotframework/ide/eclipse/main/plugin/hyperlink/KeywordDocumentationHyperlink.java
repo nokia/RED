@@ -78,6 +78,11 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
     }
 
     @Override
+    public String elementName() {
+        return kwSpec.getName();
+    }
+
+    @Override
     public String getLabelForCompoundHyperlinksDialog() {
         return libSpec.getName();
     }

@@ -29,17 +29,20 @@ public class RegionsHyperlink implements RedHyperlink {
 
     private final String additionalLabelDecoration;
 
+    private final String elementName;
+
     public RegionsHyperlink(final ITextViewer viewer, final IRegion from, final IRegion to) {
-        this(viewer, null, from, to, "");
+        this(viewer, null, from, to, "", "");
     }
 
     public RegionsHyperlink(final ITextViewer viewer, final RobotSuiteFile fromAndToFile, final IRegion from,
-            final IRegion to, final String additionalLabelDecoration) {
+            final IRegion to, final String additionalLabelDecoration, final String elementName) {
         this.viewer = viewer;
         this.sourceAndDestinationFile = fromAndToFile;
         this.source = from;
         this.destination = to;
         this.additionalLabelDecoration = additionalLabelDecoration;
+        this.elementName = elementName;
     }
 
     @Override
@@ -59,7 +62,12 @@ public class RegionsHyperlink implements RedHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return "Open Definition";
+        return "Open Definition " + elementName();
+    }
+
+    @Override
+    public String elementName() {
+        return elementName;
     }
 
     @Override
