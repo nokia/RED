@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _BW-V4B8oEeWYlfCPyvfohw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 4:37 PM
+Save-Time: 3/1/17 8:25 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -20,11 +20,11 @@ proc "robot-specific" [val robot2_8] [val robot_2_9]
 	if [$robot_version | matches "^Robot Framework 2\.8\.\d .*"] { 
 		echo $robot_2_8
 	}
-	if [$robot_version | matches "^Robot Framework 2\.\9\d?.*"] { 
+	if [$robot_version | matches "^Robot Framework 2\.\9(\.\d)? .*"] { 
 		echo $robot_2_9
 	}
 	//make for the feature if will be 3.\d\d
-	if [$robot_version | matches "^Robot Framework 3\.\d\d? .*"] { 
+	if [$robot_version | matches "^Robot Framework 3\.\d\.\d? .*"] { 
 		echo $robot_2_9
 	}
 }
