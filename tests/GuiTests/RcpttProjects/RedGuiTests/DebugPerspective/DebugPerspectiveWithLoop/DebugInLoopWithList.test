@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Fy_PcKTFEeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/20/17 5:54 PM
+Save-Time: 3/1/17 8:19 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -148,7 +148,7 @@ exec-with-options -disableJobWaiting -command {
 
 	//resume loop with kw: Exit For Loop
 	get-button "Resume (F8)" | click
-	
+	wait 500
 	//BP set in test wit loop and ZIP
 	with [get-view Debug | get-tree] {
 	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
@@ -176,8 +176,11 @@ exec-with-options -disableJobWaiting -command {
 	//go to test with IN ENUMERATE
 	with [get-button "Resume (F8)"] {
 	    click
+	    wait 300
 	    click
+	    wait 300
 	    click
+	    wait 300
 	}
 	with [get-view Debug | get-tree] {
 	    get-item "TestFile.robot \\[Robot\\]/Robot Test at .*/Thread \\[main\\]" 
