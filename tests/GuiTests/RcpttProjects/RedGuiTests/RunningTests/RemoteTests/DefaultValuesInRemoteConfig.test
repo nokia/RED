@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HO73kPzXEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/28/17 2:39 PM
+Save-Time: 3/1/17 11:33 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -38,22 +38,28 @@ proc "check-label-for-error" [val val] [val errorType]{
 	    	
 } 
 
-proc "check-command-line" [val text]{
+proc "check-command-line" [val ip] [val port]{
 	get-window "Run Configurations" | get-group "Remote Client" | get-editbox 
    		 -after [get-label "Add following argument to command line when running tests on client side"] | get-property text 
-   		| equals $text | verify-true
+   		| equals [format "--listener TestRunnerAgent.py:%s:%s" $ip $port] | verify-true
 }    
 get-menu "Run/Run Configurations..." | click
 
-//add new run config by clicking in Run Config.. panel
-get-window "Run Configurations" | get-tree | select "Remote Robot" | double-click
 with [get-window "Run Configurations" | get-tree] {
-    get-item "Remote Robot" | get-property childCount | equals 1 | verify-true
-    get-item "Remote Robot" | get-property "getText()" | equals "Remote Robot" | verify-true
+    get-item Robot | get-property caption | equals Robot | verify-true
+    get-item "Robot Remote" | get-property caption | equals "Robot Remote" | verify-true
+    get-item "Robot Script" | get-property caption | equals "Robot Script" | verify-true
+}
+
+//add new run config by clicking in Run Config.. panel
+get-window "Run Configurations" | get-tree | select "Robot Remote" | double-click
+with [get-window "Run Configurations" | get-tree] {
+    get-item "Robot Remote" | get-property childCount | equals 1 | verify-true
+    get-item "Robot Remote" | get-property "getText()" | equals "Robot Remote" | verify-true
 }
 
 //check if project is not selected
-get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration"
+get-window "Run Configurations" | get-tree | select "Robot Remote/New_configuration"
 with [get-window "Run Configurations"] {
     get-editbox -after [get-label "Name:"] | get-property text | equals "New_configuration" | verify-true
     with [get-group Project] {
@@ -89,7 +95,7 @@ with [get-window "Run Configurations"] {
         get-property "getChildren().Control[2].getText()" 
             | equals "Add following argument to command line when running tests on client side" | verify-true
         get-property "getChildren().Control[3].getText()" 
-            | equals "--listener TestRunnerAgent.py:12345:False:127.0.0.1" | verify-true
+            | equals "--listener TestRunnerAgent.py:127.0.0.1:12345" | verify-true
         get-property "getChildren().Control[3].getEditable()" | equals false | verify-true
     }
 }
@@ -137,29 +143,29 @@ check-label-for-error -val "Server IP cannot be empty" -errorType IP
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local IP:"] 
     | set-text "10.154.2.3"
 check-label-for-no-error
-check-command-line "--listener TestRunnerAgent.py:12345:False:10.154.2.3"
+check-command-line -ip "10.154.2.3" -port "12345"
 //set onet.pl
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local IP:"] 
     | set-text "www.onet.pl"
 check-label-for-no-error
-check-command-line "--listener TestRunnerAgent.py:12345:False:www.onet.pl"
+check-command-line -ip "www.onet.pl" -port "12345"
 
 // ------------------------------- port ----------------------------------------------------------------------------------
 
 //add 0 as port
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 0
 check-label-for-error -val "0" -errorType "port"
-check-command-line "--listener TestRunnerAgent.py:0:False:www.onet.pl"
+check-command-line -ip "www.onet.pl" -port "0"
 
 //add max port
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 65535
 check-label-for-no-error
-check-command-line "--listener TestRunnerAgent.py:65535:False:www.onet.pl"
+check-command-line -ip "www.onet.pl" -port "65535"
 
 //add min port
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text 1
 check-label-for-no-error
-check-command-line "--listener TestRunnerAgent.py:1:False:www.onet.pl"
+check-command-line -ip "www.onet.pl" -port "1"
 
 //add negative port
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local port:"] | set-text "-1"
@@ -188,13 +194,13 @@ check-label-for-no-error
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] 
     | set-text "apple"
 check-label-for-error -val "apple" -errorType "timeout"    
-check-command-line "--listener TestRunnerAgent.py:4569:False:www.onet.pl"    
+check-command-line -port "4569" -ip "www.onet.pl"    
 
 //set maximal value    
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] 
     | set-text 3600
 check-label-for-no-error
-check-command-line "--listener TestRunnerAgent.py:4569:False:www.onet.pl"        
+check-command-line -port "4569" -ip "www.onet.pl"          
 
 
 //save changed and add new config
@@ -203,14 +209,14 @@ with [get-window "Run Configurations"] {
 }
 
 //add new
-get-window "Run Configurations" | get-tree | select "Remote Robot" | double-click
+get-window "Run Configurations" | get-tree | select "Robot Remote" | double-click
 with [get-window "Run Configurations" | get-tree] {
-    get-item "Remote Robot" | get-property childCount | equals 2 | verify-true
-    get-item "Remote Robot" | get-property "getItems().TreeItem[0].getText()" | equals "New_configuration" | verify-true
-    get-item "Remote Robot" | get-property "getItems().TreeItem[1].getText()" | equals "New_configuration (1)" 
+    get-item "Robot Remote" | get-property childCount | equals 2 | verify-true
+    get-item "Robot Remote" | get-property "getItems().TreeItem[0].getText()" | equals "New_configuration" | verify-true
+    get-item "Robot Remote" | get-property "getItems().TreeItem[1].getText()" | equals "New_configuration (1)" 
         | verify-true
 }
-get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration"
+get-window "Run Configurations" | get-tree | select "Robot Remote/New_configuration"
 with [get-window "Run Configurations" | get-group "RED Server"] {
     get-editbox -after [get-label "Local IP:"] | get-property text | equals "www.onet.pl" | verify-true
     get-editbox -after [get-label "Local port:"] | get-property text | equals 4569 | verify-true
@@ -218,7 +224,7 @@ with [get-window "Run Configurations" | get-group "RED Server"] {
 }
 
 //check second config if it has no copied fields
-get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration (1)"
+get-window "Run Configurations" | get-tree | select "Robot Remote/New_configuration (1)"
 with [get-window "Run Configurations"] {
     get-group Project | get-editbox | get-property text | equals "" | verify-true
     with [get-group "RED Server"] {
@@ -232,7 +238,7 @@ get-window "Run Configurations" | get-button Close | click
 
 //open again and export python script
 get-menu "Run/Run Configurations..." | click
-get-window "Run Configurations" | get-tree | select "Remote Robot/New_configuration"
+get-window "Run Configurations" | get-tree | select "Robot Remote/New_configuration"
 set-dialog-result Folder $RED_workspace_path
 get-window "Run Configurations" | get-group "Remote Client" | get-button "Export Client Script" | click
 get-window "Run Configurations" | get-button Close | click
