@@ -37,16 +37,19 @@ public class SuiteFileSourceRegionHyperlink implements RedHyperlink {
 
     private final String additionalLabelDecoration;
 
+    private final String elementName;
+
     public SuiteFileSourceRegionHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to) {
-        this(from, toFile, to, "");
+        this(from, toFile, to, "", "");
     }
 
     public SuiteFileSourceRegionHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to,
-            final String additionalLabelDecoration) {
+            final String additionalLabelDecoration, final String elementName) {
         this.source = from;
         this.destinationFile = toFile;
         this.destination = to;
         this.additionalLabelDecoration = additionalLabelDecoration;
+        this.elementName = elementName;
     }
 
     @Override
@@ -71,7 +74,12 @@ public class SuiteFileSourceRegionHyperlink implements RedHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return "Open Definition";
+        return "Open Definition " + elementName();
+    }
+
+    @Override
+    public String elementName() {
+        return elementName;
     }
 
     @Override

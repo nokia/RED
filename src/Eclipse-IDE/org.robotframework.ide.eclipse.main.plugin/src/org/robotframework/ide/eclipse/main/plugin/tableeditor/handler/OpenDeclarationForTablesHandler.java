@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
@@ -15,6 +16,7 @@ import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -56,6 +58,16 @@ public class OpenDeclarationForTablesHandler extends DIParameterizedHandler<E4Op
 
     private static Optional<IHyperlink> getHyperlink(final int row, final int column, final String label,
             final List<ITableHyperlinksDetector> detectors) {
+        final List<ITableHyperlinksDetector> keywordDetector = detectors.stream()
+                .filter(TableHyperlinksToKeywordsDetector.class::isInstance)
+                .map(TableHyperlinksToKeywordsDetector.class::cast)
+                .collect(Collectors.toList());
+        if (!keywordDetector.isEmpty()) {
+            final Optional<IHyperlink> hyperlink = detect(row, column, label, keywordDetector.get(0));
+            if (hyperlink.isPresent()) {
+                return hyperlink;
+            }
+        }
         for (final ITableHyperlinksDetector detector : detectors) {
             final Optional<IHyperlink> hyperlink = detect(row, column, label, detector);
             if (hyperlink.isPresent()) {

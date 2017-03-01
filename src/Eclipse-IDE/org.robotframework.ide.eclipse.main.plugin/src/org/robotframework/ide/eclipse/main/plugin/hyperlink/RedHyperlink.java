@@ -21,4 +21,6 @@ public interface RedHyperlink extends IHyperlink {
 
     String additionalLabelDecoration();
 
+    String elementName();
+
 }

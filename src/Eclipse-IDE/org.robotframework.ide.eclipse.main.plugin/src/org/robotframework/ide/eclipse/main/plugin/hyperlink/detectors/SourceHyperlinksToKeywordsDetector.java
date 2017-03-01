@@ -67,13 +67,13 @@ public class SourceHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDete
     protected IHyperlink createLocalKeywordHyperlink(final KeywordHyperlinkEntity keywordEntity, final IRegion from,
             final String additionalInfo) {
         return new RegionsHyperlink(textViewer, keywordEntity.exposingResource, from,
-                keywordEntity.destinationPosition.toRegion(), additionalInfo);
+                keywordEntity.destinationPosition.toRegion(), additionalInfo, keywordEntity.getNameFromDefinition());
     }
 
     @Override
     protected IHyperlink createResourceKeywordHyperlink(final KeywordHyperlinkEntity keywordEntity, final IRegion from,
             final String additionalInfo) {
         return new SuiteFileSourceRegionHyperlink(from, keywordEntity.exposingResource,
-                keywordEntity.destinationPosition.toRegion(), additionalInfo);
+                keywordEntity.destinationPosition.toRegion(), additionalInfo, keywordEntity.getNameFromDefinition());
     }
 }
