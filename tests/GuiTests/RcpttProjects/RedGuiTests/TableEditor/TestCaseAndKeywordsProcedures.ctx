@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/2/17 5:07 PM
+Save-Time: 3/2/17 5:40 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -104,6 +104,6 @@ proc "is-cell-selected" [val row] [val col] [val table] [val file_name "TestFile
 			| invoke getUnderlyingLayerByPosition 0 0 | invoke isCellPositionSelected $col $row | eq true | verify-true
 			
 	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected 0 | eq false | verify-true			
+			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected $row | eq false | verify-true			
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
