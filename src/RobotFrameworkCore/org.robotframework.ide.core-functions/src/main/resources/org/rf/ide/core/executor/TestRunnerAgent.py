@@ -59,6 +59,13 @@ else:
 from robot.running.signalhandler import STOP_SIGNAL_MONITOR
 from robot.errors import ExecutionFailed
 
+
+# Setting Output encoding to UTF-8 and ignoring the platform specs
+import robot.utils.encoding
+robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
+# RF 2.6.3 and RF 2.5.7
+robot.utils.encoding._output_encoding = robot.utils.encoding.OUTPUT_ENCODING
+
 try:
     # RF 2.7.5
     from robot.running import EXECUTION_CONTEXTS
@@ -83,13 +90,28 @@ except ImportError:
             return True
         return OUTPUT._xmllogger._log_message_is_logged(level)
 
-# Setting Output encoding to UTF-8 and ignoring the platform specs
-# RIDE will expect UTF-8
-import robot.utils.encoding
-# Set output encoding to UTF-8 for piped output streams
-robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
-# RF 2.6.3 and RF 2.5.7
-robot.utils.encoding._output_encoding = robot.utils.encoding.OUTPUT_ENCODING
+        
+def _fix_unicode(max_length, data):
+    if sys.version_info < (3, 0, 0) and isinstance(data, unicode):
+        return _truncate(max_length, data.encode('utf-8'))
+    elif sys.version_info < (3, 0, 0) and isinstance(data, basestring):
+        return _truncate(max_length, data.encode('unicode_escape'))
+    elif sys.version_info >= (3, 0, 0) and isinstance(data, str):
+        return _truncate(max_length, data)
+    elif isinstance(data, dict):
+        data = dict((_fix_unicode(max_length, k), _fix_unicode(max_length, data[k])) for k in data)
+    elif isinstance(data, list):
+        range_fun = xrange if sys.version_info < (3, 0, 0) else range
+        for i in range_fun(0, len(data)):
+            data[i] = _fix_unicode(max_length, data[i])
+    elif data is None:
+        data = _fix_unicode(max_length, 'None')
+    else:
+        data = _fix_unicode(max_length, str(data))
+    return data
+    
+def _truncate(max_length, s):
+    return s[:max_length] + ' <truncated>' if len(s) > max_length else s
 
 
 class TestRunnerAgent:
@@ -109,7 +131,6 @@ class TestRunnerAgent:
             self.host, self.port = args[0], int(args[1])
         
         self.sock = None
-        self.filehandler = None
         self.decoder_encoder = None
         
         if self._connect():
@@ -127,7 +148,7 @@ class TestRunnerAgent:
     def _wait_for_requestor(self, wait_for_signal):
         if wait_for_signal:
             self._send_to_server('ready_to_start')
-            response = self._wait_for_reponse('do_start')
+            self._wait_for_reponse('do_start')
 
     def _create_kill_server(self):
         self._killer = RobotKillerServer(self._debugger)
@@ -142,7 +163,7 @@ class TestRunnerAgent:
         return self._receive_operating_mode()
         
     def _receive_operating_mode(self):
-        response = self._wait_for_reponse('operating_mode')
+        _, response = self._wait_for_reponse('operating_mode')
         operating_mode = response['operating_mode']
         return operating_mode['mode'].lower() == 'debug', operating_mode['wait_for_start_allowance']
         
@@ -188,31 +209,17 @@ class TestRunnerAgent:
         self._send_to_server('end_suite', name, attrs)
 
     def start_keyword(self, name, attrs):
+        # we're cutting args from original attrs dictionary, because it may contain 
+        # objects which are not json-serializable and we don't need them anyway
         attrs_copy = copy.copy(attrs)
         attrs_copy['args'] = list()
         self._send_to_server('start_keyword', name, attrs_copy)
+        
         if self._is_debug_enabled:
             self._send_vars()
-        is_robot_paused = False
-        if self._is_debug_enabled:
-            if self._check_breakpoint():
-                is_robot_paused = True
-        if is_robot_paused:
-            self._send_to_server('paused')
-            self._wait_for_resume()
-
-    def _wait_for_resume(self):
-        resumed = False
-        while not resumed:
-            response = self._wait_for_reponse('resume', 'interrupt', 'variable_change')
-        
-            if response.keys()[0] == 'interrupt':
-                sys.exit()
-            elif response.keys()[0] == 'variable_change':
-                self._check_changed_variable(response)
-            else:
-                self._debugger.resume()
-                resumed = True
+            if self._should_stop_on_breakpoint():
+                self._send_to_server('paused')
+                self._wait_for_resume()
 
     def _send_vars(self):
         vars = {}
@@ -224,57 +231,40 @@ class TestRunnerAgent:
                 value = vars[k]
                 if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
                     try:
-                        if (type(value) is list) or (isinstance(value, dict)):
-                            data[k] = self._fix_unicode(copy.copy(value))
+                        if type(value) is list or isinstance(value, dict):
+                            data[k] = _fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, copy.copy(value))
                         else:
-                            data[k] = str(self._fix_unicode(value))
+                            data[k] = str(_fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, value))
                     except:
                         data[k] = 'None'
             self._send_to_server('vars', 'vars', data)
         except Exception as e:
             self.print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
 
-    def _fix_unicode(self, data):
-        if sys.version_info < (3, 0, 0) and isinstance(data, unicode):
-            v = data.encode('utf-8')
-            if len(v) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
-                v = v[:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
-            return v
-        elif sys.version_info >= (3, 0, 0) and isinstance(data, str):
-            v = data
-            if len(v) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
-                v = v[:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
-            return v
-        elif isinstance(data, basestring):
-            v = data.encode('unicode_escape')
-            if len(v) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
-                v = v[:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
-            return v
-        elif isinstance(data, dict):
-            data = dict((self._fix_unicode(k), self._fix_unicode(data[k])) for k in data)
-        elif isinstance(data, list):
-            range_fun = xrange if sys.version_info < (3, 0, 0) else range
-            for i in range_fun(0, len(data)):
-                data[i] = self._fix_unicode(data[i])
-        elif inspect.ismodule(data) or inspect.isfunction(data) or inspect.isclass(data):
-            data = self._fix_unicode(str(data))
-        elif data is None:
-            data = self._fix_unicode('None')
-        else:
-            data = self._fix_unicode(str(data))
-        return data
+    def _wait_for_resume(self):
+        resumed = False
+        while not resumed:
+            response_name, response = self._wait_for_reponse('resume', 'interrupt', 'variable_change')
+        
+            if response_name == 'interrupt':
+                sys.exit()
+            elif response_name == 'variable_change':
+                self._check_changed_variable(response)
+            else:
+                self._debugger.resume()
+                resumed = True
 
-    def _check_breakpoint(self):
+    def _should_stop_on_breakpoint(self):
         self._send_to_server('check_condition')
         while True:
-            response = self._wait_for_reponse('stop', 'continue', 'interrupt', 'keyword_condition')
-            if response.keys()[0] == 'stop':
+            response_name, response = self._wait_for_reponse('stop', 'continue', 'interrupt', 'keyword_condition')
+            if response_name == 'stop':
                 return True
-            elif response.keys()[0] == 'continue':
+            elif response_name == 'continue':
                 return False
-            elif response.keys()[0] == 'interrupt':
+            elif response_name == 'interrupt':
                 sys.exit()
-            elif response.keys()[0] == 'keyword_condition':
+            elif response_name == 'keyword_condition':
                 self._run_condition_keyword(response)
 
     def _run_condition_keyword(self, condition):
@@ -323,7 +313,6 @@ class TestRunnerAgent:
                         BuiltIn().set_test_variable(key, js[key][0])
         except Exception as e:
             self.print_error_message('Setting variables error: ' + str(e) + ' Received data:' + str(data))
-            pass
 
     def end_keyword(self, name, attrs):
         attrs_copy = copy.copy(attrs)
@@ -369,8 +358,7 @@ class TestRunnerAgent:
 
     def log_message(self, message):
         if _is_logged(message['level']):
-            if len(message['message']) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
-                message['message'] = message['message'][:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
+            message['message'] = _truncate(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, message['message'])
             self._send_to_server('log_message', message)
 
     def log_file(self, path):
@@ -391,7 +379,7 @@ class TestRunnerAgent:
     def close(self):
         self._send_to_server('close')
         if self.sock:
-            self.filehandler.close()
+            self.decoder_encoder.close()
             self.sock.close()
 
     def print_error_message(self, message):
@@ -402,20 +390,17 @@ class TestRunnerAgent:
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.sock.connect((self.host, self.port))
-            # IronPython does not return right object type if not binary mode
-            self.filehandler = self.sock.makefile('wb')
-            self.decoder_encoder = MessagesDecoderEncoder(self.filehandler)
+            self.decoder_encoder = MessagesDecoderEncoder(self.sock)
             return True
         except socket.error as e:
             print('TestRunnerAgent: unable to open socket to "%s:%s" error: %s' % (self.host, self.port, str(e)))
             self.sock = None
-            self.filehandler = None
             self.decoder_encoder = None
             return False
 
     def _send_to_server(self, name, *args):
         try:
-            if self.filehandler:
+            if self.decoder_encoder:
                 packet = {name: args}
                 self.decoder_encoder.dump(packet)
         except Exception:
@@ -425,15 +410,17 @@ class TestRunnerAgent:
             sys.stdout.flush()
             raise
         
-    def _wait_for_reponse(self, *args):
+    def _wait_for_reponse(self, *expected_responses):
         response = self._receive_from_server()
-        while not response.keys()[0] in args:
+        response_key = list(response.keys())[0]
+        while not response_key in expected_responses:
             response = self._receive_from_server()
-        return response
+            response_key = list(response.keys())[0]
+        return response_key, response
     
     def _receive_from_server(self):
         try:
-            if self.filehandler:
+            if self.decoder_encoder:
                 return self.decoder_encoder.load()
         except Exception:
             import traceback
@@ -442,26 +429,46 @@ class TestRunnerAgent:
             sys.stdout.flush()
             raise
 
-
 class MessagesDecoderEncoder(object):
     
-    def __init__(self, filehandler):
+    def __init__(self, sock):
         self._json_encoder = json.JSONEncoder(separators=(',', ':'), sort_keys=True).encode
         self._json_decoder = json.JSONDecoder(strict=False).decode
-        self._filehandler = filehandler
+        # IronPython does not return right object type if not binary mode
+        self._file_to_write = sock.makefile('wb')
+        self._file_to_read = sock.makefile('rb')
 
     def dump(self, obj):
+        if not self._can_write():
+            return
         json_string = self._json_encoder(obj) + '\n'
         if sys.version_info < (3, 0, 0):
-            self._filehandler.write(json_string)
+            self._file_to_write.write(json_string)
         else:
-            self._filehandler.write(bytes(json_string, 'UTF-8'))
-        self._filehandler.flush()
+            self._file_to_write.write(bytes(json_string, 'UTF-8'))
+        self._file_to_write.flush()
             
     def load(self):
-        json_string = self._filehandler.readline();
-        return self._json_decoder(json_string)
-
+        if not self._can_read():
+            return
+        json_string = self._file_to_read.readline();
+        if sys.version_info < (3, 0, 0):
+            return self._json_decoder(json_string)
+        else:
+            return self._json_decoder(str(json_string, 'UTF-8'))
+    
+    def _can_write(self):
+        return self._file_to_write
+    
+    def _can_read(self):
+        return self._file_to_read
+    
+    def close(self):
+        if self._can_write():
+            self._file_to_write.close()
+        if self._can_read():
+            self._file_to_read.close()
+        
 
 class RobotDebugger(object):
     def __init__(self, pause_on_failure=False):
