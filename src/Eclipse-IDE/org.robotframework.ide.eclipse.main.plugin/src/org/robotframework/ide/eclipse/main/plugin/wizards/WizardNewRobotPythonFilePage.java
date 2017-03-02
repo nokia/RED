@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -81,6 +82,9 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
 
         if (!(selection.length == 0)) {
             for (Object project : selection) {
+                while (project instanceof IFolder || project instanceof IFile) {
+                    project = ((IResource) project).getParent();
+                }
                 if (project instanceof IProject) {
                     if (((IProject) project).isOpen()) {
                         isProjectavailable = true;
