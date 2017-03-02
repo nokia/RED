@@ -44,6 +44,13 @@
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.13</version>
 				<inherited>true</inherited>
+		        <reportSets>
+			    	<reportSet>
+			        	<reports>
+			              <report>report-only</report>
+			            </reports>
+			        </reportSet>
+		        </reportSets>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -212,7 +219,7 @@
 	    	    <executions>
 		          	<execution>
 			            <id>copy-resources</id>
-		            	<phase>test</phase>
+		            	<phase>generate-test-resources</phase>
 		            	<goals>
 		              		<goal>copy-resources</goal>
 		            	</goals>
