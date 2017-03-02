@@ -206,10 +206,10 @@ public class RunCommandLineCallBuilder {
             cmdLine.addAll(tagsToInclude);
             cmdLine.addAll(tagsToExclude);
             cmdLine.add("--listener");
-            cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port);
+            cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + port);
             if (enableDryRun) {
                 cmdLine.add("--prerunmodifier");
-                cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("SuiteVisitorImportProxy.py").toPath().toString());
+                cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py").toPath().toString());
                 cmdLine.add("--runemptysuite");
                 cmdLine.add("--dryrun");
                 cmdLine.add("--output");

@@ -219,6 +219,16 @@ public class RobotRuntimeEnvironment {
         return scriptFile;
     }
 
+    public static File copyScriptFile(final String filename) throws IOException {
+        final Path tempDir = createTemporaryDirectory();
+        final File scriptFile = new File(tempDir.toString() + File.separator + filename);
+        if (!scriptFile.exists()) {
+            Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream("/scripts/" + filename), scriptFile.toPath(),
+                    StandardCopyOption.REPLACE_EXISTING);
+        }
+        return scriptFile;
+    }
+
     private static synchronized Path createTemporaryDirectory() throws IOException {
         if (temporaryDirectory != null) {
             return temporaryDirectory;
@@ -427,8 +437,8 @@ public class RobotRuntimeEnvironment {
         // import quite a lot of modules; maybe we could restart xml-rpc
         // server from time to time; then we can consider moving this
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("module_classes_printer.py");
-            RobotRuntimeEnvironment.copyResourceFile("extend_pythonpath.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("module_classes_printer.py");
+            RobotRuntimeEnvironment.copyScriptFile("extend_pythonpath.py");
 
             if (scriptFile != null) {
                 final SuiteExecutor interpreter = ((PythonInstallationDirectory) location).getInterpreter();
