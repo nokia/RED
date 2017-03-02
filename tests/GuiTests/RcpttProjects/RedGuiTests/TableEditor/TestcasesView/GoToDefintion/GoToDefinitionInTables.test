@@ -1,0 +1,189 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _BgIRMPnjEea7hL0QdGOb6w,_VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: GoToDefinitionInTables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ERiB0PnjEea7hL0QdGOb6w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/2/17 5:30 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-focus-in-variables" [val row] [val col]{
+	with [get-editor "TestFile.robot"] {
+	    get-tab-folder | get-property activePage | equals Variables | verify-true
+	    with [get-canvas -after [get-label Variables] -index 1] {
+	        get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().PositionCoordinate[0].rowPosition" 
+	            | equals $row | verify-true
+	        get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().PositionCoordinate[0].getColumnPosition()" 
+	            | equals $col | verify-true
+	        get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().length" | equals 1 
+	            | verify-true
+	    }
+	}
+}
+//open file and go to first TC
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+with [get-view Outline | get-tree] {
+    select "TestFile.robot/Test Cases/CAPITAL LETTER" | click
+    
+}
+
+//go to [Setup] to user kw
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Right
+    key-type Left
+    key-type Down -times 3
+    key-type Right
+    key-type F3
+}
+
+//check taht KW tab waas open
+
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Keywords | verify-true
+is-row-fully-selected -row 0 -table "User Keywords"
+
+
+
+//go back to TC and selct focus on @list
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item "Test Cases" | click
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down -times 4
+        key-type F3
+    }
+}
+//check if focus was set in variables table
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Variables | verify-true
+check-focus-in-variables -row 1 -col 0
+
+//go to Tc and go to kw that is written in lower case
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item "Test Cases" | click
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Left
+        key-type Down
+        key-type F3
+    }
+}
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Keywords | verify-true
+is-row-fully-selected -row 7 -table "User Keywords"
+
+//go to Tc and go to kw in python file
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item "Test Cases" | click
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type F3
+    }
+}
+get-editor "simple_lib.py" | get-text-viewer | get-property "getSelectionText()" | equals "my_function" | verify-true
+
+//go to function set in nested res
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type F3
+    }
+}
+get-editor "res3.robot" | get-tab-folder | get-property activePage | equals Keywords | verify-true
+is-row-fully-selected -row 0 -table "User Keywords" -file_name "res3.robot"
+
+// ----------------------------------------------------------------------------
+//go to Kw table
+with [get-editor "TestFile.robot"] {
+    click
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+//focus is stil set on ABC
+with [get-editor "TestFile.robot"] {
+    click
+    get-tab-folder | get-tab-item Keywords | click
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Up -times 3
+        key-type F3
+    }
+}
+
+is-cell-selected -row 0 -col 1 -table "User Keywords"
+
+// check that in doc F3 do nothing
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down
+    key-type F3 
+}    
+is-cell-selected -row 1 -col 1 -table "User Keywords"
+  
+//go to kw ABc  
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] { 
+    key-type Down
+    key-type F3
+}
+is-row-fully-selected -row 7 -table "User Keywords"
+
+
+//got to kw "Sum two valus" that is above
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {     
+    key-type Right
+    key-type Down
+    key-type Left
+    key-type F3
+}
+
+is-row-fully-selected -row 0 -table "User Keywords"
+
+//go to kw "nice kw" that is in resource
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Left
+    key-type Down -times 9
+    key-type F3
+}
+is-row-fully-selected -row 4 -table "User Keywords" -file_name "res.robot"
+
+//go to built-in kw when Given is set
+with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down
+    key-type F3
+}
+
+get-editor "BuiltIn.py" | get-text-viewer | get-property "getSelectionText()" | equals "should_be_equal" | verify-true
+
+
+//go to resource and press F3 on kw with prefix
+get-editor "res3.robot" | click
+get-view Outline | get-tree | select "res3.robot/Keywords/kw from res3"
+get-editor "res3.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down
+get-editor "res3.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type F3
+
+get-editor "String.py" | get-text-viewer | get-property "getSelectionText()" | equals "convert_to_uppercase" 
+    | verify-true
+    
+    
+//----------------------- variables--------------------------------------------------
+//go to scalar that has value equal to other scalar
+with [get-editor "TestFile.robot"] {
+    click
+    get-tab-folder | get-tab-item Variables | click
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down -times 2
+        key-type Right
+        key-type F3
+    }
+}    
+    
+check-focus-in-variables -row 0 -col 0    
+    
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
