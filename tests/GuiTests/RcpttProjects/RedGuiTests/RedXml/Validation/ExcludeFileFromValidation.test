@@ -7,9 +7,9 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ErbYMPglEea7hL0QdGOb6w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/27/17 3:58 PM
+Save-Time: 3/2/17 11:45 AM
 Testcase-Type: ecl
-Verifications: _Q-r-8Pg4Eea7hL0QdGOb6w,_kIYBEPhCEea7hL0QdGOb6w
+Verifications: _kIYBEPhCEea7hL0QdGOb6w
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -139,10 +139,8 @@ get-button "Save (M1+S)" | click
 
 //check warnings
 with [get-view Problems | get-tree] {
-    get-item "Warnings \\(2 items\\)" | get-property childCount | equals 2 | verify-true
-    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-        | equals "Missing excluded resource 'RobotProject/a/b/c1/tsv_test.tsv'" | verify-true
-    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item "Warnings \\(1 item\\)" | get-property childCount | equals 1 | verify-true
+    get-item "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "The path 'RobotProject/folder_to_remove/file_to_remove.robot' is already excluded by 'RobotProject/folder_to_remove'" 
         | verify-true
 }
@@ -167,5 +165,36 @@ get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Exclude from 
 get-view "Project Explorer" | get-tree | select "RobotProject/variables/var1.py"
 get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Exclude from validation" | click
 
- 
+with [get-view "Project Explorer" | get-tree] {
+    get-item RobotProject | get-property "getItems().TreeItem[1].getText()" | equals a | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals b 
+        | verify-true
+    get-item RobotProject 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals c1 
+        | verify-true
+    get-item RobotProject 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals var 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[2].getText()" | equals "empty folder" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[3].getText()" | equals "folder_to_remove [excluded]" 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[3].getItems().TreeItem[0].getText()" 
+        | equals "file_to_remove.robot [excluded]" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[4].getText()" | equals "single test" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[4].getItems().TreeItem[0].getText()" | equals "test1.tsv" 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[5].getText()" | equals "suite folder with init" 
+        | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[5].getItems().TreeItem[0].getText()" 
+        | equals "__init__.txt" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[5].getItems().TreeItem[1].getText()" 
+        | equals "suite test.txt" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[6].getText()" | equals tests | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[7].getText()" | equals TestSuiteFolder | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[8].getText()" | equals variables | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[8].getItems().TreeItem[0].getText()" 
+        | equals "var1.py [excluded]" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[9].getText()" | equals "red.xml [excluded]" | verify-true
+    get-item RobotProject | get-property "getItems().TreeItem[10].getText()" | equals "TestFile.robot" | verify-true
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
