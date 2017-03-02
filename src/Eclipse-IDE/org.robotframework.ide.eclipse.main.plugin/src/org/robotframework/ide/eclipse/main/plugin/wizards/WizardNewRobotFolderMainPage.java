@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.wizards;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -25,9 +26,12 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
 
     private final Map<String, Button> extensionButtons;
 
+    private IStructuredSelection currentSelection;
+
     public WizardNewRobotFolderMainPage(final String pageName, final IStructuredSelection selection,
             final String firstExtension, final String... restExtensions) {
         super(pageName, selection);
+        currentSelection = selection;
         extensionButtons = Maps.<String, Button> newLinkedHashMap();
         extensionButtons.put(firstExtension, null);
         for (final String extension : restExtensions) {
@@ -76,5 +80,30 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
             }
         }
         throw new IllegalStateException("There should be extension chosen!");
+    }
+
+    @Override
+    protected boolean validatePage() {
+        boolean isProjectavailable = false;
+        Object[] selection = currentSelection.toArray();
+
+        if (!(selection.length == 0)) {
+            for (Object project : selection) {
+                if (project instanceof IProject) {
+                    if (((IProject) project).isOpen()) {
+                    isProjectavailable = true;
+                    break;
+                }
+                }
+            }
+        }
+        if (!isProjectavailable) {
+            setErrorMessage("Action impossible to finish: No project available");
+            return false;
+        }
+        boolean isValid = super.validatePage();
+
+        return isValid;
+
     }
 }
