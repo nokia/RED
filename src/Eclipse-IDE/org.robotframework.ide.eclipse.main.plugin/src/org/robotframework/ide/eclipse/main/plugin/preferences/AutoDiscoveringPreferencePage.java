@@ -22,8 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class AutoDiscoveringPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-    private static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.autodiscovering";
-
     public AutoDiscoveringPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));

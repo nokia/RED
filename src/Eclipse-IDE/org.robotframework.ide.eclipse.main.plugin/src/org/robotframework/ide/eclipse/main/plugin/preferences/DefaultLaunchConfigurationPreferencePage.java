@@ -27,9 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunc
 public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage {
 
-    @SuppressWarnings("unused")
-    private static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.launch.default";
-
     public DefaultLaunchConfigurationPreferencePage() {
         super(DefaultLaunchConfigurationPreferencePage.GRID);
         setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
