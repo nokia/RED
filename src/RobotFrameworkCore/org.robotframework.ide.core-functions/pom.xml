@@ -96,6 +96,9 @@
 			<resource>
 				<directory>${basedir}/src/main/resources</directory>
 			</resource>
+			<resource>
+				<directory>${basedir}/src/main/python</directory>
+			</resource>
 		</resources>
 		<plugins>
 			<plugin>
@@ -202,6 +205,57 @@
 					<!-- Skips unit tests if the value of skip.unit.tests property is true -->
 					<skipTests>${skip.unit.tests}</skipTests>
 				</configuration>
+			</plugin>
+	      	<plugin>
+	        	<artifactId>maven-resources-plugin</artifactId>
+	        	<version>3.0.2</version>
+	    	    <executions>
+		          	<execution>
+			            <id>copy-resources</id>
+		            	<phase>test</phase>
+		            	<goals>
+		              		<goal>copy-resources</goal>
+		            	</goals>
+		            	<configuration>
+		              		<outputDirectory>${basedir}/target/pyunit</outputDirectory>
+			              	<resources>
+			                	<resource>
+			                  		<directory>${basedir}/src/main/python</directory>
+			                  		<filtering>true</filtering>
+			                	</resource>
+			                	<resource>
+			                  		<directory>${basedir}/src/test/python</directory>
+			                  		<filtering>true</filtering>
+			                	</resource>
+			              	</resources>              
+		            	</configuration>            
+          			</execution>
+        		</executions>
+	      	</plugin>
+			<plugin>
+			  	<groupId>org.codehaus.mojo</groupId>
+			  	<artifactId>exec-maven-plugin</artifactId>
+			  	<version>1.5.0</version>
+			  	<executions>
+			   		<execution>
+			    		<configuration>
+			     			<executable>python</executable>
+			     			<workingDirectory>${basedir}/target/pyunit</workingDirectory>
+			     			<arguments>
+			      				<argument>-m</argument>
+			      				<argument>unittest_red</argument>
+			      				<argument>discover</argument>
+			      				<argument>${basedir}/target/pyunit/scripts</argument>
+			     			</arguments>    
+			     			<environmentVariables/>
+			    		</configuration>
+			    		<id>python-test</id>
+			    		<phase>test</phase>
+			    		<goals>
+			     			<goal>exec</goal>
+			    		</goals>
+			   		</execution>
+			  	</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>

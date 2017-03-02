@@ -50,7 +50,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         try {
             final String normalizedPath = filePath.replace('\\', '/');
 
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_variables.py");
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-variables",
                     normalizedPath);
             cmdLine.addAll(fileArguments);
@@ -77,7 +77,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public Map<String, Object> getGlobalVariables() {
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_variables.py");
             if (scriptFile != null) {
                 final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-global");
                 final StringBuilder jsonEncodedOutput = new StringBuilder();
@@ -104,7 +104,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public List<String> getStandardLibrariesNames() {
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-names");
             final List<String> stdLibs = new ArrayList<>();
             final ILineHandler linesHandler = new ILineHandler() {
@@ -123,7 +123,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public String getStandardLibraryPath(final String libraryName) {
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-path",
                     libraryName);
             final StringBuilder path = new StringBuilder();
@@ -217,7 +217,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                 }
             };
 
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-pythonpath");
             final int returnCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine, handler);
             if (returnCode != 0) {
@@ -244,7 +244,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             }
         };
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
             
             final List<String> cmdLine = newArrayList(interpreterPath);
             if (interpreterType == SuiteExecutor.Jython) {
@@ -275,7 +275,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public Boolean isVirtualenv() {
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_virtualenv_check.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_virtualenv_check.py");
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath());
             final StringBuilder result = new StringBuilder();
             final ILineHandler linesHandler = new ILineHandler() {
