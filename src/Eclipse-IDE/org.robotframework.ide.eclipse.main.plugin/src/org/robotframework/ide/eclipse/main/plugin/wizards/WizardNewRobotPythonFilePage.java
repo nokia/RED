@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -32,8 +33,11 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
 
     private final Map<Template, Button> buttons = new LinkedHashMap<>();
 
+    private IStructuredSelection currentSelection;
+
     WizardNewRobotPythonFilePage(final String pageName, final IStructuredSelection selection) {
         super(pageName, selection);
+        currentSelection = selection;
         setFileExtension("py");
     }
 
@@ -72,6 +76,23 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
 
     @Override
     protected boolean validatePage() {
+        boolean isProjectavailable = false;
+        Object[] selection = currentSelection.toArray();
+
+        if (!(selection.length == 0)) {
+            for (Object project : selection) {
+                if (project instanceof IProject) {
+                    if (((IProject) project).isOpen()) {
+                        isProjectavailable = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!isProjectavailable) {
+            setErrorMessage("Action impossible to finish: No project available");
+            return false;
+        }
         final boolean isValid = super.validatePage();
         if (!isValid) {
             return false;
