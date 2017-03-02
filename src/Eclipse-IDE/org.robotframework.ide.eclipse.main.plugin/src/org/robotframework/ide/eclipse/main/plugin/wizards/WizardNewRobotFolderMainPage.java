@@ -8,7 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.wizards;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -89,6 +92,9 @@ public class WizardNewRobotFolderMainPage extends WizardNewFolderMainPage {
 
         if (!(selection.length == 0)) {
             for (Object project : selection) {
+                while (project instanceof IFolder || project instanceof IFile) {
+                    project = ((IResource) project).getParent();
+                }
                 if (project instanceof IProject) {
                     if (((IProject) project).isOpen()) {
                     isProjectavailable = true;
