@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/28/17 2:11 PM
+Save-Time: 3/2/17 10:43 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,5 +80,55 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 		| get-property "getChildren().Control[6].getText()" | equals "" | verify-true
 }
 
+//validation
+proc "check-if-no-error-is-shown"{
+	get-window Preferences | get-label "Default Launch Configurations" | get-property caption 
+      | equals "Default Launch Configurations" | verify-true
+}
+
+proc "check-error"[val type]{
+	if [$type | eq "port"]{
+		get-window Preferences | get-editbox -index 1 | get-property text 
+	      | equals "Value must be an Integer between 1 and 65[, ]535" | verify-true
+    }
+    if [$type | eq "timeout"]{ 
+    	get-window Preferences | get-editbox -index 1 | get-property text 
+   		  | equals "Value must be an Integer between 1 and 3[, ]600" | verify-true
+    }
+}
+//Remote
+
+//IP
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Local IP:"] | set-text ""
+check-if-no-error-is-shown
+
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Local IP:"] | set-text "12.4.444444.4"
+check-if-no-error-is-shown
+
+
+//port
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Local port:"] | set-text 0
+check-error -type "port"
+
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Local port:"] | set-text 8
+check-if-no-error-is-shown
+
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Local port:"] | set-text ""
+check-error -type "port"
+
+//timeout
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Connection timeout [s]:"] 
+    | set-text "466.90"
+check-error -type "timout"
+        
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Connection timeout [s]:"] | set-text 89
+check-if-no-error-is-shown
+
+get-window Preferences | get-group "Remote tab" | get-editbox -after [get-label "Connection timeout [s]:"] | set-text ""
+check-error -type "timout"
+
+
 get-window Preferences | get-button Cancel | click
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
