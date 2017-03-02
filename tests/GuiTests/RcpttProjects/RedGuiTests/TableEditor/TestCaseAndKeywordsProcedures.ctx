@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/8/16 3:25 PM
+Save-Time: 3/2/17 5:07 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -86,15 +86,24 @@ proc "compare-row-with-list" [val file] [val table] [val col_amount] [val row] [
 }
 
 //rows starts from 0
-proc "is-row-fully-selected" [val row] [val table]{
-	get-editor "TestFile.robot" | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+//tables: "User Keywords" and "Test Cases"
+proc "is-row-fully-selected" [val row] [val table] [val file_name "TestFile.robot"]{
+	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected  $row | eq true | verify-true
 	
-	get-editor "TestFile.robot" | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+	get-editor $file_name| get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 			| invoke getUnderlyingLayerByPosition 0 0 | invoke hasRowSelection | eq true | verify-true
 					
-	get-editor "TestFile.robot" | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+	//check if only one row is selected				
+	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 		| invoke getUnderlyingLayerByPosition 0 0 | invoke getSelectedRowCount | eq 1 | verify-true
 } 
 
+proc "is-cell-selected" [val row] [val col] [val table] [val file_name "TestFile.robot"]{
+	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+			| invoke getUnderlyingLayerByPosition 0 0 | invoke isCellPositionSelected $col $row | eq true | verify-true
+			
+	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected 0 | eq false | verify-true			
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
