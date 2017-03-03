@@ -25,6 +25,8 @@ import org.rf.ide.core.execution.server.response.ServerResponse.ResponseExceptio
  */
 public class RobotDryRunOutputParser implements IAgentMessageHandler {
 
+    private static final String AGENT_INITIALIZING_EVENT_NAME = "agent_initializing";
+
     private static final String MESSAGE_EVENT_NAME = "message";
 
     private static final String LIBRARY_IMPORT_EVENT_NAME = "library_import";
@@ -54,7 +56,7 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        if (eventMap.containsKey("agent_initializing")) {
+        if (eventMap.containsKey(AGENT_INITIALIZING_EVENT_NAME)) {
             try {
                 client.send(new InitializeAgent(TestsMode.RUN, false));
             } catch (ResponseException | IOException e) {
