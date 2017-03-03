@@ -108,11 +108,6 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         additionalScriptArguments.load();
         addField(additionalScriptArguments);
 
-        final StringFieldEditor scriptRunCommand = new StringFieldEditor(RedPreferences.LAUNCH_SCRIPT_RUN_COMMAND,
-                "Script run command:", group);
-        scriptRunCommand.load();
-        addField(scriptRunCommand);
-
         GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(group));
     }
 

@@ -5,10 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import java.util.HashMap;
-import java.util.List;
-
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -19,8 +15,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -31,8 +25,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWra
 import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationException;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuitesListener;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.TagsListener;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
@@ -45,14 +37,6 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
     private ExecutorScriptComposite executorScriptComposite;
 
     private Text scriptArgumentsText;
-
-    private Text scriptRunCommandText;
-
-    private IncludeExcludeTagsComposite includeExcludeTagsComposite;
-
-    private ProjectComposite projectComposite;
-
-    private SuitesToRunComposite suitesToRunComposite;
 
     @Override
     public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
@@ -71,14 +55,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         try {
             executorScriptComposite.setInput(robotConfig.getScriptPath());
             scriptArgumentsText.setText(robotConfig.getScriptArguments());
-            scriptRunCommandText.setText(robotConfig.getScriptRunCommand());
-            includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
-                    robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
-            projectComposite.setInput(robotConfig.getProjectName());
-            suitesToRunComposite.setInput(robotConfig.getProjectName(), robotConfig.getSuitePaths());
-            includeExcludeTagsComposite.switchTo(robotConfig.getProjectName(), robotConfig.collectSuitesToRun());
         } catch (final CoreException e) {
-            includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
     }
@@ -90,13 +67,6 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         try {
             robotConfig.setScriptPath(executorScriptComposite.getSelectedScriptPath());
             robotConfig.setScriptArguments(scriptArgumentsText.getText().trim());
-            robotConfig.setScriptRunCommand(scriptRunCommandText.getText().trim());
-            robotConfig.setIsIncludeTagsEnabled(includeExcludeTagsComposite.isIncludeTagsEnabled());
-            robotConfig.setIncludedTags(includeExcludeTagsComposite.getIncludedTags());
-            robotConfig.setIsExcludeTagsEnabled(includeExcludeTagsComposite.isExcludeTagsEnabled());
-            robotConfig.setExcludedTags(includeExcludeTagsComposite.getExcludedTags());
-            robotConfig.setProjectName(projectComposite.getSelectedProjectName());
-            robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
@@ -108,30 +78,17 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         setErrorMessage(null);
         setWarningMessage(null);
 
-        includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
-
         final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
         try {
-            suitesToRunComposite.switchTo(robotConfig.getProjectName());
             new LaunchConfigurationsValidator().validate(robotConfig);
-
-            return includeExcludeTagsComposite.userDoNotWriteNewTagCurrently();
         } catch (final LaunchConfigurationValidationException e) {
             setWarningMessage(e.getMessage());
-            return includeExcludeTagsComposite.userDoNotWriteNewTagCurrently();
+            return false;
         } catch (final LaunchConfigurationValidationFatalException e) {
             setErrorMessage(e.getMessage());
             return false;
-        } catch (final CoreException e) {
-            setErrorMessage(e.getMessage());
-            return false;
-        } finally {
-            try {
-                includeExcludeTagsComposite.switchTo(robotConfig.getProjectName(), robotConfig.collectSuitesToRun());
-            } catch (final CoreException e) {
-                throw new IllegalStateException("Shouldn't happen", e);
-            }
         }
+        return true;
     }
 
     @Override
@@ -146,7 +103,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     @Override
     public boolean canSave() {
-        return !projectComposite.getSelectedProjectName().isEmpty();
+        return !executorScriptComposite.getSelectedScriptPath().isEmpty();
     }
 
     @Override
@@ -160,9 +117,6 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(composite);
 
         createExecutorScriptGroup(composite);
-        createTagsGroup(composite);
-        createProjectGroup(composite);
-        createSuitesGroup(composite);
 
         setControl(composite);
     }
@@ -183,7 +137,6 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorScriptComposite);
 
         scriptArgumentsText = createLabeledText(group, "Additional script arguments:");
-        scriptRunCommandText = createLabeledText(group, "Script run command:");
     }
 
     private Text createLabeledText(final Composite parent, final String label) {
@@ -201,70 +154,6 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
             }
         });
         return txt;
-    }
-
-    private void createTagsGroup(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Tags");
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-        GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
-
-        includeExcludeTagsComposite = new IncludeExcludeTagsComposite(group, new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        }, new TagsListener() {
-
-            @Override
-            public void newTagIsEdited() {
-                updateLaunchConfigurationDialog();
-            }
-
-            @Override
-            public void tagAdded(final String tag) {
-                updateLaunchConfigurationDialog();
-            }
-
-            @Override
-            public void tagRemoved(final String tag) {
-                updateLaunchConfigurationDialog();
-            }
-        });
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(includeExcludeTagsComposite);
-    }
-
-    private void createProjectGroup(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Project");
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-        GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
-
-        projectComposite = new ProjectComposite(group, new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(projectComposite);
-    }
-
-    private void createSuitesGroup(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Test Suite(s)");
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
-        GridLayoutFactory.fillDefaults().applyTo(group);
-
-        suitesToRunComposite = new SuitesToRunComposite(group, new SuitesListener() {
-
-            @Override
-            public void suitesChanged() {
-                updateLaunchConfigurationDialog();
-            }
-        });
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(suitesToRunComposite);
     }
 
 }

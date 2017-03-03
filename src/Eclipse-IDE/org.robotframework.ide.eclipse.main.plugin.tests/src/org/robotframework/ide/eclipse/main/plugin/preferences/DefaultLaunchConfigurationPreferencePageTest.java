@@ -46,10 +46,10 @@ public class DefaultLaunchConfigurationPreferencePageTest {
                 RedPreferences.LAUNCH_REMOTE_TIMEOUT);
         final List<String> stringPrefNames = newArrayList(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS,
                 RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, RedPreferences.LAUNCH_REMOTE_HOST,
-                RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS, RedPreferences.LAUNCH_SCRIPT_RUN_COMMAND);
+                RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(8);
+        assertThat(editors).hasSize(7);
         for (final Object ed : editors) {
             final FieldEditor editor = (FieldEditor) ed;
 
