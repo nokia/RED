@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -23,8 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.OpenDeclarationForTablesHandler.E4OpenDeclarationForTablesHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
-
-import com.google.common.base.Optional;
 
 public class OpenDeclarationForTablesHandler extends DIParameterizedHandler<E4OpenDeclarationForTablesHandler> {
 
@@ -58,12 +56,12 @@ public class OpenDeclarationForTablesHandler extends DIParameterizedHandler<E4Op
 
     private static Optional<IHyperlink> getHyperlink(final int row, final int column, final String label,
             final List<ITableHyperlinksDetector> detectors) {
-        final List<ITableHyperlinksDetector> keywordDetector = detectors.stream()
+        final java.util.Optional<TableHyperlinksToKeywordsDetector> keywordDetector = detectors.stream()
                 .filter(TableHyperlinksToKeywordsDetector.class::isInstance)
                 .map(TableHyperlinksToKeywordsDetector.class::cast)
-                .collect(Collectors.toList());
-        if (!keywordDetector.isEmpty()) {
-            final Optional<IHyperlink> hyperlink = detect(row, column, label, keywordDetector.get(0));
+                .findFirst();
+        if (keywordDetector.isPresent()) {
+            final Optional<IHyperlink> hyperlink = detect(row, column, label, keywordDetector.get());
             if (hyperlink.isPresent()) {
                 return hyperlink;
             }
@@ -74,7 +72,7 @@ public class OpenDeclarationForTablesHandler extends DIParameterizedHandler<E4Op
                 return hyperlink;
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private static Optional<IHyperlink> detect(final int row, final int column, final String label,
@@ -83,6 +81,6 @@ public class OpenDeclarationForTablesHandler extends DIParameterizedHandler<E4Op
         if (hyperlinks != null && hyperlinks.size() > 0) {
             return Optional.of(hyperlinks.get(0));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }
