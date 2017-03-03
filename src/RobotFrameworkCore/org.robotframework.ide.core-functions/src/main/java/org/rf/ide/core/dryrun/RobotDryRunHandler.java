@@ -82,7 +82,7 @@ public class RobotDryRunHandler {
         File file = null;
         PrintWriter printWriter = null;
         try {
-            file = RobotRuntimeEnvironment.copyResourceFile("DryRunTempSuite.robot");
+            file = RobotRuntimeEnvironment.createTemporaryFile("DryRunTempSuite.robot");
             printWriter = new PrintWriter(file);
             printWriter.println("*** Test Cases ***");
             printWriter.println("T1");
