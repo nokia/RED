@@ -21,6 +21,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.IServiceLocator;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -53,7 +54,7 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         if (selection instanceof StructuredSelection && !selection.isEmpty()) {
             final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
-            Set<RobotCase> firstCases = findFirstCases(structuredSelection);
+            final Set<RobotCase> firstCases = findFirstCases(structuredSelection);
             if (firstCases.size() == 1) {
                 contributeBefore(contributedItems);
                 contributedItems.add(createCurrentCaseItem(activeWindow, firstCases.toArray(new RobotCase[1])[0]));
@@ -66,11 +67,15 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
     }
 
     private Set<RobotCase> findFirstCases(final IStructuredSelection selection) {
-        Set<RobotCase> firstCases = new HashSet<RobotCase>();
-        for (Object o : selection.toList()) {
+        final Set<RobotCase> firstCases = new HashSet<RobotCase>();
+        for (final Object o : selection.toList()) {
             RobotCase testCase = null;
             if (o instanceof RobotKeywordCall) {
-                testCase = (RobotCase) ((RobotKeywordCall) o).getParent();
+                // workaround for possible RobotSettingsSection type, should be changed
+                final IRobotCodeHoldingElement parent = ((RobotKeywordCall) o).getParent();
+                if (parent instanceof RobotCase) {
+                    testCase = (RobotCase) parent;
+                }
             } else if (o instanceof RobotCase) {
                 testCase = (RobotCase) o;
             }
