@@ -12,6 +12,10 @@
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<jdk.version>1.8</jdk.version>
 		<pmd.file>../../PMD/pegasus-pmd.xml</pmd.file>
+		<skip.unit.tests>false</skip.unit.tests>
+		<skip.py.unit.tests>false</skip.py.unit.tests>
+		<skip.py3.unit.tests>true</skip.py3.unit.tests>
+		<skip.jy.unit.tests>true</skip.jy.unit.tests>
 	</properties>
 
 	<reporting>
@@ -209,7 +213,6 @@
 					<forkMode>once</forkMode>
 					<reportFormat>xml</reportFormat>
 					<argline>-Djava.endorsed.dirs="${endorsed.dir}"</argline>
-					<!-- Skips unit tests if the value of skip.unit.tests property is true -->
 					<skipTests>${skip.unit.tests}</skipTests>
 				</configuration>
 			</plugin>
@@ -253,10 +256,63 @@
 			      				<argument>unittest_red</argument>
 			      				<argument>discover</argument>
 			      				<argument>${basedir}/target/pyunit/scripts</argument>
-			     			</arguments>    
+			     			</arguments>
 			     			<environmentVariables/>
+							<skip>${skip.py.unit.tests}</skip>
 			    		</configuration>
 			    		<id>python-test</id>
+			    		<phase>test</phase>
+			    		<goals>
+			     			<goal>exec</goal>
+			    		</goals>
+			   		</execution>
+			  	</executions>
+			</plugin>
+			<plugin>
+			  	<groupId>org.codehaus.mojo</groupId>
+			  	<artifactId>exec-maven-plugin</artifactId>
+			  	<version>1.5.0</version>
+			  	<executions>
+			   		<execution>
+			    		<configuration>
+			     			<executable>python3</executable>
+			     			<workingDirectory>${basedir}/target/pyunit</workingDirectory>
+			     			<arguments>
+			      				<argument>-m</argument>
+			      				<argument>unittest_red</argument>
+			      				<argument>discover</argument>
+			      				<argument>${basedir}/target/pyunit/scripts</argument>
+			     			</arguments>
+			     			<environmentVariables/>
+							<skip>${skip.py3.unit.tests}</skip>
+			    		</configuration>
+			    		<id>python3-test</id>
+			    		<phase>test</phase>
+			    		<goals>
+			     			<goal>exec</goal>
+			    		</goals>
+			   		</execution>
+			  	</executions>
+			</plugin>
+			<plugin>
+			  	<groupId>org.codehaus.mojo</groupId>
+			  	<artifactId>exec-maven-plugin</artifactId>
+			  	<version>1.5.0</version>
+			  	<executions>
+			   		<execution>
+			    		<configuration>
+			     			<executable>jython</executable>
+			     			<workingDirectory>${basedir}/target/pyunit</workingDirectory>
+			     			<arguments>
+			      				<argument>-m</argument>
+			      				<argument>unittest_red</argument>
+			      				<argument>discover</argument>
+			      				<argument>${basedir}/target/pyunit/scripts</argument>
+			     			</arguments>
+			     			<environmentVariables/>
+							<skip>${skip.jy.unit.tests}</skip>
+			    		</configuration>
+			    		<id>jython-test</id>
 			    		<phase>test</phase>
 			    		<goals>
 			     			<goal>exec</goal>
