@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aZra8NS6EeWO-beUKyHz0g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 3:38 PM
+Save-Time: 3/3/17 4:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -113,5 +113,39 @@ with [get-view "Project Explorer" | get-tree] {
     get-menu Debug | get-property index | equals 2 | verify-true
 }
 
+//check that user cannot run tests form 2 projects
+
+//select 2 files
+get-view "Project Explorer" | get-tree | select "NextProject/Test2.robot" "RobotProject/TestFile.robot"
+
+//check error
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu "Run As/1 Robot Test" | click
+    get-window "Problem Occurred" | get-label "Cannot generate Robot Launch Configuration" | get-property caption 
+        | equals "Cannot generate Robot Launch Configuration" | verify-true
+    get-window "Problem Occurred" | get-label "See 'Details' for more information." | get-property caption 
+        | equals "See 'Details' for more information." | verify-true
+    get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" | get-editbox -after [get-label "See 'Details' for more information."] 
+        | get-property text | equals "Cannot generate Robot Launch Configuration\n"
+        + "All selected elements need to be members of only one project." | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+//select 2 TC from 2 tests
+get-view "Project Explorer" | get-tree 
+    | select "NextProject/Test2.robot/Test Cases/abc" "RobotProject/TestFile.robot/Test Cases/test 1"
+    
+//checkt that run/debug are disabled    
+with [get-view "Project Explorer" | get-tree] {
+    get-menu Open | get-property enablement | equals false | verify-true
+    get-menu Run | get-property enablement | equals false | verify-true
+    get-menu Debug | get-property enablement | equals false | verify-true
+}
+
+
+//run two tests from the same project
+get-view "Project Explorer" | get-tree  
+    | select "RobotProject/Test.tsv/Test Cases/TSV test" "RobotProject/TestFile.robot/Test Cases/test 1" | get-menu Run | click
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
