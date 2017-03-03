@@ -221,10 +221,13 @@ public class RobotRuntimeEnvironment {
         final Path tempDir = createTemporaryDirectory();
         final File scriptFile = new File(tempDir.toString() + File.separator + filename);
         if (!scriptFile.exists()) {
-            Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream("/scripts/" + filename), scriptFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(getScriptFileAsStream(filename), scriptFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }
         return scriptFile;
+    }
+
+    public static InputStream getScriptFileAsStream(final String filename) throws IOException {
+        return RobotRuntimeEnvironment.class.getResourceAsStream("/scripts/" + filename);
     }
 
     private static synchronized Path createTemporaryDirectory() throws IOException {
