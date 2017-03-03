@@ -101,17 +101,17 @@ public class SelectionsPropertyTester extends PropertyTester {
         }
         final Set<IProject> projects = new HashSet<IProject>();
         for (final IResource resource : resources) {
-            if (!projects.add(resource.getProject())) {
+            if (projects.add(resource.getProject()) && projects.size() > 1) {
                 return !expected;
             }
         }
         for (final RobotCasesSection section : sections) {
-            if (!projects.add(section.getSuiteFile().getProject().getProject())) {
+            if (projects.add(section.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
                 return !expected;
             }
         }
         for (final RobotCase robotCase : cases) {
-            if (!projects.add(robotCase.getSuiteFile().getProject().getProject())) {
+            if (projects.add(robotCase.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
                 return !expected;
             }
         }
