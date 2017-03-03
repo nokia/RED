@@ -5,4 +5,4 @@ import xmlrunner
 __unittest = True
 
 from unittest.main import main
-main(module=None, testRunner=xmlrunner.XMLTestRunner())
+main(testRunner=xmlrunner.XMLTestRunner())
