@@ -166,7 +166,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 if (dir != null) {
                     final File scriptFile = new File(dir + File.separator + fileName);
                     try {
-                        Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(fileName), scriptFile.toPath(),
+                        Files.copy(RobotRuntimeEnvironment.getScriptFileAsStream(fileName), scriptFile.toPath(),
                                 StandardCopyOption.REPLACE_EXISTING);
                     } catch (final IOException e) {
                         final String message = "Unable to copy file to " + scriptFile.getAbsolutePath();
