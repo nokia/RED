@@ -22,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJo
 import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogView;
+import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
@@ -55,7 +56,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
 
         try {
-            AgentConnectionServerJob.setupServerAt(host, port)
+            final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
                     .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
@@ -69,6 +70,8 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
 
             final Process process = execProcess(cmdLine, robotConfig);
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
+
+            RemoteExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
