@@ -70,7 +70,7 @@ public class RobotRuntimeEnvironment {
      * Locates directories in which python interpreters pointed in environment
      * path are located. Uses where command in Windows and which command under
      * Unix.
-     * 
+     *
      * @return Directories where python interpreters are installed or empty list
      *         if there is no python at all.
      */
@@ -134,7 +134,7 @@ public class RobotRuntimeEnvironment {
      * given location does not contain python executable. Otherwise
      * {@link PythonInstallationDirectory} instance (copy of location, but with
      * other type) is returned.
-     * 
+     *
      * @param location
      *            Location to check
      * @return the same location given as {@link File} subtype
@@ -184,7 +184,7 @@ public class RobotRuntimeEnvironment {
 
     /**
      * Gets robot framework version.
-     * 
+     *
      * @param pythonLocation
      * @return Robot version as returned by robot
      */
@@ -209,14 +209,12 @@ public class RobotRuntimeEnvironment {
         return null;
     }
 
-    public static File copyResourceFile(final String filename) throws IOException {
+    public static File createTemporaryFile(final String filename) throws IOException {
         final Path tempDir = createTemporaryDirectory();
-        final File scriptFile = new File(tempDir.toString() + File.separator + filename);
-        if (!scriptFile.exists()) {
-            Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(filename), scriptFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING);
-        }
-        return scriptFile;
+        final File tempFile = new File(tempDir.toString() + File.separator + filename);
+        tempFile.delete();
+        tempFile.createNewFile();
+        return tempFile;
     }
 
     public static File copyScriptFile(final String filename) throws IOException {
@@ -426,7 +424,7 @@ public class RobotRuntimeEnvironment {
      * Return names of python classes contained in module point by argument and
      * all of its submodules. For packages-module __init__.py file path should
      * be provided.
-     * 
+     *
      * @param moduleLocation
      * @return
      * @throws RobotEnvironmentException
@@ -512,7 +510,7 @@ public class RobotRuntimeEnvironment {
         }
         return new LinkedHashMap<>();
     }
-    
+
     public boolean isVirtualenv() {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
