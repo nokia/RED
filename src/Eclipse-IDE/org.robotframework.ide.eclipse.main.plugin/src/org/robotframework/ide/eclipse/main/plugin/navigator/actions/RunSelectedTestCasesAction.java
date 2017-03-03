@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfig
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfigurationFinder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.propertytester.SelectionsPropertyTester;
 import org.robotframework.red.viewers.Selections;
 
 public class RunSelectedTestCasesAction extends Action implements IEnablementUpdatingAction {
@@ -106,9 +107,9 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
 
     @Override
     public void updateEnablement(final IStructuredSelection selection) {
-        final boolean robotCaseAbsent = Selections.getElements(selection, RobotCase.class).isEmpty();
-        final boolean robotCasesSectionAbsent = Selections.getElements(selection, RobotCasesSection.class).isEmpty();
-        setEnabled(!robotCaseAbsent || !robotCasesSectionAbsent);
+        setEnabled(SelectionsPropertyTester.testIfAllElementsAreFromSameProject(selection, true)
+                && (!Selections.getElements(selection, RobotCase.class).isEmpty()
+                        || !Selections.getElements(selection, RobotCasesSection.class).isEmpty()));
     }
 
     public static enum Mode {
