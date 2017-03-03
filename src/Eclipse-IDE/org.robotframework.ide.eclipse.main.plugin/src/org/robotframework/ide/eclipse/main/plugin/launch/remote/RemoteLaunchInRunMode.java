@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJo
 import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogView;
+import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator;

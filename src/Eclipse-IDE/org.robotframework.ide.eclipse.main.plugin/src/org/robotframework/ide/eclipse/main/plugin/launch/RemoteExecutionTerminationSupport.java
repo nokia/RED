@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch.remote;
+package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.io.IOException;
 
@@ -14,12 +14,10 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
-import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
-import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 
-class RemoteExecutionTerminationSupport {
+public class RemoteExecutionTerminationSupport {
 
-    static void installTerminationSupport(final AgentConnectionServerJob serverJob,
+    public static void installTerminationSupport(final AgentConnectionServerJob serverJob,
             final AgentServerKeepAlive keepAliveListener, final IRobotProcess robotProcess) {
 
         DebugPlugin.getDefault().addDebugEventListener(new DebugTerminationListener(serverJob, keepAliveListener, robotProcess));
