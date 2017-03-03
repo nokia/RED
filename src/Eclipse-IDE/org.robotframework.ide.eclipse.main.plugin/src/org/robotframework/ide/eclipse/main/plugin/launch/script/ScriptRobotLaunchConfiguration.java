@@ -22,15 +22,15 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.launch.AbstractTaggedSuitesRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 
-public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLaunchConfiguration
+public class ScriptRobotLaunchConfiguration extends RobotLaunchConfiguration
         implements IRemoteRobotLaunchConfiguration {
 
     public static final String TYPE_ID = "org.robotframework.ide.scriptRobotLaunchConfiguration";
@@ -45,15 +45,9 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
 
     private static final String SCRIPT_ARGUMENTS_ATTRIBUTE = "Script arguments";
 
-    private static final String SCRIPT_RUN_COMMAND_ATTRIBUTE = "Script run command";
-
     public static String[] getSystemDependentScriptExtensions() {
-        return RedSystemProperties.isWindowsPlatform() ? new String[] { "*.bat", "*.*" }
+        return RedSystemProperties.isWindowsPlatform() ? new String[] { "*.bat;*.com;*.exe", "*.*" }
                 : new String[] { "*.sh", "*.*" };
-    }
-
-    public static String getSystemDependentScriptRunCommand() {
-        return RedSystemProperties.isWindowsPlatform() ? "cmd /c start" : "";
     }
 
     static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
@@ -101,7 +95,6 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         setScriptPath(preferences.getLaunchScriptPath());
         setScriptArguments(preferences.getLaunchAdditionalScriptArguments());
-        setScriptRunCommand(preferences.getLaunchScriptRunCommand());
         setRemoteHostValue(preferences.getLaunchRemoteHost());
         setRemotePortValue(preferences.getLaunchRemotePort());
         setRemoteTimeoutValue(preferences.getLaunchRemoteTimeout());
@@ -185,10 +178,6 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
         return configuration.getAttribute(SCRIPT_ARGUMENTS_ATTRIBUTE, "");
     }
 
-    public String getScriptRunCommand() throws CoreException {
-        return configuration.getAttribute(SCRIPT_RUN_COMMAND_ATTRIBUTE, "");
-    }
-
     public void setScriptPath(final String path) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(SCRIPT_PATH_ATTRIBUTE, path);
@@ -197,11 +186,6 @@ public class ScriptRobotLaunchConfiguration extends AbstractTaggedSuitesRobotLau
     public void setScriptArguments(final String arguments) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(SCRIPT_ARGUMENTS_ATTRIBUTE, arguments);
-    }
-
-    public void setScriptRunCommand(final String command) throws CoreException {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(SCRIPT_RUN_COMMAND_ATTRIBUTE, command);
     }
 
 }

@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -67,15 +66,10 @@ public class ScriptRobotLaunchConfigurationTest {
 
     @Test
     public void systemDependentAttributesObtained() {
-        if (RedSystemProperties.isWindowsPlatform()) {
-            assertThat(ScriptRobotLaunchConfiguration.getSystemDependentScriptExtensions()).containsExactly("*.bat",
-                    "*.*");
-            assertThat(ScriptRobotLaunchConfiguration.getSystemDependentScriptRunCommand()).isEqualTo("cmd /c start");
-        } else {
-            assertThat(ScriptRobotLaunchConfiguration.getSystemDependentScriptExtensions()).containsExactly("*.sh",
-                    "*.*");
-            assertThat(ScriptRobotLaunchConfiguration.getSystemDependentScriptRunCommand()).isEqualTo("");
-        }
+        final String[] expectedScriptExtensions = RedSystemProperties.isWindowsPlatform()
+                ? new String[] { "*.bat;*.com;*.exe", "*.*" } : new String[] { "*.sh", "*.*" };
+        assertThat(ScriptRobotLaunchConfiguration.getSystemDependentScriptExtensions())
+                .containsExactly(expectedScriptExtensions);
     }
 
     @Test
@@ -86,8 +80,6 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.getSuitePaths().keySet()).containsExactly("Resource");
         assertThat(robotConfig.getScriptPath()).isEqualTo("");
         assertThat(robotConfig.getScriptArguments()).isEqualTo("");
-        assertThat(robotConfig.getScriptRunCommand())
-                .isEqualTo(RedSystemProperties.isWindowsPlatform() ? "cmd /c start" : "");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
@@ -104,7 +96,6 @@ public class ScriptRobotLaunchConfigurationTest {
         suites.put("key", newArrayList("value"));
         robotConfig.setScriptPath("path");
         robotConfig.setScriptArguments("arguments");
-        robotConfig.setScriptRunCommand("cmd");
         robotConfig.setProjectName(PROJECT_NAME);
         robotConfig.setSuitePaths(suites);
         robotConfig.setIsIncludeTagsEnabled(true);
@@ -119,8 +110,6 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.getSuitePaths()).isEmpty();
         assertThat(robotConfig.getScriptPath()).isEqualTo("");
         assertThat(robotConfig.getScriptArguments()).isEqualTo("");
-        assertThat(robotConfig.getScriptRunCommand())
-                .isEqualTo(RedSystemProperties.isWindowsPlatform() ? "cmd /c start" : "");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
@@ -128,45 +117,6 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getRemotePort()).isEqualTo(12345);
         assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
-    }
-
-    @Test
-    public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
-        final IResource res = project.getFile("Resource1");
-        final IResource res2 = project.getFile("Resource2");
-        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
-        final List<String> casesForRes = newArrayList("case1", "case3");
-        final List<String> casesForRes2 = newArrayList("case1");
-        resourcesToTestCases.put(res, casesForRes);
-        resourcesToTestCases.put(res2, casesForRes2);
-        final ILaunchConfigurationWorkingCopy configuration = ScriptRobotLaunchConfiguration
-                .prepareForSelectedTestCases(resourcesToTestCases);
-        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
-        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
-        final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
-        assertThat(suitePaths.keySet()).containsExactlyInAnyOrder("Resource1", "Resource2");
-        assertThat(suitePaths).containsEntry("Resource1", casesForRes);
-        assertThat(suitePaths).containsEntry("Resource2", casesForRes2);
-        assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
-        assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
-        assertThat(robotConfig.getIncludedTags()).isEmpty();
-        assertThat(robotConfig.getExcludedTags()).isEmpty();
-    }
-
-    @Test
-    public void suitesObtained_whenSuitesCollectedFromConfiguration() throws CoreException {
-        final List<IResource> resources = newArrayList();
-        for (int i = 0; i < 3; i++) {
-            final IResource res = project.getFile("Resource " + i + ".fake");
-            resources.add(res);
-        }
-        final ILaunchConfigurationWorkingCopy configuration = ScriptRobotLaunchConfiguration.prepareDefault(resources);
-        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
-        final Map<IResource, List<String>> obtainedSuites = robotConfig.collectSuitesToRun();
-        assertThat(obtainedSuites).hasSameSizeAs(resources);
-        for (int i = 0; i < resources.size(); i++) {
-            assertThat(obtainedSuites).containsKey(resources.get(i));
-        }
     }
 
     @Test

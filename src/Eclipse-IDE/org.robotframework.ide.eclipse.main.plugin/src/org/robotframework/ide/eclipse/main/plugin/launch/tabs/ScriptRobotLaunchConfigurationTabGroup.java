@@ -18,8 +18,9 @@ public class ScriptRobotLaunchConfigurationTabGroup extends AbstractLaunchConfig
     @Override
     public void createTabs(final ILaunchConfigurationDialog dialog, final String mode) {
         setTabs(new ILaunchConfigurationTab[] {
-                new RobotLaunchConfigurationScriptTab(),
+                new RobotLaunchConfigurationMainTab(),
                 new RobotLaunchConfigurationRemoteTab(),
+                new RobotLaunchConfigurationScriptTab(),
                 new SourceLookupTab(),
                 new EnvironmentTab(),
                 new CommonTab()
