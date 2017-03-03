@@ -70,8 +70,6 @@ public class RedPreferences {
 
     public static final String LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS = "red.launch.additionalscriptArguments";
 
-    public static final String LAUNCH_SCRIPT_RUN_COMMAND = "red.launch.scriptRunCommand";
-
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
     }
@@ -205,10 +203,6 @@ public class RedPreferences {
 
     public String getLaunchAdditionalScriptArguments() {
         return store.getString(LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
-    }
-
-    public String getLaunchScriptRunCommand() {
-        return store.getString(LAUNCH_SCRIPT_RUN_COMMAND);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {

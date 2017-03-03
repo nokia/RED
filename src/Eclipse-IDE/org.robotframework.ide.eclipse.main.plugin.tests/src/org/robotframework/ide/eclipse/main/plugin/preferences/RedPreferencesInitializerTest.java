@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.junit.Test;
-import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
@@ -80,7 +79,5 @@ public class RedPreferencesInitializerTest {
         verify(preferences).put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30");
         verify(preferences).put(RedPreferences.LAUNCH_SCRIPT_PATH, "");
         verify(preferences).put(RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS, "");
-        verify(preferences).put(RedPreferences.LAUNCH_SCRIPT_RUN_COMMAND,
-                RedSystemProperties.isWindowsPlatform() ? "cmd /c start" : "");
     }
 }

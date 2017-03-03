@@ -35,8 +35,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
     private final RobotEventBroker robotEventBroker;
 
-    private boolean hasViewsInitialized;
-
     public RobotLaunchConfigurationDelegate() {
         robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
@@ -88,21 +86,15 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     private void initViews() {
-        // TODO : is this field even needed?
-        if (!hasViewsInitialized) {
-            SwtThread.syncExec(new Runnable() {
+        // TODO : this has to be implemented in a better way...
+        SwtThread.syncExec(() -> {
 
-                @Override
-                public void run() {
-                    final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-                    if (page != null) {
-                        openOrShowView(page, MessageLogView.ID);
-                        openOrShowView(page, ExecutionView.ID);
-                    }
-                }
-            });
-            hasViewsInitialized = true;
-        }
+            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            if (page != null) {
+                openOrShowView(page, MessageLogView.ID);
+                openOrShowView(page, ExecutionView.ID);
+            }
+        });
     }
 
     private void openOrShowView(final IWorkbenchPage page, final String viewId) {
