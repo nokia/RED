@@ -5,10 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.expressions.PropertyTester;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
@@ -36,7 +42,8 @@ public class SelectionsPropertyTester extends PropertyTester {
         return false;
     }
 
-    private boolean testProperty(final IStructuredSelection selection, final String property, final boolean expected) {
+    private static boolean testProperty(final IStructuredSelection selection, final String property,
+            final boolean expected) {
         if (ALL_ELEMENTS_HAVE_SAME_TYPE.equals(property)) {
             return testIfAllElementsHaveSameType(selection, expected);
         } else if (SELECTED_ACTUAL_FILE.equals(property)) {
@@ -45,7 +52,8 @@ public class SelectionsPropertyTester extends PropertyTester {
         return false;
     }
 
-    private boolean testIfIsSelectedActualProjectMember(final IStructuredSelection selection, final boolean expected) {
+    private static boolean testIfIsSelectedActualProjectMember(final IStructuredSelection selection,
+            final boolean expected) {
         if (selection.isEmpty()) {
             return !expected;
         }
@@ -61,7 +69,7 @@ public class SelectionsPropertyTester extends PropertyTester {
         return expected;
     }
 
-    private boolean testIfAllElementsHaveSameType(final IStructuredSelection selection, final boolean expected) {
+    private static boolean testIfAllElementsHaveSameType(final IStructuredSelection selection, final boolean expected) {
         final List<Object> elements = Selections.getElements(selection, Object.class);
         if (elements.isEmpty()) {
             return expected;
@@ -81,6 +89,33 @@ public class SelectionsPropertyTester extends PropertyTester {
             }
         }
         return expected;
+    }
+
+    public static boolean testIfAllElementsAreFromSameProject(final IStructuredSelection selection,
+            final boolean expected) {
+        final List<IResource> resources = Selections.getAdaptableElements(selection, IResource.class);
+        final List<RobotCasesSection> sections = Selections.getElements(selection, RobotCasesSection.class);
+        final List<RobotCase> cases = Selections.getElements(selection, RobotCase.class);
+        if (sections.isEmpty() && cases.isEmpty() && resources.isEmpty()) {
+            return !expected;
+        }
+        final Set<IProject> projects = new HashSet<IProject>();
+        for (final IResource resource : resources) {
+            if (!projects.add(resource.getProject())) {
+                return !expected;
+            }
+        }
+        for (final RobotCasesSection section : sections) {
+            if (!projects.add(section.getSuiteFile().getProject().getProject())) {
+                return !expected;
+            }
+        }
+        for (final RobotCase robotCase : cases) {
+            if (!projects.add(robotCase.getSuiteFile().getProject().getProject())) {
+                return !expected;
+            }
+        }
+        return (projects.size() == 1) == expected;
     }
 
 }

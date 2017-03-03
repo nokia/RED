@@ -28,6 +28,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.propertytester.SelectionsPropertyTester;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.viewers.Selections;
 
@@ -38,18 +39,22 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
     @Override
     public void launch(final ISelection selection, final String mode) {
         if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
-            final List<IResource> resources = Selections.getAdaptableElements((IStructuredSelection) selection,
-                    IResource.class);
-
-            for (final Object o : ((IStructuredSelection) selection).toList()) {
-                if (o instanceof RobotCasesSection) {
-                    resources.add(((RobotCasesSection) o).getSuiteFile().getFile());
+            final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+            if (SelectionsPropertyTester.testIfAllElementsAreFromSameProject(structuredSelection, true)) {
+                final List<IResource> resources = Selections.getAdaptableElements(structuredSelection, IResource.class);
+                for (final Object o : structuredSelection.toList()) {
+                    if (o instanceof RobotCasesSection) {
+                        resources.add(((RobotCasesSection) o).getSuiteFile().getFile());
+                    }
                 }
-            }
-            if (!resources.isEmpty()) {
-                createAndLaunchConfiguration(resources, mode);
+                if (!resources.isEmpty()) {
+                    createAndLaunchConfiguration(resources, mode);
+                } else {
+                    createAndLaunchConfigurationForSelectedTestCases(structuredSelection, mode);
+                }
             } else {
-                createAndLaunchConfigurationForSelectedTestCases((IStructuredSelection) selection, mode);
+                DetailedErrorDialog.openErrorDialog("Cannot generate Robot Launch Configuration",
+                        "All selected elements need to be members of only one project.");
             }
         }
     }
@@ -113,15 +118,18 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
         if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
             try {
                 final IStructuredSelection ss = (IStructuredSelection) selection;
-                final List<IResource> resources = Selections.getAdaptableElements(ss, IResource.class);
-                if (!resources.isEmpty()) {
-                    config = RobotLaunchConfigurationFinder.getLaunchConfigurationExceptSelectedTestCases(resources);
-                } else {
-                    final Optional<Map<IResource, List<String>>> resourcesToTests = mapResourcesToTestCases(ss);
-                    if (resourcesToTests.isPresent()) {
+                if (SelectionsPropertyTester.testIfAllElementsAreFromSameProject(ss, true)) {
+                    final List<IResource> resources = Selections.getAdaptableElements(ss, IResource.class);
+                    if (!resources.isEmpty()) {
                         config = RobotLaunchConfigurationFinder
-                                .getLaunchConfigurationForSelectedTestCases(resourcesToTests.get());
-                        new RobotLaunchConfiguration(config).updateTestCases(resourcesToTests.get());
+                                .getLaunchConfigurationExceptSelectedTestCases(resources);
+                    } else {
+                        final Optional<Map<IResource, List<String>>> resourcesToTests = mapResourcesToTestCases(ss);
+                        if (resourcesToTests.isPresent()) {
+                            config = RobotLaunchConfigurationFinder
+                                    .getLaunchConfigurationForSelectedTestCases(resourcesToTests.get());
+                            new RobotLaunchConfiguration(config).updateTestCases(resourcesToTests.get());
+                        }
                     }
                 }
             } catch (final CoreException e) {
