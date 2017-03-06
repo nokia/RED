@@ -77,14 +77,17 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
     }
 
     @Override
-    public int getRemoteTimeout() throws CoreException {
+    public Optional<Integer> getRemoteTimeout() throws CoreException {
         final String timeout = getRemoteTimeoutValue();
+        if (timeout.isEmpty()) {
+            return Optional.empty();
+        }
         final Integer timeoutAsInt = Ints.tryParse(timeout);
         if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
             throw newCoreException(String.format("Connection timeout '%s' must be an Integer between 1 and %,d",
                     timeout, MAX_TIMEOUT));
         }
-        return timeoutAsInt;
+        return Optional.of(timeoutAsInt);
     }
 
     @Override

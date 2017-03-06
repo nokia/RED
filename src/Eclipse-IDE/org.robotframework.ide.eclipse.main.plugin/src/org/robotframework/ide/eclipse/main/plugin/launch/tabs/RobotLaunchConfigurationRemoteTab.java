@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -109,8 +110,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             }
         });
 
-        // spacer to occupy next grid cell
-        new Label(serverGroup, SWT.NONE);
+        final Label defaultHostLbl = new Label(serverGroup, SWT.WRAP);
+        defaultHostLbl.setText("(localhost if empty)");
 
         final Label portLbl = new Label(serverGroup, SWT.NONE);
         portLbl.setText("Local port:");
@@ -125,8 +126,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             }
         });
 
-        // spacer to occupy next grid cell
-        new Label(serverGroup, SWT.NONE);
+        final Label defaultPortLbl = new Label(serverGroup, SWT.WRAP);
+        defaultPortLbl.setText("(random free port if empty)");
 
         final Label timeoutLbl = new Label(serverGroup, SWT.NONE);
         timeoutLbl.setText("Connection timeout [s]:");
@@ -140,6 +141,10 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 updateLaunchConfigurationDialog();
             }
         });
+
+        final Label defaultTimeoutLbl = new Label(serverGroup, SWT.WRAP);
+        defaultTimeoutLbl
+                .setText(String.format("(%d if empty)", AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT));
     }
 
     private void createClientGroup(final Composite parent) {
@@ -221,7 +226,9 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     }
 
     private void updateCommandLineArguments(final String hostIp, final String port) {
-        commandLineArgument.setText("--listener TestRunnerAgent.py:" + hostIp + ":" + port);
+        final String hostArg = hostIp.isEmpty() ? "" : ":" + hostIp;
+        final String portArg = port.isEmpty() ? ":<RANDOM>" : ":" + port;
+        commandLineArgument.setText("--listener TestRunnerAgent.py" + hostArg + portArg);
     }
 
     @Override

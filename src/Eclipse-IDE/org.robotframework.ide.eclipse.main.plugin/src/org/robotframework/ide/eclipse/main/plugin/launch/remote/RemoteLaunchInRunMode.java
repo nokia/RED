@@ -44,7 +44,8 @@ class RemoteLaunchInRunMode {
         if (port < 0) {
             throw newCoreException("Unable to find free port");
         }
-        final int timeout = robotConfig.getRemoteTimeout();
+        final int timeout = robotConfig.getRemoteTimeout()
+                .orElse(AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT);
 
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);

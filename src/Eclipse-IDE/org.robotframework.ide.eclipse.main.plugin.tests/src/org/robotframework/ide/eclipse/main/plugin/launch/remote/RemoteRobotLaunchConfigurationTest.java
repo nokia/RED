@@ -70,7 +70,7 @@ public class RemoteRobotLaunchConfigurationTest {
         assertThat(robotConfig.getProjectName()).isEqualTo("");
         assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
         assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
-        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
+        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
     }
 
     @Test
@@ -124,13 +124,10 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void whenTimeoutIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600");
-
+    public void whenTimeoutIsEmpty_emptyOptionalIsReturned() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
         robotConfig.setRemoteTimeoutValue("");
-        robotConfig.getRemoteTimeout();
+        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
     }
 
     @Test
@@ -171,12 +168,13 @@ public class RemoteRobotLaunchConfigurationTest {
         robotConfig.setRemoteTimeoutValue("567");
         final Optional<String> host = robotConfig.getRemoteHost();
         final Optional<Integer> port = robotConfig.getRemotePort();
-        final int timeout = robotConfig.getRemoteTimeout();
+        final Optional<Integer> timeout = robotConfig.getRemoteTimeout();
         assertThat(host.isPresent()).isTrue();
         assertThat(host.get()).isEqualTo("192.168.1.21");
         assertThat(port.isPresent()).isTrue();
         assertThat(port.get()).isEqualTo(1234);
-        assertThat(timeout).isEqualTo(567);
+        assertThat(timeout.isPresent()).isTrue();
+        assertThat(timeout.get()).isEqualTo(567);
     }
 
     @Test
