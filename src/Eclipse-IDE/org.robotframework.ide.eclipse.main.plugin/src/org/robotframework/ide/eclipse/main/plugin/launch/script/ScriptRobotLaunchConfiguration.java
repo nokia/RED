@@ -67,7 +67,7 @@ public class ScriptRobotLaunchConfiguration extends RobotLaunchConfiguration
     private static ILaunchConfigurationWorkingCopy prepareCopy(final Map<IResource, List<String>> suitesMapping,
             final RobotLaunchConfigurationType type) throws CoreException {
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final String namePrefix = RobotLaunchConfigurationNaming.getNamePrefix(suitesMapping.keySet(), type);
+        final String namePrefix = RobotLaunchConfigurationNaming.getBasicName(suitesMapping.keySet(), type);
         final String name = manager.generateLaunchConfigurationName(namePrefix);
 
         final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
