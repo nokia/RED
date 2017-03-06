@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -43,9 +44,13 @@ public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDet
         this.dataProvider = dataProvider;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public List<IHyperlink> detectHyperlinks(final int row, final int column, final String label, final int indexInLabel) {
-        final Object rowObject = dataProvider.getRowObject(row);
+        Object rowObject = dataProvider.getRowObject(row);
+        if (rowObject instanceof Entry) {
+            rowObject = ((Entry) rowObject).getValue();
+        }
         if (rowObject instanceof RobotFileInternalElement) {
             final RobotFileInternalElement element = (RobotFileInternalElement) rowObject;
             final RobotSuiteFile suiteFile = element.getSuiteFile();
