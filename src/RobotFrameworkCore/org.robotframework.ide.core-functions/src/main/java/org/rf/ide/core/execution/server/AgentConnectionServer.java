@@ -23,7 +23,7 @@ import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListene
 
 public class AgentConnectionServer {
 
-    static final int RED_AGENT_PROTOCOL_VERSION = 1;
+    public static final int RED_AGENT_PROTOCOL_VERSION = 1;
 
     public static final String DEFAULT_CLIENT_HOST = "127.0.0.1";
 

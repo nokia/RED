@@ -17,7 +17,9 @@ import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.response.InitializeAgent;
+import org.rf.ide.core.execution.server.response.ProtocolVersion;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
 /**
@@ -26,6 +28,8 @@ import org.rf.ide.core.execution.server.response.ServerResponse.ResponseExceptio
 public class RobotDryRunOutputParser implements IAgentMessageHandler {
 
     private static final String AGENT_INITIALIZING_EVENT_NAME = "agent_initializing";
+
+    private static final String VERSION_EVENT_NAME = "version";
 
     private static final String MESSAGE_EVENT_NAME = "message";
 
@@ -59,6 +63,17 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
         if (eventMap.containsKey(AGENT_INITIALIZING_EVENT_NAME)) {
             try {
                 client.send(new InitializeAgent(TestsMode.RUN, false));
+            } catch (ResponseException | IOException e) {
+                throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+            }
+        } else if (eventMap.containsKey(VERSION_EVENT_NAME)) {
+            try {
+                final List<?> arguments = eventMap.get("version");
+                final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
+                final int protocolVersion = (Integer) attributes.get("protocol");
+
+                final boolean isCorrect = protocolVersion == AgentConnectionServer.RED_AGENT_PROTOCOL_VERSION;
+                client.send(new ProtocolVersion(isCorrect));
             } catch (ResponseException | IOException e) {
                 throw new RobotAgentEventsListenerException("Unable to send response to client", e);
             }
