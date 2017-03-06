@@ -79,7 +79,7 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
     protected boolean validatePage() {
         boolean isProjectavailable = false;
         Object[] selection = currentSelection.toArray();
-
+        final boolean isValid = super.validatePage();
         if (!(selection.length == 0)) {
             for (Object project : selection) {
                 while (project instanceof IFolder || project instanceof IFile) {
@@ -93,11 +93,11 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
                 }
             }
         }
-        if (!isProjectavailable) {
+        if (!isProjectavailable && !isValid) {
             setErrorMessage("Action impossible to finish: No project available");
             return false;
         }
-        final boolean isValid = super.validatePage();
+
         if (!isValid) {
             return false;
         }
