@@ -17,17 +17,11 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
-import org.robotframework.ide.eclipse.main.plugin.views.message.MessageLogView;
-import org.robotframework.red.swt.SwtThread;
 
 
 public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
@@ -49,7 +43,6 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
             return;
         }
         try {
-            initViews();
             robotEventBroker.sendClearEventToMessageLogView();
             robotEventBroker.sendClearEventToExecutionView();
             doLaunch(configuration, mode, launch, monitor);
@@ -57,29 +50,6 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
             throw newCoreException("Unable to launch Robot", e);
         } finally {
             IRobotLaunchConfiguration.unlockConfigurationLaunches();
-        }
-    }
-
-    private void initViews() {
-        // TODO : this has to be implemented in a better way...
-        SwtThread.syncExec(() -> {
-
-            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            if (page != null) {
-                openOrShowView(page, MessageLogView.ID);
-                openOrShowView(page, ExecutionView.ID);
-            }
-        });
-    }
-
-    private void openOrShowView(final IWorkbenchPage page, final String viewId) {
-        final IViewPart view = page.findView(viewId);
-        if (view == null || !page.isPartVisible(view)) {
-            try {
-                page.showView(viewId);
-            } catch (final PartInitException e) {
-                e.printStackTrace();
-            }
         }
     }
 
