@@ -3,12 +3,10 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.execution;
+package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
@@ -16,39 +14,30 @@ import org.rf.ide.core.execution.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 
-public class ExecutionViewLabelProvider extends StyledCellLabelProvider {
+class ExecutionViewLabelProvider extends RedCommonLabelProvider {
 
     @Override
-    public void update(final ViewerCell cell) {
-        
-        final StyledString label = getStyledString(cell.getElement());
-        cell.setText(label.getString());
-        cell.setStyleRanges(label.getStyleRanges());
-        
-        cell.setImage(getImage(cell.getElement()));
-        
-        super.update(cell);
-    }
+    public StyledString getStyledText(final Object element) {
+        final ExecutionStatus status = (ExecutionStatus) element;
+        final String time = status.getElapsedTime();
 
-    private StyledString getStyledString(final Object element) {
-        String elapsedTime = "";
-        final String time = ((ExecutionStatus) element).getElapsedTime();
+        final StyledString label = new StyledString(status.getName());
         if (time != null) {
-            elapsedTime = " (" + time + " s)";
-        }
-        final StyledString label = new StyledString(((ExecutionStatus) element).getName());
-        label.append(elapsedTime, new Styler() {
+            label.append(" (" + time + " s)", new Styler() {
 
-            @Override
-            public void applyStyles(final TextStyle textStyle) {
-                textStyle.foreground = RedTheme.getEclipseDecorationColor();
-            }
-        });
+                @Override
+                public void applyStyles(final TextStyle textStyle) {
+                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                }
+            });
+        }
         return label;
     }
     
-    private Image getImage(final Object element) {
+    @Override
+    public Image getImage(final Object element) {
         final ExecutionStatus status = (ExecutionStatus) element;
 
         if (status.getType() == ExecutionElementType.SUITE) {

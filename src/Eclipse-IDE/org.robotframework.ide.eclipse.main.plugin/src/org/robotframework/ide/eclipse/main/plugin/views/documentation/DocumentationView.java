@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.views;
+package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -34,7 +34,6 @@ import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
-import org.robotframework.ide.eclipse.main.plugin.documentation.DocumentationViewPartListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;

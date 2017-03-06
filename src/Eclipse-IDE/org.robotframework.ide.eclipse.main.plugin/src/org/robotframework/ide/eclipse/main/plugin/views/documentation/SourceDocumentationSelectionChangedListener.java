@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.documentation;
+package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -19,7 +19,6 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
 import com.google.common.base.Optional;
 
@@ -40,7 +39,7 @@ public class SourceDocumentationSelectionChangedListener {
     private final DocViewDelayedUpdateJob delayedUpdateJob = new DocViewDelayedUpdateJob(
             "Documentation View Delayed Update Job");
 
-    public SourceDocumentationSelectionChangedListener(final DocumentationView view) {
+    SourceDocumentationSelectionChangedListener(final DocumentationView view) {
         this.view = view;
     }
 
