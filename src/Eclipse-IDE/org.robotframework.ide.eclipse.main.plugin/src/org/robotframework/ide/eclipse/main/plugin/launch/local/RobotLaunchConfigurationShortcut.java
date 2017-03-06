@@ -175,6 +175,18 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
 
     @Override
     public ILaunchConfiguration[] getLaunchConfigurations(final IEditorPart editorpart) {
+        final IEditorInput input = editorpart.getEditorInput();
+        if (input instanceof FileEditorInput) {
+            try {
+                final IResource file = ((FileEditorInput) input).getFile();
+                final ILaunchConfigurationWorkingCopy config = RobotLaunchConfiguration
+                        .prepareDefault(newArrayList(file));
+                final ILaunchConfiguration sameConfig = RobotLaunchConfigurationFinder.findSameAs(config);
+                return new ILaunchConfiguration[] { sameConfig != null ? sameConfig : config };
+            } catch (final CoreException e) {
+                return null;
+            }
+        }
         return null;
     }
 
