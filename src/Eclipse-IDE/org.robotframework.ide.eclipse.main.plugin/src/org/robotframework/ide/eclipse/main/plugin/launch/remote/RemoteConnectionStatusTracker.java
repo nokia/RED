@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -14,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.server.AgentServerStatusListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
+
+import com.google.common.base.Splitter;
 
 class RemoteConnectionStatusTracker extends RobotDefaultAgentEventListener
         implements AgentServerStatusListener {
@@ -49,16 +52,23 @@ class RemoteConnectionStatusTracker extends RobotDefaultAgentEventListener
 
     @Override
     public void clientConnectionError(final IOException e) {
+        writeMessageLine("Connection error occurred:\n" + indentMessage(e.getMessage()));
         endQueueing();
     }
 
     @Override
     public void clientEventHandlingError(final RobotAgentEventsListenerException e) {
+        writeMessageLine("Error occurred when communicating with agent:\n" + indentMessage(e.getMessage()));
         endQueueing();
     }
 
+    private static String indentMessage(final String message) {
+        final List<String> msgLines = Splitter.on('\n').splitToList(message);
+        return "\t" + String.join("\n\t", msgLines);
+    }
+
     @Override
-    public void handleVersions(final String pythonVersion, final String robotVersion) {
+    public void handleVersions(final String pythonVersion, final String robotVersion, final int protocolVersion) {
         writeMessageLine("client python version: " + pythonVersion);
         writeMessageLine("client robot version: " + robotVersion);
     }
