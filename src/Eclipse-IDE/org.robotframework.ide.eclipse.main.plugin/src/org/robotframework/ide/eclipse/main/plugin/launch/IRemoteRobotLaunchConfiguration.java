@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.CoreException;
 
 public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfiguration {
@@ -15,11 +17,11 @@ public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfigurati
 
     boolean isDefiningProjectDirectly();
 
-    int getRemotePort() throws CoreException;
+    Optional<String> getRemoteHost() throws CoreException;
+
+    Optional<Integer> getRemotePort() throws CoreException;
 
     int getRemoteTimeout() throws CoreException;
-
-    String getRemoteHost() throws CoreException;
 
     String getRemotePortValue() throws CoreException;
 

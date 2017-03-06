@@ -25,7 +25,17 @@ public class AgentConnectionServer {
 
     static final int RED_AGENT_PROTOCOL_VERSION = 1;
 
-    public static final int CLIENT_CONNECTION_TIMEOUT = 30;
+    public static final String DEFAULT_CLIENT_HOST = "127.0.0.1";
+
+    public static final int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 30;
+
+    public static final int findFreePort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (final IOException e) {
+            return -1;
+        }
+    }
 
     private final int port;
 
@@ -40,7 +50,7 @@ public class AgentConnectionServer {
     private ServerSocket serverSocket;
 
     public AgentConnectionServer(final String host, final int port) {
-        this(host, port, CLIENT_CONNECTION_TIMEOUT, TimeUnit.SECONDS);
+        this(host, port, DEFAULT_CLIENT_CONNECTION_TIMEOUT, TimeUnit.SECONDS);
     }
 
     public AgentConnectionServer(final String host, final int port, final int timeout, final TimeUnit timeoutUnit) {

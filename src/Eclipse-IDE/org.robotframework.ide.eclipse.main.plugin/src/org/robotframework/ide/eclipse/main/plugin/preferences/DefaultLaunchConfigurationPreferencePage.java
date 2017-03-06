@@ -77,9 +77,8 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         remoteHost.load();
         addField(remoteHost);
 
-        final IntegerFieldEditor remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_PORT, "Local port:",
+        final StringFieldEditor remotePort = new StringFieldEditor(RedPreferences.LAUNCH_REMOTE_PORT, "Local port:",
                 group);
-        remotePort.setValidRange(1, IRemoteRobotLaunchConfiguration.MAX_PORT);
         remotePort.load();
         addField(remotePort);
 

@@ -146,7 +146,7 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                 RedPreferences.SEPARATOR_TO_USE, "user defined separator (use '|', 's' for space or 't' for tab)",
                 regex, sourceGroup);
         separatorEditor.setErrorMessage(
-                "User defined spearator should have at least one tab or two spaces, or bar '|' sourrounded "
+                "User defined separator should have at least one tab or two spaces, or bar '|' surrounded "
                         + "with at least one space or tab");
         addField(separatorEditor);
         GridDataFactory.fillDefaults().indent(5, 0).applyTo(separatorEditor.getLabelControl(sourceGroup));

@@ -266,16 +266,6 @@ public class LaunchConfigurationsValidatorTest {
     }
 
     @Test
-    public void whenHostIsEmpty_fatalExceptionIsThrown() throws CoreException {
-        thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Server IP cannot be empty");
-
-        final RemoteRobotLaunchConfiguration launchConfig = createRemoteRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setRemoteHostValue("");
-        validator.validate(launchConfig);
-    }
-
-    @Test
     public void whenPortIsNotCorrect_fatalExceptionIsThrown() throws CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage("Server port 'xyz' must be an Integer between 1 and 65,535");

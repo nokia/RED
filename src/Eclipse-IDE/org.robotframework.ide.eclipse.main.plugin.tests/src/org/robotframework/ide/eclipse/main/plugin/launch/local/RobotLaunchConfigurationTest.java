@@ -132,7 +132,7 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void defaultConfigurationObtained_whenCustomConfigurationFilledDefaults() throws CoreException {
+    public void defaultConfigurationObtained_whenCustomConfigurationIsFilledWithDefaults() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         final Map<String, List<String>> suites = new HashMap<>();
         suites.put("key", newArrayList("value"));

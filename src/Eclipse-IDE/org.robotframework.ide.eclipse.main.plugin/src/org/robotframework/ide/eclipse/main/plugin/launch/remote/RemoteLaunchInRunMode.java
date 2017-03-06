@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.rf.ide.core.execution.TestsMode;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -38,8 +39,11 @@ class RemoteLaunchInRunMode {
 
         new LaunchConfigurationsValidator().validate(robotConfig);
 
-        final String host = robotConfig.getRemoteHost();
-        final int port = robotConfig.getRemotePort();
+        final String host = robotConfig.getRemoteHost().orElse(AgentConnectionServer.DEFAULT_CLIENT_HOST);
+        final int port = robotConfig.getRemotePort().orElseGet(AgentConnectionServer::findFreePort);
+        if (port < 0) {
+            throw newCoreException("Unable to find free port");
+        }
         final int timeout = robotConfig.getRemoteTimeout();
 
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
@@ -72,6 +76,10 @@ class RemoteLaunchInRunMode {
             throw newCoreException("Interrupted when waiting for remote connection server", e);
         }
 
+    }
+
+    private CoreException newCoreException(final String message) {
+        return newCoreException(message, null);
     }
 
     private CoreException newCoreException(final String msg, final Throwable cause) {
