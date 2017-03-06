@@ -39,7 +39,7 @@ public class RobotDryRunHandler {
         builder.suitesToRun(suites);
         builder.addLocationsToPythonPath(pythonPathLocations);
         builder.addLocationsToClassPath(classPathLocations);
-        builder.enableDryRun(true);
+        builder.enableDryRun();
         builder.withAdditionalProjectsLocations(additionalProjectsLocations);
 
         return builder.build();

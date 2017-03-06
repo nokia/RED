@@ -28,7 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminat
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchInMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 class RobotLaunchInDebugMode extends RobotLaunchInMode {
