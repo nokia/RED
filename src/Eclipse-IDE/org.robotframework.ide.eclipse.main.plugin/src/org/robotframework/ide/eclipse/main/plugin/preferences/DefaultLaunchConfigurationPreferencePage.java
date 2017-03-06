@@ -11,7 +11,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -21,7 +20,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
 
 public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPreferencePage
@@ -82,9 +80,8 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         remotePort.load();
         addField(remotePort);
 
-        final IntegerFieldEditor remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
+        final StringFieldEditor remoteTimeout = new StringFieldEditor(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
                 "Connection timeout [s]:", group);
-        remoteTimeout.setValidRange(1, IRemoteRobotLaunchConfiguration.MAX_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);
     }

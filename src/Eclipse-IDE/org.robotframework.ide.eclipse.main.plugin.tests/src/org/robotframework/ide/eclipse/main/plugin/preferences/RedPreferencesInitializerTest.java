@@ -65,13 +65,4 @@ public class RedPreferencesInitializerTest {
 
         verify(preferences).put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
     }
-
-    @Test
-    public void byDefaultLaunchConfigurationPreferencesAreInitialized() {
-        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
-
-        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
-
-        verify(preferences).put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30");
-    }
 }
