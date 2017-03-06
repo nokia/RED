@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.execution;
+package org.robotframework.red.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -30,7 +30,6 @@ public class CollapseAllAction extends Action implements IWorkbenchAction {
 
     @Override
     public void dispose() {
-
+        // nothing to dispose
     }
-
 }

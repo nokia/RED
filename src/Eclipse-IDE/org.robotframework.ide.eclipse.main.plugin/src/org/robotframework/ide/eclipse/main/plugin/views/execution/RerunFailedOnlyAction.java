@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.execution;
+package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -20,20 +20,23 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 
-public class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
+class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
 
     private static final String ID = "org.robotframework.action.executionView.RerunFailedOnlyAction";
 
     private String outputFilePath;
 
-    public RerunFailedOnlyAction() {
+    RerunFailedOnlyAction() {
         super("Rerun Failed Tests Only", RedImages.getRelaunchFailedImage());
         setId(ID);
     }
 
+    void setOutputFilePath(final String outputFilePath) {
+        this.outputFilePath = outputFilePath;
+    }
+
     @Override
     public void run() {
-
         final ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
         if (launches != null && launches.length > 0) {
             final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
@@ -60,9 +63,6 @@ public class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
 
     @Override
     public void dispose() {
-    }
-
-    public void setOutputFilePath(final String outputFilePath) {
-        this.outputFilePath = outputFilePath;
+        // nothing to dispose
     }
 }

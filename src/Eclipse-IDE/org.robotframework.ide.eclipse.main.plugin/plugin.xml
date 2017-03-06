@@ -336,7 +336,7 @@
     </category>
       <view
             category="org.robotframework.ide.eclipse.views"
-            class="org.robotframework.ide.eclipse.main.plugin.views.MessageLogViewWrapper"
+            class="org.robotframework.ide.eclipse.main.plugin.views.message.MessageLogViewWrapper"
             icon="resources/robot.png"
             id="org.robotframework.ide.MessageLogView"
             name="Message Log"
@@ -344,7 +344,7 @@
       </view>
       <view
             category="org.robotframework.ide.eclipse.views"
-            class="org.robotframework.ide.eclipse.main.plugin.views.ExecutionViewWrapper"
+            class="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper"
             icon="resources/robot.png"
             id="org.robotframework.ide.ExecutionView"
             name="Execution View"
@@ -352,7 +352,7 @@
       </view>
       <view
             category="org.robotframework.ide.eclipse.views"
-            class="org.robotframework.ide.eclipse.main.plugin.views.DocumentationViewWrapper"
+            class="org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewWrapper"
             icon="resources/robot.png"
             id="org.robotframework.ide.DocumentationView"
             name="Documentation View"

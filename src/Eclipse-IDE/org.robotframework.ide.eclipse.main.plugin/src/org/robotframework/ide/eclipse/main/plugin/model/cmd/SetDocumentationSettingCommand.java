@@ -13,7 +13,7 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationView;
 
 
 public class SetDocumentationSettingCommand extends EditorCommand {

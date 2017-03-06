@@ -47,12 +47,12 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
-import org.robotframework.ide.eclipse.main.plugin.documentation.SourceDocumentationSelectionChangedListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.SourceDocumentationSelectionChangedListener;
 import org.robotframework.red.swt.StyledTextWrapper;
 
 import com.google.common.base.Supplier;

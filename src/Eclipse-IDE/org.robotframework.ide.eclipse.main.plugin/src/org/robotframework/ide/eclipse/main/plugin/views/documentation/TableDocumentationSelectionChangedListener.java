@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.documentation;
+package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -18,12 +18,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
 
-public class TableDocumentationSelectionChangedListener implements ISelectionChangedListener {
+class TableDocumentationSelectionChangedListener implements ISelectionChangedListener {
 
     private final DocumentationView view;
 
@@ -31,7 +30,7 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
 
     private RobotElement currentElementParent;
 
-    public TableDocumentationSelectionChangedListener(final DocumentationView view) {
+    TableDocumentationSelectionChangedListener(final DocumentationView view) {
         this.view = view;
     }
 
