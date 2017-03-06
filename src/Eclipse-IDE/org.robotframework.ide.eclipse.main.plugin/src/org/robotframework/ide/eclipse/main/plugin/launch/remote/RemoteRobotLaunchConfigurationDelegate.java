@@ -25,8 +25,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
-import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
-import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
+import org.robotframework.ide.eclipse.main.plugin.views.message.MessageLogView;
 import org.robotframework.red.swt.SwtThread;
 
 

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.views;
+package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.MouseAdapter;
@@ -55,14 +56,6 @@ import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
 import org.rf.ide.core.execution.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.execution.CollapseAllAction;
-import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionStatus;
-import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewContentProvider;
-import org.robotframework.ide.eclipse.main.plugin.execution.ExecutionViewLabelProvider;
-import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
-import org.robotframework.ide.eclipse.main.plugin.execution.RerunAction;
-import org.robotframework.ide.eclipse.main.plugin.execution.RerunFailedOnlyAction;
-import org.robotframework.ide.eclipse.main.plugin.execution.ShowFailedOnlyAction;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
@@ -73,6 +66,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefini
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
+import org.robotframework.red.actions.CollapseAllAction;
+import org.robotframework.red.actions.ExpandAllAction;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
@@ -136,13 +131,20 @@ public class ExecutionView {
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(executionViewer.getTree());
         executionViewContentProvider = new ExecutionViewContentProvider();
         executionViewer.setContentProvider(executionViewContentProvider);
-        executionViewer.setLabelProvider(new ExecutionViewLabelProvider());
-        setViewerInput();
+
         executionViewer.addSelectionChangedListener(createSelectionChangedListener());
         executionViewer.addDoubleClickListener(createDoubleClickListener());
         final Menu menu = createContextMenu();
         executionViewer.getTree().addMouseListener(createMouseListener(menu));
         
+        ViewerColumnsFactory.newColumn("")
+                .withWidth(300)
+                .shouldGrabAllTheSpaceLeft(true)
+                .labelsProvidedBy(new ExecutionViewLabelProvider())
+                .createFor(executionViewer);
+
+        setViewerInput();
+
         messageText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         messageText.setFont(JFaceResources.getTextFont());
         GridDataFactory.fillDefaults().grab(true, false).indent(3, 0).hint(0, 50).applyTo(messageText);

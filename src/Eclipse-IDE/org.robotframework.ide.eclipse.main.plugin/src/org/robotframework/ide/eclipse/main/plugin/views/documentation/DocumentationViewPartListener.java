@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.documentation;
+package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
@@ -14,9 +14,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
-public class DocumentationViewPartListener implements IPartListener, IPageChangedListener {
+class DocumentationViewPartListener implements IPartListener, IPageChangedListener {
 
     private final SourceDocumentationSelectionChangedListener sourceDocSelectionChangedListener;
 
@@ -24,7 +23,7 @@ public class DocumentationViewPartListener implements IPartListener, IPageChange
     
     private IEditorPart currentlyActiveEditor;
 
-    public DocumentationViewPartListener(final DocumentationView view) {
+    DocumentationViewPartListener(final DocumentationView view) {
         this.sourceDocSelectionChangedListener = new SourceDocumentationSelectionChangedListener(view);
         this.tableDocSelectionChangedListener = new TableDocumentationSelectionChangedListener(view);
     }
@@ -69,7 +68,7 @@ public class DocumentationViewPartListener implements IPartListener, IPageChange
 
     }
 
-    public void dispose() {
+    void dispose() {
         if (currentlyActiveEditor != null) {
             removeDocSelectionChangedListenerFromActiveEditor(currentlyActiveEditor);
             currentlyActiveEditor = null;

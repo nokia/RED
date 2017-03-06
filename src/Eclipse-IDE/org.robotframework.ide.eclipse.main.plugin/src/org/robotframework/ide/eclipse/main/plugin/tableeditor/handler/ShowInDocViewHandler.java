@@ -30,8 +30,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ShowInDocViewHandler.E4ShowInDocViewHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationViewWrapper;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationView;
+import org.robotframework.ide.eclipse.main.plugin.views.documentation.DocumentationViewWrapper;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 

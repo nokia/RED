@@ -38,7 +38,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotContainer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -51,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
+import org.robotframework.red.actions.ExpandAllAction;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
 
