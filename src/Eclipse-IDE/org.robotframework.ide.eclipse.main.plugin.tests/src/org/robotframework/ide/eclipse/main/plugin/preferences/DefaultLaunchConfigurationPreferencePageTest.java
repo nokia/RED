@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FileFieldEditor;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.junit.Rule;
@@ -44,17 +43,15 @@ public class DefaultLaunchConfigurationPreferencePageTest {
 
         final List<String> stringPrefNames = newArrayList(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS,
                 RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, RedPreferences.LAUNCH_REMOTE_HOST,
-                RedPreferences.LAUNCH_REMOTE_PORT, RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
+                RedPreferences.LAUNCH_REMOTE_PORT, RedPreferences.LAUNCH_REMOTE_TIMEOUT,
+                RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(7);
         for (final Object ed : editors) {
             final FieldEditor editor = (FieldEditor) ed;
 
-            if (editor instanceof IntegerFieldEditor) {
-                final IntegerFieldEditor integerFieldEditor = (IntegerFieldEditor) editor;
-                assertThat(integerFieldEditor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_REMOTE_TIMEOUT);
-            } else if (editor instanceof StringFieldEditor) {
+            if (editor instanceof StringFieldEditor) {
                 stringPrefNames.remove(editor.getPreferenceName());
             } else if (editor instanceof FileFieldEditor) {
                 final FileFieldEditor fileFieldEditor = (FileFieldEditor) editor;

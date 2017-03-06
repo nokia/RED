@@ -21,7 +21,7 @@ public interface IRemoteRobotLaunchConfiguration extends IRobotLaunchConfigurati
 
     Optional<Integer> getRemotePort() throws CoreException;
 
-    int getRemoteTimeout() throws CoreException;
+    Optional<Integer> getRemoteTimeout() throws CoreException;
 
     String getRemotePortValue() throws CoreException;
 

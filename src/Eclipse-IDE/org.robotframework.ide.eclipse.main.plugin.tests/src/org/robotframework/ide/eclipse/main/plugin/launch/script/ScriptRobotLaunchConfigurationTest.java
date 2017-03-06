@@ -86,7 +86,7 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
         assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
-        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
+        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
         assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
-        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
+        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
     }
 
     @Test
@@ -126,14 +126,14 @@ public class ScriptRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void whenServerIpIsEmpty_coreExceptionIsThrown() throws CoreException {
+    public void whenServerIpIsEmpty_emptyOptionalIsReturned() throws CoreException {
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemoteHostValue("");
         assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
     }
 
     @Test
-    public void whenPortIsEmpty_coreExceptionIsThrown() throws CoreException {
+    public void whenPortIsEmpty_emptyOptionalIsReturned() throws CoreException {
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemotePortValue("");
         assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
@@ -170,13 +170,10 @@ public class ScriptRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void whenTimeoutIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600");
-
+    public void whenTimeoutIsEmpty_emptyOptionalIsReturned() throws CoreException {
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemoteTimeoutValue("");
-        robotConfig.getRemoteTimeout();
+        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
     }
 
     @Test

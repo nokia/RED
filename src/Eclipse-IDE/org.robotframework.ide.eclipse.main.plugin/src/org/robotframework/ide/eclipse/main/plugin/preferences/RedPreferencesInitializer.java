@@ -13,7 +13,6 @@ import java.util.List;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -44,7 +43,6 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSyntaxColoringPreferences(preferences);
         initializeAutodiscoveringPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
-        initializeDefaultLaunchConfigurationPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -90,11 +88,6 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putBoolean(RedPreferences.FOLDABLE_CASES, true);
         preferences.putBoolean(RedPreferences.FOLDABLE_KEYWORDS, true);
         preferences.putBoolean(RedPreferences.FOLDABLE_DOCUMENTATION, true);
-    }
-
-    private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
-        preferences.put(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
-                String.valueOf(AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT));
     }
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
