@@ -66,7 +66,7 @@ public class RobotLaunchConfigurationFinder {
         final ILaunchConfigurationType launchConfigurationType = launchManager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(launchConfigurationType);
-        final String configurationName = RobotLaunchConfigurationNaming.getNamePrefix(resources,
+        final String configurationName = RobotLaunchConfigurationNaming.getBasicName(resources,
                 RobotLaunchConfigurationType.SELECTED_TEST_CASES);
         final String projectName = resources.get(0).getProject().getName();
         for (final ILaunchConfiguration configuration : launchConfigs) {

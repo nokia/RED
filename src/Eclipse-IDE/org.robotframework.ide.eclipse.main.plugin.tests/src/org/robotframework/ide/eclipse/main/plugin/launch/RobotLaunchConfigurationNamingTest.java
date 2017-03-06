@@ -28,58 +28,58 @@ public class RobotLaunchConfigurationNamingTest {
 
     @Test
     public void newConfigurationNameIsReturned_forEmptyResources() throws Exception {
-        final String namePrefix1 = RobotLaunchConfigurationNaming.getNamePrefix(Collections.emptyList(),
+        final String basicName1 = RobotLaunchConfigurationNaming.getBasicName(Collections.emptyList(),
                 RobotLaunchConfigurationType.GENERAL_PURPOSE);
-        assertThat(namePrefix1).isEqualTo("New Configuration");
-        final String namePrefix2 = RobotLaunchConfigurationNaming.getNamePrefix(Collections.emptyList(),
+        assertThat(basicName1).isEqualTo("New Configuration");
+        final String basicName2 = RobotLaunchConfigurationNaming.getBasicName(Collections.emptyList(),
                 RobotLaunchConfigurationType.SELECTED_TEST_CASES);
-        assertThat(namePrefix2).isEqualTo("New Configuration");
+        assertThat(basicName2).isEqualTo("New Configuration");
     }
 
     @Test
     public void resourceConfigurationNameWithoutSuffixIsReturned_forSingleResource() throws Exception {
         final IResource resource = projectProvider1.createFile("single.robot");
-        final String namePrefix = RobotLaunchConfigurationNaming.getNamePrefix(Collections.singletonList(resource),
+        final String basicName = RobotLaunchConfigurationNaming.getBasicName(Collections.singletonList(resource),
                 RobotLaunchConfigurationType.GENERAL_PURPOSE);
-        assertThat(namePrefix).isEqualTo("single.robot");
+        assertThat(basicName).isEqualTo("single.robot");
     }
 
     @Test
     public void resourceConfigurationNameWithSuffixIsReturned_forSingleResource() throws Exception {
         final IResource resource = projectProvider1.createFile("single.robot");
-        final String namePrefix = RobotLaunchConfigurationNaming.getNamePrefix(Collections.singletonList(resource),
+        final String basicName = RobotLaunchConfigurationNaming.getBasicName(Collections.singletonList(resource),
                 RobotLaunchConfigurationType.SELECTED_TEST_CASES);
-        assertThat(namePrefix).isEqualTo("single.robot (Selected Test Cases)");
+        assertThat(basicName).isEqualTo("single.robot (Selected Test Cases)");
     }
 
     @Test
     public void projectConfigurationNameWithoutSuffixIsReturned_forResourcesFromOneProject() throws Exception {
         final IResource resource1 = projectProvider1.createFile("first.robot");
         final IResource resource2 = projectProvider1.createFile("second.robot");
-        final String namePrefix = RobotLaunchConfigurationNaming.getNamePrefix(Arrays.asList(resource1, resource2),
+        final String basicName = RobotLaunchConfigurationNaming.getBasicName(Arrays.asList(resource1, resource2),
                 RobotLaunchConfigurationType.GENERAL_PURPOSE);
-        assertThat(namePrefix).isEqualTo("RobotLaunchConfigurationNamingTest1");
+        assertThat(basicName).isEqualTo("RobotLaunchConfigurationNamingTest1");
     }
 
     @Test
     public void projectConfigurationNameWithSuffixIsReturned_forResourcesFromOneProject() throws Exception {
         final IResource resource1 = projectProvider1.createFile("first.robot");
         final IResource resource2 = projectProvider1.createFile("second.robot");
-        final String namePrefix = RobotLaunchConfigurationNaming.getNamePrefix(Arrays.asList(resource1, resource2),
+        final String basicName = RobotLaunchConfigurationNaming.getBasicName(Arrays.asList(resource1, resource2),
                 RobotLaunchConfigurationType.SELECTED_TEST_CASES);
-        assertThat(namePrefix).isEqualTo("RobotLaunchConfigurationNamingTest1 (Selected Test Cases)");
+        assertThat(basicName).isEqualTo("RobotLaunchConfigurationNamingTest1 (Selected Test Cases)");
     }
 
     @Test
     public void newConfigurationNameIsReturned_forDifferentResourcesFromDifferentProjects() throws Exception {
         final IResource resource1 = projectProvider1.createFile("first.robot");
         final IResource resource2 = projectProvider2.createFile("second.robot");
-        final String namePrefix1 = RobotLaunchConfigurationNaming.getNamePrefix(Arrays.asList(resource1, resource2),
+        final String basicName1 = RobotLaunchConfigurationNaming.getBasicName(Arrays.asList(resource1, resource2),
                 RobotLaunchConfigurationType.GENERAL_PURPOSE);
-        assertThat(namePrefix1).isEqualTo("New Configuration");
-        final String namePrefix2 = RobotLaunchConfigurationNaming.getNamePrefix(Arrays.asList(resource1, resource2),
+        assertThat(basicName1).isEqualTo("New Configuration");
+        final String basicName2 = RobotLaunchConfigurationNaming.getBasicName(Arrays.asList(resource1, resource2),
                 RobotLaunchConfigurationType.SELECTED_TEST_CASES);
-        assertThat(namePrefix2).isEqualTo("New Configuration");
+        assertThat(basicName2).isEqualTo("New Configuration");
     }
 
 }

@@ -18,7 +18,7 @@ public class RobotLaunchConfigurationNaming {
 
     private static final String NEW_CONFIGURATION_NAME = "New Configuration";
 
-    public static String getNamePrefix(final Collection<IResource> resources, final RobotLaunchConfigurationType type) {
+    public static String getBasicName(final Collection<IResource> resources, final RobotLaunchConfigurationType type) {
         if (resources.size() == 1) {
             return getFirst(resources, null).getName() + type.getNameSuffix();
         }
