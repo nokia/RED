@@ -65,14 +65,14 @@ public abstract class RobotLaunchInMode {
         return runtimeEnvironment;
     }
 
-    protected final RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig)
+    protected final RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final int port)
             throws CoreException, IOException {
 
         final RobotProject robotProject = robotConfig.getRobotProject();
 
         final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
-                ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment())
-                : RunCommandLineCallBuilder.forExecutor(robotConfig.getExecutor());
+                ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
+                : RunCommandLineCallBuilder.forExecutor(robotConfig.getExecutor(), port);
 
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());

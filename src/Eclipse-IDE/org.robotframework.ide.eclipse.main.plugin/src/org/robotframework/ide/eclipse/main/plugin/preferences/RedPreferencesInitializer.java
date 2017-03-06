@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -92,13 +93,8 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
-        preferences.put(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "");
-        preferences.put(RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "");
-        preferences.put(RedPreferences.LAUNCH_REMOTE_HOST, "127.0.0.1");
-        preferences.put(RedPreferences.LAUNCH_REMOTE_PORT, "12345");
-        preferences.put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30");
-        preferences.put(RedPreferences.LAUNCH_SCRIPT_PATH, "");
-        preferences.put(RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS, "");
+        preferences.put(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
+                String.valueOf(AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT));
     }
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {

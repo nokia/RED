@@ -42,11 +42,9 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<String> integerPrefNames = newArrayList(RedPreferences.LAUNCH_REMOTE_PORT,
-                RedPreferences.LAUNCH_REMOTE_TIMEOUT);
         final List<String> stringPrefNames = newArrayList(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS,
                 RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, RedPreferences.LAUNCH_REMOTE_HOST,
-                RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
+                RedPreferences.LAUNCH_REMOTE_PORT, RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(7);
@@ -54,7 +52,8 @@ public class DefaultLaunchConfigurationPreferencePageTest {
             final FieldEditor editor = (FieldEditor) ed;
 
             if (editor instanceof IntegerFieldEditor) {
-                integerPrefNames.remove(editor.getPreferenceName());
+                final IntegerFieldEditor integerFieldEditor = (IntegerFieldEditor) editor;
+                assertThat(integerFieldEditor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_REMOTE_TIMEOUT);
             } else if (editor instanceof StringFieldEditor) {
                 stringPrefNames.remove(editor.getPreferenceName());
             } else if (editor instanceof FileFieldEditor) {
@@ -63,6 +62,5 @@ public class DefaultLaunchConfigurationPreferencePageTest {
             }
         }
         assertThat(stringPrefNames).isEmpty();
-        assertThat(integerPrefNames).isEmpty();
     }
 }

@@ -28,12 +28,12 @@ public class RobotDryRunHandler {
 
     private Process dryRunProcess;
 
-    public RunCommandLine buildDryRunCommand(final RobotRuntimeEnvironment environment, final File projectLocation,
-            final Collection<String> suites, final Collection<String> pythonPathLocations,
+    public RunCommandLine buildDryRunCommand(final RobotRuntimeEnvironment environment, final int port,
+            final File projectLocation, final Collection<String> suites, final Collection<String> pythonPathLocations,
             final Collection<String> classPathLocations, final Collection<String> additionalProjectsLocations)
             throws IOException {
 
-        final IRunCommandLineBuilder builder = RunCommandLineCallBuilder.forEnvironment(environment);
+        final IRunCommandLineBuilder builder = RunCommandLineCallBuilder.forEnvironment(environment, port);
 
         builder.withProject(projectLocation);
         builder.suitesToRun(suites);

@@ -72,12 +72,6 @@ public class RedPreferencesInitializerTest {
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
-        verify(preferences).put(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS, "");
-        verify(preferences).put(RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, "");
-        verify(preferences).put(RedPreferences.LAUNCH_REMOTE_HOST, "127.0.0.1");
-        verify(preferences).put(RedPreferences.LAUNCH_REMOTE_PORT, "12345");
         verify(preferences).put(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "30");
-        verify(preferences).put(RedPreferences.LAUNCH_SCRIPT_PATH, "");
-        verify(preferences).put(RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS, "");
     }
 }

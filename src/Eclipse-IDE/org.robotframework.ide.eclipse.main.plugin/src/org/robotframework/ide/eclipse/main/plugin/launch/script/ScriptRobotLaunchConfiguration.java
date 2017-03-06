@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -107,23 +108,23 @@ public class ScriptRobotLaunchConfiguration extends RobotLaunchConfiguration
     }
 
     @Override
-    public String getRemoteHost() throws CoreException {
+    public Optional<String> getRemoteHost() throws CoreException {
         final String host = getRemoteHostValue();
-        if (host.isEmpty()) {
-            throw newCoreException("Server IP cannot be empty");
-        }
-        return host;
+        return Optional.of(host).filter(h -> !h.isEmpty());
     }
 
     @Override
-    public int getRemotePort() throws CoreException {
+    public Optional<Integer> getRemotePort() throws CoreException {
         final String port = getRemotePortValue();
+        if (port.isEmpty()) {
+            return Optional.empty();
+        }
         final Integer portAsInt = Ints.tryParse(port);
         if (portAsInt == null || !Range.closed(1, MAX_PORT).contains(portAsInt)) {
             throw newCoreException(
                     String.format("Server port '%s' must be an Integer between 1 and %,d", port, MAX_PORT));
         }
-        return portAsInt;
+        return Optional.of(portAsInt);
     }
 
     @Override
