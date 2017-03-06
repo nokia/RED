@@ -59,8 +59,7 @@ public class LaunchConfigurationsWrappers implements IProcessFactory {
             } else if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(id)) {
                 return new RemoteProcess(launch, () -> {}, name);
             } else if (ScriptRobotLaunchConfiguration.TYPE_ID.equals(id)) {
-                // FIXME : return local process
-                return null;
+                return new LocalProcess(launch, process, name, attributes);
             }
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to create process representation", e);

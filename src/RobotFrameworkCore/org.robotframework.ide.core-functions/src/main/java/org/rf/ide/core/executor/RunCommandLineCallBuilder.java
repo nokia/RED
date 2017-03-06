@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.executor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -16,8 +14,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
-
-import com.google.common.base.Joiner;
 
 /**
  * @author Michal Anglart
@@ -44,7 +40,7 @@ public class RunCommandLineCallBuilder {
 
         public IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
 
-        public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun);
+        public IRunCommandLineBuilder enableDryRun();
 
         public IRunCommandLineBuilder withProject(final File project);
 
@@ -162,8 +158,8 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun) {
-            this.enableDryRun = shouldEnableDryRun;
+        public IRunCommandLineBuilder enableDryRun() {
+            this.enableDryRun = true;
             return this;
         }
 
@@ -234,17 +230,17 @@ public class RunCommandLineCallBuilder {
 
         private String classPath() {
             final String sysPath = System.getenv("CLASSPATH");
-            final List<String> wholeClasspath = newArrayList();
+            final List<String> wholeClasspath = new ArrayList<>();
             if (sysPath != null && !sysPath.isEmpty()) {
                 wholeClasspath.add(sysPath);
             }
             wholeClasspath.addAll(classPath);
 
-            return Joiner.on(RedSystemProperties.getPathsSeparator()).join(wholeClasspath);
+            return String.join(RedSystemProperties.getPathsSeparator(), wholeClasspath);
         }
 
         private String pythonPath() {
-            return Joiner.on(":").join(pythonPath);
+            return String.join(":", pythonPath);
         }
 
         private String extractAdditionalPythonPathLocationForJython() {
@@ -292,7 +288,7 @@ public class RunCommandLineCallBuilder {
         }
 
         public String show() {
-            return Joiner.on(' ').join(commandLine);
+            return String.join(" ", commandLine);
         }
     }
 }

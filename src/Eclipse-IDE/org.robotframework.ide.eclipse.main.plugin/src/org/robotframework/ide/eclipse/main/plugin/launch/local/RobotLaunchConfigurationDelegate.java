@@ -23,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchInMode;
 
 public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 

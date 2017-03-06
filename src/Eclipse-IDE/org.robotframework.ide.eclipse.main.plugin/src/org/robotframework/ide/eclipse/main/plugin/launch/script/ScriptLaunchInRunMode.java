@@ -3,9 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch.local;
+package org.robotframework.ide.eclipse.main.plugin.launch.script;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
@@ -16,45 +19,43 @@ import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogView;
-import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
-class RobotLaunchInRunMode extends RobotLaunchInMode {
+class ScriptLaunchInRunMode extends ScriptRobotLaunchInMode {
 
     private final RobotEventBroker robotEventBroker;
 
-    RobotLaunchInRunMode(final RobotEventBroker robotEventBroker) {
+    ScriptLaunchInRunMode(final RobotEventBroker robotEventBroker) {
         this.robotEventBroker = robotEventBroker;
     }
 
     @Override
-    protected Process launchAndAttachToProcess(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
+    protected Process launchAndAttachToProcess(final ScriptRobotLaunchConfiguration robotConfig, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException, IOException {
 
         final RobotProject robotProject = robotConfig.getRobotProject();
-        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
-        final String host = AgentConnectionServer.DEFAULT_CLIENT_HOST;
-        final int port = AgentConnectionServer.findFreePort();
+        final String host = robotConfig.getRemoteHost().orElse(AgentConnectionServer.DEFAULT_CLIENT_HOST);
+        final int port = robotConfig.getRemotePort().orElseGet(AgentConnectionServer::findFreePort);
         if (port < 0) {
             throw newCoreException("Unable to find free port");
         }
-        final int timeout = AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
+        final int timeout = robotConfig.getRemoteTimeout()
+                .orElse(AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT);
 
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
 
         try {
-            final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
+            AgentConnectionServerJob.setupServerAt(host, port)
                     .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
@@ -63,20 +64,21 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
                     .start()
                     .waitForServer();
 
-            final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
-            final String version = robotConfig.createExecutorVersion(runtimeEnvironment);
+            final String processLabel = robotConfig.getScriptPath();
 
             final RunCommandLine cmdLine = prepareCommandLine(robotConfig, port);
 
-            final Process process = execProcess(cmdLine, robotConfig);
-            final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
+            final List<String> commandLineList = new ArrayList<>();
+            commandLineList.add(robotConfig.getScriptPath());
+            commandLineList.addAll(Arrays.asList(cmdLine.getCommandLine()));
+            final String[] commandLine = commandLineList.toArray(new String[0]);
 
-            RemoteExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
+            final Process process = execProcess(commandLine, robotConfig);
+            final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
-            redConsole.writeLine("Command: " + cmdLine.show());
-            redConsole.writeLine("Suite Executor: " + version);
+            redConsole.writeLine("Command: " + String.join(" ", commandLine));
 
             testsStarter.allowClientTestsStart();
             return process;
