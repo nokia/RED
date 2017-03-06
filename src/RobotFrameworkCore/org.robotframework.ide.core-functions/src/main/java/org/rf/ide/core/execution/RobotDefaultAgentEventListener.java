@@ -34,7 +34,7 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleVersions(final String pythonVersion, final String robotVersion) {
+    public void handleVersions(final String pythonVersion, final String robotVersion, final int protocolVersion) {
         // implement in subclasses
     }
 
