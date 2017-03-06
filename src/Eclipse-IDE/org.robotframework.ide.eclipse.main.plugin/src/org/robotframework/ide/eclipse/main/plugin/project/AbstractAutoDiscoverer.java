@@ -29,6 +29,7 @@ import org.rf.ide.core.dryrun.IAgentMessageHandler;
 import org.rf.ide.core.dryrun.IDryRunStartSuiteHandler;
 import org.rf.ide.core.dryrun.RobotDryRunHandler;
 import org.rf.ide.core.dryrun.RobotDryRunOutputParser;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -86,12 +87,13 @@ public abstract class AbstractAutoDiscoverer {
         dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations();
         subMonitor.worked(1);
 
+        final int port = AgentConnectionServer.findFreePort();
         final RunCommandLine dryRunCommandLine = createDryRunCommandLine(librariesSourcesCollector,
-                dryRunTargetsCollector);
+                dryRunTargetsCollector, port);
         subMonitor.worked(1);
 
         subMonitor.subTask("Executing Robot dry run...");
-        executeDryRun(dryRunCommandLine, subMonitor);
+        executeDryRun(dryRunCommandLine, port, subMonitor);
         subMonitor.worked(1);
     }
 
@@ -111,13 +113,13 @@ public abstract class AbstractAutoDiscoverer {
     }
 
     private RunCommandLine createDryRunCommandLine(final LibrariesSourcesCollector librariesSourcesCollector,
-            final IDryRunTargetsCollector dryRunTargetsCollector) throws InvocationTargetException {
+            final IDryRunTargetsCollector dryRunTargetsCollector, final int port) throws InvocationTargetException {
         try {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             if (runtimeEnvironment == null) {
                 return null;
             }
-            return dryRunHandler.buildDryRunCommand(runtimeEnvironment, getProjectLocationFile(),
+            return dryRunHandler.buildDryRunCommand(runtimeEnvironment, port, getProjectLocationFile(),
                     dryRunTargetsCollector.getSuiteNames(), librariesSourcesCollector.getPythonpathLocations(),
                     librariesSourcesCollector.getClasspathLocations(),
                     dryRunTargetsCollector.getAdditionalProjectsLocations());
@@ -126,7 +128,7 @@ public abstract class AbstractAutoDiscoverer {
         }
     }
 
-    private void executeDryRun(final RunCommandLine dryRunCommandLine, final SubMonitor subMonitor)
+    private void executeDryRun(final RunCommandLine dryRunCommandLine, final int port, final SubMonitor subMonitor)
             throws InvocationTargetException, InterruptedException {
         if (dryRunCommandLine != null && !subMonitor.isCanceled()) {
             dryRunOutputParser.setStartSuiteHandler(new IDryRunStartSuiteHandler() {
@@ -136,8 +138,6 @@ public abstract class AbstractAutoDiscoverer {
                     subMonitor.subTask("Executing Robot dry run on suite: " + suiteName);
                 }
             });
-
-            final int port = dryRunCommandLine.getPort();
             final List<IAgentMessageHandler> listeners = newArrayList(dryRunOutputParser);
             final Thread handlerThread = dryRunHandler.createDryRunHandlerThread(port, listeners);
             handlerThread.start();

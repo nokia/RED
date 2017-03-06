@@ -44,20 +44,19 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
 
-        final RunCommandLine cmdLine = prepareCommandLine(robotConfig);
-        if (cmdLine.getPort() < 0) {
+        final String host = AgentConnectionServer.DEFAULT_CLIENT_HOST;
+        final int port = AgentConnectionServer.findFreePort();
+        if (port < 0) {
             throw newCoreException("Unable to find free port");
         }
-
-        final String host = "127.0.0.1";
-        final int port = cmdLine.getPort();
+        final int timeout = AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
 
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
 
         try {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
-                    .withConnectionTimeout(AgentConnectionServer.CLIENT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+                    .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(new MessagesTrackerForLogView())
@@ -67,6 +66,8 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
 
             final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
             final String version = robotConfig.createExecutorVersion(runtimeEnvironment);
+
+            final RunCommandLine cmdLine = prepareCommandLine(robotConfig, port);
 
             final Process process = execProcess(cmdLine, robotConfig);
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);

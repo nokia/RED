@@ -200,7 +200,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         try {
             final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                     .remoteLaunchConfiguration(configuration);
-            final String hostIp = robotConfig.getRemoteHost();
+            final String hostIp = robotConfig.getRemoteHostValue();
             final String port = robotConfig.getRemotePortValue();
             final String timeout = robotConfig.getRemoteTimeoutValue();
 

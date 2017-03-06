@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -61,6 +60,8 @@ public class RunCommandLineCallBuilder {
 
         private final String executablePath;
 
+        private final int port;
+
         private final List<String> pythonPath = new ArrayList<>();
 
         private final List<String> classPath = new ArrayList<>();
@@ -85,9 +86,10 @@ public class RunCommandLineCallBuilder {
 
         private String interpreterUserArgs = "";
 
-        private Builder(final SuiteExecutor executor, final String executable) {
+        private Builder(final SuiteExecutor executor, final String executablePath, final int port) {
             this.executor = executor;
-            this.executablePath = executable;
+            this.executablePath = executablePath;
+            this.port = port;
         }
 
         @Override
@@ -180,10 +182,8 @@ public class RunCommandLineCallBuilder {
 
         @Override
         public RunCommandLine build() throws IOException {
-            final int port = findFreePort();
-            
             final List<String> cmdLine = new ArrayList<>();
-            
+
             cmdLine.add(executablePath);
             if (executor == SuiteExecutor.Jython) {
                 final String additionalPythonPathLocationForJython = extractAdditionalPythonPathLocationForJython();
@@ -229,15 +229,7 @@ public class RunCommandLineCallBuilder {
             for (final String projectLocation : additionalProjectsLocations) {
                 cmdLine.add(projectLocation);
             }
-            return new RunCommandLine(cmdLine, port);
-        }
-
-        private static int findFreePort() {
-            try (ServerSocket socket = new ServerSocket(0)) {
-                return socket.getLocalPort();
-            } catch (final IOException e) {
-                return -1;
-            }
+            return new RunCommandLine(cmdLine);
         }
 
         private String classPath() {
@@ -254,7 +246,7 @@ public class RunCommandLineCallBuilder {
         private String pythonPath() {
             return Joiner.on(":").join(pythonPath);
         }
-        
+
         private String extractAdditionalPythonPathLocationForJython() {
             String additionalPythonPathLocation = "";
             final Path jythonPath = Paths.get(executablePath);
@@ -279,31 +271,24 @@ public class RunCommandLineCallBuilder {
         }
     }
 
-    public static IRunCommandLineBuilder forEnvironment(final RobotRuntimeEnvironment env) {
-        return new Builder(env.getInterpreter(), env.getPythonExecutablePath());
+    public static IRunCommandLineBuilder forEnvironment(final RobotRuntimeEnvironment env, final int port) {
+        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), port);
     }
 
-    public static IRunCommandLineBuilder forExecutor(final SuiteExecutor executor) {
-        return new Builder(executor, executor.executableName());
+    public static IRunCommandLineBuilder forExecutor(final SuiteExecutor executor, final int port) {
+        return new Builder(executor, executor.executableName(), port);
     }
 
     public static class RunCommandLine {
 
         private final List<String> commandLine;
 
-        private final int port;
-
-        RunCommandLine(final List<String> commandLine, final int port) {
+        RunCommandLine(final List<String> commandLine) {
             this.commandLine = new ArrayList<>(commandLine);
-            this.port = port;
         }
 
         public String[] getCommandLine() {
             return commandLine.toArray(new String[0]);
-        }
-
-        public int getPort() {
-            return port;
         }
 
         public String show() {

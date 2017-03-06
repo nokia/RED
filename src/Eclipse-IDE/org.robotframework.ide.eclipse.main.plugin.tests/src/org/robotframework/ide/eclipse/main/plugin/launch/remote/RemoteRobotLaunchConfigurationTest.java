@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
@@ -59,22 +61,15 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void defaultConfigurationObtained_whenDefaultConfigurationIsCreated() throws CoreException {
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        assertThat(robotConfig.getName()).isEqualTo("config_name");
-        assertThat(robotConfig.getProjectName()).isEmpty();
-    }
-
-    @Test
-    public void defaultConfigurationObtained_whenCustomConfigurationFilledDefaults() throws CoreException {
+    public void defaultConfigurationObtained_whenCustomConfigurationIsFilledWithDefaults() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
         robotConfig.setRemoteHostValue("1.2.3.4");
         robotConfig.setRemotePortValue("987");
         robotConfig.setRemoteTimeoutValue("123");
         robotConfig.fillDefaults();
         assertThat(robotConfig.getProjectName()).isEqualTo("");
-        assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
-        assertThat(robotConfig.getRemotePort()).isEqualTo(12345);
+        assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
+        assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
         assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
     }
 
@@ -85,23 +80,17 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void whenServerIpIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Server IP cannot be empty");
-
+    public void whenServerIpIsEmpty_emptyOptionalIsReturned() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
         robotConfig.setRemoteHostValue("");
-        robotConfig.getRemoteHost();
+        assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
     }
 
     @Test
-    public void whenPortIsEmpty_coreExceptionIsThrown() throws CoreException {
-        thrown.expect(CoreException.class);
-        thrown.expectMessage("Server port '' must be an Integer between 1 and 65,535");
-
+    public void whenPortIsEmpty_emptyOptionalIsReturned() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
         robotConfig.setRemotePortValue("");
-        robotConfig.getRemotePort();
+        assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
     }
 
     @Test
@@ -180,11 +169,13 @@ public class RemoteRobotLaunchConfigurationTest {
         robotConfig.setRemoteHostValue("192.168.1.21");
         robotConfig.setRemotePortValue("1234");
         robotConfig.setRemoteTimeoutValue("567");
-        final String host = robotConfig.getRemoteHost();
-        final int port = robotConfig.getRemotePort();
+        final Optional<String> host = robotConfig.getRemoteHost();
+        final Optional<Integer> port = robotConfig.getRemotePort();
         final int timeout = robotConfig.getRemoteTimeout();
-        assertThat(host).isEqualTo("192.168.1.21");
-        assertThat(port).isEqualTo(1234);
+        assertThat(host.isPresent()).isTrue();
+        assertThat(host.get()).isEqualTo("192.168.1.21");
+        assertThat(port.isPresent()).isTrue();
+        assertThat(port.get()).isEqualTo(1234);
         assertThat(timeout).isEqualTo(567);
     }
 
