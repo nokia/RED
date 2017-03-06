@@ -21,7 +21,7 @@ public interface RobotAgentEventListener {
 
     void handleAgentIsReadyToStart();
 
-    void handleVersions(String pythonVersion, String robotVersion);
+    void handleVersions(String pythonVersion, String robotVersion, int protocolVersion);
 
     void handleSuiteStarted(String suiteName, File suiteFilePath);
 

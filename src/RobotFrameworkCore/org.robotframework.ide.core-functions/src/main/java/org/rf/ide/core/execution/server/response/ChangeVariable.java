@@ -13,7 +13,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.collect.ImmutableMap;
 
-public class ChangeVariable implements ServerResponse {
+public final class ChangeVariable implements ServerResponse {
 
     private final String variableName;
     private final List<String> values;

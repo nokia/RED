@@ -149,7 +149,7 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
-        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(mock(AgentClient.class), listener);
 
         final Map<String, Object> attributes = ImmutableMap.of("python", "py3", "robot", "1.2.3", "protocol", 1);
         final String json = toJson(ImmutableMap.of("version", newArrayList(attributes)));
@@ -157,7 +157,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleVersions("py3", "1.2.3");
+        verify(listener).handleVersions("py3", "1.2.3", 1);
         verifyNoMoreInteractions(listener);
     }
 

@@ -136,7 +136,10 @@ class TestRunnerAgent:
         if self._connect():
             self._is_debug_enabled, wait_for_signal = self._send_agent_initializing()
             self._send_version()
-            self._send_global_variables()
+            if self._check_protocol_version():
+                self._send_global_variables()
+            else:
+                self._is_debug_enabled, wait_for_signal = False, False
         else:
             self._is_debug_enabled, wait_for_signal = False, False
         
@@ -173,6 +176,16 @@ class TestRunnerAgent:
         info = {'python' : sys.version, 'robot' : robot_version, 'protocol' : self.RED_AGENT_PROTOCOL_VERSION}
         self._send_to_server('version', info)
         
+    def _check_protocol_version(self):
+        _, response = self._wait_for_reponse('protocol_version')
+        is_correct = response['protocol_version']['is_correct']
+        
+        if not is_correct:
+            self._close_connection()
+            self._print_error_message('TestRunnerAgent <-> RED protocol version mismatch. ' +
+                 'Closing connection. Please use agent script as exported from RED instance you\'re using')
+        return is_correct
+        
     def _send_global_variables(self):
         variables = {}
         try:
@@ -190,7 +203,7 @@ class TestRunnerAgent:
                 data[new_key] = str(variables[key])
             self._send_to_server('global_vars', 'global_vars', data)
         except Exception as e:
-            self.print_error_message(
+            self._print_error_message(
                 'Global variables sending error: ' + str(e) + ' Global variables: ' + str(variables))
 
     def _send_server_port(self, port):
@@ -239,7 +252,7 @@ class TestRunnerAgent:
                         data[k] = 'None'
             self._send_to_server('vars', 'vars', data)
         except Exception as e:
-            self.print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
+            self._print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
 
     def _wait_for_resume(self):
         resumed = False
@@ -312,7 +325,7 @@ class TestRunnerAgent:
                     else:
                         BuiltIn().set_test_variable(key, js[key][0])
         except Exception as e:
-            self.print_error_message('Setting variables error: ' + str(e) + ' Received data:' + str(data))
+            self._print_error_message('Setting variables error: ' + str(e) + ' Received data:' + str(data))
 
     def end_keyword(self, name, attrs):
         attrs_copy = copy.copy(attrs)
@@ -378,12 +391,19 @@ class TestRunnerAgent:
 
     def close(self):
         self._send_to_server('close')
+        self._close_connection()
+            
+    def _close_connection(self):
         if self.sock:
             self.decoder_encoder.close()
-            self.sock.close()
+            self.decoder_encoder = None
+            
+            self.sock.close()           
+            self.sock = None
 
-    def print_error_message(self, message):
-        print('\n[Error] ' + message)
+    def _print_error_message(self, message):
+        sys.stderr.write('\n[ ERROR ] ' + message)
+        sys.stderr.flush()
 
     def _connect(self):
         '''Establish a connection for sending data'''
@@ -458,10 +478,10 @@ class MessagesDecoderEncoder(object):
             return self._json_decoder(str(json_string, 'UTF-8'))
     
     def _can_write(self):
-        return self._file_to_write
+        return self._file_to_write is not None
     
     def _can_read(self):
-        return self._file_to_read
+        return self._file_to_read is not None
     
     def close(self):
         if self._can_write():
