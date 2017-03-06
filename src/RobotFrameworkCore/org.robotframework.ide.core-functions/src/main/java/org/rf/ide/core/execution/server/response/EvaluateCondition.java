@@ -13,7 +13,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.collect.ImmutableMap;
 
-public class EvaluateCondition implements ServerResponse {
+public final class EvaluateCondition implements ServerResponse {
 
     private final List<String> conditionWithArguments;
 

@@ -14,7 +14,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.collect.ImmutableMap;
 
-public class ContinueExecution implements ServerResponse {
+public final class ContinueExecution implements ServerResponse {
 
     @Override
     public String toMessage() {

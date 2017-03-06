@@ -31,8 +31,11 @@ class RobotAgentEventDispatcher {
     private final List<RobotAgentEventListener> eventsListeners;
 
     RobotAgentEventDispatcher(final AgentClient client, final RobotAgentEventListener... eventsListeners) {
-        this.eventsListeners = Collections.synchronizedList(newArrayList(eventsListeners));
-        for (final RobotAgentEventListener listener : eventsListeners) {
+        final List<RobotAgentEventListener> listeners = newArrayList(eventsListeners);
+        listeners.add(0, new AgentServerProtocolVersionChecker());
+        this.eventsListeners = Collections.synchronizedList(listeners);
+
+        for (final RobotAgentEventListener listener : this.eventsListeners) {
             listener.setClient(client);
         }
     }
@@ -146,13 +149,8 @@ class RobotAgentEventDispatcher {
         final String robotVersion = (String) attributes.get("robot");
         final int protocolVersion = (Integer) attributes.get("protocol");
 
-        if (protocolVersion != AgentConnectionServer.RED_AGENT_PROTOCOL_VERSION) {
-            throw new RobotAgentEventsListenerException("RED & Agent protocol mismatch. RED version: "
-                    + AgentConnectionServer.RED_AGENT_PROTOCOL_VERSION + ", Agent version: " + protocolVersion);
-        }
-
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleVersions(pythonVersion, robotVersion);
+            listener.handleVersions(pythonVersion, robotVersion, protocolVersion);
         }
     }
 

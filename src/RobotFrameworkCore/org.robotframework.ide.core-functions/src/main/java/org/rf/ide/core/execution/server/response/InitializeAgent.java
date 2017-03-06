@@ -13,7 +13,7 @@ import org.rf.ide.core.execution.TestsMode;
 
 import com.google.common.collect.ImmutableMap;
 
-public class InitializeAgent implements ServerResponse {
+public final class InitializeAgent implements ServerResponse {
 
     private final TestsMode mode;
 
