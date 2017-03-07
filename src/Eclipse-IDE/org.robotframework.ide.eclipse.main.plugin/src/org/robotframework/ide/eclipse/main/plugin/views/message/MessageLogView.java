@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionServi
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesStore.ExecutionMessagesStoreListener;
 import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author mmarzec
@@ -36,7 +37,17 @@ public class MessageLogView {
     private RobotTestExecutionListener executionListener;
     
     public MessageLogView() {
-        executionService = RedPlugin.getTestExecutionService();
+        this(RedPlugin.getTestExecutionService());
+    }
+
+    @VisibleForTesting
+    MessageLogView(final RobotTestExecutionService executionService) {
+        this.executionService = executionService;
+    }
+
+    @VisibleForTesting
+    StyledText getTextControl() {
+        return styledText;
     }
 
     @PostConstruct
@@ -54,7 +65,8 @@ public class MessageLogView {
         // clear log view always when new tests are launched
         final ExecutionMessagesStoreListener storeListener = (store, msg) -> SwtThread.syncExec(() -> append(msg));
         executionListener = launch -> SwtThread.syncExec(() -> {
-            final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class, () -> new ExecutionMessagesStore());
+            final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class,
+                    () -> new ExecutionMessagesStore());
             store.addStoreListener(storeListener);
 
             styledText.setText("");
