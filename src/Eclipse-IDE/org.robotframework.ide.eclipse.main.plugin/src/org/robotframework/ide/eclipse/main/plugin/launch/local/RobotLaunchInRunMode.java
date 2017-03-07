@@ -26,14 +26,18 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminat
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 class RobotLaunchInRunMode extends RobotLaunchInMode {
 
     private final RobotEventBroker robotEventBroker;
 
-    RobotLaunchInRunMode(final RobotEventBroker robotEventBroker) {
+    private final RobotTestsLaunch testsLaunchContext;
+
+    RobotLaunchInRunMode(final RobotEventBroker robotEventBroker, final RobotTestsLaunch testsLaunchContext) {
         this.robotEventBroker = robotEventBroker;
+        this.testsLaunchContext = testsLaunchContext;
     }
 
     @Override
@@ -58,7 +62,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
                     .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
-                    .agentEventsListenedBy(new MessagesTrackerForLogView())
+                    .agentEventsListenedBy(new MessagesTrackerForLogView(testsLaunchContext))
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
                     .start()
                     .waitForServer();

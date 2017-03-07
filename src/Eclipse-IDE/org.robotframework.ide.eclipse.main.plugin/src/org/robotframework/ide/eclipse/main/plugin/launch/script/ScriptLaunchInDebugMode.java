@@ -26,14 +26,18 @@ import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogVi
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 class ScriptLaunchInDebugMode extends ScriptRobotLaunchInMode {
 
     private final RobotEventBroker robotEventBroker;
 
-    public ScriptLaunchInDebugMode(final RobotEventBroker robotEventBroker) {
+    private final RobotTestsLaunch testsLaunchContext;
+
+    public ScriptLaunchInDebugMode(final RobotEventBroker robotEventBroker, final RobotTestsLaunch testsLaunchContext) {
         this.robotEventBroker = robotEventBroker;
+        this.testsLaunchContext = testsLaunchContext;
     }
 
     @Override
@@ -62,7 +66,7 @@ class ScriptLaunchInDebugMode extends ScriptRobotLaunchInMode {
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(
                             new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
-                    .agentEventsListenedBy(new MessagesTrackerForLogView())
+                    .agentEventsListenedBy(new MessagesTrackerForLogView(testsLaunchContext))
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
                     .start()
                     .waitForServer();
