@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogVi
 import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator;
 
 
@@ -31,8 +32,11 @@ class RemoteLaunchInRunMode {
 
     private final RobotEventBroker robotEventBroker;
 
-    RemoteLaunchInRunMode(final RobotEventBroker robotEventBroker) {
+    private final RobotTestsLaunch testsLaunchContext;
+
+    RemoteLaunchInRunMode(final RobotEventBroker robotEventBroker, final RobotTestsLaunch testsLaunchContext) {
         this.robotEventBroker = robotEventBroker;
+        this.testsLaunchContext = testsLaunchContext;
     }
 
     void launch(final RemoteRobotLaunchConfiguration robotConfig, final ILaunch launch) throws CoreException {
@@ -58,7 +62,7 @@ class RemoteLaunchInRunMode {
                     .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(remoteConnectionStatusTracker)
-                    .agentEventsListenedBy(new MessagesTrackerForLogView())
+                    .agentEventsListenedBy(new MessagesTrackerForLogView(testsLaunchContext))
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
                     .start()
                     .waitForServer();

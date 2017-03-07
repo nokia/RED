@@ -22,14 +22,18 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 
 public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
     private final RobotEventBroker robotEventBroker;
+    private final RobotTestExecutionService executionService;
 
     public RemoteRobotLaunchConfigurationDelegate() {
         this.robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
+        this.executionService = RedPlugin.getTestExecutionService();
     }
 
     @Override
@@ -43,9 +47,10 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
             return;
         }
         try {
-            robotEventBroker.sendClearEventToMessageLogView();
+            final RobotTestsLaunch testsLaunchContext = executionService.testExecutionStarting();
+
             robotEventBroker.sendClearEventToExecutionView();
-            doLaunch(configuration, mode, launch, monitor);
+            doLaunch(configuration, mode, launch, testsLaunchContext, monitor);
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
         } finally {
@@ -54,15 +59,16 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
     }
 
     private void doLaunch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
-            final IProgressMonitor monitor) throws CoreException, IOException {
+            final RobotTestsLaunch testsLaunchContext, final IProgressMonitor monitor)
+            throws CoreException, IOException {
 
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(configuration);
 
         if (ILaunchManager.RUN_MODE.equals(mode)) {
-            new RemoteLaunchInRunMode(robotEventBroker).launch(robotConfig, launch);
+            new RemoteLaunchInRunMode(robotEventBroker, testsLaunchContext).launch(robotConfig, launch);
 
         } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-            new RemoteLaunchInDebugMode(robotEventBroker).launch(robotConfig, launch);
+            new RemoteLaunchInDebugMode(robotEventBroker, testsLaunchContext).launch(robotConfig, launch);
         }
     }
 
