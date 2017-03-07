@@ -56,4 +56,23 @@ public class ExecutionMessagesStoreTest {
         assertThat(str2.toString()).isEqualTo("msg2");
     }
 
+    @Test
+    public void storeListenersAreRemoved_whenDisposed() {
+        final StringBuilder str1 = new StringBuilder();
+        final StringBuilder str2 = new StringBuilder();
+
+        final ExecutionMessagesStoreListener listener1 = (s, msg) -> str1.append(msg);
+        final ExecutionMessagesStoreListener listener2 = (s, msg) -> str2.append(msg);
+
+        final ExecutionMessagesStore store = new ExecutionMessagesStore();
+        store.addStoreListener(listener1);
+        store.addStoreListener(listener2);
+        store.append("msg1");
+        store.dispose();
+        store.append("msg2");
+
+        assertThat(str1.toString()).isEqualTo("msg1");
+        assertThat(str2.toString()).isEqualTo("msg1");
+    }
+
 }
