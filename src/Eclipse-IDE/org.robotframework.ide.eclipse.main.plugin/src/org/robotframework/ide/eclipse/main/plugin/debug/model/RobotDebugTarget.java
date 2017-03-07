@@ -26,6 +26,7 @@ import org.eclipse.debug.core.model.IThread;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.server.AgentClient;
 import org.rf.ide.core.execution.server.response.ChangeVariable;
+import org.rf.ide.core.execution.server.response.InterruptExecution;
 import org.rf.ide.core.execution.server.response.ResumeExecution;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
@@ -153,9 +154,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     @Override
     public void terminate() {
-        // if (eventSocket != null) {
-        // userController.interrupt();
-        // }
+        try {
+            client.send(new InterruptExecution());
+        } catch (ResponseException | IOException e) {
+            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        }
         terminated();
     }
 
@@ -249,7 +252,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
         fireTerminateEvent();
        
-        if(getProcess() != null) {
+        final IProcess process = getProcess();
+        if (process != null) {
             try {
                 getProcess().terminate();
             } catch (final DebugException e) {
