@@ -1,0 +1,186 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _F4PwYAKIEeeoIJPDKwyifg,_VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: GoToDefinitionInSettings
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _laalYAKCEeeoIJPDKwyifg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/7/17 9:58 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-focus-in-variables" [val row] [val col] [val file "TestFile.robot"]{
+	with [get-editor $file] {
+	    get-tab-folder | get-property activePage | equals Variables | verify-true
+	    with [get-canvas -after [get-label Variables] -index 1] {
+	        get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().PositionCoordinate[0].rowPosition" 
+	            | equals $row | verify-true
+	        get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().PositionCoordinate[0].getColumnPosition()" 
+	            | equals $col | verify-true
+	        get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().length" | equals 1 
+	            | verify-true
+	    }
+	}
+}
+	
+//open file
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+
+//go to Settings table
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
+
+//select Default tag
+get-view Outline | get-tree| select "TestFile.robot/Settings/Default Tags" | click
+
+
+//go to Log kw
+with [get-editor "TestFile.robot" | get-section General | get-canvas] {
+    key-type Right
+    key-type F3
+}
+get-editor "BuiltIn.py" | get-text-viewer | get-property "getSelectionText()" | equals log | verify-true
+get-editor "TestFile.robot" | click
+get-editor "BuiltIn.py" | close
+
+//check if under argumnets are open declaration avaible
+with [get-editor "TestFile.robot" | get-section General | get-canvas] {
+    key-type Up -times 4
+    key-type Right
+    key-type F3
+    key-type Right
+    key-type F3
+    key-type Right
+    
+    //go to list
+    key-type F3
+}
+//check if variables tab is open
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Variables | verify-true
+check-focus-in-variables -row 1 -col 0
+		
+//go back to Settings, gow right and go to variable set in other resource		
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
+    
+with [get-editor "TestFile.robot" | get-section General | get-canvas] {
+    key-type Right
+    key-type F3
+}
+get-editor "res.robot" | get-tab-folder | get-property activePage | equals Variables | verify-true		
+check-focus-in-variables -row 0 -col 0 -file "res.robot"
+		
+//check if user can go to kw that name is set in variable
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section General | get-canvas] {
+        key-type Up
+        key-type Left -times 4
+        key-type F3
+    }
+}
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Variables | verify-true
+check-focus-in-variables -row 0 -col 0
+		
+
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section General | get-canvas] {
+        key-type Up -times 2
+        key-type F3
+    }
+}
+get-editor "res.robot" -index 1 | get-tab-folder | get-property activePage | equals Keywords | verify-true
+is-row-fully-selected -row 0 -table "User Keywords" -file_name "res.robot" -index 1
+
+
+//go to Import settings 
+with [get-editor "TestFile.robot"] {
+    click
+    wait 500
+    get-section Imports | click
+}
+//go to resource file
+with [get-view Outline] {
+    get-button "Expand All" | click
+    get-tree | select "TestFile.robot/Settings/Resource/res.robot"
+}
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+    key-type Right
+    key-type F3
+}
+get-editor "res.robot" -index 1 | get-tab-folder | get-property activePage | equals Keywords | verify-true
+is-row-fully-selected -row 0 -table"User Keywords" -file_name "res.robot" -index 1
+
+//---------------------------------------------- tsv file -------------------------------------------------
+
+//goto settings table
+get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | double-click
+get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Settings | click
+
+get-view Outline | get-tree | select "tsv_file.tsv/Settings/Force Tags" | click
+
+//check if in force tag kw is visible
+with [get-editor "tsv_file.tsv" | get-section General | get-canvas] {
+    key-type Right
+    key-type F3
+}
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals Keywords | verify-true
+is-row-fully-selected -row 3 -table"User Keywords" -file_name  "tsv_file.tsv" 
+
+//go to kw set in pytohn file
+with [get-editor "tsv_file.tsv"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section General | get-canvas] {
+        key-type Up -times 3
+        key-type F3
+    }
+}
+get-editor "sum.py" | get-text-viewer | get-property "getSelectionText()" | equals sum | verify-true
+
+
+with [get-editor "tsv_file.tsv"] {
+    click
+    with [get-section General | get-canvas] {
+        key-type Right
+        //built-in varaible
+        key-type F3
+        
+        //list @{last list}
+        key-type Up
+        key-type F3
+    }
+}
+get-editor "res.robot" | get-tab-folder | get-property activePage | equals Variables | verify-true
+check-focus-in-variables -row 1 -col 0 -file "res.robot"
+
+//check usr kw abc
+with [get-editor "tsv_file.tsv"] {
+    click
+    with [get-section General | get-canvas] {
+        key-type Up
+        key-type Left
+        key-type F3
+    }
+}
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals Keywords | verify-true
+is-row-fully-selected -row 3 -table"User Keywords" -file_name "tsv_file.tsv"
+
+//go to path - nothig should be open
+with [get-editor "tsv_file.tsv"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section General | get-canvas] {
+        key-type Up
+        key-type Right
+        key-type F3
+    }
+}
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals Settings | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
