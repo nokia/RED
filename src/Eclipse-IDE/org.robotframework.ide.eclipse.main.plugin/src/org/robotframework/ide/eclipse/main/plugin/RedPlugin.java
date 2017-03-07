@@ -20,6 +20,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.fileWatcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
 import org.robotframework.red.graphics.ColorsManager;
@@ -40,6 +41,10 @@ public class RedPlugin extends AbstractUIPlugin {
 
     public static RobotModelManager getModelManager() {
         return RobotModelManager.getInstance();
+    }
+
+    public static RobotTestExecutionService getTestExecutionService() {
+        return RobotTestExecutionServiceManager.getInstance().service;
     }
 
     static ImageDescriptor getImageDescriptor(final String path) {
@@ -71,6 +76,7 @@ public class RedPlugin extends AbstractUIPlugin {
         FontsManager.disposeFonts();
         ImagesManager.disposeImages();
         RobotModelManager.getInstance().dispose();
+        RobotTestExecutionServiceManager.getInstance().dispose();
         RedFileWatcher.getInstance().closeWatchService();
     }
 
@@ -90,7 +96,7 @@ public class RedPlugin extends AbstractUIPlugin {
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
         final List<RobotRuntimeEnvironment> allRobotInstallation = InstalledRobotEnvironments
                 .getAllRobotInstallation(new RedPreferences(getPreferenceStore()));
-        return allRobotInstallation == null ? new ArrayList<RobotRuntimeEnvironment>() : allRobotInstallation;
+        return allRobotInstallation == null ? new ArrayList<>() : allRobotInstallation;
     }
 
     public static void logInfo(final String message) {
@@ -113,10 +119,26 @@ public class RedPlugin extends AbstractUIPlugin {
         if (adapterClass.isInstance(adaptee)) {
             return adapterClass.cast(adaptee);
         } else if (adaptee instanceof IAdaptable) {
-            return (T) ((IAdaptable) adaptee).getAdapter(adapterClass);
+            return adapterClass.cast(((IAdaptable) adaptee).getAdapter(adapterClass));
         } else {
             return null;
         }
+    }
+    
+    private static class RobotTestExecutionServiceManager {
 
+        private static class InstanceHolder {
+            private static final RobotTestExecutionServiceManager INSTANCE = new RobotTestExecutionServiceManager();
+        }
+
+        private RobotTestExecutionService service = new RobotTestExecutionService();
+
+        private static RobotTestExecutionServiceManager getInstance() {
+            return InstanceHolder.INSTANCE;
+        }
+        
+        public void dispose() {
+            this.service = new RobotTestExecutionService();
+        }
     }
 }
