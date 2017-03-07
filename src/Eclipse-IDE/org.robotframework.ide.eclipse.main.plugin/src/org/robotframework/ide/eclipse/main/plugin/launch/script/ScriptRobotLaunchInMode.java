@@ -18,6 +18,7 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public abstract class ScriptRobotLaunchInMode {
@@ -42,10 +43,10 @@ public abstract class ScriptRobotLaunchInMode {
             final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException, IOException;
 
-    protected Process execProcess(final String[] cmdLine, final ScriptRobotLaunchConfiguration robotConfig)
+    protected Process execProcess(final RunCommandLine cmdLine, final RobotLaunchConfiguration robotConfig)
             throws CoreException {
         final RobotProject robotProject = robotConfig.getRobotProject();
-        return DebugPlugin.exec(cmdLine, robotProject.getProject().getLocation().toFile(),
+        return DebugPlugin.exec(cmdLine.getCommandLine(), robotProject.getProject().getLocation().toFile(),
                 robotConfig.getEnvironmentVariables());
     }
 
@@ -73,6 +74,7 @@ public abstract class ScriptRobotLaunchInMode {
                 ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
                 : RunCommandLineCallBuilder.forExecutor(robotConfig.getExecutor(), port);
 
+        builder.withExecutableScript(robotConfig.getScriptPath());
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
         builder.addLocationsToPythonPath(robotProject.getPythonpath());
