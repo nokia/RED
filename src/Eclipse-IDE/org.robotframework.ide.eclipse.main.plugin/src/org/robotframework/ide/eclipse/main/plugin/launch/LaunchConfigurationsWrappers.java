@@ -57,7 +57,7 @@ public class LaunchConfigurationsWrappers implements IProcessFactory {
             if (RobotLaunchConfiguration.TYPE_ID.equals(id)) {
                 return new LocalProcess(launch, process, name, attributes);
             } else if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(id)) {
-                return new RemoteProcess(launch, () -> {}, name);
+                return new RemoteProcess(launch, name);
             } else if (ScriptRobotLaunchConfiguration.TYPE_ID.equals(id)) {
                 return new LocalProcess(launch, process, name, attributes);
             }

@@ -22,7 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJo
 import org.robotframework.ide.eclipse.main.plugin.launch.DebugExecutionEventsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
-import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -76,7 +75,7 @@ class RemoteLaunchInDebugMode {
             final String processLabel = "TCP connection using " + host + "@" + port;
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, null, processLabel);
 
-            RemoteExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
+            TestsExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             remoteConnectionStatusTracker.startTrackingInto(redConsole);

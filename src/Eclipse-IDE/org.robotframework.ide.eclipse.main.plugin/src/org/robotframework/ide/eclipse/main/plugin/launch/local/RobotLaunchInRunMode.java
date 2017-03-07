@@ -21,7 +21,6 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
-import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
@@ -54,16 +53,15 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         }
         final int timeout = AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
 
-        final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
 
         try {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
                     .withConnectionTimeout(timeout, TimeUnit.SECONDS)
-                    .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
+                    .agentEventsListenedBy(new AgentServerKeepAlive())
                     .start()
                     .waitForServer();
 
@@ -74,8 +72,13 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
 
             final Process process = execProcess(cmdLine, robotConfig);
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
-
-            RemoteExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
+            robotProcess.onTerminate(() -> {
+                try {
+                    job.stopServer();
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));

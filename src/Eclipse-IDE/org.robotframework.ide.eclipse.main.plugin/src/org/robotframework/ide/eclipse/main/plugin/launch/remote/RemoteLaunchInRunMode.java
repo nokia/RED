@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
@@ -20,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
-import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -69,8 +69,16 @@ class RemoteLaunchInRunMode {
 
             final String processLabel = "TCP connection using " + host + "@" + port;
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, null, processLabel);
+            robotProcess.onTerminate(() -> {
+                try {
+                    job.stopServer();
+                } catch (final IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            });
 
-            RemoteExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
+            TestsExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             remoteConnectionStatusTracker.startTrackingInto(redConsole);

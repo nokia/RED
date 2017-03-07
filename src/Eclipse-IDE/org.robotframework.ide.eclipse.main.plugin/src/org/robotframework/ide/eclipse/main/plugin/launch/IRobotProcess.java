@@ -11,4 +11,6 @@ public interface IRobotProcess extends IProcess {
 
     RobotConsoleFacade provideConsoleFacade(String processLabel);
 
+    void onTerminate(Runnable operation);
+
 }
