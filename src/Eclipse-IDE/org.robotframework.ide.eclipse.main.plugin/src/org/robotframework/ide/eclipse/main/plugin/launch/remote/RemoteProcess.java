@@ -34,11 +34,10 @@ public class RemoteProcess implements IRobotProcess {
 
     private boolean isTerminated;
 
-    private final Runnable serverCloser;
+    private Runnable onTerminateHook;
 
-    public RemoteProcess(final ILaunch launch, final Runnable serverCloser, final String label) {
+    public RemoteProcess(final ILaunch launch, final String label) {
         this.launch = launch;
-        this.serverCloser = serverCloser;
         this.label = label;
         this.streamsProxy = new NullStreamsProxy();
         this.isTerminated = false;
@@ -50,6 +49,12 @@ public class RemoteProcess implements IRobotProcess {
     @Override
     public RobotConsoleFacade provideConsoleFacade(final String consoleDescription) {
         return RobotConsoleFacade.provide(launch.getLaunchConfiguration(), consoleDescription);
+    }
+
+
+    @Override
+    public void onTerminate(final Runnable operation) {
+        this.onTerminateHook = operation;
     }
 
     @Override
@@ -64,11 +69,9 @@ public class RemoteProcess implements IRobotProcess {
 
     @Override
     public void terminate() {
-        serverCloser.run();
-        terminated();
-    }
-
-    void terminated() {
+        if (onTerminateHook != null) {
+            onTerminateHook.run();
+        }
         if (!isTerminated) {
             isTerminated = true;
 
