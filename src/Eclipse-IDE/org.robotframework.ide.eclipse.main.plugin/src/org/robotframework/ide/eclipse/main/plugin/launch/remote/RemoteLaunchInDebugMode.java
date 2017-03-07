@@ -22,12 +22,12 @@ import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJo
 import org.robotframework.ide.eclipse.main.plugin.launch.DebugExecutionEventsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
-import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogView;
 import org.robotframework.ide.eclipse.main.plugin.launch.RemoteExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator;
+import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
 
 class RemoteLaunchInDebugMode {
@@ -68,7 +68,7 @@ class RemoteLaunchInDebugMode {
                     .agentEventsListenedBy(remoteConnectionStatusTracker)
                     .agentEventsListenedBy(
                             new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
-                    .agentEventsListenedBy(new MessagesTrackerForLogView(testsLaunchContext))
+                    .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
                     .start()
                     .waitForServer();
