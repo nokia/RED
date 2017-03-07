@@ -16,6 +16,9 @@ import java.util.function.Supplier;
 
 import org.eclipse.ui.services.IDisposable;
 
+/**
+ * This service should be obtained by calling RedPlugin.getTestExecutionService()
+ */
 public class RobotTestExecutionService {
 
     private static final int LAUNCHES_HISTORY_LIMIT = 10;

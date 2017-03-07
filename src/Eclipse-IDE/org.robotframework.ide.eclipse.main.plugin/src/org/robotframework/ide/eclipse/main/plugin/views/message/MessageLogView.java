@@ -15,10 +15,9 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogView.MessageStore;
-import org.robotframework.ide.eclipse.main.plugin.launch.MessagesTrackerForLogView.MessageStoreListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
+import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesStore.ExecutionMessagesStoreListener;
 import org.robotframework.red.swt.SwtThread;
 
 
@@ -53,9 +52,9 @@ public class MessageLogView {
         styledText.setText(getMessageFromLastLaunch());
 
         // clear log view always when new tests are launched
-        final MessageStoreListener storeListener = (store, msg) -> SwtThread.syncExec(() -> append(msg));
+        final ExecutionMessagesStoreListener storeListener = (store, msg) -> SwtThread.syncExec(() -> append(msg));
         executionListener = launch -> SwtThread.syncExec(() -> {
-            final MessageStore store = launch.getExecutionData(MessageStore.class, () -> new MessageStore());
+            final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class, () -> new ExecutionMessagesStore());
             store.addStoreListener(storeListener);
 
             styledText.setText("");
@@ -70,7 +69,7 @@ public class MessageLogView {
 
     private String getMessageFromLastLaunch() {
         return executionService.getLastLaunch()
-                .flatMap(launch -> launch.getExecutionData(MessageStore.class))
+                .flatMap(launch -> launch.getExecutionData(ExecutionMessagesStore.class))
                 .map(store -> store.getMessage())
                 .orElse("");
     }
