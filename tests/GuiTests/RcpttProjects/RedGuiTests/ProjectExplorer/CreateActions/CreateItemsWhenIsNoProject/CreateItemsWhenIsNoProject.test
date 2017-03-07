@@ -1,0 +1,90 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Jhq2QAMZEeeiJ58fwe1u-w
+Element-Name: CreateItemsWhenIsNoProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _4-8DwAMYEeeiJ58fwe1u-w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/7/17 12:02 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-error-and-finish-button" [val window_name] [val label]{
+	with [get-window $window_name] {
+	    //error
+	    get-editbox -after [get-label $label] | get-property text 
+	        | equals "Action impossible to finish: No project available" | verify-true
+	    
+	    //button is disable
+	    get-button Finish | get-property selected | equals false | verify-true
+	}
+	
+}
+
+
+proc "set-project-name"[val window_name]{
+	get-window $window_name| get-editbox -after [get-label "Enter or select the parent folder:"] 
+	    | set-text new
+}
+//menu from toolbar
+
+// suite folder
+get-menu "File/New/Robot Test Suites folder" | click
+
+//set folder name
+get-window "New Robot Test Suites folder" | get-editbox -after [get-label "Folder name:"] | set-text abc
+check-error-and-finish-button "New Robot Test Suites folder" -label "Robot Suites Folder"
+
+//add project name and check error
+set-project-name  "New Robot Test Suites folder" 
+check-error-and-finish-button "New Robot Test Suites folder" -label "Robot Suites Folder"
+get-window "New Robot Test Suites folder" | get-button Cancel | click
+
+
+//resource
+get-menu "File/New/Robot Resource file" | click
+get-window "New Robot Resource file" | get-editbox -after [get-label "File name:"] | set-text def
+check-error-and-finish-button "New Robot Resource file" -label "Robot Resource file"
+set-project-name "New Robot Resource file"
+check-error-and-finish-button "New Robot Resource file" -label "Robot Resource file"
+get-window "New Robot Resource file"| get-button Cancel | click
+
+//suite
+get-menu "File/New/Robot Test Suite" | click
+get-window "New Robot Test Suite" | get-editbox -after [get-label "File name:"] | set-text abc
+check-error-and-finish-button "New Robot Test Suite" -label "Robot Test Suite"
+set-project-name "New Robot Test Suite"
+check-error-and-finish-button "New Robot Test Suite" -label "Robot Test Suite"
+get-window "New Robot Test Suite" | get-button Cancel | click
+
+//python file
+get-menu "File/New/Robot python file" | click
+get-window "New Robot python file" | get-editbox -after [get-label "File name:"] | set-text "this is file"
+check-error-and-finish-button "New Robot python file" -label "Robot python file"
+set-project-name "New Robot python file"
+check-error-and-finish-button "New Robot python file" -label "Robot python file"
+get-window "New Robot python file" |  get-button Cancel | click
+
+
+//------------------ from PE----------------------------------------------------------
+//open menu just as workaround
+get-view "Project Explorer" | get-tree | get-menu "New/Project..." | get-property index | equals 0 | verify-true
+
+with [get-view "Project Explorer" | get-tree] {
+    get-property "getMenu().getItems().MenuItem[0].getMenu().toString()" 
+        | equals "Menu {P&roject..., |, Robot Project, Robot Test Suites folder, |, &Other...\9M1+N}" | verify-true
+    get-property "getMenu().getItems().MenuItem[0].getStyle()" | equals "[CASCADE]" | verify-true
+}
+
+//try to cretae suite folder
+get-view "Project Explorer" | get-tree | get-menu "New/Robot Test Suites folder" | click
+get-window "New Robot Test Suites folder" | get-editbox -after [get-label "Folder name:"] | set-text abc
+get-window "New Robot Test Suites folder" | get-editbox -after [get-label "Robot Suites Folder"] | get-property text 
+    | equals "Action impossible to finish: No project available" | verify-true
+get-window "New Robot Test Suites folder" | get-button Cancel | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
