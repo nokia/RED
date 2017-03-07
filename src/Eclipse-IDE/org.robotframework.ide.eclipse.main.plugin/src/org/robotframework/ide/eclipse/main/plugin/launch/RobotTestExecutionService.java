@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -16,17 +17,25 @@ import java.util.function.Supplier;
 
 import org.eclipse.ui.services.IDisposable;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
+
 /**
  * This service should be obtained by calling RedPlugin.getTestExecutionService()
  */
 public class RobotTestExecutionService {
 
-    private static final int LAUNCHES_HISTORY_LIMIT = 10;
+    @VisibleForTesting
+    static final int LAUNCHES_HISTORY_LIMIT = 10;
 
     private final Deque<RobotTestsLaunch> launches = new ArrayDeque<>();
 
     private final List<RobotTestExecutionListener> executionListeners = new ArrayList<>();
 
+    @VisibleForTesting
+    Collection<RobotTestsLaunch> getLaunches() {
+        return ImmutableList.copyOf(launches);
+    }
 
     public void addExecutionListener(final RobotTestExecutionListener listener) {
         executionListeners.add(listener);
@@ -79,6 +88,7 @@ public class RobotTestExecutionService {
             for (final Object data : executionData.values()) {
                 IDisposable.class.cast(data).dispose();
             }
+            executionData.clear();
         }
     }
 }
