@@ -22,34 +22,35 @@ public class RunCommandLineCallBuilder {
 
     public static interface IRunCommandLineBuilder {
 
-        public IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> pythonPathLocations);
+        IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> pythonPathLocations);
 
-        public IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> classPathLocations);
+        IRunCommandLineBuilder addLocationsToClassPath(final Collection<String> classPathLocations);
 
-        public IRunCommandLineBuilder addVariableFiles(final Collection<String> varFiles);
+        IRunCommandLineBuilder addVariableFiles(final Collection<String> varFiles);
 
-        public IRunCommandLineBuilder suitesToRun(final Collection<String> suites);
+        IRunCommandLineBuilder suitesToRun(final Collection<String> suites);
 
-        public IRunCommandLineBuilder testsToRun(final Collection<String> tests);
+        IRunCommandLineBuilder testsToRun(final Collection<String> tests);
 
-        public IRunCommandLineBuilder includeTags(final Collection<String> tags);
+        IRunCommandLineBuilder includeTags(final Collection<String> tags);
 
-        public IRunCommandLineBuilder excludeTags(final Collection<String> tags);
+        IRunCommandLineBuilder excludeTags(final Collection<String> tags);
 
-        public IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments);
+        IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments);
 
-        public IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
+        IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
 
-        public IRunCommandLineBuilder enableDryRun();
+        IRunCommandLineBuilder enableDryRun();
 
-        public IRunCommandLineBuilder withProject(final File project);
+        IRunCommandLineBuilder withProject(final File project);
 
-        public IRunCommandLineBuilder withAdditionalProjectsLocations(
-                final Collection<String> additionalProjectsLocations);
+        IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<String> additionalProjectsLocations);
 
-        public IRunCommandLineBuilder withExecutableScript(final String scriptPath);
+        IRunCommandLineBuilder withExecutableScript(final String scriptPath);
 
-        public RunCommandLine build() throws IOException;
+        IRunCommandLineBuilder addUserArgumentsForExecutableScript(final String arguments);
+
+        RunCommandLine build() throws IOException;
     }
 
     private static class Builder implements IRunCommandLineBuilder {
@@ -76,8 +77,6 @@ public class RunCommandLineCallBuilder {
 
         private final List<String> additionalProjectsLocations = new ArrayList<>();
 
-        private String executableScriptPath = "";
-
         private File project = null;
 
         private boolean enableDryRun = false;
@@ -85,6 +84,10 @@ public class RunCommandLineCallBuilder {
         private String robotUserArgs = "";
 
         private String interpreterUserArgs = "";
+
+        private String executableScriptPath = "";
+
+        private String executableScriptArgs = "";
 
         private Builder(final SuiteExecutor executor, final String executorPath, final int listenerPort) {
             this.executor = executor;
@@ -187,11 +190,20 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
+        public IRunCommandLineBuilder addUserArgumentsForExecutableScript(final String arguments) {
+            this.executableScriptArgs = arguments.trim();
+            return this;
+        }
+
+        @Override
         public RunCommandLine build() throws IOException {
             final List<String> cmdLine = new ArrayList<>();
 
             if (!executableScriptPath.isEmpty()) {
                 cmdLine.add(executableScriptPath);
+                if (!executableScriptArgs.isEmpty()) {
+                    cmdLine.add(executableScriptArgs);
+                }
             }
             cmdLine.add(executorPath);
             if (executor == SuiteExecutor.Jython) {

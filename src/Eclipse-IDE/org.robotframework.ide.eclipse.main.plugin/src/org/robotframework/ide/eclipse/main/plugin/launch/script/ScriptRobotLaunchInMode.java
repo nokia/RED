@@ -75,6 +75,7 @@ public abstract class ScriptRobotLaunchInMode {
                 : RunCommandLineCallBuilder.forExecutor(robotConfig.getExecutor(), port);
 
         builder.withExecutableScript(robotConfig.getScriptPath());
+        builder.addUserArgumentsForExecutableScript(robotConfig.getScriptArguments());
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
         builder.addLocationsToPythonPath(robotProject.getPythonpath());

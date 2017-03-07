@@ -83,7 +83,6 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
             new LaunchConfigurationsValidator().validate(robotConfig);
         } catch (final LaunchConfigurationValidationException e) {
             setWarningMessage(e.getMessage());
-            return false;
         } catch (final LaunchConfigurationValidationFatalException e) {
             setErrorMessage(e.getMessage());
             return false;
