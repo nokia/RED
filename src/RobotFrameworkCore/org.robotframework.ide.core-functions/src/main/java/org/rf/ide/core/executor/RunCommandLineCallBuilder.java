@@ -47,6 +47,8 @@ public class RunCommandLineCallBuilder {
         public IRunCommandLineBuilder withAdditionalProjectsLocations(
                 final Collection<String> additionalProjectsLocations);
 
+        public IRunCommandLineBuilder withExecutableScript(final String scriptPath);
+
         public RunCommandLine build() throws IOException;
     }
 
@@ -54,9 +56,9 @@ public class RunCommandLineCallBuilder {
 
         private final SuiteExecutor executor;
 
-        private final String executablePath;
+        private final String executorPath;
 
-        private final int port;
+        private final int listenerPort;
 
         private final List<String> pythonPath = new ArrayList<>();
 
@@ -74,6 +76,8 @@ public class RunCommandLineCallBuilder {
 
         private final List<String> additionalProjectsLocations = new ArrayList<>();
 
+        private String executableScriptPath = "";
+
         private File project = null;
 
         private boolean enableDryRun = false;
@@ -82,10 +86,10 @@ public class RunCommandLineCallBuilder {
 
         private String interpreterUserArgs = "";
 
-        private Builder(final SuiteExecutor executor, final String executablePath, final int port) {
+        private Builder(final SuiteExecutor executor, final String executorPath, final int listenerPort) {
             this.executor = executor;
-            this.executablePath = executablePath;
-            this.port = port;
+            this.executorPath = executorPath;
+            this.listenerPort = listenerPort;
         }
 
         @Override
@@ -177,10 +181,19 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
+        public IRunCommandLineBuilder withExecutableScript(final String executableScriptPath) {
+            this.executableScriptPath = executableScriptPath;
+            return this;
+        }
+
+        @Override
         public RunCommandLine build() throws IOException {
             final List<String> cmdLine = new ArrayList<>();
 
-            cmdLine.add(executablePath);
+            if (!executableScriptPath.isEmpty()) {
+                cmdLine.add(executableScriptPath);
+            }
+            cmdLine.add(executorPath);
             if (executor == SuiteExecutor.Jython) {
                 final String additionalPythonPathLocationForJython = extractAdditionalPythonPathLocationForJython();
                 if (!additionalPythonPathLocationForJython.isEmpty()) {
@@ -202,7 +215,7 @@ public class RunCommandLineCallBuilder {
             cmdLine.addAll(tagsToInclude);
             cmdLine.addAll(tagsToExclude);
             cmdLine.add("--listener");
-            cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + port);
+            cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + listenerPort);
             if (enableDryRun) {
                 cmdLine.add("--prerunmodifier");
                 cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py").toPath().toString());
@@ -245,7 +258,7 @@ public class RunCommandLineCallBuilder {
 
         private String extractAdditionalPythonPathLocationForJython() {
             String additionalPythonPathLocation = "";
-            final Path jythonPath = Paths.get(executablePath);
+            final Path jythonPath = Paths.get(executorPath);
             Path jythonParentPath = jythonPath.getParent();
             if (jythonParentPath == null) {
                 final List<PythonInstallationDirectory> pythonInterpreters = RobotRuntimeEnvironment
@@ -261,18 +274,19 @@ public class RunCommandLineCallBuilder {
                     && jythonParentPath.getFileName().toString().equalsIgnoreCase("bin")) {
                 final Path mainDir = jythonParentPath.getParent();
                 final Path sitePackagesDir = Paths.get(mainDir.toString(), "Lib", "site-packages");
-                additionalPythonPathLocation = "-J-Dpython.path=" + sitePackagesDir.toString(); // in case of 'robot' folder existing in project
+                // in case of 'robot' folder existing in project
+                additionalPythonPathLocation = "-J-Dpython.path=" + sitePackagesDir.toString();
             }
             return additionalPythonPathLocation;
         }
     }
 
-    public static IRunCommandLineBuilder forEnvironment(final RobotRuntimeEnvironment env, final int port) {
-        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), port);
+    public static IRunCommandLineBuilder forEnvironment(final RobotRuntimeEnvironment env, final int listenerPort) {
+        return new Builder(env.getInterpreter(), env.getPythonExecutablePath(), listenerPort);
     }
 
-    public static IRunCommandLineBuilder forExecutor(final SuiteExecutor executor, final int port) {
-        return new Builder(executor, executor.executableName(), port);
+    public static IRunCommandLineBuilder forExecutor(final SuiteExecutor executor, final int listenerPort) {
+        return new Builder(executor, executor.executableName(), listenerPort);
     }
 
     public static class RunCommandLine {
