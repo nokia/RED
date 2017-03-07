@@ -66,7 +66,6 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
             if (sameConfig != null) {
                 doLaunchConfiguration(sameConfig, mode);
             } else {
-                config.doSave();
                 doLaunchConfiguration(config, mode);
             }
         } catch (final CoreException e) {

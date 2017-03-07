@@ -64,7 +64,7 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
                     final RobotLaunchConfiguration robotconfig = new RobotLaunchConfiguration(config);
                     robotconfig.updateTestCases(resourcesToTestCases);
 
-                    config.doSave().launch(mode.launchMgrName, monitor);
+                    config.launch(mode.launchMgrName, monitor);
                 } else {
                     final List<RobotCasesSection> selectedTestSuites = Selections.getElements(selection,
                             RobotCasesSection.class);
