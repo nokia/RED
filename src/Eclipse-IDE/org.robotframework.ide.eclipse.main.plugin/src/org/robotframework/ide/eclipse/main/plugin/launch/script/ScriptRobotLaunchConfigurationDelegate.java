@@ -68,19 +68,21 @@ public class ScriptRobotLaunchConfigurationDelegate extends LaunchConfigurationD
     }
 
     private static void saveConfiguration(final ILaunchConfiguration configuration) throws CoreException {
-        ILaunchConfigurationWorkingCopy toSave = null;
         if (configuration.isWorkingCopy()) {
             // since 3.3 ILaunchConfigurationWorkingCopy'ies can be nested
-            final ILaunchConfiguration original = ((ILaunchConfigurationWorkingCopy) configuration).getOriginal();
-            if (original != null) {
-                toSave = original.getWorkingCopy();
-            } else {
-                toSave = (ILaunchConfigurationWorkingCopy) configuration;
-            }
+            deepSaveConfigurationWorkingCopy((ILaunchConfigurationWorkingCopy) configuration);
         } else {
-            toSave = configuration.getWorkingCopy();
+            configuration.getWorkingCopy().doSave();
         }
-        toSave.doSave();
+    }
+
+    private static void deepSaveConfigurationWorkingCopy(final ILaunchConfigurationWorkingCopy copy)
+            throws CoreException {
+        copy.doSave();
+        final ILaunchConfigurationWorkingCopy parent = copy.getParent();
+        if (parent != null) {
+            deepSaveConfigurationWorkingCopy(parent);
+        }
     }
 
     private void doLaunch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
