@@ -6,9 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.script;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
@@ -74,17 +71,12 @@ class ScriptLaunchInDebugMode extends ScriptRobotLaunchInMode {
 
             final RunCommandLine cmdLine = prepareCommandLine(robotConfig, port);
 
-            final List<String> commandLineList = new ArrayList<>();
-            commandLineList.add(robotConfig.getScriptPath());
-            commandLineList.addAll(Arrays.asList(cmdLine.getCommandLine()));
-            final String[] commandLine = commandLineList.toArray(new String[] {});
-
-            final Process process = execProcess(commandLine, robotConfig);
+            final Process process = execProcess(cmdLine, robotConfig);
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
-            redConsole.writeLine("Command: " + String.join(" ", commandLine));
+            redConsole.writeLine("Command: " + cmdLine.show());
 
             debugTarget.connectWith(robotProcess);
 
