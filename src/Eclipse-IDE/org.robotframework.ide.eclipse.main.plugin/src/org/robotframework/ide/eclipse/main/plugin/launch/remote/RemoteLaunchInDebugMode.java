@@ -20,23 +20,19 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.DebugExecutionEventsListener;
-import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
 
 class RemoteLaunchInDebugMode {
 
-    private final RobotEventBroker robotEventBroker;
-
     private final RobotTestsLaunch testsLaunchContext;
 
-    RemoteLaunchInDebugMode(final RobotEventBroker robotEventBroker, final RobotTestsLaunch testsLaunchContext) {
-        this.robotEventBroker = robotEventBroker;
+    RemoteLaunchInDebugMode(final RobotTestsLaunch testsLaunchContext) {
         this.testsLaunchContext = testsLaunchContext;
     }
 
@@ -67,7 +63,7 @@ class RemoteLaunchInDebugMode {
                     .agentEventsListenedBy(
                             new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
                     .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
-                    .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
+                    .agentEventsListenedBy(new ExecutionElementsTracker(testsLaunchContext))
                     .agentEventsListenedBy(keepAliveListener)
                     .start()
                     .waitForServer();

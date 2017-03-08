@@ -17,10 +17,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -56,7 +54,9 @@ import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
 import org.rf.ide.core.execution.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -66,9 +66,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefini
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsStore.ExecutionElementsStoreListener;
 import org.robotframework.red.actions.CollapseAllAction;
 import org.robotframework.red.actions.ExpandAllAction;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.swt.SwtThread;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author mmarzec
@@ -77,10 +81,13 @@ import org.robotframework.red.graphics.ImagesManager;
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class ExecutionView {
     
+    public static final String ID = "org.robotframework.ide.ExecutionView";
+
     @Inject
     protected IEventBroker eventBroker;
     
-    public static final String ID = "org.robotframework.ide.ExecutionView";
+    private final RobotTestExecutionService executionService;
+    private RobotTestExecutionListener executionListener;
 
     private Label passCounterLabel;
 
@@ -103,7 +110,17 @@ public class ExecutionView {
     private final List<ExecutionStatus> executionViewerInput = new ArrayList<>();
 
     private final LinkedList<ExecutionStatus> suitesStack = new LinkedList<>();
+
     
+    public ExecutionView() {
+        this(RedPlugin.getTestExecutionService());
+    }
+
+    @VisibleForTesting
+    ExecutionView(final RobotTestExecutionService executionService) {
+        this.executionService = executionService;
+    }
+
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
@@ -154,7 +171,20 @@ public class ExecutionView {
         
         createToolbarActions(part.getViewSite().getActionBars().getToolBarManager());
         
-        initPreviousViewerContent();
+        for (final ExecutionElement executionElement : getExecutionElementsFromLastLaunch()) {
+            executionEvent(executionElement);
+        }
+        final ExecutionElementsStoreListener storeListener = (store, element) -> SwtThread.syncExec(() -> {
+            executionEvent(element);
+        });
+        executionListener = launch -> SwtThread.syncExec(() -> {
+            final ExecutionElementsStore store = launch.getExecutionData(ExecutionElementsStore.class,
+                    () -> new ExecutionElementsStore());
+            store.addStoreListener(storeListener);
+
+            clearEvent();
+        });
+        executionService.addExecutionListener(executionListener);
     }
     
     @Focus
@@ -164,13 +194,17 @@ public class ExecutionView {
 
     @PreDestroy
     public void dispose() {
-        
+        executionService.removeExecutionListner(executionListener);
+    }
+
+    private List<ExecutionElement> getExecutionElementsFromLastLaunch() {
+        return executionService.getLastLaunch()
+                .flatMap(launch -> launch.getExecutionData(ExecutionElementsStore.class))
+                .map(store -> store.getElements())
+                .orElse(new ArrayList<>());
     }
     
-    @Inject
-    @Optional
-    private void executionEvent(@UIEventTopic("ExecutionView/ExecutionEvent") final ExecutionElement executionElement) {
-        
+    private void executionEvent(final ExecutionElement executionElement) {
         if (isSuiteStartEvent(executionElement)) {
             handleSuiteStartEvent(executionElement);
         } else if (isTestStartEvent(executionElement)) {
@@ -182,13 +216,10 @@ public class ExecutionView {
         } else if (isOutputFileEvent(executionElement)) {
             handleOutputFileEvent(executionElement);
         }
-
         refreshViewer();
     }
 
-    @Inject
-    @Optional
-    private void clearEvent(@UIEventTopic("ExecutionView/ClearEvent") final String s) {
+    private void clearEvent() {
         suitesStack.clear();
         executionViewerInput.clear();
         setViewerInput();
@@ -426,11 +457,5 @@ public class ExecutionView {
     
     private void setViewerInput() {
         executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
-    }
-    
-    private void initPreviousViewerContent() {
-        for (final ExecutionElement executionElement : RobotEventBroker.getExecutionViewContent()) {
-            executionEvent(executionElement);
-        }
     }
 }
