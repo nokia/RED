@@ -5,6 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static org.mockito.AdditionalMatchers.and;
+import static org.mockito.AdditionalMatchers.geq;
+import static org.mockito.AdditionalMatchers.leq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -64,5 +68,17 @@ public class RedPreferencesInitializerTest {
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
         verify(preferences).put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
+    }
+
+    @Test
+    public void byDefaultAllLaunchConfigurationPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.LAUNCH_REMOTE_ENABLED, false);
+        verify(preferences).put(RedPreferences.LAUNCH_REMOTE_HOST, "127.0.0.1");
+        verify(preferences).putInt(eq(RedPreferences.LAUNCH_REMOTE_PORT), and(geq(1), leq(65_535)));
+        verify(preferences).putInt(RedPreferences.LAUNCH_REMOTE_TIMEOUT, 30);
     }
 }

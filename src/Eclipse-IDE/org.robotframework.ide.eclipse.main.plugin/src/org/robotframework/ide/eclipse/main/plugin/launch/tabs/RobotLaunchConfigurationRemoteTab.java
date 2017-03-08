@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -49,6 +48,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         implements ILaunchConfigurationTab {
 
     private ProjectComposite projectComposite;
+
+    private Button enableRemoteBtn;
 
     private Text hostTxt;
 
@@ -97,12 +98,44 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 .setText("Setup server which will track execution of Robot tests running on remotely connected client");
         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(description);
 
-        final Label hostLbl = new Label(serverGroup, SWT.NONE);
-        hostLbl.setText("Local IP:");
+        enableRemoteBtn = createLabeledButton(serverGroup, "Enable remote values", SWT.CHECK);
 
-        hostTxt = new Text(serverGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(hostTxt);
-        hostTxt.addModifyListener(new ModifyListener() {
+        hostTxt = createLabeledText(serverGroup, "Local IP:");
+
+        portTxt = createLabeledText(serverGroup, "Local port:");
+
+        timeoutTxt = createLabeledText(serverGroup, "Connection timeout [s]:");
+
+        enableRemoteBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+
+                updateRemoteGroupState();
+                updateLaunchConfigurationDialog();
+            }
+        });
+    }
+
+    private Button createLabeledButton(final Composite parent, final String label, final int style) {
+        final Label lbl = new Label(parent, SWT.NONE);
+        lbl.setText(label);
+
+        final Button button = new Button(parent, style);
+
+        // spacer to occupy next grid cell
+        new Label(parent, SWT.NONE);
+
+        return button;
+    }
+
+    private Text createLabeledText(final Composite parent, final String label) {
+        final Label lbl = new Label(parent, SWT.NONE);
+        lbl.setText(label);
+
+        final Text txt = new Text(parent, SWT.BORDER);
+        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(txt);
+        txt.addModifyListener(new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
@@ -110,41 +143,17 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             }
         });
 
-        final Label defaultHostLbl = new Label(serverGroup, SWT.WRAP);
-        defaultHostLbl.setText("(localhost if empty)");
+        // spacer to occupy next grid cell
+        new Label(parent, SWT.NONE);
 
-        final Label portLbl = new Label(serverGroup, SWT.NONE);
-        portLbl.setText("Local port:");
+        return txt;
+    }
 
-        portTxt = new Text(serverGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(portTxt);
-        portTxt.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
-
-        final Label defaultPortLbl = new Label(serverGroup, SWT.WRAP);
-        defaultPortLbl.setText("(random free port if empty)");
-
-        final Label timeoutLbl = new Label(serverGroup, SWT.NONE);
-        timeoutLbl.setText("Connection timeout [s]:");
-
-        timeoutTxt = new Text(serverGroup, SWT.BORDER);
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(timeoutTxt);
-        timeoutTxt.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
-            }
-        });
-
-        final Label defaultTimeoutLbl = new Label(serverGroup, SWT.WRAP);
-        defaultTimeoutLbl
-                .setText(String.format("(%d if empty)", AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT));
+    private void updateRemoteGroupState() {
+        final boolean enabled = enableRemoteBtn.getSelection();
+        hostTxt.setEnabled(enabled);
+        portTxt.setEnabled(enabled);
+        timeoutTxt.setEnabled(enabled);
     }
 
     private void createClientGroup(final Composite parent) {
@@ -205,30 +214,30 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         try {
             final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                     .remoteLaunchConfiguration(configuration);
-            final String hostIp = robotConfig.getRemoteHostValue();
-            final String port = robotConfig.getRemotePortValue();
-            final String timeout = robotConfig.getRemoteTimeoutValue();
-
             if (robotConfig.isDefiningProjectDirectly()) {
                 projectComposite.setInput(robotConfig.getProjectName());
             } else {
                 projectComposite.disposeGroup();
             }
 
-            hostTxt.setText(hostIp);
-            portTxt.setText(port);
-            timeoutTxt.setText(timeout);
+            enableRemoteBtn.setSelection(robotConfig.isRemoteAgent());
+            hostTxt.setText(robotConfig.getRemoteHostValue());
+            portTxt.setText(robotConfig.getRemotePortValue());
+            timeoutTxt.setText(robotConfig.getRemoteTimeoutValue());
 
-            updateCommandLineArguments(hostIp, port);
+            updateCommandLineArguments();
+            updateRemoteGroupState();
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
     }
 
-    private void updateCommandLineArguments(final String hostIp, final String port) {
-        final String hostArg = hostIp.isEmpty() ? "" : ":" + hostIp;
-        final String portArg = port.isEmpty() ? ":<RANDOM>" : ":" + port;
-        commandLineArgument.setText("--listener TestRunnerAgent.py" + hostArg + portArg);
+    private void updateCommandLineArguments() {
+        if (enableRemoteBtn.getSelection()) {
+            commandLineArgument.setText("--listener TestRunnerAgent.py:" + hostTxt.getText() + ":" + portTxt.getText());
+        } else {
+            commandLineArgument.setText("--listener TestRunnerAgent.py:<AUTO>");
+        }
     }
 
     @Override
@@ -236,7 +245,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         setErrorMessage(null);
         setWarningMessage(null);
 
-        updateCommandLineArguments(hostTxt.getText(), portTxt.getText());
+        updateCommandLineArguments();
 
         try {
             new LaunchConfigurationsValidator()
@@ -261,6 +270,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             if (robotConfig.isDefiningProjectDirectly()) {
                 robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             }
+            robotConfig.setRemoteAgentValue(String.valueOf(enableRemoteBtn.getSelection()));
             robotConfig.setRemoteHostValue(hostTxt.getText().trim());
             robotConfig.setRemotePortValue(portTxt.getText().trim());
             robotConfig.setRemoteTimeoutValue(timeoutTxt.getText().trim());
