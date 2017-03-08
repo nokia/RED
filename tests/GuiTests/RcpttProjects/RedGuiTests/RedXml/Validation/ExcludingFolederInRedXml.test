@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-2m5wKjCEeWg6OFh_tHgTw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/10/17 10:16 AM
+Save-Time: 3/6/17 11:30 AM
 Testcase-Type: ecl
 Verifications: _m9LPkKj7EeW6oYCgHZ503g,_rI-sMKj8EeW6oYCgHZ503g,_lJPcoLh5EeWzJthH3JoEWQ
 
@@ -18,7 +18,7 @@ Entry-Name: .content
 try -times 4 -delay 1000 -command{
 	get-view Problems | get-tree | get-item "Errors \\(8 items\\)" | get-property childCount | equals 8 | verify-true
 }
-//check of are 5 errors
+//check of are 8 errors
 with [get-view Problems | get-tree] {
     get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Invalid variable definition 'wrong var'. Unable to recognize variable type" | verify-true
@@ -39,10 +39,11 @@ with [get-view Problems | get-tree] {
         | equals "Unknown keyword 'kw from testSuite'" | verify-true
     get-item "Errors \\(8 items\\)" | get-property "getItemCount()" | equals 8 | verify-true
 }
-//open second red,xml
+//open second red.xml
 get-view "Project Explorer" | get-tree | select "SecondProject/red.xml" | double-click
 get-editor "SecondProject/red.xml" | get-tab-folder | get-tab-item Validation | click
-//open red.xml
+
+//open first red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item Validation | click
 
@@ -54,10 +55,11 @@ with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" |
     get-menu Exclude | get-property enablement | equals true | verify-true
 }
 
-//change exclude
+// exclude folder
 get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
     | select "RobotProject/folder_to_remove" | get-menu Exclude | click
     
+//check that now only option is to include    
 with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree] {
     get-menu Include | get-property enablement | equals true | verify-true
     get-menu Exclude | get-property enablement | equals false | verify-true
@@ -67,6 +69,8 @@ with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" |
 get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
     | select "RobotProject/folder_to_remove [excluded]" | get-menu Include | click
 wait 200
+
+//check menu
 with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree] {
     get-menu Include | get-property enablement | equals false | verify-true
     get-menu Exclude | get-property enablement | equals true | verify-true
@@ -77,8 +81,7 @@ with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" |
     select "RobotProject/folder_to_remove" | get-menu Exclude | click
 }
 
-//add exclude of folder inside folder
-//get-view "Project Explorer" | get-tree | select "RobotProject/red.xml"
+//add exclude of folder inside folder, empty fgolder, folder with no test
 with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree] {
     select "RobotProject/a/b/c1"  | get-menu Exclude | click
     select "RobotProject/a/b" | get-menu Exclude | click
@@ -88,6 +91,12 @@ with [get-editor "RobotProject/red.xml" | get-section "Excluded project parts" |
     select "RobotProject/suite folder with init" | get-menu Exclude | click
 }
 get-eclipse-window | key-type "M1+s"
+
+try -times 3 -delay 1000 -command{
+	get-view Problems | get-label ".* errors, 0 warnings, 0 others" | get-property caption 
+    | equals  "3 errors, 1 warning, 0 others"| verify-true
+	
+}
 
 //remove excluded file
 get-view "Project Explorer" | get-tree | select "RobotProject/folder_to_remove [excluded]" | get-menu Delete | click
