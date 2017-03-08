@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -35,6 +34,8 @@ public class ScriptRobotLaunchConfiguration extends RobotLaunchConfiguration
         implements IRemoteRobotLaunchConfiguration {
 
     public static final String TYPE_ID = "org.robotframework.ide.scriptRobotLaunchConfiguration";
+
+    private static final String REMOTE_AGENT = "Remote agent";
 
     private static final String REMOTE_HOST_ATTRIBUTE = "Remote host";
 
@@ -96,6 +97,7 @@ public class ScriptRobotLaunchConfiguration extends RobotLaunchConfiguration
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         setScriptPath(preferences.getLaunchScriptPath());
         setScriptArguments(preferences.getLaunchAdditionalScriptArguments());
+        setRemoteAgentValue(String.valueOf(preferences.isLaunchRemoteEnabled()));
         setRemoteHostValue(preferences.getLaunchRemoteHost());
         setRemotePortValue(preferences.getLaunchRemotePort());
         setRemoteTimeoutValue(preferences.getLaunchRemoteTimeout());
@@ -108,37 +110,39 @@ public class ScriptRobotLaunchConfiguration extends RobotLaunchConfiguration
     }
 
     @Override
-    public Optional<String> getRemoteHost() throws CoreException {
-        final String host = getRemoteHostValue();
-        return Optional.of(host).filter(h -> !h.isEmpty());
+    public boolean isRemoteAgent() throws CoreException {
+        return Boolean.valueOf(configuration.getAttribute(REMOTE_AGENT, "false"));
     }
 
     @Override
-    public Optional<Integer> getRemotePort() throws CoreException {
-        final String port = getRemotePortValue();
-        if (port.isEmpty()) {
-            return Optional.empty();
+    public String getRemoteHost() throws CoreException {
+        final String host = getRemoteHostValue();
+        if (host.isEmpty()) {
+            throw newCoreException("Server IP cannot be empty");
         }
+        return host;
+    }
+
+    @Override
+    public int getRemotePort() throws CoreException {
+        final String port = getRemotePortValue();
         final Integer portAsInt = Ints.tryParse(port);
         if (portAsInt == null || !Range.closed(1, MAX_PORT).contains(portAsInt)) {
             throw newCoreException(
                     String.format("Server port '%s' must be an Integer between 1 and %,d", port, MAX_PORT));
         }
-        return Optional.of(portAsInt);
+        return portAsInt;
     }
 
     @Override
-    public Optional<Integer> getRemoteTimeout() throws CoreException {
+    public int getRemoteTimeout() throws CoreException {
         final String timeout = getRemoteTimeoutValue();
-        if (timeout.isEmpty()) {
-            return Optional.empty();
-        }
         final Integer timeoutAsInt = Ints.tryParse(timeout);
         if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
             throw newCoreException(String.format("Connection timeout '%s' must be an Integer between 1 and %,d",
                     timeout, MAX_TIMEOUT));
         }
-        return Optional.of(timeoutAsInt);
+        return timeoutAsInt;
     }
 
     @Override
@@ -154,6 +158,12 @@ public class ScriptRobotLaunchConfiguration extends RobotLaunchConfiguration
     @Override
     public String getRemoteTimeoutValue() throws CoreException {
         return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "");
+    }
+
+    @Override
+    public void setRemoteAgentValue(final String isRemote) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(REMOTE_AGENT, isRemote);
     }
 
     @Override

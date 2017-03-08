@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -43,6 +44,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSyntaxColoringPreferences(preferences);
         initializeAutodiscoveringPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
+        initializeDefaultLaunchConfigurationPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -116,6 +118,14 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         for (final ProblemCategory category : EnumSet.allOf(ProblemCategory.class)) {
             preferences.put(category.getId(), category.getDefaultSeverity().name());
         }
+    }
+
+    private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.LAUNCH_REMOTE_ENABLED, false);
+        preferences.put(RedPreferences.LAUNCH_REMOTE_HOST, AgentConnectionServer.DEFAULT_CLIENT_HOST);
+        preferences.putInt(RedPreferences.LAUNCH_REMOTE_PORT, AgentConnectionServer.findFreePort());
+        preferences.putInt(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
+                AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT);
     }
 
     static String getFontStyleIdentifierFor(final SyntaxHighlightingCategory category) {

@@ -9,10 +9,15 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
@@ -20,10 +25,21 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
 
 public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage {
+
+    private Group remoteGroup;
+
+    private Button enableRemoteBtn;
+
+    private StringFieldEditor remoteHost;
+
+    private IntegerFieldEditor remotePort;
+
+    private IntegerFieldEditor remoteTimeout;
 
     public DefaultLaunchConfigurationPreferencePage() {
         super(DefaultLaunchConfigurationPreferencePage.GRID);
@@ -65,25 +81,53 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
     }
 
     private void createRemoteRobotLaunchConfiguration(final Composite parent) {
-        final Group group = new Group(parent, SWT.NONE);
-        group.setText("Remote tab");
-        GridLayoutFactory.fillDefaults().applyTo(group);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(group);
+        remoteGroup = new Group(parent, SWT.NONE);
+        remoteGroup.setText("Remote tab");
+        GridLayoutFactory.fillDefaults().applyTo(remoteGroup);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(remoteGroup);
 
-        final StringFieldEditor remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_REMOTE_HOST, "Local IP:",
-                group);
+        final BooleanFieldEditor enableRemote = new BooleanFieldEditor(RedPreferences.LAUNCH_REMOTE_ENABLED,
+                "Enable remote values", remoteGroup);
+        enableRemote.load();
+        addField(enableRemote);
+
+        enableRemoteBtn = (Button) enableRemote.getDescriptionControl(remoteGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).applyTo(enableRemoteBtn);
+
+        remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_REMOTE_HOST, "Local IP:", remoteGroup);
+        remoteHost.setEmptyStringAllowed(false);
+        remoteHost.setErrorMessage("Server IP cannot be empty");
         remoteHost.load();
         addField(remoteHost);
 
-        final StringFieldEditor remotePort = new StringFieldEditor(RedPreferences.LAUNCH_REMOTE_PORT, "Local port:",
-                group);
+        remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_PORT, "Local port:", remoteGroup);
+        remotePort.setValidRange(1, IRemoteRobotLaunchConfiguration.MAX_PORT);
         remotePort.load();
         addField(remotePort);
 
-        final StringFieldEditor remoteTimeout = new StringFieldEditor(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
-                "Connection timeout [s]:", group);
+        remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "Connection timeout [s]:",
+                remoteGroup);
+        remoteTimeout.setValidRange(1, IRemoteRobotLaunchConfiguration.MAX_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);
+
+        enableRemoteBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+
+                updateRemoteGroupState();
+            }
+        });
+        enableRemoteBtn.setSelection(RedPlugin.getDefault().getPreferences().isLaunchRemoteEnabled());
+        updateRemoteGroupState();
+    }
+
+    private void updateRemoteGroupState() {
+        final boolean enabled = enableRemoteBtn.getSelection();
+        remotePort.setEnabled(enabled, remoteGroup);
+        remoteTimeout.setEnabled(enabled, remoteGroup);
+        remoteHost.setEnabled(enabled, remoteGroup);
     }
 
     private void createScriptRobotLaunchConfiguration(final Composite parent) {
@@ -105,6 +149,12 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         addField(additionalScriptArguments);
 
         GridDataFactory.fillDefaults().span(2, 1).applyTo(scriptPathEditor.getLabelControl(group));
+    }
+
+    @Override
+    protected void performDefaults() {
+        super.performDefaults();
+        updateRemoteGroupState();
     }
 
 }

@@ -27,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfiguratio
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
-
 class RemoteLaunchInDebugMode {
 
     private final RobotTestsLaunch testsLaunchContext;
@@ -40,13 +39,15 @@ class RemoteLaunchInDebugMode {
 
         new LaunchConfigurationsValidator().validate(robotConfig);
 
-        final String host = robotConfig.getRemoteHost().orElse(AgentConnectionServer.DEFAULT_CLIENT_HOST);
-        final int port = robotConfig.getRemotePort().orElseGet(AgentConnectionServer::findFreePort);
+        final String host = robotConfig.isRemoteAgent() ? robotConfig.getRemoteHost()
+                : AgentConnectionServer.DEFAULT_CLIENT_HOST;
+        final int port = robotConfig.isRemoteAgent() ? robotConfig.getRemotePort()
+                : AgentConnectionServer.findFreePort();
         if (port < 0) {
             throw newCoreException("Unable to find free port");
         }
-        final int timeout = robotConfig.getRemoteTimeout()
-                .orElse(AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT);
+        final int timeout = robotConfig.isRemoteAgent() ? robotConfig.getRemoteTimeout()
+                : AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
 
         final AgentServerKeepAlive keepAliveListener = new AgentServerKeepAlive();
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.DEBUG);
