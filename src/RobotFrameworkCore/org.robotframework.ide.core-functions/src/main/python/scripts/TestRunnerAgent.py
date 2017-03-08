@@ -50,6 +50,7 @@ import threading
 import inspect
 import copy
 import json
+from time import sleep
 
 if sys.version_info < (3, 0, 0):
     import SocketServer as socketserver
@@ -121,7 +122,12 @@ class TestRunnerAgent:
     If called with two, the first is a hostname, the second is a port
     """
     ROBOT_LISTENER_API_VERSION = 2
+    
+    CONNECTION_TRIALS = 5
+    CONNECTION_SLEEP_BETWEEN_TRIALS = 2
+    
     RED_AGENT_PROTOCOL_VERSION = 1
+    
     MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
 
     def __init__(self, *args):
@@ -407,16 +413,24 @@ class TestRunnerAgent:
 
     def _connect(self):
         '''Establish a connection for sending data'''
-        try:
-            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.sock.connect((self.host, self.port))
-            self.decoder_encoder = MessagesDecoderEncoder(self.sock)
-            return True
-        except socket.error as e:
-            print('TestRunnerAgent: unable to open socket to "%s:%s" error: %s' % (self.host, self.port, str(e)))
-            self.sock = None
-            self.decoder_encoder = None
-            return False
+        trials = 0
+        
+        while trials < self.CONNECTION_TRIALS:
+            print('TestRunnerAgent: connecting (%s of %s)' % (trials + 1, self.CONNECTION_TRIALS))
+            try:
+                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.sock.connect((self.host, self.port))
+                self.decoder_encoder = MessagesDecoderEncoder(self.sock)
+                print('TestRunnerAgent: connection established')
+                return True
+            except socket.error as e:
+                print('TestRunnerAgent: unable to open socket to "%s:%s"\n\terror: %s' % (self.host, self.port, str(e)))
+                self.sock = None
+                self.decoder_encoder = None
+                sleep(self.CONNECTION_SLEEP_BETWEEN_TRIALS)
+            trials += 1
+        print('TestRunnerAgent: no connection established. Running the tests')
+        return False
 
     def _send_to_server(self, name, *args):
         try:
