@@ -76,9 +76,13 @@ public class AgentConnectionServerJob extends Job {
         return this;
     }
 
-    public void stopServer() throws IOException {
+    public void stopServer() {
         if (agentServer != null) {
-            agentServer.stop();
+            try {
+                agentServer.stop();
+            } catch (final IOException e) {
+                throw new IllegalStateException("Unable to stop server", e);
+            }
         }
     }
 
