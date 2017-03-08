@@ -84,9 +84,10 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
-        assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
-        assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
-        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
+        assertThat(robotConfig.isRemoteAgent()).isFalse();
+        assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getRemotePort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
     }
 
     @Test
@@ -114,9 +115,10 @@ public class ScriptRobotLaunchConfigurationTest {
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
-        assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
-        assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
-        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
+        assertThat(robotConfig.isRemoteAgent()).isFalse();
+        assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getRemotePort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
     }
 
     @Test
@@ -126,17 +128,23 @@ public class ScriptRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void whenServerIpIsEmpty_emptyOptionalIsReturned() throws CoreException {
+    public void whenServerIpIsEmpty_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Server IP cannot be empty");
+
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemoteHostValue("");
-        assertThat(robotConfig.getRemoteHost().isPresent()).isFalse();
+        robotConfig.getRemoteHost();
     }
 
     @Test
-    public void whenPortIsEmpty_emptyOptionalIsReturned() throws CoreException {
+    public void whenPortIsEmpty_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Server port '' must be an Integer between 1 and 65,535");
+
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemotePortValue("");
-        assertThat(robotConfig.getRemotePort().isPresent()).isFalse();
+        robotConfig.getRemotePort();
     }
 
     @Test
@@ -170,10 +178,13 @@ public class ScriptRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void whenTimeoutIsEmpty_emptyOptionalIsReturned() throws CoreException {
+    public void whenTimeoutIsEmpty_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600");
+
         final ScriptRobotLaunchConfiguration robotConfig = getDefaultScriptRobotLaunchConfiguration();
         robotConfig.setRemoteTimeoutValue("");
-        assertThat(robotConfig.getRemoteTimeout().isPresent()).isFalse();
+        robotConfig.getRemoteTimeout();
     }
 
     @Test

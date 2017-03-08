@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -240,6 +241,19 @@ public class RobotLaunchConfigurationTest {
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
         assertThat(robotConfig.getExecutorArguments()).isEqualTo("-R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
+    }
+
+    @Test
+    public void projectIsReturned_whenAskedForResourcesUnderDebug() throws CoreException {
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        robotConfig.setSuitePaths(Collections.emptyMap());
+        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(project);
+    }
+
+    @Test
+    public void resourcesAreReturned_whenAskedForResourcesUnderDebug() throws CoreException {
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(project.getFile("Resource"));
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {

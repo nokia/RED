@@ -60,11 +60,13 @@ public class RedPreferences {
 
     public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
 
-    public static final String LAUNCH_REMOTE_HOST = "red.launch.host";
+    public static final String LAUNCH_REMOTE_ENABLED = "red.launch.remote.enabled";
 
-    public static final String LAUNCH_REMOTE_PORT = "red.launch.port";
+    public static final String LAUNCH_REMOTE_HOST = "red.launch.remote.host";
 
-    public static final String LAUNCH_REMOTE_TIMEOUT = "red.launch.timeout";
+    public static final String LAUNCH_REMOTE_PORT = "red.launch.remote.port";
+
+    public static final String LAUNCH_REMOTE_TIMEOUT = "red.launch.remote.timeout";
 
     public static final String LAUNCH_SCRIPT_PATH = "red.launch.scriptPath";
 
@@ -183,6 +185,10 @@ public class RedPreferences {
 
     public String getLaunchAdditionalRobotArguments() {
         return store.getString(LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS);
+    }
+
+    public boolean isLaunchRemoteEnabled() {
+        return store.getBoolean(LAUNCH_REMOTE_ENABLED);
     }
 
     public String getLaunchRemoteHost() {

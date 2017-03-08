@@ -122,7 +122,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     private void createExecutorScriptGroup(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
-        group.setText("Executor Script");
+        group.setText("Executable file");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
@@ -135,7 +135,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         }, ScriptRobotLaunchConfiguration.getSystemDependentScriptExtensions());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorScriptComposite);
 
-        scriptArgumentsText = createLabeledText(group, "Additional script arguments:");
+        scriptArgumentsText = createLabeledText(group, "Additional executable file arguments:");
     }
 
     private Text createLabeledText(final Composite parent, final String label) {
