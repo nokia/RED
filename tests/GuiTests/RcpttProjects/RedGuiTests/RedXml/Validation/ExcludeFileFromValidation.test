@@ -7,13 +7,21 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ErbYMPglEea7hL0QdGOb6w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/2/17 11:45 AM
+Save-Time: 3/6/17 11:20 AM
 Testcase-Type: ecl
 Verifications: _kIYBEPhCEea7hL0QdGOb6w
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+proc "wait-for-errors"[val amount]{
+	try -times 3 -delay 1000 -command{
+		get-view Problems | get-label ".* errors, 0 warnings, 0 others" | get-property caption 
+	    | equals [format "%s errors, 0 warnings, 0 others"  $amount ]| verify-true
+		
+	}
+}
 
 //select 2 files from 2 projects
 with [get-view "Project Explorer" | get-tree] {
@@ -29,10 +37,7 @@ get-editor "SecondProject/red.xml" | get-section "Excluded project parts" | get-
     | select "SecondProject/test/file_with_error.robot [excluded]"
 
 //check if are 6 errors
-try -times 4 -delay 1000 -command{        
-	get-view Problems | get-label "6 errors, 0 warnings, 0 others" | get-property caption 
-	    | equals "6 errors, 0 warnings, 0 others" | verify-true
-}	    
+wait-for-errors -amount 6    
 
 //exclude one file from PE
 with [get-view "Project Explorer" | get-tree] {
@@ -43,11 +48,18 @@ with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/red.xml" | double-click
 }
 
+wait-for-loading-red-xml -editor_name "RobotProject/red.xml" 
+
+//check if are 5 errors
+wait-for-errors -amount 5
+
 //exclude from red.xml
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item Validation | click
 get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
     | select "RobotProject/TestSuiteFolder/with_init.tsv" | get-menu Exclude | click
 get-button "Save (M1+S)" | click
+
+wait-for-errors -amount 4
 
 //expand
 with [get-view "Project Explorer" | get-tree] {
@@ -89,17 +101,20 @@ with [get-view "Project Explorer" | get-tree] {
 }
 
 
-//Include 2 files that was excluded
+//Include 2 files that was excluded (from PE)
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/single test/test1.tsv [excluded]" "RobotProject/TestSuiteFolder/with_init.tsv [excluded]"
     get-menu "Robot Framework/Include for validation" | click
 }
+
+wait-for-errors -amount 6
 
 //include file from red.xml
 get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
     | select "RobotProject/folder_to_remove/file_to_remove.robot [excluded]" | get-menu Include | click
 get-button "Save (M1+S)" | click
 
+wait-for-errors -amount 7
 
 //exclude file that will be removed
 get-view "Project Explorer" | get-tree | select "RobotProject/a/b/c1/tsv_test.tsv" 
@@ -197,4 +212,5 @@ with [get-view "Project Explorer" | get-tree] {
     get-item RobotProject | get-property "getItems().TreeItem[9].getText()" | equals "red.xml [excluded]" | verify-true
     get-item RobotProject | get-property "getItems().TreeItem[10].getText()" | equals "TestFile.robot" | verify-true
 }
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
