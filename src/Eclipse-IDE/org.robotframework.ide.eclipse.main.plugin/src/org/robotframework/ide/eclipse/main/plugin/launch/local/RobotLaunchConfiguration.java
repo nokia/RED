@@ -160,7 +160,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     public SuiteExecutor getExecutor() throws CoreException {
-        return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
+        try {
+            return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
+        } catch (final IllegalArgumentException e) {
+            return null;
+        }
     }
 
     public String getExecutorArguments() throws CoreException {

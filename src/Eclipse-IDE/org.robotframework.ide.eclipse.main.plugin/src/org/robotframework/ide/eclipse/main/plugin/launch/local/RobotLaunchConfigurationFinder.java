@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
@@ -152,7 +153,7 @@ public class RobotLaunchConfigurationFinder {
             throws CoreException {
         final RobotLaunchConfiguration rConfig1 = new RobotLaunchConfiguration(config1);
         final RobotLaunchConfiguration rConfig2 = new RobotLaunchConfiguration(config2);
-        return rConfig1.getExecutor().equals(rConfig2.getExecutor())
+        return Objects.equals(rConfig1.getExecutor(), rConfig2.getExecutor())
                 && rConfig1.getExecutorArguments().equals(rConfig2.getExecutorArguments())
                 && rConfig1.getProjectName().equals(rConfig2.getProjectName())
                 && rConfig1.isUsingInterpreterFromProject() == rConfig2.isUsingInterpreterFromProject()
