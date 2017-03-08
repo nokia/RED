@@ -408,28 +408,27 @@ class TestRunnerAgent:
             self.sock = None
 
     def _print_error_message(self, message):
-        sys.stderr.write('\n[ ERROR ] ' + message)
+        sys.stderr.write('[ ERROR ] ' + message + '\n')
         sys.stderr.flush()
 
     def _connect(self):
         '''Establish a connection for sending data'''
-        trials = 0
+        trials = 1
         
-        while trials < self.CONNECTION_TRIALS:
-            print('TestRunnerAgent: connecting (%s of %s)' % (trials + 1, self.CONNECTION_TRIALS))
+        while trials <= self.CONNECTION_TRIALS:
             try:
                 self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.sock.connect((self.host, self.port))
                 self.decoder_encoder = MessagesDecoderEncoder(self.sock)
-                print('TestRunnerAgent: connection established')
                 return True
             except socket.error as e:
-                print('TestRunnerAgent: unable to open socket to "%s:%s"\n\terror: %s' % (self.host, self.port, str(e)))
+                print('TestRunnerAgent: connection trial failed (%s of %s)' % (trials, self.CONNECTION_TRIALS))
+                print('\tUnable to open socket to "%s:%s"'  % (self.host, self.port))
+                print('\terror: %s' % str(e))
                 self.sock = None
                 self.decoder_encoder = None
                 sleep(self.CONNECTION_SLEEP_BETWEEN_TRIALS)
             trials += 1
-        print('TestRunnerAgent: no connection established. Running the tests')
         return False
 
     def _send_to_server(self, name, *args):
