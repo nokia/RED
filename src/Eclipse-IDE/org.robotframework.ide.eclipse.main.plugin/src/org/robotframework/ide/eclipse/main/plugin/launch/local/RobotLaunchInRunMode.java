@@ -58,6 +58,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         try {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
                     .withConnectionTimeout(timeout, TimeUnit.SECONDS)
+                    .serverStatusHandledBy(new ServerProblemsHandler())
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
