@@ -78,13 +78,8 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
 
             final Process process = execProcess(cmdLine, robotConfig);
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, process, processLabel);
-            robotProcess.onTerminate(() -> {
-                try {
-                    job.stopServer();
-                } catch (final IOException e) {
-                    e.printStackTrace();
-                }
-            });
+
+            robotProcess.onTerminate(() -> job.stopServer());
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
