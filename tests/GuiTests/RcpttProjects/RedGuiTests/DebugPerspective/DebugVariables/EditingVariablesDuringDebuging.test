@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z2XpsP28EeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/2/17 8:29 AM
+Save-Time: 3/8/17 12:24 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -144,22 +144,26 @@ exec-with-options -disableJobWaiting -command {
 	    click
 	    wait 500
 	    click
+	    wait 1000
 	}
-	move-focus-up
+	get-view Variables | maximize
+	wait 500
 	//change value in list to empty
 	change-value -var_name "&{browsers}/chrome" -value ""
+	get-view Variables | restore
 	
 	with [get-button "Step Into (F5)"] {
 	    click
 	    wait 500
 	    click
 	}
-	move-focus-up
+	get-view Variables | maximize
 	//change vlaue of creted var in test
 	change-value -var_name"${new}" -value "animal"
-
+	get-view Variables | restore
+	
 	get-button "Step Into (F5)" | click
-	move-focus-up
+	get-view Variables | maximize
 	
 	//check if dict cretaed by command has updated value from param
 	with [get-view Variables | get-tree] {
@@ -196,6 +200,7 @@ exec-with-options -disableJobWaiting -command {
 	    
 	    get-item "${example}" | get-property "values['Value']" | equals "var form arg" | verify-true
 	}
+	get-view Variables | restore
 	get-button "Resume (F8)" | click
 
 }
@@ -216,4 +221,5 @@ get-view "Message Log" | get-editbox | get-property text | matches "Starting tes
     + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : &\{abc\} = \{ 1=\"abba\" \| var=1  2  \}\n"
     + "\d{8} (\d\d:){2}\d\d\.\d\d\d : INFO : animal\n"
     + "Ending test: RobotProject.TestFile.test" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
