@@ -16,23 +16,18 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 
 public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
-    private final RobotEventBroker robotEventBroker;
     private final RobotTestExecutionService executionService;
 
     public RemoteRobotLaunchConfigurationDelegate() {
-        this.robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
         this.executionService = RedPlugin.getTestExecutionService();
     }
 
@@ -49,7 +44,6 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
         try {
             final RobotTestsLaunch testsLaunchContext = executionService.testExecutionStarting();
 
-            robotEventBroker.sendClearEventToExecutionView();
             doLaunch(configuration, mode, launch, testsLaunchContext, monitor);
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
@@ -65,10 +59,10 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(configuration);
 
         if (ILaunchManager.RUN_MODE.equals(mode)) {
-            new RemoteLaunchInRunMode(robotEventBroker, testsLaunchContext).launch(robotConfig, launch);
+            new RemoteLaunchInRunMode(testsLaunchContext).launch(robotConfig, launch);
 
         } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-            new RemoteLaunchInDebugMode(robotEventBroker, testsLaunchContext).launch(robotConfig, launch);
+            new RemoteLaunchInDebugMode(testsLaunchContext).launch(robotConfig, launch);
         }
     }
 

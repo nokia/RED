@@ -19,23 +19,19 @@ import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
-import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
 class RobotLaunchInRunMode extends RobotLaunchInMode {
 
-    private final RobotEventBroker robotEventBroker;
-
     private final RobotTestsLaunch testsLaunchContext;
 
-    RobotLaunchInRunMode(final RobotEventBroker robotEventBroker, final RobotTestsLaunch testsLaunchContext) {
-        this.robotEventBroker = robotEventBroker;
+    RobotLaunchInRunMode(final RobotTestsLaunch testsLaunchContext) {
         this.testsLaunchContext = testsLaunchContext;
     }
 
@@ -61,7 +57,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
                     .serverStatusHandledBy(new ServerProblemsHandler())
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
-                    .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
+                    .agentEventsListenedBy(new ExecutionElementsTracker(testsLaunchContext))
                     .agentEventsListenedBy(new AgentServerKeepAlive())
                     .start()
                     .waitForServer();

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch;
+package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import java.io.File;
 
@@ -11,27 +11,35 @@ import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.ExecutionElementsFactory;
 import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.Status;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 
-public class ExecutionTrackerForExecutionView extends RobotDefaultAgentEventListener {
+public class ExecutionElementsTracker extends RobotDefaultAgentEventListener {
 
-    private final RobotEventBroker robotEventBroker;
+    private final RobotTestsLaunch testsLaunchContext;
 
-    public ExecutionTrackerForExecutionView(final RobotEventBroker robotEventBroker) {
-        this.robotEventBroker = robotEventBroker;
+    public ExecutionElementsTracker(final RobotTestsLaunch testsLaunchContext) {
+        this.testsLaunchContext = testsLaunchContext;
+    }
+
+    @Override
+    public void handleAgentInitializing() {
+        testsLaunchContext.getExecutionData(ExecutionElementsStore.class, () -> new ExecutionElementsStore());
     }
 
     @Override
     public void handleOutputFile(final File outputFilepath) {
         final ExecutionElement execElement = ExecutionElementsFactory.createOutputFileExecutionElement(outputFilepath);
-        robotEventBroker.sendExecutionEventToExecutionView(execElement);
+        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
+                .ifPresent(store -> store.addElement(execElement));
     }
 
     @Override
     public void handleSuiteStarted(final String suiteName, final File suiteFilePath) {
         final ExecutionElement execElement = ExecutionElementsFactory.createStartSuiteExecutionElement(suiteName,
                 suiteFilePath);
-        robotEventBroker.sendExecutionEventToExecutionView(execElement);
+        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
+                .ifPresent(store -> store.addElement(execElement));
     }
 
     @Override
@@ -39,13 +47,15 @@ public class ExecutionTrackerForExecutionView extends RobotDefaultAgentEventList
             final String errorMessage) {
         final ExecutionElement execElement = ExecutionElementsFactory.createEndSuiteExecutionElement(suiteName,
                 elapsedTime, errorMessage, status);
-        robotEventBroker.sendExecutionEventToExecutionView(execElement);
+        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
+                .ifPresent(store -> store.addElement(execElement));
     }
 
     @Override
     public void handleTestStarted(final String testCaseName, final String testCaseLongName) {
         final ExecutionElement execElement = ExecutionElementsFactory.createStartTestExecutionElement(testCaseName);
-        robotEventBroker.sendExecutionEventToExecutionView(execElement);
+        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
+                .ifPresent(store -> store.addElement(execElement));
     }
 
     @Override
@@ -53,6 +63,7 @@ public class ExecutionTrackerForExecutionView extends RobotDefaultAgentEventList
             final Status status, final String errorMessage) {
         final ExecutionElement execElement = ExecutionElementsFactory.createEndTestExecutionElement(testCaseName,
                 elapsedTime, errorMessage, status);
-        robotEventBroker.sendExecutionEventToExecutionView(execElement);
+        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
+                .ifPresent(store -> store.addElement(execElement));
     }
 }
