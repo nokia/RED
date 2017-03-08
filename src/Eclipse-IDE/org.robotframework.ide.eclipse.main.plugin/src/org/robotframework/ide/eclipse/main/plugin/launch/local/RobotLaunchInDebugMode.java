@@ -62,6 +62,7 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
         try {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
                     .withConnectionTimeout(timeout, TimeUnit.SECONDS)
+                    .serverStatusHandledBy(new ServerProblemsHandler())
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(
                             new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
