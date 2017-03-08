@@ -62,20 +62,21 @@ class RemoteLaunchInDebugMode {
             final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
                     .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                     .serverStatusHandledBy(remoteConnectionStatusTracker)
-                    .agentEventsListenedBy(keepAliveListener)
                     .agentEventsListenedBy(testsStarter)
                     .agentEventsListenedBy(remoteConnectionStatusTracker)
                     .agentEventsListenedBy(
                             new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
                     .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
                     .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
+                    .agentEventsListenedBy(keepAliveListener)
                     .start()
                     .waitForServer();
 
             final String processLabel = "TCP connection using " + host + "@" + port;
             final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, null, processLabel);
 
-            TestsExecutionTerminationSupport.installTerminationSupport(job, keepAliveListener, robotProcess);
+            robotProcess.onTerminate(() -> job.stopServer());
+            TestsExecutionTerminationSupport.installTerminationSupport(job, robotProcess);
 
             final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
             remoteConnectionStatusTracker.startTrackingInto(redConsole);
