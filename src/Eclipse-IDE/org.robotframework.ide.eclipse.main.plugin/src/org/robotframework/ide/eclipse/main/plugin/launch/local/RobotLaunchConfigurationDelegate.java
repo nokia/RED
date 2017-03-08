@@ -17,23 +17,17 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
-import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate {
 
-    private final RobotEventBroker robotEventBroker;
-
     private final RobotTestExecutionService executionService;
 
     public RobotLaunchConfigurationDelegate() {
-        this.robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
         this.executionService = RedPlugin.getTestExecutionService();
     }
 
@@ -57,7 +51,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         try {
             final RobotTestsLaunch testsLaunchContext = executionService.testExecutionStarting();
 
-            robotEventBroker.sendClearEventToExecutionView();
             doLaunch(configuration, mode, launch, testsLaunchContext, monitor);
             saveConfiguration(configuration);
         } catch (final IOException e) {
@@ -93,10 +86,10 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
         RobotLaunchInMode launchMode = null;
         if (ILaunchManager.RUN_MODE.equals(mode)) {
-            launchMode = new RobotLaunchInRunMode(robotEventBroker, testsLaunchContext);
+            launchMode = new RobotLaunchInRunMode(testsLaunchContext);
 
         } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-            launchMode = new RobotLaunchInDebugMode(robotEventBroker, testsLaunchContext);
+            launchMode = new RobotLaunchInDebugMode(testsLaunchContext);
         }
         launchMode.launch(robotConfig, launch, monitor);
     }

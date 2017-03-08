@@ -21,23 +21,19 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.DebugExecutionEventsListener;
-import org.robotframework.ide.eclipse.main.plugin.launch.ExecutionTrackerForExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
 class RobotLaunchInDebugMode extends RobotLaunchInMode {
 
-    private final RobotEventBroker robotEventBroker;
-
     private final RobotTestsLaunch testsLaunchContext;
 
-    public RobotLaunchInDebugMode(final RobotEventBroker robotEventBroker, final RobotTestsLaunch testsLaunchContext) {
-        this.robotEventBroker = robotEventBroker;
+    public RobotLaunchInDebugMode(final RobotTestsLaunch testsLaunchContext) {
         this.testsLaunchContext = testsLaunchContext;
     }
 
@@ -67,7 +63,7 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
                     .agentEventsListenedBy(
                             new DebugExecutionEventsListener(debugTarget, robotConfig.getResourcesUnderDebug()))
                     .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
-                    .agentEventsListenedBy(new ExecutionTrackerForExecutionView(robotEventBroker))
+                    .agentEventsListenedBy(new ExecutionElementsTracker(testsLaunchContext))
                     .agentEventsListenedBy(new AgentServerKeepAlive())
                     .start()
                     .waitForServer();
