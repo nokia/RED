@@ -202,7 +202,7 @@ public class RunCommandLineCallBuilder {
             if (!executableScriptPath.isEmpty()) {
                 cmdLine.add(executableScriptPath);
                 if (!executableScriptArgs.isEmpty()) {
-                    cmdLine.add(executableScriptArgs);
+                    cmdLine.addAll(convertArguments(executableScriptArgs));
                 }
             }
             cmdLine.add(executorPath);
@@ -215,7 +215,7 @@ public class RunCommandLineCallBuilder {
                 cmdLine.add(classPath());
             }
             if (!interpreterUserArgs.isEmpty()) {
-                cmdLine.add(interpreterUserArgs);
+                cmdLine.addAll(convertArguments(interpreterUserArgs));
             }
             cmdLine.add("-m");
             cmdLine.add("robot.run");
@@ -243,14 +243,17 @@ public class RunCommandLineCallBuilder {
             cmdLine.addAll(suitesToRun);
             cmdLine.addAll(testsToRun);
             if (!robotUserArgs.isEmpty()) {
-                cmdLine.addAll(ArgumentsConverter
-                        .fromJavaArgsToPythonLike(ArgumentsConverter.convertToJavaMainLikeArgs(robotUserArgs)));
+                cmdLine.addAll(convertArguments(robotUserArgs));
             }
             cmdLine.add(project.getAbsolutePath());
             for (final String projectLocation : additionalProjectsLocations) {
                 cmdLine.add(projectLocation);
             }
             return new RunCommandLine(cmdLine);
+        }
+
+        private List<String> convertArguments(final String args) {
+            return ArgumentsConverter.fromJavaArgsToPythonLike(ArgumentsConverter.convertToJavaMainLikeArgs(args));
         }
 
         private String classPath() {
