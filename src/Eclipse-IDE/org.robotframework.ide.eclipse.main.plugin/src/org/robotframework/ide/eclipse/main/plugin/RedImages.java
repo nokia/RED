@@ -96,7 +96,7 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/variable.png");
     }
 
-    public static ImageDescriptor getRobotUknownVariableImage() {
+    public static ImageDescriptor getRobotUnknownVariableImage() {
         return RedPlugin.getImageDescriptor("resources/variable_unknown.png");
     }
 
@@ -384,7 +384,7 @@ public class RedImages {
      * @param descriptor
      * @return Gray version of image from parameter.
      */
-    public static ImageDescriptor getGreyedImage(final ImageDescriptor descriptor) {
+    public static ImageDescriptor getGrayedImage(final ImageDescriptor descriptor) {
         if (descriptor == null) {
             return null;
         }

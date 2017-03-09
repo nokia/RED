@@ -73,7 +73,7 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
 
         final ImageDescriptor keywordImage = RedImages.getUserKeywordImage();
         final Image imageToUse = ImagesManager
-                .getImage(isEditable ? keywordImage : RedImages.getGreyedImage(keywordImage));
+                .getImage(isEditable ? keywordImage : RedImages.getGrayedImage(keywordImage));
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new InactiveCellPainter(),
                 DisplayMode.NORMAL, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
