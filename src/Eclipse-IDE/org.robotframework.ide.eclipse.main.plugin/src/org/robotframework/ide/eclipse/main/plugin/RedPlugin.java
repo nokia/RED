@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,7 +32,7 @@ public class RedPlugin extends AbstractUIPlugin {
 
     public static final String DETAILS_EDITING_CONTEXT_ID = "org.robotframework.ide.eclipse.details.context";
 
-	public static final String PLUGIN_ID = "org.robotframework.ide.eclipse.main.plugin";
+    public static final String PLUGIN_ID = "org.robotframework.ide.eclipse.main.plugin";
 
     private static RedPlugin plugin;
 
@@ -115,6 +116,14 @@ public class RedPlugin extends AbstractUIPlugin {
         getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, cause));
     }
 
+    public static CoreException newCoreException(final String message) {
+        return new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, message));
+    }
+
+    public static CoreException newCoreException(final String message, final Throwable cause) {
+        return new CoreException(new Status(IStatus.ERROR, PLUGIN_ID, message, cause));
+    }
+
     public static <T> T getAdapter(final Object adaptee, final Class<? extends T> adapterClass) {
         if (adapterClass.isInstance(adaptee)) {
             return adapterClass.cast(adaptee);
@@ -124,10 +133,11 @@ public class RedPlugin extends AbstractUIPlugin {
             return null;
         }
     }
-    
+
     private static class RobotTestExecutionServiceManager {
 
         private static class InstanceHolder {
+
             private static final RobotTestExecutionServiceManager INSTANCE = new RobotTestExecutionServiceManager();
         }
 
@@ -136,7 +146,7 @@ public class RedPlugin extends AbstractUIPlugin {
         private static RobotTestExecutionServiceManager getInstance() {
             return InstanceHolder.INSTANCE;
         }
-        
+
         public void dispose() {
             this.service = new RobotTestExecutionService();
         }

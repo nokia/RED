@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.List;
 
@@ -88,8 +89,8 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
         final String timeout = getRemoteTimeoutValue();
         final Integer timeoutAsInt = Ints.tryParse(timeout);
         if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
-            throw newCoreException(String.format("Connection timeout '%s' must be an Integer between 1 and %,d",
-                    timeout, MAX_TIMEOUT));
+            throw newCoreException(String
+                    .format("Connection timeout '%s' must be an Integer between 1 and %,d", timeout, MAX_TIMEOUT));
         }
         return timeoutAsInt;
     }
