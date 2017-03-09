@@ -17,6 +17,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.rf.ide.core.execution.TestsMode;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
@@ -48,7 +49,7 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         try {
             final RobotTestsLaunch testsLaunchContext = executionService.testExecutionStarting();
 
-            doLaunch(configuration, mode, launch, testsLaunchContext, monitor);
+            doLaunch(configuration, getTestsMode(mode), launch, testsLaunchContext, monitor);
             // FIXME: saving should be moved to shortcuts
             saveConfiguration(configuration);
         } catch (final IOException e) {
@@ -58,8 +59,12 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         }
     }
 
-    protected abstract void doLaunch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
-            final RobotTestsLaunch testsLaunchContext, final IProgressMonitor monitor)
+    private static TestsMode getTestsMode(final String mode) {
+        return ILaunchManager.RUN_MODE.equals(mode) ? TestsMode.RUN : TestsMode.DEBUG;
+    }
+
+    protected abstract void doLaunch(final ILaunchConfiguration configuration, final TestsMode testsMode,
+            final ILaunch launch, final RobotTestsLaunch testsLaunchContext, final IProgressMonitor monitor)
             throws CoreException, IOException;
 
     private void saveConfiguration(final ILaunchConfiguration configuration) throws CoreException {

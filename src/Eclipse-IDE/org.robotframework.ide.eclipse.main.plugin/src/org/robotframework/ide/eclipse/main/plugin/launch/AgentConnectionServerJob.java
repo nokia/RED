@@ -123,6 +123,11 @@ public class AgentConnectionServerJob extends Job {
             return this;
         }
 
+        public AgentConnectionServerJobBuilder agentEventsListenedBy(final List<RobotAgentEventListener> listeners) {
+            agentEventListeners.addAll(listeners);
+            return this;
+        }
+
         public AgentConnectionServerJob createJob() {
             return new AgentConnectionServerJob(host, port, timeout, timeoutUnit, serverListeners, agentEventListeners);
         }
