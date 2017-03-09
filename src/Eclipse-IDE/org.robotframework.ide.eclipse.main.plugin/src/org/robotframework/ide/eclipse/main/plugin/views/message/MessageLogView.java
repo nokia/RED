@@ -66,7 +66,7 @@ public class MessageLogView {
         final ExecutionMessagesStoreListener storeListener = (store, msg) -> SwtThread.syncExec(() -> append(msg));
         executionListener = launch -> SwtThread.syncExec(() -> {
             final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class,
-                    () -> new ExecutionMessagesStore());
+                    ExecutionMessagesStore::new);
             store.addStoreListener(storeListener);
 
             styledText.setText("");

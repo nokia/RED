@@ -29,7 +29,7 @@ class ExecutionElementsStore implements IDisposable {
 
     synchronized void addElement(final ExecutionElement element) {
         elements.add(element);
-        listeners.stream().forEach(listener -> listener.storeChanged(this, element));
+        listeners.forEach(listener -> listener.storeChanged(this, element));
     }
 
     synchronized public List<ExecutionElement> getElements() {
