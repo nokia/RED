@@ -43,7 +43,7 @@ public class ExecutionMessagesTrackerTest {
     public void testStartMessageIsStored_whenThereIsAStoreDefined() {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch();
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
-                () -> new ExecutionMessagesStore());
+                ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.handleTestStarted("tc", "test_case");
@@ -59,7 +59,7 @@ public class ExecutionMessagesTrackerTest {
         tracker.handleTestStarted("tc", "test_case");
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
-                () -> new ExecutionMessagesStore());
+                ExecutionMessagesStore::new);
         assertThat(store.getMessage()).isEmpty();
     }
 
@@ -67,7 +67,7 @@ public class ExecutionMessagesTrackerTest {
     public void testEndMessageIsStored_whenThereIsAStoreDefined() {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch();
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
-                () -> new ExecutionMessagesStore());
+                ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.handleTestEnded("tc", "test_case", 100, Status.PASS, "");
@@ -83,7 +83,7 @@ public class ExecutionMessagesTrackerTest {
         tracker.handleTestEnded("tc", "test_case", 100, Status.PASS, "");
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
-                () -> new ExecutionMessagesStore());
+                ExecutionMessagesStore::new);
         assertThat(store.getMessage()).isEmpty();
     }
 
@@ -91,7 +91,7 @@ public class ExecutionMessagesTrackerTest {
     public void logMessageIsStored_whenThereIsAStoreDefined() {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch();
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
-                () -> new ExecutionMessagesStore());
+                ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.handleLogMessage("msg", LogLevel.INFO, "stamp");
@@ -107,7 +107,7 @@ public class ExecutionMessagesTrackerTest {
         tracker.handleLogMessage("msg", LogLevel.INFO, "stamp");
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
-                () -> new ExecutionMessagesStore());
+                ExecutionMessagesStore::new);
         assertThat(store.getMessage()).isEmpty();
     }
 

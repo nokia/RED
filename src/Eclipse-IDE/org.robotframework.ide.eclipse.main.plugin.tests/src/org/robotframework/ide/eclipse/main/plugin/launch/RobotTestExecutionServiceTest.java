@@ -53,7 +53,7 @@ public class RobotTestExecutionServiceTest {
         final RobotTestExecutionService service = new RobotTestExecutionService();
 
         final RobotTestsLaunch oldestLaunch = service.testExecutionStarting();
-        oldestLaunch.getExecutionData(ExecutionData.class, () -> new ExecutionData());
+        oldestLaunch.getExecutionData(ExecutionData.class, ExecutionData::new);
 
         for (int i = 0; i < RobotTestExecutionService.LAUNCHES_HISTORY_LIMIT; i++) {
             service.testExecutionStarting();
