@@ -31,12 +31,13 @@ class ServerProblemsHandler implements AgentServerStatusListener {
 
     @Override
     public void clientConnectionTimedOut(final SocketTimeoutException e) {
-        throw new RedServerException("Server error: timed out when waiting for agent connection", e);
+        // throw new RedServerException("Server error: timed out when waiting for agent connection",
+        // e);
     }
 
     @Override
     public void clientConnectionError(final IOException e) {
-        throw new RedServerException("Server error: problem connecting with agent", e);
+        // throw new RedServerException("Server error: problem connecting with agent", e);
     }
 
     @Override
