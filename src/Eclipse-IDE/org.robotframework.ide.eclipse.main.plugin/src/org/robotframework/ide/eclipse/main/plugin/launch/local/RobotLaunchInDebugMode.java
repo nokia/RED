@@ -45,6 +45,7 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
 
         final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
+        final String version = robotConfig.checkExecutorVersion(runtimeEnvironment);
 
         final String host = AgentConnectionServer.DEFAULT_CLIENT_HOST;
         final int port = AgentConnectionServer.findFreePort();
@@ -71,7 +72,6 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
                     .waitForServer();
 
             final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
-            final String version = robotConfig.createExecutorVersion(runtimeEnvironment);
 
             final RunCommandLine cmdLine = prepareCommandLine(robotConfig, port);
 
