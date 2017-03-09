@@ -11,22 +11,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchManager;
+import org.rf.ide.core.execution.TestsMode;
 import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 public class ScriptRobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigurationDelegate {
 
     @Override
-    protected void doLaunch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
+    protected void doLaunch(final ILaunchConfiguration configuration, final TestsMode testsMode, final ILaunch launch,
             final RobotTestsLaunch testsLaunchContext, final IProgressMonitor monitor)
             throws CoreException, IOException {
 
         final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
 
-        if (ILaunchManager.RUN_MODE.equals(mode)) {
+        if (testsMode == TestsMode.RUN) {
             new ScriptLaunchInRunMode(testsLaunchContext).launch(robotConfig, launch, monitor);
-        } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+        } else if (testsMode == TestsMode.DEBUG) {
             new ScriptLaunchInDebugMode(testsLaunchContext).launch(robotConfig, launch, monitor);
         }
     }
