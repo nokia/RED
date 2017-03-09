@@ -412,7 +412,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getExecutor().executableName();
     }
 
-    String createExecutorVersion(final RobotRuntimeEnvironment env) throws RobotEnvironmentException, CoreException {
+    String checkExecutorVersion(final RobotRuntimeEnvironment env) throws RobotEnvironmentException, CoreException {
         return isUsingInterpreterFromProject() ? env.getVersion() : RobotRuntimeEnvironment.getVersion(getExecutor());
     }
 
