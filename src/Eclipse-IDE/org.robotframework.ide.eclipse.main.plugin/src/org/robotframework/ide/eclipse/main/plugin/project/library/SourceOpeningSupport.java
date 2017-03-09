@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
@@ -92,7 +94,7 @@ public class SourceOpeningSupport {
     private static IFile resolveFile(final IPath location, final IProject project, final LibrarySpecification libSpec)
             throws CoreException {
         if (location == null) {
-            throw new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Empty location path!"));
+            throw newCoreException("Empty location path!");
         }
         IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
         if (file == null || !file.isAccessible()) {
