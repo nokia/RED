@@ -47,9 +47,9 @@ public class ElementAddingTokenTest {
     @Test
     public void tokenHasGrayedAddImage_whenIsDisabledAndRankIsZero() {
         final ElementAddingToken token = new ElementAddingToken("element", false);
-        RedImages.getGreyedImage(RedImages.getAddImage()).equals(RedImages.getGreyedImage(RedImages.getAddImage()));
+        RedImages.getGrayedImage(RedImages.getAddImage()).equals(RedImages.getGrayedImage(RedImages.getAddImage()));
 
-        final Image expectedImage = ImagesManager.getImage(RedImages.getGreyedImage(RedImages.getAddImage()));
+        final Image expectedImage = ImagesManager.getImage(RedImages.getGrayedImage(RedImages.getAddImage()));
         assertThat(token.getImage()).isEqualTo(expectedImage);
     }
 
