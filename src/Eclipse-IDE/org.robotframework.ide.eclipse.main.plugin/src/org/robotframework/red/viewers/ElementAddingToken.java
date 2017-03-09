@@ -53,7 +53,7 @@ public class ElementAddingToken {
             return null;
         }
         final ImageDescriptor addImage = RedImages.getAddImage();
-        return ImagesManager.getImage(enabled ? addImage : RedImages.getGreyedImage(addImage));
+        return ImagesManager.getImage(enabled ? addImage : RedImages.getGrayedImage(addImage));
     }
 
     public StyledString getStyledText() {

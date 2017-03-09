@@ -70,7 +70,7 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
                 AddingElementLabelAccumulator.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
         
         final ImageDescriptor addImage = RedImages.getAddImage();
-        final Image imageToUse = ImagesManager.getImage(isEditable ? addImage : RedImages.getGreyedImage(addImage));
+        final Image imageToUse = ImagesManager.getImage(isEditable ? addImage : RedImages.getGrayedImage(addImage));
 
         final TextPainter textPainter = new TextPainter(false, true, 2);
         final ICellPainter cellPainter = new CellPainterDecorator(textPainter, CellEdgeEnum.LEFT,

@@ -210,7 +210,7 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
         @Override
         public ImageDescriptor getImageDescriptor(final Object object) {
             final Image folderImg = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-            return RedImages.getGreyedImage(ImageDescriptor.createFromImage(folderImg));
+            return RedImages.getGrayedImage(ImageDescriptor.createFromImage(folderImg));
         }
 
         @Override

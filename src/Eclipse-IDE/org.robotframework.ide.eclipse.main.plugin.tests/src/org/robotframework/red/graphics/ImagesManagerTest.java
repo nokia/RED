@@ -46,7 +46,7 @@ public class ImagesManagerTest {
     @Test
     public void managerDoesNotGrowWhenGrayedVersionIsProvided() {
         for (int i = 0; i < 10; i++) {
-            assertThat(ImagesManager.getImage(RedImages.getGreyedImage(RedImages.getRobotImage()))).isNotNull();
+            assertThat(ImagesManager.getImage(RedImages.getGrayedImage(RedImages.getRobotImage()))).isNotNull();
         }
         assertThat(ImagesManager.size()).isEqualTo(1);
     }

@@ -76,7 +76,7 @@ class VariableFilesLabelProvider extends RedCommonLabelProvider {
 
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(varFile);
             if (RedXmlProblem.hasErrors(problems)) {
-                return ImagesManager.getImage(RedImages.getRobotUknownVariableImage());
+                return ImagesManager.getImage(RedImages.getRobotUnknownVariableImage());
             } else if (!problems.isEmpty()) {
                 return ImagesManager.getImage(RedImages.getRobotWarnedVariableImage());
             } else {

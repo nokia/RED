@@ -135,7 +135,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
             case DICTIONARY:
                 return RedImages.getRobotDictionaryVariableImage();
             case INVALID:
-                return RedImages.getRobotUknownVariableImage();
+                return RedImages.getRobotUnknownVariableImage();
             default:
                 return null;
         }

@@ -64,9 +64,9 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
                 CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
         
         final ImageDescriptor caseImage = isEditable ? RedImages.getTestCaseImage()
-                : RedImages.getGreyedImage(RedImages.getTestCaseImage());
+                : RedImages.getGrayedImage(RedImages.getTestCaseImage());
         final ImageDescriptor templatedCaseImage = isEditable ? RedImages.getTemplatedTestCaseImage()
-                : RedImages.getGreyedImage(RedImages.getTemplatedTestCaseImage());
+                : RedImages.getGrayedImage(RedImages.getTemplatedTestCaseImage());
         final ICellPainter caseCellPainter = new CellPainterDecorator(new RedTableTextPainter(2),
                 CellEdgeEnum.LEFT, new ImagePainter(ImagesManager.getImage(caseImage)));
         final ICellPainter templatedCaseCellPainter = new CellPainterDecorator(new RedTableTextPainter(2),

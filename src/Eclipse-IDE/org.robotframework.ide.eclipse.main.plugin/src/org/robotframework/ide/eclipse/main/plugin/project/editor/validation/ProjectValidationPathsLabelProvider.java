@@ -64,7 +64,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
 
         final ImageDescriptor imageDescriptor = projectTreeElement.getImageDescriptor();
         if (projectTreeElement.isExcluded()) {
-            return ImagesManager.getImage(RedImages.getGreyedImage(imageDescriptor));
+            return ImagesManager.getImage(RedImages.getGrayedImage(imageDescriptor));
         } else {
             return ImagesManager.getImage(imageDescriptor);
         }
