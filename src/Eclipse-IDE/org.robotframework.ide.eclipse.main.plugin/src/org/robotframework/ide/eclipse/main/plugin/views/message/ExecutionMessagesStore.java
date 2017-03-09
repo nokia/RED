@@ -28,7 +28,7 @@ class ExecutionMessagesStore implements IDisposable {
 
     synchronized void append(final String msg) {
         message.append(msg);
-        listeners.stream().forEach(listener -> listener.storeAppended(this, msg));
+        listeners.forEach(listener -> listener.storeAppended(this, msg));
     }
 
     synchronized public String getMessage() {
