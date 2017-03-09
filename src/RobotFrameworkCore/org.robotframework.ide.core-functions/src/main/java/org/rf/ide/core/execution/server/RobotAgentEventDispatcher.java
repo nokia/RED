@@ -334,7 +334,8 @@ class RobotAgentEventDispatcher {
 
     private void handleOutputFile(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("output_file");
-        final File path = new File((String) arguments.get(0));
+        final String filepath = (String) arguments.get(0);
+        final File path = filepath == null ? null : new File(filepath);
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleOutputFile(path);
