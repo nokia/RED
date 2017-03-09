@@ -179,7 +179,7 @@ public class ExecutionView {
         });
         executionListener = launch -> SwtThread.syncExec(() -> {
             final ExecutionElementsStore store = launch.getExecutionData(ExecutionElementsStore.class,
-                    () -> new ExecutionElementsStore());
+                    ExecutionElementsStore::new);
             store.addStoreListener(storeListener);
 
             clearEvent();

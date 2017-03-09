@@ -20,7 +20,7 @@ public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
 
     @Override
     public void handleAgentInitializing() {
-        testsLaunchContext.getExecutionData(ExecutionMessagesStore.class, () -> new ExecutionMessagesStore());
+        testsLaunchContext.getExecutionData(ExecutionMessagesStore.class, ExecutionMessagesStore::new);
     }
 
     @Override

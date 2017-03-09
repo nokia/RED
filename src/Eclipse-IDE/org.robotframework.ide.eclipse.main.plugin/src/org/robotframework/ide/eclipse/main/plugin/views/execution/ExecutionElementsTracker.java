@@ -24,7 +24,7 @@ public class ExecutionElementsTracker extends RobotDefaultAgentEventListener {
 
     @Override
     public void handleAgentInitializing() {
-        testsLaunchContext.getExecutionData(ExecutionElementsStore.class, () -> new ExecutionElementsStore());
+        testsLaunchContext.getExecutionData(ExecutionElementsStore.class, ExecutionElementsStore::new);
     }
 
     @Override
