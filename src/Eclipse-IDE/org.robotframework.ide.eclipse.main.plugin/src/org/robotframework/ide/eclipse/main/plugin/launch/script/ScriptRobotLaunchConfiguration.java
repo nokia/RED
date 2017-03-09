@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.script;
 
 import static com.google.common.collect.Iterables.getFirst;
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -5,11 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -83,10 +83,6 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     public ILaunchConfigurationWorkingCopy asWorkingCopy() throws CoreException {
         return configuration instanceof ILaunchConfigurationWorkingCopy
                 ? (ILaunchConfigurationWorkingCopy) configuration : configuration.getWorkingCopy();
-    }
-
-    protected static CoreException newCoreException(final String message) {
-        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message));
     }
 
 }

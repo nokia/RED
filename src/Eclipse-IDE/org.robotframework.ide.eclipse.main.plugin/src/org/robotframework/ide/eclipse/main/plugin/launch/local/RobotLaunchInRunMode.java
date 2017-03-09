@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 

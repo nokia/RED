@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+
 import java.io.IOException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
@@ -60,7 +60,6 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
 
         if (ILaunchManager.RUN_MODE.equals(mode)) {
             new RemoteLaunchInRunMode(testsLaunchContext).launch(robotConfig, launch);
-
         } else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
             new RemoteLaunchInDebugMode(testsLaunchContext).launch(robotConfig, launch);
         }
@@ -73,11 +72,4 @@ public class RemoteRobotLaunchConfigurationDelegate extends LaunchConfigurationD
                 LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getRobotProject().getProject() };
     }
 
-    private static CoreException newCoreException(final String message) {
-        return newCoreException(message, null);
-    }
-
-    private static CoreException newCoreException(final String message, final Throwable cause) {
-        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
-    }
 }

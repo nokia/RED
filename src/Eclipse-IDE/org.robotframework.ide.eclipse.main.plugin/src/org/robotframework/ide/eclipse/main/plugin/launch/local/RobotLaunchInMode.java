@@ -5,25 +5,24 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+
 import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public abstract class RobotLaunchInMode {
 
-    public void launch(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
-            final IProgressMonitor monitor) throws CoreException, IOException {
+    public void launch(final RobotLaunchConfiguration robotConfig, final ILaunch launch, final IProgressMonitor monitor)
+            throws CoreException, IOException {
 
         try {
             final Process process = launchAndAttachToProcess(robotConfig, launch, monitor);
@@ -39,14 +38,13 @@ public abstract class RobotLaunchInMode {
     }
 
     protected abstract Process launchAndAttachToProcess(final RobotLaunchConfiguration robotConfig,
-            final ILaunch launch,
-            final IProgressMonitor monitor) throws CoreException, IOException;
+            final ILaunch launch, final IProgressMonitor monitor) throws CoreException, IOException;
 
     protected Process execProcess(final RunCommandLine cmdLine, final RobotLaunchConfiguration robotConfig)
             throws CoreException {
         final RobotProject robotProject = robotConfig.getRobotProject();
-        return DebugPlugin.exec(cmdLine.getCommandLine(),
-                robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
+        return DebugPlugin.exec(cmdLine.getCommandLine(), robotProject.getProject().getLocation().toFile(),
+                robotConfig.getEnvironmentVariables());
     }
 
     protected final RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotProject robotProject)
@@ -93,11 +91,4 @@ public abstract class RobotLaunchInMode {
         return builder.build();
     }
 
-    protected final CoreException newCoreException(final String message) {
-        return newCoreException(message, null);
-    }
-
-    protected final CoreException newCoreException(final String message, final Throwable cause) {
-        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
-    }
 }

@@ -9,6 +9,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.ArrayList;
 import java.util.Collection;
