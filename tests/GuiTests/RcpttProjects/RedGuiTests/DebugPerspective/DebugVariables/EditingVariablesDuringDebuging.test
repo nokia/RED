@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z2XpsP28EeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/8/17 2:33 PM
+Save-Time: 3/10/17 4:13 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -55,14 +55,17 @@ get-editor "TestFile.robot" | get-text-viewer |  key-type "M1+s"
 //run to create run config
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
 get-menu "Run/Run Configurations..." | click
+
+//add new variable from interpreter
 with [get-window "Run Configurations"] {
-    get-tree | select "Robot/TestFile.robot"
-    with [get-group Executor | get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
-        set-text "-v example:90"
+    with [get-tab-folder] {
+        get-tab-item Robot | click
     }
+    get-group Arguments | get-editbox -after [get-label "Additional Robot Framework arguments:"] | set-text "-v example:90"
     get-button Apply | click
     get-button Close | click
 }
+
 //set breakpoint
 with [get-editor "TestFile.robot"] {
     with [get-left-ruler | get-ruler-column AnnotationColumn] {
