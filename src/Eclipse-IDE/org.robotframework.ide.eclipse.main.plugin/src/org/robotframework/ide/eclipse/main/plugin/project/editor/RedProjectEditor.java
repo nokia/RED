@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -56,8 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.Proj
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariablesProjectConfigurationEditorPart;
 import org.robotframework.red.swt.SwtThread;
 
-import com.google.common.base.Optional;
-
 public class RedProjectEditor extends MultiPageEditorPart {
 
     public static final String ID = "org.robotframework.ide.project.editor";
@@ -90,7 +89,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
                 try (InputStream stream = storage.getContents()) {
-                    editorInput = new RedProjectEditorInput(Optional.<IFile> absent(), !storage.isReadOnly(),
+                    editorInput = new RedProjectEditorInput(Optional.<IFile> empty(), !storage.isReadOnly(),
                             new RobotProjectConfigReader().readConfigurationWithLines(stream));
                 } catch (final CoreException | IOException e) {
                     throw new IllegalProjectConfigurationEditorInputException(

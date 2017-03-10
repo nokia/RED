@@ -5,6 +5,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
@@ -18,7 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 import org.robotframework.red.jface.text.rules.IRedTokenScanner;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
 public class RedTokenScanner implements IRedTokenScanner {

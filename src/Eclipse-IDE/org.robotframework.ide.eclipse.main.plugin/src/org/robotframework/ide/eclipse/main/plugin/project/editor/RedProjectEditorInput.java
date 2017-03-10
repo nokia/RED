@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -22,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 public class RedProjectEditorInput {
 
@@ -59,7 +59,7 @@ public class RedProjectEditorInput {
     }
 
     public void refreshProjectConfiguration(final IFile file) {
-        this.file = Optional.fromNullable(file);
+        this.file = Optional.ofNullable(file);
         projectConfiguration = new RedEclipseProjectConfigReader().readConfigurationWithLines(file);
     }
 

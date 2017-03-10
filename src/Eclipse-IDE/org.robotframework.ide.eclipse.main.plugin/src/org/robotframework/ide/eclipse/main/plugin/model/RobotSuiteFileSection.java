@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
@@ -20,7 +21,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public abstract class RobotSuiteFileSection implements RobotFileInternalElement {
@@ -118,7 +118,7 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
                 return Optional.of(this);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.library;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.io.File;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -39,8 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.KeywordsAutoDiscoverer;
-
-import com.google.common.base.Optional;
 
 /**
  * @author bembenek

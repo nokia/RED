@@ -2,14 +2,13 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 public class ExecutableRowCallRule implements ISyntaxColouringRule {
 
@@ -32,7 +31,7 @@ public class ExecutableRowCallRule implements ISyntaxColouringRule {
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset() + offsetInToken,
                     token.getText().length() - offsetInToken));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     protected boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {

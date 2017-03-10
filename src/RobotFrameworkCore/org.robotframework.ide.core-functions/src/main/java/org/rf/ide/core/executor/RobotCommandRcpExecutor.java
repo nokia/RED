@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +43,6 @@ import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 

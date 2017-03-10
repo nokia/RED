@@ -331,7 +331,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     }
 
     private RobotKeywordsSection getSection() {
-        return fileModel.findSection(RobotKeywordsSection.class).orNull();
+        return fileModel.findSection(RobotKeywordsSection.class).orElse(null);
     }
 
     public void revealElement(final RobotElement element, final boolean focus) {

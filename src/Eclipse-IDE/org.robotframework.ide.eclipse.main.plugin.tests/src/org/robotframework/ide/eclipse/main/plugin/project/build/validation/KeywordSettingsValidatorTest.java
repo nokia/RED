@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -41,7 +42,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockR
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 

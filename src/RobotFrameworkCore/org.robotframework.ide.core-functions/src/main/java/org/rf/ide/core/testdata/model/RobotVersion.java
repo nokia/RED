@@ -6,10 +6,9 @@
 package org.rf.ide.core.testdata.model;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.google.common.base.Optional;
 
 public final class RobotVersion implements Comparable<RobotVersion> {
 
@@ -41,7 +40,7 @@ public final class RobotVersion implements Comparable<RobotVersion> {
     public RobotVersion(final int major, final int minor) {
         this.major = major;
         this.minor = minor;
-        this.patch = Optional.absent();
+        this.patch = Optional.empty();
     }
 
     public RobotVersion(final int major, final int minor, final int patch) {

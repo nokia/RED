@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +23,6 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Multimap;
 
 public class RobotElementsComperatorWithPositionChangedPresaveTest {
@@ -63,7 +63,7 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_findType_typeNotExists() {
         // prepare
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setType(RobotTokenType.COMMENT_CONTINUE);
 
         // execute
@@ -76,7 +76,7 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_findType_typeExists() {
         // prepare
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setType(RobotTokenType.COMMENT_CONTINUE);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.ASSIGNMENT, 0, new ArrayList<>(Arrays.asList(tok)));
 
@@ -150,12 +150,12 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_startComment_and_commentContinue() {
         // prepare
-        RobotToken startComment = new RobotToken();
+        final RobotToken startComment = new RobotToken();
         startComment.setType(RobotTokenType.START_HASH_COMMENT);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 1,
                 new ArrayList<IRobotLineElement>(Arrays.asList(startComment)));
 
-        RobotToken continueComment = new RobotToken();
+        final RobotToken continueComment = new RobotToken();
         continueComment.setType(RobotTokenType.COMMENT_CONTINUE);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
                 new ArrayList<IRobotLineElement>(Arrays.asList(continueComment)));
@@ -173,12 +173,12 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_commentComment_and_commentContinue() {
         // prepare
-        RobotToken continueComment1 = new RobotToken();
+        final RobotToken continueComment1 = new RobotToken();
         continueComment1.setType(RobotTokenType.COMMENT_CONTINUE);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
                 new ArrayList<IRobotLineElement>(Arrays.asList(continueComment1)));
 
-        RobotToken continueComment2 = new RobotToken();
+        final RobotToken continueComment2 = new RobotToken();
         continueComment2.setType(RobotTokenType.COMMENT_CONTINUE);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
                 new ArrayList<IRobotLineElement>(Arrays.asList(continueComment2)));
@@ -196,8 +196,8 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_notExistingTypes_bothOnTheSamePosition() {
         // prepare
-        RobotToken tok1 = new RobotToken();
-        RobotToken tok2 = new RobotToken();
+        final RobotToken tok1 = new RobotToken();
+        final RobotToken tok2 = new RobotToken();
 
         // execute
         final int compareResult = robotElemsCmp.compare(tok1, tok2);
@@ -209,12 +209,12 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_notExistingTypes_onDifferentPosition_theFirstElementIsTheFirst() {
         // prepare
-        RobotToken tok1 = new RobotToken();
+        final RobotToken tok1 = new RobotToken();
         tok1.setStartColumn(0);
         tok1.setStartOffset(0);
         tok1.setLineNumber(0);
 
-        RobotToken tok2 = new RobotToken();
+        final RobotToken tok2 = new RobotToken();
 
         // execute
         final int compareResult = robotElemsCmp.compare(tok1, tok2);
@@ -226,9 +226,9 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_notExistingTypes_onDifferentPosition_theFirstElementIsTheSecond() {
         // prepare
-        RobotToken tok1 = new RobotToken();
+        final RobotToken tok1 = new RobotToken();
 
-        RobotToken tok2 = new RobotToken();
+        final RobotToken tok2 = new RobotToken();
         tok2.setStartColumn(0);
         tok2.setStartOffset(0);
         tok2.setLineNumber(0);
@@ -243,9 +243,9 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_existingTypes_differentType() {
         // prepare
-        RobotToken tok1 = new RobotToken();
+        final RobotToken tok1 = new RobotToken();
         tok1.setType(RobotTokenType.START_HASH_COMMENT);
-        RobotToken tok2 = new RobotToken();
+        final RobotToken tok2 = new RobotToken();
         tok2.setType(RobotTokenType.COMMENT_CONTINUE);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 1,
                 new ArrayList<RobotToken>(Arrays.asList(tok1)));
@@ -265,9 +265,9 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_existingTypes_theSameType() {
         // prepare
-        RobotToken tok1 = new RobotToken();
+        final RobotToken tok1 = new RobotToken();
         tok1.setType(RobotTokenType.START_HASH_COMMENT);
-        RobotToken tok2 = new RobotToken();
+        final RobotToken tok2 = new RobotToken();
         tok2.setType(RobotTokenType.START_HASH_COMMENT);
         robotElemsCmp.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 1,
                 new ArrayList<RobotToken>(Arrays.asList(tok1, tok2)));
@@ -285,14 +285,14 @@ public class RobotElementsComperatorWithPositionChangedPresaveTest {
     @Test
     public void test_compareFor_modifiedSequenceOfTokens() {
         // prepare
-        RobotToken tok1 = new RobotToken();
+        final RobotToken tok1 = new RobotToken();
         tok1.setType(RobotTokenType.START_HASH_COMMENT);
-        RobotToken tok2 = new RobotToken();
+        final RobotToken tok2 = new RobotToken();
         tok2.setLineNumber(0);
         tok2.setStartColumn(0);
         tok2.setStartOffset(0);
         tok2.setType(RobotTokenType.COMMENT_CONTINUE);
-        RobotToken tok3 = new RobotToken();
+        final RobotToken tok3 = new RobotToken();
         tok3.setLineNumber(0);
         tok3.setStartColumn(1);
         tok3.setStartOffset(1);

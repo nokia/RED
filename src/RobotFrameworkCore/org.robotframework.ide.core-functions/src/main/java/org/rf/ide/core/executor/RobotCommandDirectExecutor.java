@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -20,7 +21,6 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailed
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 

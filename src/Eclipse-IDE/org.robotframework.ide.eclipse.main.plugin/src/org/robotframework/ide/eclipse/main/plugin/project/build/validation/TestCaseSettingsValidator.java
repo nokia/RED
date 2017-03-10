@@ -9,6 +9,7 @@ import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -26,8 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

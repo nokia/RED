@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -25,8 +26,6 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -85,7 +84,7 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
                     new CompletionProposal(toInsert, charStart, charEnd - charStart, toInsert.length(), image,
                             getLabel(), null, Snippets.createSnippetInfo(document, regionToChange, toInsert)));
         } catch (final CoreException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

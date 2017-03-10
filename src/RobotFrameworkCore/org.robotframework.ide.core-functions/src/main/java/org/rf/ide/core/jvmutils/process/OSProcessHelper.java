@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -18,7 +19,6 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.jvmutils.process.IProcessTreeHandler.ProcessKillException;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 public class OSProcessHelper {
 
@@ -39,7 +39,7 @@ public class OSProcessHelper {
     public IProcessTreeHandler getInstanceByOS() {
         IProcessTreeHandler proc = null;
 
-        for (IProcessTreeHandler handler : osPidCheckers) {
+        for (final IProcessTreeHandler handler : osPidCheckers) {
             if (handler.isSupportedOS()) {
                 proc = handler;
                 break;
@@ -51,7 +51,7 @@ public class OSProcessHelper {
 
     public int execCommandAndCollectOutput(final List<String> command, final Collection<String> output)
             throws IOException {
-        MyLineHandler handler = new MyLineHandler();
+        final MyLineHandler handler = new MyLineHandler();
         final int exitCode = RobotRuntimeEnvironment.runExternalProcess(command, handler);
         output.addAll(handler.getCollectedOutput());
 
@@ -60,7 +60,7 @@ public class OSProcessHelper {
 
     private class MyLineHandler implements ILineHandler {
 
-        private Queue<String> lines = new ConcurrentLinkedQueue<>();
+        private final Queue<String> lines = new ConcurrentLinkedQueue<>();
 
         @Override
         public void processLine(final String line) {
@@ -123,7 +123,7 @@ public class OSProcessHelper {
 
     @VisibleForTesting
     protected Optional<IProcessTreeHandler> findProcessTreeProviderFor(final Process process) {
-        Optional<IProcessTreeHandler> provider = Optional.absent();
+        Optional<IProcessTreeHandler> provider = Optional.empty();
 
         for (final IProcessTreeHandler prov : osPidCheckers) {
             if (prov.isSupported(process)) {

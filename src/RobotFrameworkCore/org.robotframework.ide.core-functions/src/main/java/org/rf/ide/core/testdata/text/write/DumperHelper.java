@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.text.write;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -26,8 +27,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 
-import com.google.common.base.Optional;
-
 public class DumperHelper {
 
     private static final int NUMBER_OF_AFTER_UNIT_ELEMENTS_TO_TREAT_AS_NEW_UNIT_START = 3;
@@ -35,7 +34,7 @@ public class DumperHelper {
     // private static final int MAX_NUMBER_OF_COLUMN_IN_LINE = 7;
     //
     // private static final int MAX_NUMBER_OF_CHARS_IN_LINE = 120;
-    private Optional<ILineDumpTokenListener> dumpTokenListeners = Optional.absent();
+    private Optional<ILineDumpTokenListener> dumpTokenListeners = Optional.empty();
 
     private static final String EMPTY = "\\";
 
@@ -85,7 +84,7 @@ public class DumperHelper {
     }
 
     public void setTokenDumpListener(final ILineDumpTokenListener listener) {
-        this.dumpTokenListeners = Optional.fromNullable(listener);
+        this.dumpTokenListeners = Optional.ofNullable(listener);
     }
 
     public void notifyTokenDumpListener(final RobotToken oldToken, final RobotToken newToken) {
@@ -95,13 +94,13 @@ public class DumperHelper {
     }
 
     public void addEOFinCaseIsMissing(final RobotFile model, final List<RobotLine> lines) {
-        IRobotLineElement buildEOL = new EndOfLineBuilder()
+        final IRobotLineElement buildEOL = new EndOfLineBuilder()
                 .setEndOfLines(Arrays.asList(new Constant[] { Constant.EOF })).buildEOL();
 
         if (lines.isEmpty()) {
             getDumpLineUpdater().updateLine(model, lines, buildEOL);
         } else {
-            RobotLine robotLine = lines.get(lines.size() - 1);
+            final RobotLine robotLine = lines.get(lines.size() - 1);
             if (robotLine.getEndOfLine() == null || robotLine.getEndOfLine().getFilePosition().isNotSet()) {
                 getDumpLineUpdater().updateLine(model, lines, buildEOL);
             }
@@ -135,7 +134,7 @@ public class DumperHelper {
             eol = System.lineSeparator();
         }
 
-        RobotToken tempEOL = new RobotToken();
+        final RobotToken tempEOL = new RobotToken();
         tempEOL.setRaw(eol);
         tempEOL.setText(eol);
 
@@ -183,7 +182,7 @@ public class DumperHelper {
 
             for (int elemIndex = 0; elemIndex < size; elemIndex++) {
                 final AModelElement<ARobotSectionTable> e = sortedElements.get(elemIndex);
-                FilePosition pos = e.getBeginPosition();
+                final FilePosition pos = e.getBeginPosition();
 
                 if (pos.isNotSet() || pos.getOffset() == FilePosition.NOT_SET) {
                     if (size == index || elemIndex - 1 == index) {
@@ -209,7 +208,7 @@ public class DumperHelper {
                             break;
                         }
                     } else {
-                        Optional<Integer> line = model.getRobotLineIndexBy(pos.getOffset());
+                        final Optional<Integer> line = model.getRobotLineIndexBy(pos.getOffset());
                         if (line.isPresent()) {
                             final int lineIndex = line.get();
                             final RobotLine robotLine = model.getFileContent().get(lineIndex);
@@ -244,13 +243,13 @@ public class DumperHelper {
     private boolean isFollowPrettyAlign(final Set<Integer> startPosForElements, final FilePosition pos,
             final RobotFile model) {
         if (startPosForElements.contains(pos.getOffset() - 1)) {
-            Optional<Integer> line = model.getRobotLineIndexBy(pos.getOffset() - 1);
+            final Optional<Integer> line = model.getRobotLineIndexBy(pos.getOffset() - 1);
             if (line.isPresent()) {
-                RobotLine robotLine = model.getFileContent().get(line.get());
-                Optional<Integer> elementPos = robotLine.getElementPositionInLine(pos.getOffset() - 1,
+                final RobotLine robotLine = model.getFileContent().get(line.get());
+                final Optional<Integer> elementPos = robotLine.getElementPositionInLine(pos.getOffset() - 1,
                         PositionCheck.STARTS);
                 if (elementPos.isPresent()) {
-                    IRobotLineElement elem = robotLine.getLineElements().get(elementPos.get());
+                    final IRobotLineElement elem = robotLine.getLineElements().get(elementPos.get());
                     if (elem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                         return true;
                     }

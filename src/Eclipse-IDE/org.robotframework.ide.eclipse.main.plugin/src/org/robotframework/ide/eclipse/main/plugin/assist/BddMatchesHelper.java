@@ -5,12 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameOperation;
-
-import com.google.common.base.Optional;
 
 class BddMatchesHelper {
 
@@ -22,7 +21,7 @@ class BddMatchesHelper {
 
     BddAwareProposalMatch findBddAwareMatch(final String userContent, final String proposalContent) {
         final StringBuilder gherkinPrefix = new StringBuilder();
-        final AtomicReference<Optional<ProposalMatch>> match = new AtomicReference<>(Optional.<ProposalMatch> absent());
+        final AtomicReference<Optional<ProposalMatch>> match = new AtomicReference<>(Optional.<ProposalMatch> empty());
         GherkinStyleSupport.forEachPossibleGherkinName(userContent, new NameOperation() {
 
             @Override

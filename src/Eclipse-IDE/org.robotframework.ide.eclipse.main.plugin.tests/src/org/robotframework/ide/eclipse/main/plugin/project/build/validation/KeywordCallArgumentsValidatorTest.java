@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
@@ -25,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentP
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class KeywordCallArgumentsValidatorTest {

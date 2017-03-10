@@ -5,12 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

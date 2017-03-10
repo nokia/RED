@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.BeforeClass;
@@ -27,8 +28,6 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
-
-import com.google.common.base.Optional;
 
 /**
  * @author wypych

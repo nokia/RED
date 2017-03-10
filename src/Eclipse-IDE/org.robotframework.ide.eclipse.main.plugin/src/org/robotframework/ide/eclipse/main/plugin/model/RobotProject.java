@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,7 +59,6 @@ import org.robotframework.red.swt.SwtThread.Evaluation;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 
 public class RobotProject extends RobotContainer {
@@ -508,7 +508,7 @@ public class RobotProject extends RobotContainer {
     }
 
     public synchronized Optional<RobotDryRunKeywordSource> getKeywordSource(final String qualifiedKwName) {
-        return Optional.fromNullable(kwSources.get(qualifiedKwName));
+        return Optional.ofNullable(kwSources.get(qualifiedKwName));
     }
 
     private class ProjectPathsProvider implements PathsProvider {

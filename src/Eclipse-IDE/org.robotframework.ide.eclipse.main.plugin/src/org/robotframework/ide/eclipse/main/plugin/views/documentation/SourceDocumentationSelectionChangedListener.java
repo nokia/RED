@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
@@ -19,8 +20,6 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
-
-import com.google.common.base.Optional;
 
 public class SourceDocumentationSelectionChangedListener {
 

@@ -27,9 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
@@ -340,7 +340,7 @@ public class RobotRuntimeEnvironment {
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getModulePath(moduleName, additionalPaths);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public File getFile() {

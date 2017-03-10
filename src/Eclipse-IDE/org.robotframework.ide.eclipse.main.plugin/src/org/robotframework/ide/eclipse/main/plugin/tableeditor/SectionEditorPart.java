@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -43,8 +44,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshSectionCommand;
 import org.robotframework.red.forms.RedFormToolkit;
-
-import com.google.common.base.Optional;
 
 public abstract class SectionEditorPart implements ISectionEditorPart {
 
@@ -83,7 +82,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         toolkit = createToolkit(parent);
 
         final IEditorSite site = editorPart.getEditorSite();
-        final IEclipseContext parentContext = (IEclipseContext) site.getService(IEclipseContext.class);
+        final IEclipseContext parentContext = site.getService(IEclipseContext.class);
         context = parentContext.getActiveLeaf();
         context.set(RobotEditorCommandsStack.class, commandsStack);
         context.set(RedFormToolkit.class, toolkit);
@@ -173,7 +172,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     protected abstract ISelectionProvider getSelectionProvider();
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
-        final IContextService service = (IContextService) site.getService(IContextService.class);
+        final IContextService service = site.getService(IContextService.class);
         service.activateContext(SECTION_EDITOR_PART_CONTEXT_ID);
         service.activateContext(getContextId());
     }

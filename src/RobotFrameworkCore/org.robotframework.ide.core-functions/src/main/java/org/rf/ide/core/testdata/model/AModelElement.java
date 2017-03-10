@@ -8,12 +8,11 @@ package org.rf.ide.core.testdata.model;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 

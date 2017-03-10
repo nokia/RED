@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,7 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.red.viewers.TreeContentProvider;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

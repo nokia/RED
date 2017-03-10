@@ -6,14 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.e4.tools.compat.parts.DIEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-
-import com.google.common.base.Optional;
 
 @SuppressWarnings("restriction")
 public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorPart<C> implements ISectionEditorPart {

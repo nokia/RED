@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -39,8 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordExecutionManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-
-import com.google.common.base.Optional;
 
 
 public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener {
@@ -193,7 +192,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
                 return Optional.of((IFile) member);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private void switchSuite(final IContainer suiteContainer, final IFile suiteFile) {

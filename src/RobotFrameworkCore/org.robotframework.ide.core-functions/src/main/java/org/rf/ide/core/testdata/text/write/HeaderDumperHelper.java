@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.text.write;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -21,8 +22,6 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 /**
  * @author wypych
@@ -42,8 +41,8 @@ public class HeaderDumperHelper {
     public void dumpHeader(final RobotFile model, final TableHeader<? extends ARobotSectionTable> th,
             final List<RobotLine> lines) {
         if (!lines.isEmpty()) {
-            RobotLine lastLine = lines.get(lines.size() - 1);
-            IRobotLineElement endOfLine = lastLine.getEndOfLine();
+            final RobotLine lastLine = lines.get(lines.size() - 1);
+            final IRobotLineElement endOfLine = lastLine.getEndOfLine();
             if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                     || endOfLine.getTypes().contains(EndOfLineTypes.NON)
                     || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
@@ -62,7 +61,7 @@ public class HeaderDumperHelper {
 
         RobotLine currentLine = null;
         if (fileOffset >= 0) {
-            Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
+            final Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
             if (lineIndex.isPresent()) {
                 currentLine = model.getFileContent().get(lineIndex.get());
             }
@@ -140,7 +139,7 @@ public class HeaderDumperHelper {
             getDumpLineUpdater().updateLine(model, lines, columnToken);
             lastToken = columnToken;
             if (!columnToken.isDirty()) {
-                int thisTokenPosIndex = lineElements.indexOf(decToken);
+                final int thisTokenPosIndex = lineElements.indexOf(decToken);
                 if (thisTokenPosIndex >= 0) {
                     if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
                         final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
@@ -164,7 +163,7 @@ public class HeaderDumperHelper {
             getDumpLineUpdater().updateLine(model, lines, commentPart);
             lastToken = commentPart;
             if (!commentPart.isDirty()) {
-                int thisTokenPosIndex = lineElements.indexOf(decToken);
+                final int thisTokenPosIndex = lineElements.indexOf(decToken);
                 if (thisTokenPosIndex >= 0) {
                     if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
                         final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);

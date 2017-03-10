@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
+import java.util.Optional;
+
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -20,8 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.PasteVariablesHandler.E4PasteVariablesHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariablesHandler> {
 
@@ -56,12 +56,12 @@ public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariabl
                 final int index = selectedVar.getParent().getChildren().indexOf(selectedVar);
                 return Optional.of(new InsertVariablesCommand(selectedVar.getParent(), index, variables));
             } else {
-                final RobotVariablesSection section = fileModel.findSection(RobotVariablesSection.class).orNull();
+                final RobotVariablesSection section = fileModel.findSection(RobotVariablesSection.class).orElse(null);
                 if (section != null) {
                     return Optional.of(new InsertVariablesCommand(section, variables));
                 }
             }
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

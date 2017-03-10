@@ -3,11 +3,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
-
-import com.google.common.base.Optional;
 
 
 class SuiteFileMarkersContainerMock implements SuiteFileMarkersContainer {
@@ -19,7 +18,7 @@ class SuiteFileMarkersContainerMock implements SuiteFileMarkersContainer {
         if (element.isPresent() && markers.containsKey(element.get())) {
             return Optional.of(markers.get(element.get()));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

@@ -12,6 +12,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -41,7 +42,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywo
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistenceValidator;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 
@@ -198,7 +198,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private void reportKeywordUsageProblems(final List<UserKeyword> keywords) {
         TestCaseTableValidator.reportKeywordUsageProblems(validationContext, reporter, findExecutableRows(keywords),
-                Optional.<String> absent());
+                Optional.<String> empty());
     }
 
     private List<RobotExecutableRow<?>> findExecutableRows(final List<UserKeyword> keywords) {

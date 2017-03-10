@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.model.table;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -17,7 +18,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -84,13 +84,13 @@ public class RobotExecutableRowView {
         if (elementPositionInLine.isPresent()) {
             int lastAssignment = -1;
             final List<IRobotLineElement> lineElements = robotLine.getLineElements();
-            int lineElementsSize = lineElements.size();
+            final int lineElementsSize = lineElements.size();
             final List<RobotToken> tokensView = specialTokens.get(token);
             for (int i = elementPositionInLine.get() + 1; i < lineElementsSize; i++) {
                 final IRobotLineElement lineElement = lineElements.get(i);
                 final List<IRobotTokenType> elementTypes = lineElement.getTypes();
                 if (lineElement.getClass() == RobotToken.class) {
-                    RobotToken currentToken = (RobotToken) lineElement;
+                    final RobotToken currentToken = (RobotToken) lineElement;
                     if (elementTypes.contains(RobotTokenType.ASSIGNMENT)
                             || elementTypes.contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                         specialTokens.put(token, currentToken);
@@ -118,7 +118,7 @@ public class RobotExecutableRowView {
     public String getTokenRepresentation(final RobotToken token) {
         final List<RobotToken> additionalTokens = specialTokens.get(token);
         if (additionalTokens != null && !additionalTokens.isEmpty()) {
-            StringBuilder str = new StringBuilder(token.getText());
+            final StringBuilder str = new StringBuilder(token.getText());
             for (final RobotToken tok : additionalTokens) {
                 str.append(tok.getText());
             }

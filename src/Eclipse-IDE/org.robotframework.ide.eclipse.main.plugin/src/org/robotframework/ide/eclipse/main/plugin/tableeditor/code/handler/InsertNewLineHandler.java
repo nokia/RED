@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler;
 
+import java.util.Optional;
+
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -20,8 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertNewLineHandler.E4InsertNewLineHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLineHandler> {
 

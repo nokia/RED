@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +26,6 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.robotframework.ide.eclipse.main.plugin.refactoring.MatchingEngine.MatchAccess;
 
-import com.google.common.base.Optional;
 import com.google.common.io.CharStreams;
 
 /**

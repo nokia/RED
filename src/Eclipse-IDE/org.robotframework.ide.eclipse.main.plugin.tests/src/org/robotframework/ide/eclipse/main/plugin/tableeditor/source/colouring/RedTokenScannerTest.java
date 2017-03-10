@@ -7,6 +7,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colo
 import java.io.File;
 import java.util.Deque;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
@@ -23,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocume
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.LineElement;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
 public class RedTokenScannerTest {
@@ -200,7 +200,7 @@ public class RedTokenScannerTest {
                     return Optional.of(
                             new PositionedTextToken(token, robotToken.getStartOffset(), robotToken.getText().length()));
                 }
-                return Optional.absent();
+                return Optional.empty();
             }
         };
     }
@@ -226,7 +226,7 @@ public class RedTokenScannerTest {
                                 robotToken.getStartOffset() + offsetInToken, 1));
                     }
                 }
-                return Optional.absent();
+                return Optional.empty();
             }
         };
     }
@@ -242,7 +242,7 @@ public class RedTokenScannerTest {
             @Override
             public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
                     final List<IRobotLineElement> analyzedTokens) {
-                return Optional.absent();
+                return Optional.empty();
             }
         };
     }

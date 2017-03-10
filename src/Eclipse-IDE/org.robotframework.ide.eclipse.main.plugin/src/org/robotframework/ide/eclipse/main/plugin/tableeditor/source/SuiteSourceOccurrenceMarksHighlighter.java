@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -34,7 +35,6 @@ import org.eclipse.swt.custom.CaretListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 class SuiteSourceOccurrenceMarksHighlighter {
 
@@ -117,8 +117,11 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
     private Optional<IRegion> getCurrentRegion(final int offset) throws BadLocationException {
         final boolean isTsv = fileModel.isTsvFile();
-        return DocumentUtilities.findVariable(document, isTsv, offset)
-                .or(DocumentUtilities.findCellRegion(document, isTsv, offset));
+        Optional<IRegion> region = DocumentUtilities.findVariable(document, isTsv, offset);
+        if (!region.isPresent()) {
+            region = DocumentUtilities.findCellRegion(document, isTsv, offset);
+        }
+        return region;
     }
 
     private Set<IRegion> findOccurrencesRegions(final IRegion region) throws BadLocationException {

@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import java.util.Optional;
+
 import org.eclipse.jface.text.DocumentCommand;
 import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.TextUtilities;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-
-import com.google.common.base.Optional;
 
 class SuiteSourceInsertLineContinuationStrategy implements IAutoEditStrategy {
 
@@ -51,7 +51,7 @@ class SuiteSourceInsertLineContinuationStrategy implements IAutoEditStrategy {
             return Optional.of("\\");
         if (isDocumentation(commandLineContent))
             return Optional.of("...");
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private boolean isForLoop(final String commandLineContent) {

@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
@@ -11,7 +12,6 @@ import org.eclipse.swt.widgets.Event;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 
 
 public class RedNatTableContentTooltip extends NatTableContentTooltip {
@@ -54,7 +54,7 @@ public class RedNatTableContentTooltip extends NatTableContentTooltip {
     protected Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
         final Object rowObject = dataProvider.getRowObject(rowPosition);
         return rowObject instanceof RobotFileInternalElement ? Optional.of((RobotFileInternalElement) rowObject)
-                : Optional.<RobotFileInternalElement> absent();
+                : Optional.<RobotFileInternalElement> empty();
     }
 
     private String createMessage(final List<String> markerDescriptions) {

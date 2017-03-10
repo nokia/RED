@@ -135,7 +135,7 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
                     @Override
                     public ICompletionProposal apply(final RedSuiteMarkerResolution resolution) {
                         return resolution.asContentProposal(marker, invocationContext.getSourceViewer().getDocument(),
-                                suiteModel).orNull();
+                                suiteModel).orElse(null);
                     }
                 }), Predicates.notNull());
         final Iterable<ICompletionProposal> redXmlRepairProposals = filter(

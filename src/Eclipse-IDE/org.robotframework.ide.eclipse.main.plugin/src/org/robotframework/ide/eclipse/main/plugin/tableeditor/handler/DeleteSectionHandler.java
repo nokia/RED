@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
+import java.util.Optional;
+
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -17,8 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.DeleteSectionHandler.E4DeleteSection;
 import org.robotframework.red.commands.DIParameterizedHandler;
-
-import com.google.common.base.Optional;
 
 public class DeleteSectionHandler extends DIParameterizedHandler<E4DeleteSection> {
 

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -21,8 +22,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Optional;
 
 public class RedXmlEditsCollectorTest {
 
@@ -50,7 +49,7 @@ public class RedXmlEditsCollectorTest {
         final String documentContent = document.get();
 
         final RedXmlEditsCollector editsCollector = new RedXmlEditsCollector(new Path(PROJECT_NAME + "/a"),
-                Optional.<IPath> absent());
+                Optional.<IPath> empty());
 
         final List<TextEdit> edits = editsCollector.collectEditsInExcludedPaths(PROJECT_NAME, document);
         assertThat(edits).hasSize(2);
@@ -67,7 +66,7 @@ public class RedXmlEditsCollectorTest {
         final Document document = new Document(projectProvider.getFileContent(new Path("red.xml")));
 
         final RedXmlEditsCollector editsCollector = new RedXmlEditsCollector(new Path(PROJECT_NAME + "/x"),
-                Optional.<IPath> absent());
+                Optional.<IPath> empty());
 
         assertThat(editsCollector.collectEditsInExcludedPaths(PROJECT_NAME, document)).isEmpty();
     }
@@ -77,7 +76,7 @@ public class RedXmlEditsCollectorTest {
         final Document document = new Document(projectProvider.getFileContent(new Path("red.xml")));
 
         final RedXmlEditsCollector editsCollector = new RedXmlEditsCollector(new Path("otherProject/a"),
-                Optional.<IPath> absent());
+                Optional.<IPath> empty());
 
         assertThat(editsCollector.collectEditsInExcludedPaths(PROJECT_NAME, document)).isEmpty();
     }
@@ -128,7 +127,7 @@ public class RedXmlEditsCollectorTest {
         final String fileContent = projectProvider.getFileContent("red.xml");
 
         final RedXmlEditsCollector editsCollector = new RedXmlEditsCollector(new Path(PROJECT_NAME + "/a"),
-                Optional.<IPath> absent());
+                Optional.<IPath> empty());
 
         final List<TextEdit> edits = editsCollector.collectEditsInExcludedPaths(PROJECT_NAME, file);
         assertThat(edits).hasSize(2);
@@ -145,7 +144,7 @@ public class RedXmlEditsCollectorTest {
         final IFile file = projectProvider.getFile(new Path("red.xml"));
 
         final RedXmlEditsCollector editsCollector = new RedXmlEditsCollector(new Path(PROJECT_NAME + "/x"),
-                Optional.<IPath> absent());
+                Optional.<IPath> empty());
 
         assertThat(editsCollector.collectEditsInExcludedPaths(PROJECT_NAME, file)).isEmpty();
     }
@@ -155,7 +154,7 @@ public class RedXmlEditsCollectorTest {
         final IFile file = projectProvider.getFile(new Path("red.xml"));
 
         final RedXmlEditsCollector editsCollector = new RedXmlEditsCollector(new Path("otherProject/a"),
-                Optional.<IPath> absent());
+                Optional.<IPath> empty());
 
         assertThat(editsCollector.collectEditsInExcludedPaths(PROJECT_NAME, file)).isEmpty();
     }

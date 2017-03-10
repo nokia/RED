@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -45,7 +46,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
@@ -70,7 +70,7 @@ abstract class HyperlinksToKeywordsDetector {
                     @Override
                     public Optional<String> transform(final String gherkinNameVariant) {
                         return context.isKeywordAccessible(keywordProposal, gherkinNameVariant)
-                                ? Optional.of(gherkinNameVariant) : Optional.<String> absent();
+                                ? Optional.of(gherkinNameVariant) : Optional.<String> empty();
                     }
                 });
 

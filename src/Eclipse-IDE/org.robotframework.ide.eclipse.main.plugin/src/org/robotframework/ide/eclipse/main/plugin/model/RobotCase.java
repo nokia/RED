@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -23,8 +24,6 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-
-import com.google.common.base.Optional;
 
 public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
@@ -107,7 +106,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     }
     
     public Optional<String> getTemplateInUse() {
-        return Optional.fromNullable(getLinkedElement().getTemplateKeywordName());
+        return Optional.ofNullable(getLinkedElement().getTemplateKeywordName());
     }
 
     @Override

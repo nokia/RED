@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -45,7 +46,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.Robot
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotSuiteFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Queues;
 
 public class RobotArtifactsValidator {
@@ -331,7 +331,7 @@ public class RobotArtifactsValidator {
                 throws CoreException {
             return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating)
                     ? createProperValidator(context, (IFile) resource, reporter)
-                    : Optional.<ModelUnitValidator> absent();
+                    : Optional.<ModelUnitValidator> empty();
         }
 
         private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
@@ -392,7 +392,7 @@ public class RobotArtifactsValidator {
             } else if (file.getName().equals(RobotProjectConfig.FILENAME) && file.getParent() == file.getProject()) {
                 return Optional.of(new RobotProjectConfigFileValidator(context, file, reporter));
             }
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

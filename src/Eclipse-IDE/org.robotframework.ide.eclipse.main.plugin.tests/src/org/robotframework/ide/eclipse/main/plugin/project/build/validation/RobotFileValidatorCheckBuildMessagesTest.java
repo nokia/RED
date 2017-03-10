@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -44,8 +45,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-
-import com.google.common.base.Optional;
 
 public class RobotFileValidatorCheckBuildMessagesTest {
 
@@ -433,13 +432,13 @@ public class RobotFileValidatorCheckBuildMessagesTest {
     private RobotSuiteFile createSuiteFile() {
         final RobotSuiteFile mySuiteFile = mock(RobotSuiteFile.class);
 
-        final Optional<RobotCasesSection> cases = Optional.absent();
+        final Optional<RobotCasesSection> cases = Optional.empty();
         when(mySuiteFile.findSection(RobotCasesSection.class)).thenReturn(cases);
-        final Optional<RobotSettingsSection> settings = Optional.absent();
+        final Optional<RobotSettingsSection> settings = Optional.empty();
         when(mySuiteFile.findSection(RobotSettingsSection.class)).thenReturn(settings);
-        final Optional<RobotKeywordsSection> keywords = Optional.absent();
+        final Optional<RobotKeywordsSection> keywords = Optional.empty();
         when(mySuiteFile.findSection(RobotKeywordsSection.class)).thenReturn(keywords);
-        final Optional<RobotVariablesSection> variables = Optional.absent();
+        final Optional<RobotVariablesSection> variables = Optional.empty();
         when(mySuiteFile.findSection(RobotVariablesSection.class)).thenReturn(variables);
 
         return mySuiteFile;

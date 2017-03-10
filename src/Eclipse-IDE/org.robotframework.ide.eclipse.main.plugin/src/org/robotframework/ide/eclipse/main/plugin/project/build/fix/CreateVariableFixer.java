@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -20,7 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 /**
@@ -44,7 +45,7 @@ public class CreateVariableFixer extends RedSuiteMarkerResolution {
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
         if (variableName == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         final String lineDelimiter = DocumentUtilities.getDelimiter(document);
@@ -66,7 +67,7 @@ public class CreateVariableFixer extends RedSuiteMarkerResolution {
 
                 offsetOfChange = lineInformation.getOffset() + lineInformation.getLength();
             } catch (final BadLocationException e) {
-                return Optional.absent();
+                return Optional.empty();
             }
         } else {
             toInsert = Strings.repeat(lineDelimiter, 2) + "*** Variables ***" + variableDefinition;

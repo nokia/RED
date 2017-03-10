@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
@@ -29,8 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart.SettingsEditor;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
 
 @SuppressWarnings("restriction")
 public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
@@ -121,7 +120,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         protected List<? extends ISectionFormFragment> createFormFragments() {
             generalFragment = new GeneralSettingsFormFragment();
             metadataFragment = shouldShowMetadata() ? Optional.of(new MetadataSettingsFormFragment())
-                    : Optional.<MetadataSettingsFormFragment> absent();
+                    : Optional.<MetadataSettingsFormFragment> empty();
             importFragment = new ImportSettingsFormFragment();
 
             if (metadataFragment.isPresent()) {
@@ -155,7 +154,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         @Override

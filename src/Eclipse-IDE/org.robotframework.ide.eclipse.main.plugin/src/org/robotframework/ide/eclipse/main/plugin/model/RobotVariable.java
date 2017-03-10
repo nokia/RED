@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.transform;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
@@ -26,7 +27,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 public class RobotVariable implements RobotFileInternalElement, Serializable {
@@ -181,7 +181,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
                 && offset <= linkedElement.getEndPosition().getOffset()) {
             return Optional.of(this);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

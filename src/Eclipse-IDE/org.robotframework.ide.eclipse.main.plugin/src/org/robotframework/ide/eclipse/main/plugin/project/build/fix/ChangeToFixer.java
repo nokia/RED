@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.IDocument;
@@ -18,8 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
 
 
 /**

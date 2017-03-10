@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.IToken;
@@ -8,7 +9,6 @@ import org.eclipse.jface.text.rules.Token;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 
 public interface ISyntaxColouringRule {
 

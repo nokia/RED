@@ -12,6 +12,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.jface.text.Position;
@@ -25,7 +26,6 @@ import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpd
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
@@ -160,7 +160,7 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         if (position.getOffset() <= offset && offset <= position.getOffset() + position.getLength()) {
             return Optional.of(this);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

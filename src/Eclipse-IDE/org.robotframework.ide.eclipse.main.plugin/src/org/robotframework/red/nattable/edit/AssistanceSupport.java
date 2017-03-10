@@ -5,13 +5,13 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import java.util.Optional;
+
 import org.eclipse.swt.widgets.Text;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

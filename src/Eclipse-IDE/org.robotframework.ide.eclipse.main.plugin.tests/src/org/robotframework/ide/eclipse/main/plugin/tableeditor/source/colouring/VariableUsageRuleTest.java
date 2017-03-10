@@ -9,6 +9,7 @@ import static org.robotframework.red.junit.Conditions.present;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Optional;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.Token;
@@ -18,8 +19,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
-
-import com.google.common.base.Optional;
 
 public class VariableUsageRuleTest {
 

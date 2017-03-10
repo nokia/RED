@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -19,8 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 class TableDocumentationSelectionChangedListener implements ISelectionChangedListener {
 

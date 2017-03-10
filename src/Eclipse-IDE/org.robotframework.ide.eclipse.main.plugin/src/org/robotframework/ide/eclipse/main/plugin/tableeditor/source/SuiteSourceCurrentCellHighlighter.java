@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -26,7 +27,6 @@ import org.eclipse.swt.custom.CaretListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

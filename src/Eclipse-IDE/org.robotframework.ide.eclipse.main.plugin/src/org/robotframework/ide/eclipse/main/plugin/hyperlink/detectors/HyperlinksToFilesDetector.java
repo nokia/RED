@@ -9,6 +9,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -26,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 abstract class HyperlinksToFilesDetector {
 
@@ -59,20 +59,20 @@ abstract class HyperlinksToFilesDetector {
             final Optional<ResolvedImportPath> resolvedPath = ResolvedImportPath.from(ImportPath.from(path),
                     variablesMapping);
             if (!resolvedPath.isPresent()) {
-                return Optional.absent();
+                return Optional.empty();
             }
             final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
             final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
             return searchPaths.findAbsoluteUri(suiteFile.getFile().getLocationURI(), resolvedPath.get());
         } catch (final MalformedPathImportException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
     private Optional<IHyperlink> createLink(final RobotSuiteFile suiteFile, final IRegion fromRegion, final URI path) {
         final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
         final IResource resource = new RedWorkspace(wsRoot).forUri(path);
-        return resource != null ? createHyperlink(fromRegion, resource) : Optional.<IHyperlink> absent();
+        return resource != null ? createHyperlink(fromRegion, resource) : Optional.<IHyperlink> empty();
     }
 
     private Optional<IHyperlink> createHyperlink(final IRegion fromRegion, final IResource destination) {
@@ -80,7 +80,7 @@ abstract class HyperlinksToFilesDetector {
             return Optional.<IHyperlink> of(
                     new FileHyperlink(fromRegion, (IFile) destination, "Open File", performAfterOpening()));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     protected abstract Function<IFile, Void> performAfterOpening();

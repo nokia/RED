@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -25,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 public class AssistProposalPredicatesTest {
@@ -94,7 +94,7 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenInSecondCellAndForOrGherkingWordIsGiven_theReservedWordPredicateIsSatisfied() {
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates.codeReservedWordsPredicate(1,
-                Optional.<RobotToken> absent());
+                Optional.<RobotToken> empty());
 
         assertThat(predicate.apply(":FOR")).isTrue();
         assertThat(predicate.apply("Given")).isTrue();
@@ -108,9 +108,9 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenInNonSecondCellAndForOrGherkingWordIsGiven_theReservedWordPredicateIsNotSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
-                Optional.<RobotToken> absent());
+                Optional.<RobotToken> empty());
         final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(3,
-                Optional.<RobotToken> absent());
+                Optional.<RobotToken> empty());
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2)) {
             assertThat(predicate.apply(":FOR")).isFalse();
@@ -126,11 +126,11 @@ public class AssistProposalPredicatesTest {
     @Test
     public void whenThereIsNoTokenGiven_theReservedWordPredicateIsNotSatisfiedForArbitraryWords() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
-                Optional.<RobotToken> absent());
+                Optional.<RobotToken> empty());
         final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(1,
-                Optional.<RobotToken> absent());
+                Optional.<RobotToken> empty());
         final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.codeReservedWordsPredicate(5,
-                Optional.<RobotToken> absent());
+                Optional.<RobotToken> empty());
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
             assertThat(predicate.apply(null)).isFalse();

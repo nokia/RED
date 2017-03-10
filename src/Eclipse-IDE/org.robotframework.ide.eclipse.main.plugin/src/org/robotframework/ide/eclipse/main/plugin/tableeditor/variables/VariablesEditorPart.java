@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -24,8 +25,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart.VariablesEditor;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
 
 public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
 
@@ -102,7 +101,7 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
         
         @Override
         public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         @Override
