@@ -33,7 +33,7 @@ class ProjectComposite extends Composite {
         super(parent, SWT.NONE);
         this.listener = listener;
 
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 5).applyTo(this);
 
         createProjectText();
         createBrowseButton();

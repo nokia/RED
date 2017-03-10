@@ -35,16 +35,15 @@ import com.google.common.base.Optional;
 /**
  * @author bembenek
  */
-public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab
-        implements ILaunchConfigurationTab {
+public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
     private InterpretersComposite interpretersComposite;
 
     private Text interpreterArgumentsText;
 
-    private ExecutableFileComposite executorScriptComposite;
+    private ExecutableFileComposite executableFileComposite;
 
-    private Text scriptArgumentsText;
+    private Text executableFileArgumentsText;
 
     @Override
     public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
@@ -63,8 +62,8 @@ public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationT
         try {
             interpretersComposite.setInput(robotConfig.isUsingInterpreterFromProject(), robotConfig.getInterpreter());
             interpreterArgumentsText.setText(robotConfig.getInterpreterArguments());
-            executorScriptComposite.setInput(robotConfig.getExecutableFilePath());
-            scriptArgumentsText.setText(robotConfig.getExecutableFileArguments());
+            executableFileComposite.setInput(robotConfig.getExecutableFilePath());
+            executableFileArgumentsText.setText(robotConfig.getExecutableFileArguments());
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
@@ -78,8 +77,8 @@ public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationT
             robotConfig.setUsingInterpreterFromProject(interpretersComposite.isUsingProjectInterpreter());
             robotConfig.setInterpreter(interpretersComposite.getChosenSystemExecutor());
             robotConfig.setInterpreterArguments(interpreterArgumentsText.getText());
-            robotConfig.setExecutableFilePath(executorScriptComposite.getSelectedExecutableFilePath());
-            robotConfig.setExecutableFileArguments(scriptArgumentsText.getText().trim());
+            robotConfig.setExecutableFilePath(executableFileComposite.getSelectedExecutableFilePath());
+            robotConfig.setExecutableFileArguments(executableFileArgumentsText.getText().trim());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
@@ -120,7 +119,7 @@ public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationT
 
     @Override
     public String getMessage() {
-        return "Create or edit a configuration to launch Robot Framework tests with custom script";
+        return "Edit interpreter parameters for launch configuration";
     }
 
     @Override
@@ -138,7 +137,7 @@ public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationT
         final Group group = new Group(parent, SWT.NONE);
         group.setText("Interpreter");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-        GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
+        GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).extendedMargins(0, 0, 0, 20).applyTo(group);
 
         interpretersComposite = new InterpretersComposite(group, new InterpreterListener() {
 
@@ -158,16 +157,21 @@ public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationT
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
-        executorScriptComposite = new ExecutableFileComposite(group, new ModifyListener() {
+        final Label executableFileDescription = new Label(group, SWT.WRAP);
+        executableFileDescription.setText(
+                "Setup executable file which will be used to run Robot Framework tests instead of interpreter selected above");
+        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(executableFileDescription);
+
+        executableFileComposite = new ExecutableFileComposite(group, new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
         }, RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions());
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(executorScriptComposite);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(executableFileComposite);
 
-        scriptArgumentsText = createLabeledText(group, "Additional executable file arguments:");
+        executableFileArgumentsText = createLabeledText(group, "Additional executable file arguments:");
     }
 
     private Text createLabeledText(final Composite parent, final String label) {

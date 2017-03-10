@@ -141,7 +141,7 @@ public class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab 
 
     @Override
     public String getMessage() {
-        return "Create or edit a configuration to launch Robot Framework tests";
+        return "Edit Robot Framework parameters for launch configuration";
     }
 
     @Override

@@ -52,7 +52,7 @@ class InterpretersComposite extends Composite {
         super(parent, SWT.NONE);
         this.listener = listener;
 
-        GridLayoutFactory.fillDefaults().numColumns(4).spacing(2, 2).margins(5, 5).applyTo(this);
+        GridLayoutFactory.fillDefaults().numColumns(4).spacing(2, 2).margins(0, 5).applyTo(this);
 
         createProjectInterpreterButton();
         createSystemInterpreterButton();
