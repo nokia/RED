@@ -167,7 +167,7 @@ public class RobotLaunchConfigurationFinder {
     }
 
     private static ILaunchConfigurationWorkingCopy asWorkingCopy(final ILaunchConfiguration config) {
-        if (config instanceof ILaunchConfigurationWorkingCopy) {
+        if (config.isWorkingCopy()) {
             return (ILaunchConfigurationWorkingCopy) config;
         } else {
             try {

@@ -16,6 +16,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.rf.ide.core.execution.TestsMode;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -50,7 +51,6 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
             final RobotTestsLaunch testsLaunchContext = executionService.testExecutionStarting();
 
             doLaunch(configuration, getTestsMode(mode), launch, testsLaunchContext, monitor);
-            saveConfiguration(configuration);
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
         } finally {
@@ -62,25 +62,30 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         return ILaunchManager.RUN_MODE.equals(mode) ? TestsMode.RUN : TestsMode.DEBUG;
     }
 
+    @Override
+    public ILaunch getLaunch(final ILaunchConfiguration configuration, final String mode) throws CoreException {
+        final ILaunchConfiguration original = saveConfiguration(configuration);
+        return new Launch(original, mode, null);
+    }
+
     protected abstract void doLaunch(final ILaunchConfiguration configuration, final TestsMode testsMode,
             final ILaunch launch, final RobotTestsLaunch testsLaunchContext, final IProgressMonitor monitor)
             throws CoreException, IOException;
 
-    private void saveConfiguration(final ILaunchConfiguration configuration) throws CoreException {
+    private ILaunchConfiguration saveConfiguration(final ILaunchConfiguration configuration) throws CoreException {
         if (configuration.isWorkingCopy()) {
             // since 3.3 ILaunchConfigurationWorkingCopy'ies can be nested
-            deepSaveConfigurationWorkingCopy((ILaunchConfigurationWorkingCopy) configuration);
+            return deepSaveConfigurationWorkingCopy((ILaunchConfigurationWorkingCopy) configuration);
         } else {
-            configuration.getWorkingCopy().doSave();
+            return configuration;
         }
     }
 
-    private void deepSaveConfigurationWorkingCopy(final ILaunchConfigurationWorkingCopy copy) throws CoreException {
-        copy.doSave();
+    private ILaunchConfiguration deepSaveConfigurationWorkingCopy(final ILaunchConfigurationWorkingCopy copy)
+            throws CoreException {
+        final ILaunchConfiguration original = copy.doSave();
         final ILaunchConfigurationWorkingCopy parent = copy.getParent();
-        if (parent != null) {
-            deepSaveConfigurationWorkingCopy(parent);
-        }
+        return parent == null ? original : deepSaveConfigurationWorkingCopy(parent);
     }
 
 }
