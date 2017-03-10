@@ -45,34 +45,33 @@ public class SelectionsPropertyTester extends PropertyTester {
     private static boolean testProperty(final IStructuredSelection selection, final String property,
             final boolean expected) {
         if (ALL_ELEMENTS_HAVE_SAME_TYPE.equals(property)) {
-            return testIfAllElementsHaveSameType(selection, expected);
+            return allElementsHaveSameType(selection) == expected;
         } else if (SELECTED_ACTUAL_FILE.equals(property)) {
-            return testIfIsSelectedActualProjectMember(selection, expected);
+            return isSelectedActualProjectMember(selection) == expected;
         }
         return false;
     }
 
-    private static boolean testIfIsSelectedActualProjectMember(final IStructuredSelection selection,
-            final boolean expected) {
+    private static boolean isSelectedActualProjectMember(final IStructuredSelection selection) {
         if (selection.isEmpty()) {
-            return !expected;
+            return false;
         }
         final Object firstSelectedElement = selection.getFirstElement();
         if (firstSelectedElement instanceof RobotFileInternalElement) {
             final RobotSuiteFile parentFile = ((RobotFileInternalElement) firstSelectedElement).getSuiteFile();
             if (parentFile instanceof RobotSuiteStreamFile) {
-                return !expected;
+                return false;
             }
         } else {
-            return !expected;
+            return false;
         }
-        return expected;
+        return true;
     }
 
-    private static boolean testIfAllElementsHaveSameType(final IStructuredSelection selection, final boolean expected) {
+    private static boolean allElementsHaveSameType(final IStructuredSelection selection) {
         final List<Object> elements = Selections.getElements(selection, Object.class);
         if (elements.isEmpty()) {
-            return expected;
+            return true;
         }
         Class<?> mostGeneralType = elements.get(0).getClass();
         for (final Object element : elements) {
@@ -81,41 +80,40 @@ public class SelectionsPropertyTester extends PropertyTester {
             }
         }
         if (mostGeneralType == Object.class) {
-            return !expected;
+            return false;
         }
         for (final Object element : elements) {
             if (!mostGeneralType.isInstance(element)) {
-                return !expected;
+                return false;
             }
         }
-        return expected;
+        return true;
     }
 
-    public static boolean testIfAllElementsAreFromSameProject(final IStructuredSelection selection,
-            final boolean expected) {
+    public static boolean allElementsAreFromSameProject(final IStructuredSelection selection) {
         final List<IResource> resources = Selections.getAdaptableElements(selection, IResource.class);
         final List<RobotCasesSection> sections = Selections.getElements(selection, RobotCasesSection.class);
         final List<RobotCase> cases = Selections.getElements(selection, RobotCase.class);
         if (sections.isEmpty() && cases.isEmpty() && resources.isEmpty()) {
-            return !expected;
+            return false;
         }
         final Set<IProject> projects = new HashSet<IProject>();
         for (final IResource resource : resources) {
             if (projects.add(resource.getProject()) && projects.size() > 1) {
-                return !expected;
+                return false;
             }
         }
         for (final RobotCasesSection section : sections) {
             if (projects.add(section.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
-                return !expected;
+                return false;
             }
         }
         for (final RobotCase robotCase : cases) {
             if (projects.add(robotCase.getSuiteFile().getProject().getProject()) && projects.size() > 1) {
-                return !expected;
+                return false;
             }
         }
-        return (projects.size() == 1) == expected;
+        return projects.size() == 1;
     }
 
 }
