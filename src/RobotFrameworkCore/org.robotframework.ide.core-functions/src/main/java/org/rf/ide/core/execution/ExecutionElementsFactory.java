@@ -30,7 +30,7 @@ public class ExecutionElementsFactory {
     }
 
     public static ExecutionElement createOutputFileExecutionElement(final File outputFilepath) {
-        return new ExecutionElement(outputFilepath.getAbsolutePath(), ExecutionElementType.OUTPUT_FILE, null, -1, null,
-                null);
+        return new ExecutionElement(outputFilepath == null ? null : outputFilepath.getAbsolutePath(),
+                ExecutionElementType.OUTPUT_FILE, null, -1, null, null);
     }
 }
