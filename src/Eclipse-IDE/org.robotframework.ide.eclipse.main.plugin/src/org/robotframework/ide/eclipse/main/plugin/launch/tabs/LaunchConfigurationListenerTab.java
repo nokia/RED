@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -28,6 +29,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -35,27 +37,32 @@ import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
 /**
  * @author mmarzec
  */
-public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurationTab
-        implements ILaunchConfigurationTab {
+public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
     private ProjectComposite projectComposite;
 
-    private Button enableRemoteBtn;
+    private Button useLocalAgentButton;
+
+    private Button useRemoteAgentButton;
+
+    private Group serverGroup;
 
     private Text hostTxt;
 
     private Text portTxt;
 
     private Text timeoutTxt;
+
+    private Group clientGroup;
 
     private Text commandLineArgument;
 
@@ -65,6 +72,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(composite);
 
         createProjectGroup(composite);
+        createAgentGroup(composite);
         createServerGroup(composite);
         createClientGroup(composite);
 
@@ -87,8 +95,53 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         GridDataFactory.fillDefaults().grab(true, false).applyTo(projectComposite);
     }
 
+    private void createAgentGroup(final Composite parent) {
+        final Group agentGroup = new Group(parent, SWT.NONE);
+        agentGroup.setText("Test Runner Agent");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(agentGroup);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(agentGroup);
+
+        createLocalAgentButton(agentGroup);
+
+        createRemoteAgentButton(agentGroup);
+    }
+
+    private void createLocalAgentButton(final Composite parent) {
+        useLocalAgentButton = new Button(parent, SWT.RADIO);
+        useLocalAgentButton.setText("Use local agent connection");
+        GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(useLocalAgentButton);
+        useLocalAgentButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                updateRemoteGroupState();
+            }
+        });
+    }
+
+    private void createRemoteAgentButton(final Composite parent) {
+        useRemoteAgentButton = new Button(parent, SWT.RADIO);
+        useRemoteAgentButton.setText("Use remote agent connection");
+        GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(useRemoteAgentButton);
+        useRemoteAgentButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                updateRemoteGroupState();
+            }
+        });
+    }
+
+    private void updateRemoteGroupState() {
+        if (!useRemoteAgentButton.isDisposed()) {
+            final boolean isRemoteAgent = useRemoteAgentButton.getSelection();
+            Arrays.stream(serverGroup.getChildren()).forEach(control -> control.setEnabled(isRemoteAgent));
+            Arrays.stream(clientGroup.getChildren()).forEach(control -> control.setEnabled(isRemoteAgent));
+        }
+    }
+
     private void createServerGroup(final Composite parent) {
-        final Group serverGroup = new Group(parent, SWT.NONE);
+        serverGroup = new Group(parent, SWT.NONE);
         serverGroup.setText("RED Server");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(serverGroup);
         GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(serverGroup);
@@ -98,35 +151,11 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                 .setText("Setup server which will track execution of Robot tests running on remotely connected client");
         GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(description);
 
-        enableRemoteBtn = createLabeledButton(serverGroup, "Enable remote values", SWT.CHECK);
-
         hostTxt = createLabeledText(serverGroup, "Local IP:");
 
         portTxt = createLabeledText(serverGroup, "Local port:");
 
         timeoutTxt = createLabeledText(serverGroup, "Connection timeout [s]:");
-
-        enableRemoteBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-
-                updateRemoteGroupState();
-                updateLaunchConfigurationDialog();
-            }
-        });
-    }
-
-    private Button createLabeledButton(final Composite parent, final String label, final int style) {
-        final Label lbl = new Label(parent, SWT.NONE);
-        lbl.setText(label);
-
-        final Button button = new Button(parent, style);
-
-        // spacer to occupy next grid cell
-        new Label(parent, SWT.NONE);
-
-        return button;
     }
 
     private Text createLabeledText(final Composite parent, final String label) {
@@ -149,15 +178,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         return txt;
     }
 
-    private void updateRemoteGroupState() {
-        final boolean enabled = enableRemoteBtn.getSelection();
-        hostTxt.setEnabled(enabled);
-        portTxt.setEnabled(enabled);
-        timeoutTxt.setEnabled(enabled);
-    }
-
     private void createClientGroup(final Composite parent) {
-        final Group clientGroup = new Group(parent, SWT.NONE);
+        clientGroup = new Group(parent, SWT.NONE);
         clientGroup.setText("Remote Client");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(clientGroup);
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(clientGroup);
@@ -212,18 +234,21 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     @Override
     public void initializeFrom(final ILaunchConfiguration configuration) {
         try {
-            final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
-                    .remoteLaunchConfiguration(configuration);
+            final IRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
+                    .robotLaunchConfiguration(configuration);
+
             if (robotConfig.isDefiningProjectDirectly()) {
                 projectComposite.setInput(robotConfig.getProjectName());
+                disposeGroup(useLocalAgentButton);
             } else {
-                projectComposite.disposeGroup();
+                useLocalAgentButton.setSelection(!robotConfig.isRemoteAgent());
+                useRemoteAgentButton.setSelection(robotConfig.isRemoteAgent());
+                disposeGroup(projectComposite);
             }
 
-            enableRemoteBtn.setSelection(robotConfig.isRemoteAgent());
-            hostTxt.setText(robotConfig.getRemoteHostValue());
-            portTxt.setText(robotConfig.getRemotePortValue());
-            timeoutTxt.setText(robotConfig.getRemoteTimeoutValue());
+            hostTxt.setText(robotConfig.getAgentConnectionHostValue());
+            portTxt.setText(robotConfig.getAgentConnectionPortValue());
+            timeoutTxt.setText(robotConfig.getAgentConnectionTimeoutValue());
 
             updateCommandLineArguments();
             updateRemoteGroupState();
@@ -232,12 +257,17 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         }
     }
 
-    private void updateCommandLineArguments() {
-        if (enableRemoteBtn.getSelection()) {
-            commandLineArgument.setText("--listener TestRunnerAgent.py:" + hostTxt.getText() + ":" + portTxt.getText());
-        } else {
-            commandLineArgument.setText("--listener TestRunnerAgent.py:<AUTO>");
+    private void disposeGroup(final Control composite) {
+        if (!composite.isDisposed()) {
+            final Composite group = composite.getParent();
+            final Composite parent = group.getParent();
+            group.dispose();
+            parent.layout();
         }
+    }
+
+    private void updateCommandLineArguments() {
+        commandLineArgument.setText("--listener TestRunnerAgent.py:" + hostTxt.getText() + ":" + portTxt.getText());
     }
 
     @Override
@@ -248,8 +278,8 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         updateCommandLineArguments();
 
         try {
-            new LaunchConfigurationsValidator()
-                    .validate(LaunchConfigurationsWrappers.remoteLaunchConfiguration(configuration));
+            new LaunchConfigurationTabValidator()
+                    .validateListenerTab(LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration));
         } catch (final LaunchConfigurationValidationFatalException e) {
             setErrorMessage(e.getMessage());
             return false;
@@ -264,16 +294,17 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
-        final IRemoteRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
-                .remoteLaunchConfiguration(configuration);
+        final IRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
+                .robotLaunchConfiguration(configuration);
         try {
             if (robotConfig.isDefiningProjectDirectly()) {
                 robotConfig.setProjectName(projectComposite.getSelectedProjectName());
+            } else {
+                robotConfig.setRemoteAgentValue(String.valueOf(useRemoteAgentButton.getSelection()));
             }
-            robotConfig.setRemoteAgentValue(String.valueOf(enableRemoteBtn.getSelection()));
-            robotConfig.setRemoteHostValue(hostTxt.getText().trim());
-            robotConfig.setRemotePortValue(portTxt.getText().trim());
-            robotConfig.setRemoteTimeoutValue(timeoutTxt.getText().trim());
+            robotConfig.setAgentConnectionHostValue(hostTxt.getText().trim());
+            robotConfig.setAgentConnectionPortValue(portTxt.getText().trim());
+            robotConfig.setAgentConnectionTimeoutValue(timeoutTxt.getText().trim());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
@@ -282,7 +313,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
     @Override
     public String getName() {
-        return "Remote";
+        return "Listener";
     }
 
     @Override

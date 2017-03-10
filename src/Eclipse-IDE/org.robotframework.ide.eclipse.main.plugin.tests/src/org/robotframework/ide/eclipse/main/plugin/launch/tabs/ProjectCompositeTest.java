@@ -11,13 +11,11 @@ import static org.mockito.Mockito.mock;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.assertj.core.api.Condition;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,19 +58,6 @@ public class ProjectCompositeTest {
         assertThat(composite.getSelectedProjectName()).isEqualTo("selected");
 
         assertThat(listenerWasCalled.get()).isTrue();
-    }
-
-    @Test
-    public void projectCompositeGroupCanBeDisposed() {
-        final Group group = new Group(shellProvider.getShell(), SWT.NONE);
-        final ProjectComposite composite = new ProjectComposite(group, mock(ModifyListener.class));
-        final Composite parent = group.getParent();
-
-        composite.disposeGroup();
-
-        assertThat(parent).isNot(disposed());
-        assertThat(group).is(disposed());
-        assertThat(composite).is(disposed());
     }
 
     private static Text projectText(final Composite composite) {

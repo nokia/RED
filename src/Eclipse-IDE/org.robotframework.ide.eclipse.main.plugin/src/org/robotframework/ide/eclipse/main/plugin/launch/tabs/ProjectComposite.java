@@ -84,13 +84,4 @@ class ProjectComposite extends Composite {
         return projectText.getText().trim();
     }
 
-    void disposeGroup() {
-        if (!this.isDisposed()) {
-            final Composite group = this.getParent();
-            final Composite parent = group.getParent();
-            group.dispose();
-            parent.layout();
-        }
-    }
-
 }

@@ -69,13 +69,17 @@ public abstract class RobotLaunchInMode {
 
         final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
                 ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
-                : RunCommandLineCallBuilder.forExecutor(robotConfig.getExecutor(), port);
+                : RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
 
+        if (!robotConfig.getExecutableFilePath().isEmpty()) {
+            builder.withExecutableScript(robotConfig.getExecutableFilePath());
+            builder.addUserArgumentsForExecutableScript(robotConfig.getExecutableFileArguments());
+        }
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
         builder.addLocationsToPythonPath(robotProject.getPythonpath());
         builder.addUserArgumentsForInterpreter(robotConfig.getInterpreterArguments());
-        builder.addUserArgumentsForRobot(robotConfig.getExecutorArguments());
+        builder.addUserArgumentsForRobot(robotConfig.getRobotArguments());
 
         builder.addVariableFiles(robotProject.getVariableFilePaths());
 

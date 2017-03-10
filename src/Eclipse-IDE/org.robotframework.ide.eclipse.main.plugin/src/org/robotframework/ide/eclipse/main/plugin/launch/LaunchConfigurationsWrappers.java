@@ -15,7 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.local.LocalProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
 
 public class LaunchConfigurationsWrappers implements IProcessFactory {
 
@@ -23,25 +22,10 @@ public class LaunchConfigurationsWrappers implements IProcessFactory {
 
     public static IRobotLaunchConfiguration robotLaunchConfiguration(final ILaunchConfiguration config) {
         try {
-            if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
-                return new RemoteRobotLaunchConfiguration(config);
-            } else if (ScriptRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
-                return new ScriptRobotLaunchConfiguration(config);
-            } else if (RobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
+            if (RobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
                 return new RobotLaunchConfiguration(config);
-            }
-        } catch (final CoreException e) {
-            throw new IllegalArgumentException("Unrecognized configuration type", e);
-        }
-        throw new IllegalArgumentException("Unrecognized configuration type");
-    }
-
-    public static IRemoteRobotLaunchConfiguration remoteLaunchConfiguration(final ILaunchConfiguration config) {
-        try {
-            if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
+            } else if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
                 return new RemoteRobotLaunchConfiguration(config);
-            } else if (ScriptRobotLaunchConfiguration.TYPE_ID.equals(config.getType().getIdentifier())) {
-                return new ScriptRobotLaunchConfiguration(config);
             }
         } catch (final CoreException e) {
             throw new IllegalArgumentException("Unrecognized configuration type", e);
@@ -58,8 +42,6 @@ public class LaunchConfigurationsWrappers implements IProcessFactory {
                 return new LocalProcess(launch, process, name, attributes);
             } else if (RemoteRobotLaunchConfiguration.TYPE_ID.equals(id)) {
                 return new RemoteProcess(launch, name);
-            } else if (ScriptRobotLaunchConfiguration.TYPE_ID.equals(id)) {
-                return new LocalProcess(launch, process, name, attributes);
             }
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to create process representation", e);

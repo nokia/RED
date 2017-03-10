@@ -153,8 +153,8 @@ public class RobotLaunchConfigurationFinder {
             throws CoreException {
         final RobotLaunchConfiguration rConfig1 = new RobotLaunchConfiguration(config1);
         final RobotLaunchConfiguration rConfig2 = new RobotLaunchConfiguration(config2);
-        return Objects.equals(rConfig1.getExecutor(), rConfig2.getExecutor())
-                && rConfig1.getExecutorArguments().equals(rConfig2.getExecutorArguments())
+        return Objects.equals(rConfig1.getInterpreter(), rConfig2.getInterpreter())
+                && rConfig1.getRobotArguments().equals(rConfig2.getRobotArguments())
                 && rConfig1.getProjectName().equals(rConfig2.getProjectName())
                 && rConfig1.isUsingInterpreterFromProject() == rConfig2.isUsingInterpreterFromProject()
                 && rConfig1.getInterpreterArguments().equals(rConfig2.getInterpreterArguments())

@@ -20,29 +20,29 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-class ExecutorScriptComposite extends Composite {
+class ExecutableFileComposite extends Composite {
 
     private final ModifyListener listener;
 
     private final String[] filterExtensions;
 
-    private Text scriptPathText;
+    private Text executableFilePathText;
 
-    ExecutorScriptComposite(final Composite parent, final ModifyListener listener, final String[] filterExtensions) {
+    ExecutableFileComposite(final Composite parent, final ModifyListener listener, final String[] filterExtensions) {
         super(parent, SWT.NONE);
         this.listener = listener;
         this.filterExtensions = filterExtensions;
 
         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
 
-        createScriptPathText();
+        createExecutableFilePathText();
         createBrowseButton(parent.getShell());
     }
 
-    private void createScriptPathText() {
-        scriptPathText = new Text(this, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(scriptPathText);
-        scriptPathText.addModifyListener(listener);
+    private void createExecutableFilePathText() {
+        executableFilePathText = new Text(this, SWT.BORDER);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(executableFilePathText);
+        executableFilePathText.addModifyListener(listener);
     }
 
     private void createBrowseButton(final Shell shell) {
@@ -52,19 +52,19 @@ class ExecutorScriptComposite extends Composite {
 
             @Override
             public void widgetSelected(final SelectionEvent event) {
-                final FileDialog dialog = createScriptFileDialog(shell);
+                final FileDialog dialog = createExecutableFileDialog(shell);
                 dialog.setFilterExtensions(filterExtensions);
 
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    scriptPathText.setText(chosenFilePath);
+                    executableFilePathText.setText(chosenFilePath);
                 }
             }
         });
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(button);
     }
 
-    private FileDialog createScriptFileDialog(final Shell shell) {
+    private FileDialog createExecutableFileDialog(final Shell shell) {
         final IPath startingPath = getStartingPath();
         final FileDialog dialog = new FileDialog(shell, SWT.OPEN);
         dialog.setFilterPath(startingPath.toOSString());
@@ -72,7 +72,7 @@ class ExecutorScriptComposite extends Composite {
     }
 
     private IPath getStartingPath() {
-        final String selectedPath = scriptPathText.getText().trim();
+        final String selectedPath = executableFilePathText.getText().trim();
         if (selectedPath.isEmpty()) {
             return ResourcesPlugin.getWorkspace().getRoot().getLocation();
         }
@@ -83,12 +83,12 @@ class ExecutorScriptComposite extends Composite {
         return path;
     }
 
-    void setInput(final String scriptPath) {
-        scriptPathText.setText(scriptPath);
+    void setInput(final String executableFilePath) {
+        executableFilePathText.setText(executableFilePath);
     }
 
-    String getSelectedScriptPath() {
-        return scriptPathText.getText().trim();
+    String getSelectedExecutableFilePath() {
+        return executableFilePathText.getText().trim();
     }
 
 }

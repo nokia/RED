@@ -14,7 +14,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public interface IRobotLaunchConfiguration {
 
-    static final AtomicBoolean IS_CONFIGURATION_RUNNING = new AtomicBoolean(false);
+    int MAX_PORT = 65_535;
+
+    int MAX_TIMEOUT = 3_600;
+
+    AtomicBoolean IS_CONFIGURATION_RUNNING = new AtomicBoolean(false);
 
     String getName();
 
@@ -28,13 +32,37 @@ public interface IRobotLaunchConfiguration {
 
     RobotProject getRobotProject() throws CoreException;
 
+    boolean isDefiningProjectDirectly();
+
+    boolean isRemoteAgent() throws CoreException;
+
+    String getAgentConnectionHost() throws CoreException;
+
+    int getAgentConnectionPort() throws CoreException;
+
+    int getAgentConnectionTimeout() throws CoreException;
+
+    String getAgentConnectionHostValue() throws CoreException;
+
+    String getAgentConnectionPortValue() throws CoreException;
+
+    String getAgentConnectionTimeoutValue() throws CoreException;
+
+    void setRemoteAgentValue(String isRemote) throws CoreException;
+
+    void setAgentConnectionHostValue(String host) throws CoreException;
+
+    void setAgentConnectionPortValue(String port) throws CoreException;
+
+    void setAgentConnectionTimeoutValue(String timeout) throws CoreException;
+
     List<IResource> getResourcesUnderDebug() throws CoreException;
 
-    public static boolean lockConfigurationLaunches() {
+    static boolean lockConfigurationLaunches() {
         return IS_CONFIGURATION_RUNNING.getAndSet(true);
     }
 
-    public static void unlockConfigurationLaunches() {
+    static void unlockConfigurationLaunches() {
         IS_CONFIGURATION_RUNNING.set(false);
     }
 

@@ -50,7 +50,6 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
             final RobotTestsLaunch testsLaunchContext = executionService.testExecutionStarting();
 
             doLaunch(configuration, getTestsMode(mode), launch, testsLaunchContext, monitor);
-            // FIXME: saving should be moved to shortcuts
             saveConfiguration(configuration);
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
