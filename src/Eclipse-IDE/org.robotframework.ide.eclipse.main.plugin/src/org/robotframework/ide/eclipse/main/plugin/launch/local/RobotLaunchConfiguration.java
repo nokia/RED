@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -30,8 +29,6 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.rf.ide.core.executor.RedSystemProperties;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -379,77 +376,6 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public void setExecutableFileArguments(final String arguments) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(EXECUTABLE_FILE_ARGUMENTS_ATTRIBUTE, arguments);
-    }
-
-    boolean isSuitableFor(final List<IResource> resources) {
-        try {
-            for (final IResource resource : resources) {
-                final IProject project = resource.getProject();
-                if (!getProjectName().equals(project.getName())) {
-                    return false;
-                }
-                boolean exists = false;
-                for (final String path : getSuitePaths().keySet()) {
-                    final IResource res = project.findMember(Path.fromPortableString(path));
-                    if (res != null && res.equals(resource)) {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (!exists) {
-                    return false;
-                }
-            }
-            return true;
-        } catch (final CoreException e) {
-            return false;
-        }
-    }
-
-    boolean isSuitableForOnly(final List<IResource> resources) {
-        try {
-            final List<IResource> toCall = newArrayList();
-            toCall.addAll(resources);
-            final Set<String> canCall = getSuitePaths().keySet();
-            if (toCall.size() != canCall.size()) {
-                return false;
-            }
-            for (final IResource resource : resources) {
-                final IProject project = resource.getProject();
-                if (!getProjectName().equals(project.getName())) {
-                    return false;
-                }
-                boolean exists = false;
-                for (final String path : getSuitePaths().keySet()) {
-                    final IResource res = project.findMember(Path.fromPortableString(path));
-                    if (res != null && res.equals(resource)) {
-                        exists = true;
-                        toCall.remove(res);
-                        canCall.remove(path);
-                        break;
-                    }
-                }
-                if (!exists) {
-                    return false;
-                }
-            }
-            if (toCall.size() == 0 && canCall.size() == 0) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (final CoreException e) {
-            return false;
-        }
-    }
-
-    String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
-        return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getInterpreter().executableName();
-    }
-
-    String checkExecutorVersion(final RobotRuntimeEnvironment env) throws RobotEnvironmentException, CoreException {
-        return isUsingInterpreterFromProject() ? env.getVersion()
-                : RobotRuntimeEnvironment.getVersion(getInterpreter());
     }
 
     public String[] getEnvironmentVariables() throws CoreException {
