@@ -207,6 +207,27 @@ public class RobotLaunchConfigurationFinderTest {
         assertThat(config).isEqualToIgnoringGivenFields(configuration, "fOriginal");
     }
 
+    @Test
+    public void configurationSuitableForResources_whenApplicable() throws CoreException, IOException {
+        final IResource res = projectProvider.createFile("Resource", "");
+        final List<IResource> resources = newArrayList(res);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        assertThat(RobotLaunchConfigurationFinder.isSuitableFor(robotConfig, resources)).isTrue();
+    }
+
+    @Test
+    public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException, IOException {
+        final IResource res = projectProvider.createFile("Resource", "");
+        final List<IResource> resources = newArrayList(res);
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+
+        final IResource anotherRes = projectProvider.createFile("Another Resource", "");
+        resources.add(anotherRes);
+        assertThat(RobotLaunchConfigurationFinder.isSuitableFor(robotConfig, resources)).isFalse();
+    }
+
     private static ILaunchConfigurationWorkingCopy createDefault(final List<IResource> resources) throws CoreException {
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         configuration.doSave();
