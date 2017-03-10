@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _acbKcATKEeeYtJSRkZkJgQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/9/17 2:57 PM
+Save-Time: 3/10/17 10:38 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,18 +19,40 @@ get-view "Project Explorer" | get-tree | select "SecondProject/SingleTest.tsv" |
 
 //add args to interpreter and robot
 get-menu "Run/Run Configurations..." | click
+
+//with [get-window "Run Configurations"] {
+//    get-tree | select "Robot/SingleTest.tsv"
+//    get-tab-folder | get-tab-item Executor | click
+//    with [get-group Executor] {
+//        get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "-d -O -t -W ignore"
+//        with [get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
+//            set-text "-L Debug -e all --output NONE --report NONE --log NONE"
+//        }
+//    }
+//    //run test
+//    get-button Apply | click
+//    get-button Run | click
+//}
+
+get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
-    get-tree | select "Robot/SingleTest.tsv"
-    with [get-group Executor] {
-        get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "-d -O -t -W ignore"
-        with [get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
-            set-text "-L Debug -e all --output NONE --report NONE --log NONE"
-        }
+    get-tab-folder | get-tab-item Executor | click
+    with [get-group Interpreter | get-editbox -after [get-label "Additional interpreter arguments:"]] {
+        set-text "-d -O -t -W ignore"
     }
-    //run test
+    get-button Apply | click
+    get-tab-folder | get-tab-item Robot | click
+    with [get-group Arguments | get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
+        set-text "-L Debug -e all --output NONE --report NONE --log NONE"
+    }
     get-button Apply | click
     get-button Run | click
 }
+
+
+
+
+
 
 try -times 5 -delay 1000 -command{
 	get-view Console | get-text-viewer | get-property "getCharCount()" -raw | gt 0 | verify-true
@@ -59,11 +81,14 @@ get-view Console | get-text-viewer | get-property text
     
 //open run configuration and check if args are still in fields    
 get-menu "Run/Run Configurations..." | click
-with [get-window "Run Configurations" | get-group Executor] {
-    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "-d -O -t -W ignore" | verify-true
-    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-        | equals "-L Debug -e all --output NONE --report NONE --log NONE" | verify-true
-}
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "-L Debug -e all --output NONE --report NONE --log NONE" | verify-true
+get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
+get-window "Run Configurations" | get-group Interpreter | get-editbox 
+    -after [get-label "Additional interpreter arguments:"] | get-property text | equals "-d -O -t -W ignore" 
+    | verify-true
+    
 get-window "Run Configurations" | get-button Close | click
 
 
