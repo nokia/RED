@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _nus0MPsuEeW7_PzjO98BIw,_d8aMACuvEeW667Afdo4DcA
-Element-Name: ArgumentsInRunConfiguration
+Element-Name: ArgumentsInRunConfigurationMore
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
-Id: _DbKBQPs8EeW7_PzjO98BIw
+Id: _acbKcATKEeeYtJSRkZkJgQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/13/16 11:39 AM
+Save-Time: 3/9/17 2:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,7 +22,7 @@ get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
     get-tree | select "Robot/SingleTest.tsv"
     with [get-group Executor] {
-        get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "-d"
+        get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "-d -O -t -W ignore"
         with [get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
             set-text "-L Debug -e all --output NONE --report NONE --log NONE"
         }
@@ -36,7 +36,7 @@ try -times 5 -delay 1000 -command{
 	get-view Console | get-text-viewer | get-property "getCharCount()" -raw | gt 0 | verify-true
 }	
 get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .* -d -m robot\.run --listener .* -s SecondProject.SingleTest -L Debug -e all --output NONE --report NONE --log NONE .*SecondProject\n"
+    | equals "Command: .* -d -O -t -W ignore -m robot\.run --listener .* -s SecondProject.SingleTest -L Debug -e all --output NONE --report NONE --log NONE .*SecondProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "==============================================================================\n"
     + "SecondProject                                                                 \n"
@@ -60,7 +60,7 @@ get-view Console | get-text-viewer | get-property text
 //open run configuration and check if args are still in fields    
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations" | get-group Executor] {
-    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "-d" | verify-true
+    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "-d -O -t -W ignore" | verify-true
     get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
         | equals "-L Debug -e all --output NONE --report NONE --log NONE" | verify-true
 }
