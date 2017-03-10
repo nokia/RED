@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gCszcJREEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 2:44 PM
+Save-Time: 3/10/17 4:15 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -30,7 +30,7 @@ get-window "Debug Configurations" | get-tree | select Robot | double-click
 with [get-window "Debug Configurations"] {
     get-tree | get-item Robot | get-property caption | equals Robot | verify-true
     // check tab Main
-    get-tab-folder | get-property activePage | equals Main | verify-true
+    get-tab-folder | get-property activePage | equals Robot | verify-true
 }
 // check tab Source
 get-window "Debug Configurations" | get-tab-folder | get-tab-item Source | click
