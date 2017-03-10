@@ -148,9 +148,9 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     }
 
     @Override
-    public void setRemoteAgentValue(final String customRemote) throws CoreException {
+    public void setRemoteAgent(final boolean isRemoteAgent) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_AGENT, customRemote);
+        launchCopy.setAttribute(REMOTE_AGENT, String.valueOf(isRemoteAgent));
     }
 
     @Override
@@ -174,10 +174,10 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     @Override
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        setRemoteAgentValue(String.valueOf(false));
-        setAgentConnectionHostValue(preferences.getLaunchRemoteHost());
-        setAgentConnectionPortValue(preferences.getLaunchRemotePort());
-        setAgentConnectionTimeoutValue(preferences.getLaunchRemoteTimeout());
+        setRemoteAgent(false);
+        setAgentConnectionHostValue(preferences.getLaunchAgentConnectionHost());
+        setAgentConnectionPortValue(preferences.getLaunchAgentConnectionPort());
+        setAgentConnectionTimeoutValue(preferences.getLaunchAgentConnectionTimeout());
         setProjectName("");
         setProcessFactory(LaunchConfigurationsWrappers.FACTORY_ID);
     }

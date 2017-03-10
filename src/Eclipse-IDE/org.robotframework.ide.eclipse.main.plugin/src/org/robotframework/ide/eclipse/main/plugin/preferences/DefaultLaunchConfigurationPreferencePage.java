@@ -48,12 +48,12 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
 
-        createRobotLaunchConfiguration(parent);
-        createRemoteRobotLaunchConfiguration(parent);
-        createScriptRobotLaunchConfiguration(parent);
+        createRobotLaunchConfigurationPreferences(parent);
+        createListenerLaunchConfigurationPreferences(parent);
+        createExecutorLaunchConfigurationPreferences(parent);
     }
 
-    private void createRobotLaunchConfiguration(final Composite parent) {
+    private void createRobotLaunchConfigurationPreferences(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
         group.setText("Robot tab");
         GridLayoutFactory.fillDefaults().applyTo(group);
@@ -67,31 +67,31 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         GridDataFactory.fillDefaults().grab(true, false).applyTo(additionalRobotArguments.getLabelControl(group));
     }
 
-    private void createRemoteRobotLaunchConfiguration(final Composite parent) {
+    private void createListenerLaunchConfigurationPreferences(final Composite parent) {
         final Group remoteGroup = new Group(parent, SWT.NONE);
         remoteGroup.setText("Listener tab");
         GridLayoutFactory.fillDefaults().applyTo(remoteGroup);
         GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(remoteGroup);
 
-        remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_REMOTE_HOST, "Local IP:", remoteGroup);
+        remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "Server IP:", remoteGroup);
         remoteHost.setEmptyStringAllowed(false);
         remoteHost.setErrorMessage("Server IP cannot be empty");
         remoteHost.load();
         addField(remoteHost);
 
-        remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_PORT, "Local port:", remoteGroup);
+        remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, "Server port:", remoteGroup);
         remotePort.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT);
         remotePort.load();
         addField(remotePort);
 
-        remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "Connection timeout [s]:",
-                remoteGroup);
+        remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
+                "Server connection timeout [s]:", remoteGroup);
         remoteTimeout.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);
     }
 
-    private void createScriptRobotLaunchConfiguration(final Composite parent) {
+    private void createExecutorLaunchConfigurationPreferences(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
         group.setText("Executor tab");
         GridLayoutFactory.fillDefaults().applyTo(group);
