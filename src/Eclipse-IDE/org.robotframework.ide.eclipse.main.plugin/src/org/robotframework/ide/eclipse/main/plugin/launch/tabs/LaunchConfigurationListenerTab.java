@@ -101,35 +101,23 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
         GridDataFactory.fillDefaults().grab(true, false).applyTo(agentGroup);
         GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(agentGroup);
 
-        createLocalAgentButton(agentGroup);
+        useLocalAgentButton = createAgentTypeSelectionButton(agentGroup, "Use local agent connection");
 
-        createRemoteAgentButton(agentGroup);
+        useRemoteAgentButton = createAgentTypeSelectionButton(agentGroup, "Use remote agent connection");
     }
 
-    private void createLocalAgentButton(final Composite parent) {
-        useLocalAgentButton = new Button(parent, SWT.RADIO);
-        useLocalAgentButton.setText("Use local agent connection");
-        GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(useLocalAgentButton);
-        useLocalAgentButton.addSelectionListener(new SelectionAdapter() {
+    private Button createAgentTypeSelectionButton(final Composite parent, final String text) {
+        final Button button = createRadioButton(parent, text);
+        GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(button);
+        button.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
+                updateLaunchConfigurationDialog();
                 updateRemoteGroupState();
             }
         });
-    }
-
-    private void createRemoteAgentButton(final Composite parent) {
-        useRemoteAgentButton = new Button(parent, SWT.RADIO);
-        useRemoteAgentButton.setText("Use remote agent connection");
-        GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(useRemoteAgentButton);
-        useRemoteAgentButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                updateRemoteGroupState();
-            }
-        });
+        return button;
     }
 
     private void updateRemoteGroupState() {
