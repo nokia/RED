@@ -107,9 +107,14 @@ public class RunSelectedTestCasesAction extends Action implements IEnablementUpd
 
     @Override
     public void updateEnablement(final IStructuredSelection selection) {
-        setEnabled(SelectionsPropertyTester.testIfAllElementsAreFromSameProject(selection, true)
-                && (!Selections.getElements(selection, RobotCase.class).isEmpty()
-                        || !Selections.getElements(selection, RobotCasesSection.class).isEmpty()));
+        if (SelectionsPropertyTester.allElementsAreFromSameProject(selection)) {
+            final boolean robotCaseAbsent = Selections.getElements(selection, RobotCase.class).isEmpty();
+            final boolean robotCasesSectionAbsent = Selections.getElements(selection, RobotCasesSection.class)
+                    .isEmpty();
+            setEnabled(!robotCaseAbsent || !robotCasesSectionAbsent);
+        } else {
+            setEnabled(false);
+        }
     }
 
     public static enum Mode {
