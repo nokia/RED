@@ -12,6 +12,7 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
@@ -26,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinit
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 public class RedVariableProposals {
     

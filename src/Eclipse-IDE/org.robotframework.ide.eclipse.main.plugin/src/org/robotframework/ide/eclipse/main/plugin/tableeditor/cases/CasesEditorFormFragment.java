@@ -331,7 +331,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     private RobotCasesSection getSection() {
-        return fileModel.findSection(RobotCasesSection.class).orNull();
+        return fileModel.findSection(RobotCasesSection.class).orElse(null);
     }
 
     public void revealElement(final RobotElement element, final boolean focus) {

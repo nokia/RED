@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -15,8 +17,6 @@ import org.eclipse.ltk.core.refactoring.NullChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.DeleteParticipant;
-
-import com.google.common.base.Optional;
 
 
 public class ResourceDeleteParticipant extends DeleteParticipant {
@@ -42,7 +42,7 @@ public class ResourceDeleteParticipant extends DeleteParticipant {
 
     @Override
     public Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
-        final Optional<IPath> newPath = Optional.absent();
+        final Optional<IPath> newPath = Optional.empty();
 
         final Optional<Change> change = new RedXmlChangesCollector().collect(deletedResource, newPath);
         return change.isPresent() && !(change.get() instanceof NullChange) ? change.get() : null;

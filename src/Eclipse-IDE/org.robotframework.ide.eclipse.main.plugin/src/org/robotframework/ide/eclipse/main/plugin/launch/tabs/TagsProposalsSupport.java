@@ -15,6 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -41,7 +42,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -60,7 +60,7 @@ class TagsProposalsSupport {
     TagsProposalsSupport() {
         this.allTagsCache = LinkedHashMultimap.create();
         this.currentSuitesToRun = new HashMap<IResource, List<String>>();
-        this.proposals = Optional.absent();
+        this.proposals = Optional.empty();
     }
 
     void install(final Control textField) {
@@ -70,7 +70,7 @@ class TagsProposalsSupport {
     }
 
     void switchTo(final String projectName, final Map<IResource, List<String>> suitesToRun) {
-        this.proposals = Optional.absent();
+        this.proposals = Optional.empty();
         this.currentSuitesToRun.clear();
         this.currentSuitesToRun.putAll(suitesToRun);
 

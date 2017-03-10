@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -33,8 +34,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSe
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteSettingsHandler.E4PasteSettingsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettingsHandler> {
 
@@ -79,7 +78,7 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
                 }
             } else {
                 final RobotSettingsSection section = firstSelected.isPresent() ? firstSelected.get().getParent()
-                        : fileModel.findSection(RobotSettingsSection.class).orNull();
+                        : fileModel.findSection(RobotSettingsSection.class).orElse(null);
                 if (section != null) {
                     commandsStack.execute(new InsertSettingCommand(section, firstSelected, settings));
                 }

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -25,8 +26,6 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -50,7 +49,7 @@ class RedXmlInTextEditorChangesCollector {
     Optional<Change> collect() {
         final IDocument currentlyEditedConfigDocument = getDocumentUnderEdit(redXmlFile);
         if (currentlyEditedConfigDocument == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return collectChanges(currentlyEditedConfigDocument);
     }
@@ -99,7 +98,7 @@ class RedXmlInTextEditorChangesCollector {
                     validationExcluded.toArray(new TextEdit[0])));
             return Optional.<Change> of(docChange);
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

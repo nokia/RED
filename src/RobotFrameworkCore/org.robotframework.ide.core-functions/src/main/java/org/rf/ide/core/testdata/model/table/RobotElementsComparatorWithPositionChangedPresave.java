@@ -12,12 +12,12 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -36,7 +36,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
     }
 
     public Optional<IRobotTokenType> findType(final IRobotLineElement elem) {
-        Optional<IRobotTokenType> type = Optional.absent();
+        Optional<IRobotTokenType> type = Optional.empty();
         for (final IRobotTokenType currentType : typeToTokens.keySet()) {
             final Collection<IRobotLineElement> list = typeToTokens.get(currentType);
             for (final IRobotLineElement e : list) {
@@ -58,7 +58,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
             final IRobotLineElement... elements) {
         final List<IRobotLineElement> elems = new ArrayList<>(Arrays.asList(elements));
         final Multimap<IRobotLineElement, Integer> found = ArrayListMultimap.create();
-        int listSize = list.size();
+        final int listSize = list.size();
         for (int i = 0; i < listSize; i++) {
             for (final IRobotLineElement e : elems) {
                 if (e == list.toArray()[i]) {
@@ -77,20 +77,20 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
         final Optional<IRobotTokenType> o1TypeOP = findType(o1);
         final Optional<IRobotTokenType> o2TypeOP = findType(o2);
 
-        int posComperatorResult = posComperator.compare(o1, o2);
+        final int posComperatorResult = posComperator.compare(o1, o2);
         if (o1TypeOP.isPresent() && o2TypeOP.isPresent()) {
             if (o1TypeOP.get() == o2TypeOP.get()) {
-                Multimap<IRobotLineElement, Integer> indexes = indexesOf(typeToTokens.get(o1TypeOP.get()), o1, o2);
-                Collection<Integer> o1PosInSequence = indexes.get(o1);
-                Collection<Integer> o2PosInSequence = indexes.get(o2);
+                final Multimap<IRobotLineElement, Integer> indexes = indexesOf(typeToTokens.get(o1TypeOP.get()), o1, o2);
+                final Collection<Integer> o1PosInSequence = indexes.get(o1);
+                final Collection<Integer> o2PosInSequence = indexes.get(o2);
 
-                Integer o1Index = o1PosInSequence.toArray(new Integer[o1PosInSequence.size()])[0];
-                Integer o2Index = o2PosInSequence.toArray(new Integer[o2PosInSequence.size()])[0];
+                final Integer o1Index = o1PosInSequence.toArray(new Integer[o1PosInSequence.size()])[0];
+                final Integer o2Index = o2PosInSequence.toArray(new Integer[o2PosInSequence.size()])[0];
 
                 result = Integer.compare(o1Index, o2Index);
             } else {
-                Integer typeO1hierarchy = typesToHierarchy.get(o1TypeOP.get());
-                Integer typeO2hierarchy = typesToHierarchy.get(o2TypeOP.get());
+                final Integer typeO1hierarchy = typesToHierarchy.get(o1TypeOP.get());
+                final Integer typeO2hierarchy = typesToHierarchy.get(o2TypeOP.get());
 
                 result = Integer.compare(typeO1hierarchy, typeO2hierarchy);
                 if (posComperatorResult != ECompareResult.EQUAL_TO.getValue()) {

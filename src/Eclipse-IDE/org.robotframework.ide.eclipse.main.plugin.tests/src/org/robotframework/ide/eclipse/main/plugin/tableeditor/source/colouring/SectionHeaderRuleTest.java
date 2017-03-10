@@ -10,6 +10,7 @@ import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.eclipse.jface.text.Position;
@@ -22,8 +23,6 @@ import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
-
-import com.google.common.base.Optional;
 
 public class SectionHeaderRuleTest {
 

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -29,8 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfiguratio
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
-
-import com.google.common.base.Optional;
 
 /**
  * @author bembenek

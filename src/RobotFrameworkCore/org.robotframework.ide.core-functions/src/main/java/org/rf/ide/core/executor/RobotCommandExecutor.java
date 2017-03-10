@@ -8,8 +8,7 @@ package org.rf.ide.core.executor;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * @author Michal Anglart

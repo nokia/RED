@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -15,8 +17,6 @@ import org.eclipse.ltk.core.refactoring.NullChange;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.participants.CheckConditionsContext;
 import org.eclipse.ltk.core.refactoring.participants.RenameParticipant;
-
-import com.google.common.base.Optional;
 
 
 public class ResourceRenameParticipant extends RenameParticipant {

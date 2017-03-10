@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ui.IEditorDescriptor;
@@ -24,8 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActivePageSaver;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-
-import com.google.common.base.Optional;
 
 class PageActivatingOpeningStrategy extends OpenStrategy {
 

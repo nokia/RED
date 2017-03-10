@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model.table.exec;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -19,8 +20,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 public class ExecutableUnitsFixer {
 
@@ -207,7 +206,7 @@ public class ExecutableUnitsFixer {
                 return Optional.of(i);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private <T extends AModelElement<? extends ARobotSectionTable>> void merge(final IExecutableStepsHolder<T> execUnit,
@@ -283,7 +282,7 @@ public class ExecutableUnitsFixer {
     }
 
     private Optional<RobotToken> getPreviouseLineContinueToken(final List<RobotToken> tokens) {
-        Optional<RobotToken> token = Optional.absent();
+        Optional<RobotToken> token = Optional.empty();
         for (final RobotToken rt : tokens) {
             String text = rt.getRaw();
             if (text != null) {

@@ -337,7 +337,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     }
 
     private RobotSettingsSection getSection() {
-        return fileModel.findSection(RobotSettingsSection.class).orNull();
+        return fileModel.findSection(RobotSettingsSection.class).orElse(null);
     }
 
     public void revealSetting(final RobotSetting setting, final boolean focus) {

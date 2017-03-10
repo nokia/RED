@@ -284,7 +284,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     private RobotVariablesSection getSection() {
-        return fileModel.findSection(RobotVariablesSection.class).orNull();
+        return fileModel.findSection(RobotVariablesSection.class).orElse(null);
     }
 
     void revealVariable(final RobotVariable robotVariable, final boolean focus) {

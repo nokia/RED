@@ -5,8 +5,7 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public class RedWithNameProposals {
 

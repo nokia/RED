@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
@@ -32,7 +33,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
 public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
@@ -230,7 +230,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                 && offset <= linkedElement.getEndPosition().getOffset()) {
             return Optional.of(this);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

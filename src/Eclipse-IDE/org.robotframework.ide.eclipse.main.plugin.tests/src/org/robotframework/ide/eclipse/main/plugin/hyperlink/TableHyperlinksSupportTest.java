@@ -11,15 +11,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
-
-import com.google.common.base.Optional;
 
 public class TableHyperlinksSupportTest {
 

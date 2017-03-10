@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.assertj.core.api.Condition;
@@ -22,8 +23,6 @@ import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.InterpretersComposite.InterpreterListener;
 import org.robotframework.red.junit.ShellProvider;
-
-import com.google.common.base.Optional;
 
 public class InterpretersCompositeTest {
 

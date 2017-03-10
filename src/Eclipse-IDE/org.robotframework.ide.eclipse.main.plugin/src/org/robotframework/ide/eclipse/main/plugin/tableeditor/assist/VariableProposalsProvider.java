@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.text.IRegion;
@@ -28,8 +29,6 @@ import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-
-import com.google.common.base.Optional;
 
 public class VariableProposalsProvider implements RedContentProposalProvider {
 

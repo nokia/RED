@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
@@ -56,7 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 
 public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 
@@ -77,10 +77,14 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         try {
             final IDocument document = textViewer.getDocument();
             final boolean isTsv = suiteFile.isTsvFile();
-            return DocumentUtilities.findVariable(document, isTsv, offset)
-                    .or(DocumentUtilities.findCellRegion(document, isTsv, offset))
-                    .or(Optional.of(new Region(0, 0)))
-                    .get();
+            Optional<IRegion> region = DocumentUtilities.findVariable(document, isTsv, offset);
+            if (!region.isPresent()) {
+                region = DocumentUtilities.findCellRegion(document, isTsv, offset);
+                if (!region.isPresent()) {
+                    region = Optional.of(new Region(0, 0));
+                }
+            }
+            return region.get();
         } catch (final BadLocationException e) {
             RedPlugin.logError(e.getMessage(), e);
             return new Region(0, 0);
@@ -113,10 +117,10 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
                                 @Override
                                 public Optional<String> transform(final String gherkinNameVariant) {
-                                    return Optional.fromNullable(getKeywordHoverInfo(gherkinNameVariant));
+                                    return Optional.ofNullable(getKeywordHoverInfo(gherkinNameVariant));
                                 }
                             });
-                    return info.orNull();
+                    return info.orElse(null);
                 }
             }
         } catch (final BadLocationException | CoreException e) {

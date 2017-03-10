@@ -1,14 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 
 public class CommentRule implements ISyntaxColouringRule {
@@ -33,6 +32,6 @@ public class CommentRule implements ISyntaxColouringRule {
                 || tokenTypes.contains(RobotTokenType.COMMENT_CONTINUE)) {
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
@@ -19,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class DocumentToDocumentationWordFixer extends RedSuiteMarkerResolution {
@@ -38,7 +39,7 @@ public class DocumentToDocumentationWordFixer extends RedSuiteMarkerResolution {
     @Override
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
-        Optional<ICompletionProposal> proposal = Optional.absent();
+        final Optional<ICompletionProposal> proposal = Optional.empty();
 
         final Range<Integer> defRange = getRange(marker);
         final Optional<? extends RobotSuiteFileSection> section = suiteModel.findSection(sectionClass);
@@ -55,16 +56,16 @@ public class DocumentToDocumentationWordFixer extends RedSuiteMarkerResolution {
 
     private Optional<ICompletionProposal> createProposal(final IDocument document,
             final Optional<? extends RobotElement> optional) throws BadLocationException {
-        Optional<ICompletionProposal> proposal = Optional.absent();
+        Optional<ICompletionProposal> proposal = Optional.empty();
         if (optional.isPresent()) {
-            RobotKeywordCall setting = (RobotKeywordCall) optional.get();
+            final RobotKeywordCall setting = (RobotKeywordCall) optional.get();
             final RobotToken docDeclaration = setting.getLinkedElement().getDeclaration();
             final String documentValue = docDeclaration.getRaw();
-            String withoutSpaces = documentValue.replaceAll("\\s+", "");
-            boolean containsSquareBracket = (withoutSpaces.indexOf('[') >= 0);
-            boolean endsWithColon = (withoutSpaces.endsWith(":"));
+            final String withoutSpaces = documentValue.replaceAll("\\s+", "");
+            final boolean containsSquareBracket = (withoutSpaces.indexOf('[') >= 0);
+            final boolean endsWithColon = (withoutSpaces.endsWith(":"));
 
-            StringBuilder replacement = new StringBuilder();
+            final StringBuilder replacement = new StringBuilder();
             if (containsSquareBracket) {
                 replacement.append('[');
             }

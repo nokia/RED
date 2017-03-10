@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.text.write.tables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -27,8 +28,6 @@ import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
-
-import com.google.common.base.Optional;
 
 public abstract class AExecutableTableDumper implements ISectionTableDumper {
 

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -17,8 +18,6 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
-import com.google.common.base.Optional;
 
 public class SuiteDocumentationViewTest {
 
@@ -30,19 +29,19 @@ public class SuiteDocumentationViewTest {
         final SettingTable settingTable = robotFile.getSettingTable();
 
         final RobotToken suiteDocOne = new RobotToken();
-        SuiteDocumentation docOne = new SuiteDocumentation(suiteDocOne);
+        final SuiteDocumentation docOne = new SuiteDocumentation(suiteDocOne);
         docOne.addDocumentationText("doc1");
         docOne.addDocumentationText("doc2");
         settingTable.addDocumentation(docOne);
 
         final RobotToken suiteDocTwo = new RobotToken();
-        SuiteDocumentation docTwo = new SuiteDocumentation(suiteDocTwo);
+        final SuiteDocumentation docTwo = new SuiteDocumentation(suiteDocTwo);
         docTwo.addDocumentationText("doc3");
         docTwo.addDocumentationText("doc4");
         settingTable.addDocumentation(docTwo);
 
         // execute
-        Optional<SuiteDocumentation> documentation = settingTable.documentation();
+        final Optional<SuiteDocumentation> documentation = settingTable.documentation();
 
         // verify
         assertThat(documentation.isPresent());
@@ -58,19 +57,19 @@ public class SuiteDocumentationViewTest {
         final SettingTable settingTable = robotFile.getSettingTable();
 
         final RobotToken suiteDocOne = new RobotToken();
-        SuiteDocumentation docOne = new SuiteDocumentation(suiteDocOne);
+        final SuiteDocumentation docOne = new SuiteDocumentation(suiteDocOne);
         docOne.addDocumentationText("doc1");
         docOne.addDocumentationText("doc2");
         settingTable.addDocumentation(docOne);
 
         final RobotToken suiteDocTwo = new RobotToken();
-        SuiteDocumentation docTwo = new SuiteDocumentation(suiteDocTwo);
+        final SuiteDocumentation docTwo = new SuiteDocumentation(suiteDocTwo);
         docTwo.addDocumentationText("doc3");
         docTwo.addDocumentationText("doc4");
         settingTable.addDocumentation(docTwo);
 
         // execute
-        Optional<SuiteDocumentation> documentation = settingTable.documentation();
+        final Optional<SuiteDocumentation> documentation = settingTable.documentation();
         assertThat(documentation.isPresent());
         documentation.get().addDocumentationText("doc5");
 
@@ -89,20 +88,20 @@ public class SuiteDocumentationViewTest {
         final SettingTable settingTable = robotFile.getSettingTable();
 
         final RobotToken suiteDocOne = new RobotToken();
-        SuiteDocumentation docOne = new SuiteDocumentation(suiteDocOne);
+        final SuiteDocumentation docOne = new SuiteDocumentation(suiteDocOne);
         docOne.addDocumentationText("doc1");
         docOne.addDocumentationText("doc2");
         settingTable.addDocumentation(docOne);
 
         final RobotToken suiteDocTwo = new RobotToken();
-        SuiteDocumentation docTwo = new SuiteDocumentation(suiteDocTwo);
+        final SuiteDocumentation docTwo = new SuiteDocumentation(suiteDocTwo);
         docTwo.addDocumentationText("doc3");
         docTwo.addDocumentationText("doc4");
         settingTable.addDocumentation(docTwo);
         docTwo.getDocumentationText().get(1).setText("doc_mod");
 
         // execute
-        Optional<SuiteDocumentation> documentation = settingTable.documentation();
+        final Optional<SuiteDocumentation> documentation = settingTable.documentation();
 
         // verify
         assertThat(documentation.isPresent());
@@ -111,8 +110,8 @@ public class SuiteDocumentationViewTest {
         assertThat(settingTable.getDocumentation()).hasSize(2);
     }
 
-    private List<String> getText(List<RobotToken> tokens) {
-        List<String> text = new ArrayList<>();
+    private List<String> getText(final List<RobotToken> tokens) {
+        final List<String> text = new ArrayList<>();
         for (final RobotToken tok : tokens) {
             text.add(tok.getText());
         }

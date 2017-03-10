@@ -6,6 +6,7 @@
 package org.robotframework.red.jface.assist;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
@@ -51,7 +52,6 @@ import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -106,7 +106,7 @@ public class RedContentProposalAdapter {
 
     public static RedContentProposalAdapter install(final Text text, final AssistantContext context,
             final RedContentProposalProvider proposalsProvider) {
-        return install(text, context, proposalsProvider, Optional.<RedContentProposalListener> absent());
+        return install(text, context, proposalsProvider, Optional.<RedContentProposalListener> empty());
     }
 
     public static RedContentProposalAdapter install(final Text text, final AssistantContext context,

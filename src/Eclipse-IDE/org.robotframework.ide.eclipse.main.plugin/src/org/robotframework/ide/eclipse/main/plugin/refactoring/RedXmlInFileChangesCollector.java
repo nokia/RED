@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -14,8 +15,6 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -54,7 +53,7 @@ class RedXmlInFileChangesCollector {
                     validationExcluded.toArray(new TextEdit[0])));
             return Optional.<Change> of(fileChange);
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

@@ -5,11 +5,12 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import java.util.Optional;
+
 import org.rf.ide.core.testdata.mapping.variables.CommonVariableHelper;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 /**
  * @author wypych
@@ -31,7 +32,7 @@ public class VariableNameRedCellEditorValidator extends DefaultRedCellEditorValu
 
     @VisibleForTesting
     Optional<String> getProblemsWithVariableName(final String value) {
-        Optional<String> error = Optional.absent();
+        Optional<String> error = Optional.empty();
         final char[] chars = value.toCharArray();
         if (chars.length > 3) {
             if (value.startsWith(VariableType.SCALAR.getIdentificator() + "{")

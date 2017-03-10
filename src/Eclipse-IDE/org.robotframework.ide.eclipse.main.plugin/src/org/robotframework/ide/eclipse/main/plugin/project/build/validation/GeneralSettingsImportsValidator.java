@@ -9,6 +9,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IResource;
@@ -35,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -209,13 +209,13 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             final Optional<ResolvedImportPath> resolvedPath = ResolvedImportPath.from(ImportPath.from(path),
                     variablesMapping);
             if (!resolvedPath.isPresent()) {
-                return Optional.absent();
+                return Optional.empty();
             }
             final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
             final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
             return searchPaths.findAbsoluteMarkedUri(suiteFile.getFile().getLocationURI(), resolvedPath.get());
         } catch (final MalformedPathImportException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

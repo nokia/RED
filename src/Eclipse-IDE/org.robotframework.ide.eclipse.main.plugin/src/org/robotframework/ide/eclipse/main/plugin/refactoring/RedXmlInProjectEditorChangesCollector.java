@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -21,8 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -45,7 +45,7 @@ class RedXmlInProjectEditorChangesCollector {
     Optional<Change> collect() {
         final RobotProjectConfig currentlyEditedConfig = getConfigUnderEdit(redXmlFile);
         if (currentlyEditedConfig == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
         final CompositeChange change = new CompositeChange(
                 redXmlFile.getName() + " - " + redXmlFile.getParent().getFullPath().toString());

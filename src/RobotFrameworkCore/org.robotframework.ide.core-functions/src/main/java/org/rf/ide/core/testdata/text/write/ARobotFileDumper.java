@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.DumpedResultBuilder;
@@ -46,7 +47,6 @@ import org.rf.ide.core.testdata.text.write.tables.TestCasesSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.VariablesSectionTableDumper;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 public abstract class ARobotFileDumper implements IRobotFileDumper {

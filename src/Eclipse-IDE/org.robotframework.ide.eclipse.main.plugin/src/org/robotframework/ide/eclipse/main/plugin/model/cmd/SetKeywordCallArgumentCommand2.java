@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
@@ -16,8 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-
-import com.google.common.base.Optional;
 
 public class SetKeywordCallArgumentCommand2 extends EditorCommand {
 
@@ -75,7 +74,7 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
                 && keywordCall.getName().isEmpty()) {
             return Optional.of("\\");
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public static List<String> prepareArgumentsList(final List<String> originalList, final int index,

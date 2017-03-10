@@ -5,9 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import java.util.Optional;
+
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class ProposalMatchers {
@@ -20,7 +21,7 @@ public class ProposalMatchers {
                 if (proposalContent.toLowerCase().startsWith(userContent.toLowerCase())) {
                     return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
                 } else {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
             }
         };
@@ -34,7 +35,7 @@ public class ProposalMatchers {
                 if (proposalContent.startsWith(userContent)) {
                     return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
                 } else {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
             }
         };
@@ -49,7 +50,7 @@ public class ProposalMatchers {
                 if (index >= 0) {
                     return Optional.of(new ProposalMatch(Range.closedOpen(0, index)));
                 } else {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
             }
         };
@@ -68,7 +69,7 @@ public class ProposalMatchers {
                     return Optional
                             .of(new ProposalMatch(Range.closedOpen(index + 1, index + 1 + userContent.length())));
                 }
-                return Optional.absent();
+                return Optional.empty();
             }
         };
     }

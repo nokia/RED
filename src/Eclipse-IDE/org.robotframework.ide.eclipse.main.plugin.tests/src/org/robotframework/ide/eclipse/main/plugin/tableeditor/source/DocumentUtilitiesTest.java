@@ -7,14 +7,14 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
-
-import com.google.common.base.Optional;
 
 public class DocumentUtilitiesTest {
 

@@ -6,9 +6,9 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 class Commons {
@@ -22,7 +22,7 @@ class Commons {
                     final int index = proposalContent.toLowerCase().indexOf(userContent.toLowerCase());
                     return Optional.of(new ProposalMatch(Range.closedOpen(index, index + userContent.length())));
                 }
-                return Optional.absent();
+                return Optional.empty();
             }
         };
     }

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
@@ -18,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 /**
@@ -42,11 +43,11 @@ public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
         if (keywordName == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
         final Optional<RobotKeywordsSection> section = suiteModel.findSection(RobotKeywordsSection.class);
         if (!section.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         for (final RobotKeywordDefinition keyword : section.get().getChildren()) {
             final Range<Integer> defRange = getRange(marker);
@@ -54,11 +55,11 @@ public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
                 try {
                     return createProposal(document, keyword);
                 } catch (final BadLocationException e) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<ICompletionProposal> createProposal(final IDocument document, final RobotKeywordDefinition keyword)

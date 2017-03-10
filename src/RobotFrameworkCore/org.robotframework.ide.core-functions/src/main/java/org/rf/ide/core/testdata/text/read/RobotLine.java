@@ -9,6 +9,7 @@ import static com.google.common.collect.Iterables.filter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.IChildElement;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -16,7 +17,6 @@ import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 public class RobotLine implements IChildElement<RobotFile> {
@@ -27,7 +27,7 @@ public class RobotLine implements IChildElement<RobotFile> {
 
     private List<IRobotLineElement> lineElements = new ArrayList<>(0);
 
-    private Optional<SeparatorType> separatorForLine = Optional.absent();
+    private Optional<SeparatorType> separatorForLine = Optional.empty();
 
     private IRobotLineElement eol = EndOfLineBuilder.newInstance()
             .setEndOfLines(null)
@@ -42,7 +42,7 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public void setSeparatorType(final SeparatorType separatorForLine) {
-        this.separatorForLine = Optional.fromNullable(separatorForLine);
+        this.separatorForLine = Optional.ofNullable(separatorForLine);
     }
 
     public Optional<SeparatorType> getSeparatorForLine() {
@@ -79,7 +79,7 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public Optional<Integer> getElementPositionInLine(final int offset, final PositionCheck posCheckStrategy) {
-        Optional<Integer> pos = Optional.absent();
+        Optional<Integer> pos = Optional.empty();
         final int size = lineElements.size();
         for (int i = 0; i < size; i++) {
             final IRobotLineElement e = lineElements.get(i);
@@ -122,7 +122,7 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public Optional<Integer> getElementPositionInLine(final IRobotLineElement elem) {
-        Optional<Integer> pos = Optional.absent();
+        Optional<Integer> pos = Optional.empty();
         final int size = lineElements.size();
         for (int i = 0; i < size; i++) {
             if (lineElements.get(i) == elem) {

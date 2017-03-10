@@ -336,7 +336,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     }
 
     private RobotSettingsSection getSection() {
-        return fileModel.findSection(RobotSettingsSection.class).orNull();
+        return fileModel.findSection(RobotSettingsSection.class).orElse(null);
     }
 
     public void revealSetting(final RobotKeywordCall setting, final boolean focus) {

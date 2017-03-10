@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -35,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class SuiteFileValidationListener implements IResourceChangeListener, SuiteFileMarkersContainer {
@@ -128,7 +128,7 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
     @Override
     public Optional<Severity> getHighestSeverityMarkerFor(final Optional<? extends RobotFileInternalElement> element) {
         if (!element.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         final List<RobotToken> allTokens = getTokensFor(element.get());
 
@@ -157,7 +157,7 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
         } else if (hasInfo.get()) {
             return Optional.of(Severity.INFO);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private List<RobotToken> getTokensFor(final RobotFileInternalElement element) {

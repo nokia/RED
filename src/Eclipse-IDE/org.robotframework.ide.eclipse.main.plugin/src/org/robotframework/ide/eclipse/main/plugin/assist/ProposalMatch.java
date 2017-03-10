@@ -10,8 +10,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public final class ProposalMatch implements Iterable<Range<Integer>> {
@@ -57,7 +57,7 @@ public final class ProposalMatch implements Iterable<Range<Integer>> {
         for (final Range<Integer> match : rangesInDomain) {
             newMatches.add(Range.closedOpen(match.lowerEndpoint() - startIndex, match.upperEndpoint() - startIndex));
         }
-        return newMatches.isEmpty() ? Optional.<ProposalMatch> absent() : Optional.of(new ProposalMatch(newMatches));
+        return newMatches.isEmpty() ? Optional.<ProposalMatch> empty() : Optional.of(new ProposalMatch(newMatches));
     }
 
     @Override

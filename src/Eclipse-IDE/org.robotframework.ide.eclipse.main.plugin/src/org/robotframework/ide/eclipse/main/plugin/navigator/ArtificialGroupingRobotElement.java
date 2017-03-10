@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
@@ -17,7 +18,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGro
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 
 public class ArtificialGroupingRobotElement implements RobotFileInternalElement {
 

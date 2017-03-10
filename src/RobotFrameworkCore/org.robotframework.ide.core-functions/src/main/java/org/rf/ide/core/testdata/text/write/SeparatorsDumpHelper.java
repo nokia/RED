@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.text.write;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -13,8 +14,6 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 /**
  * @author wypych
@@ -32,14 +31,14 @@ public class SeparatorsDumpHelper {
         int dumpEndIndex = -1;
         List<IRobotLineElement> lineElements = currentLine.getLineElements();
         currentLine.getEndOfLine();
-        Optional<Integer> forCurrentLine = getDumpEndIndex(lineElements, currentToken);
+        final Optional<Integer> forCurrentLine = getDumpEndIndex(lineElements, currentToken);
         if (forCurrentLine.isPresent()) {
             dumpEndIndex = forCurrentLine.get();
         } else {
             if (currentToken.getLineNumber() != FilePosition.NOT_SET) {
                 final RobotLine robotLine = model.getFileContent().get(currentToken.getLineNumber() - 1);
                 lineElements = robotLine.getLineElements();
-                Optional<Integer> forTokenLine = getDumpEndIndex(lineElements, currentToken);
+                final Optional<Integer> forTokenLine = getDumpEndIndex(lineElements, currentToken);
                 if (forTokenLine.isPresent()) {
                     dumpEndIndex = forTokenLine.get();
                 }
@@ -47,7 +46,7 @@ public class SeparatorsDumpHelper {
         }
 
         if (dumpEndIndex >= 0) {
-            int tokenPosIndex = lineElements.indexOf(currentToken);
+            final int tokenPosIndex = lineElements.indexOf(currentToken);
             for (int myIndex = tokenPosIndex + 1; myIndex < lineElements.size() && myIndex <= dumpEndIndex; myIndex++) {
                 dumpHelper.getDumpLineUpdater().updateLine(model, lines, lineElements.get(myIndex));
             }
@@ -57,9 +56,9 @@ public class SeparatorsDumpHelper {
 
     private Optional<Integer> getDumpEndIndex(final List<IRobotLineElement> lineElements,
             final IRobotLineElement currentToken) {
-        Optional<Integer> dumpEndIndex = Optional.absent();
+        Optional<Integer> dumpEndIndex = Optional.empty();
 
-        int tokenPosIndex = lineElements.indexOf(currentToken);
+        final int tokenPosIndex = lineElements.indexOf(currentToken);
         if (tokenPosIndex > -1) {
             for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
                 if (lineElements.get(index) instanceof RobotToken) {
@@ -79,7 +78,7 @@ public class SeparatorsDumpHelper {
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         final int tokenPosIndex = lineElements.indexOf(currentToken);
         for (int index = tokenPosIndex - 1; index >= 0; index--) {
-            IRobotLineElement lineElem = lineElements.get(index);
+            final IRobotLineElement lineElem = lineElements.get(index);
             if (lineElem instanceof RobotToken) {
                 if (!lineElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                     break;

@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -78,7 +78,7 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
                 return Optional.of(arguments.get(i));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public boolean supportsKwargs() {
@@ -152,7 +152,7 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         public Argument(final ArgumentType type, final String arg, final String defaultValue) {
             this.type = type;
             this.argumentName = arg;
-            this.defaultValue = Optional.fromNullable(defaultValue);
+            this.defaultValue = Optional.ofNullable(defaultValue);
         }
 
         public String getName() {

@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
@@ -20,8 +21,6 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
-
-import com.google.common.base.Optional;
 
 public class RobotFileOutput {
 
@@ -78,11 +77,11 @@ public class RobotFileOutput {
 
         if (!docInLine.isEmpty()) {
             if (docInOffset.size() < docInLine.size() || docInOffset.size() == docInLine.size()) {
-                return Optional.fromNullable(docInLine.get(0).getCached());
+                return Optional.ofNullable(docInLine.get(0).getCached());
             }
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public Optional<IDocumentationHolder> findDocumentationForOffset(final int offset) {
@@ -91,7 +90,7 @@ public class RobotFileOutput {
             return Optional.of(found.get(0).getCached());
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public Optional<IDocumentationHolder> findDocumentationForLine(final int lineNumber) {
@@ -100,7 +99,7 @@ public class RobotFileOutput {
             return Optional.of(found.get(0).getCached());
         }
 
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public FileRegionCacher<IDocumentationHolder> getDocumentationCacher() {

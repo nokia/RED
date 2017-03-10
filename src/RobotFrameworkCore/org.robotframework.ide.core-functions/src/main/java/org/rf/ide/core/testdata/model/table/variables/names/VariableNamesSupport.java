@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model.table.variables.names;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
@@ -16,7 +17,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -102,7 +102,7 @@ public class VariableNamesSupport {
                 Double.parseDouble(text);
                 return true;
             }
-        } catch (NumberFormatException nfe) {
+        } catch (final NumberFormatException nfe) {
         }
 
         return false;

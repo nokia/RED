@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -22,8 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedCodeReservedWordProp
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
-
-import com.google.common.base.Optional;
 
 
 /**
@@ -92,7 +91,7 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         final RobotLine lineModel = assist.getModel().getLinkedElement().getFileContent().get(line);
         final List<RobotToken> lineTokens = lineModel.getLineTokens();
         final Optional<RobotToken> firstToken = lineTokens.isEmpty() ?
-                Optional.<RobotToken>absent() :
+                Optional.<RobotToken> empty() :
                 Optional.of(lineTokens.get(0));
         
         return AssistProposalPredicates.codeReservedWordsPredicate(separators, firstToken);

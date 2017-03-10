@@ -10,13 +10,12 @@ import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestH
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
-
-import com.google.common.base.Optional;
 
 public class TestTimeoutViewTest {
 
@@ -27,11 +26,11 @@ public class TestTimeoutViewTest {
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
-        TestTimeout timeoutOne = new TestTimeout(createToken(""));
+        final TestTimeout timeoutOne = new TestTimeout(createToken(""));
         timeoutOne.setTimeout("2 minutes");
         timeoutOne.addMessageArgument("arg1_tok1");
 
-        TestTimeout timeoutTwo = new TestTimeout(createToken(""));
+        final TestTimeout timeoutTwo = new TestTimeout(createToken(""));
         timeoutTwo.setTimeout("3 minutes");
         timeoutTwo.addMessageArgument("arg1_tok2");
 
@@ -39,7 +38,7 @@ public class TestTimeoutViewTest {
         settingTable.addTestTimeout(timeoutTwo);
 
         // execute
-        Optional<TestTimeout> testTimeout = settingTable.testTimeout();
+        final Optional<TestTimeout> testTimeout = settingTable.testTimeout();
 
         // verify
         assertThat(testTimeout.isPresent()).isTrue();
@@ -54,11 +53,11 @@ public class TestTimeoutViewTest {
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
-        TestTimeout timeoutOne = new TestTimeout(createToken(""));
+        final TestTimeout timeoutOne = new TestTimeout(createToken(""));
         timeoutOne.setTimeout("2 minutes");
         timeoutOne.addMessageArgument("arg1_tok1");
 
-        TestTimeout timeoutTwo = new TestTimeout(createToken(""));
+        final TestTimeout timeoutTwo = new TestTimeout(createToken(""));
         timeoutTwo.setTimeout("3 minutes");
         timeoutTwo.addMessageArgument("arg1_tok2");
 
@@ -66,9 +65,9 @@ public class TestTimeoutViewTest {
         settingTable.addTestTimeout(timeoutTwo);
 
         // execute
-        Optional<TestTimeout> testTimeout = settingTable.testTimeout();
+        final Optional<TestTimeout> testTimeout = settingTable.testTimeout();
         assertThat(testTimeout.isPresent()).isTrue();
-        TestTimeout tTimeout = testTimeout.get();
+        final TestTimeout tTimeout = testTimeout.get();
         tTimeout.addMessageArgument("new_arg1");
 
         // verify
@@ -84,11 +83,11 @@ public class TestTimeoutViewTest {
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
-        TestTimeout timeoutOne = new TestTimeout(createToken(""));
+        final TestTimeout timeoutOne = new TestTimeout(createToken(""));
         timeoutOne.setTimeout("2 minutes");
         timeoutOne.addMessageArgument("arg1_tok1");
 
-        TestTimeout timeoutTwo = new TestTimeout(createToken(""));
+        final TestTimeout timeoutTwo = new TestTimeout(createToken(""));
         timeoutTwo.setTimeout("3 minutes");
         timeoutTwo.addMessageArgument("arg1_tok2");
 
@@ -96,9 +95,9 @@ public class TestTimeoutViewTest {
         settingTable.addTestTimeout(timeoutTwo);
 
         // execute
-        Optional<TestTimeout> testTimeout = settingTable.testTimeout();
+        final Optional<TestTimeout> testTimeout = settingTable.testTimeout();
         assertThat(testTimeout.isPresent()).isTrue();
-        TestTimeout tTimeout = testTimeout.get();
+        final TestTimeout tTimeout = testTimeout.get();
         tTimeout.getMessageArguments().get(2).setText("arg_mod");
 
         // verify
@@ -107,7 +106,7 @@ public class TestTimeoutViewTest {
     }
 
     private List<String> getText(final TestTimeout timeout) {
-        List<String> text = new ArrayList<>();
+        final List<String> text = new ArrayList<>();
 
         if (timeout.getTimeout() != null) {
             text.add(timeout.getTimeout().getText());

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
@@ -22,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

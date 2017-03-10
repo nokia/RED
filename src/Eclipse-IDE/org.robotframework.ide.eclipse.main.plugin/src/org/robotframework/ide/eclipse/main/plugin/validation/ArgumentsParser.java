@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.validation;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 /**
@@ -83,7 +83,7 @@ class ArgumentsParser {
 
         private final List<String> projectsToImport = new ArrayList<>();
 
-        private Optional<String> reportFilepath = Optional.absent();
+        private Optional<String> reportFilepath = Optional.empty();
 
         private final List<String> projectNames = new ArrayList<>();
 

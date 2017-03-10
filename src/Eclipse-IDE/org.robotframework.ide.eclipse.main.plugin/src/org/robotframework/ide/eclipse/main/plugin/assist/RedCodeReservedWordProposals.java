@@ -11,8 +11,7 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public class RedCodeReservedWordProposals {
 
@@ -48,8 +47,13 @@ public class RedCodeReservedWordProposals {
         proposals.addAll(generateProposalsFrom(GHERKIN_ELEMENTS, userContent));
         // match against both variants, but add only one proposal
         if (predicateWordHasToSatisfy.apply(FOR_LOOP_1)) {
-            final Optional<ProposalMatch> forLoopMatch = matcher.matches(userContent, FOR_LOOP_1)
-                    .or(matcher.matches(userContent, FOR_LOOP_2));
+            
+            final Optional<ProposalMatch> forLoopMatch = newArrayList(FOR_LOOP_1, FOR_LOOP_2).stream()
+                    .map(variant -> matcher.matches(userContent, variant))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst();
+            
             if (forLoopMatch.isPresent()) {
                 proposals.add(AssistProposals.createCodeReservedWordProposal(FOR_LOOP_1, forLoopMatch.get()));
             }

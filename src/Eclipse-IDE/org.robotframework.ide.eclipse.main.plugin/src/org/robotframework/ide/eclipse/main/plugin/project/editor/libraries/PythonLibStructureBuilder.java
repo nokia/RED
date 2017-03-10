@@ -12,6 +12,7 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -28,7 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 
 public class PythonLibStructureBuilder {
@@ -49,7 +49,7 @@ public class PythonLibStructureBuilder {
     }
 
     public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, Optional.<String> absent(), false);
+        return provideEntriesFromFile(path, Optional.<String> empty(), false);
     }
 
     private Collection<ILibraryClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,

@@ -4,14 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IFile;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
-
-import com.google.common.base.Optional;
 
 public class RedXmlEditorPropertyTesterTest {
 
@@ -48,8 +48,8 @@ public class RedXmlEditorPropertyTesterTest {
         final RedProjectEditor editorWithEditableFile = mock(RedProjectEditor.class);
         final RedProjectEditor editorWithNonEditableFile = mock(RedProjectEditor.class);
 
-        final RedProjectEditorInput editableInput = new RedProjectEditorInput(Optional.<IFile> absent(), true, null);
-        final RedProjectEditorInput nonEditableInput = new RedProjectEditorInput(Optional.<IFile> absent(), false,
+        final RedProjectEditorInput editableInput = new RedProjectEditorInput(Optional.<IFile> empty(), true, null);
+        final RedProjectEditorInput nonEditableInput = new RedProjectEditorInput(Optional.<IFile> empty(), false,
                 null);
 
         when(editorWithEditableFile.getRedProjectEditorInput()).thenReturn(editableInput);

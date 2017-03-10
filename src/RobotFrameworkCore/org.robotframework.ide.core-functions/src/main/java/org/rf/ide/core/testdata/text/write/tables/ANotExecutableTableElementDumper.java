@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.text.write.tables;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -27,8 +28,6 @@ import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
-
-import com.google.common.base.Optional;
 
 public abstract class ANotExecutableTableElementDumper implements ISectionElementDumper {
 

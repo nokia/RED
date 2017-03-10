@@ -6,6 +6,7 @@
 package org.robotframework.red.nattable.edit;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
@@ -35,7 +36,6 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 /**
  * Modified version of {@link org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor} which
@@ -129,7 +129,7 @@ public class RedTextCellEditor extends TextCellEditor {
         }
         ((InlineFocusListener) focusListener).handleFocusChanges = true;
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
 
         return text;
@@ -155,7 +155,7 @@ public class RedTextCellEditor extends TextCellEditor {
     public void close() {
         super.close();
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
     }
 

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -22,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 /**
  * @author Lukasz Wlodarczyk
@@ -51,7 +51,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         final File file = new File(srcPath);
         try {
             file.getCanonicalPath();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             return null;
         }
         final IPath fullPath = new Path(ResolvedImportPath.from(ImportPath.from(srcPath))
@@ -91,13 +91,13 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
     }
 
     @Override
-    public Optional<ICompletionProposal> asContentProposal(IMarker marker, IDocument document,
-            RobotSuiteFile suiteModel) {
+    public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
+            final RobotSuiteFile suiteModel) {
         return proposal;
     }
 
-    private static Optional<ICompletionProposal> createProposal(IMarker marker, IPath path, String res) {
-        MissingResourceFileCompletionProposal proposal = new MissingResourceFileCompletionProposal(
+    private static Optional<ICompletionProposal> createProposal(final IMarker marker, final IPath path, final String res) {
+        final MissingResourceFileCompletionProposal proposal = new MissingResourceFileCompletionProposal(
                 "Create missing " + res + " file",
                 "<b>" + res
                         + "</b><br> file will be created and opened for edition.<br><br>Resource path must be valid, "
@@ -107,7 +107,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
     }
 
     private static Optional<ICompletionProposal> createEmptyProposal() {
-        EmptyCompletionProposal proposal = new EmptyCompletionProposal("Missing resource file cannot be auto-created",
+        final EmptyCompletionProposal proposal = new EmptyCompletionProposal("Missing resource file cannot be auto-created",
                 "Please check your file path if you want to use this Quick Fix."
                         + "<br>Only valid and legal path to the file with explicit robot resource extension "
                         + "inside existing open project in this workspace can be used."

@@ -6,8 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.search;
 
 import java.util.Arrays;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 /**
  * @author Michal Anglart
@@ -41,7 +40,7 @@ public final class MatchesGroupingElement {
                 return Optional.<T> of(clazz.cast(element));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
 }

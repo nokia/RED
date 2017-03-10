@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -31,8 +32,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.propertytester.SelectionsPropertyTester;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
 
@@ -148,7 +147,7 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
                 addRobotCaseToMap(resourcesToTests, (RobotCase) o);
             } else {
                 // There is a selection element that should not be launched with others
-                return Optional.absent();
+                return Optional.empty();
             }
         }
         return Optional.of(resourcesToTests);

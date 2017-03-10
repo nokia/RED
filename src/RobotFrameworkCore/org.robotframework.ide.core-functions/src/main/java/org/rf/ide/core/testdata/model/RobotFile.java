@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
@@ -18,8 +19,6 @@ import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 public class RobotFile implements IChildElement<RobotFileOutput> {
 
@@ -50,7 +49,7 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
     public void removeLines() {
-        int numberOfLines = fileContent.size();
+        final int numberOfLines = fileContent.size();
         for (int i = 0; i < numberOfLines; i++) {
             fileContent.get(i).getLineElements().clear();
             fileContent.set(i, null);
@@ -68,16 +67,16 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
     public Optional<Integer> getRobotLineIndexBy(final int offset) {
-        Optional<Integer> foundLine = Optional.absent();
+        Optional<Integer> foundLine = Optional.empty();
         if (offset >= 0) {
-            List<RobotLine> robotLines = getFileContent();
-            int numberOfLines = robotLines.size();
+            final List<RobotLine> robotLines = getFileContent();
+            final int numberOfLines = robotLines.size();
             for (int lineIndex = 0; lineIndex < numberOfLines; lineIndex++) {
-                RobotLine line = robotLines.get(lineIndex);
-                int eolStartOffset = line.getEndOfLine().getStartOffset();
-                int start = (line.getLineElements().isEmpty()) ? eolStartOffset
+                final RobotLine line = robotLines.get(lineIndex);
+                final int eolStartOffset = line.getEndOfLine().getStartOffset();
+                final int start = (line.getLineElements().isEmpty()) ? eolStartOffset
                         : line.getLineElements().get(0).getStartOffset();
-                int end = eolStartOffset + line.getEndOfLine().getRaw().length();
+                final int end = eolStartOffset + line.getEndOfLine().getRaw().length();
                 if (start <= offset && offset < end) {
                     foundLine = Optional.of(lineIndex);
                     break;

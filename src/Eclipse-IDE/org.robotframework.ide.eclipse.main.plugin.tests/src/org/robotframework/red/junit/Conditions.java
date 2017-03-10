@@ -1,8 +1,8 @@
 package org.robotframework.red.junit;
 
-import org.assertj.core.api.Condition;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
+import org.assertj.core.api.Condition;
 
 public class Conditions {
 

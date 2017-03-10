@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
@@ -23,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinit
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 
 public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDetector

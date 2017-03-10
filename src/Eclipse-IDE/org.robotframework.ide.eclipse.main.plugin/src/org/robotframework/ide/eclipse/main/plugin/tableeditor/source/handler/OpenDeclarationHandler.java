@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 
+import java.util.Optional;
+
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -19,8 +21,6 @@ import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenDeclarationHandler.E4OpenDeclarationHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -57,7 +57,7 @@ public class OpenDeclarationHandler extends DIParameterizedHandler<E4OpenDeclara
                 return hyperlink;
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private static Optional<IHyperlink> detect(final ITextViewer viewer, final IRegion hyperlinkRegion,
@@ -66,6 +66,6 @@ public class OpenDeclarationHandler extends DIParameterizedHandler<E4OpenDeclara
         if (hyperlinks != null && hyperlinks.length > 0) {
             return Optional.of(hyperlinks[0]);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

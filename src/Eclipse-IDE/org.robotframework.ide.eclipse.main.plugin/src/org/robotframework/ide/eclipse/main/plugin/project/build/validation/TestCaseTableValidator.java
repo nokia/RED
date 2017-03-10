@@ -11,6 +11,7 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -58,7 +59,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testc
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
@@ -195,7 +195,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 && isTemplateFromTestCasesTable(testCase)
                 && !templateKeywordToken.getText().toLowerCase().equals("none")) {
             validateExistingKeywordCall(validationContext, reporter, templateKeywordToken,
-                    Optional.<List<RobotToken>> absent());
+                    Optional.<List<RobotToken>> empty());
         }
     }
 
@@ -269,7 +269,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
                     @Override
                     public Optional<String> transform(final String gherkinNameVariant) {
                         return validationContext.isKeywordAccessible(keywordProposal, gherkinNameVariant)
-                                ? Optional.of(gherkinNameVariant) : Optional.<String> absent();
+                                ? Optional.of(gherkinNameVariant) : Optional.<String> empty();
                     }
                 });
         final String name = !nameToUse.isPresent() || nameToUse.get().isEmpty() ? keywordName.getText()

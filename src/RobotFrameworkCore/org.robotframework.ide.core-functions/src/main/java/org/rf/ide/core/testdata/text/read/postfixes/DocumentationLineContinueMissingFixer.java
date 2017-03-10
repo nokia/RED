@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.text.read.postfixes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -28,7 +29,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 /**
  * @author wypych
@@ -122,8 +122,8 @@ public class DocumentationLineContinueMissingFixer implements IPostProcessFixAct
             final RobotToken declaration, final IRobotTokenType... acceptable) {
         final List<RobotToken> toks = new ArrayList<>(0);
 
-        Optional<Integer> elementPositionInLine = Optional.absent();
-        int lines = fileContent.size();
+        Optional<Integer> elementPositionInLine = Optional.empty();
+        final int lines = fileContent.size();
         boolean fetchMode = false;
         for (int lineNumber = searchStartNumber; lineNumber < lines; lineNumber++) {
             final RobotLine line = fileContent.get(lineNumber);

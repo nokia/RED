@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.rf.ide.core.testdata.mapping.collect.RobotTokensCollector;
@@ -20,7 +21,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.collect.ListMultimap;
 
 /**
@@ -44,7 +44,7 @@ public class TwoModelReferencesLinker {
     }
 
     public void update(final RobotFileOutput oldModifiedOutput, final RobotFileOutput alreadyDumpedContent,
-            boolean fallbackAllowed) {
+            final boolean fallbackAllowed) {
         validateBasicThatOutputFromSameFile(oldModifiedOutput, alreadyDumpedContent);
 
         final ListMultimap<RobotTokenType, RobotToken> oldViewAboutTokens = tokenCollector
@@ -76,7 +76,7 @@ public class TwoModelReferencesLinker {
             final List<RobotToken> oldToUpdate = oldViewAboutTokens.get(type);
             final List<RobotToken> newToCopy = newViewAboutTokens.get(type);
 
-            int tokSize = Math.min(oldToUpdate.size(), newToCopy.size());
+            final int tokSize = Math.min(oldToUpdate.size(), newToCopy.size());
             for (int index = 0; index < tokSize; index++) {
                 final RobotToken oldToken = oldToUpdate.get(index);
                 final RobotToken newToken = newToCopy.get(index);
@@ -125,16 +125,16 @@ public class TwoModelReferencesLinker {
             final ListMultimap<RobotTokenType, RobotToken> newViewAboutTokens) {
         final Set<RobotTokenType> newKeySet = newViewAboutTokens.keySet();
         for (final RobotTokenType t : newKeySet) {
-            List<RobotToken> oldToks = new ArrayList<>(oldViewAboutTokens.get(t));
-            List<RobotToken> newToks = newViewAboutTokens.get(t);
+            final List<RobotToken> oldToks = new ArrayList<>(oldViewAboutTokens.get(t));
+            final List<RobotToken> newToks = newViewAboutTokens.get(t);
 
             int toksSize = -1;
             if (oldToks.size() == newToks.size()) {
                 toksSize = oldToks.size();
             } else {
                 removePreviousLineContinue(oldToks);
-                int oldNotEmpty = findTheFirstNotEmpty(oldToks);
-                int newNotEmpty = findTheFirstNotEmpty(newToks);
+                final int oldNotEmpty = findTheFirstNotEmpty(oldToks);
+                final int newNotEmpty = findTheFirstNotEmpty(newToks);
                 if (oldNotEmpty == newNotEmpty) {
                     toksSize = oldNotEmpty;
                 } else {
@@ -170,8 +170,8 @@ public class TwoModelReferencesLinker {
         }
 
         if (rtOld.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
-            String oldText = oldTrimmed;
-            String newText = newTrimmed;
+            final String oldText = oldTrimmed;
+            final String newText = newTrimmed;
 
             if (newText.endsWith("=")) {
                 if (oldText.equals(newText.substring(0, newText.length() - 1).trim())) {
@@ -181,8 +181,8 @@ public class TwoModelReferencesLinker {
         }
 
         if (rtNew.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
-            String oldText = oldTrimmed;
-            String newText = newTrimmed;
+            final String oldText = oldTrimmed;
+            final String newText = newTrimmed;
 
             if (oldText.endsWith("=")) {
                 if (newText.equals(oldText.substring(0, oldText.length() - 1).trim())) {
@@ -210,7 +210,7 @@ public class TwoModelReferencesLinker {
     }
 
     private int findTheFirstNotEmpty(final List<RobotToken> t) {
-        int index = -1;
+        final int index = -1;
         for (int i = t.size() - 1; i >= 0; i--) {
             if (!t.get(i).getText().isEmpty()) {
                 return i;

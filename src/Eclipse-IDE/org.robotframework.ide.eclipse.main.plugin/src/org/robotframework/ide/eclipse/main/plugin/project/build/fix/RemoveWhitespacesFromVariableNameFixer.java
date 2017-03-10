@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
@@ -18,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class RemoveWhitespacesFromVariableNameFixer extends RedSuiteMarkerResolution {
@@ -38,11 +39,11 @@ public class RemoveWhitespacesFromVariableNameFixer extends RedSuiteMarkerResolu
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
         if (variableName == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
         final Optional<RobotVariablesSection> section = suiteModel.findSection(RobotVariablesSection.class);
         if (!section.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         for (final RobotVariable variable : section.get().getChildren()) {
             final Range<Integer> defRange = getRange(marker);
@@ -50,11 +51,11 @@ public class RemoveWhitespacesFromVariableNameFixer extends RedSuiteMarkerResolu
                 try {
                     return createProposal(document, variable);
                 } catch (final BadLocationException e) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private Optional<ICompletionProposal> createProposal(final IDocument document, final RobotVariable variable)
