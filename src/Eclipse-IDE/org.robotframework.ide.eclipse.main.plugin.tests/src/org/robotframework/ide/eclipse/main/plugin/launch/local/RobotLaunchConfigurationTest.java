@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -236,27 +235,6 @@ public class RobotLaunchConfigurationTest {
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setProjectName("not_existing");
         robotConfig.getRobotProject();
-    }
-
-    @Test
-    public void configurationSuitableForResources_whenApplicable() throws CoreException, IOException {
-        final IResource res = projectProvider.createFile("Resource", "");
-        final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        assertThat(robotConfig.isSuitableFor(resources)).isTrue();
-    }
-
-    @Test
-    public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException, IOException {
-        final IResource res = projectProvider.createFile("Resource", "");
-        final List<IResource> resources = newArrayList(res);
-        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
-        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-
-        final IResource anotherRes = projectProvider.createFile("Another Resource", "");
-        resources.add(anotherRes);
-        assertThat(robotConfig.isSuitableFor(resources)).isFalse();
     }
 
     @Test

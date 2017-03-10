@@ -10,17 +10,22 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
+
+import com.google.common.annotations.VisibleForTesting;;
 
 public class RobotLaunchConfigurationFinder {
 
@@ -44,7 +49,7 @@ public class RobotLaunchConfigurationFinder {
             } else {
                 for (final ILaunchConfiguration configuration : launchConfigs) {
                     final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-                    if (robotConfig.isSuitableForOnly(resources)) {
+                    if (isSuitableForOnly(robotConfig, resources)) {
                         return asWorkingCopy(configuration);
                     }
                 }
@@ -52,7 +57,7 @@ public class RobotLaunchConfigurationFinder {
         }
         for (final ILaunchConfiguration configuration : launchConfigs) {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-            if (robotConfig.isSuitableFor(resources)) {
+            if (isSuitableFor(robotConfig, resources)) {
                 return asWorkingCopy(configuration);
             }
         }
@@ -99,7 +104,7 @@ public class RobotLaunchConfigurationFinder {
         }
         for (final ILaunchConfiguration configuration : launchConfigs) {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-            if (robotConfig.isGeneralPurposeConfiguration() && robotConfig.isSuitableFor(resources)) {
+            if (robotConfig.isGeneralPurposeConfiguration() && isSuitableFor(robotConfig, resources)) {
                 return asWorkingCopy(configuration);
             }
         }
@@ -175,6 +180,70 @@ public class RobotLaunchConfigurationFinder {
             } catch (final CoreException e) {
                 return null;
             }
+        }
+    }
+
+    @VisibleForTesting
+    static boolean isSuitableFor(final RobotLaunchConfiguration robotConfig, final List<IResource> resources) {
+        try {
+            for (final IResource resource : resources) {
+                final IProject project = resource.getProject();
+                if (!robotConfig.getProjectName().equals(project.getName())) {
+                    return false;
+                }
+                boolean exists = false;
+                for (final String path : robotConfig.getSuitePaths().keySet()) {
+                    final IResource res = project.findMember(Path.fromPortableString(path));
+                    if (res != null && res.equals(resource)) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (final CoreException e) {
+            return false;
+        }
+    }
+
+    @VisibleForTesting
+    static boolean isSuitableForOnly(final RobotLaunchConfiguration robotConfig, final List<IResource> resources) {
+        try {
+            final List<IResource> toCall = newArrayList();
+            toCall.addAll(resources);
+            final Set<String> canCall = robotConfig.getSuitePaths().keySet();
+            if (toCall.size() != canCall.size()) {
+                return false;
+            }
+            for (final IResource resource : resources) {
+                final IProject project = resource.getProject();
+                if (!robotConfig.getProjectName().equals(project.getName())) {
+                    return false;
+                }
+                boolean exists = false;
+                for (final String path : robotConfig.getSuitePaths().keySet()) {
+                    final IResource res = project.findMember(Path.fromPortableString(path));
+                    if (res != null && res.equals(resource)) {
+                        exists = true;
+                        toCall.remove(res);
+                        canCall.remove(path);
+                        break;
+                    }
+                }
+                if (!exists) {
+                    return false;
+                }
+            }
+            if (toCall.size() == 0 && canCall.size() == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (final CoreException e) {
+            return false;
         }
     }
 }

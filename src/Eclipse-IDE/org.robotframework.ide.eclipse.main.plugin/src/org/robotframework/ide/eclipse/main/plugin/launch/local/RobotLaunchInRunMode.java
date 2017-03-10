@@ -18,6 +18,7 @@ import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
@@ -42,7 +43,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
 
         final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
-        final String version = robotConfig.checkExecutorVersion(runtimeEnvironment);
+        final String version = checkExecutorVersion(robotConfig, runtimeEnvironment);
 
         final String host = robotConfig.getAgentConnectionHost();
         final int port = robotConfig.getAgentConnectionPort();
@@ -61,7 +62,7 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
                     .start()
                     .waitForServer();
 
-            final String processLabel = robotConfig.createConsoleDescription(runtimeEnvironment);
+            final String processLabel = createConsoleDescription(robotConfig, runtimeEnvironment);
 
             final RunCommandLine cmdLine = prepareCommandLine(robotConfig, port);
 
@@ -80,5 +81,17 @@ class RobotLaunchInRunMode extends RobotLaunchInMode {
         } catch (final InterruptedException e) {
             throw newCoreException("Interrupted when waiting for remote connection server", e);
         }
+    }
+
+    private String createConsoleDescription(final RobotLaunchConfiguration robotConfig,
+            final RobotRuntimeEnvironment env) throws CoreException {
+        return robotConfig.isUsingInterpreterFromProject() ? env.getPythonExecutablePath()
+                : robotConfig.getInterpreter().executableName();
+    }
+
+    private String checkExecutorVersion(final RobotLaunchConfiguration robotConfig, final RobotRuntimeEnvironment env)
+            throws RobotEnvironmentException, CoreException {
+        return robotConfig.isUsingInterpreterFromProject() ? env.getVersion()
+                : RobotRuntimeEnvironment.getVersion(robotConfig.getInterpreter());
     }
 }
