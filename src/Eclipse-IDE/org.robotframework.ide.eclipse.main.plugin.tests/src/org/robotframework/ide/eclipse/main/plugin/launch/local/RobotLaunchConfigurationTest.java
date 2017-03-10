@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -182,19 +183,19 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
-        final IResource res = project.getFile("Resource1");
+        final IResource res1 = project.getFile("Resource1");
         final IResource res2 = project.getFile("Resource2");
-        final List<String> casesForRes = newArrayList("case1", "case3");
+        final List<String> casesForRes1 = newArrayList("case1", "case3");
         final List<String> casesForRes2 = newArrayList("case1");
 
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareForSelectedTestCases(ImmutableMap.of(res, casesForRes, res2, casesForRes2));
+                .prepareForSelectedTestCases(ImmutableMap.of(res1, casesForRes1, res2, casesForRes2));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
         assertThat(suitePaths.keySet()).containsExactlyInAnyOrder("Resource1", "Resource2");
-        assertThat(suitePaths).containsEntry("Resource1", casesForRes);
+        assertThat(suitePaths).containsEntry("Resource1", casesForRes1);
         assertThat(suitePaths).containsEntry("Resource2", casesForRes2);
         assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
@@ -253,9 +254,15 @@ public class RobotLaunchConfigurationTest {
     }
 
     @Test
-    public void resourcesAreReturned_whenAskedForResourcesUnderDebug() throws CoreException {
+    public void resourcesAreReturned_whenAskedForResourcesUnderDebug() throws CoreException, IOException {
+        final IResource res1 = projectProvider.createFile("DebugResource1");
+        final IResource res2 = projectProvider.createFile("DebugResource2");
+        final List<String> casesForRes1 = newArrayList("case1", "case2");
+        final List<String> casesForRes2 = newArrayList("case1");
+
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(project.getFile("Resource"));
+        robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
+        assertThat(robotConfig.getResourcesUnderDebug()).containsOnly(res1, res2);
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {

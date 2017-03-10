@@ -14,10 +14,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public interface IRobotLaunchConfiguration {
 
-    int MAX_PORT = 65_535;
-
-    int MAX_TIMEOUT = 3_600;
-
     AtomicBoolean IS_CONFIGURATION_RUNNING = new AtomicBoolean(false);
 
     String getName();
@@ -31,6 +27,8 @@ public interface IRobotLaunchConfiguration {
     void setProjectName(String projectName) throws CoreException;
 
     RobotProject getRobotProject() throws CoreException;
+
+    List<IResource> getResourcesUnderDebug() throws CoreException;
 
     boolean isDefiningProjectDirectly();
 
@@ -55,8 +53,6 @@ public interface IRobotLaunchConfiguration {
     void setAgentConnectionPortValue(String port) throws CoreException;
 
     void setAgentConnectionTimeoutValue(String timeout) throws CoreException;
-
-    List<IResource> getResourcesUnderDebug() throws CoreException;
 
     static boolean lockConfigurationLaunches() {
         return IS_CONFIGURATION_RUNNING.getAndSet(true);
