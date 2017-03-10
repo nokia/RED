@@ -17,9 +17,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -33,54 +32,27 @@ import com.google.common.base.Optional;
 /**
  * @author Michal Anglart
  */
-public class LaunchConfigurationsValidator {
+public class LaunchConfigurationTabValidator {
 
     private final RobotModel model;
 
-    public LaunchConfigurationsValidator() {
+    public LaunchConfigurationTabValidator() {
         this(RedPlugin.getModelManager().getModel());
     }
 
     @VisibleForTesting
-    LaunchConfigurationsValidator(final RobotModel model) {
+    LaunchConfigurationTabValidator(final RobotModel model) {
         this.model = model;
     }
 
-    public void validate(final IRemoteRobotLaunchConfiguration robotConfig)
-            throws LaunchConfigurationValidationFatalException {
-        try {
-            if (robotConfig.isDefiningProjectDirectly()) {
-                final String projectName = robotConfig.getProjectName();
-                validateProject(projectName);
-            }
-
-            try {
-                robotConfig.getRemoteHost();
-                robotConfig.getRemotePort();
-                robotConfig.getRemoteTimeout();
-            } catch (final CoreException e) {
-                throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
-            }
-        } catch (final CoreException e) {
-            throw new LaunchConfigurationValidationFatalException(
-                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
-        }
-    }
-
-    void validate(final RobotLaunchConfiguration robotConfig)
+    void validateRobotTab(final RobotLaunchConfiguration robotConfig)
             throws LaunchConfigurationValidationException, LaunchConfigurationValidationFatalException {
         try {
             final List<String> warnings = new ArrayList<>();
 
             final String projectName = robotConfig.getProjectName();
-            validateProject(projectName);
 
-            if (robotConfig.isUsingInterpreterFromProject()) {
-                validateRuntimeEnvironment(projectName);
-            } else {
-                warnings.add("Tests will be launched using '" + robotConfig.getExecutor().name()
-                        + "' interpreter as defined in PATH environment variable.");
-            }
+            validateProject(projectName);
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
             if (suitesToRun.isEmpty()) {
@@ -98,20 +70,43 @@ public class LaunchConfigurationsValidator {
         }
     }
 
-    void validate(final ScriptRobotLaunchConfiguration robotConfig) {
+    public void validateListenerTab(final IRobotLaunchConfiguration robotConfig)
+            throws LaunchConfigurationValidationFatalException {
+        try {
+            if (robotConfig.isDefiningProjectDirectly()) {
+                final String projectName = robotConfig.getProjectName();
+                validateProject(projectName);
+            }
+            if (robotConfig.isRemoteAgent()) {
+                try {
+                    robotConfig.getAgentConnectionHost();
+                    robotConfig.getAgentConnectionPort();
+                    robotConfig.getAgentConnectionTimeout();
+                } catch (final CoreException e) {
+                    throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
+                }
+            }
+        } catch (final CoreException e) {
+            throw new LaunchConfigurationValidationFatalException(
+                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
+        }
+    }
+
+    void validateExecutorTab(final RobotLaunchConfiguration robotConfig)
+            throws LaunchConfigurationValidationException, LaunchConfigurationValidationFatalException {
         try {
             final List<String> warnings = new ArrayList<>();
 
             final String projectName = robotConfig.getProjectName();
-            validateProject(projectName);
 
-            validateExecutorScript(robotConfig.getScriptPath());
-
-            final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
-            if (suitesToRun.isEmpty()) {
-                warnings.add("There are no suites specified. All suites in '" + projectName + "' will be executed.");
+            if (robotConfig.isUsingInterpreterFromProject()) {
+                validateRuntimeEnvironment(projectName);
+            } else {
+                warnings.add("Tests will be launched using '" + robotConfig.getInterpreter().name()
+                        + "' interpreter as defined in PATH environment variable.");
             }
-            validateSuitesToRun(suitesToRun);
+
+            validateExecutableFile(robotConfig.getExecutableFilePath());
 
             if (!warnings.isEmpty()) {
                 throw new LaunchConfigurationValidationException(String.join("\n", warnings));
@@ -135,25 +130,26 @@ public class LaunchConfigurationsValidator {
     }
 
     private void validateRuntimeEnvironment(final String projectName) {
-        final IProject project = getProject(projectName).get();
-        final RobotProject robotProject = model.createRobotProject(project);
-        final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
-        if (env == null || !env.isValidPythonInstallation()) {
-            throw new LaunchConfigurationValidationFatalException(
-                    "Project '" + projectName + "' is using invalid Python environment.");
-        } else if (!env.hasRobotInstalled()) {
-            throw new LaunchConfigurationValidationFatalException(
-                    "Project '" + projectName + "' is using invalid Python environment (missing Robot Framework).");
+        final Optional<IProject> project = getProject(projectName);
+        if (project.isPresent()) {
+            final RobotProject robotProject = model.createRobotProject(project.get());
+            final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
+            if (env == null || !env.isValidPythonInstallation()) {
+                throw new LaunchConfigurationValidationFatalException(
+                        "Project '" + projectName + "' is using invalid Python environment.");
+            } else if (!env.hasRobotInstalled()) {
+                throw new LaunchConfigurationValidationFatalException(
+                        "Project '" + projectName + "' is using invalid Python environment (missing Robot Framework).");
+            }
         }
     }
 
-    private void validateExecutorScript(final String filePath) {
-        if (filePath.isEmpty()) {
-            throw new LaunchConfigurationValidationFatalException("Executor script file path is not defined.");
-        }
-        final File file = new File(filePath);
-        if (!file.exists()) {
-            throw new LaunchConfigurationValidationFatalException("Executor script file does not exist.");
+    private void validateExecutableFile(final String filePath) {
+        if (!filePath.isEmpty()) {
+            final File file = new File(filePath);
+            if (!file.exists()) {
+                throw new LaunchConfigurationValidationFatalException("Executable file does not exist.");
+            }
         }
     }
 

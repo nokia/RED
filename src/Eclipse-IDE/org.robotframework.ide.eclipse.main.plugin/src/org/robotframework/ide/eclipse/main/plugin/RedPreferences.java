@@ -60,17 +60,15 @@ public class RedPreferences {
 
     public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
 
-    public static final String LAUNCH_REMOTE_ENABLED = "red.launch.remote.enabled";
-
     public static final String LAUNCH_REMOTE_HOST = "red.launch.remote.host";
 
     public static final String LAUNCH_REMOTE_PORT = "red.launch.remote.port";
 
     public static final String LAUNCH_REMOTE_TIMEOUT = "red.launch.remote.timeout";
 
-    public static final String LAUNCH_SCRIPT_PATH = "red.launch.scriptPath";
+    public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
 
-    public static final String LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS = "red.launch.additionalscriptArguments";
+    public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -187,10 +185,6 @@ public class RedPreferences {
         return store.getString(LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS);
     }
 
-    public boolean isLaunchRemoteEnabled() {
-        return store.getBoolean(LAUNCH_REMOTE_ENABLED);
-    }
-
     public String getLaunchRemoteHost() {
         return store.getString(LAUNCH_REMOTE_HOST);
     }
@@ -203,12 +197,12 @@ public class RedPreferences {
         return store.getString(LAUNCH_REMOTE_TIMEOUT);
     }
 
-    public String getLaunchScriptPath() {
-        return store.getString(LAUNCH_SCRIPT_PATH);
+    public String getLaunchExecutableFilePath() {
+        return store.getString(LAUNCH_EXECUTABLE_FILE_PATH);
     }
 
-    public String getLaunchAdditionalScriptArguments() {
-        return store.getString(LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
+    public String getLaunchAdditionalExecutableFileArguments() {
+        return store.getString(LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {

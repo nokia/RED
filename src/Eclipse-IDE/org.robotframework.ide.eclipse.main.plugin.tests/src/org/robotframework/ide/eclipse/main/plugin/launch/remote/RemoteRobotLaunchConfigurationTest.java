@@ -61,15 +61,18 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void defaultConfigurationObtained_whenCustomConfigurationIsFilledWithDefaults() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemoteHostValue("1.2.3.4");
-        robotConfig.setRemotePortValue("987");
-        robotConfig.setRemoteTimeoutValue("123");
+
+        robotConfig.setAgentConnectionHostValue("1.2.3.4");
+        robotConfig.setAgentConnectionPortValue("987");
+        robotConfig.setAgentConnectionTimeoutValue("123");
+
         robotConfig.fillDefaults();
+
         assertThat(robotConfig.getProjectName()).isEqualTo("");
-        assertThat(robotConfig.isRemoteAgent()).isFalse();
-        assertThat(robotConfig.getRemoteHost()).isEqualTo("127.0.0.1");
-        assertThat(robotConfig.getRemotePort()).isBetween(1, 65_535);
-        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(30);
+        assertThat(robotConfig.isRemoteAgent()).isTrue();
+        assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
     }
 
     @Test
@@ -91,8 +94,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Server IP cannot be empty");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemoteHostValue("");
-        robotConfig.getRemoteHost();
+        robotConfig.setAgentConnectionHostValue("");
+        robotConfig.getAgentConnectionHost();
     }
 
     @Test
@@ -101,8 +104,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port '' must be an Integer between 1 and 65,535");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemotePortValue("");
-        robotConfig.getRemotePort();
+        robotConfig.setAgentConnectionPortValue("");
+        robotConfig.getAgentConnectionPort();
     }
 
     @Test
@@ -111,8 +114,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port 'abc' must be an Integer between 1 and 65,535");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemotePortValue("abc");
-        robotConfig.getRemotePort();
+        robotConfig.setAgentConnectionPortValue("abc");
+        robotConfig.getAgentConnectionPort();
     }
 
     @Test
@@ -121,8 +124,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port '0' must be an Integer between 1 and 65,535");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemotePortValue("0");
-        robotConfig.getRemotePort();
+        robotConfig.setAgentConnectionPortValue("0");
+        robotConfig.getAgentConnectionPort();
     }
 
     @Test
@@ -131,8 +134,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Server port '65536' must be an Integer between 1 and 65,535");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemotePortValue("65536");
-        robotConfig.getRemotePort();
+        robotConfig.setAgentConnectionPortValue("65536");
+        robotConfig.getAgentConnectionPort();
     }
 
     @Test
@@ -141,8 +144,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemoteTimeoutValue("");
-        robotConfig.getRemoteTimeout();
+        robotConfig.setAgentConnectionTimeoutValue("");
+        robotConfig.getAgentConnectionTimeout();
     }
 
     @Test
@@ -151,8 +154,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout 'abc' must be an Integer between 1 and 3,600");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemoteTimeoutValue("abc");
-        robotConfig.getRemoteTimeout();
+        robotConfig.setAgentConnectionTimeoutValue("abc");
+        robotConfig.getAgentConnectionTimeout();
     }
 
     @Test
@@ -161,8 +164,8 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout '0' must be an Integer between 1 and 3,600");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemoteTimeoutValue("0");
-        robotConfig.getRemoteTimeout();
+        robotConfig.setAgentConnectionTimeoutValue("0");
+        robotConfig.getAgentConnectionTimeout();
     }
 
     @Test
@@ -171,19 +174,19 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expectMessage("Connection timeout '3601' must be an Integer between 1 and 3,600");
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemoteTimeoutValue("3601");
-        robotConfig.getRemoteTimeout();
+        robotConfig.setAgentConnectionTimeoutValue("3601");
+        robotConfig.getAgentConnectionTimeout();
     }
 
     @Test
     public void remoteSettingsAreCorrect_whenSet() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setRemoteHostValue("192.168.1.21");
-        robotConfig.setRemotePortValue("1234");
-        robotConfig.setRemoteTimeoutValue("567");
-        assertThat(robotConfig.getRemoteHost()).isEqualTo("192.168.1.21");
-        assertThat(robotConfig.getRemotePort()).isEqualTo(1234);
-        assertThat(robotConfig.getRemoteTimeout()).isEqualTo(567);
+        robotConfig.setAgentConnectionHostValue("192.168.1.21");
+        robotConfig.setAgentConnectionPortValue("1234");
+        robotConfig.setAgentConnectionTimeoutValue("567");
+        assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("192.168.1.21");
+        assertThat(robotConfig.getAgentConnectionPort()).isEqualTo(1234);
+        assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(567);
     }
 
     @Test

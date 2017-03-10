@@ -14,7 +14,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -121,64 +120,89 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void defaultConfigurationObtained_whenDefaultConfigurationIsCreated() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+
         assertThat(robotConfig.getName()).isEqualTo("Resource");
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.getSuitePaths().keySet()).containsExactly("Resource");
-        assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);
-        assertThat(robotConfig.getExecutorArguments()).isEqualTo("");
+        assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
+
+        assertThat(robotConfig.isRemoteAgent()).isFalse();
+        assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
+
+        assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
+        assertThat(robotConfig.getExecutableFilePath()).isEqualTo("");
+        assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("");
     }
 
     @Test
     public void defaultConfigurationObtained_whenCustomConfigurationIsFilledWithDefaults() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        final Map<String, List<String>> suites = new HashMap<>();
-        suites.put("key", newArrayList("value"));
-        robotConfig.setExecutor(SuiteExecutor.PyPy);
-        robotConfig.setExecutorArguments("arguments");
+
+        robotConfig.setRobotArguments("arguments");
         robotConfig.setProjectName(PROJECT_NAME);
-        robotConfig.setSuitePaths(suites);
+        robotConfig.setSuitePaths(ImmutableMap.of("key", newArrayList("value")));
         robotConfig.setIsIncludeTagsEnabled(true);
         robotConfig.setIsExcludeTagsEnabled(true);
         robotConfig.setExcludedTags(newArrayList("excluded"));
         robotConfig.setIncludedTags(newArrayList("included"));
+
+        robotConfig.setRemoteAgentValue(String.valueOf(true));
+        robotConfig.setAgentConnectionHostValue("1.2.3.4");
+        robotConfig.setAgentConnectionPortValue("987");
+        robotConfig.setAgentConnectionTimeoutValue("123");
+
+        robotConfig.setInterpreter(SuiteExecutor.PyPy);
+        robotConfig.setExecutableFilePath("path");
+        robotConfig.setExecutableFileArguments("-new");
+
         robotConfig.fillDefaults();
+
         assertThat(robotConfig.getProjectName()).isEqualTo("");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
-        assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);
-        assertThat(robotConfig.getExecutorArguments()).isEqualTo("");
+        assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
+
+        assertThat(robotConfig.isRemoteAgent()).isFalse();
+        assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
+
+        assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
+        assertThat(robotConfig.getExecutableFilePath()).isEqualTo("");
+        assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("");
     }
 
     @Test
     public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
         final IResource res = project.getFile("Resource1");
         final IResource res2 = project.getFile("Resource2");
-        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
         final List<String> casesForRes = newArrayList("case1", "case3");
         final List<String> casesForRes2 = newArrayList("case1");
-        resourcesToTestCases.put(res, casesForRes);
-        resourcesToTestCases.put(res2, casesForRes2);
+
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
-                .prepareForSelectedTestCases(resourcesToTestCases);
+                .prepareForSelectedTestCases(ImmutableMap.of(res, casesForRes, res2, casesForRes2));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
         assertThat(suitePaths.keySet()).containsExactlyInAnyOrder("Resource1", "Resource2");
         assertThat(suitePaths).containsEntry("Resource1", casesForRes);
         assertThat(suitePaths).containsEntry("Resource2", casesForRes2);
-        assertThat(robotConfig.getExecutor()).isEqualTo(SuiteExecutor.Python);
-        assertThat(robotConfig.getExecutorArguments()).isEqualTo("");
+        assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
+        assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
     }
 
     @Test
@@ -239,7 +263,7 @@ public class RobotLaunchConfigurationTest {
     public void configuredForRerunFailedTests_whenAskedForRerun() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         RobotLaunchConfiguration.fillForFailedTestsRerun(robotConfig.asWorkingCopy(), "path");
-        assertThat(robotConfig.getExecutorArguments()).isEqualTo("-R path");
+        assertThat(robotConfig.getRobotArguments()).isEqualTo("-R path");
         assertThat(robotConfig.getSuitePaths()).isEmpty();
     }
 

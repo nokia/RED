@@ -29,8 +29,6 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
-import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchInMode;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RuntimeEnvironmentsMocks;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -137,6 +135,31 @@ public class RobotLaunchInModeTest {
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
                 projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
+    }
+
+    @Test
+    public void commandLineStartsWitExecutableFilePath() throws Exception {
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toPortableString();
+        robotConfig.setExecutableFilePath(executablePath);
+
+        final RobotLaunchInMode launchMode = createModeUnderTest();
+        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+
+        assertThat(commandLine.getCommandLine()).startsWith(executablePath);
+    }
+
+    @Test
+    public void commandLineContainsExecutableFilePathWithArguments() throws Exception {
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toPortableString();
+        robotConfig.setExecutableFilePath(executablePath);
+        robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
+
+        final RobotLaunchInMode launchMode = createModeUnderTest();
+        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+
+        assertThat(commandLine.getCommandLine()).containsSubsequence(executablePath, "-arg1", "abc", "-arg2", "xyz");
     }
 
     private static RobotLaunchInMode createModeUnderTest() {

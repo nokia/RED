@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
@@ -47,10 +46,10 @@ public class DefaultLaunchConfigurationPreferencePageTest {
                 RedPreferences.LAUNCH_REMOTE_TIMEOUT);
         final List<String> stringPrefNames = newArrayList(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS,
                 RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, RedPreferences.LAUNCH_REMOTE_HOST,
-                RedPreferences.LAUNCH_ADDITIONAL_SCRIPT_ARGUMENTS);
+                RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(8);
+        assertThat(editors).hasSize(7);
         for (final Object ed : editors) {
             final FieldEditor editor = (FieldEditor) ed;
 
@@ -58,12 +57,9 @@ public class DefaultLaunchConfigurationPreferencePageTest {
                 integerPrefNames.remove(editor.getPreferenceName());
             } else if (editor instanceof StringFieldEditor) {
                 stringPrefNames.remove(editor.getPreferenceName());
-            } else if (editor instanceof BooleanFieldEditor) {
-                final BooleanFieldEditor booleanFieldEditor = (BooleanFieldEditor) editor;
-                assertThat(booleanFieldEditor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_REMOTE_ENABLED);
             } else if (editor instanceof FileFieldEditor) {
                 final FileFieldEditor fileFieldEditor = (FileFieldEditor) editor;
-                assertThat(fileFieldEditor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_SCRIPT_PATH);
+                assertThat(fileFieldEditor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH);
             }
         }
         assertThat(integerPrefNames).isEmpty();

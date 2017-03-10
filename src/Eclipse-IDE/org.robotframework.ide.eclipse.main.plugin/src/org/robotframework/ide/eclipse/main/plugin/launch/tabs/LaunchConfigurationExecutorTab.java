@@ -20,21 +20,29 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
-import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationException;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
+import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.InterpretersComposite.InterpreterListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationException;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
+
+import com.google.common.base.Optional;
 
 /**
  * @author bembenek
  */
-public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurationTab
+public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab
         implements ILaunchConfigurationTab {
 
-    private ExecutorScriptComposite executorScriptComposite;
+    private InterpretersComposite interpretersComposite;
+
+    private Text interpreterArgumentsText;
+
+    private ExecutableFileComposite executorScriptComposite;
 
     private Text scriptArgumentsText;
 
@@ -50,11 +58,13 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     @Override
     public void initializeFrom(final ILaunchConfiguration configuration) {
-        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         try {
-            executorScriptComposite.setInput(robotConfig.getScriptPath());
-            scriptArgumentsText.setText(robotConfig.getScriptArguments());
+            interpretersComposite.setInput(robotConfig.isUsingInterpreterFromProject(), robotConfig.getInterpreter());
+            interpreterArgumentsText.setText(robotConfig.getInterpreterArguments());
+            executorScriptComposite.setInput(robotConfig.getExecutableFilePath());
+            scriptArgumentsText.setText(robotConfig.getExecutableFileArguments());
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
@@ -62,11 +72,14 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
-        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         try {
-            robotConfig.setScriptPath(executorScriptComposite.getSelectedScriptPath());
-            robotConfig.setScriptArguments(scriptArgumentsText.getText().trim());
+            robotConfig.setUsingInterpreterFromProject(interpretersComposite.isUsingProjectInterpreter());
+            robotConfig.setInterpreter(interpretersComposite.getChosenSystemExecutor());
+            robotConfig.setInterpreterArguments(interpreterArgumentsText.getText());
+            robotConfig.setExecutableFilePath(executorScriptComposite.getSelectedExecutableFilePath());
+            robotConfig.setExecutableFileArguments(scriptArgumentsText.getText().trim());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
@@ -78,9 +91,9 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         setErrorMessage(null);
         setWarningMessage(null);
 
-        final ScriptRobotLaunchConfiguration robotConfig = new ScriptRobotLaunchConfiguration(configuration);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         try {
-            new LaunchConfigurationsValidator().validate(robotConfig);
+            new LaunchConfigurationTabValidator().validateExecutorTab(robotConfig);
         } catch (final LaunchConfigurationValidationException e) {
             setWarningMessage(e.getMessage());
         } catch (final LaunchConfigurationValidationFatalException e) {
@@ -92,7 +105,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     @Override
     public String getName() {
-        return "Script";
+        return "Executor";
     }
 
     @Override
@@ -102,7 +115,7 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
 
     @Override
     public boolean canSave() {
-        return !executorScriptComposite.getSelectedScriptPath().isEmpty();
+        return true;
     }
 
     @Override
@@ -115,24 +128,43 @@ public class RobotLaunchConfigurationScriptTab extends AbstractLaunchConfigurati
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(composite);
 
-        createExecutorScriptGroup(composite);
+        createInterpreterGroup(composite);
+        createExecutableFileGroup(composite);
 
         setControl(composite);
     }
 
-    private void createExecutorScriptGroup(final Composite parent) {
+    private void createInterpreterGroup(final Composite parent) {
+        final Group group = new Group(parent, SWT.NONE);
+        group.setText("Interpreter");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+        GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
+
+        interpretersComposite = new InterpretersComposite(group, new InterpreterListener() {
+
+            @Override
+            public void interpreterChanged(final Optional<SuiteExecutor> newExecutor) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(interpretersComposite);
+
+        interpreterArgumentsText = createLabeledText(group, "Additional interpreter arguments:");
+    }
+
+    private void createExecutableFileGroup(final Composite parent) {
         final Group group = new Group(parent, SWT.NONE);
         group.setText("Executable file");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
         GridLayoutFactory.fillDefaults().spacing(2, 2).margins(0, 3).applyTo(group);
 
-        executorScriptComposite = new ExecutorScriptComposite(group, new ModifyListener() {
+        executorScriptComposite = new ExecutableFileComposite(group, new ModifyListener() {
 
             @Override
             public void modifyText(final ModifyEvent e) {
                 updateLaunchConfigurationDialog();
             }
-        }, ScriptRobotLaunchConfiguration.getSystemDependentScriptExtensions());
+        }, RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions());
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorScriptComposite);
 
         scriptArgumentsText = createLabeledText(group, "Additional executable file arguments:");

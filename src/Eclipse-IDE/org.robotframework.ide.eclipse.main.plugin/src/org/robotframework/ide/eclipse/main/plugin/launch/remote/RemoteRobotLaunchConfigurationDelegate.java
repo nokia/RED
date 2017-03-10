@@ -19,7 +19,6 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.TestsMode;
-import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -29,7 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.DebugExecutionEventsLis
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
@@ -41,18 +39,11 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
             throws CoreException, IOException {
 
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(configuration);
-        new LaunchConfigurationsValidator().validate(robotConfig);
-        
-        final String host = robotConfig.isRemoteAgent() ? robotConfig.getRemoteHost()
-                : AgentConnectionServer.DEFAULT_CLIENT_HOST;
-        final int port = robotConfig.isRemoteAgent() ? robotConfig.getRemotePort()
-                : AgentConnectionServer.findFreePort();
-        if (port < 0) {
-            throw newCoreException("Unable to find free port");
-        }
-        final int timeout = robotConfig.isRemoteAgent() ? robotConfig.getRemoteTimeout()
-                : AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
-        
+
+        final String host = robotConfig.getAgentConnectionHost();
+        final int port = robotConfig.getAgentConnectionPort();
+        final int timeout = robotConfig.getAgentConnectionTimeout();
+
         try {
             final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(testsMode);
             final ServerJobWithProcess serverWithProcess;
@@ -64,14 +55,14 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
                         launch);
                 final DebugExecutionEventsListener debugListener = new DebugExecutionEventsListener(debugTarget,
                         robotConfig.getResourcesUnderDebug());
-        
+
                 serverWithProcess = launchServerAndProcess(launch, testsLaunchContext, host,
                         port, timeout, newArrayList(testsStarter, debugListener));
-        
+
                 debugTarget.connectWith(serverWithProcess.process);
             }
             testsStarter.allowClientTestsStart();
-        
+
             // FIXME : don't need to wait when it would be possible to launch multiple
             // configurations
             serverWithProcess.serverJob.join();
