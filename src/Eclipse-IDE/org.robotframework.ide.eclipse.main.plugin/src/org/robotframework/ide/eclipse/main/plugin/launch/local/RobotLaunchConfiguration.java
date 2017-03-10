@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newHashSet;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.ArrayList;
@@ -17,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -39,6 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotSuitesNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -129,6 +129,20 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     @Override
+    public List<IResource> getResourcesUnderDebug() throws CoreException {
+        final List<IResource> suiteResources = new ArrayList<>(getSuiteResources());
+        if (suiteResources.isEmpty()) {
+            suiteResources.add(getProject());
+        }
+        return suiteResources;
+    }
+
+    @Override
+    public boolean isDefiningProjectDirectly() {
+        return false;
+    }
+
+    @Override
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         setInterpreter(SuiteExecutor.Python);
@@ -183,20 +197,6 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public String getInterpreterArguments() throws CoreException {
         return configuration.getAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, "");
-    }
-
-    @Override
-    public List<IResource> getResourcesUnderDebug() throws CoreException {
-        final List<IResource> suiteResources = newArrayList(getSuiteResources());
-        if (suiteResources.isEmpty()) {
-            suiteResources.add(getProject());
-        }
-        return suiteResources;
-    }
-
-    @Override
-    public boolean isDefiningProjectDirectly() {
-        return false;
     }
 
     public void setIsIncludeTagsEnabled(final boolean isIncludeTagsEnabled) throws CoreException {
@@ -313,20 +313,15 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     private Collection<IResource> getSuiteResources() throws CoreException {
-        final Collection<String> suitePaths = getSuitePaths().keySet();
-
-        final Map<String, IResource> resources = Maps.asMap(newHashSet(suitePaths), new Function<String, IResource>() {
-
-            @Override
-            public IResource apply(final String suitePath) {
-                try {
-                    return getProject().findMember(Path.fromPortableString(suitePath));
-                } catch (final CoreException e) {
-                    return null;
-                }
-            }
-        });
-
+        final Map<String, IResource> resources = getSuitePaths().keySet()
+                .stream()
+                .collect(Collectors.toMap(Functions.identity(), suitePath -> {
+                    try {
+                        return getProject().findMember(Path.fromPortableString(suitePath));
+                    } catch (final CoreException e) {
+                        return null;
+                    }
+                }));
         final List<String> problems = new ArrayList<>();
         for (final Entry<String, IResource> entry : resources.entrySet()) {
             if (entry.getValue() == null || !entry.getValue().exists()) {

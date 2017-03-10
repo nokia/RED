@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 
 public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPreferencePage
@@ -80,13 +80,13 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         addField(remoteHost);
 
         remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_PORT, "Local port:", remoteGroup);
-        remotePort.setValidRange(1, IRobotLaunchConfiguration.MAX_PORT);
+        remotePort.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT);
         remotePort.load();
         addField(remotePort);
 
         remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_REMOTE_TIMEOUT, "Connection timeout [s]:",
                 remoteGroup);
-        remoteTimeout.setValidRange(1, IRobotLaunchConfiguration.MAX_TIMEOUT);
+        remoteTimeout.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);
     }

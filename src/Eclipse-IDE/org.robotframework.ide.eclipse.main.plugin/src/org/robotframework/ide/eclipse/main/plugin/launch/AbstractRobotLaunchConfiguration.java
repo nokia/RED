@@ -27,11 +27,11 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
 
     private static final String REMOTE_AGENT = "Remote agent";
 
-    protected static final String REMOTE_HOST_ATTRIBUTE = "Remote host";
+    private static final String AGENT_CONNECTION_HOST_ATTRIBUTE = "Agent connection host";
 
-    protected static final String REMOTE_PORT_ATTRIBUTE = "Remote port";
+    private static final String AGENT_CONNECTION_PORT_ATTRIBUTE = "Agent connection port";
 
-    protected static final String REMOTE_TIMEOUT_ATTRIBUTE = "Remote timeout";
+    private static final String AGENT_CONNECTION_TIMEOUT_ATTRIBUTE = "Agent connection timeout";
 
     protected final ILaunchConfiguration configuration;
 
@@ -96,7 +96,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
             }
             return host;
         }
-        return AgentConnectionServer.DEFAULT_CLIENT_HOST;
+        return AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_HOST;
     }
 
     @Override
@@ -104,9 +104,10 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
         if (isRemoteAgent()) {
             final String port = getAgentConnectionPortValue();
             final Integer portAsInt = Ints.tryParse(port);
-            if (portAsInt == null || !Range.closed(1, MAX_PORT).contains(portAsInt)) {
-                throw newCoreException(
-                        String.format("Server port '%s' must be an Integer between 1 and %,d", port, MAX_PORT));
+            if (portAsInt == null
+                    || !Range.closed(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT).contains(portAsInt)) {
+                throw newCoreException(String.format("Server port '%s' must be an Integer between 1 and %,d", port,
+                        AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT));
             }
             if (portAsInt < 0) {
                 throw newCoreException("Unable to find free port");
@@ -121,9 +122,10 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
         if (isRemoteAgent()) {
             final String timeout = getAgentConnectionTimeoutValue();
             final Integer timeoutAsInt = Ints.tryParse(timeout);
-            if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
+            if (timeoutAsInt == null
+                    || !Range.closed(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT).contains(timeoutAsInt)) {
                 throw newCoreException(String.format("Connection timeout '%s' must be an Integer between 1 and %,d",
-                        timeout, MAX_TIMEOUT));
+                        timeout, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT));
             }
             return timeoutAsInt;
         }
@@ -132,17 +134,17 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
 
     @Override
     public String getAgentConnectionHostValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "");
+        return configuration.getAttribute(AGENT_CONNECTION_HOST_ATTRIBUTE, "");
     }
 
     @Override
     public String getAgentConnectionPortValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "");
+        return configuration.getAttribute(AGENT_CONNECTION_PORT_ATTRIBUTE, "");
     }
 
     @Override
     public String getAgentConnectionTimeoutValue() throws CoreException {
-        return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "");
+        return configuration.getAttribute(AGENT_CONNECTION_TIMEOUT_ATTRIBUTE, "");
     }
 
     @Override
@@ -154,19 +156,19 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     @Override
     public void setAgentConnectionHostValue(final String host) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_HOST_ATTRIBUTE, host);
+        launchCopy.setAttribute(AGENT_CONNECTION_HOST_ATTRIBUTE, host);
     }
 
     @Override
     public void setAgentConnectionPortValue(final String port) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_PORT_ATTRIBUTE, port);
+        launchCopy.setAttribute(AGENT_CONNECTION_PORT_ATTRIBUTE, port);
     }
 
     @Override
     public void setAgentConnectionTimeoutValue(final String timeout) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_TIMEOUT_ATTRIBUTE, timeout);
+        launchCopy.setAttribute(AGENT_CONNECTION_TIMEOUT_ATTRIBUTE, timeout);
     }
 
     @Override

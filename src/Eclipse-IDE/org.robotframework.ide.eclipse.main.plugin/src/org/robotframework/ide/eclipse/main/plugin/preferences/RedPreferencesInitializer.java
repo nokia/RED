@@ -53,8 +53,9 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
             final String activePath = interpreterPaths.get(0).getAbsolutePath();
             final String activeExec = interpreterPaths.get(0).getInterpreter().name();
 
-            final String allPaths = Joiner.on(';').join(
-                    transform(interpreterPaths, new Function<PythonInstallationDirectory, String>() {
+            final String allPaths = Joiner.on(';')
+                    .join(transform(interpreterPaths, new Function<PythonInstallationDirectory, String>() {
+
                         @Override
                         public String apply(final PythonInstallationDirectory dir) {
                             return dir.getAbsolutePath();
@@ -121,7 +122,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
-        preferences.put(RedPreferences.LAUNCH_REMOTE_HOST, AgentConnectionServer.DEFAULT_CLIENT_HOST);
+        preferences.put(RedPreferences.LAUNCH_REMOTE_HOST, AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_HOST);
         preferences.putInt(RedPreferences.LAUNCH_REMOTE_PORT, AgentConnectionServer.findFreePort());
         preferences.putInt(RedPreferences.LAUNCH_REMOTE_TIMEOUT,
                 AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT);

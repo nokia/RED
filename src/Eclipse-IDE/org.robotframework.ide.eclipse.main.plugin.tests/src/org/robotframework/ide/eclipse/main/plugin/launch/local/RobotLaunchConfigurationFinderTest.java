@@ -209,7 +209,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void configurationSuitableForResources_whenApplicable() throws CoreException, IOException {
-        final IResource res = projectProvider.createFile("Resource", "");
+        final IResource res = projectProvider.createFile("Some Resource", "");
         final List<IResource> resources = newArrayList(res);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
@@ -218,7 +218,7 @@ public class RobotLaunchConfigurationFinderTest {
 
     @Test
     public void configurationNotSuitableForResources_whenNotApplicable() throws CoreException, IOException {
-        final IResource res = projectProvider.createFile("Resource", "");
+        final IResource res = projectProvider.createFile("Some Resource", "");
         final List<IResource> resources = newArrayList(res);
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
