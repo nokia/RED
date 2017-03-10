@@ -34,6 +34,7 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -99,11 +100,18 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
         final Group agentGroup = new Group(parent, SWT.NONE);
         agentGroup.setText("Test Runner Agent");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(agentGroup);
-        GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(agentGroup);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(0, 5).extendedMargins(0, 0, 0, 20).applyTo(agentGroup);
 
-        useLocalAgentButton = createAgentTypeSelectionButton(agentGroup, "Use local agent connection");
+        final Label agentDescription = new Label(agentGroup, SWT.WRAP);
+        agentDescription.setText("Choose listener connection type");
+        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(agentDescription);
 
-        useRemoteAgentButton = createAgentTypeSelectionButton(agentGroup, "Use remote agent connection");
+        useLocalAgentButton = createAgentTypeSelectionButton(agentGroup,
+                String.format("Use local agent connection (localhost with free port and %ds timeout)",
+                        AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT));
+
+        useRemoteAgentButton = createAgentTypeSelectionButton(agentGroup,
+                "Use remote agent connection (custom server parameters)");
     }
 
     private Button createAgentTypeSelectionButton(final Composite parent, final String text) {
@@ -134,10 +142,10 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
         GridDataFactory.fillDefaults().grab(true, false).applyTo(serverGroup);
         GridLayoutFactory.fillDefaults().numColumns(3).margins(3, 3).extendedMargins(0, 0, 0, 20).applyTo(serverGroup);
 
-        final Label description = new Label(serverGroup, SWT.WRAP);
-        description
+        final Label serverDescription = new Label(serverGroup, SWT.WRAP);
+        serverDescription
                 .setText("Setup server which will track execution of Robot tests running on remotely connected client");
-        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(description);
+        GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(serverDescription);
 
         hostTxt = createLabeledText(serverGroup, "Local IP:");
 
@@ -172,9 +180,10 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
         GridDataFactory.fillDefaults().grab(true, false).applyTo(clientGroup);
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(clientGroup);
 
-        final Label description = new Label(clientGroup, SWT.WRAP);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(description);
-        description.setText("Export script which should be added as listener of tests execution on client machine");
+        final Label exportDescription = new Label(clientGroup, SWT.WRAP);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(exportDescription);
+        exportDescription
+                .setText("Export script which should be added as listener of tests execution on client machine");
 
         final Button exportBtn = new Button(clientGroup, SWT.PUSH);
         GridDataFactory.swtDefaults().applyTo(exportBtn);
@@ -201,9 +210,9 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
             }
         });
 
-        final Label description2 = new Label(clientGroup, SWT.WRAP);
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).applyTo(description2);
-        description2.setText("Add following argument to command line when running tests on client side");
+        final Label commandLineDescription = new Label(clientGroup, SWT.WRAP);
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).applyTo(commandLineDescription);
+        commandLineDescription.setText("Add following argument to command line when running tests on client side");
 
         commandLineArgument = new Text(clientGroup, SWT.BORDER | SWT.READ_ONLY);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(commandLineArgument);
@@ -306,7 +315,7 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
 
     @Override
     public String getMessage() {
-        return "Create or edit a configuration to launch server for remotely running Robot Framework tests";
+        return "Edit test runner agent listener parameters for launch configuration";
     }
 
     @Override

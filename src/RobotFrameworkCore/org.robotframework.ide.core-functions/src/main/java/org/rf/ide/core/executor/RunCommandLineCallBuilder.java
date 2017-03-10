@@ -46,9 +46,9 @@ public class RunCommandLineCallBuilder {
 
         IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<String> additionalProjectsLocations);
 
-        IRunCommandLineBuilder withExecutableScript(final String scriptPath);
+        IRunCommandLineBuilder withExecutableFile(final String executableFilePath);
 
-        IRunCommandLineBuilder addUserArgumentsForExecutableScript(final String arguments);
+        IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments);
 
         RunCommandLine build() throws IOException;
     }
@@ -85,9 +85,9 @@ public class RunCommandLineCallBuilder {
 
         private String interpreterUserArgs = "";
 
-        private String executableScriptPath = "";
+        private String executableFilePath = "";
 
-        private String executableScriptArgs = "";
+        private String executableFileArgs = "";
 
         private Builder(final SuiteExecutor executor, final String executorPath, final int listenerPort) {
             this.executor = executor;
@@ -184,14 +184,14 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder withExecutableScript(final String executableScriptPath) {
-            this.executableScriptPath = executableScriptPath;
+        public IRunCommandLineBuilder withExecutableFile(final String executableFilePath) {
+            this.executableFilePath = executableFilePath;
             return this;
         }
 
         @Override
-        public IRunCommandLineBuilder addUserArgumentsForExecutableScript(final String arguments) {
-            this.executableScriptArgs = arguments.trim();
+        public IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments) {
+            this.executableFileArgs = arguments.trim();
             return this;
         }
 
@@ -199,10 +199,10 @@ public class RunCommandLineCallBuilder {
         public RunCommandLine build() throws IOException {
             final List<String> cmdLine = new ArrayList<>();
 
-            if (!executableScriptPath.isEmpty()) {
-                cmdLine.add(executableScriptPath);
-                if (!executableScriptArgs.isEmpty()) {
-                    cmdLine.addAll(convertArguments(executableScriptArgs));
+            if (!executableFilePath.isEmpty()) {
+                cmdLine.add(executableFilePath);
+                if (!executableFileArgs.isEmpty()) {
+                    cmdLine.addAll(convertArguments(executableFileArgs));
                 }
             }
             cmdLine.add(executorPath);
