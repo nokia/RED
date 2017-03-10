@@ -40,7 +40,7 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
     public void launch(final ISelection selection, final String mode) {
         if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
             final IStructuredSelection structuredSelection = (IStructuredSelection) selection;
-            if (SelectionsPropertyTester.testIfAllElementsAreFromSameProject(structuredSelection, true)) {
+            if (SelectionsPropertyTester.allElementsAreFromSameProject(structuredSelection)) {
                 final List<IResource> resources = Selections.getAdaptableElements(structuredSelection, IResource.class);
                 for (final Object o : structuredSelection.toList()) {
                     if (o instanceof RobotCasesSection) {
@@ -117,7 +117,7 @@ public class RobotLaunchConfigurationShortcut implements ILaunchShortcut2 {
         if (!selection.isEmpty() && selection instanceof IStructuredSelection) {
             try {
                 final IStructuredSelection ss = (IStructuredSelection) selection;
-                if (SelectionsPropertyTester.testIfAllElementsAreFromSameProject(ss, true)) {
+                if (SelectionsPropertyTester.allElementsAreFromSameProject(ss)) {
                     final List<IResource> resources = Selections.getAdaptableElements(ss, IResource.class);
                     if (!resources.isEmpty()) {
                         config = RobotLaunchConfigurationFinder
