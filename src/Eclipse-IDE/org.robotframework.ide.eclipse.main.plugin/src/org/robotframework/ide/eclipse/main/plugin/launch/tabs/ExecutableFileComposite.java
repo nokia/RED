@@ -33,7 +33,7 @@ class ExecutableFileComposite extends Composite {
         this.listener = listener;
         this.filterExtensions = filterExtensions;
 
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(this);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 5).applyTo(this);
 
         createExecutableFilePathText();
         createBrowseButton(parent.getShell());

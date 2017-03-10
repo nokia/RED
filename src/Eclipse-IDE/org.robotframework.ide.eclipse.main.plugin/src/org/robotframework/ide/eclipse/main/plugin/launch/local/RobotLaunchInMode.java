@@ -72,8 +72,8 @@ public abstract class RobotLaunchInMode {
                 : RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
 
         if (!robotConfig.getExecutableFilePath().isEmpty()) {
-            builder.withExecutableScript(robotConfig.getExecutableFilePath());
-            builder.addUserArgumentsForExecutableScript(robotConfig.getExecutableFileArguments());
+            builder.withExecutableFile(robotConfig.getExecutableFilePath());
+            builder.addUserArgumentsForExecutableFile(robotConfig.getExecutableFileArguments());
         }
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
