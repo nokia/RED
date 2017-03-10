@@ -21,25 +21,25 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.junit.ShellProvider;
 
-public class ExecutorScriptCompositeTest {
+public class ExecutableFileCompositeTest {
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
     @Test
-    public void executorScriptComposite_inputSettingTest() {
-        final ExecutorScriptComposite composite = new ExecutorScriptComposite(shellProvider.getShell(),
+    public void executableFileCompositeComposite_inputSettingTest() {
+        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(),
                 mock(ModifyListener.class), new String[] {});
         composite.setInput(" path ");
 
-        assertThat(scriptPathText(composite)).is(enabled());
+        assertThat(executableFilePathText(composite)).is(enabled());
         assertThat(checkBrowseButton(composite)).is(enabled());
 
-        assertThat(composite.getSelectedScriptPath()).isEqualTo("path");
+        assertThat(composite.getSelectedExecutableFilePath()).isEqualTo("path");
     }
 
     @Test
-    public void whenScriptPathIsSelected_listenerIsNotified() {
+    public void whenExecutableFilePathIsSelected_listenerIsNotified() {
         final AtomicBoolean listenerWasCalled = new AtomicBoolean(false);
         final ModifyListener listener = new ModifyListener() {
 
@@ -49,20 +49,20 @@ public class ExecutorScriptCompositeTest {
             }
         };
 
-        final ExecutorScriptComposite composite = new ExecutorScriptComposite(shellProvider.getShell(), listener,
+        final ExecutableFileComposite composite = new ExecutableFileComposite(shellProvider.getShell(), listener,
                 new String[] {});
 
-        scriptPathText(composite).setText("selected");
+        executableFilePathText(composite).setText("selected");
 
-        assertThat(scriptPathText(composite)).is(enabled());
+        assertThat(executableFilePathText(composite)).is(enabled());
         assertThat(checkBrowseButton(composite)).is(enabled());
 
-        assertThat(composite.getSelectedScriptPath()).isEqualTo("selected");
+        assertThat(composite.getSelectedExecutableFilePath()).isEqualTo("selected");
 
         assertThat(listenerWasCalled.get()).isTrue();
     }
 
-    private static Text scriptPathText(final Composite composite) {
+    private static Text executableFilePathText(final Composite composite) {
         for (final Control control : composite.getChildren()) {
             if (control instanceof Text) {
                 return (Text) control;

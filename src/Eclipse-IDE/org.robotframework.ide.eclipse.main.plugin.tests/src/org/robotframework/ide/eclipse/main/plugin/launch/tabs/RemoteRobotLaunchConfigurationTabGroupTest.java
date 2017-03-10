@@ -25,7 +25,7 @@ public class RemoteRobotLaunchConfigurationTabGroupTest {
 
         final ILaunchConfigurationTab[] tabs = group.getTabs();
         assertThat(tabs.length).isEqualTo(4);
-        assertThat(tabs[0]).isInstanceOf(RobotLaunchConfigurationRemoteTab.class);
+        assertThat(tabs[0]).isInstanceOf(LaunchConfigurationListenerTab.class);
         assertThat(tabs[1]).isInstanceOf(SourceLookupTab.class);
         assertThat(tabs[2]).isInstanceOf(EnvironmentTab.class);
         assertThat(tabs[3]).isInstanceOf(CommonTab.class);
@@ -38,7 +38,7 @@ public class RemoteRobotLaunchConfigurationTabGroupTest {
 
         final ILaunchConfigurationTab[] tabs = group.getTabs();
         assertThat(tabs.length).isEqualTo(4);
-        assertThat(tabs[0]).isInstanceOf(RobotLaunchConfigurationRemoteTab.class);
+        assertThat(tabs[0]).isInstanceOf(LaunchConfigurationListenerTab.class);
         assertThat(tabs[1]).isInstanceOf(SourceLookupTab.class);
         assertThat(tabs[2]).isInstanceOf(EnvironmentTab.class);
         assertThat(tabs[3]).isInstanceOf(CommonTab.class);

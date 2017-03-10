@@ -20,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.local.LocalProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
 
 public class LaunchConfigurationsWrappersTest {
 
@@ -40,14 +39,6 @@ public class LaunchConfigurationsWrappersTest {
         assertThat(wrapper).isExactlyInstanceOf(RemoteRobotLaunchConfiguration.class);
     }
 
-    @Test
-    public void properWrapperIsReturnedForScriptLaunchConfiguration() throws Exception {
-        final ILaunchConfiguration config = createConfigurationMock(ScriptRobotLaunchConfiguration.TYPE_ID);
-        final IRobotLaunchConfiguration wrapper = LaunchConfigurationsWrappers.robotLaunchConfiguration(config);
-
-        assertThat(wrapper).isExactlyInstanceOf(ScriptRobotLaunchConfiguration.class);
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIsThrown_whenCreatingWrapperForUnknownConfigurationType() throws Exception {
         final ILaunchConfiguration config = createConfigurationMock("unknown");
@@ -58,40 +49,6 @@ public class LaunchConfigurationsWrappersTest {
     public void exceptionIsThrown_whenCreatingWrapperForProblematicConfiguration() throws Exception {
         final ILaunchConfiguration config = createExceptionsThrowingConfigurationMock();
         LaunchConfigurationsWrappers.robotLaunchConfiguration(config);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIsThrown_whenCreatingRemoteWrapperForLocalTestsLaunchConfiguration() throws Exception {
-        final ILaunchConfiguration config = createConfigurationMock(RobotLaunchConfiguration.TYPE_ID);
-        LaunchConfigurationsWrappers.remoteLaunchConfiguration(config);
-    }
-
-    @Test
-    public void properRemoteWrapperIsReturnedForRemoteTestsLaunchConfiguration() throws Exception {
-        final ILaunchConfiguration config = createConfigurationMock(RemoteRobotLaunchConfiguration.TYPE_ID);
-        final IRobotLaunchConfiguration wrapper = LaunchConfigurationsWrappers.remoteLaunchConfiguration(config);
-
-        assertThat(wrapper).isExactlyInstanceOf(RemoteRobotLaunchConfiguration.class);
-    }
-
-    @Test
-    public void properRemoteWrapperIsReturnedForScriptLaunchConfiguration() throws Exception {
-        final ILaunchConfiguration config = createConfigurationMock(ScriptRobotLaunchConfiguration.TYPE_ID);
-        final IRobotLaunchConfiguration wrapper = LaunchConfigurationsWrappers.remoteLaunchConfiguration(config);
-
-        assertThat(wrapper).isExactlyInstanceOf(ScriptRobotLaunchConfiguration.class);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIsThrown_whenCreatingRemoteWrapperForUnknownConfigurationType() throws Exception {
-        final ILaunchConfiguration config = createConfigurationMock("unknown");
-        LaunchConfigurationsWrappers.remoteLaunchConfiguration(config);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void exceptionIsThrown_whenCreatingRemoteWrapperForProblematicConfiguration() throws Exception {
-        final ILaunchConfiguration config = createExceptionsThrowingConfigurationMock();
-        LaunchConfigurationsWrappers.remoteLaunchConfiguration(config);
     }
 
     @Test
@@ -122,22 +79,6 @@ public class LaunchConfigurationsWrappersTest {
         final IRobotProcess robotProcess = processFactory.newProcess(launch, process, "name", new HashMap<>());
 
         assertThat(robotProcess).isExactlyInstanceOf(RemoteProcess.class);
-        assertThat(robotProcess.getLabel()).isEqualTo("name");
-        assertThat(robotProcess.getLaunch()).isSameAs(launch);
-    }
-
-    @Test
-    public void properProcessIsReturnedForScriptLaunchConfiguration() throws Exception {
-        final ILaunchConfiguration config = createConfigurationMock(ScriptRobotLaunchConfiguration.TYPE_ID);
-        final ILaunch launch = mock(ILaunch.class);
-        when(launch.getLaunchConfiguration()).thenReturn(config);
-
-        final Process process = mock(Process.class);
-
-        final LaunchConfigurationsWrappers processFactory = new LaunchConfigurationsWrappers();
-        final IRobotProcess robotProcess = processFactory.newProcess(launch, process, "name", new HashMap<>());
-
-        assertThat(robotProcess).isExactlyInstanceOf(LocalProcess.class);
         assertThat(robotProcess.getLabel()).isEqualTo("name");
         assertThat(robotProcess.getLaunch()).isSameAs(launch);
     }

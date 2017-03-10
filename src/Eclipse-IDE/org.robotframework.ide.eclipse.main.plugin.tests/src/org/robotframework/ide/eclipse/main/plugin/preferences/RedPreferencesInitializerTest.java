@@ -76,7 +76,6 @@ public class RedPreferencesInitializerTest {
 
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
-        verify(preferences).putBoolean(RedPreferences.LAUNCH_REMOTE_ENABLED, false);
         verify(preferences).put(RedPreferences.LAUNCH_REMOTE_HOST, "127.0.0.1");
         verify(preferences).putInt(eq(RedPreferences.LAUNCH_REMOTE_PORT), and(geq(1), leq(65_535)));
         verify(preferences).putInt(RedPreferences.LAUNCH_REMOTE_TIMEOUT, 30);

@@ -13,12 +13,25 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+
+import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
 
 public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchConfiguration {
 
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
+
+    private static final String REMOTE_AGENT = "Remote agent";
+
+    protected static final String REMOTE_HOST_ATTRIBUTE = "Remote host";
+
+    protected static final String REMOTE_PORT_ATTRIBUTE = "Remote port";
+
+    protected static final String REMOTE_TIMEOUT_ATTRIBUTE = "Remote timeout";
 
     protected final ILaunchConfiguration configuration;
 
@@ -70,7 +83,99 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     }
 
     @Override
+    public boolean isRemoteAgent() throws CoreException {
+        return Boolean.valueOf(configuration.getAttribute(REMOTE_AGENT, "false"));
+    }
+
+    @Override
+    public String getAgentConnectionHost() throws CoreException {
+        if (isRemoteAgent()) {
+            final String host = getAgentConnectionHostValue();
+            if (host.isEmpty()) {
+                throw newCoreException("Server IP cannot be empty");
+            }
+            return host;
+        }
+        return AgentConnectionServer.DEFAULT_CLIENT_HOST;
+    }
+
+    @Override
+    public int getAgentConnectionPort() throws CoreException {
+        if (isRemoteAgent()) {
+            final String port = getAgentConnectionPortValue();
+            final Integer portAsInt = Ints.tryParse(port);
+            if (portAsInt == null || !Range.closed(1, MAX_PORT).contains(portAsInt)) {
+                throw newCoreException(
+                        String.format("Server port '%s' must be an Integer between 1 and %,d", port, MAX_PORT));
+            }
+            if (portAsInt < 0) {
+                throw newCoreException("Unable to find free port");
+            }
+            return portAsInt;
+        }
+        return AgentConnectionServer.findFreePort();
+    }
+
+    @Override
+    public int getAgentConnectionTimeout() throws CoreException {
+        if (isRemoteAgent()) {
+            final String timeout = getAgentConnectionTimeoutValue();
+            final Integer timeoutAsInt = Ints.tryParse(timeout);
+            if (timeoutAsInt == null || !Range.closed(1, MAX_TIMEOUT).contains(timeoutAsInt)) {
+                throw newCoreException(String.format("Connection timeout '%s' must be an Integer between 1 and %,d",
+                        timeout, MAX_TIMEOUT));
+            }
+            return timeoutAsInt;
+        }
+        return AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
+    }
+
+    @Override
+    public String getAgentConnectionHostValue() throws CoreException {
+        return configuration.getAttribute(REMOTE_HOST_ATTRIBUTE, "");
+    }
+
+    @Override
+    public String getAgentConnectionPortValue() throws CoreException {
+        return configuration.getAttribute(REMOTE_PORT_ATTRIBUTE, "");
+    }
+
+    @Override
+    public String getAgentConnectionTimeoutValue() throws CoreException {
+        return configuration.getAttribute(REMOTE_TIMEOUT_ATTRIBUTE, "");
+    }
+
+    @Override
+    public void setRemoteAgentValue(final String customRemote) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(REMOTE_AGENT, customRemote);
+    }
+
+    @Override
+    public void setAgentConnectionHostValue(final String host) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(REMOTE_HOST_ATTRIBUTE, host);
+    }
+
+    @Override
+    public void setAgentConnectionPortValue(final String port) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(REMOTE_PORT_ATTRIBUTE, port);
+    }
+
+    @Override
+    public void setAgentConnectionTimeoutValue(final String timeout) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(REMOTE_TIMEOUT_ATTRIBUTE, timeout);
+    }
+
+    @Override
     public void fillDefaults() throws CoreException {
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        setRemoteAgentValue(String.valueOf(false));
+        setAgentConnectionHostValue(preferences.getLaunchRemoteHost());
+        setAgentConnectionPortValue(preferences.getLaunchRemotePort());
+        setAgentConnectionTimeoutValue(preferences.getLaunchRemoteTimeout());
         setProjectName("");
         setProcessFactory(LaunchConfigurationsWrappers.FACTORY_ID);
     }

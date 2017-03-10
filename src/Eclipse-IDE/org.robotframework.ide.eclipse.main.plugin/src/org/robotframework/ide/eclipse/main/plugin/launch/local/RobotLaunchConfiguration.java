@@ -29,6 +29,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.SuiteExecutor;
@@ -53,7 +54,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     private static final String EXECUTOR_NAME = "Executor";
 
-    private static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
+    private static final String ROBOT_ARGUMENTS_ATTRIBUTE = "Robot arguments";
 
     private static final String INTERPRETER_ARGUMENTS_ATTRIBUTE = "Interpreter arguments";
 
@@ -68,6 +69,15 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
 
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
+
+    private static final String EXECUTABLE_FILE_PATH_ATTRIBUTE = "Executable file path";
+
+    private static final String EXECUTABLE_FILE_ARGUMENTS_ATTRIBUTE = "Executable file arguments";
+
+    public static String[] getSystemDependentExecutableFileExtensions() {
+        return RedSystemProperties.isWindowsPlatform() ? new String[] { "*.bat;*.com;*.exe", "*.*" }
+                : new String[] { "*.sh", "*.*" };
+    }
 
     static ILaunchConfigurationWorkingCopy prepareDefault(final List<IResource> resources) throws CoreException {
         final Map<IResource, List<String>> suitesMapping = new HashMap<>();
@@ -103,7 +113,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         if (robotProject.getRuntimeEnvironment() != null) {
             final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
-            robotConfig.setExecutor(interpreter);
+            robotConfig.setInterpreter(interpreter);
         }
         robotConfig.setProjectName(project.getName());
         robotConfig.updateTestCases(suitesMapping);
@@ -113,7 +123,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public static void fillForFailedTestsRerun(final ILaunchConfigurationWorkingCopy launchConfig,
             final String outputFilePath) throws CoreException {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        robotConfig.setExecutorArguments("-R " + outputFilePath);
+        robotConfig.setRobotArguments("-R " + outputFilePath);
         robotConfig.setSuitePaths(new HashMap<String, List<String>>());
     }
 
@@ -124,9 +134,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     @Override
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        setExecutor(SuiteExecutor.Python);
-        setExecutorArguments(preferences.getLaunchAdditionalRobotArguments());
+        setInterpreter(SuiteExecutor.Python);
         setInterpreterArguments(preferences.getLaunchAdditionalInterpreterArguments());
+        setExecutableFilePath(preferences.getLaunchExecutableFilePath());
+        setExecutableFileArguments(preferences.getLaunchAdditionalExecutableFileArguments());
+        setRobotArguments(preferences.getLaunchAdditionalRobotArguments());
         setSuitePaths(new HashMap<String, List<String>>());
         setIsIncludeTagsEnabled(false);
         setIsExcludeTagsEnabled(false);
@@ -141,14 +153,14 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         launchCopy.setAttribute(USE_PROJECT_EXECUTOR, usesProjectExecutor);
     }
 
-    public void setExecutor(final SuiteExecutor executor) throws CoreException {
+    public void setInterpreter(final SuiteExecutor executor) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(EXECUTOR_NAME, executor == null ? "" : executor.name());
     }
 
-    public void setExecutorArguments(final String arguments) throws CoreException {
+    public void setRobotArguments(final String arguments) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, arguments);
+        launchCopy.setAttribute(ROBOT_ARGUMENTS_ATTRIBUTE, arguments);
     }
 
     public void setInterpreterArguments(final String arguments) throws CoreException {
@@ -160,7 +172,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return configuration.getAttribute(USE_PROJECT_EXECUTOR, true);
     }
 
-    public SuiteExecutor getExecutor() throws CoreException {
+    public SuiteExecutor getInterpreter() throws CoreException {
         try {
             return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
         } catch (final IllegalArgumentException e) {
@@ -168,8 +180,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         }
     }
 
-    public String getExecutorArguments() throws CoreException {
-        return configuration.getAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
+    public String getRobotArguments() throws CoreException {
+        return configuration.getAttribute(ROBOT_ARGUMENTS_ATTRIBUTE, "");
     }
 
     public String getInterpreterArguments() throws CoreException {
@@ -183,6 +195,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             suiteResources.add(getProject());
         }
         return suiteResources;
+    }
+
+    @Override
+    public boolean isDefiningProjectDirectly() {
+        return false;
     }
 
     public void setIsIncludeTagsEnabled(final boolean isIncludeTagsEnabled) throws CoreException {
@@ -346,6 +363,24 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return configuration.getAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, false);
     }
 
+    public String getExecutableFilePath() throws CoreException {
+        return configuration.getAttribute(EXECUTABLE_FILE_PATH_ATTRIBUTE, "");
+    }
+
+    public String getExecutableFileArguments() throws CoreException {
+        return configuration.getAttribute(EXECUTABLE_FILE_ARGUMENTS_ATTRIBUTE, "");
+    }
+
+    public void setExecutableFilePath(final String path) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(EXECUTABLE_FILE_PATH_ATTRIBUTE, path);
+    }
+
+    public void setExecutableFileArguments(final String arguments) throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(EXECUTABLE_FILE_ARGUMENTS_ATTRIBUTE, arguments);
+    }
+
     boolean isSuitableFor(final List<IResource> resources) {
         try {
             for (final IResource resource : resources) {
@@ -409,11 +444,12 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     String createConsoleDescription(final RobotRuntimeEnvironment env) throws CoreException {
-        return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getExecutor().executableName();
+        return isUsingInterpreterFromProject() ? env.getPythonExecutablePath() : getInterpreter().executableName();
     }
 
     String checkExecutorVersion(final RobotRuntimeEnvironment env) throws RobotEnvironmentException, CoreException {
-        return isUsingInterpreterFromProject() ? env.getVersion() : RobotRuntimeEnvironment.getVersion(getExecutor());
+        return isUsingInterpreterFromProject() ? env.getVersion()
+                : RobotRuntimeEnvironment.getVersion(getInterpreter());
     }
 
     public String[] getEnvironmentVariables() throws CoreException {

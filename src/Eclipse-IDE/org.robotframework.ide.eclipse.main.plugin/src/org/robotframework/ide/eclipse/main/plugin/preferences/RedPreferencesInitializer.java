@@ -121,7 +121,6 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
-        preferences.putBoolean(RedPreferences.LAUNCH_REMOTE_ENABLED, false);
         preferences.put(RedPreferences.LAUNCH_REMOTE_HOST, AgentConnectionServer.DEFAULT_CLIENT_HOST);
         preferences.putInt(RedPreferences.LAUNCH_REMOTE_PORT, AgentConnectionServer.findFreePort());
         preferences.putInt(RedPreferences.LAUNCH_REMOTE_TIMEOUT,

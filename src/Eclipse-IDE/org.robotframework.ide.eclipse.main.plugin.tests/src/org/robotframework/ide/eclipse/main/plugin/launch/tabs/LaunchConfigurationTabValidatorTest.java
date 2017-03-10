@@ -26,12 +26,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.launch.IRemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.script.ScriptRobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationException;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationsValidator.LaunchConfigurationValidationFatalException;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationException;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RuntimeEnvironmentsMocks;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -39,15 +37,15 @@ import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.ImmutableMap;
 
-public class LaunchConfigurationsValidatorTest {
+public class LaunchConfigurationTabValidatorTest {
 
-    private static final String PROJECT_NAME = LaunchConfigurationsValidatorTest.class.getSimpleName();
+    private static final String PROJECT_NAME = LaunchConfigurationTabValidatorTest.class.getSimpleName();
 
     private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 
     private IProject project;
 
-    private final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator();
+    private final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator();
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -81,7 +79,7 @@ public class LaunchConfigurationsValidatorTest {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage("Project '' does not exist in workspace.");
 
-        validator.validate(createRobotLaunchConfiguration(""));
+        validator.validateRobotTab(createRobotLaunchConfiguration(""));
     }
 
     @Test
@@ -91,7 +89,7 @@ public class LaunchConfigurationsValidatorTest {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage("Project '" + PROJECT_NAME + "' does not exist in workspace.");
 
-        validator.validate(createRobotLaunchConfiguration(PROJECT_NAME));
+        validator.validateRobotTab(createRobotLaunchConfiguration(PROJECT_NAME));
     }
 
     @Test
@@ -100,52 +98,7 @@ public class LaunchConfigurationsValidatorTest {
         thrown.expectMessage("Project '" + PROJECT_NAME + "' is currently closed.");
         project.close(null);
 
-        validator.validate(createRobotLaunchConfiguration(PROJECT_NAME));
-    }
-
-    @Test
-    public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_1() throws Exception {
-        thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project '" + PROJECT_NAME + "' is using invalid Python environment.");
-
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(project)).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(null);
-
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
-        validator.validate(createRobotLaunchConfiguration(PROJECT_NAME));
-    }
-
-    @Test
-    public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_2() throws Exception {
-        thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project '" + PROJECT_NAME + "' is using invalid Python environment.");
-
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidPythonEnvironment();
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(project)).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
-
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
-        validator.validate(createRobotLaunchConfiguration(PROJECT_NAME));
-    }
-
-    @Test
-    public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_3() throws Exception {
-        thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage(
-                "Project '" + PROJECT_NAME + "' is using invalid Python environment (missing Robot Framework).");
-
-        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
-        final RobotProject robotProject = mock(RobotProject.class);
-        final RobotModel model = mock(RobotModel.class);
-        when(model.createRobotProject(project)).thenReturn(robotProject);
-        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
-
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
-        validator.validate(createRobotLaunchConfiguration(PROJECT_NAME));
+        validator.validateRobotTab(createRobotLaunchConfiguration(PROJECT_NAME));
     }
 
     @Test
@@ -159,37 +112,8 @@ public class LaunchConfigurationsValidatorTest {
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
-        validator.validate(createRobotLaunchConfiguration(PROJECT_NAME));
-    }
-
-    @Test
-    public void whenSystemInterpreterIsUsed_warningExceptionIsThrown() throws Exception {
-        thrown.expect(LaunchConfigurationValidationException.class);
-        thrown.expectMessage(CoreMatchers
-                .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable."));
-
-        final IPath filePath = Path.fromPortableString("file.robot");
-        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10");
-
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator();
-        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setUsingInterpreterFromProject(false);
-        launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList()));
-        validator.validate(launchConfig);
-    }
-
-    @Test
-    public void warningsAreCombinedTogetherInSingleException() throws Exception {
-        thrown.expect(LaunchConfigurationValidationException.class);
-        thrown.expectMessage(CoreMatchers
-                .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable.\n"
-                        + "There are no suites specified. All suites in '" + PROJECT_NAME + "' will be executed."));
-
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator();
-        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setUsingInterpreterFromProject(false);
-        validator.validate(launchConfig);
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        validator.validateRobotTab(createRobotLaunchConfiguration(PROJECT_NAME));
     }
 
     @Test
@@ -210,11 +134,11 @@ public class LaunchConfigurationsValidatorTest {
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList(), "file2.robot",
                 newArrayList(), "suite/dir", newArrayList()));
-        validator.validate(launchConfig);
+        validator.validateRobotTab(launchConfig);
     }
 
     @Test
@@ -232,11 +156,11 @@ public class LaunchConfigurationsValidatorTest {
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig
                 .setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList("case3", "case4", "case5")));
-        validator.validate(launchConfig);
+        validator.validateRobotTab(launchConfig);
     }
 
     @Test
@@ -251,10 +175,21 @@ public class LaunchConfigurationsValidatorTest {
         when(model.createRobotProject(project)).thenReturn(robotProject);
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final LaunchConfigurationsValidator validator = new LaunchConfigurationsValidator(model);
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList("case2", "case3")));
-        validator.validate(launchConfig);
+        validator.validateRobotTab(launchConfig);
+    }
+
+    @Test
+    public void nothingIsThrown_whenEverythingIsOkWithGivenConfiguration_1() throws Exception {
+        final IFile scriptFile = projectProvider.createFile("robot_script_file.txt", "run robot command");
+        final IFile testFile = projectProvider.createFile("test.robot", "*** Test Cases ***", "case1", "  Log  1");
+
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setExecutableFilePath(scriptFile.getLocation().toOSString());
+        launchConfig.setSuitePaths(ImmutableMap.of(testFile.getName(), newArrayList("case1")));
+        validator.validateRobotTab(launchConfig);
     }
 
     @Test
@@ -262,7 +197,7 @@ public class LaunchConfigurationsValidatorTest {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage("Project '' does not exist in workspace.");
 
-        validator.validate(createRemoteRobotLaunchConfiguration(""));
+        validator.validateListenerTab(createRemoteRobotLaunchConfiguration(""));
     }
 
     @Test
@@ -271,8 +206,8 @@ public class LaunchConfigurationsValidatorTest {
         thrown.expectMessage("Server port 'xyz' must be an Integer between 1 and 65,535");
 
         final RemoteRobotLaunchConfiguration launchConfig = createRemoteRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setRemotePortValue("xyz");
-        validator.validate(launchConfig);
+        launchConfig.setAgentConnectionPortValue("xyz");
+        validator.validateListenerTab(launchConfig);
     }
 
     @Test
@@ -281,50 +216,84 @@ public class LaunchConfigurationsValidatorTest {
         thrown.expectMessage("Connection timeout 'xyz' must be an Integer between 1 and 3,600");
 
         final RemoteRobotLaunchConfiguration launchConfig = createRemoteRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setRemoteTimeoutValue("xyz");
-        validator.validate(launchConfig);
+        launchConfig.setAgentConnectionTimeoutValue("xyz");
+        validator.validateListenerTab(launchConfig);
     }
 
     @Test
     public void nothingIsThrown_whenEverythingIsOkWithGivenRemoteConfiguration() throws Exception {
-        validator.validate(createRemoteRobotLaunchConfiguration(PROJECT_NAME));
+        validator.validateListenerTab(createRemoteRobotLaunchConfiguration(PROJECT_NAME));
     }
 
     @Test
-    public void projectIsNotValidatedWhenNotDefinedDirectly() throws Exception {
-        final ScriptRobotLaunchConfiguration launchConfig = createScriptRobotLaunchConfiguration("");
-        validator.validate((IRemoteRobotLaunchConfiguration) launchConfig);
-    }
+    public void whenSystemInterpreterIsUsed_warningExceptionIsThrown() throws Exception {
+        thrown.expect(LaunchConfigurationValidationException.class);
+        thrown.expectMessage(CoreMatchers
+                .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable."));
 
-    @Test
-    public void whenScriptFilePathIsEmpty_fatalExceptionIsThrown() throws CoreException {
-        thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Executor script file path is not defined.");
+        final IPath filePath = Path.fromPortableString("file.robot");
+        projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10");
 
-        final ScriptRobotLaunchConfiguration launchConfig = createScriptRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setScriptPath("");
-        validator.validate(launchConfig);
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator();
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setUsingInterpreterFromProject(false);
+        launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList()));
+        validator.validateExecutorTab(launchConfig);
     }
 
     @Test
     public void whenScriptFileDoesNotExist_fatalExceptionIsThrown() throws CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Executor script file does not exist.");
+        thrown.expectMessage("Executable file does not exist.");
 
-        final ScriptRobotLaunchConfiguration launchConfig = createScriptRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setScriptPath("/not/existing/path");
-        validator.validate(launchConfig);
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setExecutableFilePath("/not/existing/path");
+        validator.validateExecutorTab(launchConfig);
     }
 
     @Test
-    public void nothingIsThrown_whenEverythingIsOkWithGivenScriptConfiguration() throws Exception {
-        final IFile scriptFile = projectProvider.createFile("robot_script_file.txt", "run robot command");
-        final IFile testFile = projectProvider.createFile("test.robot", "*** Test Cases ***", "case1", "  Log  1");
+    public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_1() throws Exception {
+        thrown.expect(LaunchConfigurationValidationFatalException.class);
+        thrown.expectMessage("Project '" + PROJECT_NAME + "' is using invalid Python environment.");
 
-        final ScriptRobotLaunchConfiguration launchConfig = createScriptRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setScriptPath(scriptFile.getLocation().toOSString());
-        launchConfig.setSuitePaths(ImmutableMap.of(testFile.getName(), newArrayList("case1")));
-        validator.validate(launchConfig);
+        final RobotProject robotProject = mock(RobotProject.class);
+        final RobotModel model = mock(RobotModel.class);
+        when(model.createRobotProject(project)).thenReturn(robotProject);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(null);
+
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        validator.validateExecutorTab(createRobotLaunchConfiguration(PROJECT_NAME));
+    }
+
+    @Test
+    public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_2() throws Exception {
+        thrown.expect(LaunchConfigurationValidationFatalException.class);
+        thrown.expectMessage("Project '" + PROJECT_NAME + "' is using invalid Python environment.");
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidPythonEnvironment();
+        final RobotProject robotProject = mock(RobotProject.class);
+        final RobotModel model = mock(RobotModel.class);
+        when(model.createRobotProject(project)).thenReturn(robotProject);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        validator.validateExecutorTab(createRobotLaunchConfiguration(PROJECT_NAME));
+    }
+
+    @Test
+    public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_3() throws Exception {
+        thrown.expect(LaunchConfigurationValidationFatalException.class);
+        thrown.expectMessage(
+                "Project '" + PROJECT_NAME + "' is using invalid Python environment (missing Robot Framework).");
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
+        final RobotProject robotProject = mock(RobotProject.class);
+        final RobotModel model = mock(RobotModel.class);
+        when(model.createRobotProject(project)).thenReturn(robotProject);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        validator.validateExecutorTab(createRobotLaunchConfiguration(PROJECT_NAME));
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
@@ -341,16 +310,6 @@ public class LaunchConfigurationsValidatorTest {
         final ILaunchConfigurationWorkingCopy configuration = manager
                 .getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID).newInstance(null, "remote");
         final RemoteRobotLaunchConfiguration launchConfig = new RemoteRobotLaunchConfiguration(configuration);
-        launchConfig.fillDefaults();
-        launchConfig.setProjectName(projectName);
-        return launchConfig;
-    }
-
-    private ScriptRobotLaunchConfiguration createScriptRobotLaunchConfiguration(final String projectName)
-            throws CoreException {
-        final ILaunchConfigurationWorkingCopy configuration = manager
-                .getLaunchConfigurationType(ScriptRobotLaunchConfiguration.TYPE_ID).newInstance(null, "script");
-        final ScriptRobotLaunchConfiguration launchConfig = new ScriptRobotLaunchConfiguration(configuration);
         launchConfig.fillDefaults();
         launchConfig.setProjectName(projectName);
         return launchConfig;

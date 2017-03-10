@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.rf.ide.core.execution.TestsMode;
-import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
@@ -47,12 +46,9 @@ class RobotLaunchInDebugMode extends RobotLaunchInMode {
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
         final String version = robotConfig.checkExecutorVersion(runtimeEnvironment);
 
-        final String host = AgentConnectionServer.DEFAULT_CLIENT_HOST;
-        final int port = AgentConnectionServer.findFreePort();
-        if (port < 0) {
-            throw newCoreException("Unable to find free port");
-        }
-        final int timeout = AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
+        final String host = robotConfig.getAgentConnectionHost();
+        final int port = robotConfig.getAgentConnectionPort();
+        final int timeout = robotConfig.getAgentConnectionTimeout();
 
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.DEBUG);
 
