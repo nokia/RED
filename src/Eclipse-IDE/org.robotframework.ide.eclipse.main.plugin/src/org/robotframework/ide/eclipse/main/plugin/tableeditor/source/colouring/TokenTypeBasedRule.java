@@ -2,13 +2,12 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
-import com.google.common.base.Optional;
 
 
 class TokenTypeBasedRule implements ISyntaxColouringRule {
@@ -35,6 +34,6 @@ class TokenTypeBasedRule implements ISyntaxColouringRule {
         if (types.contains(type)) {
             return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

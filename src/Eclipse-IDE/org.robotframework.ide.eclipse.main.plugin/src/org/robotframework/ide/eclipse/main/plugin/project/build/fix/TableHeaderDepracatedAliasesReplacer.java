@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
@@ -19,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class TableHeaderDepracatedAliasesReplacer extends RedSuiteMarkerResolution {
@@ -48,7 +49,7 @@ public class TableHeaderDepracatedAliasesReplacer extends RedSuiteMarkerResoluti
     @Override
     public Optional<ICompletionProposal> asContentProposal(final IMarker marker, final IDocument document,
             final RobotSuiteFile suiteModel) {
-        Optional<ICompletionProposal> proposal = Optional.absent();
+        final Optional<ICompletionProposal> proposal = Optional.empty();
 
         final Range<Integer> defRange = getRange(marker);
         final Optional<? extends RobotSuiteFileSection> section = suiteModel.findSection(sectionClass);
@@ -68,8 +69,8 @@ public class TableHeaderDepracatedAliasesReplacer extends RedSuiteMarkerResoluti
         final ARobotSectionTable table = section.get().getLinkedElement();
         for (final TableHeader<? extends ARobotSectionTable> th : table.getHeaders()) {
             final RobotToken tableHeader = th.getTableHeader();
-            int headerStartOffset = tableHeader.getStartOffset();
-            int headerEndOffset = headerStartOffset + th.getTableHeader().getRaw().length();
+            final int headerStartOffset = tableHeader.getStartOffset();
+            final int headerEndOffset = headerStartOffset + th.getTableHeader().getRaw().length();
 
             if (headerStartOffset <= startOffset && startOffset < headerEndOffset) {
                 elem = th;
@@ -81,14 +82,14 @@ public class TableHeaderDepracatedAliasesReplacer extends RedSuiteMarkerResoluti
     }
 
     private Optional<ICompletionProposal> createProposal(final IDocument document,
-            TableHeader<? extends ARobotSectionTable> header) throws BadLocationException {
-        Optional<ICompletionProposal> proposal = Optional.absent();
+            final TableHeader<? extends ARobotSectionTable> header) throws BadLocationException {
+        Optional<ICompletionProposal> proposal = Optional.empty();
         if (header != null) {
             final RobotToken declaration = header.getDeclaration();
             final String declarationValue = declaration.getRaw();
             final String declarationLowerCase = declarationValue.toLowerCase();
 
-            StringBuilder replaced = new StringBuilder();
+            final StringBuilder replaced = new StringBuilder();
             replaced.append(declarationLowerCase.substring(0,
                     declarationLowerCase.indexOf(Character.toLowerCase(toReplace.charAt(0)))));
             replaced.append(replacement);
@@ -98,7 +99,7 @@ public class TableHeaderDepracatedAliasesReplacer extends RedSuiteMarkerResoluti
                                     .lastIndexOf(Character.toLowerCase(toReplace.charAt(toReplace.length() - 1))) + 1,
                             declarationLowerCase.length()));
 
-            String myReplacement = replaced.toString();
+            final String myReplacement = replaced.toString();
 
             final String replacementString = myReplacement.toString();
             final int offset = declaration.getStartOffset();

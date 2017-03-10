@@ -8,9 +8,7 @@ package org.rf.ide.core.project;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public class ImportSearchPaths {
 
@@ -25,7 +23,7 @@ public class ImportSearchPaths {
     }
 
     public Optional<URI> findAbsoluteUri(final URI importingFileUri, final ResolvedImportPath importPath) {
-        return findAbsoluteMarkedUri(importingFileUri, importPath).transform(MarkedUri.toUri());
+        return findAbsoluteMarkedUri(importingFileUri, importPath).map(MarkedUri::getPath);
     }
 
     public Optional<MarkedUri> findAbsoluteMarkedUri(final URI importingFileUri, final ResolvedImportPath importPath) {
@@ -50,7 +48,7 @@ public class ImportSearchPaths {
                 return Optional.of(new MarkedUri(searchPathUri, PathRelativityPoint.USER_DEFINED_SEARCH_PATH));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private static boolean targetExist(final URI uri) {
@@ -91,16 +89,6 @@ public class ImportSearchPaths {
 
         public URI getPath() {
             return uri;
-        }
-
-        public static Function<MarkedUri, URI> toUri() {
-            return new Function<ImportSearchPaths.MarkedUri, URI>() {
-
-                @Override
-                public URI apply(final MarkedUri markedUri) {
-                    return markedUri.uri;
-                }
-            };
         }
 
         public PathRelativityPoint getRelativity() {

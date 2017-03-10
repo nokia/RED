@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -42,8 +43,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEven
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
 
 
 /**
@@ -94,7 +93,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             final RobotProject project = RedPlugin.getModelManager().createProject(externalFile.getProject());
             final RobotRuntimeEnvironment env = project.getRuntimeEnvironment();
 
-            Optional<File> modulePath = Optional.absent();
+            Optional<File> modulePath = Optional.empty();
             try {
                 final String currentFileDirectoryPath = suiteFile.getFile().getParent().getLocation().toOSString();
                 final EnvironmentSearchPaths searchPaths = new RedEclipseProjectConfig(config)

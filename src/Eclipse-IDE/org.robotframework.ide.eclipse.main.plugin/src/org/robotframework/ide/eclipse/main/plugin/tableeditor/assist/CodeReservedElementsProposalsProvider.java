@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
@@ -21,8 +22,6 @@ import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-
-import com.google.common.base.Optional;
 
 
 public class CodeReservedElementsProposalsProvider implements RedContentProposalProvider {
@@ -58,7 +57,7 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
         if (tableElement instanceof RobotKeywordCall) {
             final List<RobotToken> tokens = ((RobotKeywordCall) tableElement).getLinkedElement().getElementTokens();
             
-            final Optional<RobotToken> firstTokenInLine = tokens.isEmpty() ? Optional.<RobotToken> absent()
+            final Optional<RobotToken> firstTokenInLine = tokens.isEmpty() ? Optional.<RobotToken> empty()
                     : Optional.of(tokens.get(0));
             return AssistProposalPredicates.codeReservedWordsPredicate(cellIndex + 1, firstTokenInLine);
         } else {

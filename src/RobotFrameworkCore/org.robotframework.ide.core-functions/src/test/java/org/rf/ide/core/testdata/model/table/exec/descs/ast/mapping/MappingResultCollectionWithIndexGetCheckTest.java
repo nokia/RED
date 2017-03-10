@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
@@ -21,8 +22,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-import com.google.common.base.Optional;
-
 @RunWith(Parameterized.class)
 public class MappingResultCollectionWithIndexGetCheckTest {
 
@@ -30,18 +29,18 @@ public class MappingResultCollectionWithIndexGetCheckTest {
 
     @Parameters(name = "${0}")
     public static Iterable<Object[]> data() throws Exception {
-        List<String> lines = Files.readAllLines(Paths.get(
+        final List<String> lines = Files.readAllLines(Paths.get(
                 VariableComputationHelperExtractionParametrizedTest.class.getResource("VAR_INDEX_CHECK.cvs").toURI()),
                 Charset.forName("UTF-8"));
 
-        List<Object[]> o = new ArrayList<>(0);
+        final List<Object[]> o = new ArrayList<>(0);
         int lineNumber = 0;
         for (final String line : lines) {
             lineNumber++;
             if ("".equals(line.trim()) || line.trim().startsWith("#")) {
                 continue;
             }
-            String[] split = SPLIT_CSV_PATTERN.split(line);
+            final String[] split = SPLIT_CSV_PATTERN.split(line);
             if (split.length != 3) {
                 throw new IllegalStateException(
                         "Expected 3 columns for each line. Line " + lineNumber + " has " + split.length);
@@ -58,7 +57,7 @@ public class MappingResultCollectionWithIndexGetCheckTest {
                         + shouldMarkAsVariableIndexText + ". Line " + lineNumber);
             }
 
-            Object[] p = new Object[3];
+            final Object[] p = new Object[3];
             p[0] = testName;
             p[1] = text;
             p[2] = shouldMarkAsVariableIndex;
@@ -88,9 +87,9 @@ public class MappingResultCollectionWithIndexGetCheckTest {
     }
 
     private void assertForText(final String text, final boolean shouldMarkAsVariableIndex) {
-        Optional<MappingResult> result = performOperationsFor(text);
+        final Optional<MappingResult> result = performOperationsFor(text);
         assertThat(result.isPresent()).isTrue();
-        MappingResult mappingResult = result.get();
+        final MappingResult mappingResult = result.get();
         if (shouldMarkAsVariableIndex) {
             assertThat(mappingResult.isCollectionVariableElementGet()).isTrue();
         } else {
@@ -99,13 +98,13 @@ public class MappingResultCollectionWithIndexGetCheckTest {
     }
 
     private Optional<MappingResult> performOperationsFor(final String text) {
-        RobotToken token = new RobotToken();
+        final RobotToken token = new RobotToken();
         token.setStartOffset(0);
         token.setLineNumber(1);
         token.setStartColumn(0);
         token.setRaw(text);
         token.setText(text);
-        VariableExtractor varExtractor = new VariableExtractor();
+        final VariableExtractor varExtractor = new VariableExtractor();
 
         return Optional.of(varExtractor.extract(token, "fileName_" + testName));
     }

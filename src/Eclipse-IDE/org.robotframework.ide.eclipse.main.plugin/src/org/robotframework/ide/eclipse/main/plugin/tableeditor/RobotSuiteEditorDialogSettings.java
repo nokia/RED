@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import java.util.Optional;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -39,14 +39,14 @@ public class RobotSuiteEditorDialogSettings {
 
     private Optional<IDialogSettings> getSuiteEditorSettings() {
         final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
-        return Optional.fromNullable(dialogSettings.getSection(RobotFormEditor.ID));
+        return Optional.ofNullable(dialogSettings.getSection(RobotFormEditor.ID));
     }
 
     private Optional<IDialogSettings> getSuiteEditorHeaderSettings() {
         final Optional<IDialogSettings> editorSettings = getSuiteEditorSettings();
         if (editorSettings.isPresent()) {
-            return Optional.fromNullable(editorSettings.get().getSection("header"));
+            return Optional.ofNullable(editorSettings.get().getSection("header"));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

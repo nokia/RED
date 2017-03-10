@@ -5,14 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

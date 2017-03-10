@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 import static com.google.common.collect.Iterables.filter;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -25,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
 public class SetVariableNameCommand extends EditorCommand {
@@ -158,7 +158,7 @@ public class SetVariableNameCommand extends EditorCommand {
         final RobotToken declaringToken = variable.getLinkedElement().getDeclaration();
         previousName = declaringToken.getText();
         if (previousName.equals(newName)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         declaringToken.setRaw(newName);
         declaringToken.setText(newName);

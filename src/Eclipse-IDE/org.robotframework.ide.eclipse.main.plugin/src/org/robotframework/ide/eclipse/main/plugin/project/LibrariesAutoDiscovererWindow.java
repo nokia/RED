@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -56,8 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningS
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.TreeContentProvider;
-
-import com.google.common.base.Optional;
 
 /**
  * @author mmarzec
@@ -231,7 +230,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 return Optional.of(childElement.getValue());
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private static Optional<IFile> getOpenableFile(final String filePath) {
@@ -240,7 +239,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         if (file != null && file.exists()) {
             return Optional.of(file);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private void createDetailsComposite(final Composite mainComposite) {

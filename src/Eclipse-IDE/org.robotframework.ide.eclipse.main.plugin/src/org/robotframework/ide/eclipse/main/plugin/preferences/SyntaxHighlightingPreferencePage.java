@@ -14,6 +14,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -47,7 +48,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.red.viewers.ListInputStructuredContentProvider;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 /**

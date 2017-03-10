@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public interface ProposalMatcher {
 

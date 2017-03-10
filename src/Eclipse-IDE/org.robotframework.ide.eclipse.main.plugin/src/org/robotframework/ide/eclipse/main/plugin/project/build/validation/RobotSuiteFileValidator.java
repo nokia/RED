@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -19,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class RobotSuiteFileValidator extends RobotFileValidator {

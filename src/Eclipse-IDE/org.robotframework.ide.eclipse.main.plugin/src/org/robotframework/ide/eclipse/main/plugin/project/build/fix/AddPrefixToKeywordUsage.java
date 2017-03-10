@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -22,8 +23,6 @@ import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -68,7 +67,7 @@ public class AddPrefixToKeywordUsage extends RedSuiteMarkerResolution {
                     new CompletionProposal(toInsert, charStart, charEnd - charStart, toInsert.length(), image,
                             getLabel(), null, Snippets.createSnippetInfo(document, regionToChange, toInsert)));
         } catch (final CoreException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

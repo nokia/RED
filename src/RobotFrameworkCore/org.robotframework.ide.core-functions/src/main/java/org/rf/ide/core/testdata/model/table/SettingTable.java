@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model.table;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
@@ -30,8 +31,6 @@ import org.rf.ide.core.testdata.model.table.setting.UnknownSetting;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 public class SettingTable extends ARobotSectionTable {
 

@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.documentation;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
@@ -42,8 +43,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.swt.SwtThread;
-
-import com.google.common.base.Optional;
 
 /**
  * @author mmarzec
@@ -260,23 +259,23 @@ public class DocumentationView {
 
     class CurrentlyDisplayedDocElement {
 
-        private Optional<RobotFileInternalElement> robotFileInternalElement = Optional.absent();
+        private Optional<RobotFileInternalElement> robotFileInternalElement = Optional.empty();
 
-        private Optional<IDocumentationHolder> documentationHolder = Optional.absent();
+        private Optional<IDocumentationHolder> documentationHolder = Optional.empty();
 
         private String suiteFileName = "";
 
         public void setRobotFileInternalElement(final RobotFileInternalElement robotFileInternalElement) {
             this.robotFileInternalElement = Optional.of(robotFileInternalElement);
             this.suiteFileName = robotFileInternalElement.getSuiteFile().getName();
-            this.documentationHolder = Optional.absent();
+            this.documentationHolder = Optional.empty();
         }
 
         public void setDocumentationHolder(final IDocumentationHolder documentationHolder,
                 final RobotSuiteFile suiteFile) {
             this.documentationHolder = Optional.of(documentationHolder);
             this.suiteFileName = suiteFile.getName();
-            this.robotFileInternalElement = Optional.absent();
+            this.robotFileInternalElement = Optional.empty();
         }
 
         public IDocumentationHolder getDocumentationHolder() {
@@ -315,7 +314,7 @@ public class DocumentationView {
             if (robotFileInternalElement.isPresent()) {
                 return Optional.of(robotFileInternalElement.get().getDefinitionPosition());
             }
-            return Optional.absent();
+            return Optional.empty();
         }
 
         public boolean isEqualTo(final RobotFileInternalElement other) {
@@ -333,8 +332,8 @@ public class DocumentationView {
         }
 
         public void reset() {
-            this.robotFileInternalElement = Optional.absent();
-            this.documentationHolder = Optional.absent();
+            this.robotFileInternalElement = Optional.empty();
+            this.documentationHolder = Optional.empty();
         }
     }
 

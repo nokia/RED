@@ -5,14 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
+import java.util.Optional;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 public class OpenAction extends Action implements IEnablementUpdatingAction {
 

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -44,7 +45,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versi
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -201,7 +201,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                     continue;
                 }
                 TestCaseTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken,
-                        Optional.<List<RobotToken>> absent());
+                        Optional.<List<RobotToken>> empty());
             }
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
                 final String actualArgs = "[" + Joiner.on(", ").join(toString(template.getUnexpectedTrashArguments()))

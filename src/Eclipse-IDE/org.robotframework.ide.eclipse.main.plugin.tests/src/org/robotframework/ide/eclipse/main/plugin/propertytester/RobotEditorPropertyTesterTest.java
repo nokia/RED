@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -29,8 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
-
-import com.google.common.base.Optional;
 
 public class RobotEditorPropertyTesterTest {
 
@@ -99,7 +98,7 @@ public class RobotEditorPropertyTesterTest {
         
         when(sectionEditorPartWithSection.provideSection(any(RobotSuiteFile.class)))
                 .thenReturn(Optional.of(mock(RobotSuiteFileSection.class)));
-        when(sectionEditorPartWithoutSection.provideSection(any(RobotSuiteFile.class))).thenReturn(Optional.absent());
+        when(sectionEditorPartWithoutSection.provideSection(any(RobotSuiteFile.class))).thenReturn(Optional.empty());
 
         assertThat(activeSectionEditorHasSection(editorOnSourcePage, true)).isFalse();
         assertThat(activeSectionEditorHasSection(editorOnSourcePage, false)).isTrue();

@@ -11,6 +11,7 @@ import static com.google.common.collect.Lists.transform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -36,7 +37,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.Gener
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 

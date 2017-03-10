@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.junit.After;
@@ -26,8 +27,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-import com.google.common.base.Optional;
-
 @RunWith(Parameterized.class)
 public class VariableComputationHelperExtractionParametrizedTest {
 
@@ -37,17 +36,17 @@ public class VariableComputationHelperExtractionParametrizedTest {
 
     @Parameters(name = "${0}")
     public static Iterable<Object[]> data() throws Exception {
-        List<String> lines = Files.readAllLines(Paths.get(VariableComputationHelperExtractionParametrizedTest.class
+        final List<String> lines = Files.readAllLines(Paths.get(VariableComputationHelperExtractionParametrizedTest.class
                 .getResource("VAR_WITH_MATH_OPERATIONS.cvs").toURI()), Charset.forName("UTF-8"));
 
-        List<Object[]> o = new ArrayList<>(0);
+        final List<Object[]> o = new ArrayList<>(0);
         int lineNumber = 0;
         for (final String line : lines) {
             lineNumber++;
             if ("".equals(line.trim()) || line.trim().startsWith("#")) {
                 continue;
             }
-            String[] split = SPLIT_CSV_PATTERN.split(line);
+            final String[] split = SPLIT_CSV_PATTERN.split(line);
             if (split.length != 5) {
                 throw new IllegalStateException(
                         "Expected 5 columns for each line. Line " + lineNumber + " has " + split.length);
@@ -75,7 +74,7 @@ public class VariableComputationHelperExtractionParametrizedTest {
                         + shouldExtractText + ". Line " + lineNumber);
             }
 
-            Object[] p = new Object[5];
+            final Object[] p = new Object[5];
             p[0] = testName;
             p[1] = text;
             p[2] = variableNameStart;
@@ -117,10 +116,10 @@ public class VariableComputationHelperExtractionParametrizedTest {
 
     private void assertForText(final String text, final int variableNameStart, final String variableName,
             final boolean shouldExtract) {
-        Optional<TextPosition> result = performOperationsFor(text);
+        final Optional<TextPosition> result = performOperationsFor(text);
         if (shouldExtract) {
             assertThat(result.isPresent()).isTrue();
-            TextPosition varName = result.get();
+            final TextPosition varName = result.get();
             assertThat(varName.getFullText()).isEqualTo(text);
             assertThat(varName.getStart()).isEqualTo(variableNameStart);
             assertThat(varName.getText()).isEqualTo(variableName);
@@ -132,15 +131,15 @@ public class VariableComputationHelperExtractionParametrizedTest {
     }
 
     private Optional<TextPosition> performOperationsFor(final String text) {
-        RobotToken token = new RobotToken();
+        final RobotToken token = new RobotToken();
         token.setStartOffset(0);
         token.setLineNumber(1);
         token.setStartColumn(0);
         token.setRaw(text);
         token.setText(text);
-        VariableExtractor varExtractor = new VariableExtractor();
-        MappingResult extract = varExtractor.extract(token, "fileName_" + testName);
-        List<VariableDeclaration> correctVariables = extract.getCorrectVariables();
+        final VariableExtractor varExtractor = new VariableExtractor();
+        final MappingResult extract = varExtractor.extract(token, "fileName_" + testName);
+        final List<VariableDeclaration> correctVariables = extract.getCorrectVariables();
         return vch.extractVariableName(correctVariables.get(0));
     }
 

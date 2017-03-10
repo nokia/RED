@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
+import java.util.Optional;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedTextContentAdapter.SubstituteTextModificationStrategy;
-
-import com.google.common.base.Optional;
 
 public class AssistProposalAdapter implements RedContentProposal {
 
@@ -37,7 +37,7 @@ public class AssistProposalAdapter implements RedContentProposal {
     private AssistProposalAdapter(final AssistProposal wrappedProposal,
             final ModificationStrategy modificationStrategy, final String additionalSuffix) {
         this.wrappedProposal = wrappedProposal;
-        this.modificationStrategy = Optional.fromNullable(modificationStrategy);
+        this.modificationStrategy = Optional.ofNullable(modificationStrategy);
         this.additionalSuffix = additionalSuffix;
     }
 
@@ -78,6 +78,6 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     @Override
     public ModificationStrategy getModificationStrategy() {
-        return modificationStrategy.or(new SubstituteTextModificationStrategy());
+        return modificationStrategy.orElse(new SubstituteTextModificationStrategy());
     }
 }

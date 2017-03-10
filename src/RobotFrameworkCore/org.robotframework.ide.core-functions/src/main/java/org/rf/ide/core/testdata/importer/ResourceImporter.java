@@ -10,6 +10,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
@@ -20,8 +21,6 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.AImported.Type;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
-
-import com.google.common.base.Optional;
 
 public class ResourceImporter {
 
@@ -93,7 +92,7 @@ public class ResourceImporter {
                 return Optional.of(new ResourceImportReference((ResourceImport) imported, parsed.get(0)));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public void importDebugResource(final RobotFileOutput robotFile, final File toImport) {

@@ -5,13 +5,12 @@
  */
 package org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping;
 
+import java.util.Optional;
 import java.util.Stack;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.GeneralVariableType;
-
-import com.google.common.base.Optional;
 
 public class VariableComputationHelper {
 
@@ -35,7 +34,7 @@ public class VariableComputationHelper {
             .compile("^((\\s*(" + COUNT_OPERATIONS + ")+\\s*(" + NUMBER_PATTERN + "|" + QUOTA_TEXT + ")+\\s*)+)*");
 
     public Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
-        Optional<TextPosition> text = Optional.absent();
+        final Optional<TextPosition> text = Optional.empty();
 
         if (variableDec.getVariableType() == GeneralVariableType.COMPUTATION) {
             final TextPosition textPositionVariableName = variableDec.getVariableName();
@@ -83,7 +82,7 @@ public class VariableComputationHelper {
     }
 
     private String getVariableName(final String variableName) {
-        String[] split = COUNT_OPERATION_PATTERN.split(variableName);
+        final String[] split = COUNT_OPERATION_PATTERN.split(variableName);
         if (split.length >= 2) {
             return split[0].trim();
         }
@@ -112,7 +111,7 @@ public class VariableComputationHelper {
         final char[] chars = text.toCharArray();
         final Stack<Character> bracketStack = new Stack<Character>();
         final StringBuilder removed = new StringBuilder();
-        for (char c : chars) {
+        for (final char c : chars) {
             if (c == '(') {
                 bracketStack.push(c);
             } else if (c == ')') {
@@ -120,7 +119,7 @@ public class VariableComputationHelper {
                     return null;
                 }
 
-                Character pop = bracketStack.pop();
+                final Character pop = bracketStack.pop();
                 if (pop != '(') {
                     return null;
                 }
@@ -131,7 +130,7 @@ public class VariableComputationHelper {
                     return null;
                 }
 
-                Character pop = bracketStack.pop();
+                final Character pop = bracketStack.pop();
                 if (pop != '[') {
                     return null;
                 }

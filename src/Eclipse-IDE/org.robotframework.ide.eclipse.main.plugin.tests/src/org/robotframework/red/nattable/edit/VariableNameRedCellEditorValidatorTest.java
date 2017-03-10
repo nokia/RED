@@ -7,11 +7,11 @@ package org.robotframework.red.nattable.edit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorValueValidationException;
-
-import com.google.common.base.Optional;
 
 /**
  * @author wypych

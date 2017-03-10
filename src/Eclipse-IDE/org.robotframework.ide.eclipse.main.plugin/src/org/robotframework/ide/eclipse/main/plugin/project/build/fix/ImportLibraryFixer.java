@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -35,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 /**
@@ -107,7 +107,7 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
                         .<ICompletionProposal> of(new CompletionProposal(lineToInsert, offset, 0, lineToInsert.length(),
                                 ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null));
             } catch (final BadLocationException e) {
-                return Optional.absent();
+                return Optional.empty();
             }
 
         } else {

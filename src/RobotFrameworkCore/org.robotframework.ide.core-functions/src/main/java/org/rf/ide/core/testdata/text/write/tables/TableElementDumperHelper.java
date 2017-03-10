@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.text.write.tables;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -21,8 +22,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
-
-import com.google.common.base.Optional;
 
 public class TableElementDumperHelper {
 
@@ -42,7 +41,7 @@ public class TableElementDumperHelper {
         int index = -1;
 
         if (elems != null) {
-            int size = elems.size();
+            final int size = elems.size();
             for (int elementIndex = 0; elementIndex < size; elementIndex++) {
                 final RobotToken currentElement = elems.get(elementIndex);
                 if (currentElement.isNotEmpty()) {
@@ -57,7 +56,7 @@ public class TableElementDumperHelper {
     public Set<Integer> getLineEndPos(final RobotFile model, final List<? extends IRobotLineElement> elems) {
         final Set<Integer> lof = new TreeSet<>();
 
-        int size = elems.size();
+        final int size = elems.size();
         lof.addAll(getLineEndPosByComment(elems));
         lof.addAll(getLineEndPosFromModel(model, elems));
         lof.add(size - 1);
@@ -67,13 +66,13 @@ public class TableElementDumperHelper {
 
     private Set<Integer> getLineEndPosByComment(final List<? extends IRobotLineElement> elems) {
         final Set<Integer> lof = new HashSet<>();
-        int size = elems.size();
+        final int size = elems.size();
         IRobotTokenType type = null;
         for (int index = 0; index < size; index++) {
             final IRobotLineElement el = elems.get(index);
-            boolean isComment = el.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+            final boolean isComment = el.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                     || el.getTypes().contains(RobotTokenType.COMMENT_CONTINUE);
-            RobotTokenType newType = isComment ? RobotTokenType.START_HASH_COMMENT : RobotTokenType.UNKNOWN;
+            final RobotTokenType newType = isComment ? RobotTokenType.START_HASH_COMMENT : RobotTokenType.UNKNOWN;
 
             if (type == null) {
                 type = newType;
@@ -92,9 +91,9 @@ public class TableElementDumperHelper {
     private Set<Integer> getLineEndPosFromModel(final RobotFile model, final List<? extends IRobotLineElement> elems) {
         final Set<Integer> lof = new HashSet<>();
 
-        int size = elems.size();
+        final int size = elems.size();
         if (size > 1) {
-            IRobotLineElement prevElement = elems.get(0);
+            final IRobotLineElement prevElement = elems.get(0);
             for (int tokenId = 1; tokenId < size; tokenId++) {
                 final IRobotLineElement currentElement = elems.get(tokenId);
                 if (isLineContinuedInModel(model, elems, prevElement, currentElement)) {
@@ -110,8 +109,8 @@ public class TableElementDumperHelper {
             final IRobotLineElement prevElement, final IRobotLineElement currentElement) {
         boolean result = false;
 
-        int prevLineNumber = prevElement.getLineNumber();
-        int curLineNumber = currentElement.getLineNumber();
+        final int prevLineNumber = prevElement.getLineNumber();
+        final int curLineNumber = currentElement.getLineNumber();
         if (prevLineNumber != FilePosition.NOT_SET && curLineNumber != FilePosition.NOT_SET
                 && prevLineNumber + 1 == curLineNumber) {
             final RobotLine currentLine = model.getFileContent().get(curLineNumber - 1);
@@ -143,9 +142,9 @@ public class TableElementDumperHelper {
     }
 
     public Optional<Integer> getFirstBrokenChainPosition(final List<? extends IRobotLineElement> elems,
-            boolean treatNewAsBrokenChain) {
-        Optional<Integer> o = Optional.absent();
-        int size = elems.size();
+            final boolean treatNewAsBrokenChain) {
+        Optional<Integer> o = Optional.empty();
+        final int size = elems.size();
         FilePosition pos = FilePosition.createNotSet();
         for (int index = 0; index < size; index++) {
             final FilePosition current = elems.get(index).getFilePosition();
@@ -172,7 +171,7 @@ public class TableElementDumperHelper {
             final List<RobotToken> tokens, final List<RobotLine> lines) {
         final List<IRobotLineElement> dumps = new ArrayList<>(0);
         final int tokSize = tokens.size();
-        int startOffset = startToken.getFilePosition().getOffset();
+        final int startOffset = startToken.getFilePosition().getOffset();
 
         RobotLine lastLine = null;
         IRobotLineElement lastToken = startToken;
@@ -193,13 +192,13 @@ public class TableElementDumperHelper {
         }
 
         while (meatTokens < tokSize) {
-            Optional<Integer> line = model.getRobotLineIndexBy(offset);
+            final Optional<Integer> line = model.getRobotLineIndexBy(offset);
             if (!line.isPresent()) {
                 removeUpdated = true;
                 break;
             }
             lastLine = model.getFileContent().get(line.get());
-            List<IRobotLineElement> lastToks = lastLine.getLineElements();
+            final List<IRobotLineElement> lastToks = lastLine.getLineElements();
             final int lastToksSize = lastToks.size();
 
             int elementPositionInLine;
@@ -211,7 +210,7 @@ public class TableElementDumperHelper {
                     elementPositionInLine = -1;
                 }
             } else {
-                Optional<Integer> elemPosInLine = lastLine.getElementPositionInLine(lastToken);
+                final Optional<Integer> elemPosInLine = lastLine.getElementPositionInLine(lastToken);
                 if (elemPosInLine.isPresent()) {
                     elementPositionInLine = lastLine.getElementPositionInLine(lastToken).get() + 1;
                 } else {
@@ -226,7 +225,7 @@ public class TableElementDumperHelper {
                 if (e instanceof Separator) {
                     dumps.add(e);
                 } else {
-                    RobotToken rt = (RobotToken) e;
+                    final RobotToken rt = (RobotToken) e;
                     if (tokSize > meatTokens && rt == tokens.get(meatTokens)) {
                         dumps.add(rt);
                         meatTokens++;
@@ -248,7 +247,7 @@ public class TableElementDumperHelper {
             }
 
             if (removeUpdated) {
-                int dumpSize = dumps.size();
+                final int dumpSize = dumps.size();
                 if (!dumps.isEmpty()) {
                     for (int i = 0; i < dumpSize - currentSize; i++) {
                         dumps.remove(dumps.size() - 1);
@@ -259,7 +258,7 @@ public class TableElementDumperHelper {
             } else {
                 lastToken = lastLine.getEndOfLine();
                 dumps.add(lastLine.getEndOfLine());
-                IRobotLineElement end = dumps.get(dumps.size() - 1);
+                final IRobotLineElement end = dumps.get(dumps.size() - 1);
                 offset = end.getStartOffset() + (end.getEndColumn() - end.getStartColumn());
             }
         }
@@ -272,7 +271,7 @@ public class TableElementDumperHelper {
             removeUpdated = false;
 
             for (int index = tokPosInLine + 1; index < size; index++) {
-                IRobotLineElement elem = lineElements.get(index);
+                final IRobotLineElement elem = lineElements.get(index);
                 if (elem instanceof Separator) {
                     dumps.add(elem);
                 } else {
@@ -281,7 +280,7 @@ public class TableElementDumperHelper {
             }
 
             if (removeUpdated) {
-                int dumpSize = dumps.size();
+                final int dumpSize = dumps.size();
                 if (!dumps.isEmpty()) {
                     for (int i = 0; i < dumpSize - currentSize; i++) {
                         dumps.remove(dumps.size() - 1);
@@ -321,7 +320,7 @@ public class TableElementDumperHelper {
             if (dumps.isEmpty()) {
                 result = true;
             } else {
-                int dumpsSize = dumps.size();
+                final int dumpsSize = dumps.size();
                 boolean sepsOnly = true;
                 for (int dumpId = dumpsSize - 1; dumpId >= 0; dumpId--) {
                     final IRobotLineElement rle = dumps.get(dumpId);

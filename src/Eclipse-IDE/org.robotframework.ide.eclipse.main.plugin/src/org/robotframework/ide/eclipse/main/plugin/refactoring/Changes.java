@@ -5,13 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.NullChange;
 
-import com.google.common.base.Optional;
 import com.google.common.xml.XmlEscapers;
 
 /**
@@ -56,6 +57,6 @@ class Changes {
             final IPath result = destinationPath.append(affectedPath.removeFirstSegments(sourcePath.segmentCount()));
             return Optional.of(result);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

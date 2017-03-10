@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Optional;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,8 +22,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 /**
@@ -49,14 +48,10 @@ public class DocumentUtilities {
 
             final int projectedOffset = offset - cellRegion.get().getOffset();
 
-            return findVariable(cellContent, projectedOffset).transform(new Function<IRegion, IRegion>() {
-                @Override
-                public IRegion apply(final IRegion reg) {
-                    return new Region(reg.getOffset() + cellRegion.get().getOffset(), reg.getLength());
-                }
-            });
+            return findVariable(cellContent, projectedOffset)
+                    .map(reg -> new Region(reg.getOffset() + cellRegion.get().getOffset(), reg.getLength()));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public static Optional<IRegion> findVariable(final String cellContent, final int offset) {
@@ -78,7 +73,7 @@ public class DocumentUtilities {
                 }
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private static boolean varStartDetected(final String cellContent, final int i) {
@@ -100,14 +95,9 @@ public class DocumentUtilities {
 
             final String cellContent = document.get(cellRegion.get().getOffset(), cellRegion.get().getLength());
             return findLiveVariable(cellContent, offset - cellRegion.get().getOffset())
-                    .transform(new Function<IRegion, IRegion>() {
-                        @Override
-                        public IRegion apply(final IRegion region) {
-                            return new Region(region.getOffset() + cellRegion.get().getOffset(), region.getLength());
-                        }
-                    });
+                    .map(reg -> new Region(reg.getOffset() + cellRegion.get().getOffset(), reg.getLength()));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public static Optional<IRegion> findLiveVariable(final String cellContent, final int offset) {
@@ -120,7 +110,7 @@ public class DocumentUtilities {
                 return Optional.<IRegion> of(new Region(start, end - start));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**
@@ -146,7 +136,7 @@ public class DocumentUtilities {
             return Optional.<IRegion> of(new Region(offset, 0));
         }
         if (isInsideSeparator(prev, next, isTsv)) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         final int beginOffset = offset - calculateCellRegionBegin(document, isTsv, offset);
@@ -347,7 +337,7 @@ public class DocumentUtilities {
 
     public static Optional<IRegion> getSnippet(final IDocument document, final int offset, final int noOfLinesBeforeAndAfter) {
         if (noOfLinesBeforeAndAfter < 0) {
-            return Optional.absent();
+            return Optional.empty();
         }
         try {
             final int line = document.getLineOfOffset(offset);
@@ -361,7 +351,7 @@ public class DocumentUtilities {
                     lastLineRegion.getOffset() + lastLineRegion.getLength() - firstLineRegion.getOffset()));
             
         } catch (final BadLocationException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

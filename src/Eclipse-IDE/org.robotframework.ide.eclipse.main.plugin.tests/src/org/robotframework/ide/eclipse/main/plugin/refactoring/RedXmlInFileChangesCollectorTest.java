@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -20,8 +22,6 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Optional;
 
 public class RedXmlInFileChangesCollectorTest {
 
@@ -51,7 +51,7 @@ public class RedXmlInFileChangesCollectorTest {
         final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
         
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/x"), Optional.<IPath> absent());
+                new Path(PROJECT_NAME + "/x"), Optional.<IPath> empty());
 
         assertThat(collector.collect().isPresent()).isFalse();
     }
@@ -72,7 +72,7 @@ public class RedXmlInFileChangesCollectorTest {
         final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/a"), Optional.<IPath> absent());
+                new Path(PROJECT_NAME + "/a"), Optional.<IPath> empty());
         final Optional<Change> change = collector.collect();
 
         assertThat(change.isPresent()).isTrue();

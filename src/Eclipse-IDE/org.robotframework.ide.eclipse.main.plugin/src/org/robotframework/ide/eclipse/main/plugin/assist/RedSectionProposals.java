@@ -11,13 +11,12 @@ import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-
-import com.google.common.base.Optional;
 
 public class RedSectionProposals {
 

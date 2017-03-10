@@ -7,27 +7,26 @@ package org.rf.ide.core.jvmutils.process;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public class ProcessInformation {
 
     public static final long PROCESS_NOT_FOUND = -1;
 
-    private Optional<ProcessInformation> parent = Optional.absent();
+    private Optional<ProcessInformation> parent = Optional.empty();
 
     private final long processPid;
 
     private final List<ProcessInformation> childProcesses = new ArrayList<>(0);
 
-    private Optional<IProcessTreeHandler> handler = Optional.absent();
+    private Optional<IProcessTreeHandler> handler = Optional.empty();
 
     public ProcessInformation(final long processPid) {
         this.processPid = processPid;
     }
 
     public Optional<IProcessTreeHandler> findHandler() {
-        Optional<IProcessTreeHandler> foundHandler = Optional.absent();
+        Optional<IProcessTreeHandler> foundHandler = Optional.empty();
 
         if (handler.isPresent()) {
             foundHandler = handler;
@@ -41,7 +40,7 @@ public class ProcessInformation {
     }
 
     public void setHandler(final IProcessTreeHandler handler) {
-        this.handler = Optional.fromNullable(handler);
+        this.handler = Optional.ofNullable(handler);
     }
 
     public Optional<ProcessInformation> parent() {

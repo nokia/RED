@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -24,7 +25,6 @@ import org.rf.ide.core.project.ImportSearchPaths.PathRelativityPoint;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 public class ImportSearchPathsTest {

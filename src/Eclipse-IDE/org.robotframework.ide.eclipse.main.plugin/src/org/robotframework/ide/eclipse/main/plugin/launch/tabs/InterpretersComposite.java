@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -30,8 +31,6 @@ import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -69,7 +68,7 @@ class InterpretersComposite extends Composite {
             public void widgetSelected(final SelectionEvent e) {
                 checkEnvironmentBtn.setEnabled(false);
                 comboExecutorName.setEnabled(false);
-                listener.interpreterChanged(Optional.<SuiteExecutor> absent());
+                listener.interpreterChanged(Optional.<SuiteExecutor> empty());
             }
         });
     }

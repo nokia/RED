@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -40,8 +41,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Optional;
 
 public class SuiteFileValidationListenerTest {
 
@@ -272,7 +271,7 @@ public class SuiteFileValidationListenerTest {
 
     private static Severity severityFor(final SuiteFileValidationListener listener,
             final RobotFileInternalElement element) {
-        return listener.getHighestSeverityMarkerFor(Optional.of(element)).orNull();
+        return listener.getHighestSeverityMarkerFor(Optional.of(element)).orElse(null);
     }
 
     private static List<String> messageFor(final SuiteFileValidationListener listener,

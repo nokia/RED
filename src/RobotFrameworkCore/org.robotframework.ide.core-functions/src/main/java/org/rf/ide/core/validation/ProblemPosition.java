@@ -6,8 +6,8 @@
 package org.rf.ide.core.validation;
 
 import java.util.Objects;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public final class ProblemPosition {
@@ -22,7 +22,7 @@ public final class ProblemPosition {
 
     public ProblemPosition(final int line, final Range<Integer> range) {
         this.line = line;
-        this.range = Optional.fromNullable(range);
+        this.range = Optional.ofNullable(range);
     }
 
     public int getLine() {

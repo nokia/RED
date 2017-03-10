@@ -6,6 +6,7 @@
 package org.robotframework.red.nattable.edit;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
@@ -27,8 +28,6 @@ import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-
-import com.google.common.base.Optional;
 
 /**
  * Cell editor which shows list of detailed entries which can be edited
@@ -76,10 +75,10 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         composite.setInput(column, row);
 
         final AssistantContext context = new NatTableAssistantContext(column, row);
-        assistSupport.install(composite.getText(), context, Optional.<RedContentProposalListener> absent());
+        assistSupport.install(composite.getText(), context, Optional.<RedContentProposalListener> empty());
         parent.redraw();
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
         return composite;
     }
@@ -154,7 +153,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     public void close() {
         super.close();
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
     }
 

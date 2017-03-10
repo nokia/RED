@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -12,8 +14,6 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -35,8 +35,10 @@ class RedXmlChangesCollector {
             final CompositeChange compositeChange = new CompositeChange("Change in both editors", new Change[]{changesInProjectEditor.get(), changesInTextEditor.get() });
             compositeChange.markAsSynthetic();
             return Optional.<Change> of(compositeChange);
-        } else if (changesInProjectEditor.isPresent() || changesInTextEditor.isPresent()) {
-            return changesInProjectEditor.or(changesInTextEditor);
+        } else if (changesInProjectEditor.isPresent()) {
+            return changesInProjectEditor;
+        } else if (changesInTextEditor.isPresent()) {
+            return changesInTextEditor;
         } else {
             return new RedXmlInFileChangesCollector(redXmlFile, pathBeforeRefactoring, pathAfterRefactoring).collect();
         }

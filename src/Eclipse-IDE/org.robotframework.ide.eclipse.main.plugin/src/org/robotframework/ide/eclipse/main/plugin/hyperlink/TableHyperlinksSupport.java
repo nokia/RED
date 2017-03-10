@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -48,7 +49,6 @@ import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.StructuredContentProvider;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
 
@@ -134,7 +134,7 @@ public class TableHyperlinksSupport {
     @VisibleForTesting
     static Optional<IRegion> getMergedHyperlinkRegion(final Collection<IHyperlink> hyperlinks) {
         if (hyperlinks.isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         IRegion hyperlinkRegion = Iterables.getFirst(hyperlinks, null).getHyperlinkRegion();
         for (final IHyperlink link : hyperlinks) {

@@ -10,12 +10,12 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.lang.reflect.Array;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
@@ -55,7 +55,7 @@ public class Selections {
         if (!elements.isEmpty()) {
             return Optional.of(elements.get(0));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private static <T> Function<Object, T> toObjectOfClassUsingAdapters(final Class<T> elementsClass) {

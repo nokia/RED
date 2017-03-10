@@ -6,14 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.FilePosition;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -89,7 +88,7 @@ public interface RobotFileInternalElement extends RobotElement {
          *            should be selected.
          */
         public final void run(final IWorkbenchPage page) {
-            run(page, Optional.<ElementOpenMode> absent(), null);
+            run(page, Optional.<ElementOpenMode> empty(), null);
         }
 
         /**
@@ -99,7 +98,7 @@ public interface RobotFileInternalElement extends RobotElement {
          * @param page
          */
         public final void run(final IWorkbenchPage page, final String labelWhichShouldBeInSelectedCell) {
-            run(page, Optional.<ElementOpenMode> absent(), labelWhichShouldBeInSelectedCell);
+            run(page, Optional.<ElementOpenMode> empty(), labelWhichShouldBeInSelectedCell);
         }
 
         /**

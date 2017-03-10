@@ -8,11 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-
-import com.google.common.base.Optional;
 
 public class RedLibraryProposals {
 

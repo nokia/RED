@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -47,7 +48,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.SetMultimap;
@@ -380,7 +380,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 return Optional.of(sectionClass.cast(elem));
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**
@@ -470,7 +470,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         try {
             return ResolvedImportPath.from(importPath, getProject().getRobotProjectHolder().getVariableMappings());
         } catch (final MalformedPathImportException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

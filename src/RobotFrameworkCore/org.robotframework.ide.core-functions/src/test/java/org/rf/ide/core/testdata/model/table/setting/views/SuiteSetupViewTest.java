@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.createToken;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.getText;
 
+import java.util.Optional;
+
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
-
-import com.google.common.base.Optional;
 
 public class SuiteSetupViewTest {
 
@@ -35,9 +35,9 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
+        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
         assertThat(suiteSetup.isPresent()).isTrue();
-        SuiteSetup common = suiteSetup.get();
+        final SuiteSetup common = suiteSetup.get();
         common.setArgument(2, "arg");
         // verify
         assertThat(getText(common)).containsExactly("key1", "key2", "", "arg");
@@ -64,11 +64,11 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
+        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
 
         // verify
         assertThat(suiteSetup.isPresent()).isTrue();
-        SuiteSetup common = suiteSetup.get();
+        final SuiteSetup common = suiteSetup.get();
         assertThat(getText(common)).containsExactly("key1", "arg1", "key2", "arg2");
         assertThat(settingTable.getSuiteSetups()).hasSize(2);
     }
@@ -92,9 +92,9 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
+        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
         assertThat(suiteSetup.isPresent()).isTrue();
-        SuiteSetup common = suiteSetup.get();
+        final SuiteSetup common = suiteSetup.get();
         common.addArgument(createToken("newArg"));
 
         // verify
@@ -121,9 +121,9 @@ public class SuiteSetupViewTest {
         settingTable.addSuiteSetup(setupTwo);
 
         // execute
-        Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
+        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
         assertThat(suiteSetup.isPresent()).isTrue();
-        SuiteSetup common = suiteSetup.get();
+        final SuiteSetup common = suiteSetup.get();
         common.getArguments().get(2).setText("mod");
 
         // verify

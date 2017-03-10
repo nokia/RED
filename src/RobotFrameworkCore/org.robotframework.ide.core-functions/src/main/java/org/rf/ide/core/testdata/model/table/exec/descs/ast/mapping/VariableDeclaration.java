@@ -6,14 +6,13 @@
 package org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
-import com.google.common.base.Optional;
 
 public class VariableDeclaration extends AContainerOperation {
 

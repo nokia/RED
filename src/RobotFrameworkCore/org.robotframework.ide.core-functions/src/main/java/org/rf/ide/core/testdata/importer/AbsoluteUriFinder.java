@@ -8,13 +8,12 @@ package org.rf.ide.core.testdata.importer;
 import java.io.File;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.ResolvedImportPath;
-
-import com.google.common.base.Optional;
 
 class AbsoluteUriFinder {
 

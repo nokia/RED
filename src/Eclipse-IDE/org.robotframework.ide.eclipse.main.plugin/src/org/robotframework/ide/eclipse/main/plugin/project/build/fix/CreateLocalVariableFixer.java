@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
@@ -20,8 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -72,7 +72,7 @@ public class CreateLocalVariableFixer extends RedSuiteMarkerResolution {
 
             return Optional.<ICompletionProposal> of(proposal);
         } catch (final CoreException | BadLocationException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

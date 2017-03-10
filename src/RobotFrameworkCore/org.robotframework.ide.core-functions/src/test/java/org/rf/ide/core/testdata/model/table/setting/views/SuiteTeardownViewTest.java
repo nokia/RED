@@ -9,12 +9,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.createToken;
 import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.getText;
 
+import java.util.Optional;
+
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
-
-import com.google.common.base.Optional;
 
 public class SuiteTeardownViewTest {
 
@@ -37,11 +37,11 @@ public class SuiteTeardownViewTest {
         settingTable.addSuiteTeardown(teardownTwo);
 
         // execute
-        Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
+        final Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
 
         // verify
         assertThat(suiteSetup.isPresent()).isTrue();
-        SuiteTeardown common = suiteSetup.get();
+        final SuiteTeardown common = suiteSetup.get();
         assertThat(getText(common)).containsExactly("key1", "arg1", "key2", "arg2");
         assertThat(settingTable.getSuiteTeardowns()).hasSize(2);
     }
@@ -65,9 +65,9 @@ public class SuiteTeardownViewTest {
         settingTable.addSuiteTeardown(teardownTwo);
 
         // execute
-        Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
+        final Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
         assertThat(suiteSetup.isPresent()).isTrue();
-        SuiteTeardown common = suiteSetup.get();
+        final SuiteTeardown common = suiteSetup.get();
         common.addArgument(createToken("newArg"));
 
         // verify
@@ -95,9 +95,9 @@ public class SuiteTeardownViewTest {
         settingTable.addSuiteTeardown(teardownTwo);
 
         // execute
-        Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
+        final Optional<SuiteTeardown> suiteSetup = settingTable.suiteTeardown();
         assertThat(suiteSetup.isPresent()).isTrue();
-        SuiteTeardown common = suiteSetup.get();
+        final SuiteTeardown common = suiteSetup.get();
         common.getArguments().get(2).setText("mod");
 
         // verify

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -15,13 +16,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-import com.google.common.base.Optional;
-
 public class InsertSettingCommand extends EditorCommand {
 
     private final RobotSettingsSection section;
 
-    private int index;
+    private final int index;
 
     private final List<RobotKeywordCall> settingsToInsert;
 

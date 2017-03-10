@@ -10,11 +10,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 
-import com.google.common.base.Optional;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 
@@ -62,7 +62,7 @@ public final class ResolvedImportPath {
             if (RobotExpressions.isParameterized(path)) {
                 final String resolvedPath = RobotExpressions.resolve(parameters, path);
                 if (RobotExpressions.isParameterized(resolvedPath)) {
-                    return Optional.<ResolvedImportPath> absent();
+                    return Optional.<ResolvedImportPath> empty();
                 } else {
                     return Optional.of(create(resolvedPath));
                 }
@@ -79,7 +79,7 @@ public final class ResolvedImportPath {
         final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
         final String sep = RedSystemProperties.isWindowsPlatform() ? "/" : "//";
         final String escapedPathWithScheme = new File(path).isAbsolute() ? "file:" + sep + escapedPath : escapedPath;
-        String normalizedPath = RedSystemProperties.isWindowsPlatform() ? 
+        final String normalizedPath = RedSystemProperties.isWindowsPlatform() ? 
         		escapedPathWithScheme.replaceAll("\\\\", "/") :
         		escapedPathWithScheme.replaceAll("\\\\", "%5c");
 		return new ResolvedImportPath(new URI(normalizedPath));

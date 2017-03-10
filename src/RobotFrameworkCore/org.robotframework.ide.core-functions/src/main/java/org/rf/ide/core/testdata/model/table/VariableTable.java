@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
@@ -21,8 +22,6 @@ import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 public class VariableTable extends ARobotSectionTable {
 
@@ -160,7 +159,7 @@ public class VariableTable extends ARobotSectionTable {
     }
 
     public Optional<AVariable> findVariable(final IRobotLineElement partOfVariable) {
-        Optional<AVariable> res = Optional.absent();
+        Optional<AVariable> res = Optional.empty();
 
         for (final AVariable var : variables) {
             final List<RobotToken> elems = var.getElementTokens();

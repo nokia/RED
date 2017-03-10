@@ -7,9 +7,8 @@ package org.rf.ide.core.testdata.model.table.keywords.names;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.Optional;
 import java.util.Set;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart

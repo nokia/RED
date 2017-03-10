@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,8 +54,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.red.actions.ExpandAllAction;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
-
-import com.google.common.base.Optional;
 
 class RobotOutlinePage extends ContentOutlinePage {
 
@@ -111,8 +110,8 @@ class RobotOutlinePage extends ContentOutlinePage {
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
         getSite().getActionBars().getToolBarManager().add(new ExpandAllAction(getTreeViewer()));
         
-        MenuManager menuManager = new MenuManager("Outline popup", "RobotOutlinePage.popup");
-        Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
+        final MenuManager menuManager = new MenuManager("Outline popup", "RobotOutlinePage.popup");
+        final Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
         getTreeViewer().getControl().setMenu(menu);
         getSite().registerContextMenu ("RobotOutlinePage.popup", menuManager, getTreeViewer());
         Viewers.boundViewerWithContext(getTreeViewer(), getSite(), CONTEXT_ID);
@@ -144,7 +143,7 @@ class RobotOutlinePage extends ContentOutlinePage {
                             shouldUpdateEditorSelection.set(false);
                             setSelectionInOutline(
                                     element.isPresent() && element.get() == suiteModel
-                                            ? Optional.<RobotElement> absent() : element);
+                                            ? Optional.<RobotElement> empty() : element);
                         }
                     });
                 }

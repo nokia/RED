@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.text.write;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -13,8 +14,6 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
-import com.google.common.base.Optional;
 
 /**
  * @author wypych
@@ -82,7 +81,7 @@ public class NotModelRelatedHashCommentedLineDumper {
     }
 
     private void dumpHashLine(final RobotFile model, final List<RobotLine> lines, final RobotLine robotLine) {
-        for (IRobotLineElement e : robotLine.getLineElements()) {
+        for (final IRobotLineElement e : robotLine.getLineElements()) {
             generalHelper.getDumpLineUpdater().updateLine(model, lines, e);
         }
 
@@ -92,8 +91,8 @@ public class NotModelRelatedHashCommentedLineDumper {
     }
 
     private <T> Optional<RobotToken> tokenWithMaxLineNumber(final AModelElement<T> elem) {
-        Optional<RobotToken> max = Optional.absent();
-        for (RobotToken t : elem.getElementTokens()) {
+        Optional<RobotToken> max = Optional.empty();
+        for (final RobotToken t : elem.getElementTokens()) {
             if (max.isPresent()) {
                 if (max.get().getFilePosition().getLine() < t.getLineNumber()) {
                     max = Optional.of(t);
@@ -109,7 +108,7 @@ public class NotModelRelatedHashCommentedLineDumper {
     private int findLastHashLine(final List<RobotLine> lines, final int startLine, final RobotToken lastTokenInLines) {
         int lastHash = -1;
 
-        int lineSize = lines.size();
+        final int lineSize = lines.size();
         for (int lineIndex = startLine; lineIndex < lineSize; lineIndex++) {
             final RobotLine line = lines.get(lineIndex);
             for (final IRobotLineElement rle : line.getLineElements()) {

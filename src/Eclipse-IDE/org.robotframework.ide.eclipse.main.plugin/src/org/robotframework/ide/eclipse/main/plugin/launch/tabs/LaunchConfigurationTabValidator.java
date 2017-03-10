@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -27,7 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -154,7 +154,7 @@ public class LaunchConfigurationTabValidator {
     }
 
     private Optional<IProject> getProject(final String projectName) {
-        return projectName.isEmpty() ? Optional.<IProject> absent()
+        return projectName.isEmpty() ? Optional.<IProject> empty()
                 : Optional.of(ResourcesPlugin.getWorkspace().getRoot().getProject(projectName));
     }
 

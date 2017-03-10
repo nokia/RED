@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
+import java.util.Optional;
+
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -17,8 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseUpHandler.E4MoveCaseUpHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 public class MoveCaseUpHandler extends DIParameterizedHandler<E4MoveCaseUpHandler> {
 

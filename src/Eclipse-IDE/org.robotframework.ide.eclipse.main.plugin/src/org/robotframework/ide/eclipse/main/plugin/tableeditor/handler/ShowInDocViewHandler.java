@@ -58,7 +58,7 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
             }
 
             if (selection != null) {
-                final com.google.common.base.Optional<RobotFileInternalElement> selectedElement = Selections
+                final java.util.Optional<RobotFileInternalElement> selectedElement = Selections
                         .getOptionalFirstElement(selection, RobotFileInternalElement.class);
                 if (selectedElement.isPresent()) {
                     showDoc(view, selectedElement.get());
@@ -66,7 +66,7 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
             } else if (editor.getActiveEditor() instanceof SuiteSourceEditor) {
                 final SuiteSourceEditor sourceEditor = (SuiteSourceEditor) editor.getActiveEditor();
                 final int offset = sourceEditor.getViewer().getTextWidget().getCaretOffset();
-                final com.google.common.base.Optional<? extends RobotElement> element = suiteModel.findElement(offset);
+                final java.util.Optional<? extends RobotElement> element = suiteModel.findElement(offset);
                 if (element.isPresent()) {
                     showDoc(view, (RobotFileInternalElement) element.get());
                 }

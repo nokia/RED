@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
+import java.util.Optional;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -27,8 +29,6 @@ import org.robotframework.red.nattable.edit.CellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 import org.robotframework.red.swt.LabelsMeasurer;
-
-import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -87,7 +87,7 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
         });
         validationJobScheduler.armRevalidationOn(textEdit);
         final AssistantContext context = new NatTableAssistantContext(column, row);
-        assistSupport.install(textEdit, context, Optional.<RedContentProposalListener> absent());
+        assistSupport.install(textEdit, context, Optional.<RedContentProposalListener> empty());
         GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).applyTo(textEdit);
         layout();
 

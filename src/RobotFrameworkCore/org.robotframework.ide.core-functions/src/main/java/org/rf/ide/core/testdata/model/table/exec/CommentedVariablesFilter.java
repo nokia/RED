@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model.table.exec;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -17,7 +18,6 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
 public class CommentedVariablesFilter {
@@ -38,7 +38,7 @@ public class CommentedVariablesFilter {
     }
 
     public FilteredVariables filter(final RobotFileOutput rfo, final List<VariableDeclaration> vars) {
-        FilteredVariables result = new FilteredVariables();
+        final FilteredVariables result = new FilteredVariables();
 
         for (final VariableDeclaration var : vars) {
             if (isInCommentedPart(rfo, var.asToken())) {
@@ -54,15 +54,15 @@ public class CommentedVariablesFilter {
     public boolean isInCommentedPart(final RobotFileOutput rfo, final RobotToken token) {
         boolean result = false;
 
-        Optional<Integer> startCommentRange = Optional.absent();
-        RobotFile fileModel = rfo.getFileModel();
-        int tokenOffset = token.getStartOffset();
-        Optional<Integer> robotLineIndex = fileModel.getRobotLineIndexBy(tokenOffset);
+        Optional<Integer> startCommentRange = Optional.empty();
+        final RobotFile fileModel = rfo.getFileModel();
+        final int tokenOffset = token.getStartOffset();
+        final Optional<Integer> robotLineIndex = fileModel.getRobotLineIndexBy(tokenOffset);
         if (robotLineIndex.isPresent()) {
-            RobotLine robotLine = fileModel.getFileContent().get(robotLineIndex.get());
-            List<IRobotLineElement> lineElements = robotLine.getLineElements();
-            for (IRobotLineElement lineElem : lineElements) {
-                List<IRobotTokenType> types = lineElem.getTypes();
+            final RobotLine robotLine = fileModel.getFileContent().get(robotLineIndex.get());
+            final List<IRobotLineElement> lineElements = robotLine.getLineElements();
+            for (final IRobotLineElement lineElem : lineElements) {
+                final List<IRobotTokenType> types = lineElem.getTypes();
                 if (types.contains(RobotTokenType.START_HASH_COMMENT)
                         || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
                     startCommentRange = Optional.of(lineElem.getStartOffset());
@@ -71,7 +71,7 @@ public class CommentedVariablesFilter {
             }
 
             if (startCommentRange.isPresent()) {
-                Range<Integer> range = Range.closed(startCommentRange.get(), robotLine.getEndOfLine().getStartOffset());
+                final Range<Integer> range = Range.closed(startCommentRange.get(), robotLine.getEndOfLine().getStartOffset());
                 result = range.contains(tokenOffset);
             }
         }

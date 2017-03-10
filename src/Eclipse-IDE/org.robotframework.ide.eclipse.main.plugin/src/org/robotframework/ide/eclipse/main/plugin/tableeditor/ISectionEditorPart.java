@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -22,7 +23,7 @@ public interface ISectionEditorPart {
 
     void aboutToChangeToOtherPage();
 
-    com.google.common.base.Optional<? extends RobotSuiteFileSection> provideSection(RobotSuiteFile suiteModel);
+    Optional<? extends RobotSuiteFileSection> provideSection(RobotSuiteFile suiteModel);
 
     boolean isPartFor(RobotSuiteFileSection section);
 
@@ -36,7 +37,7 @@ public interface ISectionEditorPart {
     
     List<ITableHyperlinksDetector> getDetectors();
 
-    com.google.common.base.Optional<TreeLayerAccessor> getTreeLayerAccessor();
+    Optional<TreeLayerAccessor> getTreeLayerAccessor();
 
     void waitForPendingJobs();
 }

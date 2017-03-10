@@ -181,7 +181,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private Section generalSettingsSection;
 
-    private com.google.common.base.Optional<NatTable> table = com.google.common.base.Optional.absent();
+    private java.util.Optional<NatTable> table = java.util.Optional.empty();
 
     private StyledText documentation;
 
@@ -219,7 +219,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     @Override
     public NatTable getTable() {
-        return table.orNull();
+        return table.orElse(null);
     }
 
     @Override
@@ -595,7 +595,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 EmptyGeneralSettingLabelAcumulator.EMPTY_GENERAL_SETTING_LABEL);
     }
 
-    private com.google.common.base.Optional<NatTable> createTable(final Composite parent, final TableTheme theme,
+    private java.util.Optional<NatTable> createTable(final Composite parent, final TableTheme theme,
             final RedNattableLayersFactory factory, final GridLayer gridLayer, final DataLayer dataLayer,
             final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
@@ -640,7 +640,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         table.addFocusListener(new SettingsTableFocusListener(GENERAL_SETTINGS_CONTEXT_ID, site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-        return com.google.common.base.Optional.of(table);
+        return java.util.Optional.of(table);
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
@@ -665,7 +665,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     private RobotSettingsSection getSection() {
-        return fileModel.findSection(RobotSettingsSection.class).orNull();
+        return fileModel.findSection(RobotSettingsSection.class).orElse(null);
     }
 
     public void revealSetting(final RobotSetting setting, final boolean focus) {
@@ -930,15 +930,15 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         refreshTable();
     }
 
-    private static com.google.common.base.Optional<RobotFileInternalElement> toOptionalModelElement(
+    private static java.util.Optional<RobotFileInternalElement> toOptionalModelElement(
             final Object rowObject) {
         if (rowObject instanceof Entry<?, ?>) {
             final Entry<?, ?> entry = (Entry<?, ?>) rowObject;
             return entry.getValue() instanceof RobotFileInternalElement
-                    ? com.google.common.base.Optional.of((RobotFileInternalElement) entry.getValue())
-                    : com.google.common.base.Optional.<RobotFileInternalElement> absent();
+                    ? java.util.Optional.of((RobotFileInternalElement) entry.getValue())
+                    : java.util.Optional.<RobotFileInternalElement> empty();
         }
-        return com.google.common.base.Optional.<RobotFileInternalElement> absent();
+        return java.util.Optional.<RobotFileInternalElement> empty();
     }
 
     private class GeneralSettingsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {
@@ -997,7 +997,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
 
         @Override
-        protected com.google.common.base.Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
+        protected java.util.Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
             return toOptionalModelElement(dataProvider.getRowObject(rowPosition));
         }
     }
@@ -1045,7 +1045,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
 
         @Override
-        protected com.google.common.base.Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
+        protected java.util.Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
             return toOptionalModelElement(dataProvider.getRowObject(rowPosition));
         }
     }

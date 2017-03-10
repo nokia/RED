@@ -8,13 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.NullChange;
 import org.junit.Test;
-
-import com.google.common.base.Optional;
 
 public class ChangesTest {
 
@@ -62,9 +62,9 @@ public class ChangesTest {
     @Test
     public void affectedPathIsProperlyTransformed() {
         assertThat(Changes.transformAffectedPath(path("a/b/c"), path("a/b/d"), path("x/y/z")))
-                .isEqualTo(Optional.absent());
+                .isEqualTo(Optional.empty());
         assertThat(Changes.transformAffectedPath(path("a/b/c"), path("a/b/d"), path("a/y/z")))
-                .isEqualTo(Optional.absent());
+                .isEqualTo(Optional.empty());
         assertThat(Changes.transformAffectedPath(path("a/b/c"), path("a/b/d"), path("a/b/c")))
                 .isEqualTo(Optional.of(path("a/b/d")));
         assertThat(Changes.transformAffectedPath(path("a/b/c"), path("a/b/d"), path("a/b/c/x")))

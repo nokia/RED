@@ -1,12 +1,11 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.text.rules.IToken;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
-
-import com.google.common.base.Optional;
 
 public class GherkinPrefixRule extends ExecutableRowCallRule {
 
@@ -23,6 +22,6 @@ public class GherkinPrefixRule extends ExecutableRowCallRule {
             if (prefixLength > 0)
                 return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), prefixLength));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

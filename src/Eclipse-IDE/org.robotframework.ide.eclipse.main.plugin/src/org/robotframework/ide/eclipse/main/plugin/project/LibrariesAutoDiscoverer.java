@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -44,7 +45,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarSt
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 import org.robotframework.red.swt.SwtThread;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
@@ -79,7 +79,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         super(robotProject, suiteFiles);
         this.eventBroker = eventBroker == null ? PlatformUI.getWorkbench().getService(IEventBroker.class) : eventBroker;
         this.showSummary = showSummary;
-        this.libraryNameToDiscover = Optional.fromNullable(Strings.emptyToNull(libraryNameToDiscover));
+        this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
     }
 
     @Override
@@ -287,7 +287,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         .createEnvironmentSearchPaths(robotProject.getProject());
                 return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), envSearchPaths);
             } catch (final RobotEnvironmentException e1) {
-                return Optional.absent();
+                return Optional.empty();
             }
         }
 
