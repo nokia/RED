@@ -152,7 +152,7 @@ public class RobotLaunchConfigurationTest {
         robotConfig.setExcludedTags(newArrayList("excluded"));
         robotConfig.setIncludedTags(newArrayList("included"));
 
-        robotConfig.setRemoteAgentValue(String.valueOf(true));
+        robotConfig.setRemoteAgent(true);
         robotConfig.setAgentConnectionHostValue("1.2.3.4");
         robotConfig.setAgentConnectionPortValue("987");
         robotConfig.setAgentConnectionTimeoutValue("123");

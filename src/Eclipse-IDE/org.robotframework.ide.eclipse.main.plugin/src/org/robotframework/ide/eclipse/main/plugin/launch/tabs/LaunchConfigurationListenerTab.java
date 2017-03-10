@@ -297,7 +297,7 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
             if (robotConfig.isDefiningProjectDirectly()) {
                 robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             } else {
-                robotConfig.setRemoteAgentValue(String.valueOf(useRemoteAgentButton.getSelection()));
+                robotConfig.setRemoteAgent(useRemoteAgentButton.getSelection());
             }
             robotConfig.setAgentConnectionHostValue(hostTxt.getText().trim());
             robotConfig.setAgentConnectionPortValue(portTxt.getText().trim());
