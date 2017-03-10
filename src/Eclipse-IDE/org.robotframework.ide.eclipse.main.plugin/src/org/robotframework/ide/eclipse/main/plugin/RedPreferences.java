@@ -60,11 +60,11 @@ public class RedPreferences {
 
     public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
 
-    public static final String LAUNCH_REMOTE_HOST = "red.launch.remote.host";
+    public static final String LAUNCH_AGENT_CONNECTION_HOST = "red.launch.agentConnectionHost";
 
-    public static final String LAUNCH_REMOTE_PORT = "red.launch.remote.port";
+    public static final String LAUNCH_AGENT_CONNECTION_PORT = "red.launch.agentConnectionPort";
 
-    public static final String LAUNCH_REMOTE_TIMEOUT = "red.launch.remote.timeout";
+    public static final String LAUNCH_AGENT_CONNECTION_TIMEOUT = "red.launch.agentConnectionTimeout";
 
     public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
 
@@ -185,16 +185,16 @@ public class RedPreferences {
         return store.getString(LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS);
     }
 
-    public String getLaunchRemoteHost() {
-        return store.getString(LAUNCH_REMOTE_HOST);
+    public String getLaunchAgentConnectionHost() {
+        return store.getString(LAUNCH_AGENT_CONNECTION_HOST);
     }
 
-    public String getLaunchRemotePort() {
-        return store.getString(LAUNCH_REMOTE_PORT);
+    public String getLaunchAgentConnectionPort() {
+        return store.getString(LAUNCH_AGENT_CONNECTION_PORT);
     }
 
-    public String getLaunchRemoteTimeout() {
-        return store.getString(LAUNCH_REMOTE_TIMEOUT);
+    public String getLaunchAgentConnectionTimeout() {
+        return store.getString(LAUNCH_AGENT_CONNECTION_TIMEOUT);
     }
 
     public String getLaunchExecutableFilePath() {

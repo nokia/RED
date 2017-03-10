@@ -46,7 +46,7 @@ public interface IRobotLaunchConfiguration {
 
     String getAgentConnectionTimeoutValue() throws CoreException;
 
-    void setRemoteAgentValue(String isRemote) throws CoreException;
+    void setRemoteAgent(boolean isRemoteAgent) throws CoreException;
 
     void setAgentConnectionHostValue(String host) throws CoreException;
 

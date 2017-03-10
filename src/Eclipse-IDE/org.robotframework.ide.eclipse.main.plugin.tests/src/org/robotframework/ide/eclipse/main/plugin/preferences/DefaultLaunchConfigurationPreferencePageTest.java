@@ -42,10 +42,10 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<String> integerPrefNames = newArrayList(RedPreferences.LAUNCH_REMOTE_PORT,
-                RedPreferences.LAUNCH_REMOTE_TIMEOUT);
+        final List<String> integerPrefNames = newArrayList(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT,
+                RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT);
         final List<String> stringPrefNames = newArrayList(RedPreferences.LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS,
-                RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, RedPreferences.LAUNCH_REMOTE_HOST,
+                RedPreferences.LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS, RedPreferences.LAUNCH_AGENT_CONNECTION_HOST,
                 RedPreferences.LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
