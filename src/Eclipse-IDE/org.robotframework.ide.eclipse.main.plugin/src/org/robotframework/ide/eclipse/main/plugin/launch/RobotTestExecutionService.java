@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.eclipse.ui.services.IDisposable;
@@ -26,7 +27,7 @@ import com.google.common.collect.ImmutableList;
 public class RobotTestExecutionService {
 
     @VisibleForTesting
-    static final int LAUNCHES_HISTORY_LIMIT = 10;
+    static final int LAUNCHES_HISTORY_LIMIT = 100;
 
     private final Deque<RobotTestsLaunch> launches = new ArrayDeque<>();
 
@@ -41,8 +42,12 @@ public class RobotTestExecutionService {
         executionListeners.add(listener);
     }
 
-    public void removeExecutionListner(final RobotTestExecutionListener listener) {
+    public void removeExecutionListener(final RobotTestExecutionListener listener) {
         executionListeners.remove(listener);
+    }
+
+    public synchronized void forEachLaunch(final Consumer<? super RobotTestsLaunch> action) {
+        launches.forEach(action);
     }
 
     public synchronized Optional<RobotTestsLaunch> getLastLaunch() {
@@ -51,28 +56,38 @@ public class RobotTestExecutionService {
 
     public synchronized RobotTestsLaunch testExecutionStarting() {
         final RobotTestsLaunch newLaunch = new RobotTestsLaunch();
-        launches.push(newLaunch);
+        launches.addFirst(newLaunch);
 
         if (launches.size() > LAUNCHES_HISTORY_LIMIT) {
-            final RobotTestsLaunch launch = launches.removeLast();
-            launch.dispose();
+            final RobotTestsLaunch launch = launches.getLast();
+            if (launch.isTerminated()) {
+                launches.remove(launch);
+                launch.dispose();
+            }
         }
 
-        for (final RobotTestExecutionListener listener : executionListeners) {
-            listener.executionStarting(newLaunch);
-        }
+        executionListeners.forEach(listener -> listener.executionStarting(newLaunch));
         return newLaunch;
     }
 
-    @FunctionalInterface
+    public synchronized void testExecutionEnded(final RobotTestsLaunch launch) {
+        launch.setTerminated();
+
+        executionListeners.forEach(listener -> listener.executionEnded(launch));
+    }
+
     public static interface RobotTestExecutionListener {
 
         void executionStarting(RobotTestsLaunch launch);
+
+        void executionEnded(RobotTestsLaunch launch);
     }
 
     public static class RobotTestsLaunch {
 
         private final Map<Class<?>, Object> executionData = new HashMap<>();
+
+        private boolean isTerminated;
 
         public synchronized <T extends IDisposable> T getExecutionData(final Class<? extends T> clazz,
                 final Supplier<T> supplyWhenAbsent) {
@@ -84,11 +99,24 @@ public class RobotTestExecutionService {
             return Optional.ofNullable(clazz.cast(executionData.get(clazz)));
         }
 
+        public synchronized <T extends IDisposable> void performOnExecutionData(final Class<? extends T> clazz,
+                final Consumer<T> consumer) {
+            Optional.ofNullable(clazz.cast(executionData.get(clazz))).ifPresent(consumer);
+        }
+
         private synchronized void dispose() {
             for (final Object data : executionData.values()) {
                 IDisposable.class.cast(data).dispose();
             }
             executionData.clear();
+        }
+
+        public synchronized boolean isTerminated() {
+            return isTerminated;
+        }
+
+        private synchronized void setTerminated() {
+            isTerminated = true;
         }
     }
 }

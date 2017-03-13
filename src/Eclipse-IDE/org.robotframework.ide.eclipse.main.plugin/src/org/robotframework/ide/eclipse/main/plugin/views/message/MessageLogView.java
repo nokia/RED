@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.message;
 
+import java.util.Optional;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -17,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesStore.ExecutionMessagesStoreListener;
 import org.robotframework.red.swt.SwtThread;
 
@@ -35,6 +38,8 @@ public class MessageLogView {
     private StyledText styledText;
 
     private RobotTestExecutionListener executionListener;
+
+    private final ExecutionMessagesStoreListener storeListener = (store, msg) -> SwtThread.syncExec(() -> append(msg));
     
     public MessageLogView() {
         this(RedPlugin.getTestExecutionService());
@@ -60,30 +65,39 @@ public class MessageLogView {
         styledText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         styledText.setFont(JFaceResources.getTextFont());
         styledText.setEditable(false);
-        styledText.setText(getMessageFromLastLaunch());
 
-        // clear log view always when new tests are launched
-        final ExecutionMessagesStoreListener storeListener = (store, msg) -> SwtThread.syncExec(() -> append(msg));
-        executionListener = launch -> SwtThread.syncExec(() -> {
-            final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class,
-                    ExecutionMessagesStore::new);
-            store.addStoreListener(storeListener);
+        setInput();
+    }
 
-            styledText.setText("");
-        });
-        executionService.addExecutionListener(executionListener);
+    private void setInput() {
+
+        // synchronize on service, so that any thread which would like to start another launch
+        // will have to wait
+        synchronized (executionService) {
+            executionListener = new ExecutionListener(storeListener);
+            executionService.addExecutionListener(executionListener);
+
+            final Optional<RobotTestsLaunch> lastLaunch = executionService.getLastLaunch();
+            if (lastLaunch.isPresent()) {
+                final RobotTestsLaunch launch = lastLaunch.get();
+
+                // this launch may be currently running, so we have to synchronize in order
+                // to get proper state of messages, as other threads may change it in the meantime
+                synchronized (launch) {
+                    final ExecutionMessagesStore messagesStore = launch.getExecutionData(ExecutionMessagesStore.class,
+                            ExecutionMessagesStore::new);
+                    messagesStore.addStoreListener(storeListener);
+
+                    final String currentMessages = messagesStore.getMessage();
+                    SwtThread.syncExec(() -> append(currentMessages));
+                }
+            }
+        }
     }
 
     private void append(final String msg) {
         styledText.append(msg);
         styledText.setTopIndex(styledText.getLineCount() - 1);
-    }
-
-    private String getMessageFromLastLaunch() {
-        return executionService.getLastLaunch()
-                .flatMap(launch -> launch.getExecutionData(ExecutionMessagesStore.class))
-                .map(store -> store.getMessage())
-                .orElse("");
     }
 
     @Focus
@@ -93,6 +107,33 @@ public class MessageLogView {
 
     @PreDestroy
     public void dispose() {
-        executionService.removeExecutionListner(executionListener);
+        synchronized (executionService) {
+            executionService.removeExecutionListener(executionListener);
+            executionService.forEachLaunch(launch -> launch.getExecutionData(ExecutionMessagesStore.class)
+                    .ifPresent(store -> store.removeStoreListener(storeListener)));
+        }
+    }
+
+    private class ExecutionListener implements RobotTestExecutionListener {
+
+        private final ExecutionMessagesStoreListener storeListener;
+
+        ExecutionListener(final ExecutionMessagesStoreListener storeListener) {
+            this.storeListener = storeListener;
+        }
+
+        @Override
+        public void executionStarting(final RobotTestsLaunch launch) {
+            SwtThread.syncExec(() -> styledText.setText(""));
+
+            launch.getExecutionData(ExecutionMessagesStore.class, ExecutionMessagesStore::new)
+                    .addStoreListener(storeListener);
+        }
+
+        @Override
+        public void executionEnded(final RobotTestsLaunch launch) {
+            launch.performOnExecutionData(ExecutionMessagesStore.class,
+                    store -> store.removeStoreListener(storeListener));
+        }
     }
 }

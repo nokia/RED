@@ -29,41 +29,34 @@ public class ExecutionElementsTracker extends RobotDefaultAgentEventListener {
 
     @Override
     public void handleOutputFile(final File outputFilepath) {
-        final ExecutionElement execElement = ExecutionElementsFactory.createOutputFileExecutionElement(outputFilepath);
-        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
-                .ifPresent(store -> store.addElement(execElement));
+        addExecutionElement(ExecutionElementsFactory.createOutputFileExecutionElement(outputFilepath));
     }
 
     @Override
     public void handleSuiteStarted(final String suiteName, final File suiteFilePath) {
-        final ExecutionElement execElement = ExecutionElementsFactory.createStartSuiteExecutionElement(suiteName,
-                suiteFilePath);
-        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
-                .ifPresent(store -> store.addElement(execElement));
+        addExecutionElement(ExecutionElementsFactory.createStartSuiteExecutionElement(suiteName, suiteFilePath));
     }
 
     @Override
     public void handleSuiteEnded(final String suiteName, final int elapsedTime, final Status status,
             final String errorMessage) {
-        final ExecutionElement execElement = ExecutionElementsFactory.createEndSuiteExecutionElement(suiteName,
-                elapsedTime, errorMessage, status);
-        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
-                .ifPresent(store -> store.addElement(execElement));
+        addExecutionElement(
+                ExecutionElementsFactory.createEndSuiteExecutionElement(suiteName, elapsedTime, errorMessage, status));
     }
 
     @Override
     public void handleTestStarted(final String testCaseName, final String testCaseLongName) {
-        final ExecutionElement execElement = ExecutionElementsFactory.createStartTestExecutionElement(testCaseName);
-        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
-                .ifPresent(store -> store.addElement(execElement));
+        addExecutionElement(ExecutionElementsFactory.createStartTestExecutionElement(testCaseName));
     }
 
     @Override
     public void handleTestEnded(final String testCaseName, final String testCaseLongName, final int elapsedTime,
             final Status status, final String errorMessage) {
-        final ExecutionElement execElement = ExecutionElementsFactory.createEndTestExecutionElement(testCaseName,
-                elapsedTime, errorMessage, status);
-        testsLaunchContext.getExecutionData(ExecutionElementsStore.class)
-                .ifPresent(store -> store.addElement(execElement));
+        addExecutionElement(ExecutionElementsFactory.createEndTestExecutionElement(testCaseName, elapsedTime,
+                errorMessage, status));
+    }
+
+    private void addExecutionElement(final ExecutionElement element) {
+        testsLaunchContext.performOnExecutionData(ExecutionElementsStore.class, store -> store.addElement(element));
     }
 }

@@ -17,22 +17,26 @@ class ExecutionElementsStore implements IDisposable {
 
     private final List<ExecutionElementsStoreListener> listeners = new ArrayList<>();
 
-    synchronized void addStoreListener(final ExecutionElementsStoreListener listener) {
+    void addStoreListener(final ExecutionElementsStoreListener listener) {
         listeners.add(listener);
     }
 
+    void removeStoreListener(final ExecutionElementsStoreListener storeListener) {
+        listeners.remove(storeListener);
+    }
+
     @Override
-    public synchronized void dispose() {
+    public void dispose() {
         elements.clear();
         listeners.clear();
     }
 
-    synchronized void addElement(final ExecutionElement element) {
+    void addElement(final ExecutionElement element) {
         elements.add(element);
         listeners.forEach(listener -> listener.storeChanged(this, element));
     }
 
-    synchronized public List<ExecutionElement> getElements() {
+    List<ExecutionElement> getElements() {
         return elements;
     }
 
@@ -41,5 +45,4 @@ class ExecutionElementsStore implements IDisposable {
 
         void storeChanged(ExecutionElementsStore store, ExecutionElement element);
     }
-
 }
