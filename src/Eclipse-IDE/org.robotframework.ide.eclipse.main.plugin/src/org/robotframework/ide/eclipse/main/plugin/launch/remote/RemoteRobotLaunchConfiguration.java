@@ -9,9 +9,13 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfiguration;
 
 public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
@@ -35,6 +39,19 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
     @Override
     public boolean isRemoteAgent() throws CoreException {
         return true;
+    }
+
+    public static ILaunchConfigurationWorkingCopy prepareDefault(final IProject project) throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final String namePrefix = project.getName();
+        final String name = manager.generateLaunchConfigurationName(namePrefix);
+
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+                .newInstance(null, name);
+        final RemoteRobotLaunchConfiguration remoteConfig = new RemoteRobotLaunchConfiguration(configuration);
+        remoteConfig.fillDefaults();
+        remoteConfig.setProjectName(namePrefix);
+        return configuration;
     }
 
 }
