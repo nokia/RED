@@ -5,10 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static org.mockito.AdditionalMatchers.and;
-import static org.mockito.AdditionalMatchers.geq;
-import static org.mockito.AdditionalMatchers.leq;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -77,7 +73,7 @@ public class RedPreferencesInitializerTest {
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
         verify(preferences).put(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "127.0.0.1");
-        verify(preferences).putInt(eq(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT), and(geq(1), leq(65_535)));
+        verify(preferences).putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, 43_981);
         verify(preferences).putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT, 30);
     }
 }

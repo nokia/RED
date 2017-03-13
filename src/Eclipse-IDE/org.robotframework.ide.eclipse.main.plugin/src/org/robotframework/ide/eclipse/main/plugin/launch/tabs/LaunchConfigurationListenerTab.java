@@ -197,15 +197,19 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
                 dirDialog.setMessage("Choose \"" + fileName + "\" export destination.");
                 final String dir = dirDialog.open();
                 if (dir != null) {
-                    final File scriptFile = new File(dir + File.separator + fileName);
-                    try {
-                        Files.copy(RobotRuntimeEnvironment.getScriptFileAsStream(fileName), scriptFile.toPath(),
-                                StandardCopyOption.REPLACE_EXISTING);
-                    } catch (final IOException e) {
-                        final String message = "Unable to copy file to " + scriptFile.getAbsolutePath();
-                        ErrorDialog.openError(getShell(), "File copy problem", message,
-                                new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
-                    }
+                    exportScriptFile(dir, fileName);
+                }
+            }
+
+            private void exportScriptFile(final String dir, final String fileName) {
+                final File scriptFile = new File(dir + File.separator + fileName);
+                try {
+                    Files.copy(RobotRuntimeEnvironment.getScriptFileAsStream(fileName), scriptFile.toPath(),
+                            StandardCopyOption.REPLACE_EXISTING);
+                } catch (final IOException e) {
+                    final String message = "Unable to copy file to " + scriptFile.getAbsolutePath();
+                    ErrorDialog.openError(getShell(), "File copy problem", message,
+                            new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
                 }
             }
         });

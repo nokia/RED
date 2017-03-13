@@ -27,6 +27,8 @@ public class AgentConnectionServer {
 
     public static final String DEFAULT_CLIENT_CONNECTION_HOST = "127.0.0.1";
 
+    public static final int DEFAULT_CLIENT_CONNECTION_PORT = 43_981; // 0xABCD
+
     public static final int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 30;
 
     public static final int MAX_CLIENT_CONNECTION_PORT = 65_535;
