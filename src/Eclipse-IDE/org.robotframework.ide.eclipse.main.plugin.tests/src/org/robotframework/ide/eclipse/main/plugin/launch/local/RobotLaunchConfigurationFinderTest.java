@@ -228,6 +228,103 @@ public class RobotLaunchConfigurationFinderTest {
         assertThat(RobotLaunchConfigurationFinder.isSuitableFor(robotConfig, resources)).isFalse();
     }
 
+    @Test
+    public void defaultConfigurationReturned_whenThereIsNoConfiguration() throws CoreException, IOException {
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfigurationFinder
+                .getLaunchConfiguration(resources);
+        final ILaunchConfigurationWorkingCopy defaultConfig = RobotLaunchConfiguration.prepareDefault(resources);
+
+        assertThat(configuration).isNotNull();
+        assertThat(configuration.exists()).isFalse();
+        assertThat(configuration).isEqualToComparingFieldByField(defaultConfig);
+    }
+
+    @Test
+    public void configurationReturned_whenThereIsApplicableConfiguration() throws CoreException {
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        new RobotLaunchConfiguration(configuration).setInterpreterArguments("custom");
+        configuration.doSave();
+        final ILaunchConfigurationWorkingCopy config = RobotLaunchConfigurationFinder.getLaunchConfiguration(resources);
+
+        assertThat(configuration).isEqualToIgnoringGivenFields(config, "fOriginal");
+    }
+
+    @Test
+    public void defaultConfigurationReturned_whenThereIsOnlyConfigurationForSelectedTestCases() throws CoreException {
+        final IResource res = project;
+        final List<IResource> resources = newArrayList(res);
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
+        resourcesToTestCases.put(res, newArrayList("t1", "t3"));
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
+                .prepareForSelectedTestCases(resourcesToTestCases);
+        configuration.doSave();
+        final ILaunchConfiguration config = RobotLaunchConfigurationFinder
+                .getLaunchConfigurationExceptSelectedTestCases(resources);
+        final ILaunchConfigurationWorkingCopy defaultConfig = RobotLaunchConfiguration.prepareDefault(resources);
+
+        assertThat(config).isNotNull();
+        assertThat(config).isNotEqualTo(configuration);
+        assertThat(config).isEqualToComparingFieldByField(defaultConfig);
+    }
+
+    @Test
+    public void configurationReturned_whenThereIsApplicableConfigurationForGeneralPurpose() throws CoreException {
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        new RobotLaunchConfiguration(configuration).setInterpreterArguments("custom");
+        configuration.doSave();
+        final ILaunchConfiguration config = RobotLaunchConfigurationFinder
+                .getLaunchConfigurationExceptSelectedTestCases(resources);
+
+        assertThat(config).isEqualToIgnoringGivenFields(configuration, "fOriginal");
+    }
+
+    @Test
+    public void defaultConfigurationReturned_whenThereIsNoConfigurationForSelectedTestCases() throws CoreException {
+        final IResource res = project;
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
+        resourcesToTestCases.put(res, newArrayList("t1", "t3"));
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfigurationFinder
+                .getLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+        final ILaunchConfigurationWorkingCopy defaultConfig = RobotLaunchConfiguration
+                .prepareForSelectedTestCases(resourcesToTestCases);
+
+        assertThat(configuration).isEqualToComparingFieldByField(defaultConfig);
+    }
+
+    @Test
+    public void configurationReturned_whenThereIsApplicableConfigurationForSelectedTestCases() throws CoreException {
+        final IResource res = project;
+        final Map<IResource, List<String>> resourcesToTestCases = new HashMap<>();
+        resourcesToTestCases.put(res, newArrayList("t1", "t3"));
+        final ILaunchConfigurationWorkingCopy config = RobotLaunchConfiguration
+                .prepareForSelectedTestCases(resourcesToTestCases);
+        new RobotLaunchConfiguration(config).setInterpreterArguments("custom");
+        config.doSave();
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfigurationFinder
+                .getLaunchConfigurationForSelectedTestCases(resourcesToTestCases);
+
+        assertThat(configuration).isEqualToIgnoringGivenFields(config, "fOriginal");
+    }
+
+    @Test
+    public void configurationReturned_whenThereIsExactlySameConfiguration() throws CoreException {
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        new RobotLaunchConfiguration(configuration).setInterpreterArguments("custom");
+        configuration.doSave();
+        final ILaunchConfigurationWorkingCopy foundConfig = RobotLaunchConfigurationFinder.findSameAs(configuration);
+
+        assertThat(foundConfig).isEqualToIgnoringGivenFields(configuration, "fOriginal");
+    }
+
+    @Test
+    public void noConfigurationReturned_whenThereIsNoExactlySameConfiguration() throws CoreException {
+        final ILaunchConfigurationWorkingCopy configuration = createDefault(resources);
+        new RobotLaunchConfiguration(configuration).setInterpreterArguments("custom");
+        final ILaunchConfigurationWorkingCopy foundConfig = RobotLaunchConfigurationFinder.findSameAs(configuration);
+
+        assertThat(foundConfig).isNull();
+    }
+
     private static ILaunchConfigurationWorkingCopy createDefault(final List<IResource> resources) throws CoreException {
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         configuration.doSave();

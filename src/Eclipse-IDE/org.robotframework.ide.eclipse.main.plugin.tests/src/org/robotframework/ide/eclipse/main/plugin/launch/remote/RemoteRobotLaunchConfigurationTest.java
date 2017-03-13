@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -56,6 +58,22 @@ public class RemoteRobotLaunchConfigurationTest {
         for (final ILaunchConfiguration config : launchConfigs) {
             config.delete();
         }
+    }
+
+    @Test
+    public void defaultConfigurationObtained_whenDefaultConfigurationPrepared() throws CoreException {
+        final IProject project = mock(IProject.class);
+        when(project.getName()).thenReturn(RemoteRobotLaunchConfigurationTest.class.getName());
+        final ILaunchConfigurationWorkingCopy config = RemoteRobotLaunchConfiguration.prepareDefault(project);
+        final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(config);
+
+        assertThat(config.getType())
+                .isEqualTo(manager.getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID));
+        assertThat(robotConfig.getProjectName()).isEqualTo(RemoteRobotLaunchConfigurationTest.class.getName());
+        assertThat(robotConfig.isRemoteAgent()).isTrue();
+        assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
+        assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
     }
 
     @Test
