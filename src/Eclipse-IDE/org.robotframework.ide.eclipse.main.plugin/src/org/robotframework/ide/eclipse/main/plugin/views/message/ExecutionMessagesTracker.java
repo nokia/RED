@@ -25,20 +25,20 @@ public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
 
     @Override
     public void handleLogMessage(final String msg, final LogLevel level, final String timestamp) {
-        testsLaunchContext.getExecutionData(ExecutionMessagesStore.class)
-                .ifPresent(store -> store.append(timestamp + " : " + level.name() + " : " + msg + "\n"));
+        testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
+                store -> store.append(timestamp + " : " + level.name() + " : " + msg + "\n"));
     }
 
     @Override
     public void handleTestStarted(final String testCaseName, final String testCaseLongName) {
-        testsLaunchContext.getExecutionData(ExecutionMessagesStore.class)
-                .ifPresent(store -> store.append("Starting test: " + testCaseLongName + '\n'));
+        testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
+                store -> store.append("Starting test: " + testCaseLongName + '\n'));
     }
 
     @Override
     public void handleTestEnded(final String testCaseName, final String testCaseLongName, final int elapsedTime,
             final Status status, final String errorMessage) {
-        testsLaunchContext.getExecutionData(ExecutionMessagesStore.class)
-                .ifPresent(store -> store.append("Ending test: " + testCaseLongName + "\n\n"));
+        testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
+                store -> store.append("Ending test: " + testCaseLongName + "\n\n"));
     }
 }

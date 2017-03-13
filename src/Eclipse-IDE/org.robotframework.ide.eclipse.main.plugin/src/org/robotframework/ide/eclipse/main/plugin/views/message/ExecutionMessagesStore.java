@@ -16,22 +16,26 @@ class ExecutionMessagesStore implements IDisposable {
 
     private final List<ExecutionMessagesStoreListener> listeners = new ArrayList<>();
 
-    synchronized void addStoreListener(final ExecutionMessagesStoreListener listener) {
+    void addStoreListener(final ExecutionMessagesStoreListener listener) {
         listeners.add(listener);
     }
 
+    void removeStoreListener(final ExecutionMessagesStoreListener listener) {
+        listeners.remove(listener);
+    }
+
     @Override
-    public synchronized void dispose() {
+    public void dispose() {
         message.setLength(0);
         listeners.clear();
     }
 
-    synchronized void append(final String msg) {
+    void append(final String msg) {
         message.append(msg);
         listeners.forEach(listener -> listener.storeAppended(this, msg));
     }
 
-    synchronized public String getMessage() {
+    String getMessage() {
         return message.toString();
     }
 
@@ -40,4 +44,5 @@ class ExecutionMessagesStore implements IDisposable {
 
         void storeAppended(ExecutionMessagesStore store, String appendedMsg);
     }
+
 }
