@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _56LAoKS_EeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/12/17 3:53 PM
+Save-Time: 3/13/17 11:38 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -15,63 +15,43 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-//set text
+//set test
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-with [get-editor "TestFile.robot" | get-text-viewer] {
-    key-type End
-    set-caret-pos 1 19
-    key-type Enter
-    type-text test
-    key-type Enter
-    type-text "log  56"
-    key-type "M1+s"
-}
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
-get-button "Debug.*" | click -arrow
-get-menu "Debug Configurations..." | click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test cases ***\n"
+    + "test 1\n"
+    + "    Log  5" 
 
-with [get-window "Debug Configurations"] {
-    get-tree | select "Robot/TestFile.robot"
-    get-tab-folder | get-tab-item Remote | click
-}
+get-button "Save (M1+S)" | click    
 
-//set timout to 3000 ms
-with [get-window "Debug Configurations"] {
-    with [get-group "Remote Debugging"] {
-        get-editbox -after [get-label "Connection timeout [ms]:"] | set-text 3000
-        get-editbox -after [get-label "Local IP:"] | set-text localhost
-        get-editbox -after [get-label "Local port:"] | set-text 65002
-    }
+//set in preference timeout to 3 seconds
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Default Launch Configurations"
+with [get-window Preferences] {
+    get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 3
     get-button Apply | click
+    get-button OK | click
 }
 
-measure-time "RemoteDebugTimeout3000ms" {
-	with [get-window "Debug Configurations"] {
-	    get-button Debug | click    
-	}   
-}| constrain-max duration 5000   
-
-//check console
-try -times 5 -delay 1000 -command {
-	get-view Console | get-text-viewer | get-property text 
-	    | equals "Command: .*\n"
-	    + "Suite Executor: .*\n"
-	    + "Debug server is listening on localhost:65002, you can run a remote test\n"
-	    + "A timeout was reached while waiting for a remote connection" | verify-true
+//run test from PE
+measure-time "RemoteDebugTimeout3s" {
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/2 Robot Remote Test" 
+	    | click
+}| constrain-max duration 4000  
+    
+//check console     
+get-view Console | get-text-viewer | get-property text 
+    | equals "Remote execution server is listening on 127.0.0.1:62958, you can execute tests on remote client\n"
+    + "A timeout was reached while waiting for a remote connection" | verify-true
+ 
+//set timout to 1 s in existing configuration
+get-button "Run TestFile.robot" | click -arrow
+get-menu "Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] | set-text 1
+    get-button Apply | click   
 }
-
-//set minimal timeout = 1
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" 
-    | get-menu "Debug As/Debug Configurations..." | click
-with [get-window "Debug Configurations"] {
-    get-tab-folder | get-tab-item Remote | click
-    get-group "Remote Debugging" | get-editbox -after [get-label "Connection timeout [ms]:"] | set-text 1
-    get-button Apply | click
-    get-button Close | click
-}
-
-measure-time "RemoteDebugTimeout1ms" {
-	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
-}| constrain-max duration 2100   
+measure-time "RemoteDebugTimeout1s" {
+	get-window "Run Configurations" | get-button Run | click
+}| constrain-max duration 2000 	
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
