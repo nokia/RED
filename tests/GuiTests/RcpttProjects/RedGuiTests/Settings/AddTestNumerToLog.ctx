@@ -5,8 +5,8 @@ Element-Name: AddTestNumerToLog
 Element-Type: context
 Element-Version: 2.0
 Id: _D_9CQCfwEealP8ItBfZANg
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/1/16 2:29 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/13/17 1:05 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -20,8 +20,8 @@ let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
 	}
 }
 
-global [val counter [read-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]]]
-concat "---------------- Test: " $counter " ---------------" |log 
-//concat "---------------- Test: " $counter ". " [get-time | format-time -format "HH:mm:ss:S"] " ---------------" |log 
-plus $counter 1 | write-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]
+global [val TestNameAndDesc [read-lines -uri [uri-from-path "Logs/counter.txt"]]]
+concat "---------------- Test: " $TestNameAndDesc " ---------------" |log 
+//concat "---------------- Test: " $TestNameAndDesc ". " [get-time | format-time -format "HH:mm:ss:S"] " ---------------" |log 
+//plus $counter 1 | write-lines -uri [uri-from-path [concat $RCPTT_project_path "/Logs/counter.txt"]]
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
