@@ -132,8 +132,7 @@ public class MessageLogView {
 
         @Override
         public void executionEnded(final RobotTestsLaunch launch) {
-            launch.performOnExecutionData(ExecutionMessagesStore.class,
-                    store -> store.removeStoreListener(storeListener));
+            // nothing to do
         }
     }
 }
