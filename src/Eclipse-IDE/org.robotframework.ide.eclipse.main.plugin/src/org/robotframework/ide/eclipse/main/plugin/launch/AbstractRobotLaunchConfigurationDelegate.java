@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
-import java.io.IOException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -51,10 +49,11 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         RobotTestsLaunch testsLaunchContext = null;
         try {
             testsLaunchContext = executionService.testExecutionStarting();
-
-            doLaunch(configuration, getTestsMode(mode), launch, testsLaunchContext, monitor);
-        } catch (final IOException e) {
-            throw newCoreException("Unable to launch Robot", e);
+            final LaunchExecution launchExecution = doLaunch(configuration, getTestsMode(mode), launch,
+                    testsLaunchContext);
+            // FIXME : don't need to wait when it would be possible to launch multiple
+            // configurations
+            launchExecution.waitFor(monitor);
         } finally {
             executionService.testExecutionEnded(testsLaunchContext);
 
@@ -72,9 +71,8 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         return new Launch(original, mode, null);
     }
 
-    protected abstract void doLaunch(final ILaunchConfiguration configuration, final TestsMode testsMode,
-            final ILaunch launch, final RobotTestsLaunch testsLaunchContext, final IProgressMonitor monitor)
-            throws CoreException, IOException;
+    protected abstract LaunchExecution doLaunch(final ILaunchConfiguration configuration, final TestsMode testsMode,
+            final ILaunch launch, final RobotTestsLaunch testsLaunchContext) throws CoreException;
 
     private ILaunchConfiguration saveConfiguration(final ILaunchConfiguration configuration) throws CoreException {
         if (configuration.isWorkingCopy()) {
@@ -90,6 +88,41 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         final ILaunchConfiguration original = copy.doSave();
         final ILaunchConfigurationWorkingCopy parent = copy.getParent();
         return parent == null ? original : deepSaveConfigurationWorkingCopy(parent);
+    }
+
+    protected static class LaunchExecution {
+
+        private final AgentConnectionServerJob serverJob;
+
+        private final Process execProcess;
+
+        private final IRobotProcess robotProcess;
+
+        public LaunchExecution(final AgentConnectionServerJob serverJob, final Process execProcess,
+                final IRobotProcess robotProcess) {
+            this.serverJob = serverJob;
+            this.execProcess = execProcess;
+            this.robotProcess = robotProcess;
+        }
+
+        public void waitFor(final IProgressMonitor monitor) throws CoreException {
+            try {
+                if (execProcess != null) {
+                    // TODO : after migration to Java 1.8 this can be changed to a loop using
+                    // waitFor(timeout, unit) method in order to periodically check for monitor
+                    // cancellations
+                    execProcess.waitFor();
+                } else {
+                    serverJob.join();
+                }
+            } catch (final InterruptedException e) {
+                throw newCoreException("Waiting for launch execution was interrupted", e);
+            }
+        }
+
+        public IRobotProcess getRobotProcess() {
+            return robotProcess;
+        }
     }
 
 }
