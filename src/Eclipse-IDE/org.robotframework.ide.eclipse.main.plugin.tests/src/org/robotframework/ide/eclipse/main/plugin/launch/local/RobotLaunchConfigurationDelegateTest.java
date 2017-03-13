@@ -11,13 +11,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.junit.BeforeClass;
@@ -36,9 +33,9 @@ import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.ImmutableMap;
 
-public class RobotLaunchInModeTest {
+public class RobotLaunchConfigurationDelegateTest {
 
-    private static final String PROJECT_NAME = RobotLaunchInModeTest.class.getSimpleName();
+    private static final String PROJECT_NAME = RobotLaunchConfigurationDelegateTest.class.getSimpleName();
 
     private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 
@@ -65,8 +62,8 @@ public class RobotLaunchInModeTest {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList()));
 
-        final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
     }
@@ -82,8 +79,8 @@ public class RobotLaunchInModeTest {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList("001__case1")));
 
-        final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
         assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
@@ -105,8 +102,8 @@ public class RobotLaunchInModeTest {
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
-        final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
@@ -129,8 +126,8 @@ public class RobotLaunchInModeTest {
 
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
-        final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
@@ -143,8 +140,8 @@ public class RobotLaunchInModeTest {
         final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toPortableString();
         robotConfig.setExecutableFilePath(executablePath);
 
-        final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
 
         assertThat(commandLine.getCommandLine()).startsWith(executablePath);
     }
@@ -156,21 +153,10 @@ public class RobotLaunchInModeTest {
         robotConfig.setExecutableFilePath(executablePath);
         robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
 
-        final RobotLaunchInMode launchMode = createModeUnderTest();
-        final RunCommandLine commandLine = launchMode.prepareCommandLine(robotConfig, 12345);
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence(executablePath, "-arg1", "abc", "-arg2", "xyz");
-    }
-
-    private static RobotLaunchInMode createModeUnderTest() {
-        return new RobotLaunchInMode() {
-
-            @Override
-            protected Process launchAndAttachToProcess(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
-                    final IProgressMonitor monitor) throws CoreException, IOException {
-                return null;
-            }
-        };
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {

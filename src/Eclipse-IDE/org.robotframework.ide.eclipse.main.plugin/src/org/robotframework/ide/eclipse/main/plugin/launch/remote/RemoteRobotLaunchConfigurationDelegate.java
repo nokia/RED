@@ -8,12 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -34,9 +32,8 @@ import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessage
 public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigurationDelegate {
 
     @Override
-    protected void doLaunch(final ILaunchConfiguration configuration, final TestsMode testsMode, final ILaunch launch,
-            final RobotTestsLaunch testsLaunchContext, final IProgressMonitor monitor)
-            throws CoreException, IOException {
+    protected LaunchExecution doLaunch(final ILaunchConfiguration configuration, final TestsMode testsMode,
+            final ILaunch launch, final RobotTestsLaunch testsLaunchContext) throws CoreException {
 
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(configuration);
 
@@ -46,37 +43,34 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
 
         try {
             final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(testsMode);
-            final ServerJobWithProcess serverWithProcess;
+            final LaunchExecution launchExecution;
             if (testsMode == TestsMode.RUN) {
-                serverWithProcess = launchServerAndProcess(launch, testsLaunchContext, host,
-                        port, timeout, newArrayList(testsStarter));
+                launchExecution = execute(launch, testsLaunchContext, host, port, timeout, newArrayList(testsStarter));
             } else {
                 final RobotDebugTarget debugTarget = new RobotDebugTarget("Remote Robot Test at " + host + ":" + port,
                         launch);
                 final DebugExecutionEventsListener debugListener = new DebugExecutionEventsListener(debugTarget,
                         robotConfig.getResourcesUnderDebug());
 
-                serverWithProcess = launchServerAndProcess(launch, testsLaunchContext, host,
-                        port, timeout, newArrayList(testsStarter, debugListener));
+                launchExecution = execute(launch, testsLaunchContext, host, port, timeout,
+                        newArrayList(testsStarter, debugListener));
 
-                debugTarget.connectWith(serverWithProcess.process);
+                debugTarget.connectWith(launchExecution.getRobotProcess());
             }
             testsStarter.allowClientTestsStart();
 
-            // FIXME : don't need to wait when it would be possible to launch multiple
-            // configurations
-            serverWithProcess.serverJob.join();
+            return launchExecution;
         } catch (final InterruptedException e) {
             throw newCoreException("Interrupted when waiting for remote connection server", e);
         }
     }
 
-    private ServerJobWithProcess launchServerAndProcess(final ILaunch launch, final RobotTestsLaunch testsLaunchContext,
-            final String host, final int port, final int timeout,
-            final List<RobotAgentEventListener> additionalListeners) throws InterruptedException {
+    private LaunchExecution execute(final ILaunch launch, final RobotTestsLaunch testsLaunchContext, final String host,
+            final int port, final int timeout, final List<RobotAgentEventListener> additionalListeners)
+            throws InterruptedException {
 
         final RemoteConnectionStatusTracker remoteConnectionStatusTracker = new RemoteConnectionStatusTracker();
-        final AgentConnectionServerJob job = AgentConnectionServerJob.setupServerAt(host, port)
+        final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                 .serverStatusHandledBy(remoteConnectionStatusTracker)
                 .agentEventsListenedBy(remoteConnectionStatusTracker)
@@ -90,24 +84,12 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
         final String processLabel = "TCP connection using " + host + "@" + port;
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, null, processLabel);
 
-        robotProcess.onTerminate(() -> job.stopServer());
-        TestsExecutionTerminationSupport.installTerminationSupport(job, robotProcess);
+        robotProcess.onTerminate(serverJob::stopServer);
+        TestsExecutionTerminationSupport.installTerminationSupport(serverJob, robotProcess);
 
         final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
         remoteConnectionStatusTracker.startTrackingInto(redConsole);
 
-        return new ServerJobWithProcess(job, robotProcess);
-    }
-
-    private static class ServerJobWithProcess {
-
-        private final AgentConnectionServerJob serverJob;
-
-        private final IRobotProcess process;
-
-        public ServerJobWithProcess(final AgentConnectionServerJob serverJob, final IRobotProcess process) {
-            this.serverJob = serverJob;
-            this.process = process;
-        }
+        return new LaunchExecution(serverJob, null, robotProcess);
     }
 }

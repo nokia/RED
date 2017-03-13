@@ -71,7 +71,7 @@ public class RemoteRobotLaunchConfigurationTest {
         assertThat(robotConfig.getProjectName()).isEqualTo("");
         assertThat(robotConfig.isRemoteAgent()).isTrue();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
-        assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
+        assertThat(robotConfig.getAgentConnectionPort()).isEqualTo(43_981);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
     }
 
