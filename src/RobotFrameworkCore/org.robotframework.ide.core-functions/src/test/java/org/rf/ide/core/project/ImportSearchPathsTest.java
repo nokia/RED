@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.junit.BeforeClass;
@@ -207,7 +208,7 @@ public class ImportSearchPathsTest {
         try {
             pathsSupport.getAbsoluteUri(importerUri, importPath);
             fail();
-        } catch (final IllegalStateException e) {
+        } catch (final NoSuchElementException e) {
             // expected
         }
     }
