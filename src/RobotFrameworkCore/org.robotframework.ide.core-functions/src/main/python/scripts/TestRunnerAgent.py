@@ -50,7 +50,7 @@ import threading
 import inspect
 import copy
 import json
-from time import sleep
+import time
 
 if sys.version_info < (3, 0, 0):
     import SocketServer as socketserver
@@ -123,7 +123,6 @@ class TestRunnerAgent:
     """
     ROBOT_LISTENER_API_VERSION = 2
     
-    CONNECTION_TRIALS = 5
     CONNECTION_SLEEP_BETWEEN_TRIALS = 2
     
     RED_AGENT_PROTOCOL_VERSION = 1
@@ -132,14 +131,16 @@ class TestRunnerAgent:
 
     def __init__(self, *args):
         if len(args) == 1:
-            self.host, self.port = 'localhost', int(args[0])
+            self.host, self.port, connection_timeout = 'localhost', int(args[0]), 30
+        elif len(args) == 2:
+            self.host, self.port, connection_timeout = args[0], int(args[1]), 30
         else:
-            self.host, self.port = args[0], int(args[1])
+            self.host, self.port, connection_timeout = args[0], int(args[1]), int(args[2])
         
         self.sock = None
         self.decoder_encoder = None
         
-        if self._connect():
+        if self._connect(connection_timeout):
             self._is_debug_enabled, wait_for_signal = self._send_agent_initializing()
             self._send_version()
             if self._check_protocol_version():
@@ -411,23 +412,24 @@ class TestRunnerAgent:
         sys.stderr.write('[ ERROR ] ' + message + '\n')
         sys.stderr.flush()
 
-    def _connect(self):
+    def _connect(self, connection_timeout):
         '''Establish a connection for sending data'''
         trials = 1
+        start = time.time()
         
-        while trials <= self.CONNECTION_TRIALS:
+        while int(time.time() - start) < connection_timeout:
             try:
                 self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.sock.connect((self.host, self.port))
                 self.decoder_encoder = MessagesDecoderEncoder(self.sock)
                 return True
             except socket.error as e:
-                print('TestRunnerAgent: connection trial failed (%s of %s)' % (trials, self.CONNECTION_TRIALS))
+                print('TestRunnerAgent: connection trial #%s failed' % trials)
                 print('\tUnable to open socket to "%s:%s"'  % (self.host, self.port))
                 print('\terror: %s' % str(e))
                 self.sock = None
                 self.decoder_encoder = None
-                sleep(self.CONNECTION_SLEEP_BETWEEN_TRIALS)
+                time.sleep(self.CONNECTION_SLEEP_BETWEEN_TRIALS)
             trials += 1
         return False
 
