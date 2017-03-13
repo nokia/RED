@@ -14,6 +14,16 @@ span.block {
 span.code {
 	font-family: monospace;
 }
+a.jira {
+	background: url('images/jira_icon.png') no-repeat;
+	background-position: 0 0px;
+	padding-left: 20px;
+}
+a.command {
+	background: url('../org.eclipse.help/command_link.png') no-repeat;
+	background-position: 0 5px;
+	padding-left: 20px;
+}
 
 div.code {
 	font-family: monospace;
