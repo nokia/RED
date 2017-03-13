@@ -35,17 +35,11 @@
     </topic>
     <topic href="doc/user_guide/keys.html" label="RED key shortcuts">
     </topic>
-	<topic href="doc/user_guide/validation.html" label="Validation - limiting the scope">
-    </topic>
-    <topic href="doc/user_guide/validation_preferences.html" label="Validation - setting issues severity level in preferences">
-    </topic>
     <topic href="doc/user_guide/unicode.html" label="Unicode - handling language specific chars in Eclipse">
     </topic>
 	<topic href="doc/user_guide/virtual_folders.html" label="Working with virtual folders mounted via SSH">
     </topic>
 	<topic href="doc/user_guide/eclipse_memory.html" label="Allocating memory to Eclipse/RED">
-    </topic>
-	<topic href="doc/user_guide/headless.html" label="Headless - running validation in command line">
     </topic>
 	<topic href="doc/user_guide/red_pylint.html" label="PyDev with PyLint together with RED">
     </topic>
@@ -56,6 +50,14 @@
 	<topic href="doc/user_guide/maven.html" label="Integrate RED with Robotframework Maven Plugin">
     </topic>
     <topic href="doc/user_guide/linux-gtk.html" label="GTK3 problems under Linux and how to set GTK2">
+    </topic>
+    <topic href="doc/user_guide/validation.html" label="Validation">
+       <topic href="doc/user_guide/validation/scope.html" label="Limiting validation scope">
+       </topic>
+       <topic href="doc/user_guide/validation/validation_preferences.html" label="Configuring problems severity">
+       </topic>
+       <topic href="doc/user_guide/validation/headless.html" label="Running validation in command line">
+       </topic>
     </topic>
   
  </topic> 
