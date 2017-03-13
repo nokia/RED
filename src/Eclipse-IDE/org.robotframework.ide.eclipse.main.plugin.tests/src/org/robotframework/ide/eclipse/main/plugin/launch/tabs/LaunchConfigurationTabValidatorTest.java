@@ -164,7 +164,7 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     @Test
-    public void nothingIsThrown_whenEverythingIsOkWithGivenConfiguration() throws Exception, CoreException {
+    public void nothingIsThrown_whenEverythingIsOkWithRobotTab() throws Exception, CoreException {
         final IPath filePath = Path.fromPortableString("file.robot");
         projectProvider.createFile(filePath, "*** Test Cases ***", "case1", "  Log  10", "case2", "  Log  20", "case3",
                 "  Log  30");
@@ -178,17 +178,6 @@ public class LaunchConfigurationTabValidatorTest {
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setSuitePaths(ImmutableMap.of(filePath.toPortableString(), newArrayList("case2", "case3")));
-        validator.validateRobotTab(launchConfig);
-    }
-
-    @Test
-    public void nothingIsThrown_whenEverythingIsOkWithGivenConfiguration_1() throws Exception {
-        final IFile scriptFile = projectProvider.createFile("robot_script_file.txt", "run robot command");
-        final IFile testFile = projectProvider.createFile("test.robot", "*** Test Cases ***", "case1", "  Log  1");
-
-        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setExecutableFilePath(scriptFile.getLocation().toOSString());
-        launchConfig.setSuitePaths(ImmutableMap.of(testFile.getName(), newArrayList("case1")));
         validator.validateRobotTab(launchConfig);
     }
 
@@ -221,8 +210,23 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     @Test
-    public void nothingIsThrown_whenEverythingIsOkWithGivenRemoteConfiguration() throws Exception {
+    public void nothingIsThrown_whenEverythingIsOkWithListenerTab() throws Exception {
         validator.validateListenerTab(createRemoteRobotLaunchConfiguration(PROJECT_NAME));
+    }
+
+    @Test
+    public void nothingIsThrown_whenEverythingIsOkWithListenerTab_1() throws Exception {
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setRemoteAgent(true);
+        launchConfig.setAgentConnectionHostValue("1.2.3.4");
+        launchConfig.setAgentConnectionPortValue("12345");
+        launchConfig.setAgentConnectionTimeoutValue("99");
+        validator.validateListenerTab(launchConfig);
+    }
+
+    @Test
+    public void projectIsNotValidated_whenNotDefinedDirectly() throws Exception {
+        validator.validateListenerTab(createRobotLaunchConfiguration(""));
     }
 
     @Test
@@ -242,7 +246,7 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     @Test
-    public void whenScriptFileDoesNotExist_fatalExceptionIsThrown() throws CoreException {
+    public void whenExecutableFileDoesNotExist_fatalExceptionIsThrown() throws CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
         thrown.expectMessage("Executable file does not exist.");
 
@@ -294,6 +298,17 @@ public class LaunchConfigurationTabValidatorTest {
 
         final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
         validator.validateExecutorTab(createRobotLaunchConfiguration(PROJECT_NAME));
+    }
+
+    @Test
+    public void nothingIsThrown_whenEverythingIsOkWithExecutorTab() throws Exception {
+        final IFile executableFile = projectProvider.createFile("robot_executable_file.txt", "run robot command");
+        final IFile testFile = projectProvider.createFile("test.robot", "*** Test Cases ***", "case1", "  Log  1");
+
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setExecutableFilePath(executableFile.getLocation().toOSString());
+        launchConfig.setSuitePaths(ImmutableMap.of(testFile.getName(), newArrayList("case1")));
+        validator.validateExecutorTab(launchConfig);
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
