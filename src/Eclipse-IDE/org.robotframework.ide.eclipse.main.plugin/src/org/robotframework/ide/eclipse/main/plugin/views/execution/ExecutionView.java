@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -25,11 +26,10 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
@@ -57,6 +57,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -71,8 +72,10 @@ import org.robotframework.red.actions.CollapseAllAction;
 import org.robotframework.red.actions.ExpandAllAction;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.swt.SwtThread;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 
 /**
  * @author mmarzec
@@ -87,7 +90,6 @@ public class ExecutionView {
     protected IEventBroker eventBroker;
     
     private final RobotTestExecutionService executionService;
-    private RobotTestExecutionListener executionListener;
 
     private Label passCounterLabel;
 
@@ -111,7 +113,11 @@ public class ExecutionView {
 
     private final LinkedList<ExecutionStatus> suitesStack = new LinkedList<>();
 
+    private RobotTestExecutionListener executionListener;
     
+    private final ExecutionElementsStoreListener storeListener =
+            (store, elem) -> SwtThread.syncExec(() -> executionEvent(elem));
+
     public ExecutionView() {
         this(RedPlugin.getTestExecutionService());
     }
@@ -170,23 +176,35 @@ public class ExecutionView {
         messageText.setAlwaysShowScrollBars(false);
         
         createToolbarActions(part.getViewSite().getActionBars().getToolBarManager());
-        
-        for (final ExecutionElement executionElement : getExecutionElementsFromLastLaunch()) {
-            executionEvent(executionElement);
-        }
-        final ExecutionElementsStoreListener storeListener = (store, element) -> SwtThread.syncExec(() -> {
-            executionEvent(element);
-        });
-        executionListener = launch -> SwtThread.syncExec(() -> {
-            final ExecutionElementsStore store = launch.getExecutionData(ExecutionElementsStore.class,
-                    ExecutionElementsStore::new);
-            store.addStoreListener(storeListener);
 
-            clearEvent();
-        });
-        executionService.addExecutionListener(executionListener);
+        setInput();
     }
     
+    private void setInput() {
+        // synchronize on service, so that any thread which would like to start another launch
+        // will have to wait
+        synchronized (executionService) {
+            executionListener = new ExecutionListener(storeListener);
+            executionService.addExecutionListener(executionListener);
+
+            final Optional<RobotTestsLaunch> lastLaunch = executionService.getLastLaunch();
+            if (lastLaunch.isPresent()) {
+                final RobotTestsLaunch launch = lastLaunch.get();
+
+                // this launch may be currently running, so we have to synchronize in order
+                // to get proper state of messages, as other threads may change it in the meantime
+                synchronized (launch) {
+                    final ExecutionElementsStore elementsStore = launch.getExecutionData(ExecutionElementsStore.class,
+                            ExecutionElementsStore::new);
+                    elementsStore.addStoreListener(storeListener);
+
+                    final List<ExecutionElement> currentElements = elementsStore.getElements();
+                    SwtThread.syncExec(() -> executionEvents(currentElements));
+                }
+            }
+        }
+    }
+
     @Focus
     public void onFocus() {
         executionViewer.getControl().setFocus();
@@ -194,16 +212,19 @@ public class ExecutionView {
 
     @PreDestroy
     public void dispose() {
-        executionService.removeExecutionListner(executionListener);
+        synchronized (executionService) {
+            executionService.removeExecutionListener(executionListener);
+            executionService.forEachLaunch(launch -> launch.getExecutionData(ExecutionElementsStore.class)
+                    .ifPresent(store -> store.removeStoreListener(storeListener)));
+        }
     }
 
-    private List<ExecutionElement> getExecutionElementsFromLastLaunch() {
-        return executionService.getLastLaunch()
-                .flatMap(launch -> launch.getExecutionData(ExecutionElementsStore.class))
-                .map(store -> store.getElements())
-                .orElse(new ArrayList<>());
+    private void executionEvents(final List<ExecutionElement> executionElements) {
+        for (final ExecutionElement executionElement : executionElements) {
+            executionEvent(executionElement);
+        }
     }
-    
+
     private void executionEvent(final ExecutionElement executionElement) {
         if (isSuiteStartEvent(executionElement)) {
             handleSuiteStartEvent(executionElement);
@@ -216,10 +237,10 @@ public class ExecutionView {
         } else if (isOutputFileEvent(executionElement)) {
             handleOutputFileEvent(executionElement);
         }
-        refreshViewer();
+        refreshView();
     }
 
-    private void clearEvent() {
+    private void clearView() {
         suitesStack.clear();
         executionViewerInput.clear();
         setViewerInput();
@@ -229,10 +250,10 @@ public class ExecutionView {
         executionViewContentProvider.setFailedFilterEnabled(false);
         showFailedAction.setChecked(false);
         rerunFailedOnlyAction.setOutputFilePath(null);
-        refreshViewer();
+        refreshView();
     }
 
-    private void refreshViewer() {
+    private void refreshView() {
         passCounterLabel.setText("Passed: " + passCounter);
         failCounterLabel.setText("Failed: " + failCounter);
         executionViewer.refresh();
@@ -243,32 +264,19 @@ public class ExecutionView {
 
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                final ExecutionStatus status = (ExecutionStatus) ((TreeSelection) event.getSelection()).getFirstElement();
-                if (status != null) {
-                    final String message = status.getMessage();
-                    if (message != null && !message.equals("")) {
-                        messageText.setText(message);
-                    } else {
-                        messageText.setText("");
-                    }
-                }
+                final String message = Selections
+                        .getOptionalFirstElement((IStructuredSelection) event.getSelection(), ExecutionStatus.class)
+                        .map(status -> Strings.nullToEmpty(status.getMessage()))
+                        .orElse("");
+                messageText.setText(message);
             }
         };
     }
 
     private IDoubleClickListener createDoubleClickListener() {
-        return new IDoubleClickListener() {
-
-            @Override
-            public void doubleClick(final DoubleClickEvent event) {
-                if (event.getSelection() != null && event.getSelection() instanceof StructuredSelection) {
-                    final StructuredSelection selection = (StructuredSelection) event.getSelection();
-                    if (!selection.isEmpty()) {
-                        openExecutionStatusSourceFile((ExecutionStatus) selection.getFirstElement());
-                    }
-                }
-            }
-        };
+        return event -> Selections
+                .getOptionalFirstElement((IStructuredSelection) event.getSelection(), ExecutionStatus.class)
+                        .ifPresent(status -> openExecutionStatusSourceFile(status));
     }
     
     private Menu createContextMenu() {
@@ -280,8 +288,9 @@ public class ExecutionView {
 
             @Override
             public void widgetSelected(final SelectionEvent event) {
-                final ExecutionStatus executionStatus = (ExecutionStatus) ((TreeSelection) executionViewer.getSelection()).getFirstElement();
-                openExecutionStatusSourceFile(executionStatus);
+                final IStructuredSelection selection = (IStructuredSelection) executionViewer.getSelection();
+                Selections.getOptionalFirstElement(selection, ExecutionStatus.class)
+                        .ifPresent(status -> openExecutionStatusSourceFile(status));
             }
         });
         return menu;
@@ -457,5 +466,28 @@ public class ExecutionView {
     
     private void setViewerInput() {
         executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
+    }
+
+    private class ExecutionListener implements RobotTestExecutionListener {
+
+        private final ExecutionElementsStoreListener storeListener;
+
+        ExecutionListener(final ExecutionElementsStoreListener storeListener) {
+            this.storeListener = storeListener;
+        }
+
+        @Override
+        public void executionStarting(final RobotTestsLaunch launch) {
+            SwtThread.syncExec(() -> clearView());
+
+            launch.getExecutionData(ExecutionElementsStore.class, ExecutionElementsStore::new)
+                    .addStoreListener(storeListener);
+        }
+
+        @Override
+        public void executionEnded(final RobotTestsLaunch launch) {
+            launch.performOnExecutionData(ExecutionElementsStore.class,
+                    store -> store.removeStoreListener(storeListener));
+        }
     }
 }

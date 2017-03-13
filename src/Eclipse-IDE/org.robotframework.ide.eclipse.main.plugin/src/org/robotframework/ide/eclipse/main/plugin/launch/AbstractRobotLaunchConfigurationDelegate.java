@@ -47,13 +47,17 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         if (IRobotLaunchConfiguration.lockConfigurationLaunches()) {
             return;
         }
+
+        RobotTestsLaunch testsLaunchContext = null;
         try {
-            final RobotTestsLaunch testsLaunchContext = executionService.testExecutionStarting();
+            testsLaunchContext = executionService.testExecutionStarting();
 
             doLaunch(configuration, getTestsMode(mode), launch, testsLaunchContext, monitor);
         } catch (final IOException e) {
             throw newCoreException("Unable to launch Robot", e);
         } finally {
+            executionService.testExecutionEnded(testsLaunchContext);
+
             IRobotLaunchConfiguration.unlockConfigurationLaunches();
         }
     }
