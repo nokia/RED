@@ -486,8 +486,7 @@ public class ExecutionView {
 
         @Override
         public void executionEnded(final RobotTestsLaunch launch) {
-            launch.performOnExecutionData(ExecutionElementsStore.class,
-                    store -> store.removeStoreListener(storeListener));
+            // nothing to do
         }
     }
 }
