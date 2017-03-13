@@ -32,6 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
@@ -263,6 +264,20 @@ public class RobotLaunchConfigurationTest {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
         assertThat(robotConfig.getResourcesUnderDebug()).containsOnly(res1, res2);
+    }
+
+    @Test
+    public void systemDependentExecutableFileExtensionsAreRetrieved() {
+        final String[] expectedScriptExtensions = RedSystemProperties.isWindowsPlatform()
+                ? new String[] { "*.bat;*.com;*.exe", "*.*" } : new String[] { "*.sh", "*.*" };
+        assertThat(RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions())
+                .containsExactly(expectedScriptExtensions);
+    }
+
+    @Test
+    public void remoteProjectIsNotDefinedDirectly() throws CoreException {
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        assertThat(robotConfig.isDefiningProjectDirectly()).isFalse();
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
