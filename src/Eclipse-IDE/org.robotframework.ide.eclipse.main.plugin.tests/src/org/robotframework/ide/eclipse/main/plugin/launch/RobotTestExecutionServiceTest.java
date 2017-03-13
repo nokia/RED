@@ -54,9 +54,11 @@ public class RobotTestExecutionServiceTest {
 
         final RobotTestsLaunch oldestLaunch = service.testExecutionStarting();
         oldestLaunch.getExecutionData(ExecutionData.class, ExecutionData::new);
+        service.testExecutionEnded(oldestLaunch);
 
         for (int i = 0; i < RobotTestExecutionService.LAUNCHES_HISTORY_LIMIT; i++) {
-            service.testExecutionStarting();
+            final RobotTestsLaunch launch = service.testExecutionStarting();
+            service.testExecutionEnded(launch);
         }
         
         final Collection<RobotTestsLaunch> launchesHistory = service.getLaunches();
@@ -76,7 +78,7 @@ public class RobotTestExecutionServiceTest {
 
         final RobotTestsLaunch launch1 = service.testExecutionStarting();
         final RobotTestsLaunch launch2 = service.testExecutionStarting();
-        service.removeExecutionListner(listener);
+        service.removeExecutionListener(listener);
         service.testExecutionStarting();
 
         verify(listener).executionStarting(launch1);
