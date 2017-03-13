@@ -154,10 +154,12 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     @Override
     public void terminate() {
-        try {
-            client.send(new InterruptExecution());
-        } catch (ResponseException | IOException e) {
-            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        if (client != null) {
+            try {
+                client.send(new InterruptExecution());
+            } catch (ResponseException | IOException e) {
+                throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+            }
         }
         terminated();
     }
