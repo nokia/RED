@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _56LAoKS_EeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/13/17 3:34 PM
+Save-Time: 3/14/17 11:34 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -44,7 +44,7 @@ get-view Console | get-text-viewer | get-property text
     + "A timeout was reached while waiting for a remote connection" | verify-true
  
 //set timout to 1 s in existing configuration
-get-button "Run TestFile.robot" | click -arrow
+get-button "Run.*" | click -arrow
 get-menu "Run Configurations..." | click
 with [get-window "Run Configurations"] {
     get-group "RED Server" | get-editbox -after [get-label "Connection timeout [s]:"] | set-text 1
