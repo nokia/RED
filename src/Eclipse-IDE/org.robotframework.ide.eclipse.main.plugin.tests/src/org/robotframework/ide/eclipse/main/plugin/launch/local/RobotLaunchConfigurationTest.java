@@ -137,6 +137,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
 
+        assertThat(robotConfig.isUsingInterpreterFromProject()).isTrue();
         assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
         assertThat(robotConfig.getExecutableFilePath()).isEqualTo("");
         assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("");
@@ -178,6 +179,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
 
+        assertThat(robotConfig.isUsingInterpreterFromProject()).isTrue();
         assertThat(robotConfig.getInterpreter()).isEqualTo(SuiteExecutor.Python);
         assertThat(robotConfig.getExecutableFilePath()).isEqualTo("");
         assertThat(robotConfig.getExecutableFileArguments()).isEqualTo("");
