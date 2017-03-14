@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _mJtj0Jm8EeWwXrMNKVDTwg
+Contexts: _d8aMACuvEeW667Afdo4DcA
 Element-Name: TerminateRemoteDebug
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Cy3VkJm9EeWwXrMNKVDTwg
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/2/16 12:20 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/14/17 11:33 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -22,29 +22,20 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test cases ***\n"
     + "    Log  5" 
 
 get-button "Save (M1+S)" | click    
-//run in debug to create run configuration
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
 
-exec-with-options -disableJobWaiting -command {
-//got to Debug configuration
-	get-button "Debug.*" | click -arrow
-	get-menu "Debug Configurations..." | click
-	with [get-window "Debug Configurations"] {
-	    get-tree | select "Robot/TestFile.robot"
-	    get-tab-folder | get-tab-item Remote | click
-	    with [get-group "Remote Debugging"] {
-	        get-editbox -after [get-label "Local IP:"] | set-text localhost
-	        get-editbox -after [get-label "Local port:"] | set-text 64001
-	    }
-	    get-button Apply | click
-	    get-button Debug | click
-	}
-}
-//stop test and check print on console
-get-view Console | get-button Terminate | click
+//run test
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/2 Robot Remote Test" 
+    | click
+    
+//check if tes was run    
 get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .*RemoteDebugTempScript.py\n"
-    + "Suite Executor: Robot Framework .*\n"
-    + "Debug server is listening on localhost:64001, you can run a remote test\n"
-    + "Debug server terminated by user" | verify-true
+    | equals "Remote execution server is listening on 127.0.0.1:43981, you can execute tests on remote client" 
+    | verify-true
+    
+//terminate test    
+get-view Console | get-button Terminate | click
+
+get-view Console | get-text-viewer | get-property text 
+    | equals "Remote execution server is listening on 127.0.0.1:43981, you can execute tests on remote client\n"
+    + "Here will be new nice messga to user" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
