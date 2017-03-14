@@ -30,8 +30,6 @@ public interface IRobotLaunchConfiguration {
 
     List<IResource> getResourcesUnderDebug() throws CoreException;
 
-    boolean isDefiningProjectDirectly();
-
     boolean isRemoteAgent() throws CoreException;
 
     String getAgentConnectionHost() throws CoreException;

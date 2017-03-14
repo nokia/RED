@@ -10,7 +10,8 @@ import static com.google.common.collect.Iterables.getFirst;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -130,16 +131,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     @Override
     public List<IResource> getResourcesUnderDebug() throws CoreException {
-        final List<IResource> suiteResources = new ArrayList<>(getSuiteResources());
-        if (suiteResources.isEmpty()) {
-            suiteResources.add(getProject());
-        }
-        return suiteResources;
-    }
-
-    @Override
-    public boolean isDefiningProjectDirectly() {
-        return false;
+        final List<IResource> suiteResources = getSuiteResources();
+        return suiteResources.isEmpty() ? Arrays.asList(getProject()) : suiteResources;
     }
 
     @Override
@@ -266,7 +259,6 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     public void updateTestCases(final Map<IResource, List<String>> suitesMapping) throws CoreException {
-
         final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
         for (final IResource resource : suitesMapping.keySet()) {
             if (!(resource instanceof IProject)) {
@@ -303,7 +295,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return suiteNames;
     }
 
-    private Collection<IResource> getSuiteResources() throws CoreException {
+    private List<IResource> getSuiteResources() throws CoreException {
         final List<IResource> resources = new ArrayList<>();
         final Set<String> problems = new HashSet<>();
         for (final String suitePath : getSuitePaths().keySet()) {
@@ -318,10 +310,10 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         if (!problems.isEmpty()) {
             throw newCoreException(String.join("\n", problems));
         }
-        return resources;
+        return Collections.unmodifiableList(resources);
     }
 
-    public Collection<String> getTestsToRun() throws CoreException {
+    public List<String> getTestsToRun() throws CoreException {
         final List<String> tests = new ArrayList<>();
         for (final Entry<String, List<String>> entries : getSuitePaths().entrySet()) {
             for (final String testName : entries.getValue()) {

@@ -18,7 +18,7 @@ public class RemoteRobotLaunchConfigurationTabGroup extends AbstractLaunchConfig
     @Override
     public void createTabs(final ILaunchConfigurationDialog dialog, final String mode) {
         setTabs(new ILaunchConfigurationTab[] {
-                new LaunchConfigurationListenerTab(),
+                new LaunchConfigurationListenerTab(false),
                 new SourceLookupTab(),
                 new EnvironmentTab(),
                 new CommonTab()

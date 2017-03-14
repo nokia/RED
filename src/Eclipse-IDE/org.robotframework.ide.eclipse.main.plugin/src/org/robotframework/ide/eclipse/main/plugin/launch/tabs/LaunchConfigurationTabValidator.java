@@ -20,6 +20,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.remote.RemoteRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -73,7 +74,7 @@ public class LaunchConfigurationTabValidator {
     public void validateListenerTab(final IRobotLaunchConfiguration robotConfig)
             throws LaunchConfigurationValidationFatalException {
         try {
-            if (robotConfig.isDefiningProjectDirectly()) {
+            if (robotConfig instanceof RemoteRobotLaunchConfiguration) {
                 final String projectName = robotConfig.getProjectName();
                 validateProject(projectName);
             }
