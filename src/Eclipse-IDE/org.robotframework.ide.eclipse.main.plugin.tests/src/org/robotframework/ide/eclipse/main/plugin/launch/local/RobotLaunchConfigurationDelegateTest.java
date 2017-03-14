@@ -45,12 +45,8 @@ public class RobotLaunchConfigurationDelegateTest {
     @BeforeClass
     public static void before() throws Exception {
         projectProvider.createDir(Path.fromPortableString("001__suites_a"));
-        projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"),
-                "*** Test Cases ***",
-                "001__case1",
-                "  Log  10",
-                "001__case2",
-                "  Log  20");
+        projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"), "*** Test Cases ***",
+                "001__case1", "  Log  10", "001__case2", "  Log  20");
     }
 
     @Test
@@ -63,14 +59,13 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList()));
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
     }
 
     @Test
-    public void commandLineDoesNotTranslateTestNames_whenNamesContainsDoubleUnderscores()
-            throws Exception {
+    public void commandLineDoesNotTranslateTestNames_whenNamesContainsDoubleUnderscores() throws Exception {
 
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
@@ -80,7 +75,7 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList("001__case1")));
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
         assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
@@ -103,7 +98,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
@@ -127,7 +122,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
@@ -137,11 +132,12 @@ public class RobotLaunchConfigurationDelegateTest {
     @Test
     public void commandLineStartsWitExecutableFilePath() throws Exception {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toPortableString();
         robotConfig.setExecutableFilePath(executablePath);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         assertThat(commandLine.getCommandLine()).startsWith(executablePath);
     }
@@ -149,12 +145,13 @@ public class RobotLaunchConfigurationDelegateTest {
     @Test
     public void commandLineContainsExecutableFilePathWithArguments() throws Exception {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toPortableString();
         robotConfig.setExecutableFilePath(executablePath);
         robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence(executablePath, "-arg1", "abc", "-arg2", "xyz");
     }

@@ -35,9 +35,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -274,8 +272,7 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        final RobotProject projectFromConfig = robotConfig.getRobotProject();
-        assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
+        assertThat(robotConfig.getProject()).isEqualTo(project);
     }
 
     @Test
@@ -285,7 +282,7 @@ public class RobotLaunchConfigurationTest {
 
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setProjectName("not_existing");
-        robotConfig.getRobotProject();
+        robotConfig.getProject();
     }
 
     @Test

@@ -31,8 +31,7 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
     @Override
     protected IProject[] getProjectsForProblemSearch(final ILaunchConfiguration configuration, final String mode)
             throws CoreException {
-        return new IProject[] {
-                LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getRobotProject().getProject() };
+        return new IProject[] { LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getProject() };
     }
 
     @Override
