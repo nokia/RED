@@ -22,9 +22,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class RemoteRobotLaunchConfigurationTest {
@@ -205,8 +203,7 @@ public class RemoteRobotLaunchConfigurationTest {
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
         robotConfig.setProjectName(PROJECT_NAME);
-        final RobotProject projectFromConfig = robotConfig.getRobotProject();
-        assertThat(projectFromConfig).isEqualTo(RedPlugin.getModelManager().getModel().createRobotProject(project));
+        assertThat(robotConfig.getProject()).isEqualTo(project);
     }
 
     @Test
@@ -216,7 +213,7 @@ public class RemoteRobotLaunchConfigurationTest {
 
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
         robotConfig.setProjectName("not_existing");
-        robotConfig.getRobotProject();
+        robotConfig.getProject();
     }
 
     private RemoteRobotLaunchConfiguration createRemoteRobotLaunchConfiguration() throws CoreException {

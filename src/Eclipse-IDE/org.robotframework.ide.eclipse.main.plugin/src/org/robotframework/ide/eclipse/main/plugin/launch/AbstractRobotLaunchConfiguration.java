@@ -16,7 +16,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
@@ -65,12 +64,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     }
 
     @Override
-    public RobotProject getRobotProject() throws CoreException {
-        final IProject project = getProject();
-        return RedPlugin.getModelManager().getModel().createRobotProject(project);
-    }
-
-    protected IProject getProject() throws CoreException {
+    public IProject getProject() throws CoreException {
         final String projectName = getProjectName();
         if (projectName.isEmpty()) {
             return null;

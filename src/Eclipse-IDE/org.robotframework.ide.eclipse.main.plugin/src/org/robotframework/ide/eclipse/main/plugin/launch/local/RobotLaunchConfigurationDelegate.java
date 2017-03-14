@@ -25,6 +25,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
@@ -33,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
@@ -82,7 +84,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             final List<RobotAgentEventListener> additionalListeners)
             throws InterruptedException, CoreException, IOException {
 
-        final RobotProject robotProject = robotConfig.getRobotProject();
+        final RobotModel model = RedPlugin.getModelManager().getModel();
+        final RobotProject robotProject = model.createRobotProject(robotConfig.getProject());
         final RobotRuntimeEnvironment robotRuntimeEnvironment = getRobotRuntimeEnvironment(robotProject);
         final String suiteExecutorVersion = getSuiteExecutorVersion(robotConfig, robotRuntimeEnvironment);
 
@@ -96,7 +99,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 .start()
                 .waitForServer();
 
-        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, port);
+        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port);
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final String processLabel = createConsoleDescription(robotConfig, robotRuntimeEnvironment);
@@ -133,10 +136,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
     }
 
     @VisibleForTesting
-    RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final int port)
-            throws CoreException, IOException {
-
-        final RobotProject robotProject = robotConfig.getRobotProject();
+    RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
+            final int port) throws CoreException, IOException {
 
         final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
                 ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
