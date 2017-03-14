@@ -323,12 +323,6 @@ public class RobotLaunchConfigurationTest {
                 .containsExactly(expectedScriptExtensions);
     }
 
-    @Test
-    public void remoteProjectIsNotDefinedDirectly() throws CoreException {
-        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        assertThat(robotConfig.isDefiningProjectDirectly()).isFalse();
-    }
-
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
         final IResource res = project.getFile("Resource");
         final List<IResource> resources = asList(res);

@@ -94,12 +94,6 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     @Test
-    public void remoteProjectIsDefinedDirectly() throws CoreException {
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        assertThat(robotConfig.isDefiningProjectDirectly()).isTrue();
-    }
-
-    @Test
     public void projectIsReturned_whenAskedForResourcesUnderDebug() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
         robotConfig.setProjectName(PROJECT_NAME);

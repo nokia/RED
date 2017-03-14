@@ -29,7 +29,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -49,11 +48,13 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
  */
 public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
-    private ProjectComposite projectComposite;
+    private final boolean isAgentTypeButtonSelection;
 
     private Button useLocalAgentButton;
 
     private Button useRemoteAgentButton;
+
+    private ProjectComposite projectComposite;
 
     private Group serverGroup;
 
@@ -67,13 +68,20 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
 
     private Text commandLineArgument;
 
+    public LaunchConfigurationListenerTab(final boolean isAgentTypeButtonSelection) {
+        this.isAgentTypeButtonSelection = isAgentTypeButtonSelection;
+    }
+
     @Override
     public void createControl(final Composite parent) {
         final Composite composite = new Composite(parent, SWT.NONE);
         GridLayoutFactory.fillDefaults().margins(3, 3).applyTo(composite);
 
-        createProjectGroup(composite);
-        createAgentGroup(composite);
+        if (isAgentTypeButtonSelection) {
+            createAgentGroup(composite);
+        } else {
+            createProjectGroup(composite);
+        }
         createServerGroup(composite);
         createClientGroup(composite);
 
@@ -129,7 +137,7 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
     }
 
     private void updateRemoteGroupState() {
-        if (!useRemoteAgentButton.isDisposed()) {
+        if (isAgentTypeButtonSelection) {
             final boolean isRemoteAgent = useRemoteAgentButton.getSelection();
             Arrays.stream(serverGroup.getChildren()).forEach(control -> control.setEnabled(isRemoteAgent));
             Arrays.stream(clientGroup.getChildren()).forEach(control -> control.setEnabled(isRemoteAgent));
@@ -238,13 +246,11 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
             final IRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                     .robotLaunchConfiguration(configuration);
 
-            if (robotConfig.isDefiningProjectDirectly()) {
-                projectComposite.setInput(robotConfig.getProjectName());
-                disposeGroup(useLocalAgentButton);
-            } else {
+            if (isAgentTypeButtonSelection) {
                 useLocalAgentButton.setSelection(!robotConfig.isRemoteAgent());
                 useRemoteAgentButton.setSelection(robotConfig.isRemoteAgent());
-                disposeGroup(projectComposite);
+            } else {
+                projectComposite.setInput(robotConfig.getProjectName());
             }
 
             hostTxt.setText(robotConfig.getAgentConnectionHostValue());
@@ -255,15 +261,6 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
             updateRemoteGroupState();
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
-        }
-    }
-
-    private void disposeGroup(final Control composite) {
-        if (!composite.isDisposed()) {
-            final Composite group = composite.getParent();
-            final Composite parent = group.getParent();
-            group.dispose();
-            parent.layout();
         }
     }
 
@@ -290,7 +287,7 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
 
     @Override
     public boolean canSave() {
-        return projectComposite.isDisposed() || !projectComposite.getSelectedProjectName().isEmpty();
+        return isAgentTypeButtonSelection || !projectComposite.getSelectedProjectName().isEmpty();
     }
 
     @Override
@@ -298,10 +295,10 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
         final IRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
                 .robotLaunchConfiguration(configuration);
         try {
-            if (robotConfig.isDefiningProjectDirectly()) {
-                robotConfig.setProjectName(projectComposite.getSelectedProjectName());
-            } else {
+            if (isAgentTypeButtonSelection) {
                 robotConfig.setRemoteAgent(useRemoteAgentButton.getSelection());
+            } else {
+                robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             }
             robotConfig.setAgentConnectionHostValue(hostTxt.getText().trim());
             robotConfig.setAgentConnectionPortValue(portTxt.getText().trim());
