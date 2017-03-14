@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _56LAoKS_EeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/14/17 11:34 AM
+Save-Time: 3/14/17 4:39 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -36,7 +36,7 @@ with [get-window Preferences] {
 measure-time "RemoteDebugTimeout3s" {
 	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/2 Robot Remote Test" 
 	    | click
-}| constrain-max duration 4000  
+}| constrain-max duration 4300  
     
 //check console     
 get-view Console | get-text-viewer | get-property text 
