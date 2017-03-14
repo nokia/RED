@@ -64,7 +64,7 @@ public class RobotLaunchConfigurationFinder {
         return null;
     }
 
-    public static ILaunchConfigurationWorkingCopy findLaunchConfigurationSelectedTestCases(
+    public static ILaunchConfigurationWorkingCopy findLaunchConfigurationForSelectedTestCases(
             final List<IResource> resources)
             throws CoreException {
 
@@ -133,7 +133,7 @@ public class RobotLaunchConfigurationFinder {
     public static ILaunchConfigurationWorkingCopy getLaunchConfigurationForSelectedTestCases(
             final Map<IResource, List<String>> resourcesToTests) throws CoreException {
         ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfigurationFinder
-                .findLaunchConfigurationSelectedTestCases(newArrayList(resourcesToTests.keySet()));
+                .findLaunchConfigurationForSelectedTestCases(newArrayList(resourcesToTests.keySet()));
         if (configuration == null) {
             configuration = RobotLaunchConfiguration.prepareForSelectedTestCases(resourcesToTests);
         }
