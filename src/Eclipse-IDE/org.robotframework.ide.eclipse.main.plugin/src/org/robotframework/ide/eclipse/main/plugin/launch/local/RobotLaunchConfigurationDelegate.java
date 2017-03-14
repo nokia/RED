@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -56,14 +56,14 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             final LaunchExecution launchExecution;
             if (testsMode == TestsMode.RUN) {
                 launchExecution = execute(robotConfig, launch, testsLaunchContext, host, port, timeout,
-                        newArrayList(testsStarter));
+                        Arrays.asList(testsStarter));
             } else {
                 final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot Test at " + host + ":" + port, launch);
                 final DebugExecutionEventsListener debugListener = new DebugExecutionEventsListener(debugTarget,
                         robotConfig.getResourcesUnderDebug());
 
                 launchExecution = execute(robotConfig, launch, testsLaunchContext, host, port, timeout,
-                        newArrayList(testsStarter, debugListener));
+                        Arrays.asList(testsStarter, debugListener));
 
                 debugTarget.connectWith(launchExecution.getRobotProcess());
             }
@@ -83,8 +83,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             throws InterruptedException, CoreException, IOException {
 
         final RobotProject robotProject = robotConfig.getRobotProject();
-        final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
-        final String version = getExecutorVersion(robotConfig, runtimeEnvironment);
+        final RobotRuntimeEnvironment robotRuntimeEnvironment = getRobotRuntimeEnvironment(robotProject);
+        final String suiteExecutorVersion = getSuiteExecutorVersion(robotConfig, robotRuntimeEnvironment);
 
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
@@ -99,7 +99,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         final RunCommandLine cmdLine = prepareCommandLine(robotConfig, port);
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
-        final String processLabel = createConsoleDescription(robotConfig, runtimeEnvironment);
+        final String processLabel = createConsoleDescription(robotConfig, robotRuntimeEnvironment);
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess, processLabel);
 
         robotProcess.onTerminate(serverJob::stopServer);
@@ -107,7 +107,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
         redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
         redConsole.writeLine("Command: " + cmdLine.show());
-        redConsole.writeLine("Suite Executor: " + version);
+        redConsole.writeLine("Suite Executor: " + suiteExecutorVersion);
 
         return new LaunchExecution(serverJob, execProcess, robotProcess);
     }
@@ -126,8 +126,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         return runtimeEnvironment;
     }
 
-    private String getExecutorVersion(final RobotLaunchConfiguration robotConfig, final RobotRuntimeEnvironment env)
-            throws RobotEnvironmentException, CoreException {
+    private String getSuiteExecutorVersion(final RobotLaunchConfiguration robotConfig,
+            final RobotRuntimeEnvironment env) throws RobotEnvironmentException, CoreException {
         return robotConfig.isUsingInterpreterFromProject() ? env.getVersion()
                 : RobotRuntimeEnvironment.getVersion(robotConfig.getInterpreter());
     }
