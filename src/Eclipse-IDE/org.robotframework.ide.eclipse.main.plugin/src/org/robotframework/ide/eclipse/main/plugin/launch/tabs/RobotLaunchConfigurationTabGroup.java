@@ -18,7 +18,7 @@ public class RobotLaunchConfigurationTabGroup extends AbstractLaunchConfiguratio
     public void createTabs(final ILaunchConfigurationDialog dialog, final String mode) {
         setTabs(new ILaunchConfigurationTab[] {
                 new LaunchConfigurationRobotTab(),
-                new LaunchConfigurationListenerTab(),
+                new LaunchConfigurationListenerTab(true),
                 new LaunchConfigurationExecutorTab(),
                 new SourceLookupTab(),
                 new EnvironmentTab(),
