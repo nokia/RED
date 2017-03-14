@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +45,7 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
             final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(testsMode);
             final LaunchExecution launchExecution;
             if (testsMode == TestsMode.RUN) {
-                launchExecution = execute(launch, testsLaunchContext, host, port, timeout, newArrayList(testsStarter));
+                launchExecution = execute(launch, testsLaunchContext, host, port, timeout, Arrays.asList(testsStarter));
             } else {
                 final RobotDebugTarget debugTarget = new RobotDebugTarget("Remote Robot Test at " + host + ":" + port,
                         launch);
@@ -53,7 +53,7 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
                         robotConfig.getResourcesUnderDebug());
 
                 launchExecution = execute(launch, testsLaunchContext, host, port, timeout,
-                        newArrayList(testsStarter, debugListener));
+                        Arrays.asList(testsStarter, debugListener));
 
                 debugTarget.connectWith(launchExecution.getRobotProcess());
             }
