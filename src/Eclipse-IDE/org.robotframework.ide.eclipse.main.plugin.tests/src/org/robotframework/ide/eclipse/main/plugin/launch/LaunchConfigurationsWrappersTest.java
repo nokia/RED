@@ -9,9 +9,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -56,8 +58,11 @@ public class LaunchConfigurationsWrappersTest {
         final ILaunchConfiguration config = createConfigurationMock(RobotLaunchConfiguration.TYPE_ID);
         final ILaunch launch = mock(ILaunch.class);
         when(launch.getLaunchConfiguration()).thenReturn(config);
+        when(launch.getAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT)).thenReturn("false");
 
         final Process process = mock(Process.class);
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
+        when(process.getErrorStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
 
         final LaunchConfigurationsWrappers processFactory = new LaunchConfigurationsWrappers();
         final IRobotProcess robotProcess = processFactory.newProcess(launch, process, "name", new HashMap<>());
@@ -72,8 +77,11 @@ public class LaunchConfigurationsWrappersTest {
         final ILaunchConfiguration config = createConfigurationMock(RemoteRobotLaunchConfiguration.TYPE_ID);
         final ILaunch launch = mock(ILaunch.class);
         when(launch.getLaunchConfiguration()).thenReturn(config);
+        when(launch.getAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT)).thenReturn("false");
 
         final Process process = mock(Process.class);
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
+        when(process.getErrorStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
 
         final LaunchConfigurationsWrappers processFactory = new LaunchConfigurationsWrappers();
         final IRobotProcess robotProcess = processFactory.newProcess(launch, process, "name", new HashMap<>());
@@ -88,8 +96,11 @@ public class LaunchConfigurationsWrappersTest {
         final ILaunchConfiguration config = createConfigurationMock("unknown");
         final ILaunch launch = mock(ILaunch.class);
         when(launch.getLaunchConfiguration()).thenReturn(config);
+        when(launch.getAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT)).thenReturn("false");
 
         final Process process = mock(Process.class);
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
+        when(process.getErrorStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
 
         final LaunchConfigurationsWrappers processFactory = new LaunchConfigurationsWrappers();
         processFactory.newProcess(launch, process, "name", new HashMap<>());
@@ -100,8 +111,11 @@ public class LaunchConfigurationsWrappersTest {
         final ILaunchConfiguration config = createExceptionsThrowingConfigurationMock();
         final ILaunch launch = mock(ILaunch.class);
         when(launch.getLaunchConfiguration()).thenReturn(config);
+        when(launch.getAttribute(DebugPlugin.ATTR_CAPTURE_OUTPUT)).thenReturn("false");
 
         final Process process = mock(Process.class);
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
+        when(process.getErrorStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
 
         final LaunchConfigurationsWrappers processFactory = new LaunchConfigurationsWrappers();
         processFactory.newProcess(launch, process, "name", new HashMap<>());
