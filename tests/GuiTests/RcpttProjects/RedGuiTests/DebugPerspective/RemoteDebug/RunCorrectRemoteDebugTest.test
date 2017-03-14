@@ -1,0 +1,67 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _ur0DkAf5Eee0EKWnoBYU9g,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_pjyZ0Af5Eee0EKWnoBYU9g,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: RunCorrectRemoteDebugTest
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _vURJgAffEee0EKWnoBYU9g
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/14/17 4:25 PM
+Tags: notTestable
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Default Launch Configurations"
+    get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 15
+    get-button Apply | click
+    get-button OK | click
+}
+
+
+
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot Remote" | double-click
+
+let [val path_to_project  [format "%s\Remote" $user_folder] ]{
+	set-dialog-result Folder [$path_to_project]
+	with [get-window "Run Configurations"] {
+	    get-group "Remote Client" | get-button "Export Client Script" | click
+	    get-button Close | click
+	}
+	get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | double-click
+	get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 9
+	exec-with-options -disableJobWaiting -command {
+		get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | select "RemoteProject/TestFile.robot" 
+		    | get-menu "Debug As/2 Robot Remote Test" | click
+		
+		wait-for-remote-connection 
+		
+		
+		if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+			exec-process  "cmd.exe"  "/c" "start" "\"\""  "\"python.exe\"" "-m" "robot.run" "--listener" [concat "\"" $path_to_project "\\TestRunnerAgent.py:43981\""]  "-s" "RemoteProject.TestFile" [concat "\"" $path_to_project "\\RemoteProject\""] -timeout 3		
+		}-else{
+		
+		}    
+		check-debug-marker-on-ruler -line 9	-script_name "TestFile.robot" 
+		get-button "Step Into (F5)" | click
+		check-debug-marker-on-ruler -line 3 -script_name "res.robot"
+		wait 1000
+		get-button "Step Into (F5)" | click
+
+	}
+
+}
+
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RemoteProject.TestFile.test 1\n"
+    + ".* : INFO : 5\n"
+    + "Ending test: RemoteProject.TestFile.test 1\n\n"
+    + "Starting test: RemoteProject.TestFile.test 2\n"
+    + ".* : INFO : 9\n"
+    + "Ending test: RemoteProject.TestFile.test 2" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
