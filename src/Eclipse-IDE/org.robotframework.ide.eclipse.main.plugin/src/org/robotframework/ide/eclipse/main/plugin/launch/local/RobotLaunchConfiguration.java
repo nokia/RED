@@ -12,10 +12,11 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -38,7 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotSuitesNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -277,62 +277,47 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     public Map<IResource, List<String>> collectSuitesToRun() throws CoreException {
-        IProject project;
-        final String projectName = getProjectName();
-        if (projectName.isEmpty()) {
-            project = null;
-        } else {
-            project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-            if (!project.exists()) {
-                project = null;
-            }
-        }
         final Map<IResource, List<String>> suitesToRun = new HashMap<>();
-        if (project == null) {
-            return suitesToRun;
-        }
-
-        final Map<String, List<String>> suitePaths = getSuitePaths();
-        for (final Entry<String, List<String>> entry : suitePaths.entrySet()) {
-            final IPath path = Path.fromPortableString(entry.getKey());
-            final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
-                    : project.getFile(path);
-            suitesToRun.put(resource, entry.getValue());
+        final String projectName = getProjectName();
+        if (!projectName.isEmpty()) {
+            final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+            if (project.exists()) {
+                final Map<String, List<String>> suitePaths = getSuitePaths();
+                for (final Entry<String, List<String>> entry : suitePaths.entrySet()) {
+                    final IPath path = Path.fromPortableString(entry.getKey());
+                    final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
+                            : project.getFile(path);
+                    suitesToRun.put(resource, entry.getValue());
+                }
+            }
         }
         return suitesToRun;
     }
 
     public List<String> getSuitesToRun() throws CoreException {
-        final Collection<IResource> suites = getSuiteResources();
-
         final List<String> suiteNames = new ArrayList<>();
-        for (final IResource suite : suites) {
+        for (final IResource suite : getSuiteResources()) {
             suiteNames.add(RobotSuitesNaming.createSuiteName(suite));
         }
         return suiteNames;
     }
 
     private Collection<IResource> getSuiteResources() throws CoreException {
-        final Map<String, IResource> resources = getSuitePaths().keySet()
-                .stream()
-                .collect(Collectors.toMap(Functions.identity(), suitePath -> {
-                    try {
-                        return getProject().findMember(Path.fromPortableString(suitePath));
-                    } catch (final CoreException e) {
-                        return null;
-                    }
-                }));
-        final List<String> problems = new ArrayList<>();
-        for (final Entry<String, IResource> entry : resources.entrySet()) {
-            if (entry.getValue() == null || !entry.getValue().exists()) {
-                problems.add(
-                        "Suite '" + entry.getKey() + "' does not exist in project '" + getProject().getName() + "'");
+        final List<IResource> resources = new ArrayList<>();
+        final Set<String> problems = new HashSet<>();
+        for (final String suitePath : getSuitePaths().keySet()) {
+            final IProject project = getProject();
+            final IResource resource = project.findMember(Path.fromPortableString(suitePath));
+            if (resource != null) {
+                resources.add(resource);
+            } else {
+                problems.add("Suite '" + suitePath + "' does not exist in project '" + project.getName() + "'");
             }
         }
         if (!problems.isEmpty()) {
             throw newCoreException(String.join("\n", problems));
         }
-        return resources.values();
+        return resources;
     }
 
     public Collection<String> getTestsToRun() throws CoreException {
