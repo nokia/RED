@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -147,11 +148,11 @@ public class RobotLaunchConfigurationTest {
 
         robotConfig.setRobotArguments("arguments");
         robotConfig.setProjectName(PROJECT_NAME);
-        robotConfig.setSuitePaths(ImmutableMap.of("key", newArrayList("value")));
+        robotConfig.setSuitePaths(ImmutableMap.of("key", asList("value")));
         robotConfig.setIsIncludeTagsEnabled(true);
         robotConfig.setIsExcludeTagsEnabled(true);
-        robotConfig.setExcludedTags(newArrayList("excluded"));
-        robotConfig.setIncludedTags(newArrayList("included"));
+        robotConfig.setExcludedTags(asList("excluded"));
+        robotConfig.setIncludedTags(asList("included"));
 
         robotConfig.setRemoteAgent(true);
         robotConfig.setAgentConnectionHostValue("1.2.3.4");
@@ -186,18 +187,16 @@ public class RobotLaunchConfigurationTest {
     public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
         final IResource res1 = project.getFile("Resource1");
         final IResource res2 = project.getFile("Resource2");
-        final List<String> casesForRes1 = newArrayList("case1", "case3");
-        final List<String> casesForRes2 = newArrayList("case1");
+        final List<String> casesForRes1 = asList("case1", "case3");
+        final List<String> casesForRes2 = asList("case1");
 
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration
                 .prepareForSelectedTestCases(ImmutableMap.of(res1, casesForRes1, res2, casesForRes2));
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
-        final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
-        assertThat(suitePaths.keySet()).containsExactlyInAnyOrder("Resource1", "Resource2");
-        assertThat(suitePaths).containsEntry("Resource1", casesForRes1);
-        assertThat(suitePaths).containsEntry("Resource2", casesForRes2);
+        assertThat(robotConfig.getSuitePaths())
+                .isEqualTo(ImmutableMap.of("Resource1", casesForRes1, "Resource2", casesForRes2));
         assertThat(robotConfig.getRobotArguments()).isEqualTo("");
         assertThat(robotConfig.isIncludeTagsEnabled()).isFalse();
         assertThat(robotConfig.isExcludeTagsEnabled()).isFalse();
@@ -208,7 +207,7 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void suitesObtained_whenSuitesCollectedFromConfiguration() throws CoreException {
-        final List<IResource> resources = newArrayList();
+        final List<IResource> resources = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             final IResource res = project.getFile("Resource " + i + ".fake");
             resources.add(res);
@@ -220,6 +219,54 @@ public class RobotLaunchConfigurationTest {
         for (int i = 0; i < resources.size(); i++) {
             assertThat(obtainedSuites).containsKey(resources.get(i));
         }
+    }
+
+    @Test
+    public void emptySuitesObtained_whenProjectNameIsEmpty() throws CoreException {
+        final List<IResource> resources = asList(project.getFile("Resource 1.fake"));
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.setProjectName("");
+        assertThat(robotConfig.collectSuitesToRun()).isEmpty();
+    }
+
+    @Test
+    public void suitesToRunAreRetrievedFromConfiguration() throws CoreException, IOException {
+        final IResource res1 = projectProvider.createFile("Suite1.robot");
+        final IResource res2 = projectProvider.createFile("Suite2.robot");
+        final List<String> casesForRes1 = asList("case1");
+        final List<String> casesForRes2 = asList("case2");
+
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
+        assertThat(robotConfig.getSuitesToRun()).containsOnly(PROJECT_NAME + ".Suite1", PROJECT_NAME + ".Suite2");
+    }
+
+    @Test
+    public void whenResourceDoesNotExist_coreExceptionIsThrown() throws CoreException, IOException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Suite 'suite.robot' does not exist in project '" + PROJECT_NAME + "'");
+
+        final IResource res = projectProvider.createFile("suite.robot", "case");
+        final List<IResource> resources = asList(res);
+
+        final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        res.delete(true, null);
+        robotConfig.getSuitesToRun();
+    }
+
+    @Test
+    public void testsToRunAreRetrievedFromConfiguration() throws CoreException, IOException {
+        final IResource res1 = projectProvider.createFile("Test1.robot");
+        final IResource res2 = projectProvider.createFile("Test2.robot");
+        final List<String> casesForRes1 = asList("case1", "case2");
+        final List<String> casesForRes2 = asList("case3");
+
+        final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
+        assertThat(robotConfig.getTestsToRun()).containsOnly(PROJECT_NAME + ".Test1.case1",
+                PROJECT_NAME + ".Test1.case2", PROJECT_NAME + ".Test2.case3");
     }
 
     @Test
@@ -256,10 +303,10 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void resourcesAreReturned_whenAskedForResourcesUnderDebug() throws CoreException, IOException {
-        final IResource res1 = projectProvider.createFile("DebugResource1");
-        final IResource res2 = projectProvider.createFile("DebugResource2");
-        final List<String> casesForRes1 = newArrayList("case1", "case2");
-        final List<String> casesForRes2 = newArrayList("case1");
+        final IResource res1 = projectProvider.createFile("DebugResource1.robot");
+        final IResource res2 = projectProvider.createFile("DebugResource2.robot");
+        final List<String> casesForRes1 = asList("case1");
+        final List<String> casesForRes2 = asList("case2");
 
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setSuitePaths(ImmutableMap.of(res1.getName(), casesForRes1, res2.getName(), casesForRes2));
@@ -282,7 +329,7 @@ public class RobotLaunchConfigurationTest {
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
         final IResource res = project.getFile("Resource");
-        final List<IResource> resources = newArrayList(res);
+        final List<IResource> resources = asList(res);
         return new RobotLaunchConfiguration(RobotLaunchConfiguration.prepareDefault(resources));
     }
 }
