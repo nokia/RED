@@ -145,6 +145,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     @Override
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        setUsingInterpreterFromProject(true);
         setInterpreter(SuiteExecutor.Python);
         setInterpreterArguments(preferences.getLaunchAdditionalInterpreterArguments());
         setExecutableFilePath(preferences.getLaunchExecutableFilePath());

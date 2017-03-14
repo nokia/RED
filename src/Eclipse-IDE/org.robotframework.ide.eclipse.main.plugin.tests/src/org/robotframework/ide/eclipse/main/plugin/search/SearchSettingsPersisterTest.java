@@ -106,7 +106,7 @@ public class SearchSettingsPersisterTest {
             settings.getSearchPattern().setPattern("p" + i);
 
             persister.writeSettings(settings);
-            
+
             final int expectedNoOfPatterns = Math.min(i, SearchSettingsPersister.MAXIMUM_NUMBER_OF_RECENT_SEARCHES);
             assertThat(persister.getRecentPatterns().size()).isEqualTo(expectedNoOfPatterns);
         }
@@ -122,7 +122,7 @@ public class SearchSettingsPersisterTest {
 
         final SearchSettings settings = persister.readSettings();
         final SearchSettings defaultSettings = new SearchSettings();
-        
+
         assertThat(settings.isCaseSensitive()).isEqualTo(defaultSettings.isCaseSensitive());
         assertThat(settings.getSearchFor()).isEqualTo(defaultSettings.getSearchFor());
         assertThat(settings.getSearchLimitation()).isEqualTo(defaultSettings.getSearchLimitation());
@@ -161,7 +161,7 @@ public class SearchSettingsPersisterTest {
 
         final SearchSettings settings = persister.readSettings();
 
-        assertThat(settings.isCaseSensitive()).isEqualTo(true);
+        assertThat(settings.isCaseSensitive()).isTrue();
         assertThat(settings.getSearchFor()).isEqualTo(SearchFor.DOC_CONTENT);
         assertThat(settings.getSearchLimitation()).isEqualTo(SearchLimitation.NO_LIMITS);
         assertThat(settings.getTargets()).containsOnly(SearchTarget.RESOURCE, SearchTarget.SUITE);

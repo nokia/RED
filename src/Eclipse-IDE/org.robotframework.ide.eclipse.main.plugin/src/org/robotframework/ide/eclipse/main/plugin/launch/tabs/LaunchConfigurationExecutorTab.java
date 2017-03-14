@@ -76,7 +76,7 @@ public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationT
         try {
             robotConfig.setUsingInterpreterFromProject(interpretersComposite.isUsingProjectInterpreter());
             robotConfig.setInterpreter(interpretersComposite.getChosenSystemExecutor());
-            robotConfig.setInterpreterArguments(interpreterArgumentsText.getText());
+            robotConfig.setInterpreterArguments(interpreterArgumentsText.getText().trim());
             robotConfig.setExecutableFilePath(executableFileComposite.getSelectedExecutableFilePath());
             robotConfig.setExecutableFileArguments(executableFileArgumentsText.getText().trim());
         } catch (final CoreException e) {

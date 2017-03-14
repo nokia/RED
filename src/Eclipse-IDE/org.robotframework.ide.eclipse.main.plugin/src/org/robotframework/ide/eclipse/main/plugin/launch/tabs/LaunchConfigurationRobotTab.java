@@ -64,12 +64,12 @@ public class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         try {
-            robotArgumentsText.setText(robotConfig.getRobotArguments());
-            includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
-                    robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
             projectComposite.setInput(robotConfig.getProjectName());
             suitesToRunComposite.setInput(robotConfig.getProjectName(), robotConfig.getSuitePaths());
+            includeExcludeTagsComposite.setInput(robotConfig.isIncludeTagsEnabled(), robotConfig.getIncludedTags(),
+                    robotConfig.isExcludeTagsEnabled(), robotConfig.getExcludedTags());
             includeExcludeTagsComposite.switchTo(robotConfig.getProjectName(), robotConfig.collectSuitesToRun());
+            robotArgumentsText.setText(robotConfig.getRobotArguments());
         } catch (final CoreException e) {
             includeExcludeTagsComposite.switchTo("", new HashMap<IResource, List<String>>());
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
@@ -81,13 +81,13 @@ public class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
         try {
-            robotConfig.setRobotArguments(robotArgumentsText.getText());
+            robotConfig.setProjectName(projectComposite.getSelectedProjectName());
+            robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
             robotConfig.setIsIncludeTagsEnabled(includeExcludeTagsComposite.isIncludeTagsEnabled());
             robotConfig.setIncludedTags(includeExcludeTagsComposite.getIncludedTags());
             robotConfig.setIsExcludeTagsEnabled(includeExcludeTagsComposite.isExcludeTagsEnabled());
             robotConfig.setExcludedTags(includeExcludeTagsComposite.getExcludedTags());
-            robotConfig.setProjectName(projectComposite.getSelectedProjectName());
-            robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
+            robotConfig.setRobotArguments(robotArgumentsText.getText().trim());
         } catch (final CoreException e) {
             DetailedErrorDialog.openErrorDialog("Problem with Launch Configuration",
                     "RED was unable to load the working copy of Launch Configuration.");
