@@ -41,7 +41,6 @@ import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordExecutionManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-
 public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener {
 
     private AgentClient client;
@@ -56,11 +55,10 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
 
     private boolean isBreakpointConditionFulfilled;
 
-    public DebugExecutionEventsListener(final RobotDebugTarget debugTarget, final List<IResource> suiteFilesToDebug) {
+    public DebugExecutionEventsListener(final RobotDebugTarget debugTarget, final List<IResource> resourcesUnderDebug) {
         this.debugTarget = debugTarget;
-
         this.executionContext = new RobotDebugExecutionContext();
-        this.keywordExecutionManager = new KeywordExecutionManager(suiteFilesToDebug);
+        this.keywordExecutionManager = new KeywordExecutionManager(resourcesUnderDebug);
     }
 
     @Override
