@@ -37,14 +37,18 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
 
     private final boolean isEditable;
 
-    CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable) {
+    private final boolean wrapCellContent;
+
+    CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable, final boolean wrapCellContent) {
         this.font = theme.getFont();
         this.isEditable = isEditable;
+        this.wrapCellContent = wrapCellContent;
     }
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+
         final Style caseStyle = createStyle(preferences, SyntaxHighlightingCategory.DEFINITION);
         final Style settingStyle = createStyle(preferences, SyntaxHighlightingCategory.SETTING);
         
@@ -62,15 +66,16 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
                 CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.SELECT,
                 CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
-        
+
         final ImageDescriptor caseImage = isEditable ? RedImages.getTestCaseImage()
                 : RedImages.getGrayedImage(RedImages.getTestCaseImage());
         final ImageDescriptor templatedCaseImage = isEditable ? RedImages.getTemplatedTestCaseImage()
                 : RedImages.getGrayedImage(RedImages.getTemplatedTestCaseImage());
-        final ICellPainter caseCellPainter = new CellPainterDecorator(new RedTableTextPainter(2),
+        final ICellPainter caseCellPainter = new CellPainterDecorator(new RedTableTextPainter(wrapCellContent, 2),
                 CellEdgeEnum.LEFT, new ImagePainter(ImagesManager.getImage(caseImage)));
-        final ICellPainter templatedCaseCellPainter = new CellPainterDecorator(new RedTableTextPainter(2),
-                CellEdgeEnum.LEFT, new ImagePainter(ImagesManager.getImage(templatedCaseImage)));
+        final ICellPainter templatedCaseCellPainter = new CellPainterDecorator(
+                new RedTableTextPainter(wrapCellContent, 2), CellEdgeEnum.LEFT,
+                new ImagePainter(ImagesManager.getImage(templatedCaseImage)));
         
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, caseCellPainter, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);

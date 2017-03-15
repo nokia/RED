@@ -62,10 +62,12 @@ public final class TableCellStringData {
         if (coordinate.x <= x && x <= coordinate.x + extent.x && coordinate.y <= y && y < coordinate.y + extent.y) {
             // the (x,y) position is over the string
 
+            final Range<Integer> startingRegion = getStartingRegion(extent.y, y - coordinate.y);
+            int begin = startingRegion.lowerEndpoint();
+            int end = startingRegion.upperEndpoint();
+
             int beginX = coordinate.x;
-            int begin = 0;
             int endX = beginX + extent.x;
-            int end = drawnString.length();
 
             while (beginX < (endX - 1)) {
                 final int midX = (beginX + endX) /2;
@@ -80,6 +82,39 @@ public final class TableCellStringData {
             return begin;
         }
         return -1;
+    }
+
+    private Range<Integer> getStartingRegion(final int height, final int y) {
+        final String[] lines = drawnString.split("\\r\\n|\\n\\r|\\n|\\r");
+        if (lines.length < 2) {
+            return Range.closedOpen(0, drawnString.length());
+        } else {
+            final int lineHeight = height / lines.length;
+            final int lineNo = Math.min(lines.length - 1,
+                    Math.max(0, (int) Math.ceil((double) y / (double) lineHeight) - 1));
+            
+            int currentLine = 0;
+            int startLine = 0;
+            
+            while (startLine < drawnString.length()) {
+                if (currentLine == lineNo) {
+                    return Range.closedOpen(startLine, startLine + lines[lineNo].length());
+                } else {
+                    startLine += lines[lineNo].length();
+                    final char endChar = drawnString.charAt(startLine);
+                    if ((endChar == '\n' || endChar == '\r') &&
+                            startLine < drawnString.length() - 1 &&
+                            (drawnString.charAt(startLine + 1) == '\n' || drawnString.charAt(startLine + 1) == '\r') &&
+                            endChar != drawnString.charAt(startLine + 1)) {
+                        startLine+= 2;
+                    } else if (endChar == '\n' || endChar == '\r') {
+                        startLine++;
+                    }
+                    currentLine++;
+                }
+            }
+            return null;
+        }
     }
 
     @Override

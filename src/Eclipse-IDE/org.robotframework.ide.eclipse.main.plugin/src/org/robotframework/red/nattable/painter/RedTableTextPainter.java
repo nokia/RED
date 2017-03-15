@@ -5,8 +5,13 @@
  */
 package org.robotframework.red.nattable.painter;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -30,6 +35,7 @@ import org.robotframework.red.nattable.ITableStringsDecorationsSupport;
 import org.robotframework.red.nattable.TableCellStringData;
 import org.robotframework.red.nattable.TableCellsStrings;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
@@ -42,15 +48,14 @@ import com.google.common.collect.TreeRangeSet;
  */
 public class RedTableTextPainter extends TextPainter {
 
-    // paintCell method is taken from super class TextPainter with a little except that there is no
-    // support for text wrapping currently
+    // paintCell method is taken from super class TextPainter
 
-    public RedTableTextPainter() {
-        this(0);
+    public RedTableTextPainter(final boolean wrapContent) {
+        this(wrapContent, 0);
     }
 
-    public RedTableTextPainter(final int spacing) {
-        super(false, true, spacing);
+    public RedTableTextPainter(final boolean wrapContent, final int spacing) {
+        super(wrapContent, true, spacing, wrapContent);
     }
 
     @Override
@@ -69,12 +74,12 @@ public class RedTableTextPainter extends TextPainter {
             setupGCFromConfig(gc, cellStyle);
 
             final int fontHeight = gc.getFontMetrics().getHeight();
-            String text = convertDataType(cell, configRegistry);
+            final String orignalText = convertDataType(cell, configRegistry);
 
-            text = getTextToDisplay(cell, gc, rectangle.width, text);
+            final String text = getTextToDisplay(cell, gc, rectangle.width, orignalText);
 
             // no wrapping so always 1
-            final int numberOfNewLines = 1;
+            final int numberOfNewLines = getNumberOfNewLines(text);
 
             // if the content height is bigger than the available row height
             // we're extending the row height (only if word wrapping is enabled)
@@ -95,7 +100,7 @@ public class RedTableTextPainter extends TextPainter {
             final Supplier<HeaderFilterMatchesCollection> matchesSupplier = configRegistry
                     .getConfigAttribute(ITableStringsDecorationsSupport.MATCHES_SUPPLIER, DisplayMode.NORMAL);
 
-            final StyledString styledString = highlightMatches(new StyledString(text), data,
+            final StyledString styledString = highlightMatches(new StyledString(text), orignalText, data,
                     Stylers.withFont(gc.getFont()), matchesSupplier);
             final TextLayout layout = new TextLayout(gc.getDevice());
             layout.setText(text);
@@ -118,13 +123,15 @@ public class RedTableTextPainter extends TextPainter {
         }
     }
 
-    private final StyledString highlightMatches(final StyledString label, final TableCellStringData data,
-            final Styler defaultStyler, final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
+    @VisibleForTesting
+    final StyledString highlightMatches(final StyledString label, final String orignalText,
+            final TableCellStringData data, final Styler defaultStyler,
+            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
         if (label == null || label.length() == 0) {
             return new StyledString();
         }
-        final RangeSet<Integer> hyperlinks = getHyperlinks(data);
-        final RangeSet<Integer> matches = getMatches(label.getString(), matchesSupplier);
+        final RangeSet<Integer> hyperlinks = getHyperlinks(data, label.getString(), orignalText);
+        final RangeSet<Integer> matches = getMatches(label.getString(), orignalText, matchesSupplier);
 
         final Map<CellTextRegions, Styler> stylersByRegion = stylersByRegion(defaultStyler);
 
@@ -160,26 +167,83 @@ public class RedTableTextPainter extends TextPainter {
         return stylers;
     }
 
-    private RangeSet<Integer> getHyperlinks(final TableCellStringData data) {
-        Range<Integer> hyperlink = data == null ? null : data.getHyperlinkRegion();
-        hyperlink = hyperlink == null ? Range.closed(-1, -1) : hyperlink;
-        
-        final RangeSet<Integer> hyperlinks = TreeRangeSet.create();
-        hyperlinks.add(hyperlink);
-        return hyperlinks;
+    private RangeSet<Integer> getHyperlinks(final TableCellStringData data, final String text,
+            final String orignalText) {
+        final Optional<Range<Integer>> hyperlink = Optional.ofNullable(data)
+                .map(TableCellStringData::getHyperlinkRegion);
+
+        Range<Integer> hyperlinkRegion;
+        if (wrapText && calculateByTextHeight) {
+            final int[] labelsCorrespondence = calculateOriginalToWrappedLabelMapping(text, orignalText);
+
+            hyperlinkRegion = hyperlink.flatMap(r -> transformedRangesForWrappedLabel(labelsCorrespondence, r))
+                    .orElse(Range.closed(-1, -1));
+        } else {
+            hyperlinkRegion = hyperlink.orElse(Range.closed(-1, -1));
+        }
+        return TreeRangeSet.create(newArrayList(hyperlinkRegion));
     }
 
     private RangeSet<Integer> getMatches(final String text,
-            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
+            final String orignalText, final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
         final RangeSet<Integer> matchesRanges = TreeRangeSet.create();
         final HeaderFilterMatchesCollection matches = matchesSupplier.get();
         if (matches == null) {
             return matchesRanges;
         }
-        for (final Range<Integer> range : matches.getRanges(text)) {
-            matchesRanges.add(range);
+
+        if (wrapText && calculateByTextLength) {
+            final int[] labelsCorrespondence = calculateOriginalToWrappedLabelMapping(text, orignalText);
+
+            final List<Range<Integer>> ranges = matches.getRanges(orignalText)
+                    .stream()
+                    .map(r -> transformedRangesForWrappedLabel(labelsCorrespondence, r))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+
+            matchesRanges.addAll(ranges);
+        } else {
+            matchesRanges.addAll(matches.getRanges(orignalText));
         }
         return matchesRanges;
+    }
+
+    private Optional<Range<Integer>> transformedRangesForWrappedLabel(final int[] map, final Range<Integer> range) {
+        final int lower = range.lowerEndpoint();
+        final int upper = range.upperEndpoint() - 1;
+
+        final int lowerEndpoint = map[lower] == -1 ? map[lower + 1] : map[lower];
+        final int upperEndpoint = map[upper] == -1 ? map[upper - 1] : map[upper];
+        final Optional<Range<Integer>> transformedRange;
+        if (lowerEndpoint <= upperEndpoint) {
+            transformedRange = Optional.of(Range.closedOpen(lowerEndpoint, upperEndpoint + 1));
+        } else {
+            transformedRange = Optional.empty();
+        }
+        return transformedRange;
+    }
+
+    // returned array maps indexes of characters in original text into indexes of characters in
+    // wrapped text
+    private int[] calculateOriginalToWrappedLabelMapping(final String text, final String orignalText) {
+        final int[] map = new int[orignalText.length()];
+        for (int i = 0, j = 0; i < map.length; i++, j++) {
+            // there is either \r\n or \n\r
+            if (text.charAt(j) == '\r' || text.charAt(j) == '\n') {
+                if (j < text.length() - 1 && (text.charAt(j + 1) == '\r' || text.charAt(j + 1) == '\n')
+                        && text.charAt(j) != text.charAt(j + 1)) {
+                    j++;
+                }
+                j++;
+                if (orignalText.charAt(i) == ' ') {
+                    map[i] = -1;
+                    i++;
+                }
+            }
+            map[i] = j;
+        }
+        return map;
     }
 
     private static enum CellTextRegions {

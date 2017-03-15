@@ -36,9 +36,6 @@ public class RedTableEditBindingsConfiguration extends AbstractUiBindingConfigur
         uiBindingRegistry.registerKeyBinding(new LetterOrDigitKeyEventMatcher(), new KeyEditAction());
         uiBindingRegistry.registerKeyBinding(new LetterOrDigitKeyEventMatcher(SWT.SHIFT), new KeyEditAction());
 
-        // uiBindingRegistry.registerFirstMouseDownBinding(new
-        // TableCellEditorMouseEventMatcher(GridRegion.BODY,
-        // newArrayList(DisplayMode.SELECT, DisplayMode.SELECT_HOVER)), new MouseEditAction());
         uiBindingRegistry.registerDoubleClickBinding(new CellEditorMouseEventMatcher(GridRegion.BODY),
                 new MouseEditAction());
         
@@ -46,11 +43,7 @@ public class RedTableEditBindingsConfiguration extends AbstractUiBindingConfigur
                 new ColumnResizeEventMatcher(SWT.NONE, GridRegion.COLUMN_HEADER, 0), new ColumnResizeCursorAction());
         uiBindingRegistry.registerFirstMouseDragMode(
                 new ColumnResizeEventMatcher(SWT.NONE, GridRegion.COLUMN_HEADER, 1), new ColumnResizeDragMode());
-        
-        uiBindingRegistry.registerDoubleClickBinding(new ColumnResizeEventMatcher(SWT.NONE, GridRegion.COLUMN_HEADER, 1),
-                new AutoResizeColumnAction());
-
-        // uiBindingRegistry.registerMouseDragMode(new CellEditorMouseEventMatcher(GridRegion.BODY),
-        // new CellEditDragMode());
+        uiBindingRegistry.registerDoubleClickBinding(
+                new ColumnResizeEventMatcher(SWT.NONE, GridRegion.COLUMN_HEADER, 1), new AutoResizeColumnAction());
     }
 }
