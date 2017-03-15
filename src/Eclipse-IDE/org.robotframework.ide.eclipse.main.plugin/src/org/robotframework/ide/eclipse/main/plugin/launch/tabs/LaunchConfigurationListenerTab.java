@@ -5,20 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -29,19 +22,17 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.LaunchConfigurationsWrappers;
 import org.robotframework.ide.eclipse.main.plugin.launch.tabs.LaunchConfigurationTabValidator.LaunchConfigurationValidationFatalException;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
+import org.robotframework.red.jface.dialogs.ScriptExportDialog;
 
 /**
  * @author mmarzec
@@ -200,25 +191,7 @@ public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationT
 
             @Override
             public void widgetSelected(final SelectionEvent event) {
-                final DirectoryDialog dirDialog = new DirectoryDialog(getShell());
-                final String fileName = "TestRunnerAgent.py";
-                dirDialog.setMessage("Choose \"" + fileName + "\" export destination.");
-                final String dir = dirDialog.open();
-                if (dir != null) {
-                    exportScriptFile(dir, fileName);
-                }
-            }
-
-            private void exportScriptFile(final String dir, final String fileName) {
-                final File scriptFile = new File(dir + File.separator + fileName);
-                try {
-                    Files.copy(RobotRuntimeEnvironment.getScriptFileAsStream(fileName), scriptFile.toPath(),
-                            StandardCopyOption.REPLACE_EXISTING);
-                } catch (final IOException e) {
-                    final String message = "Unable to copy file to " + scriptFile.getAbsolutePath();
-                    ErrorDialog.openError(getShell(), "File copy problem", message,
-                            new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
-                }
+                new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open();
             }
         });
 
