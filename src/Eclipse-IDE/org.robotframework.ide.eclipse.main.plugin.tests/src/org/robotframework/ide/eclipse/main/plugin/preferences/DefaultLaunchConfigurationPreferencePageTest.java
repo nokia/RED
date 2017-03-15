@@ -16,6 +16,10 @@ import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +42,7 @@ public class DefaultLaunchConfigurationPreferencePageTest {
     }
 
     @Test
-    public void thereAreSeveralTypesEditors() throws Exception {
+    public void checkIfEditorsForAllLaunchConfigurationPreferencesAreDefined() throws Exception {
         final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
         page.createControl(shellProvider.getShell());
 
@@ -64,5 +68,30 @@ public class DefaultLaunchConfigurationPreferencePageTest {
         }
         assertThat(integerPrefNames).isEmpty();
         assertThat(stringPrefNames).isEmpty();
+    }
+
+    @Test
+    public void checkIfExportClientScriptButtonIsDefined() throws Exception {
+        final DefaultLaunchConfigurationPreferencePage page = new DefaultLaunchConfigurationPreferencePage();
+        page.createControl(shellProvider.getShell());
+
+        boolean buttonFound = false;
+
+        final Composite pageControl = (Composite) page.getControl();
+        final Composite fieldEditorParent = (Composite) pageControl.getChildren()[1];
+        for (final Control fieldEditorParentControl : fieldEditorParent.getChildren()) {
+            if (fieldEditorParentControl instanceof Group) {
+                for (final Control groupControl : ((Group) fieldEditorParentControl).getChildren()) {
+                    if (groupControl instanceof Button) {
+                        if (((Button) groupControl).getText().equals("Export Client Script")) {
+                            buttonFound = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        assertThat(buttonFound).isTrue();
     }
 }

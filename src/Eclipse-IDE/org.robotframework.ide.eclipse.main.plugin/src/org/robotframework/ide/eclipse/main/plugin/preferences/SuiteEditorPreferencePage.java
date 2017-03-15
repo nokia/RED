@@ -28,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehav
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
+import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
 
 import com.google.common.base.Function;
