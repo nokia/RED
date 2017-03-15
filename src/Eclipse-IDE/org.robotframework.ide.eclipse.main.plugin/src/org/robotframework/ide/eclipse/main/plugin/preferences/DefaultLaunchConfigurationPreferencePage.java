@@ -14,6 +14,9 @@ import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
@@ -23,6 +26,7 @@ import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
+import org.robotframework.red.jface.dialogs.ScriptExportDialog;
 
 public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPreferencePage
         implements IWorkbenchPreferencePage {
@@ -68,27 +72,38 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
     }
 
     private void createListenerLaunchConfigurationPreferences(final Composite parent) {
-        final Group remoteGroup = new Group(parent, SWT.NONE);
-        remoteGroup.setText("Listener tab");
-        GridLayoutFactory.fillDefaults().applyTo(remoteGroup);
-        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(remoteGroup);
+        final Group group = new Group(parent, SWT.NONE);
+        group.setText("Listener tab");
+        GridLayoutFactory.fillDefaults().applyTo(group);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(group);
 
-        remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "Server IP:", remoteGroup);
+        remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "Server IP:", group);
         remoteHost.setEmptyStringAllowed(false);
         remoteHost.setErrorMessage("Server IP cannot be empty");
         remoteHost.load();
         addField(remoteHost);
 
-        remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, "Server port:", remoteGroup);
+        remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, "Server port:", group);
         remotePort.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT);
         remotePort.load();
         addField(remotePort);
 
         remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
-                "Server connection timeout [s]:", remoteGroup);
+                "Server connection timeout [s]:", group);
         remoteTimeout.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);
+
+        final Button exportBtn = new Button(group, SWT.PUSH);
+        GridDataFactory.swtDefaults().indent(25, 5).applyTo(exportBtn);
+        exportBtn.setText("Export Client Script");
+        exportBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent event) {
+                new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open();
+            }
+        });
     }
 
     private void createExecutorLaunchConfigurationPreferences(final Composite parent) {

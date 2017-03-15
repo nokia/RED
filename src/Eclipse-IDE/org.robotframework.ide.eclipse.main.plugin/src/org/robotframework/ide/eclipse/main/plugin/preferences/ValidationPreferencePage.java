@@ -34,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.ProblemCategoryType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
+import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 
 public class ValidationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
