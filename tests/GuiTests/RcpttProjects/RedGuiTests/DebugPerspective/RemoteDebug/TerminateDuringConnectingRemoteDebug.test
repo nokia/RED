@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Cy3VkJm9EeWwXrMNKVDTwg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/14/17 3:22 PM
+Save-Time: 3/15/17 4:01 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -24,17 +24,18 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test cases ***\n"
 get-button "Save (M1+S)" | click    
 
 //run test
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/2 Robot Remote Test" 
-    | click
-    
-//check if tes was run    
-get-view Console | get-text-viewer | get-property text 
-    | equals "Remote execution server is listening on 127.0.0.1:43981, you can execute tests on remote client" 
-    | verify-true
-    
-//terminate test    
-get-view Console | get-button Terminate | click
-
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/2 Robot Remote Test" 
+	    | click
+	wait 2000    
+	//check if tes was run    
+	get-view Console | get-text-viewer | get-property text 
+	    | equals "Remote execution server is listening on 127.0.0.1:43981, you can execute tests on remote client" 
+	    | verify-true
+	    
+	//terminate test    
+	get-view Console | get-button Terminate | click
+}
 get-view Console | get-text-viewer | get-property text 
     | equals "Remote execution server is listening on 127.0.0.1:43981, you can execute tests on remote client\n"
     + "Here will be new nice messga to user" | verify-true
