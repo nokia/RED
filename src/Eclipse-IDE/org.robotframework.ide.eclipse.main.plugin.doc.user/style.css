@@ -14,8 +14,8 @@ span.block {
 span.code {
 	font-family: monospace;
 }
-a.jira {
-	background: url('images/jira_icon.png') no-repeat;
+a.github {
+	background: url('images/github_icon.png') no-repeat;
 	background-position: 0 0px;
 	padding-left: 20px;
 }

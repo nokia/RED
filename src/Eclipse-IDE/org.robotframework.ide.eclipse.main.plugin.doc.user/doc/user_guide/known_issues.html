@@ -1,0 +1,65 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Known issues</h2>
+
+<p>For all currently opened issues please visit our repository at 
+<a href="https://github.com/nokia/RED/" class="github">GitHub</a>
+</p>
+
+<ul>
+	<li>
+		<h3>GTK3 issues under Linux</h3>
+	
+		<p>It was observed that using GTK3 library with Eclipse causes unexpected graphical glitches.
+		Those glitches are system independent although occurs more often under Debian and Ubuntu than RedHat
+		Most annoying one is screen flickering when editing large file with multiple folding sections in source editor.
+		Also some of the right click actions in red.xml are not activated.
+		</p>
+
+		<p>It is recommended to switch to GTK2 when working under Linux.</p>
+		
+		<p>RED Product for Linux has configuration to use GTK2, Eclipse users should check and change - if necessary - to GTK2.
+		</p>
+		
+		<h4>Verifying current GTK version used</h4>
+
+		<p>GTK version can be checked in Eclipse under <b>Help-&gt;Installation Details-&gt;Configuration</b>, 
+		search for <span class="code">org.eclipse.swt.internal.gtk.version</span> entry.
+		</p>
+		
+		<h4>Setting GTK2 system wide</h4>
+		
+		<p>In order to run eclipse/RED with GTK2 execute following:</p>
+		<div class="code">
+		export SWT_GTK3=0
+		</div>
+		<p>then start eclipse:</p>
+		<div class="code">
+		./eclipse
+		</div>
+		<p>or RED:</p>
+		<div class="code">
+		./RED
+		</div>
+		
+		<h4>Setting GTK2 in eclipse.ini/RED.ini</h4>
+		
+		<p>GTK2 usage can be forced for eclipse/RED instance. In order to do it simply add following 2 lines to 
+		<b>eclipse.ini</b>/<b>RED.ini</b> file before <span class="code">-vmargs</span> section:
+		</p>
+		
+		<div class="code">
+		--launcher.GTK_version 2<br/>
+		...<br/>
+		-vmargs<br/>
+		</div>
+	</li>
+</ul>
+ 
+</body>
+</html>
