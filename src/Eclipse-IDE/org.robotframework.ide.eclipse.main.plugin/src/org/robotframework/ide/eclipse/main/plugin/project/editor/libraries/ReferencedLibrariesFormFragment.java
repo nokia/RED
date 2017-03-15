@@ -293,7 +293,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     if (!locations.contains(remoteLocation)) {
                         editorInput.getProjectConfiguration().addRemoteLocation(remoteLocation);
 
-                        final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<List<RemoteLocation>>(
+                        final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<>(
                                 editorInput.getRobotProject().getConfigurationFile(), newArrayList(remoteLocation));
                         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
                     }
@@ -434,7 +434,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         autoLibReloadButton.setEnabled(isEditable);
         viewer.getTable().setEnabled(isEditable);
 
-        if (projectIsInterpretedByJython) {
+        if (!projectIsInterpretedByJython) {
             decoration = new ControlDecoration(addJavaLibButton, SWT.RIGHT | SWT.TOP);
             decoration.setDescriptionText("Project is configured to use " + environment.getInterpreter().toString()
                     + " interpreter, but Jython is needed for Java libraries.");
@@ -457,7 +457,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenLibrariesChanged(@UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED) 
+    private void whenLibrariesChanged(@UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED)
                 final RedProjectConfigEventData<List<ReferencedLibrary>> eventData) {
         if (eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
             setDirty(true);
