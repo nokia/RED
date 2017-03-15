@@ -49,6 +49,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
@@ -85,7 +88,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatches
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableEditableRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableSortingConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
@@ -100,6 +102,7 @@ import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
+import org.robotframework.red.nattable.configs.RedTableResizableRowsBindingsConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
@@ -111,9 +114,7 @@ import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.services.event.Events;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.base.Supplier;
 
 @SuppressWarnings("restriction")
 public class CasesEditorFormFragment implements ISectionFormFragment {
@@ -192,13 +193,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AssistanceLabelAccumulator(dataProvider,
-                        Predicates.<PositionCoordinateSerializer> alwaysTrue(),
-                        new Predicate<Object>() {
-                            @Override
-                            public boolean apply(final Object rowObject) {
-                                return rowObject instanceof RobotKeywordCall;
-                            }
-                        }),
+                        Predicates.alwaysTrue(),
+                        rowObject -> rowObject instanceof RobotKeywordCall),
                 new AlternatingRowConfigLabelAccumulator(),
                 new AddingElementLabelAccumulator(dataProvider),
                 new CasesElementsLabelAccumulator(dataProvider));
@@ -236,9 +232,13 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
+        final boolean wrapCellContent = hasWrappedCells();
+        if (wrapCellContent) {
+            gridLayer.addConfiguration(new RedTableResizableRowsBindingsConfiguration());
+        }
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
-                CodeTableEditableRule.createEditableRule(fileModel)));
-        gridLayer.addConfiguration(new CasesTableEditConfiguration(fileModel, dataProvider));
+                CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent));
+        gridLayer.addConfiguration(new CasesTableEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
         table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
@@ -270,16 +270,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         addCustomStyling(table, theme);
 
-        final Supplier<HeaderFilterMatchesCollection> matchesSupplier = new Supplier<HeaderFilterMatchesCollection>() {
-
-            @Override
-            public HeaderFilterMatchesCollection get() {
-                return matches;
-            }
-        };
-
         // find matches configuration
-        table.addConfiguration(new TableMatchesSupplierRegistryConfiguration(matchesSupplier));
+        table.addConfiguration(new TableMatchesSupplierRegistryConfiguration(() -> matches));
 
         // hyperlinks configuration
         final TableCellsStrings tableStrings = new TableCellsStrings();
@@ -302,14 +294,20 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
-        table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter()));
+        final boolean wrapCells = hasWrappedCells();
+        table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter(wrapCells)));
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
         table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
         table.addConfiguration(new RowHeaderStyleConfiguration(theme));
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
-        table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable()));
+        table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable(), wrapCells));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
+    }
+
+    private boolean hasWrappedCells() {
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        return preferences.getCellWrappingStrategy() == CellWrappingStrategy.WRAP;
     }
 
     @Override

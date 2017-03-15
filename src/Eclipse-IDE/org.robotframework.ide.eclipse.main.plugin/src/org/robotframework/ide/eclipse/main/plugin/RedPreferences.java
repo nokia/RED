@@ -40,6 +40,7 @@ public class RedPreferences {
     public static final String SEPARATOR_TO_USE = "separatorToUse";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
     public static final String BEHAVIOR_ON_CELL_COMMIT = "cellCommitBehavior";
+    public static final String CELL_WRAPPING = "red.editor.tables.cellWrapping";
 
     public static final String FOLDABLE_SECTIONS = "foldableSections";
     public static final String FOLDABLE_CASES = "foldableCases";
@@ -69,6 +70,7 @@ public class RedPreferences {
     public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
 
     public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
+
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -134,6 +136,10 @@ public class RedPreferences {
 
     public CellCommitBehavior getCellCommitBehavior() {
         return CellCommitBehavior.valueOf(store.getString(BEHAVIOR_ON_CELL_COMMIT));
+    }
+
+    public CellWrappingStrategy getCellWrappingStrategy() {
+        return CellWrappingStrategy.valueOf(store.getString(CELL_WRAPPING));
     }
 
     public boolean isAssistantAutoActivationEnabled() {
@@ -250,6 +256,11 @@ public class RedPreferences {
     public enum CellCommitBehavior {
         STAY_IN_SAME_CELL,
         MOVE_TO_ADJACENT_CELL
+    }
+
+    public enum CellWrappingStrategy {
+        WRAP,
+        SINGLE_LINE_CUT
     }
 
     public enum FoldableElements {

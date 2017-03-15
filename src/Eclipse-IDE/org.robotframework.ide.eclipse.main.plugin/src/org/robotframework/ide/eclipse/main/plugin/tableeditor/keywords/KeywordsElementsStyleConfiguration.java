@@ -37,9 +37,13 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
 
     private final boolean isEditable;
 
-    public KeywordsElementsStyleConfiguration(final TableTheme theme, final boolean isEditable) {
+    private final boolean wrapCellContent;
+
+    public KeywordsElementsStyleConfiguration(final TableTheme theme, final boolean isEditable,
+            final boolean wrapCellContent) {
         this.font = theme.getFont();
         this.isEditable = isEditable;
+        this.wrapCellContent = wrapCellContent;
     }
 
     @Override
@@ -78,8 +82,8 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new InactiveCellPainter(),
                 DisplayMode.NORMAL, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
 
-        final ICellPainter cellPainter = new CellPainterDecorator(new RedTableTextPainter(2), CellEdgeEnum.LEFT,
-                new ImagePainter(imageToUse));
+        final ICellPainter cellPainter = new CellPainterDecorator(new RedTableTextPainter(wrapCellContent, 2),
+                CellEdgeEnum.LEFT, new ImagePainter(imageToUse));
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
     };

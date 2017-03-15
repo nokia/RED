@@ -55,34 +55,39 @@ public class RedTextCellEditor extends TextCellEditor {
 
     private final AssistanceSupport support;
 
+    private final boolean wrapCellContent;
+
     private IContextActivation contextActivation;
 
-    public RedTextCellEditor() {
-        this(0, 0, new DefaultRedCellEditorValueValidator(), null);
+    public RedTextCellEditor(final boolean wrapCellContent) {
+        this(0, 0, new DefaultRedCellEditorValueValidator(), null, wrapCellContent);
     }
 
-    public RedTextCellEditor(final RedContentProposalProvider proposalProvider) {
-        this(0, 0, new DefaultRedCellEditorValueValidator(), proposalProvider);
+    public RedTextCellEditor(final RedContentProposalProvider proposalProvider, final boolean wrapCellContent) {
+        this(0, 0, new DefaultRedCellEditorValueValidator(), proposalProvider, wrapCellContent);
     }
 
-    public RedTextCellEditor(final CellEditorValueValidator<String> validator) {
-        this(0, 0, validator, null);
-    }
-
-    public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift) {
-        this(selectionStartShift, selectionEndShift, new DefaultRedCellEditorValueValidator(), null);
+    public RedTextCellEditor(final CellEditorValueValidator<String> validator, final boolean wrapCellContent) {
+        this(0, 0, validator, null, wrapCellContent);
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
-            final CellEditorValueValidator<String> validator) {
-        this(selectionStartShift, selectionEndShift, validator, null);
+            final boolean wrapCellContent) {
+        this(selectionStartShift, selectionEndShift, new DefaultRedCellEditorValueValidator(), null, wrapCellContent);
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
-            final CellEditorValueValidator<String> validator, final RedContentProposalProvider proposalProvider) {
+            final CellEditorValueValidator<String> validator, final boolean wrapCellContent) {
+        this(selectionStartShift, selectionEndShift, validator, null, wrapCellContent);
+    }
+
+    public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
+            final CellEditorValueValidator<String> validator, final RedContentProposalProvider proposalProvider,
+            final boolean wrapCellContent) {
         super(true, true);
         this.selectionStartShift = selectionStartShift;
         this.selectionEndShift = selectionEndShift;
+        this.wrapCellContent = wrapCellContent;
         this.support = new AssistanceSupport(proposalProvider);
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
@@ -94,7 +99,8 @@ public class RedTextCellEditor extends TextCellEditor {
 
     @Override
     protected Text createEditorControl(final Composite parent, final int style) {
-        final Text textControl = new Text(parent, style);
+        final int finalStyle = wrapCellContent ? style | SWT.WRAP | SWT.MULTI : style;
+        final Text textControl = new Text(parent, finalStyle);
 
         textControl.setBackground(this.cellStyle.getAttributeValue(CellStyleAttributes.BACKGROUND_COLOR));
         textControl.setForeground(this.cellStyle.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR));
@@ -188,7 +194,7 @@ public class RedTextCellEditor extends TextCellEditor {
                 }
             } else if (event.keyCode == SWT.ESC && event.stateMask == 0) {
                 close();
-            } else if (RedTextCellEditor.this.editMode == EditModeEnum.INLINE) {
+            } else if (RedTextCellEditor.this.editMode == EditModeEnum.INLINE && !wrapCellContent) {
                 if (event.keyCode == SWT.ARROW_UP) {
                     commit(MoveDirectionEnum.UP);
                 } else if (event.keyCode == SWT.ARROW_DOWN) {
