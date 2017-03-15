@@ -63,6 +63,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
     void install(final SourceViewer viewer) {
         annotationModel = viewer.getAnnotationModel();
         viewer.getTextWidget().addCaretListener(new CaretListener() {
+
             @Override
             public void caretMoved(final CaretEvent event) {
                 scheduleRefresh(event.caretOffset);
@@ -133,16 +134,23 @@ class SuiteSourceOccurrenceMarksHighlighter {
         }
 
         int currentOffset = 0;
-        IRegion foundedRegion = findAdapter.find(currentOffset, selectedText, true, true, !isVariable(selectedText),
-                false);
+        IRegion foundedRegion = findOccurrenceRegion(currentOffset, selectedText);
         while (foundedRegion != null) {
             regions.add(foundedRegion);
 
             currentOffset = foundedRegion.getOffset() + foundedRegion.getLength();
-            foundedRegion = findAdapter.find(currentOffset, selectedText, true, true, !isVariable(selectedText), false);
+            foundedRegion = findOccurrenceRegion(currentOffset, selectedText);
         }
 
         return regions;
+    }
+
+    private IRegion findOccurrenceRegion(final int currentOffset, final String selectedText)
+            throws BadLocationException {
+        if (findAdapter.length() > currentOffset) {
+            return findAdapter.find(currentOffset, selectedText, true, true, !isVariable(selectedText), false);
+        }
+        return null;
     }
 
     private static boolean isVariable(final String text) {
