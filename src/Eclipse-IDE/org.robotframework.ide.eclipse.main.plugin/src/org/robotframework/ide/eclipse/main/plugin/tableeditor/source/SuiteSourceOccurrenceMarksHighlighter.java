@@ -147,10 +147,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
     private IRegion findOccurrenceRegion(final int currentOffset, final String selectedText)
             throws BadLocationException {
-        if (findAdapter.length() > currentOffset) {
-            return findAdapter.find(currentOffset, selectedText, true, true, !isVariable(selectedText), false);
-        }
-        return null;
+        return findAdapter.find(currentOffset, selectedText, true, true, !isVariable(selectedText), false);
     }
 
     private static boolean isVariable(final String text) {
