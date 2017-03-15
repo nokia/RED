@@ -109,18 +109,14 @@ public class RobotDryRunHandler {
     }
 
     private Runnable createStreamDrainRunnable(final InputStream inputStream) {
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        line = reader.readLine();
-                    }
-                } catch (final IOException e) {
-                    // nothing to do
+        return () -> {
+            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line = reader.readLine();
+                while (line != null) {
+                    line = reader.readLine();
                 }
+            } catch (final IOException e) {
+                // nothing to do
             }
         };
     }
