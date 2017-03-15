@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _QcX10PsxEeW7_PzjO98BIw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/16 1:42 PM
+Save-Time: 3/15/17 4:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -23,11 +23,11 @@ get-view Console | get-label ".*" -index 0
 get-view Console | get-text-viewer | get-object |invoke getLine 1 | contains "Python" |verify-true  
 
 get-menu "Run/Run Configurations..." | click
-
+get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
 //select other interpreter
 with [get-window "Run Configurations"] {
     get-tree | select "Robot/SingleTest.tsv"
-    get-group Executor | get-button Use | click
+    get-group Interpreter | get-button Use | click
 }
 //check info for user 
 get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
@@ -35,7 +35,7 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
     | equals "Tests will be launched using 'Python' interpreter as defined in PATH environment variable." | verify-true
     
 //check python interpreter    
-get-window "Run Configurations" | get-group Executor | get-button "Check interpreter" | click
+get-window "Run Configurations" | get-group Interpreter | get-button "Check interpreter" | click
 
 
 //check if robot version is shown
@@ -47,7 +47,7 @@ with [get-window "Run Configurations" | get-window "Progress Information" | get-
 //select IronPython
 with [get-window "Run Configurations"] {
     get-window "Progress Information" | get-window "Interpreter checked" | get-button OK | click
-    get-group Executor | get-combo | select IronPython
+    get-group Interpreter | get-combo | select IronPython
 }
 //check if text was changed as information to user
 get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
@@ -57,7 +57,7 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
     
 //select Check interpreter and check error    
 exec-with-options {
-    get-window "Run Configurations" | get-group Executor | get-button "Check interpreter" | click
+    get-window "Run Configurations" | get-group Interpreter | get-button "Check interpreter" | click
     get-window "Run Configurations" | get-window "Problem Occurred" 
         | get-label "Unable to find ipy(.exe)? executable in the system." | get-property caption 
         | equals "Unable to find ipy(.exe)? executable in the system." | verify-true
@@ -74,7 +74,7 @@ exec-with-options {
 
 
 //select Jython
-get-window "Run Configurations" | get-group Executor | get-combo | select Jython
+get-window "Run Configurations" | get-group Interpreter | get-combo | select Jython
 
 //check user info
 get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
@@ -104,7 +104,7 @@ get-view Console | get-text-viewer | get-object |invoke getLine 1 | contains "Jy
 //select PyPy    
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
-    get-group Executor | get-combo | select PyPy
+    get-group Interpreter | get-combo | select PyPy
     get-button Apply | click
 }
 
@@ -142,7 +142,7 @@ get-editor "SecondProject/red.xml" | get-section "Robot framework" | get-table
 	//open run configuration and change to use interpreter from project
 	get-menu "Run/Run Configurations..." | click
 	with [get-window "Run Configurations"] {
-	    get-group Executor | get-button "Use interpreter as defined in project configuration" | click
+	    get-group Interpreter | get-button "Use interpreter as defined in project configuration" | click
 	    get-button Run | click
 	}
 	try -times 5 -delay 1000 -command{
