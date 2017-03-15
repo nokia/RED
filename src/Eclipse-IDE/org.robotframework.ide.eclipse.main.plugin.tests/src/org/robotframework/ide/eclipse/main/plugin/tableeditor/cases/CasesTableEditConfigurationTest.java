@@ -23,7 +23,7 @@ public class CasesTableEditConfigurationTest {
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
         final CasesTableEditConfiguration configuration = new CasesTableEditConfiguration(
-                new RobotSuiteFileCreator().build(), mock(IRowDataProvider.class));
+                new RobotSuiteFileCreator().build(), mock(IRowDataProvider.class), true);
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class),
