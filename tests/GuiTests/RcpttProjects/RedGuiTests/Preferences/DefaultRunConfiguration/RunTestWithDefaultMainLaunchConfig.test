@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/1/17 9:58 AM
+Save-Time: 3/10/17 11:00 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -46,12 +46,13 @@ wait-for-console
 //open run configs an chceck if arg was added
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot"
-with [get-window "Run Configurations" | get-group Executor] {
-    get-button "Use interpreter as defined in project configuration" | get-property selected | equals true | verify-true
-    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "--version" 
-        | verify-true
-    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text | equals "" | verify-true
-}
+get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
+get-window "Run Configurations" | get-group Interpreter | get-editbox 
+    -after [get-label "Additional interpreter arguments:"] | get-property text | equals "--version" | verify-true
+get-window "Run Configurations" | get-tab-folder | get-tab-item Robot | click
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text | equals "" | verify-true
+    
 with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
     get-item "test_for_run_config.robot/abc" | get-property checked | equals true | verify-true
     get-item "test_for_run_config.robot/def" | get-property checked | equals true | verify-true
@@ -136,19 +137,26 @@ if [not [get-view Console | get-text-viewer | get-property text -raw
 //check if run config for selected test was created
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot (Selected Test Cases)"
-with [get-window "Run Configurations" | get-group Executor] {
-    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-        | equals "-i test 1 -o None -d None -l None -r None" | verify-true
-    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
-}
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
+
+//interpreter  
+get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click  
+get-window "Run Configurations" | get-group Interpreter | get-editbox 
+    -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
 
 //check if run config for entire test remains
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot"
-with [get-window "Run Configurations" | get-group Executor] {
-    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-        | equals "-i test 1 -o None -d None -l None -r None" | verify-true
-    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
-}
+get-window "Run Configurations" | get-group Arguments | get-editbox 
+    -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
+
+//interpreter
+get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
+get-window "Run Configurations" | get-group Interpreter | get-editbox 
+    -after [get-label "Additional interpreter arguments:"] | get-property text | equals "" | verify-true
+        
 get-window "Run Configurations" | get-button Close | click
 
 
