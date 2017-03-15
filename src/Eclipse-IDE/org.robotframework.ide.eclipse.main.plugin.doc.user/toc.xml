@@ -49,8 +49,6 @@
     </topic>
 	<topic href="doc/user_guide/maven.html" label="Integrate RED with Robotframework Maven Plugin">
     </topic>
-    <topic href="doc/user_guide/linux-gtk.html" label="GTK3 problems under Linux and how to set GTK2">
-    </topic>
     <topic href="doc/user_guide/validation.html" label="Validation">
        <topic href="doc/user_guide/validation/scope.html" label="Limiting validation scope">
        </topic>
@@ -58,6 +56,8 @@
        </topic>
        <topic href="doc/user_guide/validation/headless.html" label="Running validation in command line">
        </topic>
+    </topic>
+    <topic href="doc/user_guide/known_issues.html" label="Known issues">
     </topic>
   
  </topic> 
