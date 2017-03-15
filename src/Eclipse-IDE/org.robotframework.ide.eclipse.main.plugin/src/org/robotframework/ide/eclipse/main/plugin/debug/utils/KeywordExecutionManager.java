@@ -29,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoin
 
 public class KeywordExecutionManager {
 
-    private final List<IResource> suiteFilesToDebug;
+    private final List<IResource> resourcesUnderDebug;
 
     private IFile currentInitFile;
 
@@ -49,15 +49,14 @@ public class KeywordExecutionManager {
 
     private final Map<IBreakpoint, Integer> breakpointHitCounts;
 
-    public KeywordExecutionManager(final List<IResource> suiteFilesToDebug) {
-        this.suiteFilesToDebug = suiteFilesToDebug;
+    public KeywordExecutionManager(final List<IResource> resourcesUnderDebug) {
+        this.resourcesUnderDebug = resourcesUnderDebug;
         breakpointHitCounts = new LinkedHashMap<>();
     }
 
     public IFile extractCurrentSuite(final IPath suiteFilePath) {
         currentSuiteName = suiteFilePath.lastSegment();
-        currentSuiteFile = extractSuiteFile(currentSuiteName, suiteFilePath.removeLastSegments(1),
-                suiteFilesToDebug);
+        currentSuiteFile = extractSuiteFile(currentSuiteName, suiteFilePath.removeLastSegments(1), resourcesUnderDebug);
         if (currentSuiteFile != null) {
             currentSuiteParent = currentSuiteFile.getParent();
         }
@@ -85,7 +84,7 @@ public class KeywordExecutionManager {
 
     public boolean hasBreakpointAtCurrentKeywordPosition(final String executedSuite, final int keywordLineNumber,
             final RobotDebugTarget target) {
-        if(keywordLineNumber < 0) {
+        if (keywordLineNumber < 0) {
             return false;
         }
         final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
@@ -97,16 +96,14 @@ public class KeywordExecutionManager {
         final IBreakpoint[] currentBreakpoints = breakpointManager.getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
         for (final IBreakpoint currentBreakpoint : currentBreakpoints) {
             try {
-                if (currentBreakpoint.isEnabled()
-                        && isBreakpointSourceFileInCurrentExecutionContext(currentBreakpoint.getMarker().getResource(),
-                                executedSuite)) {
-                    final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
-                            IMarker.LINE_NUMBER);
+                if (currentBreakpoint.isEnabled() && isBreakpointSourceFileInCurrentExecutionContext(
+                        currentBreakpoint.getMarker().getResource(), executedSuite)) {
+                    final int breakpointLineNum = (int) currentBreakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER);
                     if (keywordLineNumber == breakpointLineNum) {
                         final boolean hasHitCountConditionFulfilled = checkHitCountCondition(currentBreakpoint);
                         if (hasHitCountConditionFulfilled) {
-                            breakpointCondition = currentBreakpoint.getMarker().getAttribute(
-                                    RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                            breakpointCondition = currentBreakpoint.getMarker()
+                                    .getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
                             hasBreakpoint = true;
                             target.breakpointHit(currentBreakpoint);
                         }
@@ -133,11 +130,10 @@ public class KeywordExecutionManager {
                 && breakpointSourceFile.getParent().getName().equalsIgnoreCase(currentFileParentName);
     }
 
-
     private boolean checkHitCountCondition(final IBreakpoint currentBreakpoint) {
         boolean hasHitCountConditionFulfilled = false;
-        final int breakpointHitCount = currentBreakpoint.getMarker().getAttribute(
-                RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+        final int breakpointHitCount = currentBreakpoint.getMarker()
+                .getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
         if (breakpointHitCount > 1) {
             if (breakpointHitCounts.containsKey(currentBreakpoint)) {
                 final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
@@ -154,9 +150,10 @@ public class KeywordExecutionManager {
         return hasHitCountConditionFulfilled;
     }
 
-    private IFile extractSuiteFile(final String suiteName, final IPath suiteParentPath, final List<IResource> resources) {
+    private IFile extractSuiteFile(final String suiteName, final IPath suiteParentPath,
+            final List<IResource> resources) {
         for (final IResource resource : resources) {
-            if (resource.getName().equalsIgnoreCase(suiteName) && resource instanceof IFile
+            if (resource instanceof IFile && resource.getName().equalsIgnoreCase(suiteName)
                     && isParentsEqual(suiteParentPath, resource)) {
                 return (IFile) resource;
             } else if (resource instanceof IContainer) {
@@ -182,7 +179,7 @@ public class KeywordExecutionManager {
             return resource.getParent().getName().equalsIgnoreCase(suiteParent.getName());
         }
 
-        return true;  // e.g. remote files can have different parents
+        return true; // e.g. remote files can have different parents
     }
 
     private void extractResourceParent() {
