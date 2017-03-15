@@ -19,8 +19,6 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.junit.ShellProvider;
 
-import com.google.common.base.Function;
-
 public class SuiteEditorPreferencePageTest {
 
     @Rule
@@ -43,21 +41,12 @@ public class SuiteEditorPreferencePageTest {
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
 
-        assertThat(transform(editors, preferenceName())).containsOnly(
+        assertThat(transform(editors, FieldEditor::getPreferenceName)).containsOnly(
                 RedPreferences.FILE_ELEMENTS_OPEN_MODE,
                 RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS,
                 RedPreferences.BEHAVIOR_ON_CELL_COMMIT,
                 RedPreferences.SEPARATOR_MODE,
-                RedPreferences.SEPARATOR_TO_USE);
-    }
-
-    private static Function<FieldEditor, String> preferenceName() {
-        return new Function<FieldEditor, String>() {
-
-            @Override
-            public String apply(final FieldEditor editor) {
-                return editor.getPreferenceName();
-            }
-        };
+                RedPreferences.SEPARATOR_TO_USE,
+                RedPreferences.CELL_WRAPPING);
     }
 }

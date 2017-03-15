@@ -51,7 +51,7 @@ public class VariableValuesEditConfigurationTest {
         // prepare
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
         final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
-                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
+                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
 
         // execute
         final IConfigRegistry configRegistry = new ConfigRegistry();
@@ -71,7 +71,7 @@ public class VariableValuesEditConfigurationTest {
     public void thereIsATextCellEditorRegisteredForScalarVariableValues() {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
         final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
-                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
+                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
 
         final IConfigRegistry configRegistry = new ConfigRegistry();
         config.configureRegistry(configRegistry);
@@ -85,7 +85,7 @@ public class VariableValuesEditConfigurationTest {
     public void thereIsADetailCellEditorRegisteredForScalarAsListVariableValues() {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
         final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
-                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
+                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
 
         final IConfigRegistry configRegistry = new ConfigRegistry();
         config.configureRegistry(configRegistry);
@@ -100,7 +100,7 @@ public class VariableValuesEditConfigurationTest {
     public void thereIsADetailCellEditorRegisteredForListVariableValues() {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
         final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
-                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
+                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
 
         final IConfigRegistry configRegistry = new ConfigRegistry();
         config.configureRegistry(configRegistry);
@@ -114,7 +114,7 @@ public class VariableValuesEditConfigurationTest {
     public void thereIsADetailCellEditorRegisteredForDictionaryVariableValues() {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
         final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
-                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
+                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
 
         final IConfigRegistry configRegistry = new ConfigRegistry();
         config.configureRegistry(configRegistry);
@@ -129,7 +129,7 @@ public class VariableValuesEditConfigurationTest {
     public void thereIsADetailCellEditorRegisteredForInvalidVariableValues() {
         final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
         final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
-                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
+                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class), true);
 
         final IConfigRegistry configRegistry = new ConfigRegistry();
         config.configureRegistry(configRegistry);

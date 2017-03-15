@@ -148,4 +148,73 @@ public class TableCellStringDataTest {
             assertThat(data.getCharacterIndexFrom(40, y)).isEqualTo(5);
         }
     }
+
+    @Test
+    public void indexOfCharacterIsReturned_whenCoordinateIsInMultilineLabel() {
+        final int yBegin = 10;
+        final int yLength = 45;
+        final int yEnd = yBegin + yLength;
+
+        final TableCellStringData data = new TableCellStringData("line1\nline2\r\nline3", new Point(10, yBegin),
+                new Point(30, yLength));
+
+        // over first line
+        for (int y = yBegin; y < 16; y++) {
+            assertThat(data.getCharacterIndexFrom(10, y)).isEqualTo(0);
+            assertThat(data.getCharacterIndexFrom(12, y)).isEqualTo(0);
+            assertThat(data.getCharacterIndexFrom(14, y)).isEqualTo(0);
+            assertThat(data.getCharacterIndexFrom(16, y)).isEqualTo(0);
+            assertThat(data.getCharacterIndexFrom(18, y)).isEqualTo(1);
+            assertThat(data.getCharacterIndexFrom(20, y)).isEqualTo(1);
+            assertThat(data.getCharacterIndexFrom(22, y)).isEqualTo(1);
+            assertThat(data.getCharacterIndexFrom(24, y)).isEqualTo(1);
+            assertThat(data.getCharacterIndexFrom(26, y)).isEqualTo(2);
+            assertThat(data.getCharacterIndexFrom(28, y)).isEqualTo(2);
+            assertThat(data.getCharacterIndexFrom(30, y)).isEqualTo(2);
+            assertThat(data.getCharacterIndexFrom(32, y)).isEqualTo(3);
+            assertThat(data.getCharacterIndexFrom(34, y)).isEqualTo(3);
+            assertThat(data.getCharacterIndexFrom(36, y)).isEqualTo(4);
+            assertThat(data.getCharacterIndexFrom(38, y)).isEqualTo(4);
+            assertThat(data.getCharacterIndexFrom(40, y)).isEqualTo(4);
+        }
+        // over second line
+        for (int y = yBegin + 16; y < 31; y++) {
+            assertThat(data.getCharacterIndexFrom(10, y)).isEqualTo(6);
+            assertThat(data.getCharacterIndexFrom(12, y)).isEqualTo(6);
+            assertThat(data.getCharacterIndexFrom(14, y)).isEqualTo(6);
+            assertThat(data.getCharacterIndexFrom(16, y)).isEqualTo(6);
+            assertThat(data.getCharacterIndexFrom(18, y)).isEqualTo(7);
+            assertThat(data.getCharacterIndexFrom(20, y)).isEqualTo(7);
+            assertThat(data.getCharacterIndexFrom(22, y)).isEqualTo(7);
+            assertThat(data.getCharacterIndexFrom(24, y)).isEqualTo(7);
+            assertThat(data.getCharacterIndexFrom(26, y)).isEqualTo(8);
+            assertThat(data.getCharacterIndexFrom(28, y)).isEqualTo(8);
+            assertThat(data.getCharacterIndexFrom(30, y)).isEqualTo(8);
+            assertThat(data.getCharacterIndexFrom(32, y)).isEqualTo(9);
+            assertThat(data.getCharacterIndexFrom(34, y)).isEqualTo(9);
+            assertThat(data.getCharacterIndexFrom(36, y)).isEqualTo(10);
+            assertThat(data.getCharacterIndexFrom(38, y)).isEqualTo(10);
+            assertThat(data.getCharacterIndexFrom(40, y)).isEqualTo(10);
+        }
+        // over third line
+        for (int y = yBegin + 31; y < yEnd; y++) {
+            assertThat(data.getCharacterIndexFrom(10, y)).isEqualTo(13);
+            assertThat(data.getCharacterIndexFrom(12, y)).isEqualTo(13);
+            assertThat(data.getCharacterIndexFrom(14, y)).isEqualTo(13);
+            assertThat(data.getCharacterIndexFrom(16, y)).isEqualTo(13);
+            assertThat(data.getCharacterIndexFrom(18, y)).isEqualTo(14);
+            assertThat(data.getCharacterIndexFrom(20, y)).isEqualTo(14);
+            assertThat(data.getCharacterIndexFrom(22, y)).isEqualTo(14);
+            assertThat(data.getCharacterIndexFrom(24, y)).isEqualTo(14);
+            assertThat(data.getCharacterIndexFrom(26, y)).isEqualTo(15);
+            assertThat(data.getCharacterIndexFrom(28, y)).isEqualTo(15);
+            assertThat(data.getCharacterIndexFrom(30, y)).isEqualTo(15);
+            assertThat(data.getCharacterIndexFrom(32, y)).isEqualTo(16);
+            assertThat(data.getCharacterIndexFrom(34, y)).isEqualTo(16);
+            assertThat(data.getCharacterIndexFrom(36, y)).isEqualTo(17);
+            assertThat(data.getCharacterIndexFrom(38, y)).isEqualTo(17);
+            assertThat(data.getCharacterIndexFrom(40, y)).isEqualTo(17);
+        }
+
+    }
 }
