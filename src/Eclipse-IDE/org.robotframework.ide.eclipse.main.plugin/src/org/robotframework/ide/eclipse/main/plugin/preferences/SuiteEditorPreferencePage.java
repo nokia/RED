@@ -25,6 +25,7 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
@@ -116,11 +117,17 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
         addField(columnsEditor);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(columnsEditor.getLabelControl(tablesGroup));
 
+        final ComboBoxFieldEditor longCellContentStrategy = new ComboBoxFieldEditor(RedPreferences.CELL_WRAPPING,
+                "When cell is too small for content",
+                "", 5, createLongCellContentLabelsAndValues(), tablesGroup);
+        addField(longCellContentStrategy);
+
         final ComboBoxFieldEditor behaviorOnCellCommitEditor = new ComboBoxFieldEditor(
                 RedPreferences.BEHAVIOR_ON_CELL_COMMIT, "After pressing Enter in cell under edit", "", 5,
                 createCellCommitLabelsAndValues(),
                 tablesGroup);
         addField(behaviorOnCellCommitEditor);
+        
     }
 
     private String[][] createCellCommitLabelsAndValues() {
@@ -128,6 +135,12 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                 new String[] { "stay in the same cell", CellCommitBehavior.STAY_IN_SAME_CELL.name() },
                 new String[] { "move to next cell (previous with Shift pressed)",
                         CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name() } };
+    }
+
+    private String[][] createLongCellContentLabelsAndValues() {
+        return new String[][] {
+            new String[] { "cut the content", CellWrappingStrategy.SINGLE_LINE_CUT.name() },
+            new String[] { "wrap the content", CellWrappingStrategy.WRAP.name() } };
     }
 
     private void createSourceSettingsGroup(final Composite parent) {

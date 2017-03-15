@@ -22,9 +22,13 @@ public class KeywordsTableEditConfiguration extends AbstractRegistryConfiguratio
 
     private final IRowDataProvider<?> dataProvider;
 
-    public KeywordsTableEditConfiguration(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider) {
+    private final boolean wrapCellContent;
+
+    public KeywordsTableEditConfiguration(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider,
+            final boolean wrapCellContent) {
         this.suiteFile = suiteFile;
         this.dataProvider = dataProvider;
+        this.wrapCellContent = wrapCellContent;
     }
 
     @Override
@@ -37,6 +41,7 @@ public class KeywordsTableEditConfiguration extends AbstractRegistryConfiguratio
                 new VariableProposalsProvider(suiteFile, dataProvider));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(proposalProvider), DisplayMode.NORMAL, TableConfigurationLabels.ASSIST_REQUIRED);
+                new RedTextCellEditor(proposalProvider, wrapCellContent), DisplayMode.NORMAL,
+                TableConfigurationLabels.ASSIST_REQUIRED);
     }
 }

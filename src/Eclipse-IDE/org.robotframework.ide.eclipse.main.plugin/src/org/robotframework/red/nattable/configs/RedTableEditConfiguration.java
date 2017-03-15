@@ -30,13 +30,18 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
 
     private final NewElementsCreator<T> creator;
 
-    public RedTableEditConfiguration(final RobotSuiteFile fileModel, final NewElementsCreator<T> creator) {
-        this(creator, SuiteModelEditableRule.createEditableRule(fileModel));
+    private boolean wrapCellContent;
+
+    public RedTableEditConfiguration(final RobotSuiteFile fileModel, final NewElementsCreator<T> creator,
+            final boolean wrapCellContent) {
+        this(creator, SuiteModelEditableRule.createEditableRule(fileModel), wrapCellContent);
     }
     
-    public RedTableEditConfiguration(final NewElementsCreator<T> creator, final IEditableRule editableRule) {
+    public RedTableEditConfiguration(final NewElementsCreator<T> creator, final IEditableRule editableRule,
+            final boolean wrapCellContent) {
         this.editableRule = editableRule;
         this.creator = creator;
+        this.wrapCellContent = wrapCellContent;
     }
 
     @Override
@@ -49,7 +54,7 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
                 AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(),
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(wrapCellContent),
                 DisplayMode.NORMAL, GridRegion.BODY);
         configRegistry.registerConfigAttribute(EditConfigAttributes.DATA_VALIDATOR, new DefaultDataValidator());
         configRegistry.registerConfigAttribute(EditConfigAttributes.OPEN_ADJACENT_EDITOR, Boolean.TRUE,
