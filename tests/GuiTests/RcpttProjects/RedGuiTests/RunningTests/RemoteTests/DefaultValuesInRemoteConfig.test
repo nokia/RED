@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HO73kPzXEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/3/17 5:00 PM
+Save-Time: 3/15/17 4:23 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,7 +17,7 @@ Entry-Name: .content
 proc "check-label-for-no-error"{
 	get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
     	| get-property text 
-    	| equals "Create or edit a configuration to launch server for remotely running Robot Framework tests" | verify-true
+    	| equals "Edit test runner agent listener parameters for launch configuration" | verify-true
 }   
 
 proc "check-label-for-error" [val val] [val errorType]{
@@ -51,7 +51,6 @@ get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations" | get-tree] {
     get-item Robot | get-property caption | equals Robot | verify-true
     get-item "Robot Remote" | get-property caption | equals "Robot Remote" | verify-true
-    get-item "Robot Script" | get-property caption | equals "Robot Script" | verify-true
 }
 
 //add new run config by clicking in Run Config.. panel
@@ -59,11 +58,11 @@ get-window "Run Configurations" | get-tree | select "Robot Remote" | double-clic
 
 //check ho may tabs is config
 with [get-window "Run Configurations" | get-tab-folder] {
-    get-property "pages[0]" | equals Remote | verify-true
+    get-property "pages[0]" | equals Listener | verify-true
     get-property "pages[1]" | equals Source | verify-true
     get-property "pages[2]" | equals Environment | verify-true
     get-property "pages[3]" | equals "&Common" | verify-true
-    get-property activePage | equals Remote | verify-true
+    get-property activePage | equals Listener | verify-true
     get-property tabCount | equals 4 | verify-true
 }
 
@@ -85,18 +84,20 @@ with [get-window "Run Configurations"] {
     
     //check deafult values for IP, port
     with [get-group "RED Server"] {
-        get-property caption | equals "RED Server" | verify-true
-        get-property "getChildren().length" | equals 9 | verify-true
-        get-property "getChildren().Control[0].getText()" 
-            | equals "Setup server which will track execution of Robot tests running on remotely connected client" 
-            | verify-true
-        get-property "getChildren().Control[1].getText()" | equals "Local IP:" | verify-true
-        get-property "getChildren().Control[2].getText()" | equals "127.0.0.1" | verify-true
-        get-property "getChildren().Control[4].getText()" | equals "Local port:" | verify-true
-        get-property "getChildren().Control[5].getText()" | equals 12345 | verify-true
-        get-property "getChildren().Control[7].getText()" | equals "Connection timeout [s]:" | verify-true
-        get-property "getChildren().Control[8].getText()" | equals 30 | verify-true
-    }
+        get-property childCount | equals 10 | verify-true
+	    get-property "getChildren().Control[0].getText()" 
+	        | equals "Setup server which will track execution of Robot tests running on remotely connected client" 
+	        | verify-true
+	    get-property "getChildren().Control[1].getText()" | equals "Local IP:" | verify-true
+	    get-property "getChildren().Control[2].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[2].getText()" | equals "127.0.0.1" | verify-true
+	    get-property "getChildren().Control[4].getText()" | equals "Local port:" | verify-true
+	    get-property "getChildren().Control[5].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[5].getText()" | equals 43981 | verify-true
+	    get-property "getChildren().Control[7].getText()" | equals "Connection timeout [s]:" | verify-true
+	    get-property "getChildren().Control[8].getEditable()" | equals true | verify-true
+	    get-property "getChildren().Control[8].getText()" | equals 30 | verify-true
+	}
     
     //remote script
     with [get-group "Remote Client"] {
@@ -109,7 +110,7 @@ with [get-window "Run Configurations"] {
         get-property "getChildren().Control[2].getText()" 
             | equals "Add following argument to command line when running tests on client side" | verify-true
         get-property "getChildren().Control[3].getText()" 
-            | equals "--listener TestRunnerAgent.py:127.0.0.1:12345" | verify-true
+            | equals "--listener TestRunnerAgent.py:127.0.0.1:43981" | verify-true
         get-property "getChildren().Control[3].getEditable()" | equals false | verify-true
     }
 }
@@ -157,12 +158,12 @@ check-label-for-error -val "Server IP cannot be empty" -errorType IP
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local IP:"] 
     | set-text "10.154.2.3"
 check-label-for-no-error
-check-command-line -ip "10.154.2.3" -port "12345"
+check-command-line -ip "10.154.2.3" -port "43981"
 //set onet.pl
 get-window "Run Configurations" | get-group "RED Server" | get-editbox -after [get-label "Local IP:"] 
     | set-text "www.onet.pl"
 check-label-for-no-error
-check-command-line -ip "www.onet.pl" -port "12345"
+check-command-line -ip "www.onet.pl" -port "43981"
 
 // ------------------------------- port ----------------------------------------------------------------------------------
 
@@ -243,7 +244,7 @@ with [get-window "Run Configurations"] {
     get-group Project | get-editbox | get-property text | equals "" | verify-true
     with [get-group "RED Server"] {
         get-editbox -after [get-label "Local IP:"] | get-property text | equals "127.0.0.1" | verify-true
-        get-editbox -after [get-label "Local port:"] | get-property text | equals 12345 | verify-true
+        get-editbox -after [get-label "Local port:"] | get-property text | equals 43981 | verify-true
         get-editbox -after [get-label "Connection timeout [s]:"] | get-property text | equals 30 | verify-true
     }
 }
