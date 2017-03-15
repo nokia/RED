@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XxFF4JQgEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/9/16 4:00 PM
+Save-Time: 3/15/17 4:09 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -57,15 +57,19 @@ proc "set-incorrect-column-number-in-preference" [val col_nr]{
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Editor"
 with [get-window Preferences | get-group Tables] {
-    get-property caption | equals Tables | verify-true
+    get-property "getChildren().length" | equals 6 | verify-true
     get-property "getChildren().Control[0].getText()" 
         | equals "Default number of columns for arguments in table editors" | verify-true
     get-property "getChildren().Control[1].getText()" | equals 5 | verify-true
-    get-property "getChildren().Control[1].getEditable()" | equals true | verify-true
-    get-property "getChildren().Control[2].getText()" | equals "After pressing Enter in cell under edit" | verify-true
-    get-property "getChildren().Control[3].getText()" | equals "move to next cell (previous with Shift pressed)" 
+    get-property "getChildren().Control[2].getText()" | equals "When cell is too small for content" | verify-true
+    get-property "getChildren().Control[3].getText()" | equals "cut the content" | verify-true
+    get-property "getChildren().Control[4].getText()" | equals "After pressing Enter in cell under edit" | verify-true
+    get-property "getChildren().Control[5].getText()" | equals "move to next cell (previous with Shift pressed)" 
         | verify-true
-    get-property "getChildren().Control[3].getSelectionIndex()" | equals 1 | verify-true
+    with [get-combo -after [get-label "When cell is too small for content"]] {
+        get-property "values[0]" | equals "cut the content" | verify-true
+        get-property "values[1]" | equals "wrap the content" | verify-true
+    }
     with [get-combo -after [get-label "After pressing Enter in cell under edit"]] {
         get-property "values[0]" | equals "stay in the same cell" | verify-true
         get-property "values[1]" | equals "move to next cell (previous with Shift pressed)" | verify-true
