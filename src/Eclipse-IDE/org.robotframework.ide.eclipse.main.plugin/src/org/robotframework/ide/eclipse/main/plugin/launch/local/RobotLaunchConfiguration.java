@@ -11,7 +11,6 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -310,7 +309,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         if (!problems.isEmpty()) {
             throw newCoreException(String.join("\n", problems));
         }
-        return Collections.unmodifiableList(resources);
+        return resources;
     }
 
     public List<String> getTestsToRun() throws CoreException {

@@ -45,14 +45,15 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
             final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(testsMode);
             final LaunchExecution launchExecution;
             if (testsMode == TestsMode.RUN) {
-                launchExecution = execute(launch, testsLaunchContext, host, port, timeout, Arrays.asList(testsStarter));
+                launchExecution = doLaunch(launch, testsLaunchContext, host, port, timeout,
+                        Arrays.asList(testsStarter));
             } else {
                 final RobotDebugTarget debugTarget = new RobotDebugTarget("Remote Robot Test at " + host + ":" + port,
                         launch);
                 final DebugExecutionEventsListener debugListener = new DebugExecutionEventsListener(debugTarget,
                         robotConfig.getResourcesUnderDebug());
 
-                launchExecution = execute(launch, testsLaunchContext, host, port, timeout,
+                launchExecution = doLaunch(launch, testsLaunchContext, host, port, timeout,
                         Arrays.asList(testsStarter, debugListener));
 
                 debugTarget.connectWith(launchExecution.getRobotProcess());
@@ -65,7 +66,7 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
         }
     }
 
-    private LaunchExecution execute(final ILaunch launch, final RobotTestsLaunch testsLaunchContext, final String host,
+    private LaunchExecution doLaunch(final ILaunch launch, final RobotTestsLaunch testsLaunchContext, final String host,
             final int port, final int timeout, final List<RobotAgentEventListener> additionalListeners)
             throws InterruptedException {
 
