@@ -42,7 +42,7 @@ public class Stylers {
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.background = RedTheme.getEclipseSearchMatchColor();
-            };
+            }
         };
 
         public static final Styler STRIKEOUT_STYLER = new Styler() {

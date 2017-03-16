@@ -52,7 +52,7 @@ public abstract class ACreationOfSettingsLibraryImportTest {
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
-        RobotToken libName = new RobotToken();
+        final RobotToken libName = new RobotToken();
         libName.setText("newLib.py");
         lib.setPathOrName(libName);
 
@@ -71,15 +71,15 @@ public abstract class ACreationOfSettingsLibraryImportTest {
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
-        RobotToken libName = new RobotToken();
+        final RobotToken libName = new RobotToken();
         libName.setText("newLib.py");
         lib.setPathOrName(libName);
 
-        RobotToken cm1 = new RobotToken();
+        final RobotToken cm1 = new RobotToken();
         cm1.setText("cm1");
-        RobotToken cm2 = new RobotToken();
+        final RobotToken cm2 = new RobotToken();
         cm2.setText("cm2");
-        RobotToken cm3 = new RobotToken();
+        final RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
         lib.addCommentPart(cm1);
         lib.addCommentPart(cm2);
@@ -100,11 +100,11 @@ public abstract class ACreationOfSettingsLibraryImportTest {
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
 
-        RobotToken cm1 = new RobotToken();
+        final RobotToken cm1 = new RobotToken();
         cm1.setText("cm1");
-        RobotToken cm2 = new RobotToken();
+        final RobotToken cm2 = new RobotToken();
         cm2.setText("cm2");
-        RobotToken cm3 = new RobotToken();
+        final RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
         lib.addCommentPart(cm1);
         lib.addCommentPart(cm2);
@@ -125,15 +125,15 @@ public abstract class ACreationOfSettingsLibraryImportTest {
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
-        RobotToken libName = new RobotToken();
+        final RobotToken libName = new RobotToken();
         libName.setText("newLib.py");
         lib.setPathOrName(libName);
 
-        RobotToken arg1 = new RobotToken();
+        final RobotToken arg1 = new RobotToken();
         arg1.setText("arg1");
-        RobotToken arg2 = new RobotToken();
+        final RobotToken arg2 = new RobotToken();
         arg2.setText("arg2");
-        RobotToken arg3 = new RobotToken();
+        final RobotToken arg3 = new RobotToken();
         arg3.setText("arg3");
         lib.addArgument(arg1);
         lib.addArgument(arg2);
@@ -155,25 +155,25 @@ public abstract class ACreationOfSettingsLibraryImportTest {
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
-        RobotToken libName = new RobotToken();
+        final RobotToken libName = new RobotToken();
         libName.setText("newLib.py");
         lib.setPathOrName(libName);
 
-        RobotToken cm1 = new RobotToken();
+        final RobotToken cm1 = new RobotToken();
         cm1.setText("cm1");
-        RobotToken cm2 = new RobotToken();
+        final RobotToken cm2 = new RobotToken();
         cm2.setText("cm2");
-        RobotToken cm3 = new RobotToken();
+        final RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
         lib.addCommentPart(cm1);
         lib.addCommentPart(cm2);
         lib.addCommentPart(cm3);
 
-        RobotToken arg1 = new RobotToken();
+        final RobotToken arg1 = new RobotToken();
         arg1.setText("arg1");
-        RobotToken arg2 = new RobotToken();
+        final RobotToken arg2 = new RobotToken();
         arg2.setText("arg2");
-        RobotToken arg3 = new RobotToken();
+        final RobotToken arg3 = new RobotToken();
         arg3.setText("arg3");
         lib.addArgument(arg1);
         lib.addArgument(arg2);
@@ -190,36 +190,35 @@ public abstract class ACreationOfSettingsLibraryImportTest {
         final String fileName = PRETTY_NEW_DIR_LOCATION
                 + "LibraryDeclarationWithLibraryNameAndThreeArgsThreeCommentsAliasOnly." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-        ;
 
         // test data prepare
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
-        RobotToken libName = new RobotToken();
+        final RobotToken libName = new RobotToken();
         libName.setText("newLib.py");
         lib.setPathOrName(libName);
 
-        LibraryAlias newAlias = lib.newAlias();
-        RobotToken libraryAlias = new RobotToken();
+        final LibraryAlias newAlias = lib.newAlias();
+        final RobotToken libraryAlias = new RobotToken();
         libraryAlias.setText("aliasLib");
         newAlias.setLibraryAlias(libraryAlias);
 
-        RobotToken cm1 = new RobotToken();
+        final RobotToken cm1 = new RobotToken();
         cm1.setText("cm1");
-        RobotToken cm2 = new RobotToken();
+        final RobotToken cm2 = new RobotToken();
         cm2.setText("cm2");
-        RobotToken cm3 = new RobotToken();
+        final RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
         lib.addCommentPart(cm1);
         lib.addCommentPart(cm2);
         lib.addCommentPart(cm3);
 
-        RobotToken arg1 = new RobotToken();
+        final RobotToken arg1 = new RobotToken();
         arg1.setText("arg1");
-        RobotToken arg2 = new RobotToken();
+        final RobotToken arg2 = new RobotToken();
         arg2.setText("arg2");
-        RobotToken arg3 = new RobotToken();
+        final RobotToken arg3 = new RobotToken();
         arg3.setText("arg3");
         lib.addArgument(arg1);
         lib.addArgument(arg2);

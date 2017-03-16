@@ -100,7 +100,7 @@ public class RobotProjectConfigReader {
             throw new CannotReadProjectConfigurationException(e.getMessage(), e);
         }
     }
-    
+
     public static class RobotProjectConfigWithLines {
 
         private final Map<Object, ProblemPosition> locations;
@@ -125,7 +125,8 @@ public class RobotProjectConfigReader {
         private final XMLStreamReader streamReader;
 
         private final Deque<Location> locationsStack = new LinkedList<>();
-        private final Map<Object, ProblemPosition> locations = new HashMap<>();;
+
+        private final Map<Object, ProblemPosition> locations = new HashMap<>();
 
         private LocationListener(final XMLStreamReader streamReader) {
             this.streamReader = streamReader;
