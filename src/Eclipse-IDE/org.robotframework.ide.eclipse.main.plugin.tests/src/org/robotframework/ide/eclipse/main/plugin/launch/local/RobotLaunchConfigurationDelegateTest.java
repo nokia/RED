@@ -61,7 +61,8 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
+        assertThat(commandLine.getArgumentFile().generateContent())
+                .contains("--suite      " + PROJECT_NAME + ".Suites_a");
     }
 
     @Test
@@ -77,8 +78,9 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
+        final String argFileContent = commandLine.getArgumentFile().generateContent();
+        assertThat(argFileContent).contains("-suite", PROJECT_NAME + ".Suites_a");
+        assertThat(argFileContent).contains("-test", PROJECT_NAME + ".Suites_a.001__case1");
     }
 
     @Test
@@ -101,8 +103,9 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
-                projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
+        assertThat(commandLine.getArgumentFile().generateContent()).contains(
+                "-pythonpath " + projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator
+                        + "folder2");
     }
 
     @Test
@@ -125,8 +128,12 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
-                projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
+        // assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
+        // projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator +
+        // "folder2");
+        assertThat(commandLine.getArgumentFile().generateContent()).contains(
+                "--pythonpath " + projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator
+                        + "folder2");
     }
 
     @Test
