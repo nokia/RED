@@ -117,7 +117,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
             setupEnvironmentLoadingJob();
         } catch (final PartInitException e) {
-            throw new EditorInitalizationException("Unable to initialize editor", e);
+            throw new EditorInitializationException("Unable to initialize editor", e);
         }
     }
 
@@ -138,6 +138,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             @Override
             public void whenFileWasRemoved() {
                 SwtThread.syncExec(new Runnable() {
+
                     @Override
                     public void run() {
                         getSite().getPage().closeEditor(RedProjectEditor.this, false);
@@ -326,6 +327,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
         super.dispose();
 
         SwtThread.asyncExec(new Runnable() {
+
             @Override
             public void run() {
                 final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
@@ -335,6 +337,9 @@ public class RedProjectEditor extends MultiPageEditorPart {
     }
 
     private static class IllegalProjectConfigurationEditorInputException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
         public IllegalProjectConfigurationEditorInputException(final String message) {
             super(message);
         }
@@ -344,9 +349,11 @@ public class RedProjectEditor extends MultiPageEditorPart {
         }
     }
 
-    private static class EditorInitalizationException extends RuntimeException {
+    private static class EditorInitializationException extends RuntimeException {
 
-        public EditorInitalizationException(final String message, final Throwable cause) {
+        private static final long serialVersionUID = 1L;
+
+        public EditorInitializationException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }
