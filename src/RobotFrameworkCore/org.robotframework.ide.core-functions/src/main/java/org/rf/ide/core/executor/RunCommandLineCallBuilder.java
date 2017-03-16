@@ -109,46 +109,31 @@ public class RunCommandLineCallBuilder {
 
         @Override
         public IRunCommandLineBuilder addVariableFiles(final Collection<String> varFiles) {
-            for (final String varFile : varFiles) {
-                variableFiles.add("-V");
-                variableFiles.add(varFile);
-            }
+            variableFiles.addAll(varFiles);
             return this;
         }
 
         @Override
         public IRunCommandLineBuilder suitesToRun(final Collection<String> suites) {
-            for (final String suite : suites) {
-                suitesToRun.add("-s");
-                suitesToRun.add(suite);
-            }
+            suitesToRun.addAll(suites);
             return this;
         }
 
         @Override
         public IRunCommandLineBuilder testsToRun(final Collection<String> tests) {
-            for (final String test : tests) {
-                testsToRun.add("-t");
-                testsToRun.add(test);
-            }
+            testsToRun.addAll(tests);
             return this;
         }
 
         @Override
         public IRunCommandLineBuilder includeTags(final Collection<String> tags) {
-            for (final String tag : tags) {
-                tagsToInclude.add("-i");
-                tagsToInclude.add(tag);
-            }
+            tagsToInclude.addAll(tags);
             return this;
         }
 
         @Override
         public IRunCommandLineBuilder excludeTags(final Collection<String> tags) {
-            for (final String tag : tags) {
-                tagsToExclude.add("-e");
-                tagsToExclude.add(tag);
-            }
+            tagsToExclude.addAll(tags);
             return this;
         }
 
@@ -219,41 +204,81 @@ public class RunCommandLineCallBuilder {
             }
             cmdLine.add("-m");
             cmdLine.add("robot.run");
-            if (!pythonPath.isEmpty()) {
-                cmdLine.add("-P");
-                cmdLine.add(pythonPath());
-            }
-            cmdLine.addAll(variableFiles);
-            cmdLine.addAll(tagsToInclude);
-            cmdLine.addAll(tagsToExclude);
+
             cmdLine.add("--listener");
             cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + listenerPort);
-            if (enableDryRun) {
-                cmdLine.add("--prerunmodifier");
-                cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py").toPath().toString());
-                cmdLine.add("--runemptysuite");
-                cmdLine.add("--dryrun");
-                cmdLine.add("--output");
-                cmdLine.add("NONE");
-                cmdLine.add("--report");
-                cmdLine.add("NONE");
-                cmdLine.add("--log");
-                cmdLine.add("NONE");
+
+            final ArgumentsFile argumentsFile = createArgumentsFile();
+            cmdLine.add("--argumentfile");
+            cmdLine.add(argumentsFile.writeToTemporaryOrUseAlreadyExisting().toPath().toString());
+
+            if (project != null) {
+                cmdLine.add(project.getAbsolutePath());
             }
-            cmdLine.addAll(suitesToRun);
-            cmdLine.addAll(testsToRun);
-            if (!robotUserArgs.isEmpty()) {
-                cmdLine.addAll(convertArguments(robotUserArgs));
-            }
-            cmdLine.add(project.getAbsolutePath());
             for (final String projectLocation : additionalProjectsLocations) {
                 cmdLine.add(projectLocation);
             }
-            return new RunCommandLine(cmdLine);
+            return new RunCommandLine(cmdLine, argumentsFile);
         }
 
         private List<String> convertArguments(final String args) {
-            return ArgumentsConverter.fromJavaArgsToPythonLike(ArgumentsConverter.convertToJavaMainLikeArgs(args));
+            return ArgumentsConverter.joinMultipleArgValues(ArgumentsConverter.parseArguments(args));
+        }
+
+        private ArgumentsFile createArgumentsFile() throws IOException {
+            final ArgumentsFile argumentsFile = new ArgumentsFile();
+            argumentsFile.addCommentLine("arguments automatically generated");
+            if (!pythonPath.isEmpty()) {
+                argumentsFile.addLine("--pythonpath", pythonPath());
+            }
+            for (final String varFile : variableFiles) {
+                argumentsFile.addLine("--variablefile", varFile);
+            }
+            for (final String tagToInclude : tagsToInclude) {
+                argumentsFile.addLine("--include", tagToInclude);
+            }
+            for (final String tagToExclude : tagsToExclude) {
+                argumentsFile.addLine("--exclude", tagToExclude);
+            }
+            if (enableDryRun) {
+                argumentsFile.addLine("--prerunmodifier",
+                        RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py").toPath().toString());
+                argumentsFile.addLine("--runemptysuite");
+                argumentsFile.addLine("--dryrun");
+                argumentsFile.addLine("--output", "NONE");
+                argumentsFile.addLine("--report", "NONE");
+                argumentsFile.addLine("--log", "NONE");
+            }
+            for (final String suiteToRun : suitesToRun) {
+                argumentsFile.addLine("--suite", suiteToRun);
+            }
+            for (final String testToRun : testsToRun) {
+                argumentsFile.addLine("--test", testToRun);
+            }
+            if (!robotUserArgs.isEmpty()) {
+                addUserArguments(argumentsFile);
+            }
+            return argumentsFile;
+        }
+
+        private void addUserArguments(final ArgumentsFile argumentsFile) {
+            argumentsFile.addCommentLine("arguments specified manually by user");
+
+            final List<String> args = ArgumentsConverter.parseArguments(robotUserArgs);
+            final List<String> joinedArgs = ArgumentsConverter.joinMultipleArgValues(args);
+            
+            int i = 0;
+            while (i < joinedArgs.size()) {
+                if (ArgumentsConverter.isSwitchArgument(joinedArgs.get(i))) {
+                    if (i < joinedArgs.size() - 1 && ArgumentsConverter.isSwitchArgument(joinedArgs.get(i + 1))) {
+                        argumentsFile.addLine(joinedArgs.get(i));
+                    } else {
+                        argumentsFile.addLine(joinedArgs.get(i), joinedArgs.get(i + 1));
+                        i++;
+                    }
+                }
+                i++;
+            }
         }
 
         private String classPath() {
@@ -308,8 +333,15 @@ public class RunCommandLineCallBuilder {
 
         private final List<String> commandLine;
 
-        RunCommandLine(final List<String> commandLine) {
+        private final ArgumentsFile argFile;
+
+        RunCommandLine(final List<String> commandLine, final ArgumentsFile argumentsFile) {
             this.commandLine = new ArrayList<>(commandLine);
+            this.argFile = argumentsFile;
+        }
+
+        public ArgumentsFile getArgumentFile() {
+            return argFile;
         }
 
         public String[] getCommandLine() {
