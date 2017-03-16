@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ErbYMPglEea7hL0QdGOb6w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/6/17 11:20 AM
+Save-Time: 3/16/17 12:18 PM
 Testcase-Type: ecl
 Verifications: _kIYBEPhCEea7hL0QdGOb6w
 
@@ -59,6 +59,10 @@ get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-t
     | select "RobotProject/TestSuiteFolder/with_init.tsv" | get-menu Exclude | click
 get-button "Save (M1+S)" | click
 
+//clean must be after editing red.xml
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
 wait-for-errors -amount 4
 
 //expand
@@ -100,6 +104,7 @@ with [get-view "Project Explorer" | get-tree] {
         | equals "file_with_error.robot [excluded]" | verify-true
 }
 
+get-editor "RobotProject/red.xml" | close
 
 //Include 2 files that was excluded (from PE)
 with [get-view "Project Explorer" | get-tree] {
@@ -110,9 +115,13 @@ with [get-view "Project Explorer" | get-tree] {
 wait-for-errors -amount 6
 
 //include file from red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-tree 
     | select "RobotProject/folder_to_remove/file_to_remove.robot [excluded]" | get-menu Include | click
 get-button "Save (M1+S)" | click
+
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
 
 wait-for-errors -amount 7
 
