@@ -25,7 +25,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
 
-import com.google.common.annotations.VisibleForTesting;;
+import com.google.common.annotations.VisibleForTesting;
 
 public class RobotLaunchConfigurationFinder {
 

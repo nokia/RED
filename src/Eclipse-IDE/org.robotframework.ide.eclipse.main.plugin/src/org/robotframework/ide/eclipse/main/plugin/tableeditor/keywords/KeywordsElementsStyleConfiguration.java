@@ -86,7 +86,7 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
                 CellEdgeEnum.LEFT, new ImagePainter(imageToUse));
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
-    };
+    }
 
     private Font getFont(final Font fontToReuse, final int style) {
         final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;

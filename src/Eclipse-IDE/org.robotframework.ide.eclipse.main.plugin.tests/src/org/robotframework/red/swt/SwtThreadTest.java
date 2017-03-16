@@ -75,7 +75,7 @@ public class SwtThreadTest {
     @Test
     public void asyncEvaluationIsPerformedAsPromised() throws InterruptedException, ExecutionException {
         final AtomicBoolean resultIsAsExpected = new AtomicBoolean(false);
-        
+
         final Semaphore waitForAsyncEvalQueued = new Semaphore(0);
         final Thread someThread = new Thread(new Runnable() {
             @Override
@@ -100,7 +100,7 @@ public class SwtThreadTest {
         waitForAsyncEvalQueued.acquire();
         execAllAwaitingMessages();
         someThread.join();
-        
+
         assertThat(resultIsAsExpected.get()).isTrue();
     }
 
@@ -230,7 +230,7 @@ public class SwtThreadTest {
 
     private static void execAllAwaitingMessages() {
         while (Display.getDefault().readAndDispatch()) {
-            ;
+            // nothing to do
         }
     }
 

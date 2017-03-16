@@ -586,7 +586,7 @@ public class LibrariesWatchHandlerTest {
 
         public void execAllAwaitingMessages() {
             while (Display.getDefault().readAndDispatch()) {
-                ;
+                // nothing to do
             }
         }
 

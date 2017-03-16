@@ -45,6 +45,5 @@ public class SuiteTeardownModelOperation extends KeywordBaseModelOperations impl
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {
         settingsTable.removeSuiteTeardown();
-        ;
     }
 }

@@ -42,10 +42,10 @@ public class CycledContentAssistProcessorTest {
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
         final AssitantCallbacks callback = mock(AssitantCallbacks.class);
-        
+
         final IDocument document = spy(new Document());
         when(document.getContentType(0)).thenReturn("__ct");
-        
+
         final ITextViewer viewer = mock(ITextViewer.class);
         when(viewer.getDocument()).thenReturn(document);
 
@@ -270,7 +270,7 @@ public class CycledContentAssistProcessorTest {
 
     private static void execAllAwaitingMessages() {
         while (Display.getDefault().readAndDispatch()) {
-            ;
+            // nothing to do
         }
 
         // injecting empty operation, so that all the events awaiting in queue for SWT thread
