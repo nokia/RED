@@ -81,7 +81,7 @@ public class DeclarationMapper {
                 }
 
                 final IElementDeclaration lastComplex = mappedElements.get(mappedElements.size() - 1);
-                final IElementDeclaration variableIdentificator = getPossibleVariableIdentificator(mappedElements);
+                final IElementDeclaration variableIdentifier = getPossibleVariableIdentifier(mappedElements);
                 if (lastComplex instanceof VariableDeclaration) {
                     final VariableDeclaration variableDec = (VariableDeclaration) lastComplex;
                     final List<IElementDeclaration> escape = getEscape(mappedElements);
@@ -91,7 +91,7 @@ public class DeclarationMapper {
                                 topContainer.removeExactlyTheSameInstance(d);
                             }
                         } else {
-                            if (variableIdentificator != null) {
+                            if (variableIdentifier != null) {
                                 for (final IElementDeclaration d : escape) {
                                     mappingResult.removeExactlyTheSameInstance(d);
                                 }
@@ -101,15 +101,15 @@ public class DeclarationMapper {
                         variableDec.setEscape(escape.get(0).getStart());
                     }
 
-                    if (variableIdentificator != null) {
+                    if (variableIdentifier != null) {
                         if (topContainer != null) {
-                            topContainer.removeExactlyTheSameInstance(variableIdentificator);
+                            topContainer.removeExactlyTheSameInstance(variableIdentifier);
                         } else {
-                            mappingResult.removeExactlyTheSameInstance(variableIdentificator);
+                            mappingResult.removeExactlyTheSameInstance(variableIdentifier);
                         }
                         variableDec.setTypeIdentificator(new TextPosition(
-                                variableIdentificator.getStart().getFullText(),
-                                variableIdentificator.getStart().getStart(), variableIdentificator.getEnd().getEnd()));
+                                variableIdentifier.getStart().getFullText(), variableIdentifier.getStart().getStart(),
+                                variableIdentifier.getEnd().getEnd()));
                     }
 
                     if (seamsToBeCorrectRobotVariable(previousForContainer, mappingResult, variableDec)) {
@@ -200,9 +200,9 @@ public class DeclarationMapper {
                     ContainerElementType.VARIABLE_TYPE_ID);
             joinedStart.addElementDeclarationInside(typeId);
         }
-        final TextDeclaration variableCurrlyBracket = new TextDeclaration(variableDec.getStart(),
-                ContainerElementType.CURRLY_BRACKET_OPEN);
-        joinedStart.addElementDeclarationInside(variableCurrlyBracket);
+        final TextDeclaration variableCurlyBracket = new TextDeclaration(variableDec.getStart(),
+                ContainerElementType.CURLY_BRACKET_OPEN);
+        joinedStart.addElementDeclarationInside(variableCurlyBracket);
 
         if (topContainer != null) {
             topContainer.removeExactlyTheSameInstance(variableDec);
@@ -239,7 +239,7 @@ public class DeclarationMapper {
         final TextPosition end = variableDec.getEnd();
         if (end != null) {
             final JoinedTextDeclarations joinedEnd = new JoinedTextDeclarations();
-            joinedEnd.addElementDeclarationInside(new TextDeclaration(end, ContainerElementType.CURRLY_BRACKET_CLOSE));
+            joinedEnd.addElementDeclarationInside(new TextDeclaration(end, ContainerElementType.CURLY_BRACKET_CLOSE));
             if (topContainer != null) {
                 topContainer.addElementDeclarationInside(joinedEnd);
             } else {
@@ -306,7 +306,7 @@ public class DeclarationMapper {
         return varElements;
     }
 
-    private IElementDeclaration getPossibleVariableIdentificator(final List<IElementDeclaration> mappedElements) {
+    private IElementDeclaration getPossibleVariableIdentifier(final List<IElementDeclaration> mappedElements) {
         IElementDeclaration elem = null;
         if (mappedElements != null) {
             final int numberOfMapped = mappedElements.size();

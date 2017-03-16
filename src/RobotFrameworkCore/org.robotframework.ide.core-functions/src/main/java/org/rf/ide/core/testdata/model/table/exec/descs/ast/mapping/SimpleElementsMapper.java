@@ -22,11 +22,11 @@ public class SimpleElementsMapper {
 
     public SimpleElementsMapper() {
         mappers.put(ContainerElementType.TEXT, new TextDeclarationMapper());
-        mappers.put(ContainerElementType.CURRLY_BRACKET_CLOSE, new TextDeclarationMapper());
+        mappers.put(ContainerElementType.CURLY_BRACKET_CLOSE, new TextDeclarationMapper());
         mappers.put(ContainerElementType.SQUARE_BRACKET_CLOSE, new TextDeclarationMapper());
         mappers.put(ContainerElementType.WHITESPACE, new WhitespaceMapper());
         mappers.put(ContainerElementType.ESCAPE, new EscapeMapper());
-        mappers.put(ContainerElementType.VARIABLE_TYPE_ID, new VariableIdentificatorMapper());
+        mappers.put(ContainerElementType.VARIABLE_TYPE_ID, new VariableIdentifierMapper());
     }
 
     public interface IElementMapper {
@@ -65,16 +65,16 @@ public class SimpleElementsMapper {
         @Override
         public MappingResult map(final MappingResult currentResult, final IContainerElement containerElement,
                 final FilePosition fp, final String filename) {
-            MappingResult mr = new MappingResult(fp, filename);
-            List<IElementDeclaration> mappedElements = currentResult.getMappedElements();
-            TextPosition position = ((ContainerElement) containerElement).getPosition();
-            TextDeclaration decText = new TextDeclaration(position, containerElement.getType());
+            final MappingResult mr = new MappingResult(fp, filename);
+            final List<IElementDeclaration> mappedElements = currentResult.getMappedElements();
+            final TextPosition position = ((ContainerElement) containerElement).getPosition();
+            final TextDeclaration decText = new TextDeclaration(position, containerElement.getType());
 
             boolean shouldMapToNew = true;
             if (!mappedElements.isEmpty()) {
-                IElementDeclaration lastMapped = mappedElements.get(mappedElements.size() - 1);
+                final IElementDeclaration lastMapped = mappedElements.get(mappedElements.size() - 1);
                 if (lastMapped instanceof JoinedTextDeclarations) {
-                    JoinedTextDeclarations joined = (JoinedTextDeclarations) lastMapped;
+                    final JoinedTextDeclarations joined = (JoinedTextDeclarations) lastMapped;
                     if (containsOnly(joined.getElementsDeclarationInside(), mergeAllowedTypes)) {
                         joined.addElementDeclarationInside(decText);
                         shouldMapToNew = false;
@@ -83,7 +83,7 @@ public class SimpleElementsMapper {
             }
 
             if (shouldMapToNew) {
-                JoinedTextDeclarations text = new JoinedTextDeclarations();
+                final JoinedTextDeclarations text = new JoinedTextDeclarations();
                 text.addElementDeclarationInside(decText);
                 mr.addMappedElement(text);
             }
@@ -105,7 +105,7 @@ public class SimpleElementsMapper {
 
     }
 
-    private class VariableIdentificatorMapper implements IElementMapper {
+    private class VariableIdentifierMapper implements IElementMapper {
 
         @Override
         public MappingResult map(final MappingResult currentResult, final IContainerElement containerElement,
@@ -116,10 +116,10 @@ public class SimpleElementsMapper {
 
     private MappingResult createNewTextDeclaration(final IContainerElement containerElement, final FilePosition fp,
             final String filename) {
-        MappingResult mr = new MappingResult(fp, filename);
-        TextPosition position = ((ContainerElement) containerElement).getPosition();
-        TextDeclaration decText = new TextDeclaration(position, containerElement.getType());
-        JoinedTextDeclarations text = new JoinedTextDeclarations();
+        final MappingResult mr = new MappingResult(fp, filename);
+        final TextPosition position = ((ContainerElement) containerElement).getPosition();
+        final TextDeclaration decText = new TextDeclaration(position, containerElement.getType());
+        final JoinedTextDeclarations text = new JoinedTextDeclarations();
         text.addElementDeclarationInside(decText);
         mr.addMappedElement(text);
         mr.setLastFilePosition(new FilePosition(fp.getLine(), fp.getColumn() + position.getLength(),
@@ -131,7 +131,7 @@ public class SimpleElementsMapper {
     private boolean containsOnly(final List<IElementDeclaration> mappedElements,
             final List<ContainerElementType> typesAllowed) {
         boolean result = true;
-        for (IElementDeclaration dec : mappedElements) {
+        for (final IElementDeclaration dec : mappedElements) {
             if (!containsOnly(dec, typesAllowed)) {
                 result = false;
                 break;
@@ -143,7 +143,7 @@ public class SimpleElementsMapper {
     public boolean containsOnly(final IElementDeclaration elem, final List<ContainerElementType> typesAllowed) {
         boolean result = true;
         final List<ContainerElementType> types = elem.getTypes();
-        for (ContainerElementType t : types) {
+        for (final ContainerElementType t : types) {
             if (!typesAllowed.contains(t)) {
                 result = false;
                 break;
