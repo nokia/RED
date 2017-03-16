@@ -187,7 +187,13 @@ public class RedTextCellEditor extends TextCellEditor {
             if (commitOnEnter && (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR)) {
                 final boolean commit = event.stateMask != SWT.ALT;
                 if (commit) {
-                    commit(getMoveDirection(event));
+                    final boolean commited = commit(getMoveDirection(event));
+                    if (!commited && wrapCellContent) {
+                        // when there is multiline Text control we don't want to
+                        // have new lines there, so cannot deliver this event to
+                        // control
+                        event.doit = false;
+                    }
                 }
                 if (RedTextCellEditor.this.editMode == EditModeEnum.DIALOG) {
                     parent.forceFocus();
