@@ -64,12 +64,12 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
     public void matchFound(final PatternMatchEvent event) {
         try {
             final String matchedLine = console.getDocument().get(event.getOffset(), event.getLength());
-            final String strippedFile = getPath(matchedLine);
-            final File file = new File(strippedFile);
+            final PathWithOffset pathWithOffset = getPath(matchedLine);
+            final File file = new File(pathWithOffset.path);
 
             if (file.exists() && file.isFile()) {
-                final int offset = event.getOffset() + (event.getLength() - strippedFile.length());
-                final int length = strippedFile.length();
+                final int offset = event.getOffset() + pathWithOffset.offsetInLine;
+                final int length = pathWithOffset.path.length();
 
                 console.addHyperlink(new ExecutionArtifactsHyperlink(robotProject.getProject(), file), offset, length);
             }
@@ -79,20 +79,31 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
         }
     }
 
-    private String getPath(final String matchedLine) {
+    private PathWithOffset getPath(final String matchedLine) {
         if (matchedLine.startsWith("Output:")) {
-            return matchedLine.substring("Output:".length()).trim();
+            final String path = matchedLine.substring("Output:".length()).trim();
+            final int offset = matchedLine.length() - path.length();
+            return new PathWithOffset(path, offset);
         } else if (matchedLine.startsWith("Log:")) {
-            return matchedLine.substring("Log:".length()).trim();
+            final String path = matchedLine.substring("Log:".length()).trim();
+            final int offset = matchedLine.length() - path.length();
+            return new PathWithOffset(path, offset);
         } else if (matchedLine.startsWith("Report:")) {
-            return matchedLine.substring("Report:".length()).trim();
+            final String path = matchedLine.substring("Report:".length()).trim();
+            final int offset = matchedLine.length() - path.length();
+            return new PathWithOffset(path, offset);
+        } else if (matchedLine.startsWith("Command:")) {
+            final String listenerArg = "--argumentfile ";
+            final int start = matchedLine.indexOf(listenerArg) + listenerArg.length();
+            final int end = matchedLine.indexOf(' ', start);
+            return new PathWithOffset(matchedLine.substring(start, end), start);
         }
         return null;
     }
 
     @Override
     public String getPattern() {
-        return "(Output|Log|Report):.*";
+        return "(Output|Log|Report|Command):\\s*(.*)";
     }
 
     @Override
@@ -102,7 +113,7 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
 
     @Override
     public String getLineQualifier() {
-        return "(Output|Log|Report): ";
+        return "(Output|Log|Report|Command): ";
     }
 
     private static final class ExecutionArtifactsHyperlink implements IHyperlink {
@@ -190,6 +201,18 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
         private void openInEditor(final IWorkbenchWindow workbenchWindow, final IFile wsFile) throws PartInitException {
             final IEditorDescriptor desc = IDE.getEditorDescriptor(wsFile);
             workbenchWindow.getActivePage().openEditor(new FileEditorInput(wsFile), desc.getId());
+        }
+    }
+
+    private static class PathWithOffset {
+
+        private final String path;
+
+        private final int offsetInLine;
+
+        public PathWithOffset(final String path, final int offsetInLine) {
+            this.path = path;
+            this.offsetInLine = offsetInLine;
         }
     }
 }
