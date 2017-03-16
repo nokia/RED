@@ -106,7 +106,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
 
     @Override
     public void handleKeywordStarted(final String name, final String type, final List<String> args) {
-        checkKeywordBeforeStart(name, type, args);
+        prepareKeywordStart(name, type, args);
 
         executionContext.startKeyword(name, type, args);
 
@@ -137,13 +137,11 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         debugTarget.getCurrentKeywordsContext().put(name, newKeywordContext);
     }
 
-    private void checkKeywordBeforeStart(final String name, final String type, final List<String> args) {
+    private void prepareKeywordStart(final String name, final String type, final List<String> args) {
         if (executionContext.isSuiteSetupTeardownKeyword(type) && !executionContext.isInSuite()
                 && keywordExecutionManager.getCurrentSuiteLocation() != null) {
             handleInitFile();
-        }
-
-        if (executionContext.isTestCaseTeardownKeyword(type)) {
+        } else if (executionContext.isTestCaseTeardownKeyword(type)) {
             debugTarget.clearStackFrames();
         }
 
