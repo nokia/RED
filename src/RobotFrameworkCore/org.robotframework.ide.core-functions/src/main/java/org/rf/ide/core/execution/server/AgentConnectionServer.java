@@ -80,7 +80,7 @@ public class AgentConnectionServer {
             serverSocket.setSoTimeout(timeoutInMillis);
 
             serverSetupSemaphore.release();
-            listeners.stream().forEach(listener -> listener.serverEstablished(host, port));
+            listeners.forEach(listener -> listener.serverEstablished(host, port));
             try (Socket clientSocket = serverSocket.accept()) {
 
                 final int clientId = clientSocket.hashCode();
@@ -92,16 +92,16 @@ public class AgentConnectionServer {
                 final RobotAgentEventDispatcher eventsDispatcher = new RobotAgentEventDispatcher(
                         new AgentClient(clientId, eventsWriter), eventsListeners);
 
-                listeners.stream().forEach(listener -> listener.clientConnected(clientId));
+                listeners.forEach(listener -> listener.clientConnected(clientId));
                 eventsDispatcher.runEventsLoop(eventsReader);
-                listeners.stream().forEach(listener -> listener.clientConnectionClosed(clientId));
+                listeners.forEach(listener -> listener.clientConnectionClosed(clientId));
 
             } catch (final RobotAgentEventsListenerException e) {
-                listeners.stream().forEach(listener -> listener.clientEventHandlingError(e));
+                listeners.forEach(listener -> listener.clientEventHandlingError(e));
             } catch (final SocketTimeoutException e) {
-                listeners.stream().forEach(listener -> listener.clientConnectionTimedOut(e));
+                listeners.forEach(listener -> listener.clientConnectionTimedOut(e));
             } catch (final IOException e) {
-                listeners.stream().forEach(listener -> listener.clientConnectionError(e));
+                listeners.forEach(listener -> listener.clientConnectionError(e));
             }
         } finally {
             stop();

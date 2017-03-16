@@ -120,10 +120,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
             executedFileName = new File(currentResourceFile).getName();
         }
 
-        final boolean hasBreakpoint = keywordExecutionManager.hasBreakpointAtCurrentKeywordPosition(executedFileName,
-                keywordLineNumber, debugTarget);
-
-        if (shouldStopExecution(keywordLineNumber, hasBreakpoint)) {
+        if (shouldStopExecution(executedFileName, keywordLineNumber)) {
             isStopping = true;
             resetSteppingState();
             resetStackFramesState();
@@ -201,9 +198,11 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         display.syncExec(() -> MessageDialog.openError(display.getActiveShell(), title, message));
     }
 
-    private boolean shouldStopExecution(final int keywordLineNumber, final boolean hasBreakpoint) {
-        return hasBreakpoint || (debugTarget.getRobotThread().isStepping() && !debugTarget.hasStepOver()
-                && !debugTarget.hasStepReturn() && keywordLineNumber >= 0);
+    private boolean shouldStopExecution(final String executedFileName, final int keywordLineNumber) {
+        final boolean hasBreakpoint = keywordExecutionManager.hasBreakpointAtCurrentKeywordPosition(executedFileName,
+                keywordLineNumber, debugTarget);
+        return hasBreakpoint || (keywordLineNumber >= 0 && debugTarget.getRobotThread().isStepping()
+                && !debugTarget.hasStepOver() && !debugTarget.hasStepReturn());
     }
 
     private void resetSteppingState() {
