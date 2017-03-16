@@ -27,8 +27,8 @@ public class RedSystemProperties {
         return System.getProperty("red.connectToServerAt") != null;
     }
 
-    public static int getPortOfRunningServer() {
-        return Integer.valueOf(System.getProperty("red.connectToServerAt"));
+    public static String getSessionServerAddress() {
+        return System.getProperty("red.connectToServerAt");
     }
 
     public static boolean shouldUseDirectExecutor() {
