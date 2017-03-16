@@ -12,9 +12,9 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 
-public class RemoteRobotLaunchConfigurationFinder {
+class RemoteRobotLaunchConfigurationFinder {
 
-    public static ILaunchConfigurationWorkingCopy findSameAs(final ILaunchConfiguration configuration)
+    static ILaunchConfigurationWorkingCopy findSameAs(final ILaunchConfiguration configuration)
             throws CoreException {
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationType launchConfigurationType = launchManager
@@ -28,16 +28,10 @@ public class RemoteRobotLaunchConfigurationFinder {
         return null;
     }
 
-    private static ILaunchConfigurationWorkingCopy asWorkingCopy(final ILaunchConfiguration config) {
-        if (config.isWorkingCopy()) {
-            return (ILaunchConfigurationWorkingCopy) config;
-        } else {
-            try {
-                return config.getWorkingCopy();
-            } catch (final CoreException e) {
-                return null;
-            }
-        }
+    private static ILaunchConfigurationWorkingCopy asWorkingCopy(final ILaunchConfiguration configuration)
+            throws CoreException {
+        return configuration.isWorkingCopy() ? (ILaunchConfigurationWorkingCopy) configuration
+                : configuration.getWorkingCopy();
     }
 
     private static boolean contentEquals(final ILaunchConfiguration config1, final ILaunchConfiguration config2)
