@@ -75,12 +75,14 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     void waitForEstablishedConnection() {
         if (new File(interpreterPath).exists() && scriptFile.exists()) {
             isExternal = RedSystemProperties.shouldConnectToRunningServer();
-            final int port = isExternal ? RedSystemProperties.getPortOfRunningServer() : findFreePort();
 
-            if (!isExternal) {
+            if (isExternal) {
+                client = createClient(RedSystemProperties.getSessionServerAddress());
+            } else {
+                final int port = findFreePort();
                 serverProcess = createPythonServerProcess(interpreterPath, scriptFile, port);
+                client = createClient("127.0.0.1:" + port);
             }
-            client = createClient(port);
             waitForConnectionToServer(CONNECTION_TIMEOUT);
         } else {
             throw new RobotCommandExecutorException("Could not setup python server on file: " + interpreterPath);
@@ -169,10 +171,10 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         }
     }
 
-    private XmlRpcClient createClient(final int port) {
+    private XmlRpcClient createClient(final String hostAndPort) {
         final XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
         try {
-            config.setServerURL(new URL("http://127.0.0.1:" + port));
+            config.setServerURL(new URL("http://" + hostAndPort));
             config.setConnectionTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
             config.setReplyTimeout((int) TimeUnit.SECONDS.toMillis(CONNECTION_TIMEOUT));
         } catch (final MalformedURLException e) {
