@@ -96,7 +96,7 @@ public abstract class ACreationOfListVariableTest {
         values.add("value1");
 
         final AVariable aVariable = variableTable.createListVariable(0, "list", values);
-        ;
+
         final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
         final RobotToken cmTok2 = new RobotToken();

@@ -18,7 +18,7 @@ import org.eclipse.ui.contexts.IContextService;
  * This is a custom implementation of TextCellEditor which can be activated by
  * any character key press and this character will be preserved after editor
  * activation.
- * 
+ *
  */
 public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
@@ -70,7 +70,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
         @Override
         public void beforeEditorDeactivated(final ColumnViewerEditorDeactivationEvent event) {
-            final IContextService service = (IContextService) PlatformUI.getWorkbench()
+            final IContextService service = PlatformUI.getWorkbench()
                     .getService(
                     IContextService.class);
             service.deactivateContext(contextActivation);
@@ -78,7 +78,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
         @Override
         public void beforeEditorActivated(final ColumnViewerEditorActivationEvent event) {
-            final IContextService service = (IContextService) PlatformUI.getWorkbench()
+            final IContextService service = PlatformUI.getWorkbench()
                     .getService(
                     IContextService.class);
             contextActivation = service.activateContext(contextToDeactivate);
@@ -95,5 +95,5 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
         public void afterEditorDeactivated(final ColumnViewerEditorDeactivationEvent event) {
             // nothing to do
         }
-    };
+    }
 }

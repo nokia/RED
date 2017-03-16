@@ -72,7 +72,7 @@ public final class ProposalMatch implements Iterable<Range<Integer>> {
     @Override
     public int hashCode() {
         return matches.hashCode();
-    };
+    }
 
     @Override
     public String toString() {

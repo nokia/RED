@@ -59,6 +59,6 @@ public class DefaultTagsModelOperation implements ISettingTableElementOperation 
 
     @Override
     public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
-        settingsTable.addDefaultTags((DefaultTags) modelElement);;
+        settingsTable.addDefaultTags((DefaultTags) modelElement);
     }
 }

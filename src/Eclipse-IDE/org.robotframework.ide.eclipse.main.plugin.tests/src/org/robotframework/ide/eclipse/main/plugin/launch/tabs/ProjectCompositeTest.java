@@ -91,14 +91,4 @@ public class ProjectCompositeTest {
             }
         };
     }
-
-    private static Condition<? super Control> disposed() {
-        return new Condition<Control>() {
-
-            @Override
-            public boolean matches(final Control control) {
-                return control.isDisposed();
-            }
-        };
-    }
 }
