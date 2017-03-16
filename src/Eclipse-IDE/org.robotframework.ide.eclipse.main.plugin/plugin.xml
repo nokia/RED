@@ -3235,13 +3235,13 @@
           commandId="org.robotframework.red.revalidateSelection"
           contextId="org.eclipse.ui.contexts.window"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-          sequence="M1+F5">
+          sequence="M3+F5">
     </key>
     <key
           commandId="org.robotframework.red.revalidateEditor"
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-          sequence="M1+F5">
+          sequence="M3+F5">
        <parameter
              id="org.robotframework.red.revalidateEditor.mode"
              value="FILE">
@@ -3251,7 +3251,7 @@
           commandId="org.robotframework.red.revalidateEditor"
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-          sequence="M1+M2+F5">
+          sequence="M3+M2+F5">
        <parameter
              id="org.robotframework.red.revalidateEditor.mode"
              value="PROJECT">
