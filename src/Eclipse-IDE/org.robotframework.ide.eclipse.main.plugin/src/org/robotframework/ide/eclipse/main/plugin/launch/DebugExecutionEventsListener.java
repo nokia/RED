@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -140,23 +138,21 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     }
 
     private void checkKeywordBeforeStart(final String name, final String type, final List<String> args) {
-        if (keywordExecutionManager.getCurrentSuiteFile() == null
-                && !executionContext.isSuiteSetupTeardownKeyword(type)) {
-            String message = "Missing suite file for execution";
-            if (keywordExecutionManager.getCurrentSuiteName() != null) {
-                message += ", current suite name: '" + keywordExecutionManager.getCurrentSuiteName() + "'";
-            }
-            message += ", current keyword: '" + name + "' type='" + type + "' args=" + args;
-            showError("Robot Event Dispatcher Error", message);
-            throw new RobotAgentEventsListenerException(message);
-        }
-
-        if (!executionContext.isInSuite() && keywordExecutionManager.getCurrentSuiteLocation() != null) {
+        if (executionContext.isSuiteSetupTeardownKeyword(type) && !executionContext.isInSuite()
+                && keywordExecutionManager.getCurrentSuiteLocation() != null) {
             handleInitFile();
         }
 
         if (executionContext.isTestCaseTeardownKeyword(type)) {
             debugTarget.clearStackFrames();
+        }
+
+        if (keywordExecutionManager.getCurrentSuiteFile() == null) {
+            final String message = String.format(
+                    "Invalid execution context: suite='%s', name='%s', type='%s', args='%s'",
+                    keywordExecutionManager.getCurrentSuiteName(), name, type, args);
+            showError("Debug Execution Context Error", message);
+            throw new RobotAgentEventsListenerException(message);
         }
     }
 
@@ -204,13 +200,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
 
     private void showError(final String title, final String message) {
         final Display display = PlatformUI.getWorkbench().getDisplay();
-        display.syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                MessageDialog.openError(display.getActiveShell(), title, message);
-            }
-        });
+        display.syncExec(() -> MessageDialog.openError(display.getActiveShell(), title, message));
     }
 
     private boolean shouldStopExecution(final int keywordLineNumber, final boolean hasBreakpoint) {
@@ -263,7 +253,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     public void handleCheckCondition() {
         try {
             if (keywordExecutionManager.hasBreakpointCondition()) {
-                client.send(new EvaluateCondition(newArrayList(keywordExecutionManager.getBreakpointConditionCall())));
+                client.send(new EvaluateCondition(Arrays.asList(keywordExecutionManager.getBreakpointConditionCall())));
             } else if (isStopping) {
                 client.send(new StopExecution());
             } else {
