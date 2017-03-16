@@ -10,12 +10,12 @@ import java.util.List;
 
 class ArgumentsConverter {
 
-    static List<String> fromJavaArgsToPythonLike(final List<String> javaLikeArgs) {
-        final List<String> args = new ArrayList<String>();
+    static List<String> joinMultipleArgValues(final List<String> javaLikeArgs) {
+        final List<String> args = new ArrayList<>();
 
         StringBuilder current = new StringBuilder();
         for (final String arg : javaLikeArgs) {
-            if (arg.startsWith("-")) {
+            if (isSwitchArgument(arg)) {
                 if (current.length() > 0) {
                     args.add(current.toString());
                     current = new StringBuilder();
@@ -37,8 +37,8 @@ class ArgumentsConverter {
         return args;
     }
 
-    static List<String> convertToJavaMainLikeArgs(final String arguments) {
-        final List<String> args = new ArrayList<String>();
+    static List<String> parseArguments(final String arguments) {
+        final List<String> args = new ArrayList<>();
         final char chars[] = arguments.toCharArray();
         char previousToken = ' ';
         boolean wasQuotationMark = false;
@@ -71,7 +71,6 @@ class ArgumentsConverter {
             } else {
                 currentToken.append(c);
             }
-
             previousToken = c;
         }
 
@@ -79,5 +78,9 @@ class ArgumentsConverter {
             args.add(currentToken.toString());
         }
         return args;
+    }
+
+    static boolean isSwitchArgument(final String arg) {
+        return arg.startsWith("-");
     }
 }

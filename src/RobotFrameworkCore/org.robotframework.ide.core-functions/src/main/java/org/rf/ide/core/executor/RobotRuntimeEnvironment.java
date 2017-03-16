@@ -230,7 +230,7 @@ public class RobotRuntimeEnvironment {
         return RobotRuntimeEnvironment.class.getResourceAsStream("/scripts/" + filename);
     }
 
-    private static synchronized Path createTemporaryDirectory() throws IOException {
+    static synchronized Path createTemporaryDirectory() throws IOException {
         if (temporaryDirectory != null) {
             return temporaryDirectory;
         }
