@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/15/17 4:39 PM
+Save-Time: 3/16/17 11:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -78,11 +78,11 @@ proc "check-if-no-error-is-shown"{
 proc "check-error"[val type]{
 	if [$type | eq "port"]{
 		get-window Preferences | get-editbox -index 1 | get-property text 
-	      | equals "Value must be an Integer between 1 and 65( |,)535" | verify-true
+	      | equals "Value must be an Integer between 1 and 65\D535" | verify-true
     }
     if [$type | eq "timeout"]{ 
     	get-window Preferences | get-editbox -index 1 | get-property text 
-   		  | equals "Value must be an Integer between 1 and 3( |,)600" | verify-true
+   		  | equals "Value must be an Integer between 1 and 3\D600" | verify-true
     }
 }
 //Remote
