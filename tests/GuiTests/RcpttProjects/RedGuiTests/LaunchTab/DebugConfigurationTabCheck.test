@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gCszcJREEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/14/17 11:51 AM
+Save-Time: 3/16/17 5:08 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -126,6 +126,8 @@ with [get-window "Debug Configurations"] {
     get-button Close | click
 }
 get-eclipse-window | key-type "F11"
+
+wait-for-console
 // verify if test was skipped during  execution
 get-view Console | get-text-viewer | get-property text | matches "1 critical test, 1 passed, 0 failed"
 get-view Console | get-text-viewer | get-property text | matches "test1"
