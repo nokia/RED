@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _YQTIILklEeWzhqlyblQz1g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/8/17 11:55 AM
+Save-Time: 3/17/17 4:52 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -85,7 +85,7 @@ exec-with-options -disableJobWaiting -command {
 }    
 
 wait-for-console  
-
+wait 1000
 //check conole that test was run
 get-view Console | get-text-viewer | get-property text 
     | equals "Command: .*\n"
