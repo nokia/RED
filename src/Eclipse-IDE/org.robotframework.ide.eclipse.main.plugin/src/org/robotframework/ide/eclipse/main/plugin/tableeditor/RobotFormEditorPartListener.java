@@ -10,8 +10,11 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
@@ -24,26 +27,35 @@ class RobotFormEditorPartListener implements IPartListener {
     private Job validationJob;
 
     @Override
-    public void partOpened(IWorkbenchPart part) {
+    public void partOpened(final IWorkbenchPart part) {
+        // nothing to do
     }
 
     @Override
-    public void partDeactivated(IWorkbenchPart part) {
+    public void partDeactivated(final IWorkbenchPart part) {
         if (part instanceof RobotFormEditor) {
             cancelValidationJobIfScheduled();
         }
     }
 
     @Override
-    public void partClosed(IWorkbenchPart part) {
+    public void partClosed(final IWorkbenchPart part) {
+        // nothing to do
     }
 
     @Override
-    public void partBroughtToTop(IWorkbenchPart part) {
+    public void partBroughtToTop(final IWorkbenchPart part) {
+        if (part instanceof RobotFormEditor) {
+            final IWorkbenchWindow window = part.getSite().getWorkbenchWindow();
+            final IPerspectiveDescriptor perspective = window.getActivePage().getPerspective();
+            if (IDebugUIConstants.ID_DEBUG_PERSPECTIVE.equals(perspective.getId())) {
+                RobotFormEditor.activateSourcePageInActiveEditor(window);
+            }
+        }
     }
 
     @Override
-    public void partActivated(IWorkbenchPart part) {
+    public void partActivated(final IWorkbenchPart part) {
         if (part instanceof RobotFormEditor) {
             final RobotFormEditor editor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
