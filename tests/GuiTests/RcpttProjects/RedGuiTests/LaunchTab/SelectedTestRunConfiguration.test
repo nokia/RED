@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4lAb8OldEea0ALtmCcrmfA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/15/17 4:28 PM
+Save-Time: 3/17/17 2:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -143,12 +143,15 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + ".* : INFO : Removed tag 'tags'.\n"
     + "Ending test: RobotProject.TestFile.test 3" | verify-true
 
-//run test by button - now is wrong name - shoud be "get-button "Run TestFile.robot (Selected Test Cases)" | click"
-//get-button "Run.*" -index 0 | get-property tooltip | equals "Run TestFile.robot" | verify-true
-
+//run by button - entire test will be run
 get-button "Run.*" -index 0 | click
-get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 3\n"
-    + ".* : INFO : Removed tag 'tags'.\n"
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+    + ".* : INFO : 7\n"
+    + "Ending test: RobotProject.TestFile.test 1\n\n"
+    + "Starting test: RobotProject.TestFile.TEST 2\n"
+    + "Ending test: RobotProject.TestFile.TEST 2\n\n"
+    + "Starting test: RobotProject.TestFile.test 3\n"
+    + ".*: INFO : Removed tag 'tags'.\n"
     + "Ending test: RobotProject.TestFile.test 3" | verify-true
     
 //run entire test
@@ -159,7 +162,6 @@ check-console-for-all-tests
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | get-item Robot | get-property childCount | equals 2 | verify-true
 
-check-selection-of-tests -t3 true
 get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot"
 check-selection-of-tests -t1 true -t2 true -t3 true
 
