@@ -245,8 +245,8 @@ public class KeywordExecutionManager {
         return !breakpointCondition.isEmpty();
     }
 
-    public String[] getBreakpointConditionCall() {
-        return breakpointCondition.split("(\\s{2,}|\t)");
+    public List<String> getBreakpointConditionCall() {
+        return Arrays.asList(breakpointCondition.split("(\\s{2,}|\t)"));
     }
 
     public void resetBreakpointCondition() {

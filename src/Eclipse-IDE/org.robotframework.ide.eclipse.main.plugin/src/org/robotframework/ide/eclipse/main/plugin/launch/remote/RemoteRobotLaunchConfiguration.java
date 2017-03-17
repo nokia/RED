@@ -5,7 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
-import java.util.Arrays;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -27,7 +28,7 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     @Override
     public List<IResource> getResourcesUnderDebug() throws CoreException {
-        return Arrays.asList(getProject());
+        return newArrayList(getProject());
     }
 
     @Override
