@@ -1,0 +1,143 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9twu0PUsEeaWpbE3jg39cA,_d8aMACuvEeW667Afdo4DcA
+Element-Name: LaunchHistory
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _FLUv0ApmEeejVuwCsDdH_w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/17/17 11:48 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    double-click
+    
+    //run entire file
+    select "LaunchesTests/SecondTest.robot" | get-menu "Run As/1 Robot Test" | click
+   
+    //run entire file
+    select "LaunchesTests/FirstFile.robot" | get-menu "Run As/1 Robot Test" | click
+   
+    //run test in file with the same name as above
+    select "LaunchesTests/tests/FirstFile.robot/Test Cases/test 2" | get-menu Run | click
+}
+
+//check test configs if exists in Run Configuration window
+get-button "Run.*" | click -arrow
+get-menu "Run Configurations..." | click
+with [get-window "Run Configurations" | get-tree] {
+    get-item Robot | get-property childCount | equals 3 | verify-true
+    get-item Robot | get-property "getItems().TreeItem[0].getText()" | equals "FirstFile.robot" | verify-true
+    get-item Robot | get-property "getItems().TreeItem[1].getText()" | equals "FirstFile.robot (Selected Test Cases)" 
+        | verify-true
+    get-item Robot | get-property "getItems().TreeItem[2].getText()" | equals "SecondTest.robot" | verify-true
+}
+
+//check selected test 
+get-window "Run Configurations" | get-tree | select "Robot/FirstFile.robot (Selected Test Cases)"
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "tests\\/FirstFile.robot" | get-property childCount | equals 3 | verify-true
+    get-item "tests\\/FirstFile.robot/test 1" | get-property checked | equals false | verify-true
+    get-item "tests\\/FirstFile.robot/test 2" | get-property checked | equals true | verify-true
+    get-item "tests\\/FirstFile.robot/test 4" | get-property checked | equals false | verify-true
+}
+get-window "Run Configurations" | get-button Close | click
+
+//run the same file name but different test name
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/FirstFile.robot/Test Cases/test 3" | get-menu Run | click
+    
+    //run entire project but in Debug mode
+    select LaunchesTests | get-menu "Debug As/1 Robot Test" | click
+}
+
+//decrease timeout for remote config
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Default Launch Configurations"
+    get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 2
+    get-button Apply | click
+    get-button OK | click
+}
+
+//run remote test on project (will get index: LaunchesTests (1))
+get-view "Project Explorer" | get-tree | select LaunchesTests | get-menu "Run As/2 Robot Remote Test" | click
+
+//check how many confgs are
+get-button "Run.*" | click -arrow
+get-menu "1 LaunchesTests (1)" 
+get-menu "2 LaunchesTests" 
+get-menu "3 FirstFile.robot (Selected Test Cases)"
+get-menu "4 FirstFile.robot"
+get-menu "5 SecondTest.robot" 
+
+//check in run configs configuration for entire project (check index)
+get-menu "Run/Run Configurations..." | click
+
+//check run config with index 1
+get-window "Run Configurations" | get-tree | select "Robot Remote/LaunchesTests (1)"
+with [get-window "Run Configurations" | get-tree] {
+    get-item "Robot Remote" | get-property childCount | equals 1 | verify-true
+    get-item "Robot Remote" | get-property "getItems().TreeItem[0].getText()" | equals "LaunchesTests (1)" | verify-true
+}
+
+//config with no index is normal run
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/LaunchesTests"
+    get-tab-folder | get-tab-item Robot | click
+}
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-property itemCount | equals 0 | verify-true
+
+//check if selected test has different test checked
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/FirstFile.robot (Selected Test Cases)"
+    get-tab-folder | get-tab-item Robot | click
+}
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "FirstFile.robot/test 1" | get-property checked | equals false | verify-true
+    get-item "FirstFile.robot/test 2" | get-property checked | equals false | verify-true
+    get-item "FirstFile.robot/test 3" | get-property checked | equals true | verify-true
+}
+
+//add new config "mine" and close window -not run test
+with [get-window "Run Configurations"] {
+    get-tree | select Robot
+    get-button "New launch configuration" | click
+    get-editbox -after [get-label "Name:"] | set-text mine
+    get-group Project | get-button "Browse..." | click
+    with [get-window "Select project"] {
+        get-tree | select LaunchesTests
+        get-button OK | click
+    }
+    get-button Apply | click
+    get-button Close | click
+}
+
+//this config is not added to history
+get-button "Run.*" | click -arrow
+get-menu "1 LaunchesTests (1)" 
+get-menu "2 LaunchesTests" 
+get-menu "3 FirstFile.robot (Selected Test Cases)"
+get-menu "4 FirstFile.robot"
+get-menu "5 SecondTest.robot" 
+
+
+//run new config
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/mine" | double-click
+
+//check if was added at the beginning
+get-button "Run.*" | click -arrow
+get-menu "1 mine" 
+get-menu "2 LaunchesTests (1)" 
+get-menu "3 LaunchesTests" 
+get-menu "4 FirstFile.robot (Selected Test Cases)"
+get-menu "5 FirstFile.robot"
+get-menu "6 SecondTest.robot" 
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
