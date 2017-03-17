@@ -1,0 +1,98 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<h2>Runnning tests using Gradle</h2>
+
+	<p>It is possible to run Robot tests from RED by launching them through script. 
+	There are at least two different possibilities for running the tests from inside of
+	<a href="https://gradle.org/">Gradle</a> building script:
+	</p>
+	
+	<ol>
+		<li>by explicitly running Python interpreter passing required arguments for robot</li>
+		<li>by using some Gradle plugin which will use Standalone Robot JAR distribution
+		obtained from repository (see
+		<a href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#standalone-jar-distribution">RF help topic about standalone JAR</a>)
+		</li>
+	</ol>
+	
+	<p>The first possibility requires having some python interpreter with RF installed 
+	(CPython, PyPy, Jython, IronPython) while the latter only requires Java (which anyway has
+	to be installed in order to run Gradle).
+	</p>
+
+	<dl class="warning">
+	   <dt>Warning</dt>
+	   <dd>As for now RED cannot use Standalone JAR distribution of RF, so while it would 
+	   possible to run the tests using (2) possibility it is currently not possible to 
+	   have other features of RED like validation, code assistance etc. without having 
+	   python interpreter installed.
+	   </dd>
+	</dl>
+	
+	<h3>Simple Gradle script running external interpreter</h3>
+	<p>We will use following simple script in order to run interpreter from RED: 
+	</p>
+	
+	<div class="code">
+		task runRobot(type:Exec) {<br/>
+	  		&nbsp;&nbsp;&nbsp;&nbsp;executable robotExec<br/>
+	  		&nbsp;&nbsp;&nbsp;&nbsp;args Eval.me(robotArguments)<br/>
+		}
+	</div>
+	
+	<p>it expects two arguments: path to interpreter executable and a list of it's arguments 
+	written in a form: <span class="code">['arg1', 'arg2', ..., 'arg_n']</span>
+	</p>
+	
+	<p>When launching the test RED does not pass arguments in form like above, moreover 
+	Gradle passes arguments mostly using it's own syntax: <span class="code">-Parg=val</span>.
+	Because of this we need to create own script which will perform arguments translation
+	(or modify Gradle Wrapper script).
+	</p>
+	
+	<ul>
+		<li><b>Windows batch script</b> - <span class="code">gradlew_robot.bat</span>
+			<div class="code">
+			@echo off<br/>
+			set FIRST="true"<br/>
+			set EXEC=%1<br/>
+			set RF_ARGS=[<br/>
+			shift<br/>
+			:loop1<br/>
+			if "%1"=="" goto after_loop<br/>
+			if %FIRST%=="true" (<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;set RF_ARGS=%RF_ARGS%'%1'<br/>
+			) else (<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;set RF_ARGS=%RF_ARGS%, '%1'<br/>
+			)<br/>
+			shift<br/>
+			set FIRST="false"<br/>
+			goto loop1<br/>
+		
+			:after_loop<br/>
+			set RF_ARGS=%RF_ARGS:\=/%]<br/>
+	
+			call gradlew.bat runRobot -ProbotExec=%EXEC% -ProbotArguments="%RF_ARGS%"<br/>
+			</div>
+			<p>It is now possible to run tests with the script above: in order to do it
+			create Robot Launch configuration set executable file at <b>Executor</b> tab 
+			and launch the tests. 
+			</p>
+			<img src="images/gradle_win.png"/>
+		</li>
+	</ul>
+	
+	<dl class="note">
+	   <dt>Note</dt>
+	   <dd>Instead of specifying script at <b>Executor</b> tab manually it is possible to define
+	   default value of executor script path in Preferences, which will be used when creating 
+	   launch configurations.
+	   </dd>
+	</dl>
+</body>
+</html>
