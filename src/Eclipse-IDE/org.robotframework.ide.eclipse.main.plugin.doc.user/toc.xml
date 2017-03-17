@@ -56,6 +56,8 @@
        </topic>
        <topic href="doc/user_guide/tools_integration/maven.html" label="Robot Framework Maven plugin">
        </topic>
+       <topic href="doc/user_guide/tools_integration/gradle.html" label="Running tests using Gradle">
+       </topic>
     </topic>
     <topic href="doc/user_guide/known_issues.html" label="Known issues">
     </topic>
