@@ -7,10 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getFirst;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -131,7 +131,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     @Override
     public List<IResource> getResourcesUnderDebug() throws CoreException {
         final List<IResource> suiteResources = getSuiteResources();
-        return suiteResources.isEmpty() ? Arrays.asList(getProject()) : suiteResources;
+        return suiteResources.isEmpty() ? newArrayList(getProject()) : suiteResources;
     }
 
     @Override

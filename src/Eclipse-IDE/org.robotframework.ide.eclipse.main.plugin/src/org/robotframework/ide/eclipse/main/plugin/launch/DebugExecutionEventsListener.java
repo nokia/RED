@@ -250,7 +250,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     public void handleCheckCondition() {
         try {
             if (keywordExecutionManager.hasBreakpointCondition()) {
-                client.send(new EvaluateCondition(Arrays.asList(keywordExecutionManager.getBreakpointConditionCall())));
+                client.send(new EvaluateCondition(keywordExecutionManager.getBreakpointConditionCall()));
             } else if (isStopping) {
                 client.send(new StopExecution());
             } else {
