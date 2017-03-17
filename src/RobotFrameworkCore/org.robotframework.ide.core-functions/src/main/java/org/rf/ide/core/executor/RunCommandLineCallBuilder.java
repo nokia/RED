@@ -269,13 +269,12 @@ public class RunCommandLineCallBuilder {
             
             int i = 0;
             while (i < joinedArgs.size()) {
-                if (ArgumentsConverter.isSwitchArgument(joinedArgs.get(i))) {
-                    if (i < joinedArgs.size() - 1 && ArgumentsConverter.isSwitchArgument(joinedArgs.get(i + 1))) {
-                        argumentsFile.addLine(joinedArgs.get(i));
-                    } else {
-                        argumentsFile.addLine(joinedArgs.get(i), joinedArgs.get(i + 1));
-                        i++;
-                    }
+                if (ArgumentsConverter.isSwitchArgument(joinedArgs.get(i)) && i < joinedArgs.size() - 1
+                        && !ArgumentsConverter.isSwitchArgument(joinedArgs.get(i + 1))) {
+                    argumentsFile.addLine(joinedArgs.get(i), joinedArgs.get(i + 1));
+                    i++;
+                } else {
+                    argumentsFile.addLine(joinedArgs.get(i));
                 }
                 i++;
             }

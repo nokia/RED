@@ -203,13 +203,15 @@ public class RunCommandLineCallBuilderTest {
         final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
 
         final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
-                .addUserArgumentsForRobot("--arg val1 -X val2")
+                .addUserArgumentsForRobot("--arg val1 -X val2 --other --other2")
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
         assertThat(commandLine).hasSize(7).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
                 "--argumentfile");
-        assertThat(cmdLine.getArgumentFile().generateContent()).contains("--arg val1");
-        assertThat(cmdLine.getArgumentFile().generateContent()).contains("-X    val2");
+        assertThat(cmdLine.getArgumentFile().generateContent()).contains("--arg    val1");
+        assertThat(cmdLine.getArgumentFile().generateContent()).contains("-X       val2");
+        assertThat(cmdLine.getArgumentFile().generateContent()).contains("--other");
+        assertThat(cmdLine.getArgumentFile().generateContent()).contains("--other2");
     }
 
     @Test
