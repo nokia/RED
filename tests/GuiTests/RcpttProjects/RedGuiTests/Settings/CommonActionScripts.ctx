@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/28/17 1:45 PM
+Save-Time: 3/17/17 3:23 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -144,4 +144,12 @@ proc "wait-for-discover-window"{
 		get-window "Discovering libraries summary"
 	}
 }
+
+proc "get-arg-file-path"{
+	get-view Console | get-text-viewer | get-object |invoke getLine 0 | let [val lol -input]{
+		$lol | invoke substring [$lol | invoke lastIndexOf "--argumentfile" | int | plus 15 ]
+		      [$lol | invoke lastIndexOf ".arg" | int | plus 4] 
+	}
+}
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
