@@ -20,6 +20,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescriber;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -35,8 +36,13 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PerspectiveAdapter;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.contexts.IContextService;
@@ -96,7 +102,9 @@ public class RobotFormEditor extends FormEditor {
 
     private SuiteFileValidationListener validationListener;
 
-    private static RobotFormEditorPartListener robotFormEditorPartListener;
+    private static IPartListener robotFormEditorPartListener;
+
+    private static IPerspectiveListener workbenchWindowPerspectiveListener;
 
     private final OnSaveLibrariesAutodiscoveryTrigger saveLibDiscoveryTrigger = new OnSaveLibrariesAutodiscoveryTrigger();
 
@@ -117,8 +125,10 @@ public class RobotFormEditor extends FormEditor {
             validationListener.init();
             ResourcesPlugin.getWorkspace().addResourceChangeListener(validationListener,
                     IResourceChangeEvent.POST_CHANGE);
-            
+
             initRobotFormEditorPartListener(site.getPage());
+
+            initWorkbenchWindowPerspectiveListener(site.getWorkbenchWindow());
 
             site.getService(ICommandService.class).addExecutionListener(saveLibDiscoveryTrigger);
 
@@ -147,6 +157,21 @@ public class RobotFormEditor extends FormEditor {
         if (robotFormEditorPartListener == null) {
             robotFormEditorPartListener = new RobotFormEditorPartListener();
             page.addPartListener(robotFormEditorPartListener);
+        }
+    }
+
+    private void initWorkbenchWindowPerspectiveListener(final IWorkbenchWindow window) {
+        if (workbenchWindowPerspectiveListener == null) {
+            workbenchWindowPerspectiveListener = new PerspectiveAdapter() {
+
+                @Override
+                public void perspectiveActivated(final IWorkbenchPage page, final IPerspectiveDescriptor perspective) {
+                    if (IDebugUIConstants.ID_DEBUG_PERSPECTIVE.equals(perspective.getId())) {
+                        activateSourcePageInActiveEditor(page.getWorkbenchWindow());
+                    }
+                }
+            };
+            window.addPerspectiveListener(workbenchWindowPerspectiveListener);
         }
     }
 
@@ -198,7 +223,7 @@ public class RobotFormEditor extends FormEditor {
             if (openMode == ElementOpenMode.OPEN_IN_SOURCE) {
                 setActivePart("");
             } else {
-                setActivePage(0);
+                activateFirstPage();
             }
         } else {
             setActivePart(pageToActivate);
@@ -520,6 +545,15 @@ public class RobotFormEditor extends FormEditor {
             return (ISectionEditorPart) pages.get(index);
         }
         return null;
+    }
+
+    public static void activateSourcePageInActiveEditor(final IWorkbenchWindow window) {
+        if (window != null) {
+            final IEditorPart activeEditor = window.getActivePage().getActiveEditor();
+            if (activeEditor instanceof RobotFormEditor) {
+                ((RobotFormEditor) activeEditor).activateSourcePage();
+            }
+        }
     }
 
     private void checkRuntimeEnvironment(final RobotSuiteFile suiteFile) {

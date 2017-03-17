@@ -38,6 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordExecutionManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener {
 
@@ -121,6 +122,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         }
 
         if (shouldStopExecution(executedFileName, keywordLineNumber)) {
+            activateActiveEditorSourcePage();
             isStopping = true;
             resetSteppingState();
             resetStackFramesState();
@@ -132,6 +134,12 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
                 keywordExecutionManager.extractExecutedFileNameWithParentFolderInfo(executedFileName),
                 keywordLineNumber, null);
         debugTarget.getCurrentKeywordsContext().put(name, newKeywordContext);
+    }
+
+    private void activateActiveEditorSourcePage() {
+        final Display display = PlatformUI.getWorkbench().getDisplay();
+        display.syncExec(() -> RobotFormEditor
+                .activateSourcePageInActiveEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow()));
     }
 
     private void prepareKeywordStart(final String name, final String type, final List<String> args) {
