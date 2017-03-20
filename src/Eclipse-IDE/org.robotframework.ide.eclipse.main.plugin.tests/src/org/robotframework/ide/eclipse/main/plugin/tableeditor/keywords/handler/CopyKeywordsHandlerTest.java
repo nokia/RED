@@ -88,7 +88,6 @@ public class CopyKeywordsHandlerTest {
         final RobotKeywordDefinition selectedKeyword = keywords.get(0);
         final RobotKeywordCall selectedCall = keywords.get(0).getChildren().get(1);
 
-        @SuppressWarnings("unchecked")
         final IStructuredSelection selection = new StructuredSelection(newArrayList(selectedKeyword, selectedCall));
 
         final boolean copied = handler.copyKeywords(selection, clipboard);

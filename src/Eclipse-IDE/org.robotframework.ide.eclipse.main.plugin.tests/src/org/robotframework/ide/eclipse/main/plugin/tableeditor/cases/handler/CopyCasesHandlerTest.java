@@ -88,7 +88,6 @@ public class CopyCasesHandlerTest {
         final RobotCase selectedCase = cases.get(0);
         final RobotKeywordCall selectedCall = cases.get(0).getChildren().get(1);
 
-        @SuppressWarnings("unchecked")
         final IStructuredSelection selection = new StructuredSelection(newArrayList(selectedCase, selectedCall));
 
         final boolean copied = handler.copyCases(selection, clipboard);

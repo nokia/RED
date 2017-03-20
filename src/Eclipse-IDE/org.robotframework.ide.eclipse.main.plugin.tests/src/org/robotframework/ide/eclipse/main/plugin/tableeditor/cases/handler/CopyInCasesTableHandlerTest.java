@@ -49,7 +49,7 @@ public class CopyInCasesTableHandlerTest {
         clipboard = new RedClipboardMock();
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
     }
-    
+
     @Test
     public void nothingIsCopied_whenNothingIsSelected() {
         when(selectionLayerAccessor.getSelectedPositions()).thenReturn(new PositionCoordinate[] {});
@@ -65,7 +65,7 @@ public class CopyInCasesTableHandlerTest {
         final List<RobotCase> cases = createCases();
         final RobotKeywordCall selectedCall1 = cases.get(0).getChildren().get(0);
         final RobotKeywordCall selectedCall2 = cases.get(0).getChildren().get(2);
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 1, 1),
                 new PositionCoordinate(null, 3, 3)};
@@ -90,13 +90,13 @@ public class CopyInCasesTableHandlerTest {
                 new PositionCoordinateSerializer(1, 1),
                 new PositionCoordinateSerializer(3, 3));
     }
-    
+
     @Test
     public void casesWithPositionsAreCopied_whenOnlyCasesAreSelected() {
         final List<RobotCase> cases = createCases();
         final RobotCase selectedCase1 = cases.get(0);
         final RobotCase selectedCase2 = cases.get(1);
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 0, 0),
                 new PositionCoordinate(null, 2, 5) };
@@ -127,11 +127,10 @@ public class CopyInCasesTableHandlerTest {
         final List<RobotCase> cases = createCases();
         final RobotCase selectedCase = cases.get(0);
         final RobotKeywordCall selectedCall = cases.get(0).getChildren().get(1);
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 0, 0),
                 new PositionCoordinate(null, 1, 2) };
-        @SuppressWarnings("unchecked")
         final List<?> selectedElements = newArrayList(selectedCase, selectedCall);
 
         when(selectionLayerAccessor.getSelectedPositions()).thenReturn(selectedPositions);
@@ -173,12 +172,12 @@ public class CopyInCasesTableHandlerTest {
     }
 
     @Test
-    public void positionsOfAddingTokensAreNotCopied_whenTheyAreSelectedAmongsOtherRobotElements() {
+    public void positionsOfAddingTokensAreNotCopied_whenTheyAreSelectedAmongOtherRobotElements() {
         final List<RobotCase> cases = createCases();
         final RobotCase selectedCase = cases.get(0);
         final RobotKeywordCall selectedCall = cases.get(0).getChildren().get(0);
         final AddingToken selectedToken = new AddingToken(null, mock(TokenState.class));
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 0, 0),
                 new PositionCoordinate(null, 1, 1),
