@@ -128,9 +128,6 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
-        // assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
-        // projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator +
-        // "folder2");
         assertThat(commandLine.getArgumentFile().generateContent()).contains(
                 "--pythonpath " + projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator
                         + "folder2");
