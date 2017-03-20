@@ -130,9 +130,13 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
     }
 
     private String getSuiteExecutorVersion(final RobotLaunchConfiguration robotConfig,
-            final RobotRuntimeEnvironment env) throws RobotEnvironmentException, CoreException {
-        return robotConfig.isUsingInterpreterFromProject() ? env.getVersion()
-                : RobotRuntimeEnvironment.getVersion(robotConfig.getInterpreter());
+            final RobotRuntimeEnvironment env) throws CoreException {
+        try {
+            return robotConfig.isUsingInterpreterFromProject() ? env.getVersion()
+                    : RobotRuntimeEnvironment.getVersion(robotConfig.getInterpreter());
+        } catch (final RobotEnvironmentException e) {
+            throw newCoreException(e.getMessage(), e.getCause());
+        }
     }
 
     @VisibleForTesting
