@@ -90,7 +90,7 @@ public class ArgumentsFile {
         return filePath;
     }
 
-    public void writeTo(final File file) throws IOException {
+    private void writeTo(final File file) throws IOException {
         if (!file.exists()) {
             file.createNewFile();
         }
