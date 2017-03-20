@@ -27,21 +27,21 @@ public class VariableExtractor {
     @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     public MappingResult extract(final FilePosition fp, final String text, final String fileName) {
         try {
-            Container mainContainer = structureExtractor.buildStructureTree(text);
+            final Container mainContainer = structureExtractor.buildStructureTree(text);
 
             String extractionInsideFile = fileName;
             if (fileName == null) {
                 extractionInsideFile = "<NOT_SET>";
             }
 
-            MappingResult result = mapper.map(fp, mainContainer, extractionInsideFile);
-            for (IElementDeclaration dec : result.getMappedElements()) {
+            final MappingResult result = mapper.map(fp, mainContainer, extractionInsideFile);
+            for (final IElementDeclaration dec : result.getMappedElements()) {
                 dec.setRobotTokenPosition(fp);
             }
 
             return result;
-        } catch (Exception e) {
-            throw new RuntimeException("An exception occures during variable extraction in file " + fileName
+        } catch (final Exception e) {
+            throw new RuntimeException("An exception occurs during variable extraction in file " + fileName
                     + " at position " + fp + " for text " + text, e);
         }
     }

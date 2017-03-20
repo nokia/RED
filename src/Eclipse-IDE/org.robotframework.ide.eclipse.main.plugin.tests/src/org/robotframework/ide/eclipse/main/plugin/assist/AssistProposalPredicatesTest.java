@@ -42,7 +42,7 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void alwaysFalsePredicate_isAlwayNotSatisfied() {
+    public void alwaysFalsePredicate_isAlwaysNotSatisfied() {
         final AssistProposalPredicate<Object> predicate = AssistProposalPredicates.alwaysFalse();
 
         assertThat(predicate.apply(null)).isFalse();
@@ -92,7 +92,7 @@ public class AssistProposalPredicatesTest {
     }
 
     @Test
-    public void whenInSecondCellAndForOrGherkingWordIsGiven_theReservedWordPredicateIsSatisfied() {
+    public void whenInSecondCellAndForOrGherkinWordIsGiven_theReservedWordPredicateIsSatisfied() {
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates.codeReservedWordsPredicate(1,
                 Optional.<RobotToken> empty());
 
@@ -104,9 +104,8 @@ public class AssistProposalPredicatesTest {
         assertThat(predicate.apply("Then")).isTrue();
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void whenInNonSecondCellAndForOrGherkingWordIsGiven_theReservedWordPredicateIsNotSatisfied() {
+    public void whenInNonSecondCellAndForOrGherkinWordIsGiven_theReservedWordPredicateIsNotSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
                 Optional.<RobotToken> empty());
         final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(3,
@@ -122,7 +121,6 @@ public class AssistProposalPredicatesTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenThereIsNoTokenGiven_theReservedWordPredicateIsNotSatisfiedForArbitraryWords() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
@@ -139,7 +137,6 @@ public class AssistProposalPredicatesTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenThereIsTokenGivenWithoutFOR_theReservedWordPredicateIsNotSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
@@ -156,7 +153,6 @@ public class AssistProposalPredicatesTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenThereIsTokenGivenWithFORButCellIsAtMostSecond_theReservedWordPredicateIsNotSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
@@ -173,7 +169,6 @@ public class AssistProposalPredicatesTest {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void whenThereIsTokenGivenWithFORAndCellIsAtLeastThird_theReservedWordPredicateIsSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(3,

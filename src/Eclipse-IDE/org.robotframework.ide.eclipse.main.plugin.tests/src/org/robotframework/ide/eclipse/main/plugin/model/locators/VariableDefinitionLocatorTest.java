@@ -383,7 +383,6 @@ public class VariableDefinitionLocatorTest {
         assertThat(visitedVars).containsOnly("${var_a}");
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void globalVariablesAreLocated() throws Exception {
         final IFile sourceFile = projectProvider.createFile("source.robot", "");
@@ -403,7 +402,6 @@ public class VariableDefinitionLocatorTest {
         assertThat(visitedVars).containsOnly("global_scalar", "global_list", "global_dict");
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void globalVariablesAreLocated_onlyUntilDetectorWantsToContinue() throws Exception {
         final IFile sourceFile = projectProvider.createFile("source.robot", "");
