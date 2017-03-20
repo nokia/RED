@@ -10,12 +10,15 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.Launch;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.execution.TestsMode;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -53,6 +56,10 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
             // FIXME : don't need to wait when it would be possible to launch multiple
             // configurations
             launchExecution.waitFor(monitor);
+        } catch (final CoreException e) {
+            final String message = String.format("'Launching %s' has encountered a problem.", configuration.getName());
+            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e),
+                    StatusManager.SHOW);
         } finally {
             executionService.testExecutionEnded(testsLaunchContext);
 
