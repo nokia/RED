@@ -24,14 +24,16 @@ a.command {
 	background-position: 0 5px;
 	padding-left: 20px;
 }
-
 div.code {
 	font-family: monospace;
     background: #eee;
     margin: 8px;
     padding: 6px;
 }
-
+img.bordered {
+	margin: 5px;
+	border: 1px #999 solid;
+}
 dl.note {
 	margin: 10px;
 	padding-left: 50px;

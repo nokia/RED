@@ -24,15 +24,6 @@
 	(CPython, PyPy, Jython, IronPython) while the latter only requires Java (which anyway has
 	to be installed in order to run Gradle).
 	</p>
-
-	<dl class="warning">
-	   <dt>Warning</dt>
-	   <dd>As for now RED cannot use Standalone JAR distribution of RF, so while it would 
-	   possible to run the tests using (2) possibility it is currently not possible to 
-	   have other features of RED like validation, code assistance etc. without having 
-	   python interpreter installed.
-	   </dd>
-	</dl>
 	
 	<h3>Simple Gradle script running external interpreter</h3>
 	<p>We will use following simple script in order to run interpreter from RED: 
@@ -45,8 +36,8 @@
 		}
 	</div>
 	
-	<p>it expects two arguments: path to interpreter executable and a list of it's arguments 
-	written in a form: <span class="code">['arg1', 'arg2', ..., 'arg_n']</span>
+	<p>the task above expects two arguments: path to interpreter executable and a list 
+	of it's arguments written in a form: <span class="code">['arg1', 'arg2', ..., 'arg_n']</span>
 	</p>
 	
 	<p>When launching the test RED does not pass arguments in form like above, moreover 
@@ -63,6 +54,7 @@
 			set EXEC=%1<br/>
 			set RF_ARGS=[<br/>
 			shift<br/>
+			<br/>
 			:loop1<br/>
 			if "%1"=="" goto after_loop<br/>
 			if %FIRST%=="true" (<br/>
@@ -73,26 +65,76 @@
 			shift<br/>
 			set FIRST="false"<br/>
 			goto loop1<br/>
-		
+			<br/>
 			:after_loop<br/>
 			set RF_ARGS=%RF_ARGS:\=/%]<br/>
-	
+			<br/>
 			call gradlew.bat runRobot -ProbotExec=%EXEC% -ProbotArguments="%RF_ARGS%"<br/>
 			</div>
-			<p>It is now possible to run tests with the script above: in order to do it
-			create Robot Launch configuration set executable file at <b>Executor</b> tab 
-			and launch the tests. 
-			</p>
-			<img src="images/gradle_win.png"/>
+		</li>
+		
+		<li><b>Linux bash script</b> - <span class="code">gradlew_robot.sh</span>
+			<div class="code">
+			#!/usr/bin/env bash<br/>
+			<br/>
+			first=1<br/>
+			exec=$1<br/>
+			restvar="["<br/>
+			<br/>
+			shift<br/>
+			for var in "$@"<br/>
+			do<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;if [ $first -eq 1]; then<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;restvar="$restvar'$var'"<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;else<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;restvar="$restvar,'$var'"<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;fi<br/>
+			&nbsp;&nbsp;&nbsp;&nbsp;first=0<br/>
+			done<br/>
+			restvar="$restvar]"<br/>
+			<br/>
+			./gradlew runRobot -ProbotExec=$exec -ProbotArguments=$restvar<br/>
+			</div>
 		</li>
 	</ul>
-	
+
+	<p>
+		It is now possible to run tests with the script above: create Robot
+		launch configuration and set executable file at <b>Executor</b> tab
+		and launch the tests as depicted on images below.
+	</p>
+	<p><img src="images/gradle_win.png"/></p>
+	<p><img src="images/gradle_linux.png"/></p>
+
 	<dl class="note">
 	   <dt>Note</dt>
 	   <dd>Instead of specifying script at <b>Executor</b> tab manually it is possible to define
-	   default value of executor script path in Preferences, which will be used when creating 
-	   launch configurations.
+	   default value of executor script path in Preferences
+	   (at <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
+	   Window-&gt;Preferences-&gt;Robot Framework-&gt;Default Launch Configurations
+	   </a></i> set <b>Executable file</b> to desired executable). Now every time new launch 
+	   configuration is created it will use given executable by default.
 	   </dd>
 	</dl>
+	
+	
+	<h3>Gradle scripts running Standalone JAR distribution</h3>
+	
+	<p>Running the tests through Gradle plugin which uses standalone JAR is very similar to running 
+	the tests using external interpreter, the only thing is that 
+	the script has to translate arguments into a form which is used by the plugin, which may of course vary
+	depending on Gradle plugin in use. The batch/bash scripts from above may be adapted and used when calling
+	tests this way.
+	</p>
+
+	<dl class="warning">
+	   <dt>Warning</dt>
+	   <dd>As for now RED cannot use Standalone JAR distribution of RF as environment, so while it would 
+	   possible to run the tests using (2) method it is currently not possible to 
+	   have other features of RED like validation, code assistance etc. working without having 
+	   python interpreter installed.
+	   </dd>
+	</dl>
+	
 </body>
 </html>
