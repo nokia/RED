@@ -5,13 +5,30 @@
 	rel="stylesheet" type="text/css" />
 </head>
 <body>
-<h2>Known issues</h2>
+<h2>Known issues and problems</h2>
 
 <p>For all currently opened issues please visit our repository at 
 <a href="https://github.com/nokia/RED/" class="github">GitHub</a>
 </p>
 
 <ul>
+	<li>
+		<h3>Memory consumption</h3>
+		
+		<p>Memory allocation is controlled in eclipse.ini/RED.ini file in eclipse/RED folder 
+		with <i>Java Virtual Machine</i> <span class="code">Xms</span> and 
+		<span class="code">Xmx</span> parameters. By default Eclipse is configured to run on 
+		system with 2GB of memory, in case of stronger systems it is advised to increase those
+		parameters to respectful levels. Change or add those parameters in <i>.ini</i> file after
+		<span class="code">-vmargs</span> parameter:
+		</p>
+		<div class="code">
+		-vmargs<br/>
+		-Xms2048m<br/>
+		-Xmx4096m<br/>
+		...
+		</div>
+	</li>
 	<li>
 		<h3>Unicode characters in test material</h3>
 		<p>Eclipse by default is not configured to interpret and display language specific
