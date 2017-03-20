@@ -16,7 +16,6 @@ import com.google.common.collect.Range;
 
 public class ProposalMatchTest {
 
-    @SuppressWarnings("unchecked")
     @Test
     public void matchesEqualityTest() {
         assertThat(new ProposalMatch().equals(ProposalMatch.EMPTY)).isTrue();
@@ -42,7 +41,6 @@ public class ProposalMatchTest {
     @Test
     public void matchesHashCodeIsBuildFromRanges() {
         final int hashcode1 = new ProposalMatch(Range.closedOpen(2, 5), Range.closedOpen(7, 10)).hashCode();
-        @SuppressWarnings("unchecked")
         final int hashcode2 = newArrayList(Range.closedOpen(2, 5), Range.closedOpen(7, 10)).hashCode();
         
         assertThat(hashcode1).isEqualTo(hashcode2);

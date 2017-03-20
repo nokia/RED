@@ -49,7 +49,7 @@ public class CopyInKeywordTableHandlerTest {
         clipboard = new RedClipboardMock();
         when(editor.getSelectionLayerAccessor()).thenReturn(selectionLayerAccessor);
     }
-    
+
     @Test
     public void nothingIsCopied_whenNothingIsSelected() {
         when(selectionLayerAccessor.getSelectedPositions()).thenReturn(new PositionCoordinate[] {});
@@ -65,7 +65,7 @@ public class CopyInKeywordTableHandlerTest {
         final List<RobotKeywordDefinition> keywords = createKeywords();
         final RobotKeywordCall selectedCall1 = keywords.get(0).getChildren().get(0);
         final RobotKeywordCall selectedCall2 = keywords.get(0).getChildren().get(2);
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 1, 1),
                 new PositionCoordinate(null, 3, 3)};
@@ -90,13 +90,13 @@ public class CopyInKeywordTableHandlerTest {
                 new PositionCoordinateSerializer(1, 1),
                 new PositionCoordinateSerializer(3, 3));
     }
-    
+
     @Test
     public void keywordsWithPositionsAreCopied_whenOnlyCasesAreSelected() {
         final List<RobotKeywordDefinition> keywords = createKeywords();
         final RobotKeywordDefinition selectedKeyword1 = keywords.get(0);
         final RobotKeywordDefinition selectedKeyword2 = keywords.get(1);
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 0, 0),
                 new PositionCoordinate(null, 2, 5) };
@@ -127,11 +127,10 @@ public class CopyInKeywordTableHandlerTest {
         final List<RobotKeywordDefinition> keywords = createKeywords();
         final RobotKeywordDefinition selectedKeyword = keywords.get(0);
         final RobotKeywordCall selectedCall = keywords.get(0).getChildren().get(1);
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 0, 0),
                 new PositionCoordinate(null, 1, 2) };
-        @SuppressWarnings("unchecked")
         final List<?> selectedElements = newArrayList(selectedKeyword, selectedCall);
 
         when(selectionLayerAccessor.getSelectedPositions()).thenReturn(selectedPositions);
@@ -173,12 +172,12 @@ public class CopyInKeywordTableHandlerTest {
     }
 
     @Test
-    public void positionsOfAddingTokensAreNotCopied_whenTheyAreSelectedAmongsOtherRobotElements() {
+    public void positionsOfAddingTokensAreNotCopied_whenTheyAreSelectedAmongOtherRobotElements() {
         final List<RobotKeywordDefinition> keywords = createKeywords();
         final RobotKeywordDefinition selectedKeyword = keywords.get(0);
         final RobotKeywordCall selectedCall = keywords.get(0).getChildren().get(0);
         final AddingToken selectedToken = new AddingToken(null, mock(TokenState.class));
-        
+
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[] {
                 new PositionCoordinate(null, 0, 0),
                 new PositionCoordinate(null, 1, 1),
