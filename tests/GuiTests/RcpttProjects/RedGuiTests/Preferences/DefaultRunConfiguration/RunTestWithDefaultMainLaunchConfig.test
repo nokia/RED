@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/16/17 5:22 PM
+Save-Time: 3/20/17 10:23 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -98,7 +98,7 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     
     
 get-view Console | get-text-viewer | get-property text 
-    | equals "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} -s RobotProject.Test_for_run_config -i test 1 -o None -d None -l None -r None .*RobotProject\n"
+    | equals "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "==============================================================================\n"
     + "RobotProject                                                                  \n"
@@ -117,13 +117,27 @@ get-view Console | get-text-viewer | get-property text
     + "==============================================================================\n"
     + "Output:  None" | verify-true   
     
+set-dialog-result File [get-arg-file-path]
+get-menu "File/Open File..." | click 
+
+get-editor "args_.*.arg" | get-text-viewer  | get-property text | equals "# arguments automatically generated\n"
+    + "--suite RobotProject.Test_for_run_config\n"
+    + "# arguments specified manually by user\n"
+    + "-i      test 1\n"
+    + "-o      None\n"
+    + "-d      None\n"
+    + "-l      None\n"
+    + "-r      None" | verify-true
+    	    
+get-editor "args_.*.arg" | close     
+    
 //run from outlie single test    
 get-view Outline | get-tree | select "test_for_run_config.robot/Test Cases/def" | get-menu Run | click
 wait-for-console
 
 //no test should be run but args should be added
 if [not [get-view Console | get-text-viewer | get-property text -raw
-    | matches "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
+    | matches "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*RobotProject\n"
     + "Suite Executor: Robot Framework .*\n"
     + "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
     + "Try --help for usage information." ]]{
@@ -132,7 +146,7 @@ if [not [get-view Console | get-text-viewer | get-property text -raw
     get-view Console | get-text-viewer | get-property text 
     	|equals "\[ ERROR \] Suite 'RobotProject' contains no tests with tag 'test 1' and named 'RobotProject.Test_for_run_config.def' in suite 'RobotProject.Test_for_run_config'.\n\n"
     + "Try --help for usage information.\n"
-    + "Command: .* -m robot.run --listener .*:False -s RobotProject.Test_for_run_config -t RobotProject.Test_for_run_config.def -i test 1 -o None -d None -l None -r None .*RobotProject\n"
+    + "Command: .* -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*RobotProject\n"
     + "Suite Executor: Robot Framework .*" | verify-true 
     
 }
