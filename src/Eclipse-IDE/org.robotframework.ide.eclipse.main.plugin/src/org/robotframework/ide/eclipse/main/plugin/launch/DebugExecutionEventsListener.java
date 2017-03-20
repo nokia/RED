@@ -122,7 +122,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         }
 
         if (shouldStopExecution(executedFileName, keywordLineNumber)) {
-            activateActiveEditorSourcePage();
+            activateSourcePageInActiveEditor();
             isStopping = true;
             resetSteppingState();
             resetStackFramesState();
@@ -136,7 +136,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         debugTarget.getCurrentKeywordsContext().put(name, newKeywordContext);
     }
 
-    private void activateActiveEditorSourcePage() {
+    private void activateSourcePageInActiveEditor() {
         final Display display = PlatformUI.getWorkbench().getDisplay();
         display.syncExec(() -> RobotFormEditor
                 .activateSourcePageInActiveEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow()));
