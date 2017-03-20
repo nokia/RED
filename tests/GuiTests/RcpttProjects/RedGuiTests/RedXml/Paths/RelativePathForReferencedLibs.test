@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/20/17 10:33 AM
+Save-Time: 3/20/17 4:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,11 +17,15 @@ Entry-Name: .content
 proc "comapre-paths" [val rp]{
 	set-dialog-result File [get-arg-file-path]
 	get-menu "File/Open File..." | click    
-	
-	get-editor "args_.*.arg" | get-text-viewer | get-property text | matches [format "# arguments automatically generated\n"
-    + "--pythonpath %s:%s:%s:%s\n"
-    + "--suite      RobotProject.Lib_with_variable" $rp $rp $rp $rp ] | verify-true
-    
+	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{  
+		get-editor "args_.*.arg" | get-text-viewer | get-property text | matches [format "# arguments automatically generated\n"
+	   	    + "--pythonpath %s:%s:%s:%s\n"
+	    	+ "--suite      RobotProject.Lib_with_variable" $rp $rp $rp $rp ] | verify-true
+    }-else{
+    	get-editor "args_.*.arg" | get-text-viewer | get-property text | matches [format "# arguments automatically generated\n"
+	    	+ "--pythonpath %s:%s\n"
+	    	+ "--suite      RobotProject.Lib_with_variable" $rp $rp] | verify-true
+    }
 	get-editor "args_.*.arg" | close 
 }
 
@@ -32,7 +36,7 @@ proc "check-arg-file-for-relative-path" [val project_name ""]{
 			comapre-paths [format "(%s%s\\\\libs|D:\\\\folder\\\\folder2|\\\\linux_path\\\\tests|\\\\win_path\\\\addons)" $new_ws_path $project_name]
 	    }
 	}-else{
-		comapre-paths [format "(%s/libs|/linux_path/tests)" $RED_workspace_path]
+		comapre-paths [format "(%s%s/libs|/linux_path/tests)" $RED_workspace_path $project_name]
 	}
 	 
 	
@@ -183,7 +187,7 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + "Ending test: RobotProject.Lib With Variable.test" | verify-true
 
 
-check-arg-file-for-relative-path -project_name "\\\\RobotProject"
+check-arg-file-for-relative-path -project_name  [os-specific -windowsValue "\\\\RobotProject" -linuxValue "/RobotProject"]
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
