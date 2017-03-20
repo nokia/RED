@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.execution.LogLevel;
 import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
@@ -137,9 +138,9 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     }
 
     private void activateSourcePageInActiveEditor() {
-        final Display display = PlatformUI.getWorkbench().getDisplay();
-        display.syncExec(() -> RobotFormEditor
-                .activateSourcePageInActiveEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow()));
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        workbench.getDisplay()
+                .syncExec(() -> RobotFormEditor.activateSourcePageInActiveEditor(workbench.getActiveWorkbenchWindow()));
     }
 
     private void prepareKeywordStart(final String name, final String type, final List<String> args) {
