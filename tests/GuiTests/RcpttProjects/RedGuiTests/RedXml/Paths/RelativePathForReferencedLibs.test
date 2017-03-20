@@ -7,12 +7,36 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:51 AM
+Save-Time: 3/20/17 10:33 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+proc "comapre-paths" [val rp]{
+	set-dialog-result File [get-arg-file-path]
+	get-menu "File/Open File..." | click    
+	
+	get-editor "args_.*.arg" | get-text-viewer | get-property text | matches [format "# arguments automatically generated\n"
+    + "--pythonpath %s:%s:%s:%s\n"
+    + "--suite      RobotProject.Lib_with_variable" $rp $rp $rp $rp ] | verify-true
+    
+	get-editor "args_.*.arg" | close 
+}
+
+proc "check-arg-file-for-relative-path" [val project_name ""]{
+	//set paths to regexp - if path is relative to WS then project_name is empty
+	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+		 replace -input $RED_workspace_path -old "\\" -new "\\\\" | let [val new_ws_path -input]{    
+			comapre-paths [format "(%s%s\\\\libs|D:\\\\folder\\\\folder2|\\\\linux_path\\\\tests|\\\\win_path\\\\addons)" $new_ws_path $project_name]
+	    }
+	}-else{
+		comapre-paths [format "(%s/libs|/linux_path/tests)" $RED_workspace_path]
+	}
+	 
+	
+}
 
 //open red.xml and add new path to PYTHONPAT
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
@@ -118,26 +142,7 @@ get-view Console | get-text-viewer | get-property text
     | contains "lib_with_variable.robot': Importing test library 'add' failed: ImportError: No module named add\n"
     | verify-true
     
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
-	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
-		let [val rp 
-		   [format "(%s\\\\libs|D:\\\\folder\\\\folder2|\\\\linux_path\\\\tests|\\\\win_path\\\\addons)" $new_ws_path]]
-		   {
-				get-view Console | get-text-viewer | get-object |invoke getLine  0
-				| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
-				| verify-true
-		   }
-    }
-}-else{
-    let [val rp 
-   [format "(%s/libs|/linux_path/tests)" $RED_workspace_path]]
-   {
-		get-view Console | get-text-viewer | get-object |invoke getLine  0
-		| matches [format "Command: .* -m .* -P %s:%s.* --listener .*" $rp $rp $rp] 
-		| verify-true
-   }
-}
-
+check-arg-file-for-relative-path
 
 //change path to Project
 get-tab-folder -index 3 | get-tab-item "RobotProject/red.xml" | click
@@ -178,26 +183,7 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + "Ending test: RobotProject.Lib With Variable.test" | verify-true
 
 
-
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
-	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
-		let [val rp 
-		   [format "(%s\\\\RobotProject\\\\libs|D:\\\\folder\\\\folder2|\\\\linux_path\\\\tests|\\\\win_path\\\\addons)" $new_ws_path]]
-		   {
-				get-view Console | get-text-viewer | get-object |invoke getLine  0
-				| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
-				| verify-true
-		   }
-    }
-}-else{
-   let [val rp 
-   [format "(%s/RobotProject/libs|/linux_path/tests)" $RED_workspace_path]]
-   {
-		get-view Console | get-text-viewer | get-object |invoke getLine  0
-		| matches [format "Command: .* -m .* -P %s:%s.* --listener .*" $rp $rp] 
-		| verify-true
-   }
-}      
+check-arg-file-for-relative-path -project_name "\\\\RobotProject"
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
