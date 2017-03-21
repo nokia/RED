@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _d8aMACuvEeW667Afdo4DcA
+Contexts: _d8aMACuvEeW667Afdo4DcA,_s-ctEA4_EeePcNCRX_abWA
 Element-Name: TimeoutInAgentForRemoteTest
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _taOpMA2GEeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/21/17 2:36 PM
+Save-Time: 3/21/17 3:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,14 +22,10 @@ proc "check-stdout-log" [val stdout_log]{
 		//check that test was run even agent doesn't connect
 	$stdout_log | contains "1 test total, 1 passed, 0 failed"
 }
+
+
 //export fresh Agnet to workspace
-get-preferences-menu | click
-get-window Preferences | get-tree | select "Robot Framework/Default Launch Configurations"
-set-dialog-result Folder $RED_workspace_path
-with [get-window Preferences] {
-    get-group "Listener tab" | get-button "Export Client Script" | click
-    get-button OK | click
-}
+export-agent-to-folder -folder $RED_workspace_path
 
 //add some content (test from this project will be run)
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
@@ -38,16 +34,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "    log  9"  
 get-button "Save \((Ctrl|M1)\+S\)" | click
 
-//run console with test with timeout set to 2s    
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{			
-	 check-stdout-log [
-	 	exec-process  "\"python.exe\"" "-m" "robot.run" "--listener" [concat "\"" $RED_workspace_path "\\TestRunnerAgent.py:localhost:43981:2\""]  "-s" "RobotProject.TestFile" [concat "\"" $RED_workspace_path "\\RobotProject\""] -timeout 15 
-			|  get stdout ]
-}-else{
-	check-stdout-log [
-	    exec-process [format "python -m robot.run --listener %s/TestRunnerAgent.py:localhost:43981:2 -s RobotProject.TestFile %s/RobotProject" $RED_workspace_path $RED_workspace_path]
-	    	| get stdout ] 
-}
+check-stdout-log -stdout_log [run-remote-test -path $RED_workspace_path -project_name "RobotProject" -IP ":localhost" -timeout ":2"]
 
 get-view Console | get-label "No consoles to display at this time." | get-property caption 
     | equals "No consoles to display at this time." | verify-true
@@ -56,13 +43,7 @@ get-view Console | get-label "No consoles to display at this time." | get-proper
 //-------------------------------------- run first Agent then test ----------------------------------------------------    
 
 //run console with test with timeout set to 8s - now IP is 127.0.0.1
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{			
-	exec-process "cmd.exe"  "/c" "start" "\"\""  "\"python.exe\"" "-m" "robot.run" "--listener" [concat "\"" $RED_workspace_path "\\TestRunnerAgent.py:127.0.0.1:43981:8\""]  "-s" "RobotProject.TestFile" [concat "\"" $RED_workspace_path "\\RobotProject\""] -timeout 5 
-		
-}-else{
-	exec-process  "gnome-terminal" "-e" [format "python -m robot.run --listener %s/TestRunnerAgent.py:127.0.0.1:43981:8 -s RobotProject.TestFile %s/RobotProject" $RED_workspace_path $RED_workspace_path] 
-	wait 2000	
-}
+run-remote-test-in-background -path $RED_workspace_path -project_name "RobotProject" -IP ":127.0.0.1" -timeout ":8"
 
 //run test when Agent is trying to connect    
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Run As/2 Robot Remote Test" | click    
