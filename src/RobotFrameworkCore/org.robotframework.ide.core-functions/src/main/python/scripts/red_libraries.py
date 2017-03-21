@@ -17,11 +17,48 @@ def get_standard_library_path(libname):
     import importlib
     module = importlib.import_module('robot.libraries.' + libname)
     return module.__file__
-    
+
+def create_libdoc(libname):
+    import robot
+    from robot.libdoc import libdoc
+    from tempfile import mkstemp
+    from base64 import b64encode
+    import sys
+    import os
+
+    try:
+        f, temp_lib_file_path = mkstemp()
+        os.close(f)
+        libdoc(libname, temp_lib_file_path, format='XML')
+        data=''
+        if sys.version_info < (3, 0, 0):
+            with open(temp_lib_file_path, 'r') as lib_file:
+                data = lib_file.read()
+            return b64encode(data)
+        else:
+            with open(temp_lib_file_path, 'r', encoding='utf-8') as lib_file:
+                data = lib_file.read()
+            return str(b64encode(bytes(data, 'utf-8')), 'utf-8')
+    finally:
+        os.remove(temp_lib_file_path)
+        
 if __name__ == '__main__':
     import sys
     if sys.argv[1] == '-names':
         print('\n'.join(get_standard_library_names()))
     elif sys.argv[1] == '-path':
         print(get_standard_library_path(sys.argv[2]))
+    elif sys.argv[1] == '-libdoc':
+        import os
+        from robot import pythonpathsetter
+        
+        libname = sys.argv[2]
+        paths = [] if len(sys.argv) <= 3 else sys.argv[3].split(os.pathsep)
+        
+        for path in paths:
+            pythonpathsetter.add_path(path)    
+        print(create_libdoc(libname))
+        for path in paths:
+            pythonpathsetter.remove_path(path)    
+        
      

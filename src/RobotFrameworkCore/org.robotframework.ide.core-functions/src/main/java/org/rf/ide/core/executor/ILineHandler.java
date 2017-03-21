@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.executor;
 
+@FunctionalInterface
 public interface ILineHandler {
     public void processLine(final String line);
 }

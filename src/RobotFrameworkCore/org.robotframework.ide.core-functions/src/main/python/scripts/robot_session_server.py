@@ -91,7 +91,6 @@ def get_module_path(module_name, python_paths, class_paths):
         pythonpathsetter.remove_path(path)    
     return module_path
 
-
 @logresult
 @encode_result_or_exception
 @logargs
@@ -158,19 +157,20 @@ def is_virtualenv():
 @logresult
 @encode_result_or_exception
 @logargs
-def create_libdoc(result_filepath, libname, python_paths, class_paths):
+def create_libdoc(libname, python_paths, class_paths):
     import robot
     from robot import pythonpathsetter
-    from robot.libdoc import libdoc
-
+    import red_libraries
+    
     __extend_classpath(class_paths)
-        
+    
     for path in python_paths + class_paths:
         pythonpathsetter.add_path(path)    
-    libdoc(libname, result_filepath, format='XML')
+    libdoc = red_libraries.create_libdoc(libname)
     for path in python_paths + class_paths:
         pythonpathsetter.remove_path(path)    
-
+    return libdoc
+    
 def __extend_classpath(class_paths):
     import platform
 

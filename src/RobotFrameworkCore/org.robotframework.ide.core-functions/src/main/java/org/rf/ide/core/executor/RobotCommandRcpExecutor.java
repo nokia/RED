@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.io.Files;
 
 /**
  * @author mmarzec
@@ -325,8 +327,16 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
             final List<String> classPaths = newArrayList(paths.getClassPaths());
 
-            callRpcFunction("createLibdoc", resultFilePath, libName, pythonPaths, classPaths);
-        } catch (final XmlRpcException e) {
+            final String base64EncodedLibfileContent = (String) callRpcFunction("createLibdoc", libName, pythonPaths,
+                    classPaths);
+            final byte[] bytes = Base64.getDecoder().decode(base64EncodedLibfileContent);
+
+            final File libdocFile = new File(resultFilePath);
+            if (!libdocFile.exists()) {
+                libdocFile.createNewFile();
+            }
+            Files.write(bytes, libdocFile);
+        } catch (final XmlRpcException | IOException e) {
             final String additional = libPath.isEmpty() ? ""
                     : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
             throw new RobotEnvironmentException(
