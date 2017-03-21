@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dEBUwBtDEeWSh6BKjAxDIw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 2:53 PM
+Save-Time: 3/21/17 5:22 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -45,8 +45,8 @@ get-button "Debug.*" | click -arrow
 exec-with-options {
     get-menu "1 SecondInsideTest.robot" | click
     wait 1000
-    get-window "Problem Occurred" | get-label "'Launching SecondInsideTest.robot' has encountered a problem." 
-        | get-property caption | equals "'Launching SecondInsideTest.robot' has encountered a problem." | verify-true
+    get-window "Problem Occurred" | get-label "Launching 'SecondInsideTest.robot' has encountered a problem." 
+        | get-property caption | equals "Launching 'SecondInsideTest.robot' has encountered a problem." | verify-true
     get-window "Problem Occurred" 
         | get-label "Suite 'Tests/SecondInsideTest.robot' does not exist in project 'ScriptWithResource'" 
         | get-property caption 
