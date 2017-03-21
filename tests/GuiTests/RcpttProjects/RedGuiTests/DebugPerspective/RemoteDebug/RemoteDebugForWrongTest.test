@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-6fSwAjXEee0EKWnoBYU9g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/21/17 3:23 PM
+Save-Time: 3/21/17 3:55 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -29,7 +29,7 @@ with [get-editor "Script.robot" | get-left-ruler | get-ruler-column AnnotationCo
 }
 
 
-let [val remote_project_path  [format "%s\Remote" $user_folder] ]{
+let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 	//export listener
 	export-agent-to-folder -folder $remote_project_path
 	
