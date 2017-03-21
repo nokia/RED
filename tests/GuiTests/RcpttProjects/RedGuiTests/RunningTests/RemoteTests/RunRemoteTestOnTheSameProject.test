@@ -1,0 +1,72 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _gURaQCu6EeW667Afdo4DcA,_ThULYA4_EeePcNCRX_abWA,_s-ctEA4_EeePcNCRX_abWA
+Element-Name: RunRemoteTestOnTheSameProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _W83MkA48EeePcNCRX_abWA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/21/17 4:51 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-console"{
+	get-view "Message Log" | get-editbox | get-property text 
+	    | equals "Starting test: OnlyRobotSuiteFile.SimpleLoggingTestCase.firstTest\n"
+	    + ".* : INFO : 1\n"
+	    + ".* : INFO : \$\{variable\} = 10\n"
+	    + ".* : INFO : 10\n"
+	    + "Ending test: OnlyRobotSuiteFile.SimpleLoggingTestCase.firstTest" | verify-true
+}  
+
+proc "check-execution-view"{
+	get-view "Execution View" | click
+	get-view "Execution View" | get-button "Expand All" | click
+	with [get-view "Execution View" | get-tree] {
+	    get-item "OnlyRobotSuiteFile \\(.* s\\)" | get-property childCount | equals 1 | verify-true
+	    get-item "OnlyRobotSuiteFile \\(.* s\\)" | get-property "getItems().length" | equals 1 | verify-true
+	    get-item "OnlyRobotSuiteFile \\(.* s\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "SimpleLoggingTestCase \\(.* s\\)" | verify-true
+	    get-item "OnlyRobotSuiteFile \\(.* s\\)" | get-property "getItems().TreeItem[0].getItems().getClassName()" 
+	        | equals "org.eclipse.swt.widgets.TreeItem[]" | verify-true
+	    get-item "OnlyRobotSuiteFile \\(.* s\\)" 
+	        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "firstTest \\(.* s\\)" 
+	        | verify-true
+	}
+
+}  
+export-agent-to-folder -folder $RED_workspace_path
+
+get-view "Project Explorer" | get-tree | select "OnlyRobotSuiteFile/SimpleLoggingTestCase.robot" 
+    | get-menu "Run As/2 Robot Remote Test" | click
+    
+run-remote-test -path $RED_workspace_path -project_name "OnlyRobotSuiteFile" -test "SimpleLoggingTestCase"
+
+    
+get-view Console | get-text-viewer | get-property text 
+    |contains "tests finished on client machine\n"
+    + "Remote connection closed" | verify-true
+    
+check-console
+check-execution-view
+
+
+//change ip to loclahost
+get-button "Run OnlyRobotSuiteFile" | click -arrow
+get-menu "Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-group "RED Server" | get-editbox -after [get-label "Local IP:"] | set-text localhost
+    get-button Apply | click
+    get-button Run | click
+}
+
+run-remote-test -path $RED_workspace_path -project_name "OnlyRobotSuiteFile" -test "SimpleLoggingTestCase"
+check-console
+check-execution-view
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
