@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HO73kPzXEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/16/17 11:23 AM
+Save-Time: 3/21/17 2:42 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,9 +33,6 @@ proc "check-label-for-error" [val val] [val errorType]{
 		get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
 	    	| get-property text | equals [format "Connection timeout '%s' must be an Integer between 1 and 3\D600" $val] | verify-true
 	}
-	
-	
-	    	
 } 
 
 proc "check-command-line" [val ip] [val port]{
@@ -45,7 +42,7 @@ proc "check-command-line" [val ip] [val port]{
 }   
 
 
- 
+//------------------------------------------------------------------------------ 
 get-menu "Run/Run Configurations..." | click
 
 with [get-window "Run Configurations" | get-tree] {
@@ -65,6 +62,21 @@ with [get-window "Run Configurations" | get-tab-folder] {
     get-property activePage | equals Listener | verify-true
     get-property tabCount | equals 4 | verify-true
 }
+
+//click all tabs - here was bug that clicking was changing run config
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot Remote/New_configuration"
+    with [get-tab-folder] {
+        get-tab-item Source | click
+        get-tab-item Environment | click
+        get-tab-item Common | click
+        get-tab-item Listener | click
+    }
+    get-button Close | click
+}
+
+//open one more time
+get-menu "Run/Run Configurations..." | click
 
 with [get-window "Run Configurations" | get-tree] {
     get-item "Robot Remote" | get-property childCount | equals 1 | verify-true
