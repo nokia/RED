@@ -37,11 +37,11 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
     }
 
     public static ILaunchConfigurationWorkingCopy prepareDefault(final IProject project) throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
         final String namePrefix = project.getName();
-        final String name = manager.generateLaunchConfigurationName(namePrefix);
+        final String name = launchManager.generateLaunchConfigurationName(namePrefix);
 
-        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+        final ILaunchConfigurationWorkingCopy configuration = launchManager.getLaunchConfigurationType(TYPE_ID)
                 .newInstance(null, name);
         final RemoteRobotLaunchConfiguration remoteConfig = new RemoteRobotLaunchConfiguration(configuration);
         remoteConfig.fillDefaults();

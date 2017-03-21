@@ -41,8 +41,6 @@ public class LaunchConfigurationTabValidatorTest {
 
     private static final String PROJECT_NAME = LaunchConfigurationTabValidatorTest.class.getSimpleName();
 
-    private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-
     private IProject project;
 
     private final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator();
@@ -65,6 +63,7 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     private static void removeAllConfigurations() throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationType[] types = manager.getLaunchConfigurationTypes();
         for (final ILaunchConfigurationType type : types) {
             final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
@@ -77,7 +76,7 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void whenProjectNameIsEmpty_fatalExceptionIsThrown() throws Exception {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project '' does not exist in workspace.");
+        thrown.expectMessage("Project cannot be empty.");
 
         validator.validateRobotTab(createRobotLaunchConfiguration(""));
     }
@@ -87,7 +86,7 @@ public class LaunchConfigurationTabValidatorTest {
         project.delete(true, null);
 
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project '" + PROJECT_NAME + "' does not exist in workspace.");
+        thrown.expectMessage("Project '" + PROJECT_NAME + "' cannot be found in workspace.");
 
         validator.validateRobotTab(createRobotLaunchConfiguration(PROJECT_NAME));
     }
@@ -184,7 +183,7 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void whenRemoteProjectNameIsEmpty_fatalExceptionIsThrown() throws Exception {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project '' does not exist in workspace.");
+        thrown.expectMessage("Project cannot be empty.");
 
         validator.validateListenerTab(createRemoteRobotLaunchConfiguration(""));
     }
@@ -192,7 +191,7 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void whenPortIsNotCorrect_fatalExceptionIsThrown() throws CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Server port 'xyz' must be an Integer between 1 and 65,535");
+        thrown.expectMessage("Server port 'xyz' must be an Integer between 1 and 65,535.");
 
         final RemoteRobotLaunchConfiguration launchConfig = createRemoteRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setAgentConnectionPortValue("xyz");
@@ -202,7 +201,7 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void whenTimeoutIsNotCorrect_fatalExceptionIsThrown() throws CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Connection timeout 'xyz' must be an Integer between 1 and 3,600");
+        thrown.expectMessage("Connection timeout 'xyz' must be an Integer between 1 and 3,600.");
 
         final RemoteRobotLaunchConfiguration launchConfig = createRemoteRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setAgentConnectionTimeoutValue("xyz");
@@ -312,6 +311,7 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationWorkingCopy configuration = manager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID).newInstance(null, "robot");
         final RobotLaunchConfiguration launchConfig = new RobotLaunchConfiguration(configuration);
@@ -322,6 +322,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     private RemoteRobotLaunchConfiguration createRemoteRobotLaunchConfiguration(final String projectName)
             throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationWorkingCopy configuration = manager
                 .getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID).newInstance(null, "remote");
         final RemoteRobotLaunchConfiguration launchConfig = new RemoteRobotLaunchConfiguration(configuration);

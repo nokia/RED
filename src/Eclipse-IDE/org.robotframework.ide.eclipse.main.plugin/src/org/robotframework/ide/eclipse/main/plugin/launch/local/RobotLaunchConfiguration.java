@@ -91,11 +91,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     private static ILaunchConfigurationWorkingCopy prepareCopy(final Map<IResource, List<String>> suitesMapping,
             final RobotLaunchConfigurationType type) throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
         final String namePrefix = RobotLaunchConfigurationNaming.getBasicName(suitesMapping.keySet(), type);
-        final String name = manager.generateLaunchConfigurationName(namePrefix);
+        final String name = launchManager.generateLaunchConfigurationName(namePrefix);
 
-        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+        final ILaunchConfigurationWorkingCopy configuration = launchManager.getLaunchConfigurationType(TYPE_ID)
                 .newInstance(null, name);
         fillDefaults(configuration, suitesMapping, type);
         return configuration;
