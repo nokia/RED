@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/14/17 2:03 PM
+Save-Time: 3/20/17 4:42 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -21,7 +21,7 @@ proc "wait-for-thread" [val file]{
 proc "wait-for-remote-connection"{
 	try -times 8 -delay 1000 -command{
 		with [get-view Debug | get-tree] {
-	    	get-item "RemoteProject \\[Robot Remote\\]/TCP connection using 127.0.0.1@43981" | get-property caption 
+	    	get-item ".* \\[Robot Remote\\]/TCP connection using 127.0.0.1@43981" | get-property caption 
 	       		 | equals "TCP connection using 127.0.0.1@43981" | verify-true
 		}
 	}
