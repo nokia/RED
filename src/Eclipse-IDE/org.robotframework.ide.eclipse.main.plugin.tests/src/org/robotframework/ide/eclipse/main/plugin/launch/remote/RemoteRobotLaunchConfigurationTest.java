@@ -18,7 +18,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -27,17 +26,15 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class RemoteRobotLaunchConfigurationTest {
 
-    private final static String PROJECT_NAME = RemoteRobotLaunchConfigurationTest.class.getSimpleName();
-
-    private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+    private static final String PROJECT_NAME = RemoteRobotLaunchConfigurationTest.class.getSimpleName();
 
     private IProject project;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Before
     public void setup() throws CoreException {
@@ -51,6 +48,7 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     private static void removeAllConfigurations() throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationType type = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
         for (final ILaunchConfiguration config : launchConfigs) {
@@ -65,8 +63,9 @@ public class RemoteRobotLaunchConfigurationTest {
         final ILaunchConfigurationWorkingCopy config = RemoteRobotLaunchConfiguration.prepareDefault(project);
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(config);
 
-        assertThat(config.getType())
-                .isEqualTo(manager.getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID));
+        assertThat(config.getType()).isEqualTo(DebugPlugin.getDefault()
+                .getLaunchManager()
+                .getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID));
         assertThat(robotConfig.getProjectName()).isEqualTo(RemoteRobotLaunchConfigurationTest.class.getName());
         assertThat(robotConfig.isRemoteAgent()).isTrue();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
@@ -76,7 +75,7 @@ public class RemoteRobotLaunchConfigurationTest {
 
     @Test
     public void defaultConfigurationObtained_whenCustomConfigurationIsFilledWithDefaults() throws CoreException {
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
 
         robotConfig.setAgentConnectionHostValue("1.2.3.4");
         robotConfig.setAgentConnectionPortValue("987");
@@ -93,8 +92,7 @@ public class RemoteRobotLaunchConfigurationTest {
 
     @Test
     public void projectIsReturned_whenAskedForResourcesUnderDebug() throws CoreException {
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setProjectName(PROJECT_NAME);
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(project);
     }
 
@@ -103,7 +101,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Server IP cannot be empty");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionHostValue("");
         robotConfig.getAgentConnectionHost();
     }
@@ -113,7 +111,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Server port '' must be an Integer between 1 and 65,535");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("");
         robotConfig.getAgentConnectionPort();
     }
@@ -123,7 +121,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Server port 'abc' must be an Integer between 1 and 65,535");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("abc");
         robotConfig.getAgentConnectionPort();
     }
@@ -133,7 +131,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Server port '0' must be an Integer between 1 and 65,535");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("0");
         robotConfig.getAgentConnectionPort();
     }
@@ -143,7 +141,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Server port '65536' must be an Integer between 1 and 65,535");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("65536");
         robotConfig.getAgentConnectionPort();
     }
@@ -153,7 +151,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("");
         robotConfig.getAgentConnectionTimeout();
     }
@@ -163,7 +161,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Connection timeout 'abc' must be an Integer between 1 and 3,600");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("abc");
         robotConfig.getAgentConnectionTimeout();
     }
@@ -173,7 +171,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Connection timeout '0' must be an Integer between 1 and 3,600");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("0");
         robotConfig.getAgentConnectionTimeout();
     }
@@ -183,14 +181,14 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Connection timeout '3601' must be an Integer between 1 and 3,600");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("3601");
         robotConfig.getAgentConnectionTimeout();
     }
 
     @Test
     public void remoteSettingsAreCorrect_whenSet() throws CoreException {
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionHostValue("192.168.1.21");
         robotConfig.setAgentConnectionPortValue("1234");
         robotConfig.setAgentConnectionTimeoutValue("567");
@@ -201,8 +199,7 @@ public class RemoteRobotLaunchConfigurationTest {
 
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
-        robotConfig.setProjectName(PROJECT_NAME);
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         assertThat(robotConfig.getProject()).isEqualTo(project);
     }
 
@@ -211,14 +208,33 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Project 'not_existing' cannot be found in workspace");
 
-        final RemoteRobotLaunchConfiguration robotConfig = createRemoteRobotLaunchConfiguration();
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setProjectName("not_existing");
         robotConfig.getProject();
     }
 
-    private RemoteRobotLaunchConfiguration createRemoteRobotLaunchConfiguration() throws CoreException {
-        final ILaunchConfigurationWorkingCopy configuration = manager
-                .getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID).newInstance(null, "config_name");
-        return new RemoteRobotLaunchConfiguration(configuration);
+    @Test
+    public void whenProjectIsClosed_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Project '" + PROJECT_NAME + "' is currently closed");
+
+        project.close(null);
+
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
+        robotConfig.getProject();
+    }
+
+    @Test
+    public void whenProjectIsEmpty_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Project cannot be empty");
+
+        final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
+        robotConfig.setProjectName("");
+        robotConfig.getProject();
+    }
+
+    private RemoteRobotLaunchConfiguration getDefaultRemoteRobotLaunchConfiguration() throws CoreException {
+        return new RemoteRobotLaunchConfiguration(RemoteRobotLaunchConfiguration.prepareDefault(project));
     }
 }

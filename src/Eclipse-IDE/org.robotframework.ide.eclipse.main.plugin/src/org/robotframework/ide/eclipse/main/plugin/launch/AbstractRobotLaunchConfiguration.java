@@ -67,11 +67,14 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     public IProject getProject() throws CoreException {
         final String projectName = getProjectName();
         if (projectName.isEmpty()) {
-            return null;
+            throw newCoreException("Project cannot be empty");
         }
         final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
         if (!project.exists()) {
-            throw newCoreException("Project '" + projectName + "' cannot be found in workspace");
+            throw newCoreException("Project '" + project.getName() + "' cannot be found in workspace");
+        }
+        if (!project.isOpen()) {
+            throw newCoreException("Project '" + project.getName() + "' is currently closed");
         }
         return project;
     }

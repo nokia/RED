@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -32,17 +31,10 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
     }
 
     @Override
-    protected IProject[] getProjectsForProblemSearch(final ILaunchConfiguration configuration, final String mode)
-            throws CoreException {
-        return new IProject[] { LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getProject() };
-    }
-
-    @Override
     public void launch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException {
-        if (!ILaunchManager.RUN_MODE.equals(mode) && !ILaunchManager.DEBUG_MODE.equals(mode)) {
-            throw newCoreException("Unrecognized launch mode: '" + mode + "'");
-        }
+
+        final TestsMode testsMode = getTestsMode(mode);
 
         if (IRobotLaunchConfiguration.lockConfigurationLaunches()) {
             return;
@@ -51,13 +43,16 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         RobotTestsLaunch testsLaunchContext = null;
         try {
             testsLaunchContext = executionService.testExecutionStarting();
-            final LaunchExecution launchExecution = doLaunch(configuration, getTestsMode(mode), launch,
-                    testsLaunchContext);
+
+            validateProject(configuration);
+            final LaunchExecution launchExecution = doLaunch(configuration, testsMode, launch, testsLaunchContext);
+
             // FIXME : don't need to wait when it would be possible to launch multiple
             // configurations
             launchExecution.waitFor(monitor);
         } catch (final CoreException e) {
-            final String message = String.format("'Launching %s' has encountered a problem.", configuration.getName());
+            // handling CoreException without logging
+            final String message = String.format("Launching '%s' has encountered a problem.", configuration.getName());
             StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e),
                     StatusManager.SHOW);
         } finally {
@@ -67,8 +62,15 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         }
     }
 
-    private static TestsMode getTestsMode(final String mode) {
+    private static TestsMode getTestsMode(final String mode) throws CoreException {
+        if (!ILaunchManager.RUN_MODE.equals(mode) && !ILaunchManager.DEBUG_MODE.equals(mode)) {
+            throw newCoreException("Unrecognized launch mode: '" + mode + "'");
+        }
         return ILaunchManager.RUN_MODE.equals(mode) ? TestsMode.RUN : TestsMode.DEBUG;
+    }
+
+    private void validateProject(final ILaunchConfiguration configuration) throws CoreException {
+        LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getProject();
     }
 
     @Override

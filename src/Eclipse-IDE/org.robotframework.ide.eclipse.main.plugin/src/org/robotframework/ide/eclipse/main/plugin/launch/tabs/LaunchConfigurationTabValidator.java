@@ -51,13 +51,16 @@ public class LaunchConfigurationTabValidator {
         try {
             final List<String> warnings = new ArrayList<>();
 
-            final String projectName = robotConfig.getProjectName();
-
-            validateProject(projectName);
+            try {
+                robotConfig.getProject();
+            } catch (final CoreException e) {
+                throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage() + ".");
+            }
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
             if (suitesToRun.isEmpty()) {
-                warnings.add("There are no suites specified. All suites in '" + projectName + "' will be executed.");
+                warnings.add("There are no suites specified. All suites in '" + robotConfig.getProjectName()
+                        + "' will be executed.");
             }
             validateSuitesToRun(suitesToRun);
 
@@ -75,21 +78,15 @@ public class LaunchConfigurationTabValidator {
             throws LaunchConfigurationValidationFatalException {
         try {
             if (robotConfig instanceof RemoteRobotLaunchConfiguration) {
-                final String projectName = robotConfig.getProjectName();
-                validateProject(projectName);
+                robotConfig.getProject();
             }
             if (robotConfig.isRemoteAgent()) {
-                try {
-                    robotConfig.getAgentConnectionHost();
-                    robotConfig.getAgentConnectionPort();
-                    robotConfig.getAgentConnectionTimeout();
-                } catch (final CoreException e) {
-                    throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
-                }
+                robotConfig.getAgentConnectionHost();
+                robotConfig.getAgentConnectionPort();
+                robotConfig.getAgentConnectionTimeout();
             }
         } catch (final CoreException e) {
-            throw new LaunchConfigurationValidationFatalException(
-                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
+            throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage() + ".");
         }
     }
 
@@ -119,21 +116,10 @@ public class LaunchConfigurationTabValidator {
         }
     }
 
-    private void validateProject(final String projectName) throws CoreException {
-        final Optional<IProject> project = getProject(projectName);
-        if (!project.isPresent() || !project.get().exists()) {
-            throw new LaunchConfigurationValidationFatalException(
-                    "Project '" + projectName + "' does not exist in workspace.");
-        }
-        if (!project.get().isOpen()) {
-            throw new LaunchConfigurationValidationFatalException("Project '" + projectName + "' is currently closed.");
-        }
-    }
-
     private void validateRuntimeEnvironment(final String projectName) {
-        final Optional<IProject> project = getProject(projectName);
-        if (project.isPresent()) {
-            final RobotProject robotProject = model.createRobotProject(project.get());
+        if (!projectName.isEmpty()) {
+            final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+            final RobotProject robotProject = model.createRobotProject(project);
             final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
             if (env == null || !env.isValidPythonInstallation()) {
                 throw new LaunchConfigurationValidationFatalException(
@@ -152,11 +138,6 @@ public class LaunchConfigurationTabValidator {
                 throw new LaunchConfigurationValidationFatalException("Executable file does not exist.");
             }
         }
-    }
-
-    private Optional<IProject> getProject(final String projectName) {
-        return projectName.isEmpty() ? Optional.<IProject> empty()
-                : Optional.of(ResourcesPlugin.getWorkspace().getRoot().getProject(projectName));
     }
 
     private void validateSuitesToRun(final Map<IResource, List<String>> suitesToRun) {

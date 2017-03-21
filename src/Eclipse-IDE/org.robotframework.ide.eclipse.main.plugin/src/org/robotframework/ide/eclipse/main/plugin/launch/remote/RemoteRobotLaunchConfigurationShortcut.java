@@ -64,9 +64,6 @@ public class RemoteRobotLaunchConfigurationShortcut implements ILaunchShortcut2 
     }
 
     private void doLaunchConfiguration(final ILaunchConfiguration config, final String mode) {
-        if (config == null) {
-            throw new IllegalStateException("There must be valid Remote Robot Launch Configuration provided.");
-        }
         final WorkspaceJob job = new WorkspaceJob("Launching Remote Robot Tests") {
 
             @Override
