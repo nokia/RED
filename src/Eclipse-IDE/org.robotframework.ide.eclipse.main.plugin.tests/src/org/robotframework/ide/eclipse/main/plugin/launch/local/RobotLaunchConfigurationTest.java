@@ -28,7 +28,6 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -42,17 +41,15 @@ import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfigurationTest {
 
-    private final static String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
-
-    private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+    private static final String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
 
     private IProject project;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Before
     public void setup() throws CoreException {
@@ -66,7 +63,9 @@ public class RobotLaunchConfigurationTest {
     }
 
     private static void removeAllConfigurations() throws CoreException {
-        final ILaunchConfigurationType type = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
+        final ILaunchConfigurationType type = manager
+                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
         final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
         for (final ILaunchConfiguration config : launchConfigs) {
             config.delete();
@@ -282,6 +281,27 @@ public class RobotLaunchConfigurationTest {
 
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setProjectName("not_existing");
+        robotConfig.getProject();
+    }
+
+    @Test
+    public void whenProjectIsClosed_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Project '" + PROJECT_NAME + "' is currently closed");
+
+        project.close(null);
+
+        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        robotConfig.getProject();
+    }
+
+    @Test
+    public void whenProjectIsEmpty_coreExceptionIsThrown() throws CoreException {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Project cannot be empty");
+
+        final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
+        robotConfig.setProjectName("");
         robotConfig.getProject();
     }
 

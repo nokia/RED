@@ -37,8 +37,6 @@ public class RobotLaunchConfigurationDelegateTest {
 
     private static final String PROJECT_NAME = RobotLaunchConfigurationDelegateTest.class.getSimpleName();
 
-    private static final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
@@ -161,6 +159,7 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
+        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final ILaunchConfigurationWorkingCopy configuration = manager
                 .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID).newInstance(null, "robot");
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
