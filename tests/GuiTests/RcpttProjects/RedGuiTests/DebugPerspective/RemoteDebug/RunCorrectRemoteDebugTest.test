@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _ur0DkAf5Eee0EKWnoBYU9g,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_pjyZ0Af5Eee0EKWnoBYU9g,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _ur0DkAf5Eee0EKWnoBYU9g,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_pjyZ0Af5Eee0EKWnoBYU9g,_2Q6oEPOSEeaWpbE3jg39cA,_ThULYA4_EeePcNCRX_abWA,_s-ctEA4_EeePcNCRX_abWA
 Element-Name: RunCorrectRemoteDebugTest
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _vURJgAffEee0EKWnoBYU9g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/16/17 4:56 PM
+Save-Time: 3/21/17 3:30 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -15,42 +15,32 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-preferences-menu | click
-with [get-window Preferences] {
-    get-tree | select "Robot Framework/Default Launch Configurations"
-    get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 15
-    get-button Apply | click
-    get-button OK | click
-}
-
-
-
+//create run configuration
 get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | select "Robot Remote" | double-click
 
-let [val path_to_project  [format "%s/Remote" $user_folder] ]{
-	set-dialog-result Folder [$path_to_project]
+let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
+	//set path to user home folder
+	set-dialog-result Folder [$remote_project_path]
 	with [get-window "Run Configurations"] {
 	    get-group "Remote Client" | get-button "Export Client Script" | click
 	    get-button Close | click
 	}
+	
+	//add BP
 	get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | double-click
 	get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 9
 	
+	//run test twice - problem with resource
 	repeat -times 2 -command{
 		exec-with-options -disableJobWaiting -command {
-			get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | select "RemoteProject/TestFile.robot" 
+			get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" 
 			    | get-menu "Debug As/2 Robot Remote Test" | click
 			
 			wait-for-remote-connection 
 			
+			run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
 			
-			if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-				exec-process  "cmd.exe"  "/c" "start" "\"\""  "\"python.exe\"" "-m" "robot.run" "--listener" [concat "\"" $path_to_project "\\TestRunnerAgent.py:43981\""]  "-s" "RemoteProject.TestFile" [concat "\"" $path_to_project "\\RemoteProject\""] -timeout 3		
-			}-else{
-			    exec-process  "gnome-terminal" "-e" [format "python -m robot.run --listener %s/TestRunnerAgent.py:43981 -s RemoteProject.TestFile %s/RemoteProject" $path_to_project $path_to_project]
-			    wait 2000
-			}    
 			check-debug-marker-on-ruler -line 9	-script_name "TestFile.robot" 
 			get-button "Step Into (F5)" | click
 			check-debug-marker-on-ruler -line 3 -script_name "res.robot"
