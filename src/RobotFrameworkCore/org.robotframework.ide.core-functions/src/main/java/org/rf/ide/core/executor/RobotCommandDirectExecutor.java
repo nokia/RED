@@ -6,6 +6,7 @@
 package org.rf.ide.core.executor;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.io.IOException;
@@ -165,10 +166,9 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
-            final String paths = RobotRuntimeEnvironment
-                    .wrapArgumentIfNeeded(Joiner.on(File.pathSeparator).join(additions));
-            final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-libdoc", libName,
-                    paths);
+            final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-libdoc",
+                    libName);
+            cmdLine.addAll(additions.stream().map(RobotRuntimeEnvironment::wrapArgumentIfNeeded).collect(toList()));
 
             final byte[] docededFileContent = runLibdoc(libName, cmdLine);
             final File libdocFile = new File(resultFilePath);

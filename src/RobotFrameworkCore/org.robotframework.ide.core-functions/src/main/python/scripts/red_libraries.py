@@ -49,16 +49,10 @@ if __name__ == '__main__':
     elif sys.argv[1] == '-path':
         print(get_standard_library_path(sys.argv[2]))
     elif sys.argv[1] == '-libdoc':
-        import os
-        from robot import pythonpathsetter
-        
         libname = sys.argv[2]
-        paths = [] if len(sys.argv) <= 3 else sys.argv[3].split(os.pathsep)
+        paths = sys.argv[3:]
         
-        for path in paths:
-            pythonpathsetter.add_path(path)    
+        sys.path = paths + sys.path
         print(create_libdoc(libname))
-        for path in paths:
-            pythonpathsetter.remove_path(path)    
         
      
