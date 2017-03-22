@@ -37,7 +37,7 @@ import org.robotframework.red.jface.dialogs.ScriptExportDialog;
 /**
  * @author mmarzec
  */
-public class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
+class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
     private final boolean isAgentTypeButtonSelection;
 

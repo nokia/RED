@@ -5,9 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -135,7 +134,8 @@ class InterpretersComposite extends Composite {
         comboExecutorName.setEnabled(!usesProjectInterpreter);
         checkEnvironmentBtn.setEnabled(!usesProjectInterpreter);
 
-        comboExecutorName.select(newArrayList(comboExecutorName.getItems()).indexOf(executor.name()));
+        final String executorName = executor != null ? executor.name() : SuiteExecutor.Python.name();
+        comboExecutorName.select(Arrays.asList(comboExecutorName.getItems()).indexOf(executorName));
     }
 
     boolean isUsingProjectInterpreter() {

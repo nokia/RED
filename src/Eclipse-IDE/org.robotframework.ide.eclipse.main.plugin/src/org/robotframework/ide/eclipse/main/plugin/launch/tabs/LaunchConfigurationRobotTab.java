@@ -39,7 +39,7 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 /**
  * @author mmarzec
  */
-public class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
+class LaunchConfigurationRobotTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
     private Text robotArgumentsText;
 
