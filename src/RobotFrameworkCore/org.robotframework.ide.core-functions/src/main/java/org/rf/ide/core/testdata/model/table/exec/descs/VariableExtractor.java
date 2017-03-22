@@ -24,7 +24,6 @@ public class VariableExtractor {
         this.mapper = new DeclarationMapper();
     }
 
-    @SuppressWarnings("PMD.AvoidThrowingRawExceptionTypes")
     public MappingResult extract(final FilePosition fp, final String text, final String fileName) {
         try {
             final Container mainContainer = structureExtractor.buildStructureTree(text);
@@ -41,12 +40,19 @@ public class VariableExtractor {
 
             return result;
         } catch (final Exception e) {
-            throw new RuntimeException("An exception occurs during variable extraction in file " + fileName
+            throw new VariableExtractionException("An exception occurs during variable extraction in file " + fileName
                     + " at position " + fp + " for text " + text, e);
         }
     }
 
     public MappingResult extract(final RobotToken token, final String fileName) {
         return extract(token.getFilePosition(), token.getText().toString(), fileName);
+    }
+
+    private static class VariableExtractionException extends RuntimeException {
+
+        public VariableExtractionException(final String message, final Throwable cause) {
+            super(message, cause);
+        }
     }
 }

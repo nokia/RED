@@ -25,12 +25,10 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class RemoteRobotLaunchConfigurationFinderTest {
 
-    private static final String PROJECT_NAME = RobotLaunchConfigurationFinderTest.class.getSimpleName();
-
     private static IProject project;
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
 
     @BeforeClass
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {

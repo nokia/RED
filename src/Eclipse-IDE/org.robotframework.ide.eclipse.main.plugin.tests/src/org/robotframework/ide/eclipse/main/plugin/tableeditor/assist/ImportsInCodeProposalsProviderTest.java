@@ -22,7 +22,7 @@ import org.robotframework.red.junit.ShellProvider;
 public class ImportsInCodeProposalsProviderTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(ImportsInCodeProposalsProviderTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(ImportsInCodeProposalsProviderTest.class);
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();

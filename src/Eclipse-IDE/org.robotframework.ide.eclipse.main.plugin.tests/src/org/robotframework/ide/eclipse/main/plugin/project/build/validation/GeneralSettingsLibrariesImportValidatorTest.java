@@ -53,10 +53,10 @@ import com.google.common.collect.Range;
 
 public class GeneralSettingsLibrariesImportValidatorTest {
 
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             GeneralSettingsLibrariesImportValidatorTest.class);
 
-    public static final TemporaryFolder tempFolder = new TemporaryFolder();
+    public static TemporaryFolder tempFolder = new TemporaryFolder();
 
     @ClassRule
     public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
@@ -265,7 +265,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
         final LibraryConstructor constructor = new LibraryConstructor();
         constructor.setArguments(newArrayList("x", "y", "*ls"));
-        
+
         final LibrarySpecification spec = createNewLibrarySpecification(libPath, constructor);
         final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);

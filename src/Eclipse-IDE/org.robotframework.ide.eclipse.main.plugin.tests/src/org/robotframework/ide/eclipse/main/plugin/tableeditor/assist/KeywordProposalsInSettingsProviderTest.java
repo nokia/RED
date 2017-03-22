@@ -35,7 +35,7 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 public class KeywordProposalsInSettingsProviderTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             KeywordProposalsInSettingsProviderTest.class);
 
     @Rule
@@ -96,7 +96,7 @@ public class KeywordProposalsInSettingsProviderTest {
             }
         }
     }
-    
+
     @Test
     public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() throws Exception {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
@@ -113,7 +113,7 @@ public class KeywordProposalsInSettingsProviderTest {
             assertThat(proposals).isEmpty();
         }
     }
-    
+
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix() throws Exception {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
