@@ -106,7 +106,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
 
-        assertThat(robotConfig.isRemoteAgent()).isFalse();
+        assertThat(robotConfig.isUsingRemoteAgent()).isFalse();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
@@ -129,7 +129,7 @@ public class RobotLaunchConfigurationTest {
         robotConfig.setExcludedTags(asList("excluded"));
         robotConfig.setIncludedTags(asList("included"));
 
-        robotConfig.setRemoteAgent(true);
+        robotConfig.setUsingRemoteAgent(true);
         robotConfig.setAgentConnectionHostValue("1.2.3.4");
         robotConfig.setAgentConnectionPortValue("987");
         robotConfig.setAgentConnectionTimeoutValue("123");
@@ -148,7 +148,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
 
-        assertThat(robotConfig.isRemoteAgent()).isFalse();
+        assertThat(robotConfig.isUsingRemoteAgent()).isFalse();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);

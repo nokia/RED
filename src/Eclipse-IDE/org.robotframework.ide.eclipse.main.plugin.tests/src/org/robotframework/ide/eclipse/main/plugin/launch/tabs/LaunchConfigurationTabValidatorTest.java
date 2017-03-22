@@ -194,7 +194,7 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void nothingIsThrown_whenEverythingIsOkWithListenerTab_1() throws Exception {
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
-        launchConfig.setRemoteAgent(true);
+        launchConfig.setUsingRemoteAgent(true);
         launchConfig.setAgentConnectionHostValue("1.2.3.4");
         launchConfig.setAgentConnectionPortValue("12345");
         launchConfig.setAgentConnectionTimeoutValue("99");

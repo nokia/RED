@@ -32,7 +32,7 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
     }
 
     @Override
-    public boolean isRemoteAgent() throws CoreException {
+    public boolean isUsingRemoteAgent() throws CoreException {
         return true;
     }
 

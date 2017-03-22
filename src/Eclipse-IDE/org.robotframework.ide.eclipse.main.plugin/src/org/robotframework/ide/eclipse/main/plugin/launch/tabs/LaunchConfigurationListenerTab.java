@@ -220,8 +220,8 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
                     .robotLaunchConfiguration(configuration);
 
             if (isAgentTypeButtonSelection) {
-                useLocalAgentButton.setSelection(!robotConfig.isRemoteAgent());
-                useRemoteAgentButton.setSelection(robotConfig.isRemoteAgent());
+                useLocalAgentButton.setSelection(!robotConfig.isUsingRemoteAgent());
+                useRemoteAgentButton.setSelection(robotConfig.isUsingRemoteAgent());
             } else {
                 projectComposite.setInput(robotConfig.getProjectName());
             }
@@ -269,7 +269,7 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
                 .robotLaunchConfiguration(configuration);
         try {
             if (isAgentTypeButtonSelection) {
-                robotConfig.setRemoteAgent(useRemoteAgentButton.getSelection());
+                robotConfig.setUsingRemoteAgent(useRemoteAgentButton.getSelection());
             } else {
                 robotConfig.setProjectName(projectComposite.getSelectedProjectName());
             }
