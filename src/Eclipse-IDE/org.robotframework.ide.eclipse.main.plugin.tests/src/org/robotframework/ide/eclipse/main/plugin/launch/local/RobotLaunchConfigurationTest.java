@@ -18,16 +18,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -36,6 +31,7 @@ import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotLaunchConfiguration;
 import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.RunConfigurationProvider;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -43,34 +39,14 @@ public class RobotLaunchConfigurationTest {
 
     private static final String PROJECT_NAME = RobotLaunchConfigurationTest.class.getSimpleName();
 
-    private IProject project;
-
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
-    @Before
-    public void setup() throws CoreException {
-        removeAllConfigurations();
-        project = projectProvider.getProject();
-    }
-
-    @AfterClass
-    public static void clean() throws CoreException {
-        removeAllConfigurations();
-    }
-
-    private static void removeAllConfigurations() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType type = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
-        for (final ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-    }
+    @Rule
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
 
     @Test
     public void nullVariablesArrayIsReturned_whenThereAreNoVariablesDefined() throws Exception {
@@ -184,8 +160,8 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void onlySelectedTestCasesAreUsed_inConfigurationForSelectedTestCases() throws CoreException {
-        final IResource res1 = project.getFile("Resource1");
-        final IResource res2 = project.getFile("Resource2");
+        final IResource res1 = projectProvider.getFile("Resource1");
+        final IResource res2 = projectProvider.getFile("Resource2");
         final List<String> casesForRes1 = asList("case1", "case3");
         final List<String> casesForRes2 = asList("case1");
 
@@ -208,7 +184,7 @@ public class RobotLaunchConfigurationTest {
     public void suitesObtained_whenSuitesCollectedFromConfiguration() throws CoreException {
         final List<IResource> resources = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            final IResource res = project.getFile("Resource " + i + ".fake");
+            final IResource res = projectProvider.getFile("Resource " + i + ".fake");
             resources.add(res);
         }
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
@@ -222,7 +198,7 @@ public class RobotLaunchConfigurationTest {
 
     @Test
     public void emptySuitesObtained_whenProjectNameIsEmpty() throws CoreException {
-        final List<IResource> resources = asList(project.getFile("Resource 1.fake"));
+        final List<IResource> resources = asList(projectProvider.getFile("Resource 1.fake"));
         final ILaunchConfigurationWorkingCopy configuration = RobotLaunchConfiguration.prepareDefault(resources);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setProjectName("");
@@ -271,7 +247,7 @@ public class RobotLaunchConfigurationTest {
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
-        assertThat(robotConfig.getProject()).isEqualTo(project);
+        assertThat(robotConfig.getProject()).isEqualTo(projectProvider.getProject());
     }
 
     @Test
@@ -289,7 +265,7 @@ public class RobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Project '" + PROJECT_NAME + "' is currently closed");
 
-        project.close(null);
+        projectProvider.getProject().close(null);
 
         final IRobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.getProject();
@@ -317,7 +293,7 @@ public class RobotLaunchConfigurationTest {
     public void projectIsReturned_whenAskedForResourcesUnderDebug() throws CoreException {
         final RobotLaunchConfiguration robotConfig = getDefaultRobotLaunchConfiguration();
         robotConfig.setSuitePaths(Collections.emptyMap());
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(project);
+        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(projectProvider.getProject());
     }
 
     @Test
@@ -341,7 +317,7 @@ public class RobotLaunchConfigurationTest {
     }
 
     private RobotLaunchConfiguration getDefaultRobotLaunchConfiguration() throws CoreException {
-        final IResource res = project.getFile("Resource");
+        final IResource res = projectProvider.getFile("Resource");
         final List<IResource> resources = asList(res);
         return new RobotLaunchConfiguration(RobotLaunchConfiguration.prepareDefault(resources));
     }
