@@ -22,16 +22,16 @@ import org.robotframework.red.junit.ShellProvider;
 public class KeywordProposalsProviderTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsProviderTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsProviderTest.class);
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix() throws Exception {
-        final IFile file = projectProvider.createFile("file.robot", 
-                "*** Keywords ***", 
-                "kw1", 
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Keywords ***",
+                "kw1",
                 "kw2");
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile);

@@ -18,13 +18,13 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class RobotLaunchConfigurationNamingTest {
 
-    private final static String PROJECT_NAME = RobotLaunchConfigurationNamingTest.class.getSimpleName();
+    @ClassRule
+    public static ProjectProvider projectProvider1 = new ProjectProvider(
+            RobotLaunchConfigurationNamingTest.class.getSimpleName() + "1");
 
     @ClassRule
-    public static ProjectProvider projectProvider1 = new ProjectProvider(PROJECT_NAME + "1");
-
-    @ClassRule
-    public static ProjectProvider projectProvider2 = new ProjectProvider(PROJECT_NAME + "2");
+    public static ProjectProvider projectProvider2 = new ProjectProvider(
+            RobotLaunchConfigurationNamingTest.class.getSimpleName() + "2");
 
     @Test
     public void newConfigurationNameIsReturned_forEmptyResources() throws Exception {

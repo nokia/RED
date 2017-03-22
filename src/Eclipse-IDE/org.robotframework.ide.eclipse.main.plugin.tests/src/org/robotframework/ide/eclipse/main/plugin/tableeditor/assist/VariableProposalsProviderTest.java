@@ -35,7 +35,7 @@ import com.google.common.collect.Iterables;
 public class VariableProposalsProviderTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             VariableProposalsProviderTest.class);
 
     @Rule

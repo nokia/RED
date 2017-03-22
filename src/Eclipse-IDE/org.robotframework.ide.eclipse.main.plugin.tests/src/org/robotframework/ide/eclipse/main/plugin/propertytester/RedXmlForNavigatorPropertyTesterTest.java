@@ -15,10 +15,8 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class RedXmlForNavigatorPropertyTesterTest {
 
-    private static final String PROJECT_NAME = RedXmlForNavigatorPropertyTesterTest.class.getSimpleName();
-
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    public static ProjectProvider projectProvider = new ProjectProvider(RedXmlForNavigatorPropertyTesterTest.class);
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -87,7 +85,7 @@ public class RedXmlForNavigatorPropertyTesterTest {
         assertThat(isInternalFolder(projectProvider.getProject(), true)).isFalse();
         assertThat(isInternalFolder(projectProvider.getProject(), false)).isTrue();
     }
-    
+
     @Test
     public void testIsFileProperty() {
         assertThat(isFile(projectProvider.getDir(Path.fromPortableString("excluded_dir")), false)).isTrue();
@@ -99,7 +97,7 @@ public class RedXmlForNavigatorPropertyTesterTest {
         assertThat(isFile(projectProvider.getProject(), true)).isFalse();
         assertThat(isFile(projectProvider.getProject(), false)).isTrue();
     }
-    
+
     @Test
     public void testParentExcludedProperty() {
         assertThat(isExcludedViaInheritance(projectProvider.getDir(Path.fromPortableString("excluded_dir")), false)).isTrue();
@@ -123,11 +121,11 @@ public class RedXmlForNavigatorPropertyTesterTest {
     private boolean isInternalFolder(final IResource element, final boolean expected) {
         return tester.test(element, RedXmlForNavigatorPropertyTester.IS_INTERNAL_FOLDER, null, expected);
     }
-    
+
     private boolean isFile(final IResource element, final boolean expected) {
         return tester.test(element, RedXmlForNavigatorPropertyTester.IS_FILE, null, expected);
     }
-    
+
     private boolean isExcludedViaInheritance(final IResource element, final boolean expected) {
         return tester.test(element, RedXmlForNavigatorPropertyTester.PARENT_EXCLUDED, null, expected);
     }

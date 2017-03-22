@@ -32,7 +32,7 @@ import com.google.common.collect.Range;
 public class AttributesAugmentingReportingStrategyTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             AttributesAugmentingReportingStrategyTest.class);
 
     @BeforeClass
@@ -63,7 +63,7 @@ public class AttributesAugmentingReportingStrategyTest {
         augmentingReportingStrategy.handleProblem(problem, file, 0, additionalAttributes);
         augmentingReportingStrategy.handleProblem(problem, file, filePosition, additionalAttributes);
         augmentingReportingStrategy.handleProblem(problem, file, token, additionalAttributes);
-        
+
         final IMarker[] markers = file.findMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
         assertThat(markers).hasSize(6);
         for (final IMarker marker : markers) {

@@ -84,7 +84,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     public void start(final Shell parent) {
-        if (startDryRun()) {
+        if (lockDryRun()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Discovering libraries") {
 
                 @Override
@@ -105,7 +105,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         // fine, will simply stop dry run
                     } finally {
                         monitor.done();
-                        stopDryRun();
+                        unlockDryRun();
                     }
 
                     return Status.OK_STATUS;

@@ -33,7 +33,7 @@ public class SourceDocumentationSelectionChangedListener {
 
     private final AtomicBoolean isEditing = new AtomicBoolean();
 
-    private static final Pattern possibleKeywordPattern = Pattern.compile("^[A-Za-z].*");
+    private static final Pattern POSSIBLE_KEYWORD_PATTERN = Pattern.compile("^[A-Za-z].*");
 
     private final DocViewDelayedUpdateJob delayedUpdateJob = new DocViewDelayedUpdateJob(
             "Documentation View Delayed Update Job");
@@ -117,7 +117,7 @@ public class SourceDocumentationSelectionChangedListener {
         }
 
         private boolean isPossibleKeyword(final String text) {
-            return possibleKeywordPattern.matcher(text).matches();
+            return POSSIBLE_KEYWORD_PATTERN.matcher(text).matches();
         }
     }
 

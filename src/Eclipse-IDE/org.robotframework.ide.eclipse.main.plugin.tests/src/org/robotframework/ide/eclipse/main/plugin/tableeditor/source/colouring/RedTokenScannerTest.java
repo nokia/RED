@@ -28,10 +28,8 @@ import com.google.common.base.Supplier;
 
 public class RedTokenScannerTest {
 
-    private static final String PROJECT_NAME = RedTokenScannerTest.class.getSimpleName();
-
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    public static ProjectProvider projectProvider = new ProjectProvider(RedTokenScannerTest.class);
 
     private static RobotDocument document;
 

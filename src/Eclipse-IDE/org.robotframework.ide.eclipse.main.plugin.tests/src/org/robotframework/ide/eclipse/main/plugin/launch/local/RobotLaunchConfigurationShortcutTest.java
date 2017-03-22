@@ -5,14 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -34,46 +32,39 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class RobotLaunchConfigurationShortcutTest {
 
-    private static final String PROJECT_NAME = RobotLaunchConfigurationFinderTest.class.getSimpleName();
-
-    private static final List<String> RESOURCE_NAMES = asList("Resource1.fake");
-
     private static IProject project;
 
-    private static List<IResource> resources;
+    private static IResource resource;
+
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
 
     @BeforeClass
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {
-        resources = new ArrayList<>();
         project = projectProvider.getProject();
-        for (final String name : RESOURCE_NAMES) {
-            resources.add(projectProvider.createFile(name, ""));
-        }
+        resource = projectProvider.createFile("Resource1.fake", "");
     }
-
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Test
     public void nullReturned_whenSelectionIsEmpty() {
         final RobotLaunchConfigurationShortcut shortcut = new RobotLaunchConfigurationShortcut();
         final IStructuredSelection selection = new StructuredSelection();
         final ILaunchConfiguration[] configs = shortcut.getLaunchConfigurations(selection);
-        
+
         assertThat(configs).isNull();
     }
 
     @Test
     public void configurationReturned_whenResourceSelected() throws CoreException {
         final RobotLaunchConfigurationShortcut shortcut = new RobotLaunchConfigurationShortcut();
-        final IStructuredSelection selection = new StructuredSelection(resources);
+        final IStructuredSelection selection = new StructuredSelection(Arrays.asList(resource));
         final ILaunchConfiguration[] configs = shortcut.getLaunchConfigurations(selection);
 
         assertThat(configs).isNotNull();
         assertThat(configs.length).isEqualTo(1);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configs[0]);
         assertThat(robotConfig.getProject()).isEqualTo(project);
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resources.get(0));
+        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resource);
         assertThat(robotConfig.isGeneralPurposeConfiguration()).isTrue();
     }
 
@@ -82,7 +73,7 @@ public class RobotLaunchConfigurationShortcutTest {
         final RobotLaunchConfigurationShortcut shortcut = new RobotLaunchConfigurationShortcut();
         final RobotCase rtc = mock(RobotCase.class);
         final RobotProject robotProject = mock(RobotProject.class);
-        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, (IFile) resources.get(0));
+        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, (IFile) resource);
         when(robotProject.getProject()).thenReturn(project);
         when(rtc.getSuiteFile()).thenReturn(robotFile);
         final IStructuredSelection selection = new StructuredSelection(rtc);
@@ -92,7 +83,7 @@ public class RobotLaunchConfigurationShortcutTest {
         assertThat(configs.length).isEqualTo(1);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configs[0]);
         assertThat(robotConfig.getProject()).isEqualTo(project);
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resources.get(0));
+        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resource);
         assertThat(robotConfig.isGeneralPurposeConfiguration()).isFalse();
     }
 
@@ -130,14 +121,14 @@ public class RobotLaunchConfigurationShortcutTest {
         final IEditorPart editorPart = mock(IEditorPart.class);
         final FileEditorInput editorInput = mock(FileEditorInput.class);
         when(editorPart.getEditorInput()).thenReturn(editorInput);
-        when(editorInput.getFile()).thenReturn((IFile) resources.get(0));
+        when(editorInput.getFile()).thenReturn((IFile) resource);
         final ILaunchConfiguration[] configs = shortcut.getLaunchConfigurations(editorPart);
 
         assertThat(configs).isNotNull();
         assertThat(configs.length).isEqualTo(1);
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configs[0]);
         assertThat(robotConfig.getProject()).isEqualTo(project);
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resources.get(0));
+        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(resource);
         assertThat(robotConfig.isGeneralPurposeConfiguration()).isTrue();
     }
 
@@ -147,7 +138,7 @@ public class RobotLaunchConfigurationShortcutTest {
         final IEditorPart editorPart = mock(IEditorPart.class);
         final FileEditorInput editorInput = mock(FileEditorInput.class);
         when(editorPart.getEditorInput()).thenReturn(editorInput);
-        when(editorInput.getFile()).thenReturn((IFile) resources.get(0));
+        when(editorInput.getFile()).thenReturn((IFile) resource);
         final ILaunchConfiguration[] configs1 = shortcut.getLaunchConfigurations(editorPart);
         ((ILaunchConfigurationWorkingCopy) configs1[0]).doSave();
         final ILaunchConfiguration[] configs2 = shortcut.getLaunchConfigurations(editorPart);

@@ -43,8 +43,7 @@ import com.google.common.collect.ObjectArrays;
 public class VariableDefinitionLocatorTest {
 
     @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(
-            VariableDefinitionLocatorTest.class.getSimpleName());
+    public ProjectProvider projectProvider = new ProjectProvider(VariableDefinitionLocatorTest.class);
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByOffset_1() throws Exception {
@@ -121,7 +120,7 @@ public class VariableDefinitionLocatorTest {
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByElement_1() throws Exception {
         final IFile file = projectProvider.createFile("resource.robot", createTestCasesSection());
-        
+
         final RobotModel model = new RobotModel();
         final RobotFileInternalElement startingElement = model.createSuiteFile(file)
                 .findSection(RobotCasesSection.class)
@@ -305,11 +304,11 @@ public class VariableDefinitionLocatorTest {
 
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(sourceFile);
-        
+
         final RobotSettingsSection settings = suiteFile.findSection(RobotSettingsSection.class).get();
         final RobotSetting varSetting = (RobotSetting) settings.findChild("Variables");
         final VariablesImport varsImport = (VariablesImport) varSetting.getLinkedElement();
-        
+
         final VariablesFileImportReference varsImportRef = new VariablesFileImportReference(varsImport);
         varsImportRef.map(ImmutableMap.of("var_a", 42, "var_b", 1729));
 
