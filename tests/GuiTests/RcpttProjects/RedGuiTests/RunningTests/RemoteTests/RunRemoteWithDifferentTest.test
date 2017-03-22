@@ -1,0 +1,115 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _gURaQCu6EeW667Afdo4DcA,_s-ctEA4_EeePcNCRX_abWA,_d8aMACuvEeW667Afdo4DcA,_pjyZ0Af5Eee0EKWnoBYU9g,_ThULYA4_EeePcNCRX_abWA
+Element-Name: RunRemoteWithDifferentTest
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _nv-loA5WEeePcNCRX_abWA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/22/17 10:35 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-console-and-execution-view-for-remote"{
+	//check conole - test should be run
+	get-view Console | get-text-viewer | get-property text 
+	    | contains "tests finished on client machine\n"
+	    + "Remote connection closed " | verify-true
+	 
+	//check execution view    
+	get-view "Execution View" | get-button "Expand All" | click    
+	with [get-view "Execution View" | get-tree] {
+	    get-property itemCount | equals 1 | verify-true
+	    get-property "getItems().length" | equals 1 | verify-true
+	    get-property "getItems().TreeItem[0].getItemCount()" | equals 1 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "RemoteProject \\(.*s\)" | verify-true
+	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItemCount()" | equals 2 | verify-true
+	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile \\(.* s\\)" | verify-true
+	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+	        | equals "test 1 \\(.* s\\)" | verify-true
+	    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+	        | equals "test 2 \\(.* s\\)" | verify-true
+	}
+}
+
+//run test with different project and test name then will be run remotly
+get-view "Project Explorer" | get-tree | select "OnlyRobotSuiteFile/SimpleLoggingTestCase.robot" 
+    | get-menu "Run As/2 Robot Remote Test" | click
+
+
+//export agent to user folder and run test 
+let [val remote_project_path  [format "%s/Remote" $user_folder] ]{  
+	export-agent-to-folder -folder $remote_project_path  
+	run-remote-test -path $remote_project_path -project_name "RemoteProject" -test "TestFile"
+}	
+
+check-console-and-execution-view-for-remote
+
+//open file and run it by button - normal test should be run
+get-view "Project Explorer" | get-tree | select "OnlyRobotSuiteFile/SimpleLoggingTestCase.robot"
+get-button "Run.*" | click
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .*\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "==============================================================================\n"
+    + "OnlyRobotSuiteFile                                                            \n"
+    + "==============================================================================\n"
+    + "OnlyRobotSuiteFile.SimpleLoggingTestCase                                      \n"
+    + "==============================================================================\n"
+    + "firstTest                                                             \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "OnlyRobotSuiteFile.SimpleLoggingTestCase                              \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "OnlyRobotSuiteFile                                                    \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
+    
+//check of execution view was chcnged to locla test    
+get-view "Execution View" | get-tree | get-item "OnlyRobotSuiteFile \\(.* s\\)" | get-property caption 
+    | equals "OnlyRobotSuiteFile \\(.* s\)" | verify-true
+ 
+//run remote test again    
+get-button "Run.*" | click -arrow
+get-menu "2 OnlyRobotSuiteFile" | click
+
+let [val remote_project_path  [format "%s/Remote" $user_folder] ]{  
+	run-remote-test -path $remote_project_path -project_name "RemoteProject" -test "TestFile"
+}
+
+check-console-and-execution-view-for-remote
+
+//create new run config with changed port and timeout and new name	
+get-button "Run.*" | click -arrow
+get-menu "Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot Remote"
+    get-button "New launch configuration" | click
+    get-group Project | get-button "Browse..." | click
+    with [get-window "Select project"] {
+        get-tree | select OnlyRobotSuiteFile
+        get-button OK | click
+    }
+    with [get-group "RED Server"] {
+        get-editbox -after [get-label "Local port:"] | set-text 43982
+        get-editbox -after [get-label "Connection timeout [s]:"] | set-text 1
+    }
+    get-editbox -after [get-label "Name:"] | set-text "my config"
+    get-button Apply | click
+    get-button Run | click
+}
+
+get-view Console | get-text-viewer | get-property text 
+    | equals "Remote execution server is listening on 127.0.0.1:43982, you can execute tests on remote client\n"
+    + "A timeout was reached while waiting for a remote connection" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
