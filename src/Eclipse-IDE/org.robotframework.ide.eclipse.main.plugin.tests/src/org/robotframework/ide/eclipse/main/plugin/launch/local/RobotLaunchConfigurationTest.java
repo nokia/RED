@@ -46,7 +46,8 @@ public class RobotLaunchConfigurationTest {
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
+            RobotLaunchConfiguration.TYPE_ID);
 
     @Test
     public void nullVariablesArrayIsReturned_whenThereAreNoVariablesDefined() throws Exception {

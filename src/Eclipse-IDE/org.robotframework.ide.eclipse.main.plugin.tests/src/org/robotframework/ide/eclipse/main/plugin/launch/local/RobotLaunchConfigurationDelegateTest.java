@@ -41,7 +41,8 @@ public class RobotLaunchConfigurationDelegateTest {
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
+            RobotLaunchConfiguration.TYPE_ID);
 
     @BeforeClass
     public static void before() throws Exception {
@@ -104,9 +105,8 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
-        assertThat(commandLine.getArgumentFile().generateContent()).contains(
-                "-pythonpath " + projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator
-                        + "folder2");
+        assertThat(commandLine.getArgumentFile().generateContent()).contains("-pythonpath " + projectAbsPath
+                + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
     }
 
     @Test
@@ -129,9 +129,8 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
-        assertThat(commandLine.getArgumentFile().generateContent()).contains(
-                "--pythonpath " + projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator
-                        + "folder2");
+        assertThat(commandLine.getArgumentFile().generateContent()).contains("--pythonpath " + projectAbsPath
+                + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
     }
 
     @Test
@@ -162,8 +161,7 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
-        final ILaunchConfiguration configuration = runConfigurationProvider.create(RobotLaunchConfiguration.TYPE_ID,
-                "robot");
+        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.fillDefaults();
         robotConfig.setProjectName(projectName);
