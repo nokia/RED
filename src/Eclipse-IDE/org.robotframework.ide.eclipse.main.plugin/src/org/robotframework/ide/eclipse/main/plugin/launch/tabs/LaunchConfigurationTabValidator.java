@@ -80,7 +80,7 @@ class LaunchConfigurationTabValidator {
             if (robotConfig instanceof RemoteRobotLaunchConfiguration) {
                 robotConfig.getProject();
             }
-            if (robotConfig.isRemoteAgent()) {
+            if (robotConfig.isUsingRemoteAgent()) {
                 robotConfig.getAgentConnectionHost();
                 robotConfig.getAgentConnectionPort();
                 robotConfig.getAgentConnectionTimeout();

@@ -47,11 +47,9 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
-    private static final String USE_PROJECT_EXECUTOR = "Project executor";
+    private static final String USE_PROJECT_INTERPRETER_ATTRIBUTE = "Project interpreter";
 
-    private static final String EXECUTOR_NAME = "Executor";
-
-    private static final String ROBOT_ARGUMENTS_ATTRIBUTE = "Robot arguments";
+    private static final String INTERPRETER_NAME_ATTRIBUTE = "Interpreter name";
 
     private static final String INTERPRETER_ARGUMENTS_ATTRIBUTE = "Interpreter arguments";
 
@@ -64,6 +62,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     private static final String EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Exclude option enabled";
 
     private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
+
+    private static final String ROBOT_ARGUMENTS_ATTRIBUTE = "Robot arguments";
 
     private static final String GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE = "General purpose option enabled";
 
@@ -154,12 +154,12 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public void setUsingInterpreterFromProject(final boolean usesProjectExecutor) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(USE_PROJECT_EXECUTOR, usesProjectExecutor);
+        launchCopy.setAttribute(USE_PROJECT_INTERPRETER_ATTRIBUTE, usesProjectExecutor);
     }
 
     public void setInterpreter(final SuiteExecutor executor) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(EXECUTOR_NAME, executor == null ? "" : executor.name());
+        launchCopy.setAttribute(INTERPRETER_NAME_ATTRIBUTE, executor == null ? "" : executor.name());
     }
 
     public void setRobotArguments(final String arguments) throws CoreException {
@@ -173,12 +173,13 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     }
 
     public boolean isUsingInterpreterFromProject() throws CoreException {
-        return configuration.getAttribute(USE_PROJECT_EXECUTOR, true);
+        return configuration.getAttribute(USE_PROJECT_INTERPRETER_ATTRIBUTE, true);
     }
 
     public SuiteExecutor getInterpreter() throws CoreException {
         try {
-            return SuiteExecutor.fromName(configuration.getAttribute(EXECUTOR_NAME, SuiteExecutor.Python.name()));
+            return SuiteExecutor
+                    .fromName(configuration.getAttribute(INTERPRETER_NAME_ATTRIBUTE, SuiteExecutor.Python.name()));
         } catch (final IllegalArgumentException e) {
             return null;
         }
