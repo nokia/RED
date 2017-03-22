@@ -1,0 +1,48 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<h2>RED Agent</h2>
+	
+	<p>RED Tests Runner Agent is something of which you should be aware if you're planning 
+	to launch tests using remote configuration or if you're writing own script which will
+	run the tests in local configuration. The agent is a python script
+	which should be attached to test execution as a listener (see 
+	<a target="_blank" class="external"  href="http://robotframework.org/robotframework/latest/RobotFrameworkUserGuide.html#listener-interface">
+	Listener interface
+	</a> topic in RF User Guide).
+	</p>
+	
+	<p>Agent is responsible for listening to execution events happening in running tests, so without agent
+	both <b>Message Log</b> and <b>Execution</b> views will not work. The script is also responsible for
+	stopping/resuming tests on breakpoints, so RED debugging capabilities also only work when agent 
+	was injected into tests execution.
+	</p>
+	
+	<dl class="note">
+	   <dt>Note</dt>
+	   <dd>You can always obtain agent script from RED within Preferences dialog
+	   (at <i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default)')">
+	   Window-&gt;Preferences-&gt;Robot Framework-&gt;Default Launch Configurations
+	   </a></i>, use <b>Export Client Script</b> button).
+	   </dd>
+	</dl>
+	
+	<dl class="warning">
+	   <dt>Warning</dt>
+	   <dd>Agent script is a subject of changes, so it may happen that script exported from RED version
+	   <span class="code">x</span> is not able to work properly with RED version <span class="code">y</span> and 
+	   vice versa. From version <span class="code">0.7.6</span> onwards both script and RED are checking and handling
+	   this when establishing connection, so you will be notified. <b>Important</b>: script taken from RED older than 
+	   <span class="code">0.7.6</span> will not work with newer RED and vice-versa without notifying you
+	   (possibly even hanging infinitely).
+	   </dd>
+	</dl>
+	
+	<h3>Taking agent into Robot Tests execution</h3>
+	
+</body>
+</html>
