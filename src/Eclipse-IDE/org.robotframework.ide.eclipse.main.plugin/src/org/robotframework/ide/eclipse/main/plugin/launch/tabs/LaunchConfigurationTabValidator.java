@@ -70,7 +70,7 @@ class LaunchConfigurationTabValidator {
 
         } catch (final CoreException e) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
+                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage(), e);
         }
     }
 
@@ -86,7 +86,7 @@ class LaunchConfigurationTabValidator {
                 robotConfig.getAgentConnectionTimeout();
             }
         } catch (final CoreException e) {
-            throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage() + ".");
+            throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ class LaunchConfigurationTabValidator {
                 validateRuntimeEnvironment(projectName);
             } else {
                 warnings.add("Tests will be launched using '" + robotConfig.getInterpreter().name()
-                        + "' interpreter as defined in PATH environment variable.");
+                        + "' interpreter as defined in PATH environment variable");
             }
 
             validateExecutableFile(robotConfig.getExecutableFilePath());
@@ -112,7 +112,7 @@ class LaunchConfigurationTabValidator {
 
         } catch (final CoreException e) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
+                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage(), e);
         }
     }
 
@@ -123,10 +123,10 @@ class LaunchConfigurationTabValidator {
             final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
             if (env == null || !env.isValidPythonInstallation()) {
                 throw new LaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' is using invalid Python environment.");
+                        "Project '" + projectName + "' is using invalid Python environment");
             } else if (!env.hasRobotInstalled()) {
                 throw new LaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' is using invalid Python environment (missing Robot Framework).");
+                        "Project '" + projectName + "' is using invalid Python environment (missing Robot Framework)");
             }
         }
     }
@@ -135,7 +135,7 @@ class LaunchConfigurationTabValidator {
         if (!filePath.isEmpty()) {
             final File file = new File(filePath);
             if (!file.exists()) {
-                throw new LaunchConfigurationValidationFatalException("Executable file does not exist.");
+                throw new LaunchConfigurationValidationFatalException("Executable file does not exist");
             }
         }
     }
@@ -169,11 +169,11 @@ class LaunchConfigurationTabValidator {
         }
         if (!problematicSuites.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following suites does not exist: " + String.join(", ", problematicSuites) + ".");
+                    "Following suites does not exist: " + String.join(", ", problematicSuites));
         }
         if (!problematicTests.isEmpty()) {
             throw new LaunchConfigurationValidationFatalException(
-                    "Following tests does not exist: " + String.join(", ", problematicTests) + ".");
+                    "Following tests does not exist: " + String.join(", ", problematicTests));
         }
     }
 

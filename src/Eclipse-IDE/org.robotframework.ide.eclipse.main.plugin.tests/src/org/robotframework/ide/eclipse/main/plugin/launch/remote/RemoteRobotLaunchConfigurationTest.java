@@ -6,29 +6,18 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.core.ILaunchManager;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.RunConfigurationProvider;
 
 public class RemoteRobotLaunchConfigurationTest {
 
     private static final String PROJECT_NAME = RemoteRobotLaunchConfigurationTest.class.getSimpleName();
-
-    private IProject project;
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
@@ -36,37 +25,18 @@ public class RemoteRobotLaunchConfigurationTest {
     @Rule
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
-    @Before
-    public void setup() throws CoreException {
-        removeAllConfigurations();
-        project = projectProvider.getProject();
-    }
-
-    @AfterClass
-    public static void clean() throws CoreException {
-        removeAllConfigurations();
-    }
-
-    private static void removeAllConfigurations() throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType type = manager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        final ILaunchConfiguration[] launchConfigs = manager.getLaunchConfigurations(type);
-        for (final ILaunchConfiguration config : launchConfigs) {
-            config.delete();
-        }
-    }
+    @Rule
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
 
     @Test
     public void defaultConfigurationObtained_whenDefaultConfigurationPrepared() throws CoreException {
-        final IProject project = mock(IProject.class);
-        when(project.getName()).thenReturn(RemoteRobotLaunchConfigurationTest.class.getName());
-        final ILaunchConfigurationWorkingCopy config = RemoteRobotLaunchConfiguration.prepareDefault(project);
+        final ILaunchConfigurationWorkingCopy config = RemoteRobotLaunchConfiguration
+                .prepareDefault(projectProvider.getProject());
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(config);
 
-        assertThat(config.getType()).isEqualTo(DebugPlugin.getDefault()
-                .getLaunchManager()
-                .getLaunchConfigurationType(RemoteRobotLaunchConfiguration.TYPE_ID));
-        assertThat(robotConfig.getProjectName()).isEqualTo(RemoteRobotLaunchConfigurationTest.class.getName());
+        assertThat(config.getType())
+                .isEqualTo(runConfigurationProvider.getType(RemoteRobotLaunchConfiguration.TYPE_ID));
+        assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.isRemoteAgent()).isTrue();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
@@ -93,7 +63,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void projectIsReturned_whenAskedForResourcesUnderDebug() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
-        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(project);
+        assertThat(robotConfig.getResourcesUnderDebug()).containsExactly(projectProvider.getProject());
     }
 
     @Test
@@ -200,7 +170,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void robotProjectObtainedFromConfiguration_whenProjectInWorkspace() throws CoreException {
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
-        assertThat(robotConfig.getProject()).isEqualTo(project);
+        assertThat(robotConfig.getProject()).isEqualTo(projectProvider.getProject());
     }
 
     @Test
@@ -218,7 +188,7 @@ public class RemoteRobotLaunchConfigurationTest {
         thrown.expect(CoreException.class);
         thrown.expectMessage("Project '" + PROJECT_NAME + "' is currently closed");
 
-        project.close(null);
+        projectProvider.getProject().close(null);
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.getProject();
@@ -235,6 +205,7 @@ public class RemoteRobotLaunchConfigurationTest {
     }
 
     private RemoteRobotLaunchConfiguration getDefaultRemoteRobotLaunchConfiguration() throws CoreException {
-        return new RemoteRobotLaunchConfiguration(RemoteRobotLaunchConfiguration.prepareDefault(project));
+        return new RemoteRobotLaunchConfiguration(
+                RemoteRobotLaunchConfiguration.prepareDefault(projectProvider.getProject()));
     }
 }
