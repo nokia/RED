@@ -111,7 +111,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
                             annotationsToAdd);
                 }
             }
-        } catch (final BadLocationException e) {
+        } catch (final BadLocationException | IndexOutOfBoundsException | IllegalStateException e) {
             // silently ignore this
         }
     }
