@@ -16,6 +16,12 @@ import org.junit.runners.model.Statement;
 
 public class RunConfigurationProvider implements TestRule {
 
+    private final String typeId;
+
+    public RunConfigurationProvider(final String typeId) {
+        this.typeId = typeId;
+    }
+
     @Override
     public Statement apply(final Statement base, final Description description) {
         return new Statement() {
@@ -32,24 +38,20 @@ public class RunConfigurationProvider implements TestRule {
         };
     }
 
-    private static void removeAll() throws CoreException {
+    private void removeAll() throws CoreException {
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationType[] types = launchManager.getLaunchConfigurationTypes();
-        for (final ILaunchConfigurationType type : types) {
-            final ILaunchConfiguration[] launchConfigs = launchManager.getLaunchConfigurations(type);
-            for (final ILaunchConfiguration config : launchConfigs) {
-                config.delete();
-            }
+        for (final ILaunchConfiguration config : launchManager.getLaunchConfigurations(getType())) {
+            config.delete();
         }
     }
 
-    public ILaunchConfiguration create(final String id, final String name) throws CoreException {
-        return getType(id).newInstance(null, name);
+    public ILaunchConfiguration create(final String name) throws CoreException {
+        return getType().newInstance(null, name);
     }
 
-    public ILaunchConfigurationType getType(final String id) throws CoreException {
+    public ILaunchConfigurationType getType() throws CoreException {
         final ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-        return launchManager.getLaunchConfigurationType(id);
+        return launchManager.getLaunchConfigurationType(typeId);
     }
 
 }

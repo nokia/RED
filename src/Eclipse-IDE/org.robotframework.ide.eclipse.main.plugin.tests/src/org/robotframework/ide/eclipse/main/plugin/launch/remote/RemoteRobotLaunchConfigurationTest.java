@@ -26,7 +26,8 @@ public class RemoteRobotLaunchConfigurationTest {
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
+            RemoteRobotLaunchConfiguration.TYPE_ID);
 
     @Test
     public void defaultConfigurationObtained_whenDefaultConfigurationPrepared() throws CoreException {
@@ -34,8 +35,7 @@ public class RemoteRobotLaunchConfigurationTest {
                 .prepareDefault(projectProvider.getProject());
         final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(config);
 
-        assertThat(config.getType())
-                .isEqualTo(runConfigurationProvider.getType(RemoteRobotLaunchConfiguration.TYPE_ID));
+        assertThat(config.getType()).isEqualTo(runConfigurationProvider.getType());
         assertThat(robotConfig.getProjectName()).isEqualTo(PROJECT_NAME);
         assertThat(robotConfig.isRemoteAgent()).isTrue();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");

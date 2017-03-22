@@ -22,7 +22,8 @@ public class RemoteRobotLaunchConfigurationFinderTest {
     public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
 
     @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
+            RemoteRobotLaunchConfiguration.TYPE_ID);
 
     @Test
     public void configurationReturned_whenThereIsExactlySameConfiguration() throws CoreException {
