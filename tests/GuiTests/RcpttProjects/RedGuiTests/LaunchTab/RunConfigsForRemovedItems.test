@@ -1,0 +1,119 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_9twu0PUsEeaWpbE3jg39cA
+Element-Name: RunConfigsForRemovedItems
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Q4GtYA8DEeePcNCRX_abWA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/22/17 2:59 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//run test to creat run config
+get-view "Project Explorer" | get-tree | select "LaunchesTests/SecondTest.robot" | get-menu "Run As/1 Robot Test" 
+    | click
+
+//check if all tests are selected    
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SecondTest.robot/test 5" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 6" | get-property checked | equals true | verify-true
+    get-item "SecondTest.robot/test 7" | get-property checked | equals true | verify-true
+}
+get-window "Run Configurations" | get-button Close | click
+
+//remove file
+get-view "Project Explorer" | get-tree | select "LaunchesTests/SecondTest.robot" | get-menu Delete | click
+get-window "Delete Resources" | get-button OK | click
+
+//run test and check if error is shown to user
+exec-with-options {
+    get-button "Run.*" | click
+    get-window "Problem Occurred" | get-label "Launching 'SecondTest.robot' has encountered a problem." 
+        | get-property caption | equals "Launching 'SecondTest.robot' has encountered a problem." | verify-true
+    get-window "Problem Occurred" | get-label "Suite 'SecondTest.robot' does not exist in project 'LaunchesTests'" 
+        | get-property caption | equals "Suite 'SecondTest.robot' does not exist in project 'LaunchesTests'" 
+        | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+//open run config and check if error is shown
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+    | get-property text | equals "Following suites does not exist: /LaunchesTests/SecondTest.robot." | verify-true
+get-window "Run Configurations" | get-button Close | click
+
+//run one test from PE
+with [get-view "Project Explorer" | get-tree] {
+    select "LaunchesTests/FirstFile.robot/Test Cases/test 2" | get-menu Run | click
+    select "LaunchesTests/FirstFile.robot" | double-click
+}
+
+//remove this test from file
+with [get-editor "FirstFile.robot" | get-text-viewer] {
+    set-caret-pos 11 2
+    select-range 12 11 11 1
+    key-type BackSpace
+    key-type "M1+s"
+}
+
+//open run config and check error
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+    | get-property text | equals "Following tests does not exist: test 2." | verify-true
+    
+//check id removed test is still selected    
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-item "FirstFile.robot/test 2" 
+    | get-property selected | equals false | verify-true
+    
+//run this single test    
+get-window "Run Configurations" | get-button Close | click
+get-button "Run.*" | click -arrow
+get-menu "1 FirstFile.robot (Selected Test Cases)" | click
+
+//check if test was run
+get-view Console | get-text-viewer | get-property text 
+    | contains "[ ERROR ] Suite 'LaunchesTests' contains no tests named 'LaunchesTests.FirstFile.test 2' in suite 'LaunchesTests.FirstFile'.\n\n"
+    + "Try --help for usage information." | verify-true
+    
+//close project
+with [get-view "Project Explorer" | get-tree] {
+    select LaunchesTests | get-menu "Close Project" | click
+}
+
+//run entire project
+exec-with-options {
+    get-view "Project Explorer" | get-tree | get-menu "Run As/1 Robot Test" | click
+    
+    //check error
+    get-window "Problem Occurred" | get-label "Launching 'LaunchesTests' has encountered a problem." 
+        | get-property caption | equals "Launching 'LaunchesTests' has encountered a problem." | verify-true
+    get-window "Problem Occurred" | get-label "Project 'LaunchesTests' is currently closed" | get-property caption 
+        | equals "Project 'LaunchesTests' is currently closed" | verify-true
+    get-window "Problem Occurred" | get-button "Details >>" | click
+    get-window "Problem Occurred" | get-editbox -after [get-label "Project 'LaunchesTests' is currently closed"] 
+        | get-property text | equals "Launching 'LaunchesTests' has encountered a problem.\n"
+        + "Project 'LaunchesTests' is currently closed" | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+
+//run selected test - error should be shown about closed project
+get-button "Run.*" | click -arrow
+exec-with-options {
+    get-menu "2 FirstFile.robot (Selected Test Cases)" | click
+    get-window "Problem Occurred" 
+        | get-label "Launching 'FirstFile.robot (Selected Test Cases)' has encountered a problem." 
+        | get-property caption | equals "Launching 'FirstFile.robot (Selected Test Cases)' has encountered a problem." 
+        | verify-true
+    get-window "Problem Occurred" | get-label "Project 'LaunchesTests' is currently closed" | get-property caption 
+        | equals "Project 'LaunchesTests' is currently closed" | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
