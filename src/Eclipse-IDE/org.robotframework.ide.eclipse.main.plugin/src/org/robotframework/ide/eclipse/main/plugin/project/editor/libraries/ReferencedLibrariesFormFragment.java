@@ -435,8 +435,12 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         viewer.getTable().setEnabled(isEditable);
 
         if (!projectIsInterpretedByJython) {
+            final String envName = java.util.Optional.ofNullable(environment)
+                    .map(RobotRuntimeEnvironment::getInterpreter)
+                    .map(SuiteExecutor::toString)
+                    .orElse("<unknown>");
             decoration = new ControlDecoration(addJavaLibButton, SWT.RIGHT | SWT.TOP);
-            decoration.setDescriptionText("Project is configured to use " + environment.getInterpreter().toString()
+            decoration.setDescriptionText("Project is configured to use " + envName
                     + " interpreter, but Jython is needed for Java libraries.");
             decoration.setImage(FieldDecorationRegistry.getDefault()
                     .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION)
