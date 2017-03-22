@@ -42,7 +42,7 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 public class ImportsProposalsProviderTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             ImportsProposalsProviderTest.class);
 
     @Rule
@@ -56,7 +56,7 @@ public class ImportsProposalsProviderTest {
         projectProvider.createFile("a_vars.py");
         projectProvider.createFile("b_vars.py");
     }
-    
+
     @Test
     public void thereAreNoResourcesProposalsProvided_whenNothingMatchesToCurrentPrefix() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));

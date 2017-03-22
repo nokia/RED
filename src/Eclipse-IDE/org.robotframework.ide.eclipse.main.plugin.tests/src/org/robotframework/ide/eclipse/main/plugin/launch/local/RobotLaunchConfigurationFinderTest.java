@@ -32,8 +32,6 @@ import com.google.common.collect.ImmutableMap;
 
 public class RobotLaunchConfigurationFinderTest {
 
-    private static final String PROJECT_NAME = RobotLaunchConfigurationFinderTest.class.getSimpleName();
-
     private static final List<String> RESOURCE_NAMES = asList("Resource1.fake", "Resource2.fake", "Resource3.fake");
 
     private static final List<String> TEST_CASES = asList("t1", "t3");
@@ -43,7 +41,7 @@ public class RobotLaunchConfigurationFinderTest {
     private static List<IResource> resources;
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
 
     @BeforeClass
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {

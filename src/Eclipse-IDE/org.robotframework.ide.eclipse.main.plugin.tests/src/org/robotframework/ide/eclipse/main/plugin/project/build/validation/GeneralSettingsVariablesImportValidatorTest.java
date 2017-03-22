@@ -50,10 +50,10 @@ import com.google.common.collect.Range;
 
 public class GeneralSettingsVariablesImportValidatorTest {
 
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             GeneralSettingsVariablesImportValidatorTest.class);
 
-    public static final TemporaryFolder tempFolder = new TemporaryFolder();
+    public static TemporaryFolder tempFolder = new TemporaryFolder();
 
     @ClassRule
     public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
@@ -174,7 +174,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
         assertThat(reporter.getReportedProblems())
                 .contains(new Problem(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         new ProblemPosition(2, Range.closed(28, 46))));
-        
+
         robotProject.getRobotProjectConfig().setPythonPath(null);
     }
 
@@ -410,7 +410,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
     private void validateVariablesImport(final String toImport) {
         final RobotSuiteFile suiteFile = createVariablesImportingSuite(toImport);
         final VariablesImport varsImport = getImport(suiteFile);
-        
+
         final FileValidationContext context = prepareContext(suiteFile);
 
         final GeneralSettingsVariablesImportValidator validator = new GeneralSettingsVariablesImportValidator(context,

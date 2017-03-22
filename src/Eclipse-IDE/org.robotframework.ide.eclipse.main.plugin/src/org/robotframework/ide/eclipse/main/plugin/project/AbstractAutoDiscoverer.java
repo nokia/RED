@@ -40,7 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
  */
 public abstract class AbstractAutoDiscoverer {
 
-    private static final AtomicBoolean isDryRunRunning = new AtomicBoolean(false);
+    private static final AtomicBoolean IS_DRY_RUN_RUNNING = new AtomicBoolean(false);
 
     final RobotProject robotProject;
 
@@ -67,12 +67,12 @@ public abstract class AbstractAutoDiscoverer {
 
     abstract void start(final Shell parent);
 
-    synchronized final boolean startDryRun() {
-        return isDryRunRunning.compareAndSet(false, true);
+    final boolean lockDryRun() {
+        return IS_DRY_RUN_RUNNING.compareAndSet(false, true);
     }
 
-    synchronized final void stopDryRun() {
-        isDryRunRunning.set(false);
+    final void unlockDryRun() {
+        IS_DRY_RUN_RUNNING.set(false);
     }
 
     void startDiscovering(final IProgressMonitor monitor, final IDryRunTargetsCollector dryRunTargetsCollector)

@@ -36,7 +36,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     @Override
     public void start(final Shell parent) {
-        if (startDryRun()) {
+        if (lockDryRun()) {
             try {
                 new ProgressMonitorDialog(parent).run(true, true, new IRunnableWithProgress() {
 
@@ -51,7 +51,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                             startAddingKeywordsToProject(monitor, dryRunOutputParser.getKeywordSources());
                         } finally {
                             monitor.done();
-                            stopDryRun();
+                            unlockDryRun();
                         }
                     }
                 });

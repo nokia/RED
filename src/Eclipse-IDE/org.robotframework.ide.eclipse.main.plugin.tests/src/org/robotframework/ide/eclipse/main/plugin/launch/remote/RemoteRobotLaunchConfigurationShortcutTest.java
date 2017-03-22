@@ -32,10 +32,12 @@ import org.robotframework.red.junit.ProjectProvider;
 public class RemoteRobotLaunchConfigurationShortcutTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider1 = new ProjectProvider("Project1");
+    public static ProjectProvider projectProvider1 = new ProjectProvider(
+            RemoteRobotLaunchConfigurationShortcutTest.class.getSimpleName() + "1");
 
     @ClassRule
-    public static ProjectProvider projectProvider2 = new ProjectProvider("Project2");
+    public static ProjectProvider projectProvider2 = new ProjectProvider(
+            RemoteRobotLaunchConfigurationShortcutTest.class.getSimpleName() + "2");
 
     @Test
     public void noConfigurationReturned_forSelection() {

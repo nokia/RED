@@ -38,7 +38,7 @@ import com.google.common.base.Predicate;
 public class CodeReservedElementsProposalsProviderTest {
 
     @ClassRule
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             CodeReservedElementsProposalsProviderTest.class);
 
     @Rule

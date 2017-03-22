@@ -50,10 +50,10 @@ import com.google.common.collect.Range;
 
 public class GeneralSettingsResourcesImportValidatorTest {
 
-    public static final ProjectProvider projectProvider = new ProjectProvider(
+    public static ProjectProvider projectProvider = new ProjectProvider(
             GeneralSettingsResourcesImportValidatorTest.class);
 
-    public static final TemporaryFolder tempFolder = new TemporaryFolder();
+    public static TemporaryFolder tempFolder = new TemporaryFolder();
 
     @ClassRule
     public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
@@ -175,7 +175,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
         assertThat(reporter.getReportedProblems())
                 .contains(new Problem(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH,
                         new ProblemPosition(2, Range.closed(27, 48))));
-        
+
         robotProject.getRobotProjectConfig().setPythonPath(null);
     }
 
@@ -459,7 +459,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     private void validateResourceImport(final String toImport) {
         final RobotSuiteFile suiteFile = createResourceImportingSuite(toImport);
         final ResourceImport resImport = getImport(suiteFile);
-        
+
         final FileValidationContext context = prepareContext(suiteFile);
 
         final GeneralSettingsResourcesImportValidator validator = new GeneralSettingsResourcesImportValidator(context,

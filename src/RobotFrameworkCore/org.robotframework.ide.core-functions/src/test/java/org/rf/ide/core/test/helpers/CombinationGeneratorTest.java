@@ -19,16 +19,15 @@ import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 
 
 /**
- * 
+ *
  * @author wypych
  * @since JDK 1.7 update 74
  * @version Robot Framework 2.9 alpha 2
- * 
+ *
  * @see CombinationGenerator#convertTo(java.util.List)
  * @see CombinationGenerator#combinations(String)
  */
-@SuppressWarnings({ "PMD.MethodNamingConventions",
-        "PMD.VariableNamingConventions" })
+@SuppressWarnings("PMD.MethodNamingConventions")
 public class CombinationGeneratorTest {
 
     @ForClean
@@ -38,10 +37,10 @@ public class CombinationGeneratorTest {
     @Test
     public void test_combinations_checkForWhitespaces_shouldReturn_listEqualsToInput() {
         // prepare
-        String whitespaces = " \t\r\n\f";
+        final String whitespaces = " \t\r\n\f";
 
         // execute
-        List<String> combinations = combiner.combinations(whitespaces);
+        final List<String> combinations = combiner.combinations(whitespaces);
 
         // verify
         assertThat(combinations).isNotNull();
@@ -53,7 +52,7 @@ public class CombinationGeneratorTest {
     @Test
     public void test_combinations_checkForSingleNumber1_shouldReturn_listWith_1() {
         // execute
-        List<String> combinations = combiner.combinations("1");
+        final List<String> combinations = combiner.combinations("1");
 
         // verify
         assertThat(combinations).isNotNull();
@@ -97,7 +96,7 @@ public class CombinationGeneratorTest {
 
 
     private void assertThatCombinationListIsCorrect(
-            List<String> combinationsExpected, List<String> combinationsGet) {
+            final List<String> combinationsExpected, final List<String> combinationsGet) {
         assertThat(combinationsExpected).isNotNull();
         assertThat(combinationsGet).isNotNull();
         assertThat(combinationsGet).hasSize(combinationsExpected.size());
@@ -112,7 +111,7 @@ public class CombinationGeneratorTest {
     @Test
     public void test_combinations_checkForSingleLetterA_shouldReturn_listWith_aA() {
         // execute
-        List<String> combinations = combiner.combinations("a");
+        final List<String> combinations = combiner.combinations("a");
 
         // verify
         assertThat(combinations).isNotNull();
@@ -125,7 +124,7 @@ public class CombinationGeneratorTest {
     @Test
     public void test_combinations_checkForEmptyString_shouldReturn_emptyList() {
         // execute
-        List<String> combinations = combiner.combinations("");
+        final List<String> combinations = combiner.combinations("");
 
         // verify
         assertThat(combinations).isNotNull();
@@ -136,7 +135,7 @@ public class CombinationGeneratorTest {
     @Test
     public void test_combinations_checkForNULL_shouldReturn_emptyList() {
         // execute
-        List<String> combinations = combiner.combinations(null);
+        final List<String> combinations = combiner.combinations(null);
 
         // verify
         assertThat(combinations).isNotNull();
@@ -147,12 +146,12 @@ public class CombinationGeneratorTest {
     @Test
     public void test_convertTo_notEmptyList() {
         // prepare
-        StringBuilder text_1 = new StringBuilder("text_1");
-        StringBuilder text_2 = new StringBuilder("text_2");
-        List<StringBuilder> listOfBuilders = Arrays.asList(text_1, text_2);
+        final StringBuilder text_1 = new StringBuilder("text_1");
+        final StringBuilder text_2 = new StringBuilder("text_2");
+        final List<StringBuilder> listOfBuilders = Arrays.asList(text_1, text_2);
 
         // execute
-        List<String> strList = combiner.convertTo(listOfBuilders);
+        final List<String> strList = combiner.convertTo(listOfBuilders);
 
         // verify
         assertThat(strList).hasSize(2);
