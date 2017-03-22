@@ -44,7 +44,12 @@ public class LaunchConfigurationTabValidatorTest {
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
+    public RunConfigurationProvider robotRunConfigurationProvider = new RunConfigurationProvider(
+            RobotLaunchConfiguration.TYPE_ID);
+
+    @Rule
+    public RunConfigurationProvider remoteRobotRunConfigurationProvider = new RunConfigurationProvider(
+            RemoteRobotLaunchConfiguration.TYPE_ID);
 
     @Test
     public void whenProjectNameIsEmpty_fatalExceptionIsThrown() throws Exception {
@@ -284,8 +289,7 @@ public class LaunchConfigurationTabValidatorTest {
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
-        final ILaunchConfiguration configuration = runConfigurationProvider.create(RobotLaunchConfiguration.TYPE_ID,
-                "robot");
+        final ILaunchConfiguration configuration = robotRunConfigurationProvider.create("robot");
         final RobotLaunchConfiguration launchConfig = new RobotLaunchConfiguration(configuration);
         launchConfig.fillDefaults();
         launchConfig.setProjectName(projectName);
@@ -294,8 +298,7 @@ public class LaunchConfigurationTabValidatorTest {
 
     private RemoteRobotLaunchConfiguration createRemoteRobotLaunchConfiguration(final String projectName)
             throws CoreException {
-        final ILaunchConfiguration configuration = runConfigurationProvider
-                .create(RemoteRobotLaunchConfiguration.TYPE_ID, "remote");
+        final ILaunchConfiguration configuration = remoteRobotRunConfigurationProvider.create("remote");
         final RemoteRobotLaunchConfiguration launchConfig = new RemoteRobotLaunchConfiguration(configuration);
         launchConfig.fillDefaults();
         launchConfig.setProjectName(projectName);

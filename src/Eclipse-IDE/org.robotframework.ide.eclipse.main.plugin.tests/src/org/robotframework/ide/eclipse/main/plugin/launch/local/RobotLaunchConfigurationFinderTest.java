@@ -40,7 +40,8 @@ public class RobotLaunchConfigurationFinderTest {
     public static ProjectProvider projectProvider = new ProjectProvider(RobotLaunchConfigurationFinderTest.class);
 
     @Rule
-    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
+            RobotLaunchConfiguration.TYPE_ID);
 
     @BeforeClass
     public static void createNeededResources() throws CoreException, IOException, ClassNotFoundException {
