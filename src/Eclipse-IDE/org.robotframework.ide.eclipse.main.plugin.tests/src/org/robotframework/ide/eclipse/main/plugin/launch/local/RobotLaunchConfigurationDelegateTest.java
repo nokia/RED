@@ -14,11 +14,10 @@ import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.debug.core.DebugPlugin;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
-import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
@@ -30,6 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RuntimeEnvironmentsM
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.RunConfigurationProvider;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -39,6 +39,9 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+
+    @Rule
+    public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider();
 
     @BeforeClass
     public static void before() throws Exception {
@@ -159,9 +162,8 @@ public class RobotLaunchConfigurationDelegateTest {
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
-        final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-        final ILaunchConfigurationWorkingCopy configuration = manager
-                .getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID).newInstance(null, "robot");
+        final ILaunchConfiguration configuration = runConfigurationProvider.create(RobotLaunchConfiguration.TYPE_ID,
+                "robot");
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.fillDefaults();
         robotConfig.setProjectName(projectName);
