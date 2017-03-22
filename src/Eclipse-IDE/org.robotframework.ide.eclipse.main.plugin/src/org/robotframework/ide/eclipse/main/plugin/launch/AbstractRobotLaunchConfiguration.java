@@ -24,7 +24,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
 
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
 
-    private static final String REMOTE_AGENT = "Remote agent";
+    private static final String USE_REMOTE_AGENT_ATTRIBUTE = "Remote agent";
 
     private static final String AGENT_CONNECTION_HOST_ATTRIBUTE = "Agent connection host";
 
@@ -80,13 +80,13 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     }
 
     @Override
-    public boolean isRemoteAgent() throws CoreException {
-        return Boolean.valueOf(configuration.getAttribute(REMOTE_AGENT, "false"));
+    public boolean isUsingRemoteAgent() throws CoreException {
+        return Boolean.valueOf(configuration.getAttribute(USE_REMOTE_AGENT_ATTRIBUTE, "false"));
     }
 
     @Override
     public String getAgentConnectionHost() throws CoreException {
-        if (isRemoteAgent()) {
+        if (isUsingRemoteAgent()) {
             final String host = getAgentConnectionHostValue();
             if (host.isEmpty()) {
                 throw newCoreException("Server IP cannot be empty");
@@ -98,7 +98,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
 
     @Override
     public int getAgentConnectionPort() throws CoreException {
-        if (isRemoteAgent()) {
+        if (isUsingRemoteAgent()) {
             final String port = getAgentConnectionPortValue();
             final Integer portAsInt = Ints.tryParse(port);
             if (portAsInt == null
@@ -116,7 +116,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
 
     @Override
     public int getAgentConnectionTimeout() throws CoreException {
-        if (isRemoteAgent()) {
+        if (isUsingRemoteAgent()) {
             final String timeout = getAgentConnectionTimeoutValue();
             final Integer timeoutAsInt = Ints.tryParse(timeout);
             if (timeoutAsInt == null
@@ -145,9 +145,9 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     }
 
     @Override
-    public void setRemoteAgent(final boolean isRemoteAgent) throws CoreException {
+    public void setUsingRemoteAgent(final boolean isRemoteAgent) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        launchCopy.setAttribute(REMOTE_AGENT, String.valueOf(isRemoteAgent));
+        launchCopy.setAttribute(USE_REMOTE_AGENT_ATTRIBUTE, String.valueOf(isRemoteAgent));
     }
 
     @Override
@@ -171,7 +171,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     @Override
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-        setRemoteAgent(false);
+        setUsingRemoteAgent(false);
         setAgentConnectionHostValue(preferences.getLaunchAgentConnectionHost());
         setAgentConnectionPortValue(preferences.getLaunchAgentConnectionPort());
         setAgentConnectionTimeoutValue(preferences.getLaunchAgentConnectionTimeout());
