@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _QcX10PsxEeW7_PzjO98BIw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/22/17 2:02 PM
+Save-Time: 3/22/17 6:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -32,7 +32,7 @@ with [get-window "Run Configurations"] {
 //check info for user 
 get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
     | get-property text 
-    | equals "Tests will be launched using 'Python' interpreter as defined in PATH environment variable." | verify-true
+    | equals "Tests will be launched using 'Python' interpreter as defined in PATH environment variable" | verify-true
     
 //check python interpreter    
 get-window "Run Configurations" | get-group Interpreter | get-button "Check interpreter" | click
@@ -52,7 +52,7 @@ with [get-window "Run Configurations"] {
 //check if text was changed as information to user
 get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
     | get-property text 
-    | equals "Tests will be launched using 'IronPython' interpreter as defined in PATH environment variable." 
+    | equals "Tests will be launched using 'IronPython' interpreter as defined in PATH environment variable" 
     | verify-true
     
 //select Check interpreter and check error    
@@ -80,7 +80,7 @@ get-window "Run Configurations" | get-group Interpreter | get-combo | select Jyt
 //check user info
 get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
     | get-property text 
-    | equals "Tests will be launched using 'Jython' interpreter as defined in PATH environment variable." | verify-true
+    | equals "Tests will be launched using 'Jython' interpreter as defined in PATH environment variable" | verify-true
 
 //run test    
 get-window "Run Configurations" | get-button Run | click
