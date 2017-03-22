@@ -35,7 +35,7 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 /**
  * @author bembenek
  */
-public class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
+class LaunchConfigurationExecutorTab extends AbstractLaunchConfigurationTab implements ILaunchConfigurationTab {
 
     private InterpretersComposite interpretersComposite;
 

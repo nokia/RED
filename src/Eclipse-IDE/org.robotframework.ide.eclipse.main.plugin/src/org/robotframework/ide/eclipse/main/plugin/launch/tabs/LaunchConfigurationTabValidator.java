@@ -33,11 +33,11 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author Michal Anglart
  */
-public class LaunchConfigurationTabValidator {
+class LaunchConfigurationTabValidator {
 
     private final RobotModel model;
 
-    public LaunchConfigurationTabValidator() {
+    LaunchConfigurationTabValidator() {
         this(RedPlugin.getModelManager().getModel());
     }
 
@@ -74,7 +74,7 @@ public class LaunchConfigurationTabValidator {
         }
     }
 
-    public void validateListenerTab(final IRobotLaunchConfiguration robotConfig)
+    void validateListenerTab(final IRobotLaunchConfiguration robotConfig)
             throws LaunchConfigurationValidationFatalException {
         try {
             if (robotConfig instanceof RemoteRobotLaunchConfiguration) {
