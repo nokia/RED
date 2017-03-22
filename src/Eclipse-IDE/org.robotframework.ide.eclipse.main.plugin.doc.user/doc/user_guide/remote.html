@@ -34,7 +34,7 @@ Remote tab of Debug Configurations consists Local IP and Local port. This fields
 After pressing Debug in Debug Configurations or starting Debug manually, following Console entry should be visible:
   <br><br><img src="remote/remote_3.png"> <br><br>
 On remote host, testcase with custom listener (TestRunnerAgent.py) needs to be started. <br>
-Exact command depends on testing environment and testname, it can be derived from local debug run and from RobotFramework robot.run implementation (see <a href="https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html">https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html</a>). <br> Generally syntax with additional listener is following: <br>
+Exact command depends on testing environment and testname, it can be derived from local debug run and from RobotFramework robot.run implementation (see <a target="_blank" class="external" href="https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html">https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html</a>). <br> Generally syntax with additional listener is following: <br>
 <i>python -m robot.run --listener REMOTE_PATH\TestRunnerAgent.py:PORT:True:IP ADDITONAL_PARAMETERS</i> <br><br>
 For instance: <i>python -m robot.run --listener C:\RED\TestRunnerAgent.py:6060:True:192.168.81.1 -s robot_test.Keyword_driven</i> <br><br>
 

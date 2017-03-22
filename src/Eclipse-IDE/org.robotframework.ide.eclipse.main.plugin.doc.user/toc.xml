@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <toc label="RED - Robot Editor User Guide" topic="user_guide.html">
+   <topic href="doc/about.html" label="About this Guide">
+   </topic>
 	<topic href="doc/red_overview.html" label="RED Overview" >	</topic>
 	<topic href="doc/legal.html" label="Legal">	</topic>
 	<topic href="doc/first_steps/first_steps.html" label="First steps with RED">
@@ -41,6 +43,14 @@
        <topic href="doc/user_guide/validation/validation_preferences.html" label="Configuring problems severity">
        </topic>
        <topic href="doc/user_guide/validation/headless.html" label="Running validation in command line">
+       </topic>
+    </topic>
+    <topic href="doc/user_guide/launching.html" label="Launching Tests">
+       <topic href="doc/user_guide/launching/red_agent.html" label="RED Tests Runner Agent">
+       </topic>
+       <topic href="doc/user_guide/launching/local_launch.html" label="Local launches">
+       </topic>
+       <topic href="doc/user_guide/launching/remote_launch.html" label="Remote launches">
        </topic>
     </topic>
     <topic href="doc/user_guide/tools_integration.html" label="Integraton with other tools">

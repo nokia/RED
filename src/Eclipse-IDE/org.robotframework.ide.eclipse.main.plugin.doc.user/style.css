@@ -14,15 +14,15 @@ span.block {
 span.code {
 	font-family: monospace;
 }
-a.github {
-	background: url('images/github_icon.png') no-repeat;
-	background-position: 0 0px;
-	padding-left: 20px;
-}
 a.command {
 	background: url('../org.eclipse.help/command_link.png') no-repeat;
 	background-position: 0 5px;
 	padding-left: 20px;
+}
+a.external {
+	background: url('images/globe.png') no-repeat;
+	background-position: 0 4px;
+	padding-left: 15px;
 }
 div.code {
 	font-family: monospace;
@@ -62,6 +62,29 @@ dl.warning dt {
 dl.warning dd {
 	margin-left: 0;
 }
+
+table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	border: 1px black solid;
+	width: 100%;
+}
+table thead th {
+	text-align: left;
+	border: 1px black solid !important;
+	padding: 5px;
+	font-size: 10pt;
+	font-weight: bold;
+}
+table tbody td {
+	border: 1px black solid !important;
+	padding: 5px;
+	font-size: 10pt;
+}
+table tbody td.center {
+	text-align: center;
+}
+
 kbd {
 	margin: 0px 0.1em;
 	padding: 0.1em 0.6em;
