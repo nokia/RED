@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,6 +29,16 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
 
     public AbstractRobotLaunchConfigurationDelegate() {
         this.executionService = RedPlugin.getTestExecutionService();
+    }
+
+    @Override
+    protected IProject[] getProjectsForProblemSearch(final ILaunchConfiguration configuration, final String mode)
+            throws CoreException {
+        try {
+            return new IProject[] { LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getProject() };
+        } catch (final CoreException e) {
+            return null;
+        }
     }
 
     @Override
