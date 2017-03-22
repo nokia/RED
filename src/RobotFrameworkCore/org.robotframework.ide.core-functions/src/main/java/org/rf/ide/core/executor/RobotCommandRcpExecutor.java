@@ -330,12 +330,14 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             final String base64EncodedLibfileContent = (String) callRpcFunction("createLibdoc", libName, pythonPaths,
                     classPaths);
             final byte[] bytes = Base64.getDecoder().decode(base64EncodedLibfileContent);
-
-            final File libdocFile = new File(resultFilePath);
-            if (!libdocFile.exists()) {
-                libdocFile.createNewFile();
+            if (bytes.length > 0) {
+                final File libdocFile = new File(resultFilePath);
+                if (!libdocFile.exists()) {
+                    libdocFile.createNewFile();
+                }
+                Files.write(bytes, libdocFile);
             }
-            Files.write(bytes, libdocFile);
+
         } catch (final XmlRpcException | IOException e) {
             final String additional = libPath.isEmpty() ? ""
                     : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
