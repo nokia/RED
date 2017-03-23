@@ -61,9 +61,9 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList()));
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, true);
 
-        assertThat(commandLine.getArgumentFile().generateContent())
+        assertThat(commandLine.getArgumentFile().get().generateContent())
                 .contains("--suite      " + PROJECT_NAME + ".Suites_a");
     }
 
@@ -78,9 +78,9 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList("001__case1")));
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, true);
 
-        final String argFileContent = commandLine.getArgumentFile().generateContent();
+        final String argFileContent = commandLine.getArgumentFile().get().generateContent();
         assertThat(argFileContent).contains("-suite", PROJECT_NAME + ".Suites_a");
         assertThat(argFileContent).contains("-test", PROJECT_NAME + ".Suites_a.001__case1");
     }
@@ -102,10 +102,10 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, true);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
-        assertThat(commandLine.getArgumentFile().generateContent()).contains("-pythonpath " + projectAbsPath
+        assertThat(commandLine.getArgumentFile().get().generateContent()).contains("-pythonpath " + projectAbsPath
                 + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
     }
 
@@ -126,10 +126,10 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, true);
 
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
-        assertThat(commandLine.getArgumentFile().generateContent()).contains("--pythonpath " + projectAbsPath
+        assertThat(commandLine.getArgumentFile().get().generateContent()).contains("--pythonpath " + projectAbsPath
                 + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
     }
 
@@ -141,7 +141,7 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setExecutableFilePath(executablePath);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, true);
 
         assertThat(commandLine.getCommandLine()).startsWith(executablePath);
     }
@@ -155,7 +155,7 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, true);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence(executablePath, "-arg1", "abc", "-arg2", "xyz");
     }
