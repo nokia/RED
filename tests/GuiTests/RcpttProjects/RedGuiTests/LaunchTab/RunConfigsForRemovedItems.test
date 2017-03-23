@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Q4GtYA8DEeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/22/17 6:05 PM
+Save-Time: 3/23/17 4:23 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,6 +34,7 @@ get-window "Delete Resources" | get-button OK | click
 //run test and check if error is shown to user
 exec-with-options {
     get-button "Run.*" | click
+    wait 1000
     get-window "Problem Occurred" | get-label "Launching 'SecondTest.robot' has encountered a problem." 
         | get-property caption | equals "Launching 'SecondTest.robot' has encountered a problem." | verify-true
     get-window "Problem Occurred" | get-label "Suite 'SecondTest.robot' does not exist in project 'LaunchesTests'" 
