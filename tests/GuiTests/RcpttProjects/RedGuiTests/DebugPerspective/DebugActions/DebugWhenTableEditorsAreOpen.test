@@ -1,0 +1,126 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _lEyEsIMWEeW3Y6KfPyHe6A,_OCxtEBRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: DebugWhenTableEditorsAreOpen
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _KIn6oA8kEeePcNCRX_abWA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/23/17 11:54 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
+
+//open script and add BP
+with [get-editor "BigScript.robot"] {
+    with [get-left-ruler | get-ruler-column AnnotationColumn] {
+        double-click-ruler 66
+        hover-ruler -line 66
+    }
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+
+//open resource
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/my_keywords.robot" | double-click
+
+//open Settings tab
+get-editor "my_keywords.robot" | get-tab-folder | get-tab-item Settings | click
+
+exec-with-options -disableJobWaiting -command {
+	//debug test
+	get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
+	    | click
+	    
+	wait-for-thread -file "BigScript.robot" 
+	//check that Source tab is open for script
+	get-editor "BigScript.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+	
+	//step into resource
+	get-button "Step Into (F5)" | click
+	wait 1000
+	get-editor "my_keywords.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+	get-button "Terminate (M1+F2)" | click
+}
+with [get-tab-folder -index 2] {
+	get-property "pages[0]" | equals "BigScript.robot" | verify-true
+	get-property "pages[1]" | equals "my_keywords.robot" | verify-true
+  	get-property tabCount | equals 2 | verify-true
+} 
+ 
+//go to Robot perspective
+get-button Robot | click
+
+//----------------------------------------------- close all editors ---------------------------------
+//set KW tab in resource
+get-editor "my_keywords.robot" | get-tab-folder | get-tab-item Keywords | click
+get-editor "my_keywords.robot" | close
+
+//set Setting in script and close it
+get-editor "BigScript.robot" | get-tab-folder | get-tab-item Settings | click
+get-editor "BigScript.robot" | close
+
+//run test
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
+	    | click
+	wait-for-thread -file "BigScript.robot" 
+	
+	//check if editor was opend in Source editor    
+	get-editor "BigScript.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+	get-button "Step Into (F5)" | click
+	wait 1000
+	
+	//check if resource was opend wit Source table
+	get-editor "my_keywords.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+	get-button "Terminate (M1+F2)" | click
+	
+}	
+//because of preference always one editor will be open
+with [get-tab-folder -index 2] {
+	get-property "pages[0]" | equals "my_keywords.robot" | verify-true
+  	get-property tabCount | equals 1 | verify-true
+} 
+ 
+
+//----------------------------------------------- chanage prefernce to open editor tables -----------------------------
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Editor"
+with [get-window Preferences] {
+    get-combo -after [get-label "Prefer opening file elements from Project Explorer in"] 
+        | select "designated table page of editor"
+    get-button OK | click
+}
+//set Varaibles tab for resource and close it
+get-button Robot | click
+get-editor "my_keywords.robot" | get-tab-folder | get-tab-item Variables | click
+get-editor "my_keywords.robot" | close
+
+//open script, set Variable table and close view
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
+get-editor "BigScript.robot" | get-tab-folder | get-tab-item Variables | click
+get-editor "BigScript.robot" | close
+
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
+	    | click
+	wait-for-thread -file "BigScript.robot"   
+	
+	get-editor "BigScript.robot" | get-tab-folder | get-property activePage | equals Source | verify-true  
+	get-button "Step Into (F5)" | click
+	wait 1000
+	get-editor "my_keywords.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+	get-button "Terminate (M1+F2)" | click
+}	
+
+with [get-tab-folder -index 2] {
+	get-property "pages[0]" | equals "my_keywords.robot" | verify-true
+  	get-property tabCount | equals 1 | verify-true
+} 
+ 
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
