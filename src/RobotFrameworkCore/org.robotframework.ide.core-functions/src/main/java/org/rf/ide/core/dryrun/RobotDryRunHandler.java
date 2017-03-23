@@ -12,12 +12,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.List;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.TestRunnerAgentHandler;
 
@@ -27,23 +24,6 @@ import org.rf.ide.core.executor.TestRunnerAgentHandler;
 public class RobotDryRunHandler {
 
     private Process dryRunProcess;
-
-    public RunCommandLine buildDryRunCommand(final RobotRuntimeEnvironment environment, final int port,
-            final File projectLocation, final Collection<String> suites, final Collection<String> pythonPathLocations,
-            final Collection<String> classPathLocations, final Collection<String> additionalProjectsLocations)
-            throws IOException {
-
-        final IRunCommandLineBuilder builder = RunCommandLineCallBuilder.forEnvironment(environment, port);
-
-        builder.withProject(projectLocation);
-        builder.suitesToRun(suites);
-        builder.addLocationsToPythonPath(pythonPathLocations);
-        builder.addLocationsToClassPath(classPathLocations);
-        builder.enableDryRun();
-        builder.withAdditionalProjectsLocations(additionalProjectsLocations);
-
-        return builder.build();
-    }
 
     public Thread createDryRunHandlerThread(final int port, final List<IAgentMessageHandler> listeners) {
         final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
