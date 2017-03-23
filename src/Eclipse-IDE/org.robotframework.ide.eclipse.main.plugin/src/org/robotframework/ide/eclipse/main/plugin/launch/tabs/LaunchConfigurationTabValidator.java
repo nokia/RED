@@ -54,7 +54,7 @@ class LaunchConfigurationTabValidator {
             try {
                 robotConfig.getProject();
             } catch (final CoreException e) {
-                throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage() + ".");
+                throw new LaunchConfigurationValidationFatalException(e.getStatus().getMessage());
             }
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
