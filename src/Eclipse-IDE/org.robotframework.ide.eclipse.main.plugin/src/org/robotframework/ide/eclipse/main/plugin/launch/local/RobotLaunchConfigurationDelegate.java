@@ -99,7 +99,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 .start()
                 .waitForServer();
 
-        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port);
+        final boolean useArgumentsFile = RedPlugin.getDefault().getPreferences().shouldLaunchUsingArgumentsFile();
+        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port, useArgumentsFile);
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final String processLabel = createConsoleDescription(robotConfig, robotRuntimeEnvironment);
@@ -141,12 +142,13 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
     @VisibleForTesting
     RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
-            final int port) throws CoreException, IOException {
+            final int port, final boolean useArgumentsFile) throws CoreException, IOException {
 
         final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
                 ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
                 : RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
 
+        builder.useArgumentFile(useArgumentsFile);
         if (!robotConfig.getExecutableFilePath().isEmpty()) {
             builder.withExecutableFile(robotConfig.getExecutableFilePath());
             builder.addUserArgumentsForExecutableFile(robotConfig.getExecutableFileArguments());

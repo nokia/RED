@@ -31,6 +31,7 @@ import org.rf.ide.core.dryrun.RobotDryRunHandler;
 import org.rf.ide.core.dryrun.RobotDryRunOutputParser;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -119,10 +120,16 @@ public abstract class AbstractAutoDiscoverer {
             if (runtimeEnvironment == null) {
                 return null;
             }
-            return dryRunHandler.buildDryRunCommand(runtimeEnvironment, port, getProjectLocationFile(),
-                    dryRunTargetsCollector.getSuiteNames(), librariesSourcesCollector.getPythonpathLocations(),
-                    librariesSourcesCollector.getClasspathLocations(),
-                    dryRunTargetsCollector.getAdditionalProjectsLocations());
+            return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port)
+                    .useArgumentFile(true)
+                    .suitesToRun(dryRunTargetsCollector.getSuiteNames())
+                    .addLocationsToPythonPath(librariesSourcesCollector.getPythonpathLocations())
+                    .addLocationsToClassPath(librariesSourcesCollector.getClasspathLocations())
+                    .enableDryRun()
+                    .withProject(getProjectLocationFile())
+                    .withAdditionalProjectsLocations(dryRunTargetsCollector.getAdditionalProjectsLocations())
+                    .build();
+            
         } catch (final IOException e) {
             throw new InvocationTargetException(e);
         }
@@ -161,7 +168,7 @@ public abstract class AbstractAutoDiscoverer {
 
         List<String> getSuiteNames();
 
-        List<String> getAdditionalProjectsLocations();
+        List<File> getAdditionalProjectsLocations();
     }
 
     public static class AutoDiscovererException extends RuntimeException {
