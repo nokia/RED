@@ -93,7 +93,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
             }
             return host;
         }
-        return AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_HOST;
+        return AgentConnectionServer.DEFAULT_CONNECTION_HOST;
     }
 
     @Override
@@ -101,10 +101,11 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
         if (isUsingRemoteAgent()) {
             final String port = getAgentConnectionPortValue();
             final Integer portAsInt = Ints.tryParse(port);
-            if (portAsInt == null
-                    || !Range.closed(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT).contains(portAsInt)) {
-                throw newCoreException(String.format("Server port '%s' must be an Integer between 1 and %,d", port,
-                        AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT));
+            if (portAsInt == null || !Range
+                    .closed(AgentConnectionServer.MIN_CONNECTION_PORT, AgentConnectionServer.MAX_CONNECTION_PORT)
+                    .contains(portAsInt)) {
+                throw newCoreException(String.format("Server port '%s' must be an Integer between %,d and %,d", port,
+                        AgentConnectionServer.MIN_CONNECTION_PORT, AgentConnectionServer.MAX_CONNECTION_PORT));
             }
             if (portAsInt < 0) {
                 throw newCoreException("Unable to find free port");
@@ -119,14 +120,16 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
         if (isUsingRemoteAgent()) {
             final String timeout = getAgentConnectionTimeoutValue();
             final Integer timeoutAsInt = Ints.tryParse(timeout);
-            if (timeoutAsInt == null
-                    || !Range.closed(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT).contains(timeoutAsInt)) {
-                throw newCoreException(String.format("Connection timeout '%s' must be an Integer between 1 and %,d",
-                        timeout, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT));
+            if (timeoutAsInt == null || !Range
+                    .closed(AgentConnectionServer.MIN_CONNECTION_TIMEOUT, AgentConnectionServer.MAX_CONNECTION_TIMEOUT)
+                    .contains(timeoutAsInt)) {
+                throw newCoreException(String.format("Connection timeout '%s' must be an Integer between %,d and %,d",
+                        timeout, AgentConnectionServer.MIN_CONNECTION_TIMEOUT,
+                        AgentConnectionServer.MAX_CONNECTION_TIMEOUT));
             }
             return timeoutAsInt;
         }
-        return AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT;
+        return AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT;
     }
 
     @Override

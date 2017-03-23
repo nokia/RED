@@ -107,7 +107,7 @@ class LaunchConfigurationListenerTab extends AbstractLaunchConfigurationTab impl
 
         useLocalAgentButton = createAgentTypeSelectionButton(agentGroup,
                 String.format("Use local agent connection (localhost with free port and %ds timeout)",
-                        AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT));
+                        AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT));
 
         useRemoteAgentButton = createAgentTypeSelectionButton(agentGroup,
                 "Use remote agent connection (custom server parameters)");
