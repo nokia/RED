@@ -478,14 +478,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
     }
 
-    private Job createDocumentationChangeJob(final String docu) {
+    private Job createDocumentationChangeJob(final String documentation) {
         return new Job("changing documentation") {
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
                 try {
                     docSemaphore.acquire();
-                    final String newDocumentation = docu.replaceAll("\t", "\\\\t");
+                    final String newDocumentation = documentation.replaceAll("\t", "\\\\t");
                     final RobotSettingsSection settingsSection = getSection();
                     if (settingsSection == null) {
                         return Status.OK_STATUS;
@@ -532,7 +532,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         position -> position.getColumnPosition() < dataProvider.getColumnCount() - 1,
                         Predicates.alwaysTrue()),
                 new AlternatingRowConfigLabelAccumulator(),
-                new EmptyGeneralSettingLabelAcumulator(dataProvider));
+                new EmptyGeneralSettingLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -541,7 +541,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider,
-                new SettingsDynamicTableColumnHeaderLabelAcumulator(dataProvider));
+                new SettingsDynamicTableColumnHeaderLabelAccumulator(dataProvider));
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
         final SortHeaderLayer<Entry<String, RobotElement>> columnHeaderSortingLayer = factory
@@ -588,7 +588,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         final Style style = new Style();
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, GUIHelper.COLOR_GRAY);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                EmptyGeneralSettingLabelAcumulator.EMPTY_GENERAL_SETTING_LABEL);
+                EmptyGeneralSettingLabelAccumulator.EMPTY_GENERAL_SETTING_LABEL);
     }
 
     private java.util.Optional<NatTable> createTable(final Composite parent, final TableTheme theme,
@@ -953,13 +953,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
     }
 
-    private static class EmptyGeneralSettingLabelAcumulator implements IConfigLabelAccumulator {
+    private static class EmptyGeneralSettingLabelAccumulator implements IConfigLabelAccumulator {
 
         public static final String EMPTY_GENERAL_SETTING_LABEL = "EMPTY_GENERAL_SETTING";
 
         private final GeneralSettingsDataProvider dataProvider;
 
-        public EmptyGeneralSettingLabelAcumulator(final GeneralSettingsDataProvider dataProvider) {
+        public EmptyGeneralSettingLabelAccumulator(final GeneralSettingsDataProvider dataProvider) {
             this.dataProvider = dataProvider;
         }
 
