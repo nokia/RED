@@ -124,12 +124,10 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
-        preferences.put(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST,
-                AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_HOST);
-        preferences.putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT,
-                AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_PORT);
+        preferences.put(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, AgentConnectionServer.DEFAULT_CONNECTION_HOST);
+        preferences.putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, AgentConnectionServer.DEFAULT_CONNECTION_PORT);
         preferences.putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
-                AgentConnectionServer.DEFAULT_CLIENT_CONNECTION_TIMEOUT);
+                AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT);
     }
 
     static String getFontStyleIdentifierFor(final SyntaxHighlightingCategory category) {

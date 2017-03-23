@@ -84,13 +84,14 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         addField(remoteHost);
 
         remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, "Server port:", group);
-        remotePort.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_PORT);
+        remotePort.setValidRange(AgentConnectionServer.MIN_CONNECTION_PORT, AgentConnectionServer.MAX_CONNECTION_PORT);
         remotePort.load();
         addField(remotePort);
 
         remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
                 "Server connection timeout [s]:", group);
-        remoteTimeout.setValidRange(1, AgentConnectionServer.MAX_CLIENT_CONNECTION_TIMEOUT);
+        remoteTimeout.setValidRange(AgentConnectionServer.MIN_CONNECTION_TIMEOUT,
+                AgentConnectionServer.MAX_CONNECTION_TIMEOUT);
         remoteTimeout.load();
         addField(remoteTimeout);
 
