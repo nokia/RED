@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XUivgOobEea0ALtmCcrmfA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/16/17 11:20 AM
+Save-Time: 3/23/17 4:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,7 +16,7 @@ Entry-Name: .content
 
 //check default preference
 get-preferences-menu | click
-get-window Preferences | get-tree | select "Robot Framework/Default Launch Configurations"
+get-window Preferences | get-tree | select "Robot Framework/Launching/Default Launch Configurations"
 with [get-window Preferences] {
     with [get-control Any -after [get-label "Default Launch Configurations"] -index 9] {
         get-property "getChildren().Control[0].getText()" | equals "Configure default robot launch configurations" 
