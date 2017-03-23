@@ -206,7 +206,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider,
-                new SettingsDynamicTableColumnHeaderLabelAcumulator(dataProvider));
+                new SettingsDynamicTableColumnHeaderLabelAccumulator(dataProvider));
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
         final SortHeaderLayer<RobotKeywordCall> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(

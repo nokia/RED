@@ -22,7 +22,7 @@ class SettingsDynamicTableSortingConfiguration extends AbstractRegistryConfigura
                 ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 0);
 
         configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new NullComparator(),
-                DisplayMode.NORMAL, SettingsDynamicTableColumnHeaderLabelAcumulator.SETTING_COMMENT_LABEL);
+                DisplayMode.NORMAL, SettingsDynamicTableColumnHeaderLabelAccumulator.SETTING_COMMENT_LABEL);
     }
     
 }

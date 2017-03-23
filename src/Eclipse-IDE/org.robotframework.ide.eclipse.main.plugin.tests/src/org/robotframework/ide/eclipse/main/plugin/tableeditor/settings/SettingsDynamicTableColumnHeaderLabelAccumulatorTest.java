@@ -11,15 +11,15 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingsDataProvider;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableColumnHeaderLabelAcumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableColumnHeaderLabelAccumulator;
 
-public class SettingsDynamicTableColumnHeaderLabelAcumulatorTest {
+public class SettingsDynamicTableColumnHeaderLabelAccumulatorTest {
 
     @Test
     public void variableTypesAreProperlyLabeledOnlyInSecondColumn() {
         final ImportSettingsDataProvider dataProvider = new ImportSettingsDataProvider(new RobotEditorCommandsStack(),
                 prepareSection());
-        final SettingsDynamicTableColumnHeaderLabelAcumulator accumulator = new SettingsDynamicTableColumnHeaderLabelAcumulator(
+        final SettingsDynamicTableColumnHeaderLabelAccumulator accumulator = new SettingsDynamicTableColumnHeaderLabelAccumulator(
                 dataProvider);
 
         int columnCount = dataProvider.getColumnCount();
@@ -29,12 +29,12 @@ public class SettingsDynamicTableColumnHeaderLabelAcumulatorTest {
             assertThat(labelStackAt(accumulator, i, 1)).contains(ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + i);
         }
         assertThat(labelStackAt(accumulator, columnCount - 1, 0))
-                .contains(SettingsDynamicTableColumnHeaderLabelAcumulator.SETTING_COMMENT_LABEL);
+                .contains(SettingsDynamicTableColumnHeaderLabelAccumulator.SETTING_COMMENT_LABEL);
         assertThat(labelStackAt(accumulator, columnCount - 1, 1))
-                .contains(SettingsDynamicTableColumnHeaderLabelAcumulator.SETTING_COMMENT_LABEL);
+                .contains(SettingsDynamicTableColumnHeaderLabelAccumulator.SETTING_COMMENT_LABEL);
     }
 
-    private static List<String> labelStackAt(final SettingsDynamicTableColumnHeaderLabelAcumulator accumulator,
+    private static List<String> labelStackAt(final SettingsDynamicTableColumnHeaderLabelAccumulator accumulator,
             final int column, final int row) {
         final LabelStack configLabels = new LabelStack();
         accumulator.accumulateConfigLabels(configLabels, column, row);
