@@ -48,7 +48,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
             if (columnIndex > 0 && modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
                 if (columnIndex == 1) {
-                    return getDocumentationText(keywordCall);
+                    return getDocumentationText(keywordCall).replaceAll("\\n", " ");
                 } else {
                     return "";
                 }
