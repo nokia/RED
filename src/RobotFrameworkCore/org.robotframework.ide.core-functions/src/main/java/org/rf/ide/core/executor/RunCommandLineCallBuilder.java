@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
@@ -21,6 +22,16 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirect
 public class RunCommandLineCallBuilder {
 
     public static interface IRunCommandLineBuilder {
+
+        IRunCommandLineBuilder withExecutableFile(final String executableFilePath);
+
+        IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments);
+
+        IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments);
+
+        IRunCommandLineBuilder enableDryRun();
+
+        IRunCommandLineBuilder useArgumentFile(boolean shouldUseArgumentFile);
 
         IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> pythonPathLocations);
 
@@ -36,19 +47,11 @@ public class RunCommandLineCallBuilder {
 
         IRunCommandLineBuilder excludeTags(final Collection<String> tags);
 
-        IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments);
-
         IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
-
-        IRunCommandLineBuilder enableDryRun();
 
         IRunCommandLineBuilder withProject(final File project);
 
-        IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<String> additionalProjectsLocations);
-
-        IRunCommandLineBuilder withExecutableFile(final String executableFilePath);
-
-        IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments);
+        IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<File> additionalProjectsLocations);
 
         RunCommandLine build() throws IOException;
     }
@@ -60,6 +63,10 @@ public class RunCommandLineCallBuilder {
         private final String executorPath;
 
         private final int listenerPort;
+
+        private boolean enableDryRun = false;
+
+        private boolean useArgumentFile = false;
 
         private final List<String> pythonPath = new ArrayList<>();
 
@@ -75,11 +82,9 @@ public class RunCommandLineCallBuilder {
 
         private final List<String> tagsToExclude = new ArrayList<>();
 
-        private final List<String> additionalProjectsLocations = new ArrayList<>();
-
         private File project = null;
 
-        private boolean enableDryRun = false;
+        private final List<File> additionalProjectsLocations = new ArrayList<>();
 
         private String robotUserArgs = "";
 
@@ -89,10 +94,41 @@ public class RunCommandLineCallBuilder {
 
         private String executableFileArgs = "";
 
+
         private Builder(final SuiteExecutor executor, final String executorPath, final int listenerPort) {
             this.executor = executor;
             this.executorPath = executorPath;
             this.listenerPort = listenerPort;
+        }
+
+        @Override
+        public IRunCommandLineBuilder withExecutableFile(final String executableFilePath) {
+            this.executableFilePath = executableFilePath;
+            return this;
+        }
+
+        @Override
+        public IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments) {
+            this.executableFileArgs = arguments.trim();
+            return this;
+        }
+
+        @Override
+        public IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments) {
+            this.interpreterUserArgs = arguments.trim();
+            return this;
+        }
+
+        @Override
+        public IRunCommandLineBuilder enableDryRun() {
+            this.enableDryRun = true;
+            return this;
+        }
+
+        @Override
+        public IRunCommandLineBuilder useArgumentFile(final boolean shouldUseArgumentFile) {
+            this.useArgumentFile = shouldUseArgumentFile;
+            return this;
         }
 
         @Override
@@ -138,23 +174,10 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments) {
-            this.interpreterUserArgs = arguments.trim();
-            return this;
-        }
-
-        @Override
         public IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments) {
             this.robotUserArgs = arguments.trim();
             return this;
         }
-
-        @Override
-        public IRunCommandLineBuilder enableDryRun() {
-            this.enableDryRun = true;
-            return this;
-        }
-
         @Override
         public IRunCommandLineBuilder withProject(final File project) {
             this.project = project;
@@ -163,20 +186,8 @@ public class RunCommandLineCallBuilder {
 
         @Override
         public IRunCommandLineBuilder withAdditionalProjectsLocations(
-                final Collection<String> additionalProjectsLocations) {
+                final Collection<File> additionalProjectsLocations) {
             this.additionalProjectsLocations.addAll(additionalProjectsLocations);
-            return this;
-        }
-
-        @Override
-        public IRunCommandLineBuilder withExecutableFile(final String executableFilePath) {
-            this.executableFilePath = executableFilePath;
-            return this;
-        }
-
-        @Override
-        public IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments) {
-            this.executableFileArgs = arguments.trim();
             return this;
         }
 
@@ -208,21 +219,66 @@ public class RunCommandLineCallBuilder {
             cmdLine.add("--listener");
             cmdLine.add(RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py").toPath() + ":" + listenerPort);
 
-            final ArgumentsFile argumentsFile = createArgumentsFile();
-            cmdLine.add("--argumentfile");
-            cmdLine.add(argumentsFile.writeToTemporaryOrUseAlreadyExisting().toPath().toString());
+            ArgumentsFile argumentsFile = null;
+            if (useArgumentFile) {
+                argumentsFile = createArgumentsFile();
+                cmdLine.add("--argumentfile");
+                cmdLine.add(argumentsFile.writeToTemporaryOrUseAlreadyExisting().toPath().toString());
+            } else {
+                cmdLine.addAll(createInlinedArguments());
+            }
 
             if (project != null) {
                 cmdLine.add(project.getAbsolutePath());
             }
-            for (final String projectLocation : additionalProjectsLocations) {
-                cmdLine.add(projectLocation);
+            for (final File projectLocation : additionalProjectsLocations) {
+                cmdLine.add(projectLocation.getAbsolutePath());
             }
             return new RunCommandLine(cmdLine, argumentsFile);
         }
 
-        private List<String> convertArguments(final String args) {
-            return ArgumentsConverter.joinMultipleArgValues(ArgumentsConverter.parseArguments(args));
+        private List<String> createInlinedArguments() throws IOException {
+            final List<String> robotArgs = new ArrayList<>();
+            if (!pythonPath.isEmpty()) {
+                robotArgs.add("-P");
+                robotArgs.add(pythonPath());
+            }
+            for (final String varFile : variableFiles) {
+                robotArgs.add("-V");
+                robotArgs.add(varFile);
+            }
+            for (final String tagToInclude : tagsToInclude) {
+                robotArgs.add("-i");
+                robotArgs.add(tagToInclude);
+            }
+            for (final String tagToExclude : tagsToExclude) {
+                robotArgs.add("-e");
+                robotArgs.add(tagToExclude);
+            }
+            if (enableDryRun) {
+                robotArgs.add("--prerunmodifier");
+                robotArgs.add(RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py").toPath().toString());
+                robotArgs.add("--runemptysuite");
+                robotArgs.add("--dryrun");
+                robotArgs.add("--output");
+                robotArgs.add("NONE");
+                robotArgs.add("--report");
+                robotArgs.add("NONE");
+                robotArgs.add("--log");
+                robotArgs.add("NONE");
+            }
+            for (final String suite : suitesToRun) {
+                robotArgs.add("-s");
+                robotArgs.add(suite);
+            }
+            for (final String test : testsToRun) {
+                robotArgs.add("-t");
+                robotArgs.add(test);
+            }
+            if (!robotUserArgs.isEmpty()) {
+                robotArgs.addAll(convertArguments(robotUserArgs));
+            }
+            return robotArgs;
         }
 
         private ArgumentsFile createArgumentsFile() throws IOException {
@@ -264,8 +320,7 @@ public class RunCommandLineCallBuilder {
         private void addUserArguments(final ArgumentsFile argumentsFile) {
             argumentsFile.addCommentLine("arguments specified manually by user");
 
-            final List<String> args = ArgumentsConverter.parseArguments(robotUserArgs);
-            final List<String> joinedArgs = ArgumentsConverter.joinMultipleArgValues(args);
+            final List<String> joinedArgs = convertArguments(robotUserArgs);
             
             int i = 0;
             while (i < joinedArgs.size()) {
@@ -278,6 +333,10 @@ public class RunCommandLineCallBuilder {
                 }
                 i++;
             }
+        }
+
+        private List<String> convertArguments(final String args) {
+            return ArgumentsConverter.joinMultipleArgValues(ArgumentsConverter.parseArguments(args));
         }
 
         private String classPath() {
@@ -332,14 +391,14 @@ public class RunCommandLineCallBuilder {
 
         private final List<String> commandLine;
 
-        private final ArgumentsFile argFile;
+        private final Optional<ArgumentsFile> argFile;
 
         RunCommandLine(final List<String> commandLine, final ArgumentsFile argumentsFile) {
             this.commandLine = new ArrayList<>(commandLine);
-            this.argFile = argumentsFile;
+            this.argFile = Optional.ofNullable(argumentsFile);
         }
 
-        public ArgumentsFile getArgumentFile() {
+        public Optional<ArgumentsFile> getArgumentFile() {
             return argFile;
         }
 
