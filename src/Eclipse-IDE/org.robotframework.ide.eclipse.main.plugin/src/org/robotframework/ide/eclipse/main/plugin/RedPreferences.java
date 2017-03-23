@@ -57,6 +57,8 @@ public class RedPreferences {
 
     public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
 
+    public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
+
     public static final String LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS = "red.launch.additionalInterpreterArguments";
 
     public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
@@ -70,6 +72,7 @@ public class RedPreferences {
     public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
 
     public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
+
 
 
     public String getActiveRuntime() {
@@ -181,6 +184,10 @@ public class RedPreferences {
 
     public int getFoldingLineLimit() {
         return store.getInt(FOLDING_LINE_LIMIT);
+    }
+
+    public boolean shouldLaunchUsingArgumentsFile() {
+        return store.getBoolean(LAUNCH_USE_ARGUMENT_FILE);
     }
 
     public String getLaunchAdditionalInterpreterArguments() {

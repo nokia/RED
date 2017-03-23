@@ -5403,6 +5403,12 @@
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.AutoDiscoveringPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.autodiscovering"
+            name="Autodiscovering">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.installed"
             name="Installed frameworks">
@@ -5418,12 +5424,6 @@
             class="org.robotframework.ide.eclipse.main.plugin.preferences.SuiteEditorPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
             name="Editor">
-      </page>
-      <page
-            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
-            class="org.robotframework.ide.eclipse.main.plugin.preferences.AutoDiscoveringPreferencePage"
-            id="org.robotframework.ide.eclipse.main.plugin.preferences.autodiscovering"
-            name="Autodiscovering">
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
@@ -5445,6 +5445,12 @@
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.LaunchingPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.launch"
+            name="Launching">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.launch"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.DefaultLaunchConfigurationPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.launch.default"
             name="Default Launch Configurations">

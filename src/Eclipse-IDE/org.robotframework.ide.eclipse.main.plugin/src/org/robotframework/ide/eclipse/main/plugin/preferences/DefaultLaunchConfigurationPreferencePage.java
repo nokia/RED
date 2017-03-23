@@ -38,7 +38,7 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
     private IntegerFieldEditor remoteTimeout;
 
     public DefaultLaunchConfigurationPreferencePage() {
-        super(DefaultLaunchConfigurationPreferencePage.GRID);
+        super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
         setDescription("Configure default robot launch configurations");
     }
