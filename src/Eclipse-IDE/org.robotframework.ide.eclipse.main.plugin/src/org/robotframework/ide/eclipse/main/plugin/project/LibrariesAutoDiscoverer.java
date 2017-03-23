@@ -168,7 +168,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         private final List<String> suiteNames = newArrayList();
 
-        private final List<String> additionalProjectsLocations = newArrayList();
+        private final List<File> additionalProjectsLocations = newArrayList();
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations() {
@@ -195,7 +195,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         new ArrayList<String>());
                 if (tempSuiteFileWithResources != null) {
                     suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithResources.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFileWithResources.getParent());
+                    additionalProjectsLocations.add(tempSuiteFileWithResources.getParentFile());
                 }
             }
         }
@@ -206,7 +206,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 final File linkedFile = linkedFileLocation.toFile();
                 if (linkedFile.exists()) {
                     suiteNames.add(Files.getNameWithoutExtension(linkedFile.getName()));
-                    final String linkedFileParentPath = linkedFile.getParent();
+                    final File linkedFileParentPath = linkedFile.getParentFile();
                     if (!additionalProjectsLocations.contains(linkedFileParentPath)) {
                         additionalProjectsLocations.add(linkedFileParentPath);
                     }
@@ -220,7 +220,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         @Override
-        public List<String> getAdditionalProjectsLocations() {
+        public List<File> getAdditionalProjectsLocations() {
             return additionalProjectsLocations;
         }
 

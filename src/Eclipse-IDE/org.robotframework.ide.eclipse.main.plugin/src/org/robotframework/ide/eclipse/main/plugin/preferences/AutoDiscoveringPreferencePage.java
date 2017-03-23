@@ -40,12 +40,12 @@ public class AutoDiscoveringPreferencePage extends FieldEditorPreferencePage imp
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(libGroup);
         GridLayoutFactory.fillDefaults().applyTo(libGroup);
 
-        final BooleanFieldEditor projectModulesAdditionOnVirtualenvEditor = new BooleanFieldEditor(
+        final BooleanFieldEditor editor = new BooleanFieldEditor(
                 RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED,
                 "Add project modules recursively to PYTHONPATH/CLASSPATH during Autodiscovering on virtualenv",
                 libGroup);
-        addField(projectModulesAdditionOnVirtualenvEditor);
-        final Button button = (Button) projectModulesAdditionOnVirtualenvEditor.getDescriptionControl(libGroup);
+        addField(editor);
+        final Button button = (Button) editor.getDescriptionControl(libGroup);
         GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
     }
 

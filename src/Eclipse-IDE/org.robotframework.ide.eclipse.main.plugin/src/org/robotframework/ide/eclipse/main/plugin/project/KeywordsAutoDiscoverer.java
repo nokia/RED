@@ -80,7 +80,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
         private final List<String> suiteNames = newArrayList();
 
-        private final List<String> additionalProjectsLocations = newArrayList();
+        private final List<File> additionalProjectsLocations = newArrayList();
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations() {
@@ -90,7 +90,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                         libraryNames);
                 if (tempSuiteFileWithLibraries != null) {
                     suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithLibraries.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFileWithLibraries.getParent());
+                    additionalProjectsLocations.add(tempSuiteFileWithLibraries.getParentFile());
                 }
             }
         }
@@ -110,10 +110,8 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         @Override
-        public List<String> getAdditionalProjectsLocations() {
+        public List<File> getAdditionalProjectsLocations() {
             return additionalProjectsLocations;
         }
-
     }
-
 }
