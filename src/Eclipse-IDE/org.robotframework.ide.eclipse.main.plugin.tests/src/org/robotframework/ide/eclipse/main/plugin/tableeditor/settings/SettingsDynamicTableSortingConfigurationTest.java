@@ -15,7 +15,7 @@ import org.eclipse.nebula.widgets.nattable.config.NullComparator;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableColumnHeaderLabelAcumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableColumnHeaderLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableSortingConfiguration;
 
 public class SettingsDynamicTableSortingConfigurationTest {
@@ -28,7 +28,7 @@ public class SettingsDynamicTableSortingConfigurationTest {
         config.configureRegistry(configRegistry);
 
         final Comparator<?> comparator = configRegistry.getConfigAttribute(SortConfigAttributes.SORT_COMPARATOR,
-                DisplayMode.NORMAL, SettingsDynamicTableColumnHeaderLabelAcumulator.SETTING_COMMENT_LABEL);
+                DisplayMode.NORMAL, SettingsDynamicTableColumnHeaderLabelAccumulator.SETTING_COMMENT_LABEL);
         assertThat(comparator).isInstanceOf(NullComparator.class);
     }
 }
