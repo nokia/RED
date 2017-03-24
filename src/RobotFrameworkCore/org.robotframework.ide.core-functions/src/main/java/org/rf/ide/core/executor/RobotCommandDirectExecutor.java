@@ -142,12 +142,8 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-libdoc",
                     libName);
 
-            final byte[] docededFileContent = runLibdoc(libName, cmdLine);
-            final File libdocFile = new File(resultFilePath);
-            if (!libdocFile.exists()) {
-                libdocFile.createNewFile();
-            }
-            Files.write(docededFileContent, libdocFile);
+            final byte[] decodedFileContent = runLibdoc(libName, cmdLine);
+            writeLibdocToFile(resultFilePath, decodedFileContent);
         } catch (final IOException e) {
             // simply libdoc will not be generated
         }
@@ -170,12 +166,8 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                     libName);
             cmdLine.addAll(additions.stream().map(RobotRuntimeEnvironment::wrapArgumentIfNeeded).collect(toList()));
 
-            final byte[] docededFileContent = runLibdoc(libName, cmdLine);
-            final File libdocFile = new File(resultFilePath);
-            if (!libdocFile.exists()) {
-                libdocFile.createNewFile();
-            }
-            Files.write(docededFileContent, libdocFile);
+            final byte[] decodedFileContent = runLibdoc(libName, cmdLine);
+            writeLibdocToFile(resultFilePath, decodedFileContent);
         } catch (final IOException e) {
             // simply libdoc will not be generated
         }
@@ -199,6 +191,14 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             throw new RobotEnvironmentDetailedException(e.getMessage(),
                     "Unable to generate library specification file for library '" + libName + "'", e);
         }
+    }
+
+    private void writeLibdocToFile(final String resultFilePath, final byte[] docededFileContent) throws IOException {
+        final File libdocFile = new File(resultFilePath);
+        if (!libdocFile.exists()) {
+            libdocFile.createNewFile();
+        }
+        Files.write(docededFileContent, libdocFile);
     }
 
     @Override
