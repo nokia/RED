@@ -287,7 +287,7 @@ class SuiteSourceEditorFoldingSupport {
         };
     }
 
-    synchronized void updateFoldingStructure(final Collection<Position> positions) {
+    void updateFoldingStructure(final Collection<Position> positions) {
         if (annotationsModel == null) {
             return;
         }
