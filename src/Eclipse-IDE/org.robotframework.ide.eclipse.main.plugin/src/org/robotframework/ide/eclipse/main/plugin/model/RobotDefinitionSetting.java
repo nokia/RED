@@ -66,6 +66,20 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
         return arguments;
     }
     
+    @Override
+    public boolean shouldAddCommentMark() {
+        final RobotToken declaration = getLinkedElement().getDeclaration();
+        if (declaration.isDirty()) {
+            if (declaration.getText().isEmpty()) {
+                return true;
+            } else {
+                return !declaration.getText().trim().startsWith("#");
+            }
+        } else {
+            return !declaration.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
+        }
+    }
+
     public boolean isArguments() {
         return getLinkedElement().getModelType() == ModelType.USER_KEYWORD_ARGUMENTS;
     }
