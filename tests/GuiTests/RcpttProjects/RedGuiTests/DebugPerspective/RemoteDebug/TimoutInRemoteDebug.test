@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _56LAoKS_EeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/14/17 4:39 PM
+Save-Time: 3/24/17 10:02 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -25,7 +25,7 @@ get-button "Save (M1+S)" | click
 
 //set in preference timeout to 3 seconds
 get-preferences-menu | click
-get-window Preferences | get-tree | select "Robot Framework/Default Launch Configurations"
+get-window Preferences | get-tree | select "Robot Framework/Launching/Default Launch Configurations"
 with [get-window Preferences] {
     get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 3
     get-button Apply | click
