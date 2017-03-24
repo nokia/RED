@@ -42,7 +42,7 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
 
             if (columnIndex > 0 && modelType == ModelType.TEST_CASE_DOCUMENTATION) {
                 if (columnIndex == 1) {
-                    return getDocumentationText(keywordCall).replaceAll("\\n", " ");
+                    return getDocumentationText(keywordCall).replaceAll("\\s+", " ");
                 } else {
                     return "";
                 }
