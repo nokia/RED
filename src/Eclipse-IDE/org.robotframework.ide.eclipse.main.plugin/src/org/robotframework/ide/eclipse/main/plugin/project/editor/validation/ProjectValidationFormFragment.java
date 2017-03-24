@@ -84,7 +84,6 @@ import com.google.common.base.Predicate;
 
 /**
  * @author Michal Anglart
- *
  */
 public class ProjectValidationFormFragment implements ISectionFormFragment {
 
@@ -125,7 +124,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         createContextMenu();
         setInput();
         installResourceChangeListener();
-        
+
         final Composite excludeFilesComposite = toolkit.createComposite(internalComposite);
         GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 10).applyTo(excludeFilesComposite);
         createExcludeFilesControls(excludeFilesComposite);
@@ -158,14 +157,16 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         ViewersConfigurator.disableContextMenuOnHeader(viewer);
         Viewers.boundViewerWithContext(viewer, site, CONTEXT_ID);
     }
-    
+
     private void createColumns() {
-        ViewerColumnsFactory.newColumn("").withWidth(300)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-            .labelsProvidedBy(new ProjectValidationPathsLabelProvider(editorInput))
-            .createFor(viewer);
+        ViewerColumnsFactory.newColumn("")
+                .withWidth(300)
+                .shouldGrabAllTheSpaceLeft(true)
+                .withMinWidth(100)
+                .labelsProvidedBy(new ProjectValidationPathsLabelProvider(editorInput))
+                .createFor(viewer);
     }
-    
+
     private void createExcludeFilesControls(final Composite parent) {
         final RobotProjectConfig projectConfiguration = editorInput.getProjectConfiguration();
         excludeFilesBtn = toolkit.createButton(parent, "Exclude files by size [KB] greater than:", SWT.CHECK);
@@ -173,7 +174,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
         excludeFilesTxt = toolkit.createText(parent, projectConfiguration.getValidatedFileMaxSize());
         GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(excludeFilesTxt);
-        
+
         excludeFilesTxt.addVerifyListener(new VerifyListener() {
 
             @Override
@@ -195,17 +196,17 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
             @Override
             public void modifyText(final ModifyEvent e) {
-            	try {
-            		final String fileMaxSizeTxt = excludeFilesTxt.getText();
+                try {
+                    final String fileMaxSizeTxt = excludeFilesTxt.getText();
                     Long.parseLong(fileMaxSizeTxt);
                     editorInput.getProjectConfiguration().setValidatedFileMaxSize(fileMaxSizeTxt);
                     setDirty(true);
                 } catch (final NumberFormatException e1) {
-                    //nothing to do
+                    // nothing to do
                 }
             }
         });
-        
+
         excludeFilesBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -225,6 +226,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         final MenuManager manager = new MenuManager("Red.xml file editor validation context menu", menuId);
         manager.setRemoveAllWhenShown(true);
         final IMenuListener menuListener = new IMenuListener() {
+
             @Override
             public void menuAboutToShow(final IMenuManager menuManager) {
                 menuManager.add(new Separator("additions"));
@@ -244,7 +246,8 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private void setInput() {
-        if (viewer.getTree() == null || viewer.getTree().isDisposed()) {
+        if (viewer.getTree() == null || viewer.getTree().isDisposed()
+                || !editorInput.getRobotProject().getProject().exists()) {
             return;
         }
 
@@ -280,13 +283,14 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private void buildTreeFor(final ProjectTreeElement parent, final IResource resource) throws CoreException {
-        if (resource.getName().startsWith(".") || LibspecsFolder.get(resource.getProject()).getResource().equals(resource)) {
+        if (resource.getName().startsWith(".")
+                || LibspecsFolder.get(resource.getProject()).getResource().equals(resource)) {
             return;
         }
 
         final boolean isExcluded = editorInput.getProjectConfiguration()
                 .isExcludedFromValidation(resource.getProjectRelativePath().toPortableString());
-        
+
         final ProjectTreeElement wrappedChild = new ProjectTreeElement(resource, isExcluded);
         parent.addChild(wrappedChild);
 
@@ -341,10 +345,11 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     private void installResourceChangeListener() {
         final IResourceChangeListener resourceListener = new IResourceChangeListener() {
+
             @Override
             public void resourceChanged(final IResourceChangeEvent event) {
                 final AtomicBoolean shouldRefresh = new AtomicBoolean(false);
-                
+
                 if (event.getType() != IResourceChangeEvent.POST_CHANGE || event.getDelta() == null) {
                     return;
                 }
@@ -366,6 +371,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
                 }
                 if (shouldRefresh.get() && viewer.getTree() != null && !viewer.getTree().isDisposed()) {
                     SwtThread.syncExec(viewer.getTree().getDisplay(), new Runnable() {
+
                         @Override
                         public void run() {
                             setInput();
@@ -376,6 +382,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         };
         ResourcesPlugin.getWorkspace().addResourceChangeListener(resourceListener, IResourceChangeEvent.POST_CHANGE);
         viewer.getTree().addDisposeListener(new DisposeListener() {
+
             @Override
             public void widgetDisposed(final DisposeEvent e) {
                 ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
