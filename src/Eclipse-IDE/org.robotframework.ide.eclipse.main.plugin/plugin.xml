@@ -1310,8 +1310,13 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.openDeclarationForTables"
+          id="org.robotframework.red.openDeclarationForTables"
           name="Open Declaration For Tables">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.toggleCommentInTable"
+          name="Toggle Comment In Table">
     </command>
  </extension>
  <extension
@@ -1636,7 +1641,7 @@
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.OpenDeclarationForTablesHandler"
-          commandId="org.robotframework.ide.eclipse.openDeclarationForTables">
+          commandId="org.robotframework.red.openDeclarationForTables">
        <activeWhen>
           <with
                 variable="activePartId">
@@ -1796,6 +1801,15 @@
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.RedoHandler"
           commandId="org.robotframework.ide.eclipse.redoInTable">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ToggleCommentInTableHandler"
+          commandId="org.robotframework.red.toggleCommentInTable">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.editorContextIsActive">
@@ -3136,7 +3150,7 @@
           sequence="F3">
     </key>
     <key
-          commandId="org.robotframework.ide.eclipse.openDeclarationForTables"
+          commandId="org.robotframework.red.openDeclarationForTables"
           contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="F3">
@@ -3262,6 +3276,12 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.outline.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="F3">
+    </key>
+    <key
+          commandId="org.robotframework.red.toggleCommentInTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+/">
     </key>
  </extension>
  <extension
@@ -3650,6 +3670,11 @@
                </with>
             </visibleWhen>
 		</dynamic>
+        <command
+              commandId="org.robotframework.red.toggleCommentInTable"
+              label="Toggle Comment"
+              style="push">
+        </command>
     </menuContribution>
     <menuContribution
           allPopups="false"
