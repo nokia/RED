@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -62,9 +63,12 @@ public class AgentConnectionServerJob extends Job {
             }
             agentServer.start(agentEventListeners.toArray(new RobotAgentEventListener[0]));
             return Status.OK_STATUS;
+        } catch (final UnknownHostException e) {
+            return new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                    String.format("Unable to start server on %s:%d\nUnknown host", host, port));
         } catch (final IOException e) {
             return new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                    "Unable to start server for remote execution on " + host + ":" + port, e);
+                    String.format("Unable to start server on %s:%d\n%s", host, port, e.getMessage()));
         }
     }
 
