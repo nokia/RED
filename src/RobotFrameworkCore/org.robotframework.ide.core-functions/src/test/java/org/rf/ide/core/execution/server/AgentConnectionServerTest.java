@@ -11,11 +11,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -98,7 +100,7 @@ public class AgentConnectionServerTest {
 
         final AgentConnectionServer server = new AgentConnectionServer(host, port);
         server.addStatusListener(serverStatusListener);
-        
+
         final Thread serverThread = new Thread(() -> {
             try {
                 server.start(robotEventListener);
@@ -164,6 +166,62 @@ public class AgentConnectionServerTest {
         verify(serverStatusListener).clientConnected(anyInt());
         verify(serverStatusListener).clientConnectionClosed(anyInt());
         verifyNoMoreInteractions(serverStatusListener);
+    }
+
+    @Test(expected = BindException.class)
+    public void exceptionIsThrown_whenHostCannotBeReached() throws Exception {
+        final String host = "123456789";
+        final int port = findFreePort();
+
+        final AgentServerStatusListener serverStatusListener = mock(AgentServerStatusListener.class);
+
+        final AgentConnectionServer server = new AgentConnectionServer(host, port, 100, TimeUnit.MILLISECONDS);
+        server.addStatusListener(serverStatusListener);
+
+        server.start();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionIsThrown_whenPortIsOutOfRange() throws Exception {
+        final String host = "127.0.0.1";
+        final int port = 65536;
+
+        final AgentServerStatusListener serverStatusListener = mock(AgentServerStatusListener.class);
+
+        final AgentConnectionServer server = new AgentConnectionServer(host, port, 100, TimeUnit.MILLISECONDS);
+        server.addStatusListener(serverStatusListener);
+
+        server.start();
+    }
+
+    @Test(timeout = 5_000)
+    public void deadLockDoesNotOccur_whenWaitingForServerWhichThrewExceptionDuringStarting() throws Exception {
+        final String host = "123456789";
+        final int port = findFreePort();
+
+        final AgentServerStatusListener serverStatusListener = mock(AgentServerStatusListener.class);
+
+        final AgentConnectionServer server = new AgentConnectionServer(host, port, 100, TimeUnit.MILLISECONDS);
+        server.addStatusListener(serverStatusListener);
+
+        final Thread serverThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    server.start();
+                } catch (final Exception e) {
+                }
+            }
+
+        });
+
+        serverThread.start();
+        serverThread.join();
+
+        server.waitForServerToSetup();
+
+        verifyZeroInteractions(serverStatusListener);
     }
 
     private static int findFreePort() throws IOException {

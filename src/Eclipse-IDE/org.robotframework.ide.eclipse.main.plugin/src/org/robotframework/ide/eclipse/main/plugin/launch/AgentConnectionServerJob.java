@@ -56,15 +56,15 @@ public class AgentConnectionServerJob extends Job {
     @Override
     protected IStatus run(final IProgressMonitor monitor) {
         try {
-            agentServer = new AgentConnectionServer(host, port, timeout,
-                    timeoutUnit);
+            agentServer = new AgentConnectionServer(host, port, timeout, timeoutUnit);
             for (final AgentServerStatusListener serverStatusListener : serverListeners) {
                 agentServer.addStatusListener(serverStatusListener);
             }
             agentServer.start(agentEventListeners.toArray(new RobotAgentEventListener[0]));
             return Status.OK_STATUS;
         } catch (final IOException e) {
-            return new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Unable to start server for remote execution", e);
+            return new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                    "Unable to start server for remote execution on " + host + ":" + port, e);
         }
     }
 

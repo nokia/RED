@@ -99,6 +99,10 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 .start()
                 .waitForServer();
 
+        if (serverJob.getResult() != null && !serverJob.getResult().isOK()) {
+            return new LaunchExecution(serverJob, null, null);
+        }
+
         final boolean useArgumentsFile = RedPlugin.getDefault().getPreferences().shouldLaunchUsingArgumentsFile();
         final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port, useArgumentsFile);
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),

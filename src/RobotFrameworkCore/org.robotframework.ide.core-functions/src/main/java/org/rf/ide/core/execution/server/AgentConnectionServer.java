@@ -79,11 +79,12 @@ public class AgentConnectionServer {
 
     public void start(final RobotAgentEventListener... eventsListeners) throws IOException {
         try {
+            serverSetupSemaphore.release();
+
             serverSocket = new ServerSocket(port, 50, InetAddress.getByName(host));
             serverSocket.setReuseAddress(true);
             serverSocket.setSoTimeout(timeoutInMillis);
 
-            serverSetupSemaphore.release();
             listeners.forEach(listener -> listener.serverEstablished(host, port));
             try (Socket clientSocket = serverSocket.accept()) {
 
