@@ -166,7 +166,7 @@ public class RedTableTextPainterTest {
         Stylers.Common.MATCH_STYLER.applyStyles(matchStyle);
 
         assertThat(label.getString()).isEqualTo("line\nline");
-        assertThat(label.getStyleRanges()).hasSize(3);
+        assertThat(label.getStyleRanges()).hasSize(5);
 
         assertThat(label.getStyleRanges()[0].background).isNull();
         assertThat(label.getStyleRanges()[0].foreground).isNull();
@@ -180,14 +180,28 @@ public class RedTableTextPainterTest {
         assertThat(label.getStyleRanges()[1].borderColor).isNull();
         assertThat(label.getStyleRanges()[1].borderStyle).isEqualTo(matchStyle.borderStyle);
         assertThat(label.getStyleRanges()[1].start).isEqualTo(2);
-        assertThat(label.getStyleRanges()[1].length).isEqualTo(5);
+        assertThat(label.getStyleRanges()[1].length).isEqualTo(2);
 
         assertThat(label.getStyleRanges()[2].background).isNull();
         assertThat(label.getStyleRanges()[2].foreground).isNull();
         assertThat(label.getStyleRanges()[2].borderColor).isNull();
         assertThat(label.getStyleRanges()[2].borderStyle).isEqualTo(0);
-        assertThat(label.getStyleRanges()[2].start).isEqualTo(7);
-        assertThat(label.getStyleRanges()[2].length).isEqualTo(2);
+        assertThat(label.getStyleRanges()[2].start).isEqualTo(4);
+        assertThat(label.getStyleRanges()[2].length).isEqualTo(1);
+
+        assertThat(label.getStyleRanges()[3].background.getRGB()).isEqualTo(matchStyle.background.getRGB());
+        assertThat(label.getStyleRanges()[3].foreground).isNull();
+        assertThat(label.getStyleRanges()[3].borderColor).isNull();
+        assertThat(label.getStyleRanges()[3].borderStyle).isEqualTo(matchStyle.borderStyle);
+        assertThat(label.getStyleRanges()[3].start).isEqualTo(5);
+        assertThat(label.getStyleRanges()[3].length).isEqualTo(2);
+
+        assertThat(label.getStyleRanges()[4].background).isNull();
+        assertThat(label.getStyleRanges()[4].foreground).isNull();
+        assertThat(label.getStyleRanges()[4].borderColor).isNull();
+        assertThat(label.getStyleRanges()[4].borderStyle).isEqualTo(0);
+        assertThat(label.getStyleRanges()[4].start).isEqualTo(7);
+        assertThat(label.getStyleRanges()[4].length).isEqualTo(2);
     }
 
     @Test
@@ -205,7 +219,7 @@ public class RedTableTextPainterTest {
         Stylers.Common.HYPERLINK_STYLER.applyStyles(hyperlinkStyle);
 
         assertThat(label.getString()).isEqualTo("line\r\nline");
-        assertThat(label.getStyleRanges()).hasSize(3);
+        assertThat(label.getStyleRanges()).hasSize(5);
 
         assertThat(label.getStyleRanges()[0].background).isNull();
         assertThat(label.getStyleRanges()[0].foreground).isNull();
@@ -221,15 +235,31 @@ public class RedTableTextPainterTest {
         assertThat(label.getStyleRanges()[1].underline).isTrue();
         assertThat(label.getStyleRanges()[1].underlineColor.getRGB()).isEqualTo(hyperlinkStyle.underlineColor.getRGB());
         assertThat(label.getStyleRanges()[1].start).isEqualTo(2);
-        assertThat(label.getStyleRanges()[1].length).isEqualTo(6);
+        assertThat(label.getStyleRanges()[1].length).isEqualTo(2);
 
         assertThat(label.getStyleRanges()[2].background).isNull();
         assertThat(label.getStyleRanges()[2].foreground).isNull();
         assertThat(label.getStyleRanges()[2].borderColor).isNull();
         assertThat(label.getStyleRanges()[2].underline).isFalse();
         assertThat(label.getStyleRanges()[2].underlineColor).isNull();
-        assertThat(label.getStyleRanges()[2].start).isEqualTo(8);
+        assertThat(label.getStyleRanges()[2].start).isEqualTo(4);
         assertThat(label.getStyleRanges()[2].length).isEqualTo(2);
+
+        assertThat(label.getStyleRanges()[3].background).isNull();
+        assertThat(label.getStyleRanges()[3].foreground.getRGB()).isEqualTo(hyperlinkStyle.foreground.getRGB());
+        assertThat(label.getStyleRanges()[3].borderColor).isNull();
+        assertThat(label.getStyleRanges()[3].underline).isTrue();
+        assertThat(label.getStyleRanges()[3].underlineColor.getRGB()).isEqualTo(hyperlinkStyle.underlineColor.getRGB());
+        assertThat(label.getStyleRanges()[3].start).isEqualTo(6);
+        assertThat(label.getStyleRanges()[3].length).isEqualTo(2);
+
+        assertThat(label.getStyleRanges()[4].background).isNull();
+        assertThat(label.getStyleRanges()[4].foreground).isNull();
+        assertThat(label.getStyleRanges()[4].borderColor).isNull();
+        assertThat(label.getStyleRanges()[4].underline).isFalse();
+        assertThat(label.getStyleRanges()[4].underlineColor).isNull();
+        assertThat(label.getStyleRanges()[4].start).isEqualTo(8);
+        assertThat(label.getStyleRanges()[4].length).isEqualTo(2);
     }
 
     private HeaderFilterMatchesCollection matches(final String label, final String filter) {
