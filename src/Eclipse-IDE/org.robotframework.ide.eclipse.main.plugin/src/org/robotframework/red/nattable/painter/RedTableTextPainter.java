@@ -5,13 +5,17 @@
  */
 package org.robotframework.red.nattable.painter;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.base.Predicates.notNull;
+import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -37,6 +41,7 @@ import org.robotframework.red.nattable.TableCellsStrings;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -47,6 +52,8 @@ import com.google.common.collect.TreeRangeSet;
  * @author Michal Anglart
  */
 public class RedTableTextPainter extends TextPainter {
+
+    private static final Pattern NEW_LINE_PATTERN = Pattern.compile(NEW_LINE_REGEX);
 
     // paintCell method is taken from super class TextPainter
 
@@ -74,11 +81,10 @@ public class RedTableTextPainter extends TextPainter {
             setupGCFromConfig(gc, cellStyle);
 
             final int fontHeight = gc.getFontMetrics().getHeight();
-            final String orignalText = convertDataType(cell, configRegistry);
+            final String originalText = convertDataType(cell, configRegistry);
 
-            final String text = getTextToDisplay(cell, gc, rectangle.width, orignalText);
+            final String text = getTextToDisplay(cell, gc, rectangle.width, originalText);
 
-            // no wrapping so always 1
             final int numberOfNewLines = getNumberOfNewLines(text);
 
             // if the content height is bigger than the available row height
@@ -100,7 +106,7 @@ public class RedTableTextPainter extends TextPainter {
             final Supplier<HeaderFilterMatchesCollection> matchesSupplier = configRegistry
                     .getConfigAttribute(ITableStringsDecorationsSupport.MATCHES_SUPPLIER, DisplayMode.NORMAL);
 
-            final StyledString styledString = highlightMatches(new StyledString(text), orignalText, data,
+            final StyledString styledString = highlightMatches(new StyledString(text), originalText, data,
                     Stylers.withFont(gc.getFont()), matchesSupplier);
             final TextLayout layout = new TextLayout(gc.getDevice());
             layout.setText(text);
@@ -168,66 +174,70 @@ public class RedTableTextPainter extends TextPainter {
     }
 
     private RangeSet<Integer> getHyperlinks(final TableCellStringData data, final String text,
-            final String orignalText) {
-        final Optional<Range<Integer>> hyperlink = Optional.ofNullable(data)
-                .map(TableCellStringData::getHyperlinkRegion);
+            final String originalText) {
+        final List<TableCellStringData> datas = data == null ? new ArrayList<>()
+                : Lists.<TableCellStringData> newArrayList(data);
+        final List<Range<Integer>> hyperlinkRanges = datas.stream()
+                .map(TableCellStringData::getHyperlinkRegion)
+                .filter(notNull())
+                .collect(toList());
 
-        Range<Integer> hyperlinkRegion;
-        if (wrapText && calculateByTextHeight) {
-            final int[] labelsCorrespondence = calculateOriginalToWrappedLabelMapping(text, orignalText);
-
-            hyperlinkRegion = hyperlink.flatMap(r -> transformedRangesForWrappedLabel(labelsCorrespondence, r))
-                    .orElse(Range.closed(-1, -1));
-        } else {
-            hyperlinkRegion = hyperlink.orElse(Range.closed(-1, -1));
+        final RangeSet<Integer> hyperlinksRanges = mapOriginalRangesToCurrentLabel(hyperlinkRanges, text, originalText);
+        if (hyperlinksRanges.isEmpty()) {
+            hyperlinksRanges.add(Range.closed(-1, -1));
         }
-        return TreeRangeSet.create(newArrayList(hyperlinkRegion));
+        return hyperlinksRanges;
     }
 
-    private RangeSet<Integer> getMatches(final String text,
-            final String orignalText, final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
-        final RangeSet<Integer> matchesRanges = TreeRangeSet.create();
+    private RangeSet<Integer> getMatches(final String text, final String originalText,
+            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
         final HeaderFilterMatchesCollection matches = matchesSupplier.get();
-        if (matches == null) {
-            return matchesRanges;
-        }
+        final Collection<Range<Integer>> matchRanges = matches == null ? new ArrayList<>()
+                : matches.getRanges(originalText);
 
-        if (wrapText && calculateByTextLength) {
-            final int[] labelsCorrespondence = calculateOriginalToWrappedLabelMapping(text, orignalText);
-
-            final List<Range<Integer>> ranges = matches.getRanges(orignalText)
-                    .stream()
-                    .map(r -> transformedRangesForWrappedLabel(labelsCorrespondence, r))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toList());
-
-            matchesRanges.addAll(ranges);
-        } else {
-            matchesRanges.addAll(matches.getRanges(orignalText));
-        }
-        return matchesRanges;
+        return mapOriginalRangesToCurrentLabel(matchRanges, text, originalText);
     }
 
-    private Optional<Range<Integer>> transformedRangesForWrappedLabel(final int[] map, final Range<Integer> range) {
+    private RangeSet<Integer> mapOriginalRangesToCurrentLabel(final Collection<Range<Integer>> ranges,
+            final String text, final String originalText) {
+        final RangeSet<Integer> mappedRanges = TreeRangeSet.create();
+        if (wrapText && calculateByTextLength) {
+            mappedRanges
+                    .addAll(ranges.stream()
+                            .flatMap(r -> splitRangesForWrappedLabel(
+                                    calculateOriginalToWrappedLabelMapping(text, originalText), text, r))
+                            .collect(toList()));
+        } else {
+            mappedRanges.addAll(ranges);
+        }
+        return mappedRanges;
+    }
+
+    private Stream<Range<Integer>> splitRangesForWrappedLabel(final int[] map, final String text,
+            final Range<Integer> range) {
         final int lower = range.lowerEndpoint();
         final int upper = range.upperEndpoint() - 1;
 
         final int lowerEndpoint = map[lower] == -1 ? map[lower + 1] : map[lower];
         final int upperEndpoint = map[upper] == -1 ? map[upper - 1] : map[upper];
-        final Optional<Range<Integer>> transformedRange;
+        final List<Range<Integer>> transformedRanges = new ArrayList<>();
         if (lowerEndpoint <= upperEndpoint) {
-            transformedRange = Optional.of(Range.closedOpen(lowerEndpoint, upperEndpoint + 1));
-        } else {
-            transformedRange = Optional.empty();
+            final Matcher matcher = NEW_LINE_PATTERN.matcher(text.substring(lowerEndpoint, upperEndpoint + 1));
+
+            int lastLower = lowerEndpoint;
+            while (matcher.find()) {
+                transformedRanges.add(Range.closedOpen(lastLower, matcher.start() + lowerEndpoint));
+                lastLower = matcher.end() + lowerEndpoint;
+            }
+            transformedRanges.add(Range.closedOpen(lastLower, upperEndpoint + 1));
         }
-        return transformedRange;
+        return transformedRanges.stream();
     }
 
     // returned array maps indexes of characters in original text into indexes of characters in
     // wrapped text
-    private int[] calculateOriginalToWrappedLabelMapping(final String text, final String orignalText) {
-        final int[] map = new int[orignalText.length()];
+    private int[] calculateOriginalToWrappedLabelMapping(final String text, final String originalText) {
+        final int[] map = new int[originalText.length()];
         for (int i = 0, j = 0; i < map.length; i++, j++) {
             // there is either \r\n or \n\r
             if (text.charAt(j) == '\r' || text.charAt(j) == '\n') {
@@ -235,11 +245,13 @@ public class RedTableTextPainter extends TextPainter {
                         && text.charAt(j) != text.charAt(j + 1)) {
                     j++;
                 }
-                j++;
-                if (orignalText.charAt(i) == ' ') {
+                if (originalText.charAt(i) == ' ') {
                     map[i] = -1;
                     i++;
+                } else if (originalText.charAt(i) == '\n') {
+
                 }
+                j++;
             }
             map[i] = j;
         }
