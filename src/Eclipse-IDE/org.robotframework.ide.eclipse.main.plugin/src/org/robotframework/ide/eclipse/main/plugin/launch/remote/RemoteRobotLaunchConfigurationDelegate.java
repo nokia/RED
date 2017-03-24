@@ -68,7 +68,7 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
 
     private LaunchExecution doLaunch(final ILaunch launch, final RobotTestsLaunch testsLaunchContext, final String host,
             final int port, final int timeout, final List<RobotAgentEventListener> additionalListeners)
-            throws InterruptedException {
+            throws InterruptedException, CoreException {
 
         final RemoteConnectionStatusTracker remoteConnectionStatusTracker = new RemoteConnectionStatusTracker();
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
@@ -81,6 +81,10 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
                 .agentEventsListenedBy(new AgentServerKeepAlive())
                 .start()
                 .waitForServer();
+
+        if (serverJob.getResult() != null && !serverJob.getResult().isOK()) {
+            return new LaunchExecution(serverJob, null, null);
+        }
 
         final String processLabel = "TCP connection using " + host + "@" + port;
         final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, null, processLabel);
