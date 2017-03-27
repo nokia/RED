@@ -11,8 +11,6 @@
     </topic>
     <topic href="doc/first_steps/create_run.html" label="Create project, add test and run">
     </topic>
-    <topic href="doc/first_steps/debug.html" label="Debug">
-    </topic>
     <topic href="doc/first_steps/preferences_misc.html" label="Preferences and red.xml">
     </topic>
 	</topic>
@@ -35,8 +33,6 @@
     </topic>
     <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace">
     </topic>
-	<topic href="doc/user_guide/debug.html" label="Debug Robot">
-    </topic>
     <topic href="doc/user_guide/validation.html" label="Validation">
        <topic href="doc/user_guide/validation/scope.html" label="Limiting validation scope">
        </topic>
@@ -47,6 +43,8 @@
     </topic>
     <topic href="doc/user_guide/launching.html" label="Launching Tests">
        <topic href="doc/user_guide/launching/ui_elements.html" label="User interface">
+       </topic>
+       <topic href="doc/user_guide/launching/debug.html" label="Debugging Robot">
        </topic>
        <topic href="doc/user_guide/launching/local_launch.html" label="Local launches">
        </topic>
