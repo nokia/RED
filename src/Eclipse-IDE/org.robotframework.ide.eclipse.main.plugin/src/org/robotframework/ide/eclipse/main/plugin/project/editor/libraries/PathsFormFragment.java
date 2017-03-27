@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -54,7 +55,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.Viewers;
 
 
@@ -202,28 +202,24 @@ class PathsFormFragment implements ISectionFormFragment {
                 .createFor(viewer);
     }
 
-    private NewElementsCreator<SearchPath> elementsCreator(final PathAdder adder) {
-        return new NewElementsCreator<RobotProjectConfig.SearchPath>() {
-
-            @Override
-            public SearchPath createNew() {
-                final PathEntryDialog dialog = new PathEntryDialog(site.getShell());
-                if (dialog.open() == Window.OK) {
-                    final List<SearchPath> paths = dialog.getSearchPath();
-                    if (paths.isEmpty()) {
-                        return null;
-                    }
-                    boolean added = false;
-                    for (final SearchPath path : paths) {
-                        added |= adder.addPath(path);
-                    }
-                    if (added) {
-                        setDirty(true);
-                    }
-                    return paths.get(paths.size() - 1);
+    private Supplier<SearchPath> elementsCreator(final PathAdder adder) {
+        return () -> {
+            final PathEntryDialog dialog = new PathEntryDialog(site.getShell());
+            if (dialog.open() == Window.OK) {
+                final List<SearchPath> paths = dialog.getSearchPath();
+                if (paths.isEmpty()) {
+                    return null;
                 }
-                return null;
+                boolean added = false;
+                for (final SearchPath path : paths) {
+                    added |= adder.addPath(path);
+                }
+                if (added) {
+                    setDirty(true);
+                }
+                return paths.get(paths.size() - 1);
             }
+            return null;
         };
     }
 

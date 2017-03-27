@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -51,7 +52,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatche
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.ElementAddingToken;
-import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
 import org.robotframework.red.viewers.Viewers;
@@ -124,41 +124,37 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final NewElementsCreator<VariableMapping> creator = newElementsCreator();
+        final Supplier<VariableMapping> elementsCreator = newElementsCreator();
         ViewerColumnsFactory.newColumn("Variable name").withWidth(150)
             .withMinWidth(50)
             .editingEnabledOnlyWhen(editorInput.isEditable())
-            .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, creator))
+            .editingSupportedBy(new VariableMappingNameEditingSupport(viewer, elementsCreator))
             .labelsProvidedBy(new VariableMappingsNameLabelProvider())
             .createFor(viewer);
 
         ViewerColumnsFactory.newColumn("Value").withWidth(100)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
             .editingEnabledOnlyWhen(editorInput.isEditable())
-            .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, creator))
+            .editingSupportedBy(new VariableMappingValueEditingSupport(viewer, elementsCreator))
             .labelsProvidedBy(new VariableMappingsValueLabelProvider())
             .createFor(viewer);
     }
 
-    private NewElementsCreator<VariableMapping> newElementsCreator() {
-        return new NewElementsCreator<VariableMapping>() {
-
-            @Override
-            public VariableMapping createNew() {
-                final VariableMappingDialog dialog = new VariableMappingDialog(viewer.getTable().getShell());
-                if (dialog.open() == Window.OK) {
-                    final VariableMapping mapping = dialog.getMapping();
-                    @SuppressWarnings("unchecked")
-                    final List<VariableMapping> mappings = (List<VariableMapping>) viewer.getInput();
-                    if (!mappings.contains(mapping)) {
-                        editorInput.getProjectConfiguration().addVariableMapping(mapping);
-                        setDirty(true);
-                    }
-
-                    return mapping;
+    private Supplier<VariableMapping> newElementsCreator() {
+        return () -> {
+            final VariableMappingDialog dialog = new VariableMappingDialog(viewer.getTable().getShell());
+            if (dialog.open() == Window.OK) {
+                final VariableMapping mapping = dialog.getMapping();
+                @SuppressWarnings("unchecked")
+                final List<VariableMapping> mappings = (List<VariableMapping>) viewer.getInput();
+                if (!mappings.contains(mapping)) {
+                    editorInput.getProjectConfiguration().addVariableMapping(mapping);
+                    setDirty(true);
                 }
-                return null;
+
+                return mapping;
             }
+            return null;
         };
     }
 

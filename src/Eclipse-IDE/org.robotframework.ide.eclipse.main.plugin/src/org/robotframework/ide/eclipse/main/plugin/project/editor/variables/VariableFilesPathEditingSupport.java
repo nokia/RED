@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -33,8 +34,8 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
 
     VariableFilesPathEditingSupport(final ColumnViewer viewer,
-            final NewElementsCreator<ReferencedVariableFile> creator) {
-        super(viewer, 0, creator);
+            final Supplier<ReferencedVariableFile> elementsCreator) {
+        super(viewer, 0, elementsCreator);
     }
 
     @Override
@@ -55,7 +56,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ReferencedVariableFile) {
-            final VariableFileCreator variableFileCreator = (VariableFileCreator) creator;
+            final VariableFileCreator variableFileCreator = (VariableFileCreator) elementsCreator;
             scheduleViewerRefreshAndEditorActivation(
                     variableFileCreator.modifyExisting((ReferencedVariableFile) element));
         } else {
@@ -64,10 +65,10 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
     }
 
     private static IEventBroker getEventBroker() {
-        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
-    static class VariableFileCreator extends NewElementsCreator<ReferencedVariableFile> {
+    static class VariableFileCreator implements Supplier<ReferencedVariableFile> {
 
         private final Shell shell;
 
@@ -79,7 +80,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
         }
 
         @Override
-        public ReferencedVariableFile createNew() {
+        public ReferencedVariableFile get() {
             final FileDialog dialog = new FileDialog(shell, SWT.OPEN | SWT.MULTI);
             dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
             dialog.setFilterPath(editorInput.getRobotProject().getProject().getLocation().toPortableString());
