@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 
+import java.util.function.Supplier;
+
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
@@ -24,8 +26,8 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditingSupport {
 
     VariableMappingsDetailsEditingSupport(final ColumnViewer viewer, final int index,
-            final NewElementsCreator<VariableMapping> creator) {
-        super(viewer, index, creator);
+            final Supplier<VariableMapping> elementsCreator) {
+        super(viewer, index, elementsCreator);
     }
 
     @Override
@@ -70,8 +72,8 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
     static class VariableMappingNameEditingSupport extends VariableMappingsDetailsEditingSupport {
 
         VariableMappingNameEditingSupport(final ColumnViewer viewer,
-                final NewElementsCreator<VariableMapping> creator) {
-            super(viewer, -1, creator);
+                final Supplier<VariableMapping> elementsCreator) {
+            super(viewer, -1, elementsCreator);
         }
 
         @Override
@@ -93,8 +95,8 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
     static class VariableMappingValueEditingSupport extends VariableMappingsDetailsEditingSupport {
 
         VariableMappingValueEditingSupport(final ColumnViewer viewer,
-                final NewElementsCreator<VariableMapping> creator) {
-            super(viewer, -1, creator);
+                final Supplier<VariableMapping> elementsCreator) {
+            super(viewer, -1, elementsCreator);
         }
 
         @Override

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
@@ -28,8 +29,8 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 public class VariableFileArgumentsEditingSupport extends ElementsAddingEditingSupport {
 
     public VariableFileArgumentsEditingSupport(final ColumnViewer viewer, final int index,
-            final NewElementsCreator<ReferencedVariableFile> creator) {
-        super(viewer, index, creator);
+            final Supplier<ReferencedVariableFile> elementsCreator) {
+        super(viewer, index, elementsCreator);
     }
 
     @Override
@@ -94,6 +95,6 @@ public class VariableFileArgumentsEditingSupport extends ElementsAddingEditingSu
     }
 
     private IEventBroker getEventBroker() {
-        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 }

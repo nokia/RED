@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.variables;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -41,8 +42,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
+import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.viewers.ElementAddingToken;
-import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.StructuredContentProvider;
 import org.robotframework.red.viewers.Viewers;
 
@@ -117,19 +118,19 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final NewElementsCreator<ReferencedVariableFile> creator = new VariableFileCreator(viewer.getTable().getShell(),
+        final Supplier<ReferencedVariableFile> elementsCreator = new VariableFileCreator(viewer.getTable().getShell(),
                 editorInput);
-        createFileColumn(creator);
+        createFileColumn(elementsCreator);
 
         final int numberOfColumns = calculateLongestArgumentsLength();
         for (int i = 0; i < numberOfColumns; i++) {
             final String name = i == 0 ? "Arguments" : "";
             final boolean isLast = i == (numberOfColumns - 1);
-            createArgumentColumn(name, i, creator, isLast);
+            createArgumentColumn(name, i, elementsCreator, isLast);
         }
     }
 
-    private void createFileColumn(final NewElementsCreator<ReferencedVariableFile> creator) {
+    private void createFileColumn(final Supplier<ReferencedVariableFile> creator) {
         ViewerColumnsFactory.newColumn("File").withWidth(300)
             .withMinWidth(100)
             .editingEnabledOnlyWhen(editorInput.isEditable())
@@ -153,11 +154,11 @@ class VariableFilesFormFragment implements ISectionFormFragment {
     }
 
     private void createArgumentColumn(final String name, final int index,
-            final NewElementsCreator<ReferencedVariableFile> creator, final boolean shouldGrabAllTheSpace) {
+            final Supplier<ReferencedVariableFile> elementsCreator, final boolean shouldGrabAllTheSpace) {
         ViewerColumnsFactory.newColumn(name).withWidth(100)
             .shouldGrabAllTheSpaceLeft(shouldGrabAllTheSpace).withMinWidth(50)
             .editingEnabledOnlyWhen(editorInput.isEditable())
-            .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, creator))
+            .editingSupportedBy(new VariableFileArgumentsEditingSupport(viewer, index, elementsCreator))
             .labelsProvidedBy(new VariableFileArgumentsLabelProvider(index))
             .createFor(viewer);
     }
