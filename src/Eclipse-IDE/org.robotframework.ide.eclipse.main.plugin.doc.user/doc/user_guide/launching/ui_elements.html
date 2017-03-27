@@ -84,7 +84,34 @@
 	</dl>
 
 	<h3>Execution view</h3>
+	
+	<p>Execution view is a view provided by RED in which RED is presenting suites tree together with
+	status of tests/suites (PASS or FAIL). The view is updated during tests launch thus presenting
+	current execution progress. Remotely launched tests may also use this view - the only requirement
+	is that the tests itself has to take <a href="red_agent.html">agent</a> into execution as a listener.
+	</p>
+	<img src="images/ui_execution_view.png"/>
+	
+	<p>There are couple of actions possible within this view:
+	</p>
+	<ul>
+		<li><b>Expand All</b> - expands whole tree,</li>
+		<li><b>Collapse All</b> - collapses the tree,</li>
+		<li><b>Show failures only</b> - filters the tree, so that only failed elements are presented,</li>
+		<li><b>Rerun Tests</b> - launches the configuration again,</li>
+		<li><b>Rerun Failed Tests Only</b> - launches the configuration with tests which failed.</li>
+		<li><b>Go To File</b> - from context menu on test (also by double click) - opens editor and selects
+		test case.</li>
+	</ul>
+	
 	<h3>Message Log view</h3>
+	
+	<p>Message Log view is a view provided by RED which presents messages logged during tests execution. Like
+	execution view it it is also updated during tests launch. Similarly it may also work with Remote 
+	configurations when <a href="red_agent.html">agent</a> is taken into execution as a listener.
+	</p>
+	<img src="images/ui_msglog_view.png"/>
+	
 	<h3>Debug perspective</h3>
 	
 </body>
