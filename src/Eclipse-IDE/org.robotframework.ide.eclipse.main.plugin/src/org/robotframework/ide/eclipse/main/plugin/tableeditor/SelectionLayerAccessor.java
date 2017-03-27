@@ -57,6 +57,10 @@ public class SelectionLayerAccessor {
         this.selectionProvider = selectionProvider;
     }
 
+    public IRowDataProvider<? extends Object> getDataProvider() {
+        return dataProvider;
+    }
+
     public int getLastSelectedRowPosition() {
         final PositionCoordinate lastSelectedCellPosition = selectionLayer.getLastSelectedCellPosition();
         return lastSelectedCellPosition != null ? lastSelectedCellPosition.getRowPosition() : -1;
