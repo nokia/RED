@@ -49,7 +49,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
 
     private CasesFilter filter;
 
-    public CasesDataProvider(final RobotEditorCommandsStack commandsStack, final RobotCasesSection section) {
+    CasesDataProvider(final RobotEditorCommandsStack commandsStack, final RobotCasesSection section) {
         this.section = section;
         this.casesTreeFormat = new CodeElementsTreeFormat();
         createLists(section);
