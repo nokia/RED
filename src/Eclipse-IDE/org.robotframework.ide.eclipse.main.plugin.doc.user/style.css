@@ -14,6 +14,14 @@ span.block {
 span.code {
 	font-family: monospace;
 }
+
+div.code {
+	font-family: monospace;
+    background: #eee;
+    margin: 8px;
+    padding: 6px;
+}
+
 a.command {
 	background: url('../org.eclipse.help/command_link.png') no-repeat;
 	background-position: 0 5px;
@@ -24,16 +32,12 @@ a.external {
 	background-position: 0 4px;
 	padding-left: 15px;
 }
-div.code {
-	font-family: monospace;
-    background: #eee;
-    margin: 8px;
-    padding: 6px;
-}
+
 img.bordered {
 	margin: 5px;
 	border: 1px #999 solid;
 }
+
 dl.note {
 	margin: 10px;
 	padding-left: 50px;
@@ -47,7 +51,6 @@ dl.note dt {
 dl.note dd {
 	margin-left: 0;
 }
-
 
 dl.warning {
 	margin: 10px;
