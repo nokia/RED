@@ -29,8 +29,6 @@
     </topic>
 	<topic href="doc/user_guide/custom_paths_relatve.html" label="Custom python/class paths and path relativeness">
     </topic>
-    <topic href="doc/user_guide/remote.html" label="Remote debug">
-    </topic>
     <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace">
     </topic>
     <topic href="doc/user_guide/validation.html" label="Validation">
