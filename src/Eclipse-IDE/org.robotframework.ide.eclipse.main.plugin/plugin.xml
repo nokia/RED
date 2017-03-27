@@ -3623,6 +3623,11 @@
              name="actions"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.red.toggleCommentInTable"
+             label="Toggle Comment"
+             style="push">
+       </command>
        <menu
              label="References">
           <command
@@ -3670,11 +3675,6 @@
                </with>
             </visibleWhen>
 		</dynamic>
-        <command
-              commandId="org.robotframework.red.toggleCommentInTable"
-              label="Toggle Comment"
-              style="push">
-        </command>
     </menuContribution>
     <menuContribution
           allPopups="false"
@@ -3820,6 +3820,11 @@
              name="actions"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.red.toggleCommentInTable"
+             label="Toggle Comment"
+             style="push">
+       </command>
        <menu
              label="References">
           <command
