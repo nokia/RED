@@ -49,7 +49,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
 
     private KeywordsFilter filter;
 
-    public KeywordsDataProvider(final RobotEditorCommandsStack commandsStack, final RobotKeywordsSection section) {
+    KeywordsDataProvider(final RobotEditorCommandsStack commandsStack, final RobotKeywordsSection section) {
         this.section = section;
         this.keywordsTreeFormat = new CodeElementsTreeFormat();
         createLists(section);
