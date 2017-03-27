@@ -93,7 +93,7 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
         }
     }
 
-    private void refresh(final IMarkerDelta[] markerDeltas) throws CoreException {
+    private synchronized void refresh(final IMarkerDelta[] markerDeltas) throws CoreException {
         for (final IMarkerDelta delta : markerDeltas) {
             if (markers.containsKey(delta.getId()) && delta.getKind() == IResourceDelta.REMOVED) {
                 markers.remove(delta.getId());
@@ -181,7 +181,7 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
         }
     }
 
-    private void browseMatchingMarkers(final MarkerVisitor visitor, final List<RobotToken> tokens) {
+    private synchronized void browseMatchingMarkers(final MarkerVisitor visitor, final List<RobotToken> tokens) {
         // TODO : consider using e.g. segment tree for searching using segments (ranges), when
         // performance becomes the issue
         final Set<IMarker> alreadyVisitedMarkers = new HashSet<>();
