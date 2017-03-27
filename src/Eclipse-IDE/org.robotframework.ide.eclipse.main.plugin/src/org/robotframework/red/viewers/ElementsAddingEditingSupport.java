@@ -5,6 +5,8 @@
  */
 package org.robotframework.red.viewers;
 
+import java.util.function.Supplier;
+
 import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -22,13 +24,13 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
 
     protected final int index;
 
-    protected final NewElementsCreator<?> creator;
+    protected final Supplier<?> elementsCreator;
 
     public ElementsAddingEditingSupport(final ColumnViewer viewer, final int index,
-            final NewElementsCreator<?> creator) {
+            final Supplier<?> creator) {
         super(viewer);
         this.index = index;
-        this.creator = creator;
+        this.elementsCreator = creator;
     }
 
     @Override
@@ -47,7 +49,7 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ElementAddingToken) {
-            scheduleViewerRefreshAndEditorActivation(creator.createNew(((ElementAddingToken) element).getParent()));
+            scheduleViewerRefreshAndEditorActivation(elementsCreator.get());
         }
     }
 
@@ -77,16 +79,5 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
                 }
             }
         };
-    }
-
-    public abstract static class NewElementsCreator<T> {
-
-        public T createNew() {
-            return null;
-        }
-
-        public T createNew(@SuppressWarnings("unused") final Object parent) {
-            return createNew();
-        }
     }
 }

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import java.util.function.Supplier;
+
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -24,9 +26,9 @@ class PathsEditingSupport extends ElementsAddingEditingSupport {
 
     private final IEventBroker eventBroker;
 
-    PathsEditingSupport(final ColumnViewer viewer, final NewElementsCreator<SearchPath> creator,
+    PathsEditingSupport(final ColumnViewer viewer, final Supplier<SearchPath> elementsCreator,
             final IEventBroker eventBroker, final String pathChangeEventTopic) {
-        super(viewer, 0, creator);
+        super(viewer, 0, elementsCreator);
         this.eventBroker = eventBroker;
         this.topic = pathChangeEventTopic;
     }
