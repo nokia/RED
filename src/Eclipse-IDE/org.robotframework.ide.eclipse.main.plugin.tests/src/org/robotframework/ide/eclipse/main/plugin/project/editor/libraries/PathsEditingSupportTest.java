@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
@@ -22,7 +23,6 @@ import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.viewers.ElementAddingToken;
-import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 
 public class PathsEditingSupportTest {
 
@@ -32,7 +32,7 @@ public class PathsEditingSupportTest {
     @Test
     public void editingPossibilityTest() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final NewElementsCreator<SearchPath> creator = new NewElementsCreator<SearchPath>() {};
+        final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
@@ -45,7 +45,7 @@ public class PathsEditingSupportTest {
     @Test
     public void textCellEditorIsReturnedForSearchPath() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final NewElementsCreator<SearchPath> creator = new NewElementsCreator<SearchPath>() {};
+        final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
         when(viewer.getControl()).thenReturn(shell.getShell());
 
@@ -57,7 +57,7 @@ public class PathsEditingSupportTest {
     @Test
     public void alwaysDeactivatingCellEditorIsReturnedForAddingToken() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final NewElementsCreator<SearchPath> creator = new NewElementsCreator<SearchPath>() {};
+        final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
         when(viewer.getControl()).thenReturn(shell.getShell());
 
@@ -70,7 +70,7 @@ public class PathsEditingSupportTest {
     @Test
     public void pathIsReturnedAsValueToEditForSearchPath() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final NewElementsCreator<SearchPath> creator = new NewElementsCreator<SearchPath>() {};
+        final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
@@ -81,7 +81,7 @@ public class PathsEditingSupportTest {
     @Test
     public void nullIsReturnedAsValueToEditForAddingToken() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final NewElementsCreator<SearchPath> creator = new NewElementsCreator<SearchPath>() {};
+        final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
@@ -92,7 +92,7 @@ public class PathsEditingSupportTest {
     @Test
     public void newPathIsSetToSearchPathAndBrokerNotifiesListenersAboutIt() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final NewElementsCreator<SearchPath> creator = new NewElementsCreator<SearchPath>() {        };
+        final Supplier<SearchPath> creator = () -> null;
         final ColumnViewer viewer = mock(ColumnViewer.class);
 
         final SearchPath searchPath = SearchPath.create("path");
@@ -109,12 +109,9 @@ public class PathsEditingSupportTest {
         final AtomicBoolean creatorCalled = new AtomicBoolean(false);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final NewElementsCreator<SearchPath> creator = new NewElementsCreator<SearchPath>() {
-            @Override
-            public SearchPath createNew() {
-                creatorCalled.set(true);
-                return null;
-            }
+        final Supplier<SearchPath> creator = () -> {
+            creatorCalled.set(true);
+            return null;
         };
         final ColumnViewer viewer = mock(ColumnViewer.class);
         when(viewer.getControl()).thenReturn(shell.getShell());
