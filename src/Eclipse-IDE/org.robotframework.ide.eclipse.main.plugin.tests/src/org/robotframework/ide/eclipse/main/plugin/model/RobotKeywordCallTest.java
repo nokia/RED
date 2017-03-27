@@ -66,6 +66,31 @@ public class RobotKeywordCallTest {
         assertThat(calls.get(1).getComment()).isEqualTo("# *** Settings ***");
     }
 
+    @Test
+    public void keywordCallShouldBeCommented_whenNotCommented_andViceVersa() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("t1")
+                .appendLine("  Log  t")
+                .appendLine("  Log  t  # comment after kw")
+                .appendLine("  # line with comment only")
+                .build();
+        final List<RobotKeywordCall> calls = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+        assertThat(calls).hasSize(3);
+        assertThat(calls.get(0).getName()).isEqualTo("Log");
+        assertThat(calls.get(0).getComment()).isEmpty();
+        assertThat(calls.get(0).shouldAddCommentMark()).isTrue();
+        assertThat(calls.get(1).getName()).isEqualTo("Log");
+        assertThat(calls.get(1).getComment()).isEqualTo("# comment after kw");
+        assertThat(calls.get(1).shouldAddCommentMark()).isTrue();
+        assertThat(calls.get(2).getName()).isEmpty();
+        assertThat(calls.get(2).getComment()).isEqualTo("# line with comment only");
+        assertThat(calls.get(2).shouldAddCommentMark()).isFalse();
+    }
+
     private static void assertArguments(final List<RobotKeywordCall> calls) {
         assertThat(calls.get(0).getArguments()).isEmpty();
         assertThat(calls.get(0).getArguments()).isEmpty();
