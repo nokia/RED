@@ -46,11 +46,15 @@
        </topic>
     </topic>
     <topic href="doc/user_guide/launching.html" label="Launching Tests">
-       <topic href="doc/user_guide/launching/red_agent.html" label="RED Tests Runner Agent">
+       <topic href="doc/user_guide/launching/ui_elements.html" label="User interface">
        </topic>
        <topic href="doc/user_guide/launching/local_launch.html" label="Local launches">
        </topic>
+       <topic href="doc/user_guide/launching/local_launch_scripting.html" label="Local launches scripting">
+       </topic>
        <topic href="doc/user_guide/launching/remote_launch.html" label="Remote launches">
+       </topic>
+       <topic href="doc/user_guide/launching/red_agent.html" label="RED Tests Runner Agent">
        </topic>
     </topic>
     <topic href="doc/user_guide/tools_integration.html" label="Integraton with other tools">
