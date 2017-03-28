@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IK9JwOxWEeaEfJH5Ahap2w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/22/17 2:06 PM
+Save-Time: 3/28/17 1:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -137,8 +137,8 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot"
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu "Run As/1 Robot Test" | click
     //check error 
-    get-window "Problem Occurred" | get-label "Launching 'TestFile.robot (2)' has encountered a problem." 
-        | get-property caption | equals "Launching 'TestFile.robot (2)' has encountered a problem." | verify-true
+    get-window "Problem Occurred" | get-label "'Launching Robot Tests' has encountered a problem." 
+        | get-property caption | equals "'Launching Robot Tests' has encountered a problem." | verify-true
         
     //check text below    
     get-window "Problem Occurred" 
@@ -148,13 +148,13 @@ exec-with-options {
         | verify-true
         
     //detailes    
-    get-window "Problem Occurred" | get-button "Details >>" | click
+	get-window "Problem Occurred" | get-button "Details >>" | click
     get-window "Problem Occurred" | get-editbox 
-        -after [get-label "The runtime environment .*"] 
-        | get-property text | equals "Launching 'TestFile.robot (2)' has encountered a problem.\n"
-        | equals [format "Launching 'TestFile.robot (2)' has encountered a problem.\nThe runtime environment %s%sNoInterpreter is either not a python installation or it has no Robot installed" $RED_workspace_path $sys_sep]
+        -after [get-label "The runtime environment .* is either not a python installation or it has no Robot installed"] 
+        | get-property text 
+        | equals [format "The runtime environment %s%sNoInterpreter is either not a python installation or it has no Robot installed" $RED_workspace_path $sys_sep]
         | verify-true
-     get-window "Problem Occurred" | get-button OK | click  
+    get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
 //go to run configurations to see if are any problems
