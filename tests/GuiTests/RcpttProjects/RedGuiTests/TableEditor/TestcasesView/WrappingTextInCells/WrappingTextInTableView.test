@@ -1,0 +1,228 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _JQ93oA_ZEeePcNCRX_abWA
+Element-Name: WrappingTextInTableView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _1sKeQA-3EeePcNCRX_abWA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/27/17 5:44 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//cha
+proc "check-if-row-is-higher" [val row] [val table][val file "TestFile.robot"]{
+	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object 
+		| invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+		| invoke getUnderlyingLayerByPosition 0 0 | invoke getRowHeightByPosition $row
+		| gt 23 | verify-true
+}
+
+proc "check-if-row-is-normal" [val row] [val table] [val file "TestFile.robot"]{
+	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object 
+		| invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+		| invoke getUnderlyingLayerByPosition 0 0 | invoke getRowHeightByPosition $row
+		| eq 22 | assert-true -message [format "In row: %s value is not equal 22" $row]
+}
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+//check if all rows has the same size
+repeat [val index] -times 7 -command{
+	check-if-row-is-normal -row $index -table "User Keywords"
+}	
+
+//go to prefernce and check to wrap text
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor"
+    get-group Tables | get-combo -after [get-label "When cell is too small for content"] | select "wrap the content"
+    get-button Apply | click
+    get-button OK | click
+}
+
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//click of fisrt KW  by outline
+get-view Outline | get-tree |    select "TestFile.robot/Keywords/kw with args" | click
+wait 100
+
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "${abcdefghijklmnoprstuwxyz123456789111111111122277777}"
+        key-type Enter
+    }
+
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Left
+        key-type Enter
+    }    
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {    
+        type-text "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Adding text at the end"
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    
+    //go to "abc" text and change value to short one too
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 4
+        key-type Left
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "def ghi"
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi 12345678911121314"
+        key-type Enter
+    }
+}
+
+check-if-row-is-higher -row 0 -table "User Keywords"
+check-if-row-is-higher -row 1 -table "User Keywords"
+
+check-if-row-is-normal -row 2 -table "User Keywords"
+
+check-if-row-is-higher -row 3 -table "User Keywords"
+check-if-row-is-higher -row 4 -table "User Keywords"
+check-if-row-is-higher -row 5 -table "User Keywords"
+
+check-if-row-is-normal -row 6 -table "User Keywords"
+check-if-row-is-normal -row 7 -table "User Keywords"
+
+//go to source nad check if text is not split
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "This is test case with very long name that is longer than cell\n"
+    + "    log  9\n"
+    + "*** Keywords ***\n"
+    + "kw with args\n"
+    + "    [Arguments]    ${abcdefghijklmnoprstuwxyz123456789111111111122277777}\n"
+    + "    log  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Adding text at the end\n"
+    + "very long doc\n"
+    + "    [Documentation]  At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum\n"
+    + "    ...    eleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non\n"
+    + "    Catenate    def ghi    cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi 12345678911121314\n"
+    + "*** Variables ***\n"
+    + "${abc_def_ghi_jkl_mno_prs_tuw_xyz_123456789_abcdedfg_hijklmnopr_stuwxyz}    3\n"
+    + "@{newList}\n"
+    + "...    this is item number one in table 1234567890\n"
+    + "...  this is item number two in table 1234567890    9999999999999999999999999999999999999999999999988888888888888888888888888888888887777777777777777777777777777\n"
+    + "${newScalar with space in name that will be in 2 lines}   #aaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbb cccccccccccc" | verify-true
+    
+//----------------------------------------------------------------- test cases -------------------------------------------------------------------------
+
+
+// go to test case TC    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree 
+    | select "TestFile.robot/Test Cases/This is test case with very long name that is longer than cell" | click
+
+check-if-row-is-higher -row 0 -table "Test Cases"
+// make text short and check size of row
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Right
+        key-type Left
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "one test"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+}
+
+check-if-row-is-higher -row 0  -table "Test Cases"
+
+//in Log cell add new very long string but with no space
+with [get-editor "TestFile.robot"] {
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "SingleVeryLongTextThatWillNotBeSplitbeetweenToLines"
+        key-type Enter
+    }
+} 
+
+check-if-row-is-higher -row 0 -table "Test Cases"
+check-if-row-is-normal -row 1 -table "Test Cases"
+
+
+//-------------------------------------------------------variables --------------------------------------
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+
+check-if-row-is-normal -row 0 -table "Variables"
+check-if-row-is-higher -row 1 -table  "Variables"
+check-if-row-is-normal -row 2 -table "Variables"
+
+//add space in very long variable name
+
+get-view Outline | get-tree 
+    | select "TestFile.robot/Variables/abc_def_ghi_jkl_mno_prs_tuw_xyz_123456789_abcdedfg_hijklmnopr_stuwxyz"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Left
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "abc_def_ghi_jkl_mno_prs_tuw_xyz _123456789_abcdedfg_hijklmnopr_stuwxyz"
+        key-type Enter
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_ESCAPE"
+}
+
+//--------------------------------------------res - KW ---------------------------------------------------
+get-view "Project Explorer" | get-tree | select "RobotProject/res.robot" | double-click
+get-editor "res.robot" | get-tab-folder| get-tab-item Keywords | click
+
+//kw 1
+check-if-row-is-normal -row 0 -table "User Keywords" -file "res.robot"
+
+check-if-row-is-higher -row 1 -table "User Keywords" -file "res.robot"
+check-if-row-is-higher -row 2 -table "User Keywords" -file "res.robot"
+
+check-if-row-is-normal -row 3 -table "User Keywords" -file "res.robot"
+
+//kw 2
+check-if-row-is-normal -row 4 -table "User Keywords" -file "res.robot"
+
+check-if-row-is-higher -row 5 -table "User Keywords" -file "res.robot"
+check-if-row-is-higher -row 6 -table "User Keywords" -file "res.robot"
+check-if-row-is-normal -row 7 -table "User Keywords" -file "res.robot"
+
+//kw 3: Should be ...
+check-if-row-is-higher -row 8 -table "User Keywords" -file "res.robot"
+check-if-row-is-higher -row 9 -table "User Keywords" -file "res.robot"
+
+//--------------------------------------------res - Settings ---------------------------------------------------
+get-editor "res.robot" | get-tab-folder | get-tab-item Settings | click
+get-editor "res.robot" | get-section Imports|  get-canvas| get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+			| invoke getRowHeightByPosition 0| gt 23 | verify-true
+			
+//--------------------------------------------res - variables ---------------------------------------------------
+get-editor "res.robot" | get-tab-folder | get-tab-item Variables | click	
+check-if-row-is-higher -row 0 -table  "Variables"  -file "res.robot"
+check-if-row-is-higher -row 1 -table  "Variables" -file "res.robot"
+check-if-row-is-normal  -row 2 -table  "Variables" -file "res.robot"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
