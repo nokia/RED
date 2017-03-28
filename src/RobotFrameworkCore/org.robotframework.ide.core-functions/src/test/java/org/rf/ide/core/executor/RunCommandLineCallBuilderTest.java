@@ -181,6 +181,36 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
+    public void testCallWrappedWithOtherExecutableAndArguments_withRuntimeEnvironment_withSequenceRobotCommandArg()
+            throws IOException {
+        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
+
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+                .withExecutableFile("exec")
+                .addUserArgumentsForExecutableFile("args")
+                .useSingleRobotCommandLineArg(false)
+                .build();
+        final String[] commandLine = cmdLine.getCommandLine();
+        assertThat(commandLine).hasSize(7).containsSubsequence("exec", "args", "/x/y/z/python", "-m", "robot.run",
+                "--listener");
+    }
+
+    @Test
+    public void testCallWrappedWithOtherExecutableAndArguments_withRuntimeEnvironment_withSingleRobotCommandArg()
+            throws IOException {
+        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
+
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+                .withExecutableFile("exec")
+                .addUserArgumentsForExecutableFile("args")
+                .useSingleRobotCommandLineArg(true)
+                .build();
+        final String[] commandLine = cmdLine.getCommandLine();
+        assertThat(commandLine).hasSize(3).containsSubsequence("exec", "args");
+        assertThat(commandLine[2]).containsSequence("/x/y/z/python", "-m", "robot.run", "--listener");
+    }
+
+    @Test
     public void testCallWithInterpreterArgumentsAdded_withRuntimeEnvironment_argsFile() throws IOException {
         final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
 

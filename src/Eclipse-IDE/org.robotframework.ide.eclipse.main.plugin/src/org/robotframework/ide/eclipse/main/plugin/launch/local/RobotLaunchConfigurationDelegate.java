@@ -26,6 +26,7 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
@@ -103,8 +104,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             return new LaunchExecution(serverJob, null, null);
         }
 
-        final boolean useArgumentsFile = RedPlugin.getDefault().getPreferences().shouldLaunchUsingArgumentsFile();
-        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port, useArgumentsFile);
+        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port);
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final String processLabel = createConsoleDescription(robotConfig, robotRuntimeEnvironment);
@@ -146,16 +146,19 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
     @VisibleForTesting
     RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
-            final int port, final boolean useArgumentsFile) throws CoreException, IOException {
+            final int port) throws CoreException, IOException {
+
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
 
         final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
                 ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
                 : RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
 
-        builder.useArgumentFile(useArgumentsFile);
+        builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
         if (!robotConfig.getExecutableFilePath().isEmpty()) {
             builder.withExecutableFile(robotConfig.getExecutableFilePath());
             builder.addUserArgumentsForExecutableFile(robotConfig.getExecutableFileArguments());
+            builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
         }
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
