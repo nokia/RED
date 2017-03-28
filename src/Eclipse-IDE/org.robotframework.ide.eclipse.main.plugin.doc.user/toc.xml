@@ -62,8 +62,6 @@
        </topic>
        <topic href="doc/user_guide/tools_integration/red_pylint.html" label="PyDev and PyLint">
        </topic>
-       <topic href="doc/user_guide/tools_integration/python_red_debug.html" label="PyDev - dubugging tests and python code">
-       </topic>
        <topic href="doc/user_guide/tools_integration/maven.html" label="Robot Framework Maven plugin">
        </topic>
        <topic href="doc/user_guide/tools_integration/gradle.html" label="Running tests using Gradle">
