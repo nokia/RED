@@ -44,6 +44,8 @@
        </topic>
        <topic href="doc/user_guide/launching/debug.html" label="Debugging Robot">
        </topic>
+       <topic href="doc/user_guide/launching/robot_python_debug.html" label="Debugging Robot&amp;Python with RED&amp;PyDev">
+       </topic>
        <topic href="doc/user_guide/launching/local_launch.html" label="Local launches">
        </topic>
        <topic href="doc/user_guide/launching/local_launch_scripting.html" label="Local launches scripting">
