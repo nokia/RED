@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -35,15 +36,21 @@ public class LaunchingPreferencePageTest {
     }
 
     @Test
-    public void checkIfEditorForArgumentsFileLaunchingIsDefined() throws Exception {
+    public void checkIfAllBooleanEditorsAreDefined() throws Exception {
         final LaunchingPreferencePage page = new LaunchingPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(1);
+        final List<String> booleanPrefNames = newArrayList(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
+                RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT);
 
-        final FieldEditor editor = editors.get(0);
-        assertThat(editor).isInstanceOf(BooleanFieldEditor.class);
-        assertThat(editor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_USE_ARGUMENT_FILE);
+        final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
+        assertThat(editors).hasSize(2);
+        for (final FieldEditor editor : editors) {
+            if (editor instanceof BooleanFieldEditor) {
+                booleanPrefNames.remove(editor.getPreferenceName());
+            }
+        }
+        assertThat(booleanPrefNames).isEmpty();
     }
+
 }

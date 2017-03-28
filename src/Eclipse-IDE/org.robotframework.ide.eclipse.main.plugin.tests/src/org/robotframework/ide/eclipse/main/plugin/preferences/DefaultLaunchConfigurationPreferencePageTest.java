@@ -54,9 +54,7 @@ public class DefaultLaunchConfigurationPreferencePageTest {
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(7);
-        for (final Object ed : editors) {
-            final FieldEditor editor = (FieldEditor) ed;
-
+        for (final FieldEditor editor : editors) {
             if (editor instanceof IntegerFieldEditor) {
                 integerPrefNames.remove(editor.getPreferenceName());
             } else if (editor instanceof StringFieldEditor) {

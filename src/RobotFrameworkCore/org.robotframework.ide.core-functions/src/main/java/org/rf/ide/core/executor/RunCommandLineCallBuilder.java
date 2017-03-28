@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,8 @@ public class RunCommandLineCallBuilder {
         IRunCommandLineBuilder withExecutableFile(final String executableFilePath);
 
         IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments);
+
+        IRunCommandLineBuilder useSingleRobotCommandLineArg(boolean shouldUseSingleRobotCommandLineArg);
 
         IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments);
 
@@ -94,6 +97,7 @@ public class RunCommandLineCallBuilder {
 
         private String executableFileArgs = "";
 
+        private boolean useSingleRobotCommandLineArg = false;
 
         private Builder(final SuiteExecutor executor, final String executorPath, final int listenerPort) {
             this.executor = executor;
@@ -110,6 +114,12 @@ public class RunCommandLineCallBuilder {
         @Override
         public IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments) {
             this.executableFileArgs = arguments.trim();
+            return this;
+        }
+
+        @Override
+        public IRunCommandLineBuilder useSingleRobotCommandLineArg(final boolean shouldUseSingleRobotCommandLineArg) {
+            this.useSingleRobotCommandLineArg = shouldUseSingleRobotCommandLineArg;
             return this;
         }
 
@@ -178,6 +188,7 @@ public class RunCommandLineCallBuilder {
             this.robotUserArgs = arguments.trim();
             return this;
         }
+
         @Override
         public IRunCommandLineBuilder withProject(final File project) {
             this.project = project;
@@ -193,14 +204,36 @@ public class RunCommandLineCallBuilder {
 
         @Override
         public RunCommandLine build() throws IOException {
-            final List<String> cmdLine = new ArrayList<>();
+            final RunCommandLine robotRunCommandLine = buildRobotRunCommandLine();
 
             if (!executableFilePath.isEmpty()) {
-                cmdLine.add(executableFilePath);
-                if (!executableFileArgs.isEmpty()) {
-                    cmdLine.addAll(convertArguments(executableFileArgs));
-                }
+                return buildRunCommandLineWrappedWithExecutable(robotRunCommandLine);
             }
+
+            return robotRunCommandLine;
+        }
+
+        private RunCommandLine buildRunCommandLineWrappedWithExecutable(final RunCommandLine robotRunCommandLine) {
+            final List<String> cmdLine = new ArrayList<>();
+            cmdLine.add(executableFilePath);
+            if (!executableFileArgs.isEmpty()) {
+                cmdLine.addAll(convertArguments(executableFileArgs));
+            }
+
+            if (useSingleRobotCommandLineArg) {
+                cmdLine.add(String.join(" ", robotRunCommandLine.getCommandLine()));
+            } else {
+                cmdLine.addAll(Arrays.asList(robotRunCommandLine.getCommandLine()));
+            }
+
+            if (robotRunCommandLine.getArgumentFile().isPresent()) {
+                return new RunCommandLine(cmdLine, robotRunCommandLine.getArgumentFile().get());
+            }
+            return new RunCommandLine(cmdLine, null);
+        }
+
+        private RunCommandLine buildRobotRunCommandLine() throws IOException {
+            final List<String> cmdLine = new ArrayList<>();
             cmdLine.add(executorPath);
             if (executor == SuiteExecutor.Jython) {
                 final String additionalPythonPathLocationForJython = extractAdditionalPythonPathLocationForJython();
@@ -321,7 +354,7 @@ public class RunCommandLineCallBuilder {
             argumentsFile.addCommentLine("arguments specified manually by user");
 
             final List<String> joinedArgs = convertArguments(robotUserArgs);
-            
+
             int i = 0;
             while (i < joinedArgs.size()) {
                 if (ArgumentsConverter.isSwitchArgument(joinedArgs.get(i)) && i < joinedArgs.size() - 1
