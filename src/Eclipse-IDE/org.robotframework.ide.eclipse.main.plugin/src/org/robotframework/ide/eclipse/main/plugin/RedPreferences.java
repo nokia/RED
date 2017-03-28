@@ -73,6 +73,7 @@ public class RedPreferences {
 
     public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
 
+    public static final String LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT = "red.launch.useSingleCommandLineArgument";
 
 
     public String getActiveRuntime() {
@@ -216,6 +217,10 @@ public class RedPreferences {
 
     public String getLaunchAdditionalExecutableFileArguments() {
         return store.getString(LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS);
+    }
+
+    public boolean shouldUseSingleCommandLineArgument() {
+        return store.getBoolean(LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {

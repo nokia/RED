@@ -46,9 +46,7 @@ public class FoldingPreferencePageTest {
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
         assertThat(editors).hasSize(5);
-        for (final Object ed : editors) {
-            final FieldEditor editor = (FieldEditor) ed;
-
+        for (final FieldEditor editor : editors) {
             if (editor instanceof BooleanFieldEditor) {
                 booleanPrefNames.remove(editor.getPreferenceName());
             } else if (editor instanceof IntegerFieldEditor) {

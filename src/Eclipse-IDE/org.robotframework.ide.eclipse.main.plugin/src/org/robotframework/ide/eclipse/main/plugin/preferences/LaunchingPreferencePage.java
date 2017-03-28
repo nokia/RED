@@ -24,7 +24,6 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
-
 public class LaunchingPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     public LaunchingPreferencePage() {
@@ -43,6 +42,11 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
 
         createLink(parent);
 
+        createGeneralLaunchingPreferences(parent);
+        createExecutableFileLaunchingPreferences(parent);
+    }
+
+    private void createGeneralLaunchingPreferences(final Composite parent) {
         final Group generalGroup = new Group(parent, SWT.NONE);
         generalGroup.setText("General");
         GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(generalGroup);
@@ -51,6 +55,20 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
         final BooleanFieldEditor editor = new BooleanFieldEditor(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
                 "Pass Robot arguments using arguments file", generalGroup);
         final Button button = (Button) editor.getDescriptionControl(generalGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
+        addField(editor);
+    }
+
+    private void createExecutableFileLaunchingPreferences(final Composite parent) {
+        final Group executableGroup = new Group(parent, SWT.NONE);
+        executableGroup.setText("Executor");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(executableGroup);
+        GridLayoutFactory.fillDefaults().applyTo(executableGroup);
+
+        final BooleanFieldEditor editor = new BooleanFieldEditor(
+                RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT,
+                "Use single argument to pass robot execution command line", executableGroup);
+        final Button button = (Button) editor.getDescriptionControl(executableGroup);
         GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
         addField(editor);
     }
