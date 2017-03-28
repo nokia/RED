@@ -7,6 +7,33 @@
 <body>
 	<h2>Locally launched tests</h2>
 	
+	<p>When <b>Robot</b> launch configuration is launched it setups a simple server inside your RED instance to which 
+	execution events can be send from tests. Then it automatically starts the tests choosing suites/tests which
+	has to be executed from the configuration. The tests are either started using some kind of python interpreter
+	or using <a href="local_launch_scripting.html">user-defined script</a>.
+	</p>
+	
+	<h3>Robot launch configuration</h3>
+	
+	<p>Open 
+	<a class="command" href="javascript:executeCommand('org.eclipse.debug.ui.commands.OpenRunConfigurations')">
+	Run -> Run Configurations...</a> dialog and under <b>Robot</b> element create new configuration. The
+	configuration itself is using couple of tabs:
+	</p>
+	<ul>
+		<li><b>Robot</b> - where <b>project in use</b> should be specified, as well as <b>suites</b> and/or 
+		<b>tests</b> to be executed; <b>tags</b> used to include or exclude tests and <b>additional</b> 
+		arguments provided by user,
+		</li>
+		<li><b>Listener</b> - where agent connection type and its parameters is specified,
+		</li>
+		<li><b>Executor</b> - where executable for the tests are specified - it can be either python
+		installation used by the project; python installation taken from <code>PATH</code> variable, or
+		any script selected by user, 
+		<li><b>Environment</b> - where environment variables for robot process can be specified (if nothing is
+		specified the variables are inherited from RED/eclipse environment variables).
+	</ul>
+	
 	
 </body>
 </html>
