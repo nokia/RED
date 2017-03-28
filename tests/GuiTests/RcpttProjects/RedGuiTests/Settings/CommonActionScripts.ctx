@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/17/17 3:23 PM
+Save-Time: 3/28/17 11:24 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -139,8 +139,8 @@ proc "wait-for-loading-red-xml" [val editor_name]{
 	}
 } 
 
-proc "wait-for-discover-window"{
-	try -times 4 -delay 1000 -command{
+proc "wait-for-discover-window" [val times 4]{
+	try -times $times -delay 1000 -command{
 		get-window "Discovering libraries summary"
 	}
 }
