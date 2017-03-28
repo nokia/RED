@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Q4GtYA8DEeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/23/17 4:23 PM
+Save-Time: 3/28/17 2:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -35,8 +35,8 @@ get-window "Delete Resources" | get-button OK | click
 exec-with-options {
     get-button "Run.*" | click
     wait 1000
-    get-window "Problem Occurred" | get-label "Launching 'SecondTest.robot' has encountered a problem." 
-        | get-property caption | equals "Launching 'SecondTest.robot' has encountered a problem." | verify-true
+    get-window "Problem Occurred" | get-label "'Launching SecondTest.robot' has encountered a problem." 
+        | get-property caption | equals "'Launching SecondTest.robot' has encountered a problem." | verify-true
     get-window "Problem Occurred" | get-label "Suite 'SecondTest.robot' does not exist in project 'LaunchesTests'" 
         | get-property caption | equals "Suite 'SecondTest.robot' does not exist in project 'LaunchesTests'" 
         | verify-true
@@ -92,14 +92,14 @@ exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu "Run As/1 Robot Test" | click
     
     //check error
-    get-window "Problem Occurred" | get-label "Launching 'LaunchesTests' has encountered a problem." 
-        | get-property caption | equals "Launching 'LaunchesTests' has encountered a problem." | verify-true
+    get-window "Problem Occurred" | get-label "'Launching Robot Tests' has encountered a problem." 
+        | get-property caption | equals "'Launching Robot Tests' has encountered a problem." | verify-true
+        
     get-window "Problem Occurred" | get-label "Project 'LaunchesTests' is currently closed" | get-property caption 
         | equals "Project 'LaunchesTests' is currently closed" | verify-true
     get-window "Problem Occurred" | get-button "Details >>" | click
     get-window "Problem Occurred" | get-editbox -after [get-label "Project 'LaunchesTests' is currently closed"] 
-        | get-property text | equals "Launching 'LaunchesTests' has encountered a problem.\n"
-        + "Project 'LaunchesTests' is currently closed" | verify-true
+        | get-property text | equals "Project 'LaunchesTests' is currently closed" | verify-true
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
@@ -107,10 +107,10 @@ exec-with-options {
 //run selected test - error should be shown about closed project
 get-button "Run.*" | click -arrow
 exec-with-options {
-    get-menu "2 FirstFile.robot (Selected Test Cases)" | click
+    get-menu "2 FirstFile.robot (Selected Test Cases)"| click
     get-window "Problem Occurred" 
-        | get-label "Launching 'FirstFile.robot (Selected Test Cases)' has encountered a problem." 
-        | get-property caption | equals "Launching 'FirstFile.robot (Selected Test Cases)' has encountered a problem." 
+        | get-label "'Launching FirstFile.robot (Selected Test Cases)' has encountered a problem." 
+        | get-property caption | equals "'Launching FirstFile.robot (Selected Test Cases)' has encountered a problem." 
         | verify-true
     get-window "Problem Occurred" | get-label "Project 'LaunchesTests' is currently closed" | get-property caption 
         | equals "Project 'LaunchesTests' is currently closed" | verify-true
