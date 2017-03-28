@@ -24,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListe
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -60,7 +59,6 @@ public class RedPlugin extends AbstractUIPlugin {
             if (RedSystemProperties.shouldShowSessionConsole()) {
                 RobotRuntimeEnvironment.addProcessListener(new RedSessionProcessListener());
             }
-            RobotFormEditor.activateListeners();
         } catch (final Exception e) {
             throw new IllegalStateException("Unable to start RED plugin", e);
         }

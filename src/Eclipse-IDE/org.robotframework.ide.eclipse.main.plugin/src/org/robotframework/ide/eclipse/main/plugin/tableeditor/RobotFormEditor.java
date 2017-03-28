@@ -35,7 +35,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -88,6 +89,10 @@ public class RobotFormEditor extends FormEditor {
 
     public static final String ID = "org.robotframework.ide.tableditor";
 
+    private static IPartListener robotFormEditorPartListener;
+
+    private static IPerspectiveListener workbenchWindowPerspectiveListener;
+
     private final List<IEditorPart> parts = newArrayList();
 
     private RedClipboard clipboard;
@@ -120,6 +125,10 @@ public class RobotFormEditor extends FormEditor {
 
             site.getService(ICommandService.class).addExecutionListener(saveLibDiscoveryTrigger);
 
+            initRobotFormEditorPartListener(site.getPage());
+
+            initWorkbenchWindowPerspectiveListener(site.getWorkbenchWindow());
+
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
         }
@@ -139,6 +148,20 @@ public class RobotFormEditor extends FormEditor {
         eclipseContext.set(SuiteFileMarkersContainer.class, validationListener);
         ContextInjectionFactory.inject(this, eclipseContext);
         ContextInjectionFactory.inject(validationListener, eclipseContext);
+    }
+
+    private void initRobotFormEditorPartListener(final IWorkbenchPage page) {
+        if (robotFormEditorPartListener == null) {
+            robotFormEditorPartListener = new RobotFormEditorPartListener();
+            page.addPartListener(robotFormEditorPartListener);
+        }
+    }
+
+    private void initWorkbenchWindowPerspectiveListener(final IWorkbenchWindow window) {
+        if (workbenchWindowPerspectiveListener == null) {
+            workbenchWindowPerspectiveListener = new RobotFormEditorPerspectiveListener();
+            window.addPerspectiveListener(workbenchWindowPerspectiveListener);
+        }
     }
 
     @Override
@@ -511,20 +534,6 @@ public class RobotFormEditor extends FormEditor {
             return (ISectionEditorPart) pages.get(index);
         }
         return null;
-    }
-
-    public static void activateListeners() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        workbench.getDisplay().asyncExec(() -> {
-            final IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-            if (window != null) {
-                final IWorkbenchPage page = window.getActivePage();
-                if (page != null) {
-                    page.addPartListener(new RobotFormEditorPartListener());
-                }
-                window.addPerspectiveListener(new RobotFormEditorPerspectiveListener());
-            }
-        });
     }
 
     public static void activateSourcePageInActiveEditor(final IWorkbenchWindow window) {
