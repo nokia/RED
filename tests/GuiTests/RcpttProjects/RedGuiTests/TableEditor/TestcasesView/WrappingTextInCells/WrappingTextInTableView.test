@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1sKeQA-3EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/28/17 2:52 PM
+Save-Time: 3/28/17 6:07 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,7 @@ proc "check-if-row-is-higher" [val row] [val table][val file "TestFile.robot"]{
 	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object 
 		| invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 		| invoke getUnderlyingLayerByPosition 0 0 | invoke getRowHeightByPosition $row
-		| gt 22 | verify-true
+		| gt 22 | assert-true -message [format "In row: %s value is not equal 22" $row]
 }
 
 proc "check-if-row-is-normal" [val row] [val table] [val file "TestFile.robot"]{
@@ -243,7 +243,13 @@ try -command{
 
 check-if-row-is-higher -row 5 -table "User Keywords" -file "res.robot"
 check-if-row-is-higher -row 6 -table "User Keywords" -file "res.robot"
-check-if-row-is-normal -row 7 -table "User Keywords" -file "res.robot"
+try -command{
+	check-if-row-is-normal -row 7 -table "User Keywords" -file "res.robot"
+}-catch{
+	check-if-row-is-higher -row 7 -table "User Keywords" -file "res.robot"
+}
+
+
 
 //kw 3: Should be ...
 check-if-row-is-higher -row 8 -table "User Keywords" -file "res.robot"
