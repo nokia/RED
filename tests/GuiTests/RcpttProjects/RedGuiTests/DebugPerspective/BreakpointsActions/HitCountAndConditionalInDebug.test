@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4qmyUPRNEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/7/17 2:15 PM
+Save-Time: 3/27/17 2:59 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -83,6 +83,8 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 8 5
 exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click -arrow
 	get-menu "Debug As/1 Robot Test" | click
+	
+	wait 2000
 	try -times 5 -delay 1000 -command{
 		get-window "Conditional Breakpoint Error" 
 		    | get-label "Reason:Keyword 'BuiltIn.Should Be Equal' expected 2 to 5 arguments, got 1." | get-property caption 
