@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _QcX10PsxEeW7_PzjO98BIw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/22/17 6:03 PM
+Save-Time: 3/28/17 1:37 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -55,23 +55,23 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
     | equals "Tests will be launched using 'IronPython' interpreter as defined in PATH environment variable" 
     | verify-true
     
-//select Check interpreter and check error    
-wait 3000
-exec-with-options {
-    get-window "Run Configurations" | get-group Interpreter | get-button "Check interpreter" | click
-    get-window "Run Configurations" | get-window "Problem Occurred" 
-        | get-label "Unable to find ipy(.exe)? executable in the system." | get-property caption 
-        | equals "Unable to find ipy(.exe)? executable in the system." | verify-true
-    get-window "Run Configurations" | get-window "Problem Occurred" 
-        | get-label "There is no IronPython interpreter in system PATH environment variable" | get-property caption 
-        | equals "There is no IronPython interpreter in system PATH environment variable" | verify-true
-    get-window "Run Configurations" | get-window "Problem Occurred" | get-button "Details >>" | click
-    get-window "Run Configurations" | get-window "Problem Occurred" | get-editbox 
-        -after [get-label "There is no IronPython interpreter in system PATH environment variable"] | get-property text 
-        | equals "Unable to find ipy(.exe)? executable in the system.\n"
-        + "There is no IronPython interpreter in system PATH environment variable" | verify-true
-   get-window "Run Configurations" | get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog
+////select Check interpreter and check error    
+//wait 3000
+//exec-with-options {
+//    get-window "Run Configurations" | get-group Interpreter | get-button "Check interpreter" | click
+//    get-window "Run Configurations" | get-window "Problem Occurred" 
+//        | get-label "Unable to find ipy(.exe)? executable in the system." | get-property caption 
+//        | equals "Unable to find ipy(.exe)? executable in the system." | verify-true
+//    get-window "Run Configurations" | get-window "Problem Occurred" 
+//        | get-label "There is no IronPython interpreter in system PATH environment variable" | get-property caption 
+//        | equals "There is no IronPython interpreter in system PATH environment variable" | verify-true
+//    get-window "Run Configurations" | get-window "Problem Occurred" | get-button "Details >>" | click
+//    get-window "Run Configurations" | get-window "Problem Occurred" | get-editbox 
+//        -after [get-label "There is no IronPython interpreter in system PATH environment variable"] | get-property text 
+//        | equals "Unable to find ipy(.exe)? executable in the system.\n"
+//        + "There is no IronPython interpreter in system PATH environment variable" | verify-true
+//   get-window "Run Configurations" | get-window "Problem Occurred" | get-button OK | click
+//} -allowStatusDialog
 
 
 //select Jython
@@ -115,8 +115,8 @@ exec-with-options {
     get-window "Run Configurations" | get-button Run | click
     wait 500
     //first label
-    get-window "Problem Occurred" | get-label "Launching 'SingleTest.tsv' has encountered a problem." 
-        | get-property caption | equals "Launching 'SingleTest.tsv' has encountered a problem." | verify-true
+    get-window "Problem Occurred" | get-label "'Launching SingleTest.tsv' has encountered a problem." 
+        | get-property caption | equals "'Launching SingleTest.tsv' has encountered a problem." | verify-true
     //second label below    
     get-window "Problem Occurred" | get-label "There is no PyPy interpreter in system PATH environment variable" 
         | get-property caption | equals "There is no PyPy interpreter in system PATH environment variable" | verify-true
@@ -125,8 +125,7 @@ exec-with-options {
     get-window "Problem Occurred" | get-button "Details >>" | click
     get-window "Problem Occurred" | get-editbox 
         -after [get-label "There is no PyPy interpreter in system PATH environment variable"] | get-property text 
-        | equals "Launching 'SingleTest.tsv' has encountered a problem.\n"
-        + "There is no PyPy interpreter in system PATH environment variable" | verify-true
+        | equals "There is no PyPy interpreter in system PATH environment variable" | verify-true
         get-window "Problem Occurred" | get-button OK | click
     
 } -allowStatusDialog
