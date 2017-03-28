@@ -18,18 +18,18 @@
 <p>
 <h3>Environment Setup:</h3>
 <ul>
-<li>install PyDev to RED or Eclipse instance where RED is installed
+<li>install PyDev to RED or Eclipse instance where RED is installed if not already installed.
 <li>set Python nature to Robot project to be debugged - right click on Project,from PyDev menu select set Python nature
-<li>set port for remote PyDev debugger - Preferences -> PyDev -> Debug -> Port for remote debugger
-<li>for convenience Remote debugger server activation can be changed from Manual to Keep always on.
-<li>to use runPyDevDebug.py script logic, RED needs to pass parameters separated by space to external script. check Window -> Preferences -> RobotFramework -> XXXX</p>
+<li>set port for remote PyDev debugger: <i>Preferences -> PyDev -> Debug -> Port for remote debugger</i>
+<li>for convenience Remote debugger server activation can be changed from Manual to Keep always on: <i>Preferences -> PyDev -> Debug -> Remote debugger server activation</i>.
+<li>to use runPyDevDebug.py script logic, RED needs to pass parameters separated by space to external script. check <i>Window -> Preferences -> RobotFramework -> XXXX</i></p>
 </ul>
 
 <p>
 <h3>Script runPyDevDebug.py update:</h3>
 <ul>
-<li>PyDev debugger, pydevd.py path needs to be specified, this can be done in two ways. You can install pydevd by pip ( pip install pydevd) therefore script will use it straight away, alternatively update pathToPyDevD variable, pydevd is usually located inside PyDev RED/Eclipse under plugins/org.python.pydev/pysrc/pydevd.py
-<li>if PyDev port for remote debugger was changed, variable pydevdPort needs to be updated
+<li>PyDev debugger, <i>pydevd.py</i> path needs to be specified, this can be done in two ways. You can install pydevd by pip ( <i>pip install pydevd </i>) therefore script will use it straight away, alternatively update <i>pathToPyDevD</i> variable, pydevd is usually located inside PyDev RED/Eclipse under plugins/org.python.pydev/pysrc/pydevd.py
+<li>if PyDev port for remote debugger was changed, variable <i>pydevdPort</i> needs to be updated
 </ul>
 </p>
 
@@ -38,8 +38,8 @@
 <ul> 
 <li>open Debug Configuration,create new Robot Debug configuration</li>
 <li>in Robot tab, populate Project name,test suites to be debugged with all other relevant information</li>
-<li>in Executor tab, in Executable file provide path to Python interpreter ( for instance c:\Python27\python.exe on Windows or /usr/bin/python on Linux)</li>
-<li>in Additional executable file arguments field provide path to runPyDevDebug.py </li>
+<li>in Executor tab, in Executable file provide path to Python interpreter ( for instance <i>c:\Python27\python.exe</i> on Windows or <i>/usr/bin/python</i> on Linux)</li>
+<li>in Additional executable file arguments field provide path to <i>runPyDevDebug.py</i> </li>
 </ul>
 </p>
 
@@ -47,7 +47,7 @@
 <h3>Debug configuration template:</h3>
 <ul>
 <li>custom Robot Debug configuration created above will work for preconfigured test cases, this may not be convenient enough if you need to often switch test cases and projects.This can be avoided by defining default launch configuration template which will be used later anytime when user press Run or Debug
-<li>Provide the same paths as from Executor Tab to Default Launch Configurations under Windows -> Preferences -> RobotFramework -> Launching -> Default Launch Configuration
+<li>Provide the same paths as from Executor Tab to Default Launch Configurations under <i>Windows -> Preferences -> RobotFramework -> Launching -> Default Launch Configuration </i>
 </ul>
 </p>
 
