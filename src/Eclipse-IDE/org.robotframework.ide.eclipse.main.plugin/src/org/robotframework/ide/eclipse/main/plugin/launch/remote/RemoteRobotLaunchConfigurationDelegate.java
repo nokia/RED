@@ -56,7 +56,9 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
                 launchExecution = doLaunch(launch, testsLaunchContext, host, port, timeout,
                         Arrays.asList(testsStarter, debugListener));
 
-                debugTarget.connectWith(launchExecution.getRobotProcess());
+                if (launchExecution.getRobotProcess() != null) {
+                    debugTarget.connectWith(launchExecution.getRobotProcess());
+                }
             }
             testsStarter.allowClientTestsStart();
 
