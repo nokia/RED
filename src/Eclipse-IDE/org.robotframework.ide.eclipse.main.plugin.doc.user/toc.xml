@@ -19,18 +19,18 @@
     </topic>
     <topic href="doc/user_guide/general.html" label="General usage hints">
     </topic>
-    <topic href="doc/user_guide/Working_with_RED.html" label="Working with RED">
-        <topic href="doc/user_guide/table_general.html" label="Table Editors - general usage hints">
+    <topic href="doc/user_guide/working_with_RED.html" label="Working with RED">
+        <topic href="doc/user_guide/working_with_RED/table_general.html" label="Table Editors - general usage hints">
         </topic>
-        <topic href="doc/user_guide/libs.html" label="Recognizing external libraries and variable files in RED">
+        <topic href="doc/user_guide/working_with_RED/libs.html" label="Recognizing external libraries and variable files in RED">
         </topic>
-        <topic href="doc/user_guide/variable_mapping.html" label="Variable mapping - dealing with parametrized paths to libraries and resources">
+        <topic href="doc/user_guide/working_with_RED/variable_mapping.html" label="Variable mapping - dealing with parametrized paths to libraries and resources">
         </topic>
-        <topic href="doc/user_guide/variable_files.html" label="Variable Files - dealing with missing variables">
+        <topic href="doc/user_guide/working_with_RED/variable_files.html" label="Variable Files - dealing with missing variables">
         </topic>
-        <topic href="doc/user_guide/custom_paths_relatve.html" label="Custom python/class paths and path relativeness">
+        <topic href="doc/user_guide/working_with_RED/custom_paths_relatve.html" label="Custom python/class paths and path relativeness">
         </topic>
-        <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace">
+        <topic href="doc/user_guide/working_with_RED/importing.html" label="Importing files and projects to workspace">
     </topic>
     
     </topic>
