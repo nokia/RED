@@ -33,6 +33,18 @@
 	select those which are interesting for the script but eventually it should start robot tests execution.
 	</p>
 	
+    <dl class="note">
+	   <dt>Note</dt>
+	   <dd>By default, RED passes Robot executable command line to user script as is thus each space separated entry is own parameter.
+       From above example, following Robot command line passed to script by RED:
+       	<div class="code"><code>
+            python.exe -m robot.run --suite mySuite c:\\location\\to\\project
+        </code></div>
+        is passed to a user script as 6 arguments. This can be changed in <a href="launch_prefs.html">preferences</a>, so whole Robot executable command line is wrapped with quotation marks. This affects how script handles input parameters.
+	   </dd>
+	</dl>
+    
+    
 	<h3>Defining script call in launch configuration</h3>
 	
 	<p>Script/executable to be used when launching is defined in launch configuration dialog at <b>Executor</b> tab:</p>
@@ -54,6 +66,7 @@
 	   <a href="launch_prefs.html">preferences</a>, so every
 	   time when RED is creating new launch configuration it will use those values. It may be useful if
 	   you want to always use some script without manually changing launch configurations before launching.
+       
 	   </dd>
 	</dl>
 	
