@@ -119,7 +119,7 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         addField(additionalInterpreterArguments);
 
         final FileFieldEditor scriptPathEditor = new FileFieldEditor(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH,
-                "Executable file:", group);
+                "Executable file:", true, StringFieldEditor.VALIDATE_ON_KEY_STROKE, group);
         scriptPathEditor.setFileExtensions(RobotLaunchConfiguration.getSystemDependentExecutableFileExtensions());
         scriptPathEditor.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile());
         scriptPathEditor.load();
