@@ -1,0 +1,55 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _xG4GMBU-EeeZSZgUeG7ZOA,_Hs7GABU_EeeZSZgUeG7ZOA,_d8aMACuvEeW667Afdo4DcA,_s-ctEA4_EeePcNCRX_abWA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_YLsq8BVSEeeZSZgUeG7ZOA
+Element-Name: TerminateDebugForScriptConfig
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _mRBHMBVPEeeZSZgUeG7ZOA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/30/17 5:11 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+prepere-run-config
+
+//Add BP
+get-view "Project Explorer" | get-tree | select "ScriptProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 5
+
+//run test
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "ScriptProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" 
+	    | click
+	wait-for-thread -file "TestFile.robot" 
+	
+	check-debug-marker-on-ruler -line 5 -script_name  "TestFile.robot"
+	get-button "Terminate (M1+F2)" | click
+}
+
+//check test
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: ScriptProject.TestFile.test" 
+    | verify-true
+    
+    
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .*\n"
+    + "Suite Executor: Robot Framework .*\n\n"
+    + ".*>python  -m robot.run --listener .*TestRunnerAgent.py:localhost:43981:5 -s ScriptProject.TestFile .*ScriptProject \n"
+    + "==============================================================================\n"
+    + "ScriptProject                                                                 \n"
+    + "==============================================================================\n"
+    + "ScriptProject.TestFile                                                        \n"
+    + "==============================================================================\n"
+    + "test .*" | verify-true
+    
+//check execution view    
+get-view "Execution View" | click
+get-view "Execution View" | get-tree | get-item "ScriptProject/TestFile/test" | get-property "image.path" 
+    | equals ".*testrun.png" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
