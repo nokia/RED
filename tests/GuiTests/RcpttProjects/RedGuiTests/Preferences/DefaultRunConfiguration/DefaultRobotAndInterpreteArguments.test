@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/29/17 11:24 AM
+Save-Time: 3/30/17 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -82,7 +82,7 @@ get-preferences-menu | click
 with [get-window Preferences] {
     get-editbox -after [get-label "Additional interpreter arguments:"] | set-text ""
     get-editbox -after [get-label "Additional Robot Framework arguments:"] 
-        | set-text "-i test 1 -o None -d None -l None -r None"
+        | set-text "-i \"test 1\" -o None -d None -l None -r None"
     get-button OK | click
 }
 
@@ -156,7 +156,7 @@ get-menu "Run/Run Configurations..." | click
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot (Selected Test Cases)"
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
+    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
 
 //interpreter  
 get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click  
@@ -170,7 +170,7 @@ with [get-window "Run Configurations" | get-tab-folder] {
 }
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
+    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
 
 //interpreter
 get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
@@ -226,14 +226,14 @@ get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.r
 get-window "Run Configurations" | get-tab-folder |  get-tab-item Robot | click
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
+    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
     
 //check full file    
 get-window "Run Configurations" | get-tree | select "Robot/test_for_run_config.robot"
 get-window "Run Configurations" | get-tab-folder |  get-tab-item Robot | click
 get-window "Run Configurations" | get-group Arguments | get-editbox 
     -after [get-label "Additional Robot Framework arguments:"] | get-property text 
-    | equals "-i test 1 -o None -d None -l None -r None" | verify-true
+    | equals "-i \"test 1\" -o None -d None -l None -r None" | verify-true
     
 get-window "Run Configurations" | get-button Close | click
 
