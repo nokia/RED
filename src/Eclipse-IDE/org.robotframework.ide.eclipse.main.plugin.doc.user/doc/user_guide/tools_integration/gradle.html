@@ -39,17 +39,17 @@
 	</div>
 	
 	<p>the task above expects two arguments: path to interpreter executable and a list 
-	of it's arguments written in a form: <span class="code">['arg1', 'arg2', ..., 'arg_n']</span>
+	of it's arguments written in a form: <code>['arg1', 'arg2', ..., 'arg_n']</code>
 	</p>
 	
 	<p>When launching the test RED does not pass arguments in form like above, moreover 
-	Gradle passes arguments mostly using it's own syntax: <span class="code">-Parg=val</span>.
+	Gradle passes arguments mostly using it's own syntax: <code>-Parg=val</code>.
 	Because of this we need to create own script which will perform arguments translation
 	(or modify Gradle Wrapper script).
 	</p>
 	
 	<ul>
-		<li><b>Windows batch script</b> - <span class="code">gradlew_robot.bat</span>
+		<li><b>Windows batch script</b> - <code>gradlew_robot.bat</code>
 			<div class="code">
 			@echo off<br/>
 			set FIRST="true"<br/>
@@ -75,7 +75,7 @@
 			</div>
 		</li>
 		
-		<li><b>Linux bash script</b> - <span class="code">gradlew_robot.sh</span>
+		<li><b>Linux bash script</b> - <code>gradlew_robot.sh</code>
 			<div class="code">
 			#!/usr/bin/env bash<br/>
 			<br/>
