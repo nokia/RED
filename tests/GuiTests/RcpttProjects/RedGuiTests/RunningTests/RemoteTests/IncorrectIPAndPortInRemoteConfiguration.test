@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pNdEgA47EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/28/17 11:42 AM
+Save-Time: 3/30/17 11:59 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -46,9 +46,15 @@ exec-with-options {
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
-get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
-    | get-property "getText()" | equals "" | verify-true
-    
+try -command{
+	get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
+	    | get-property "getText()" | equals "" | verify-true
+}-catch{
+	get-view Console | get-editbox 
+   		 -after [get-label "<terminated> New_configuration [Robot Remote] TCP connection using www.niema-niema.com@43981"] 
+    | get-property text | equals "" | verify-true
+}
+	    
 //chnage url to single text
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
@@ -65,7 +71,12 @@ exec-with-options {
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
-get-view Console | get-text-viewer | get-property text | equals "" | verify-true
+try -command{
+	get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
+	    | get-property "getText()" | equals "" | verify-true
+}-catch{	    
+	get-view Console | get-text-viewer | get-property text | equals "" | verify-true
+}	
     
 //change to port used by Jenkins
 exec-with-options {
@@ -92,8 +103,11 @@ exec-with-options {
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 
-get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
-    | get-property "getText()" | equals "" | verify-true
+try -command{
+	get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
+    	| get-property "getText()" | equals "" | verify-true
+}-catch{   
     
-    
+    get-view Console | get-text-viewer | get-property text | equals "" | verify-true
+}    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
