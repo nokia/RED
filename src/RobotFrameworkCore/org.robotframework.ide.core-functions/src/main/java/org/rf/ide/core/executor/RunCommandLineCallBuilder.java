@@ -217,7 +217,7 @@ public class RunCommandLineCallBuilder {
             final List<String> cmdLine = new ArrayList<>();
             cmdLine.add(executableFilePath);
             if (!executableFileArgs.isEmpty()) {
-                cmdLine.addAll(convertArguments(executableFileArgs));
+                cmdLine.addAll(ArgumentsConverter.parseArguments(executableFileArgs));
             }
 
             if (useSingleRobotCommandLineArg) {
@@ -244,7 +244,7 @@ public class RunCommandLineCallBuilder {
                 cmdLine.add(classPath());
             }
             if (!interpreterUserArgs.isEmpty()) {
-                cmdLine.addAll(convertArguments(interpreterUserArgs));
+                cmdLine.addAll(ArgumentsConverter.parseArguments(interpreterUserArgs));
             }
             cmdLine.add("-m");
             cmdLine.add("robot.run");
@@ -309,7 +309,7 @@ public class RunCommandLineCallBuilder {
                 robotArgs.add(test);
             }
             if (!robotUserArgs.isEmpty()) {
-                robotArgs.addAll(convertArguments(robotUserArgs));
+                robotArgs.addAll(ArgumentsConverter.parseArguments(robotUserArgs));
             }
             return robotArgs;
         }
@@ -353,23 +353,19 @@ public class RunCommandLineCallBuilder {
         private void addUserArguments(final ArgumentsFile argumentsFile) {
             argumentsFile.addCommentLine("arguments specified manually by user");
 
-            final List<String> joinedArgs = convertArguments(robotUserArgs);
+            final List<String> parsedArgs = ArgumentsConverter.parseArguments(robotUserArgs);
 
             int i = 0;
-            while (i < joinedArgs.size()) {
-                if (ArgumentsConverter.isSwitchArgument(joinedArgs.get(i)) && i < joinedArgs.size() - 1
-                        && !ArgumentsConverter.isSwitchArgument(joinedArgs.get(i + 1))) {
-                    argumentsFile.addLine(joinedArgs.get(i), joinedArgs.get(i + 1));
+            while (i < parsedArgs.size()) {
+                if (ArgumentsConverter.isSwitchArgument(parsedArgs.get(i)) && i < parsedArgs.size() - 1
+                        && !ArgumentsConverter.isSwitchArgument(parsedArgs.get(i + 1))) {
+                    argumentsFile.addLine(parsedArgs.get(i), parsedArgs.get(i + 1));
                     i++;
                 } else {
-                    argumentsFile.addLine(joinedArgs.get(i));
+                    argumentsFile.addLine(parsedArgs.get(i));
                 }
                 i++;
             }
-        }
-
-        private List<String> convertArguments(final String args) {
-            return ArgumentsConverter.joinMultipleArgValues(ArgumentsConverter.parseArguments(args));
         }
 
         private String classPath() {
@@ -439,8 +435,8 @@ public class RunCommandLineCallBuilder {
             return commandLine.toArray(new String[0]);
         }
 
-        public String show() {
-            return String.join(" ", commandLine);
+        public String[] getCommandLineWithWrappedArguments() {
+            return commandLine.stream().map(RobotRuntimeEnvironment::wrapArgumentIfNeeded).toArray(String[]::new);
         }
     }
 }

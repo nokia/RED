@@ -107,8 +107,7 @@ public class RunCommandLineCallBuilderTest {
                 .withExecutableFile("exec")
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
-        assertThat(commandLine).hasSize(8).containsSubsequence("exec", "/x/y/z/python", "-m", "robot.run",
-                "--listener",
+        assertThat(commandLine).hasSize(8).containsSubsequence("exec", "/x/y/z/python", "-m", "robot.run", "--listener",
                 "--argumentfile");
     }
 
@@ -163,8 +162,8 @@ public class RunCommandLineCallBuilderTest {
                 .addUserArgumentsForExecutableFile("args")
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
-        assertThat(commandLine).hasSize(7).containsSubsequence("/x/y/z/python", "-m", "robot.run",
-                "--listener", "--argumentfile");
+        assertThat(commandLine).hasSize(7).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
+                "--argumentfile");
     }
 
     @Test
@@ -211,6 +210,22 @@ public class RunCommandLineCallBuilderTest {
     }
 
     @Test
+    public void testCallWrappedWithOtherExecutableAndSeveralArguments_withRuntimeEnvironment_withSequenceRobotCommandArg()
+            throws IOException {
+        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
+
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+                .withExecutableFile("exec")
+                .addUserArgumentsForExecutableFile("a1 -a2 \"a3 a4\" -a5 a6 a7")
+                .useSingleRobotCommandLineArg(false)
+                .build();
+        final String[] commandLine = cmdLine.getCommandLine();
+        assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
+        assertThat(commandLine).hasSize(12).containsSubsequence("exec", "a1", "-a2", "a3 a4", "-a5", "a6", "a7",
+                "/x/y/z/python", "-m", "robot.run", "--listener");
+    }
+
+    @Test
     public void testCallWithInterpreterArgumentsAdded_withRuntimeEnvironment_argsFile() throws IOException {
         final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
 
@@ -235,6 +250,20 @@ public class RunCommandLineCallBuilderTest {
         assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
         assertThat(commandLine).hasSize(6).containsSubsequence("/x/y/z/python", "args", "-m", "robot.run",
                 "--listener");
+    }
+
+    @Test
+    public void testCallWithSeveralInterpreterArgumentsAdded_withRuntimeEnvironment_argsInline() throws IOException {
+        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
+
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+                .useArgumentFile(false)
+                .addUserArgumentsForInterpreter("a1 -a2 \"a3 a4\" -a5 a6 a7")
+                .build();
+        final String[] commandLine = cmdLine.getCommandLine();
+        assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
+        assertThat(commandLine).hasSize(11).containsSubsequence("/x/y/z/python", "a1", "-a2", "a3 a4", "-a5", "a6",
+                "a7", "-m", "robot.run", "--listener");
     }
 
     @Test
@@ -404,6 +433,7 @@ public class RunCommandLineCallBuilderTest {
                 .addVariableFiles(newArrayList("var1.py", "var2.py"))
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
+        assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
         assertThat(commandLine).hasSize(9).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener", "-V",
                 "var1.py", "-V", "var2.py");
     }
@@ -432,8 +462,8 @@ public class RunCommandLineCallBuilderTest {
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
         assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
-        assertThat(commandLine).hasSize(7).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                "-P", "path1:path2");
+        assertThat(commandLine).hasSize(7).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener", "-P",
+                "path1:path2");
     }
 
     @Test
@@ -442,13 +472,13 @@ public class RunCommandLineCallBuilderTest {
 
         final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
                 .useArgumentFile(true)
-                .addUserArgumentsForRobot("--arg val1 -X val2 --other --other2")
+                .addUserArgumentsForRobot("--arg val1 -X \"val 2\" --other --other2")
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
         assertThat(commandLine).hasSize(7).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
                 "--argumentfile");
         assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--arg    val1");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("-X       val2");
+        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("-X       val 2");
         assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--other");
         assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--other2");
     }
@@ -459,12 +489,12 @@ public class RunCommandLineCallBuilderTest {
 
         final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
                 .useArgumentFile(false)
-                .addUserArgumentsForRobot("--arg val1 -X val2 --other --other2")
+                .addUserArgumentsForRobot("--arg val1 -X \"val 2\" --other --other2")
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
         assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
         assertThat(commandLine).hasSize(11).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                "--arg", "val1", "-X", "val2", "--other", "--other2");
+                "--arg", "val1", "-X", "val 2", "--other", "--other2");
     }
 
     @Test
@@ -497,8 +527,25 @@ public class RunCommandLineCallBuilderTest {
         final String[] commandLine = cmdLine.getCommandLine();
         assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
         assertThat(commandLine).hasSize(15).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                "--prerunmodifier", "--runemptysuite", "--dryrun", "--output", "NONE", "--report", "NONE",
-                "--log", "NONE");
+                "--prerunmodifier", "--runemptysuite", "--dryrun", "--output", "NONE", "--report", "NONE", "--log",
+                "NONE");
+    }
+
+    @Test
+    public void testWrappingArgumentsContainingSpaces() throws IOException {
+        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
+
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
+                .useArgumentFile(false)
+                .withExecutableFile("exec")
+                .addUserArgumentsForExecutableFile("--a1 \"a b c\"")
+                .addUserArgumentsForInterpreter("-a2 \"x y z\"")
+                .addUserArgumentsForRobot("--log \"path to file.log\"")
+                .build();
+        final String[] commandLine = cmdLine.getCommandLineWithWrappedArguments();
+        assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
+        assertThat(commandLine).hasSize(12).containsSubsequence("exec", "--a1", "\"a b c\"", "/x/y/z/python", "-a2",
+                "\"x y z\"", "-m", "robot.run", "--listener", "--log", "\"path to file.log\"");
     }
 
     private static RobotRuntimeEnvironment prepareEnvironment(final SuiteExecutor executor,

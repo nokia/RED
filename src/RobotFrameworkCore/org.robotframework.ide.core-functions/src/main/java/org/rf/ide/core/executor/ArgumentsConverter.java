@@ -10,33 +10,6 @@ import java.util.List;
 
 class ArgumentsConverter {
 
-    static List<String> joinMultipleArgValues(final List<String> javaLikeArgs) {
-        final List<String> args = new ArrayList<>();
-
-        StringBuilder current = new StringBuilder();
-        for (final String arg : javaLikeArgs) {
-            if (isSwitchArgument(arg)) {
-                if (current.length() > 0) {
-                    args.add(current.toString());
-                    current = new StringBuilder();
-                }
-
-                args.add(arg);
-            } else {
-                if (current.length() > 0) {
-                    current.append(' ');
-                }
-                current.append(arg);
-            }
-        }
-
-        if (current.length() > 0) {
-            args.add(current.toString());
-        }
-
-        return args;
-    }
-
     static List<String> parseArguments(final String arguments) {
         final List<String> args = new ArrayList<>();
         final char chars[] = arguments.toCharArray();
@@ -59,7 +32,7 @@ class ArgumentsConverter {
                 } else {
                     if (wasQuotationMark) {
                         currentToken.append(c);
-                        args.add(currentToken.toString());
+                        args.add(currentToken.substring(1, currentToken.length() - 1));
                         currentToken = new StringBuilder();
 
                         wasQuotationMark = false;
