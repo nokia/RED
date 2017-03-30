@@ -116,7 +116,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
         redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
-        redConsole.writeLine("Command: " + cmdLine.show());
+        redConsole.writeLine("Command: " + String.join(" ", cmdLine.getCommandLineWithWrappedArguments()));
         redConsole.writeLine("Suite Executor: " + suiteExecutorVersion);
 
         return new LaunchExecution(serverJob, execProcess, robotProcess);
