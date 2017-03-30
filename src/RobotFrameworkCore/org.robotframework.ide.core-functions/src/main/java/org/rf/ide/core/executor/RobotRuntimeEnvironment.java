@@ -568,8 +568,7 @@ public class RobotRuntimeEnvironment {
             this.details = details;
         }
 
-        public RobotEnvironmentDetailedException(final String details, final String reason,
-                final Throwable cause) {
+        public RobotEnvironmentDetailedException(final String details, final String reason, final Throwable cause) {
             super(reason, cause);
             this.details = details;
         }
