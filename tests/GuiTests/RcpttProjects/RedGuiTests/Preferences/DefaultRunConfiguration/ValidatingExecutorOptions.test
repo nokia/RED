@@ -1,0 +1,214 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2L7ocBRiEeeZSZgUeG7ZOA,_d8aMACuvEeW667Afdo4DcA
+Element-Name: ValidatingExecutorOptions
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Z-lo8BRiEeeZSZgUeG7ZOA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 3/30/17 1:37 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-if-no-error-is-shown"{
+	get-window Preferences | get-label "Default Launch Configurations" | get-property caption 
+      | equals "Default Launch Configurations" | verify-true
+}
+
+
+proc "check-buttons-enablement" [val apply_button] [val ok_button]{
+	with [get-window Preferences] {
+	    get-button Apply | get-property enablement | equals $apply_button | verify-true
+	    get-button OK | get-property enablement | equals $ok_button | verify-true
+	}	    
+}   
+
+
+proc "check-args-in-run-config"{
+	get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
+	with [get-window "Run Configurations" | get-group "Executable file"] {
+	    get-editbox 
+	        -after [get-label "Setup executable file which will be used to run Robot Framework tests instead of interpreter selected above"] 
+	        | get-property text 
+	        | equals [os-specific [concat $RED_workspace_path  "\\ExecutorTab\\scripts\\script_win.bat" ]  [concat $RED_workspace_path  "/ExecutorTab/scripts/script_lin.sh" ] ]
+	        | verify-true
+	    get-editbox -after [get-label "Additional executable file arguments:"] | get-property text | equals "a b" 
+	        | verify-true
+	}
+	get-window "Run Configurations" | get-button Close | click
+} 
+
+//open Preference
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Launching/Default Launch Configurations"
+
+//check if all boxes by defaul are empty
+with [get-window Preferences | get-group "Executor tab"] {
+    get-editbox -after [get-label "Executable file:"] | get-property text | equals "" | verify-true
+    get-editbox -after [get-label "Additional executable file arguments:"] | get-property text | equals "" | verify-true
+}
+
+//set path to bat/sh file
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	set-dialog-result File "platform:/resource/ExecutorTab/scripts/script_win.bat"
+}-else{
+	set-dialog-result File "platform:/resource/ExecutorTab/scripts/script_lin.sh"
+}	
+get-window Preferences | get-group "Executor tab" | get-button "Browse..." | click
+
+check-if-no-error-is-shown
+check-buttons-enablement -apply_button true -ok_button true
+
+//add args sepearte by double spaces - no errors
+get-window Preferences | get-group "Executor tab" | get-editbox 
+    -after [get-label "Additional executable file arguments:"] | set-text "a  b"
+check-if-no-error-is-shown
+check-buttons-enablement -apply_button true -ok_button true
+
+//change path to wrong
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-window Preferences | get-group "Executor tab" | get-editbox -after [get-label "Executable file:"]
+	   | set-text [format "%s\\ExecutorTab\\scripts\\script_win23.bat" $RED_workspace_path] 
+	
+}-else{
+	get-window Preferences | get-group "Executor tab" | get-editbox -after [get-label "Executable file:"]
+	    | set-text [format "%s/ExecutorTab/scripts/script_lin3.sh" $RED_workspace_path] 
+}
+
+//check error
+get-window Preferences | get-editbox -index 1 | get-property text | equals "Value must be an existing file" | verify-true
+
+check-buttons-enablement -apply_button false -ok_button false
+
+//close window without saving
+get-window Preferences | get-button Cancel | click
+
+//open again and check if wrong values were removed
+get-preferences-menu | click
+with [get-window Preferences | get-group "Executor tab"] {
+    get-editbox -after [get-label "Executable file:"] | get-property text | equals "" | verify-true
+    get-editbox -after [get-label "Additional executable file arguments:"] | get-property text | equals "" | verify-true
+}
+
+//set correct value again
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	set-dialog-result File "platform:/resource/ExecutorTab/scripts/script_win.bat"
+}-else{
+	set-dialog-result File "platform:/resource/ExecutorTab/scripts/script_lin.bat"
+}	
+with [get-window Preferences | get-group "Executor tab"] {
+    get-button "Browse..." | click
+    get-editbox -after [get-label "Additional executable file arguments:"] | set-text "a b"
+}
+check-buttons-enablement -apply_button true -ok_button true
+
+//apply and run test
+with [get-window Preferences] {
+    get-button Apply | click
+    get-button OK | click
+}
+get-view "Project Explorer" | get-tree | select "ExecutorTab/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .*\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "Argument: a\n"
+    + "Argument: b\n"
+    + "Argument: .*python.*\n"
+    + "Argument: -m\n"
+    + "Argument: robot.run\n"
+    + "Argument: --listener\n"
+    + "Argument: .*TestRunnerAgent.py:\d{1,6}\n"
+    + "Argument: --argumentfile\n"
+    + "Argument: .*\.arg\n"
+    + "Argument: .*ExecutorTab\n"
+    + "end" | verify-true
+    
+    
+get-view "Message Log" | get-editbox | get-property text | equals "" | verify-true
+get-view "Execution View" | click
+get-view "Execution View" | get-tree | get-property itemCount | equals 0 | verify-true
+
+//check run config
+get-menu "Run/Run Configurations..." | click
+check-args-in-run-config
+
+//change path to file (simple word)
+get-preferences-menu | click
+get-window Preferences | get-group "Executor tab" | get-editbox -after [get-label "Executable file:"] | set-text hello
+get-window Preferences | get-editbox -index 1 | get-property text | equals "Value must be an existing file" 
+    | verify-true
+
+//add other correct path again
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	set-dialog-result File "platform:/resource/ExecutorTab/other scripts/special script!.bat"
+}-else{
+	set-dialog-result File "platform:/resource/ExecutorTab/other scripts/9 9&jk.sh"
+}	
+with [get-window Preferences] {
+    with [get-group "Executor tab"] {
+        get-button "Browse..." | click
+        get-editbox -after [get-label "Additional executable file arguments:"] | set-text "new 1 new2 new3"
+  }
+    get-button Apply | click
+    get-button OK | click
+}
+
+//run the same test again
+get-view "Project Explorer" | get-tree | select "ExecutorTab/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+get-menu "Run/Run Configurations..." | click
+check-args-in-run-config
+
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .*\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "Argument: a\n"
+    + "Argument: b\n"
+    + "Argument: .*python.*\n"
+    + "Argument: -m\n"
+    + "Argument: robot.run\n"
+    + "Argument: --listener\n"
+    + "Argument: .*TestRunnerAgent.py:\d{1,6}\n"
+    + "Argument: --argumentfile\n"
+    + "Argument: .*\.arg\n"
+    + "Argument: .*ExecutorTab\n"
+    + "end" | verify-true
+    
+    
+//run new test
+get-view "Project Explorer" | get-tree | select "ExecutorTab/second test.tsv" | get-menu "Run As/1 Robot Test" | click
+
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: \\\".*\\\\other scripts\\\\special script!.bat\\\" new 1 new2 new3 .*\n"
+    + "Suite Executor: Robot Framework .*\n\n"
+    + ".*ExecutorTab>echo Hello world! \n"
+    + "Hello world!" | verify-true
+    
+// check that new run config has new values    
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/second test.tsv"
+    get-tab-folder | get-tab-item Executor | click
+}
+//path
+get-window "Run Configurations" | get-group "Executable file" | get-editbox 
+    -after [get-label "Setup executable file which will be used to run Robot Framework tests instead of interpreter selected above"] 
+    | get-property text 
+    | equals  [format "%s%sExecutorTab%sother scripts%sspecial script!.bat" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+    | verify-true
+//args    
+get-window "Run Configurations" | get-group "Executable file" | get-editbox 
+    -after [get-label "Additional executable file arguments:"] | get-property text | equals "new 1 new2 new3" 
+    | verify-true
+    
+//check that old config contains old values    
+get-window "Run Configurations" | get-tree | select "Robot/TestFile.robot"
+wait 500
+
+check-args-in-run-config
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
