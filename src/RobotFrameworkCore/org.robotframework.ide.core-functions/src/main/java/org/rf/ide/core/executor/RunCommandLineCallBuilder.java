@@ -24,13 +24,13 @@ public class RunCommandLineCallBuilder {
 
     public static interface IRunCommandLineBuilder {
 
-        IRunCommandLineBuilder withExecutableFile(final String executableFilePath);
+        IRunCommandLineBuilder withExecutableFile(final File executableFile);
 
-        IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments);
+        IRunCommandLineBuilder addUserArgumentsForExecutableFile(final Collection<String> arguments);
 
         IRunCommandLineBuilder useSingleRobotCommandLineArg(boolean shouldUseSingleRobotCommandLineArg);
 
-        IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments);
+        IRunCommandLineBuilder addUserArgumentsForInterpreter(final Collection<String> arguments);
 
         IRunCommandLineBuilder enableDryRun();
 
@@ -50,7 +50,7 @@ public class RunCommandLineCallBuilder {
 
         IRunCommandLineBuilder excludeTags(final Collection<String> tags);
 
-        IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
+        IRunCommandLineBuilder addUserArgumentsForRobot(final Collection<String> arguments);
 
         IRunCommandLineBuilder withProject(final File project);
 
@@ -89,13 +89,13 @@ public class RunCommandLineCallBuilder {
 
         private final List<File> additionalProjectsLocations = new ArrayList<>();
 
-        private String robotUserArgs = "";
+        private final List<String> robotUserArgs = new ArrayList<>();
 
-        private String interpreterUserArgs = "";
+        private final List<String> interpreterUserArgs = new ArrayList<>();
 
-        private String executableFilePath = "";
+        private File executableFile = null;
 
-        private String executableFileArgs = "";
+        private final List<String> executableFileArgs = new ArrayList<>();
 
         private boolean useSingleRobotCommandLineArg = false;
 
@@ -106,14 +106,14 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder withExecutableFile(final String executableFilePath) {
-            this.executableFilePath = executableFilePath;
+        public IRunCommandLineBuilder withExecutableFile(final File executableFile) {
+            this.executableFile = executableFile;
             return this;
         }
 
         @Override
-        public IRunCommandLineBuilder addUserArgumentsForExecutableFile(final String arguments) {
-            this.executableFileArgs = arguments.trim();
+        public IRunCommandLineBuilder addUserArgumentsForExecutableFile(final Collection<String> arguments) {
+            this.executableFileArgs.addAll(arguments);
             return this;
         }
 
@@ -124,8 +124,8 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder addUserArgumentsForInterpreter(final String arguments) {
-            this.interpreterUserArgs = arguments.trim();
+        public IRunCommandLineBuilder addUserArgumentsForInterpreter(final Collection<String> arguments) {
+            this.interpreterUserArgs.addAll(arguments);
             return this;
         }
 
@@ -184,8 +184,8 @@ public class RunCommandLineCallBuilder {
         }
 
         @Override
-        public IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments) {
-            this.robotUserArgs = arguments.trim();
+        public IRunCommandLineBuilder addUserArgumentsForRobot(final Collection<String> arguments) {
+            this.robotUserArgs.addAll(arguments);
             return this;
         }
 
@@ -206,7 +206,7 @@ public class RunCommandLineCallBuilder {
         public RunCommandLine build() throws IOException {
             final RunCommandLine robotRunCommandLine = buildRobotRunCommandLine();
 
-            if (!executableFilePath.isEmpty()) {
+            if (executableFile != null) {
                 return buildRunCommandLineWrappedWithExecutable(robotRunCommandLine);
             }
 
@@ -215,10 +215,8 @@ public class RunCommandLineCallBuilder {
 
         private RunCommandLine buildRunCommandLineWrappedWithExecutable(final RunCommandLine robotRunCommandLine) {
             final List<String> cmdLine = new ArrayList<>();
-            cmdLine.add(executableFilePath);
-            if (!executableFileArgs.isEmpty()) {
-                cmdLine.addAll(ArgumentsConverter.parseArguments(executableFileArgs));
-            }
+            cmdLine.add(executableFile.getAbsolutePath());
+            cmdLine.addAll(executableFileArgs);
 
             if (useSingleRobotCommandLineArg) {
                 cmdLine.add(String.join(" ", robotRunCommandLine.getCommandLine()));
@@ -243,9 +241,7 @@ public class RunCommandLineCallBuilder {
                 cmdLine.add("-J-cp");
                 cmdLine.add(classPath());
             }
-            if (!interpreterUserArgs.isEmpty()) {
-                cmdLine.addAll(ArgumentsConverter.parseArguments(interpreterUserArgs));
-            }
+            cmdLine.addAll(interpreterUserArgs);
             cmdLine.add("-m");
             cmdLine.add("robot.run");
 
@@ -308,9 +304,7 @@ public class RunCommandLineCallBuilder {
                 robotArgs.add("-t");
                 robotArgs.add(test);
             }
-            if (!robotUserArgs.isEmpty()) {
-                robotArgs.addAll(ArgumentsConverter.parseArguments(robotUserArgs));
-            }
+            robotArgs.addAll(robotUserArgs);
             return robotArgs;
         }
 
@@ -353,16 +347,14 @@ public class RunCommandLineCallBuilder {
         private void addUserArguments(final ArgumentsFile argumentsFile) {
             argumentsFile.addCommentLine("arguments specified manually by user");
 
-            final List<String> parsedArgs = ArgumentsConverter.parseArguments(robotUserArgs);
-
             int i = 0;
-            while (i < parsedArgs.size()) {
-                if (ArgumentsConverter.isSwitchArgument(parsedArgs.get(i)) && i < parsedArgs.size() - 1
-                        && !ArgumentsConverter.isSwitchArgument(parsedArgs.get(i + 1))) {
-                    argumentsFile.addLine(parsedArgs.get(i), parsedArgs.get(i + 1));
+            while (i < robotUserArgs.size()) {
+                if (robotUserArgs.get(i).startsWith("-") && i < robotUserArgs.size() - 1
+                        && !robotUserArgs.get(i + 1).startsWith("-")) {
+                    argumentsFile.addLine(robotUserArgs.get(i), robotUserArgs.get(i + 1));
                     i++;
                 } else {
-                    argumentsFile.addLine(parsedArgs.get(i));
+                    argumentsFile.addLine(robotUserArgs.get(i));
                 }
                 i++;
             }
@@ -433,10 +425,6 @@ public class RunCommandLineCallBuilder {
 
         public String[] getCommandLine() {
             return commandLine.toArray(new String[0]);
-        }
-
-        public String[] getCommandLineWithWrappedArguments() {
-            return commandLine.stream().map(RobotRuntimeEnvironment::wrapArgumentIfNeeded).toArray(String[]::new);
         }
     }
 }
