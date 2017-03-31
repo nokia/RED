@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YLsq8BVSEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/30/17 5:11 PM
+Save-Time: 3/31/17 11:26 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -23,7 +23,7 @@ proc "prepere-run-config"{
 	get-menu "Run/Run Configurations..." | click
 	get-window "Run Configurations" | get-tab-folder | get-tab-item Executor | click
 	
-	set-dialog-result File [format "platform:/resource/ScriptProject/scripts/%s" [os-specific "script_win.bat" "script_lin.bat"]]
+	set-dialog-result File [format "platform:/resource/ScriptProject/scripts/%s" [os-specific "script_win.bat" "script_lin.sh"]]
 	
 	//set path to agent (worspace) and to folder outsiece ws (user folder)
 	with [get-window "Run Configurations"] {
