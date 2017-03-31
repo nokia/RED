@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4qmyUPRNEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/31/17 12:32 PM
+Save-Time: 3/31/17 1:24 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -108,6 +108,8 @@ with [get-view Breakpoints | get-editbox] {
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 12 17
 get-button "Debug.*" | click -arrow
 get-menu "Debug As/1 Robot Test" | click
+wait-for-console
+
 get-view "Message Log" | get-editbox | get-property text 
     | contains "Ending test: RobotProject.TestFile.Continue Example" | verify-true
 	
