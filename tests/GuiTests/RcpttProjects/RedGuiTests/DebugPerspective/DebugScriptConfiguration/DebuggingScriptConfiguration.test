@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _k_D1QBU9EeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/30/17 5:11 PM
+Save-Time: 3/31/17 11:50 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -60,8 +60,7 @@ get-view "Execution View" | get-tree | get-item "ScriptProject \\(.* s\\)/TestFi
 //chec console    
 get-view Console | get-text-viewer | get-property text 
     | equals "Command: .*\n"
-    + "Suite Executor: Robot Framework .*\n\n"
-    + ".*>python  -m robot.run --listener .*TestRunnerAgent.py:localhost:43981:5 -s ScriptProject\.TestFile .*ScriptProject \n"
+    + "Suite Executor: Robot Framework .*\n"
     + "==============================================================================\n"
     + "ScriptProject                                                                 \n"
     + "==============================================================================\n"
