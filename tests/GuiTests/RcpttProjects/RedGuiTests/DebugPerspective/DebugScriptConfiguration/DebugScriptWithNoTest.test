@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __tiIYBVQEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/30/17 5:42 PM
+Save-Time: 3/31/17 11:39 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -15,9 +15,9 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-prepererun-config
+prepere-run-config
 
-let [val scrip_name [os-specific "script_win.bat" "script_lin.bat"]]{
+let [val scrip_name [os-specific "script_win.bat" "script_lin.sh"]]{
 	//Add BP
 	get-view "Project Explorer" | get-tree | select "ScriptProject/TestFile.robot" | double-click
 	get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 5
@@ -27,13 +27,17 @@ let [val scrip_name [os-specific "script_win.bat" "script_lin.bat"]]{
     
 	    
 	//add echo
+
 	with [get-editor $scrip_name | get-text-viewer] {
 	    set-caret-pos 1 1
 	    key-type "M1+a"
 	    key-type BackSpace
+	    type-text [os-specific "@echo off" "#!/usr/bin/env bash"]
+	    key-type Enter
 	    type-text "echo Hello!"
 	    key-type "M1+s"
 	}
+
 	//debug test
 	get-view "Project Explorer" | get-tree | select "ScriptProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
@@ -41,8 +45,7 @@ let [val scrip_name [os-specific "script_win.bat" "script_lin.bat"]]{
 	//check console    
 	get-view Console | get-text-viewer | get-property text 
 	    | equals [format "Command: .*%s .* .*python.* -m robot.run --listener .*TestRunnerAgent.py:43981 --argumentfile .*\.arg .*ScriptProject\n"
-	    + "Suite Executor: Robot Framework .*\n\n"
-	    + ".*>echo Hello! \n"
+	    + "Suite Executor: Robot Framework .*\n"
 	    + "Hello!" $scrip_name] | verify-true
 	    
 	get-view "Execution View" | get-tree | get-property itemCount | equals 0 | verify-true
@@ -74,8 +77,7 @@ let [val scrip_name [os-specific "script_win.bat" "script_lin.bat"]]{
 
 	}-else{
 		get-view Console | get-text-viewer | get-property text 
-		    | contains"'wrong_command' is not recognized as an internal or external command,\n"
-		    + "operable program or batch file." | verify-true
+		    | contains"line 1: wrong_command: command not found" | verify-true
 	}
 } 
     
