@@ -5,7 +5,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Requirements 
 *  Oracle Java 1.8+  https://www.java.com/
-*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
 *  Python/Jython & RobotFramework installed
 
 ## Important notice
@@ -34,8 +34,8 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - RED asks when running testsuites with Fatal errors which will fail due to Robot exception
     
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
-    
-    
+
+        
 --------------------------------------------------------------------------------------------------------------------------    
 # RED - Robot Editor v0.7.5-fix
 ## Introduction
