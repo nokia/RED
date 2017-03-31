@@ -1,3 +1,47 @@
+RED 0.7.6 - 2017/03/30
+
+** Bug
+    [RED-299] - User can run tests from closed project
+    [RED-315] - Adding prints to console in one order
+    [RED-680] - Server error after terminating script during debug
+    [RED-690] - Wizard should be aware of already existing python files and folder
+    [RED-697] - Wrong coloring for comment
+    [RED-700] - Removing error: Unable to create occurrences markers
+    [RED-706] - Comment coloring changes depending on text
+    [RED-715] - (github #81) Autodiscovery function does not work correctly
+    [RED-724] - Run configuration history doesn't show previous launches
+    [RED-726] - Debug error from TestRunner after fast terminating script
+    [RED-730] - RED recognizes every token beginning with "in" as IN_TOKEN
+    [RED-731] - RED recognizes every token including "with name" on Libraries declaration as WITH_NAME token
+    [RED-747] - Change editor to Source when running Debug if user uses Table Editors
+    [RED-754] - [github #91] jython lib decoration in red.xml editor is displaying when jython is used but should otherwise
+    [RED-761] - Remote connection problem hangs AgentConnectionServerJob
+
+** Enhancement
+    [RED-148] - Run configuration keeps deleted testcases to be run
+    [RED-385] - Adding action "comment out selected lines" in tables
+    [RED-493] - Add possibility in table for F3 or CTRL + LF Mouse button to go to declaration of keyword
+    [RED-649] - New Wizard not to allow create Robot files when no Project in Workspace
+    [RED-650] - Code assistance - provide res name when entering res filename
+    [RED-658] - Ask user if he really wants to proceed project execution with unresolved errors
+    [RED-718] - Make Toolbar Run/Debug buttons contextual sensitive
+    [RED-723] - Removing error about run configuration from .log
+
+** Feature
+    [RED-717] - Run tests with user scripts - github #70
+
+** Task
+    [RED-685] - Migrate to Java 8
+    [RED-746] - Update docs with info and examples for RED-721 - Robot Script Configuration, change screens as some of the GUI and TestRunner params are updated
+    [RED-756] - Use argument file for launching tests
+
+** Sub-task
+    [RED-720] - Activate Remote tab in Run configuration so localIP and localPort is used in Run
+    [RED-721] - Create new Robot Script Configuration to allow to execute custom script instead of local interpreter.
+    [RED-722] - Script handling
+    [RED-735] - Docs about interfaces and RED remote architecture
+
+    
 RED 0.7.5-fix - 2017/02/22
 ** Feature
 
@@ -45,7 +89,7 @@ RED 0.7.5 - 2017/02/07
     [RED-673] - Eclipse IDE for Eclipse Committers Mars - cannot install any RED above 0.6.5
     [RED-691] - Shorten the paths to some files
 
-Sub-task
+** Sub-task
 
     [RED-699] - Run action should be different for Project Explorer and Toolbar
 

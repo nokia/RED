@@ -1,37 +1,40 @@
-## Download&amp;install;
+## Download &amp; install
 
 ### Get Java
 
-RED is compatible with any Oracle Java newer than 1.7 . Java official website:
-[www.java.com](https://www.java.com)
+RED is compatible with any Oracle Java newer than 1.8.  
+[Java official website](https://www.java.com)
 
 ### Get Eclipse
 
-Currently RED is tested with Eclipse Luna (v4.4.x) release although RED is
-compatible with Eclipse Luna, Mars and Neon.  
-Official Eclipse website: [ Eclipse.org](https://www.eclipse.org/)
+Currently RED is tested with Eclipse Mars/Neon (4.4.x/4.5.x) release although
+RED is compatible with Eclipse Luna, Mars and Neon.  
+[Official Eclipse website](https://www.eclipse.org/)
 
 ### Get RED
 
-RED feature can be downloaded from
-[github.com/nokia/RED](https://github.com/nokia/RED). RED feature is a file
-with zip extension. RED Product is RED bounded with Eclipse platform.
+RED can be downloaded from
+[github.com/nokia/RED](https://github.com/nokia/RED). RED Feature is a file
+with zip extension while Product is RED bundled together with Eclipse
+platform.
 
-### Get Python & RobotFramework
+### Get Python &amp; RobotFramework
 
-In order to use full spectrum of RED features, Python & RobotFramework should
-be installed with respectful dependencies (currently Python 2.7.x is supported
-by RobotFramework).  
-Python official site: [www.python.org](http://www.python.org)  
+In order to use full spectrum of RED features, Python &amp; RobotFramework
+should be installed with respectful dependencies.  
+Python official site: [python.org](http://www.python.org)  
 RobotFramework official site: [robotframework.org](http://robotframework.org/)  
 We recommend to install Python packages using pip.  
-**Note: in some cases like using portable Python&amp;RF;, there may be a need to run Eclipse and pybot with administrative privileges.**  
+
+Note
+
+    In some cases like using portable Python&amp;RF, there may be a need to run Eclipse and pybot with administrative privileges.
 
 ### Install RED into Eclipse
 
 #### Install from Eclipse Marketplace
 
-  * Start Eclipse, open Help -> Eclipse Marketplace
+  * Start Eclipse, open _Help -> Eclipse Marketplace_
   * Search for "RED Robot Editor"
   * Install preferred version accepting license
   * Restart Eclipse to apply changes
