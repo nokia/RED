@@ -41,7 +41,7 @@ public enum SuiteFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Parser error in '%s': %s";
+            return "%s";
         }
     },
     BUILD_WARNING_MESSAGE {
@@ -58,7 +58,7 @@ public enum SuiteFileProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Parser warning in '%s': %s";
+            return "%s";
         }
     },
     FILE_PARSING_FAILED {
