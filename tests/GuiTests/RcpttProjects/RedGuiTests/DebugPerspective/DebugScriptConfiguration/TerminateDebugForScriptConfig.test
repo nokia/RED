@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mRBHMBVPEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/31/17 11:54 AM
+Save-Time: 3/31/17 1:26 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -44,7 +44,7 @@ get-view Console | get-text-viewer | get-property text
     + "==============================================================================\n"
     + "ScriptProject.TestFile                                                        \n"
     + "==============================================================================\n"
-    + "test .*" | verify-true
+    + "test.*" | verify-true
     
 //check execution view    
 get-view "Execution View" | click
