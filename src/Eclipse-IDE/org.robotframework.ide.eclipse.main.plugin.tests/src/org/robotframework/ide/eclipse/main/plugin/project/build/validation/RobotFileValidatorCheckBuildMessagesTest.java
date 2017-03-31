@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
@@ -45,6 +47,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
+
+import com.google.common.collect.Range;
 
 public class RobotFileValidatorCheckBuildMessagesTest {
 
@@ -82,6 +86,10 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
         final BuildMessage errorMsg = mock(BuildMessage.class);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
+        final FilePosition position = new FilePosition(0, 0, 0);
+        final FileRegion region = new FileRegion(position, position);
+        when(warningMsg.getFileRegion()).thenReturn(region);
+        when(errorMsg.getFileRegion()).thenReturn(region);
 
         buildMsgs.add(infoMsg);
         buildMsgs.add(warningMsg);
@@ -100,19 +108,21 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verify(infoMsg, times(2)).getType();
         order.verify(warningMsg, times(2)).getType();
-        order.verify(warningMsg, times(1)).getFileName();
         order.verify(warningMsg, times(1)).getMessage();
+        order.verify(warningMsg, times(1)).getFileRegion();
         order.verify(errorMsg, times(1)).getType();
-        order.verify(errorMsg, times(1)).getFileName();
         order.verify(errorMsg, times(1)).getMessage();
+        order.verify(errorMsg, times(1)).getFileRegion();
 
         order.verifyNoMoreInteractions();
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
-                .asList(new Problem[] { new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(-1)) }));
+                .asList(new Problem[] {
+                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
+                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
+                                new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -152,6 +162,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         final BuildMessage warningMsg = mock(BuildMessage.class);
         buildMsgs.add(warningMsg);
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
+        final FilePosition position = new FilePosition(0, 0, 0);
+        final FileRegion region = new FileRegion(position, position);
+        when(warningMsg.getFileRegion()).thenReturn(region);
 
         when(toUpdateMessages.getBuildingMessages()).thenReturn(buildMsgs);
 
@@ -165,14 +178,16 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(toUpdateMessages, times(1)).getStatus();
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verify(warningMsg, times(2)).getType();
-        order.verify(warningMsg, times(1)).getFileName();
         order.verify(warningMsg, times(1)).getMessage();
+        order.verify(warningMsg, times(1)).getFileRegion();
+
         order.verifyNoMoreInteractions();
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(
-                new Problem[] { new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(-1)) }));
+                new Problem[] { new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE,
+                        new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -184,6 +199,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         final BuildMessage errorMsg = mock(BuildMessage.class);
         buildMsgs.add(errorMsg);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
+        final FilePosition position = new FilePosition(0, 0, 0);
+        final FileRegion region = new FileRegion(position, position);
+        when(errorMsg.getFileRegion()).thenReturn(region);
 
         when(toUpdateMessages.getBuildingMessages()).thenReturn(buildMsgs);
 
@@ -197,14 +215,15 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(toUpdateMessages, times(1)).getStatus();
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verify(errorMsg, times(1)).getType();
-        order.verify(errorMsg, times(1)).getFileName();
         order.verify(errorMsg, times(1)).getMessage();
+        order.verify(errorMsg, times(1)).getFileRegion();
         order.verifyNoMoreInteractions();
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
-                .asList(new Problem[] { new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(-1)) }));
+                .asList(new Problem[] { new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
+                        new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -239,6 +258,10 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
         final BuildMessage errorMsg = mock(BuildMessage.class);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
+        final FilePosition position = new FilePosition(0, 0, 0);
+        final FileRegion region = new FileRegion(position, position);
+        when(warningMsg.getFileRegion()).thenReturn(region);
+        when(errorMsg.getFileRegion()).thenReturn(region);
 
         buildMsgs.add(infoMsg);
         buildMsgs.add(warningMsg);
@@ -258,11 +281,11 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verify(infoMsg, times(2)).getType();
         order.verify(warningMsg, times(2)).getType();
-        order.verify(warningMsg, times(1)).getFileName();
         order.verify(warningMsg, times(1)).getMessage();
+        order.verify(warningMsg, times(1)).getFileRegion();
         order.verify(errorMsg, times(1)).getType();
-        order.verify(errorMsg, times(1)).getFileName();
         order.verify(errorMsg, times(1)).getMessage();
+        order.verify(errorMsg, times(1)).getFileRegion();
 
         order.verifyNoMoreInteractions();
 
@@ -270,8 +293,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         assertThat(reportedProblems).hasSize(3);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(-1)) }));
+                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
+                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
+                                new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -314,6 +338,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         final BuildMessage warningMsg = mock(BuildMessage.class);
         buildMsgs.add(warningMsg);
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
+        final FilePosition position = new FilePosition(0, 0, 0);
+        final FileRegion region = new FileRegion(position, position);
+        when(warningMsg.getFileRegion()).thenReturn(region);
 
         when(toUpdateMessages.getBuildingMessages()).thenReturn(buildMsgs);
 
@@ -328,15 +355,16 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(file, times(1)).getName();
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verify(warningMsg, times(2)).getType();
-        order.verify(warningMsg, times(1)).getFileName();
         order.verify(warningMsg, times(1)).getMessage();
+        order.verify(warningMsg, times(1)).getFileRegion();
         order.verifyNoMoreInteractions();
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(-1)) }));
+                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE,
+                                new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -348,6 +376,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         final BuildMessage errorMsg = mock(BuildMessage.class);
         buildMsgs.add(errorMsg);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
+        final FilePosition position = new FilePosition(0, 0, 0);
+        final FileRegion region = new FileRegion(position, position);
+        when(errorMsg.getFileRegion()).thenReturn(region);
 
         when(toUpdateMessages.getBuildingMessages()).thenReturn(buildMsgs);
 
@@ -362,15 +393,16 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(file, times(1)).getName();
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verify(errorMsg, times(1)).getType();
-        order.verify(errorMsg, times(1)).getFileName();
         order.verify(errorMsg, times(1)).getMessage();
+        order.verify(errorMsg, times(1)).getFileRegion();
         order.verifyNoMoreInteractions();
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(-1)) }));
+                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
+                                new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test

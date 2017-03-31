@@ -179,15 +179,9 @@ public class RobotProjectHolder {
         return (foundFile == null) || (file.lastModified() != foundFile.getLastModificationEpochTime());
     }
 
-    public List<RobotFileOutput> findFilesWithImportedVariableFile(final PathsProvider pathsProvider,
+    public RobotFileOutput findFileWithImportedVariableFile(final PathsProvider pathsProvider,
             final File variableFile) {
-        final List<RobotFileOutput> found = new ArrayList<>();
-        final List<Integer> foundFiles = findFile(new SearchByVariablesImport(pathsProvider, variableFile));
-        for (final Integer fileId : foundFiles) {
-            found.add(readableProjectFiles.get(fileId));
-        }
-
-        return found;
+        return findFile(new SearchByVariablesImport(pathsProvider, variableFile));
     }
 
     private class SearchByVariablesImport implements ISearchCriteria {
@@ -223,13 +217,7 @@ public class RobotProjectHolder {
     }
 
     public RobotFileOutput findFileByName(final File file) {
-        RobotFileOutput found = null;
-        final List<Integer> findFile = findFile(new SearchByName(file));
-        if (!findFile.isEmpty()) {
-            found = readableProjectFiles.get(findFile.get(0));
-        }
-
-        return found;
+        return findFile(new SearchByName(file));
     }
 
     private class SearchByName implements ISearchCriteria {
@@ -251,18 +239,14 @@ public class RobotProjectHolder {
         }
     }
 
-    protected List<Integer> findFile(final ISearchCriteria criteria) {
-        final List<Integer> foundFiles = new ArrayList<>();
-        final int size = readableProjectFiles.size();
-        for (int i = 0; i < size; i++) {
+    protected RobotFileOutput findFile(final ISearchCriteria criteria) {
+        for (int i = 0; i < readableProjectFiles.size(); i++) {
             final RobotFileOutput robotFile = readableProjectFiles.get(i);
             if (criteria.matchCriteria(robotFile)) {
-                foundFiles.add(i);
-                break;
+                return robotFile;
             }
         }
-
-        return foundFiles;
+        return null;
     }
 
     protected interface ISearchCriteria {

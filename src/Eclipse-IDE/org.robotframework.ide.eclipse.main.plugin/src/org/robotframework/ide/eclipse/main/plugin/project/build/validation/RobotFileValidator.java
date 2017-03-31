@@ -8,11 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage.LogLevel;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -22,6 +24,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
+
+import com.google.common.collect.Range;
 
 public abstract class RobotFileValidator implements ModelUnitValidator {
 
@@ -88,11 +92,21 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
                 }
                 for (final BuildMessage buildMessage : robotFileOutput.getBuildingMessages()) {
                     if (buildMessage.getType() == LogLevel.ERROR) {
-                        reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.BUILD_ERROR_MESSAGE)
-                                .formatMessageWith(buildMessage.getFileName(), buildMessage.getMessage()), file, -1);
+                        final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.BUILD_ERROR_MESSAGE)
+                                .formatMessageWith(buildMessage.getMessage());
+                        final FileRegion region = buildMessage.getFileRegion();
+                        final ProblemPosition position = new ProblemPosition(
+                                region.getStart().getLine(),
+                                Range.closed(region.getStart().getOffset(), region.getEnd().getOffset()));
+                        reporter.handleProblem(problem, file, position);
                     } else if (buildMessage.getType() == LogLevel.WARN) {
-                        reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.BUILD_WARNING_MESSAGE)
-                                .formatMessageWith(buildMessage.getFileName(), buildMessage.getMessage()), file, -1);
+                        final RobotProblem problem = RobotProblem.causedBy(SuiteFileProblem.BUILD_WARNING_MESSAGE)
+                                .formatMessageWith(buildMessage.getMessage());
+                        final FileRegion region = buildMessage.getFileRegion();
+                        final ProblemPosition position = new ProblemPosition(
+                                region.getStart().getLine(),
+                                Range.closed(region.getStart().getOffset(), region.getEnd().getOffset()));
+                        reporter.handleProblem(problem, file, position);
                     }
                 }
             }
