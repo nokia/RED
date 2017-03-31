@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -116,7 +117,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
         redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
-        redConsole.writeLine("Command: " + String.join(" ", cmdLine.getCommandLineWithWrappedArguments()));
+        redConsole.writeLine("Command: " + DebugPlugin.renderArguments(cmdLine.getCommandLine(), null));
         redConsole.writeLine("Suite Executor: " + suiteExecutorVersion);
 
         return new LaunchExecution(serverJob, execProcess, robotProcess);
@@ -158,15 +159,19 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
         if (!robotConfig.getExecutableFilePath().isEmpty()) {
-            builder.withExecutableFile(robotConfig.getExecutableFilePath());
-            builder.addUserArgumentsForExecutableFile(robotConfig.getExecutableFileArguments());
+            final File executableFile = new File(robotConfig.getExecutableFilePath());
+            if (!executableFile.exists()) {
+                throw newCoreException("Executable file '" + executableFile.getAbsolutePath() + "' does not exist");
+            }
+            builder.withExecutableFile(executableFile);
+            builder.addUserArgumentsForExecutableFile(parseArguments(robotConfig.getExecutableFileArguments()));
             builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
         }
         builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
         builder.addLocationsToPythonPath(robotProject.getPythonpath());
-        builder.addUserArgumentsForInterpreter(robotConfig.getInterpreterArguments());
-        builder.addUserArgumentsForRobot(robotConfig.getRobotArguments());
+        builder.addUserArgumentsForInterpreter(parseArguments(robotConfig.getInterpreterArguments()));
+        builder.addUserArgumentsForRobot(parseArguments(robotConfig.getRobotArguments()));
 
         builder.addVariableFiles(robotProject.getVariableFilePaths());
 
@@ -180,6 +185,10 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             builder.excludeTags(robotConfig.getExcludedTags());
         }
         return builder.build();
+    }
+
+    private List<String> parseArguments(final String arguments) {
+        return Arrays.asList(DebugPlugin.parseArguments(arguments));
     }
 
     private String createConsoleDescription(final RobotLaunchConfiguration robotConfig,
