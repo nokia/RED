@@ -69,7 +69,6 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @Test
     public void commandLineDoesNotTranslateTestNames_whenNamesContainsDoubleUnderscores() throws Exception {
-
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
@@ -137,7 +136,7 @@ public class RobotLaunchConfigurationDelegateTest {
     public void commandLineStartsWitExecutableFilePath() throws Exception {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toPortableString();
+        final String executablePath = projectProvider.createFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
@@ -150,7 +149,7 @@ public class RobotLaunchConfigurationDelegateTest {
     public void commandLineContainsExecutableFilePathWithArguments() throws Exception {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        final String executablePath = projectProvider.getFile("executable_script.bat").getLocation().toPortableString();
+        final String executablePath = projectProvider.createFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
         robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
 
@@ -158,6 +157,17 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
 
         assertThat(commandLine.getCommandLine()).containsSubsequence(executablePath, "-arg1", "abc", "-arg2", "xyz");
+    }
+
+    @Test(expected = CoreException.class)
+    public void coreExceptionIsThrown_whenExecutableFileDoesNotExist() throws Exception {
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+        final String executablePath = projectProvider.getFile("not_existing.bat").getLocation().toOSString();
+        robotConfig.setExecutableFilePath(executablePath);
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345);
     }
 
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
