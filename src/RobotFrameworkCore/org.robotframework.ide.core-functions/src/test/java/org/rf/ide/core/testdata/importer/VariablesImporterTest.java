@@ -69,13 +69,13 @@ public class VariablesImporterTest {
                 "Problem with importing variable file \\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases *** with error stack: ");
         final FileRegion fileRegion = buildMessage.getFileRegion();
         assertThat(fileRegion).isNotNull();
-        assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 0, 0))).isTrue();
+        assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 9, 9))).isTrue();
         final int importTextLength = "Variables".length() + varImport.length();
         assertThat(fileRegion.getEnd().isSamePlace(new FilePosition(1, importTextLength, importTextLength))).isTrue();
     }
 
     @Test
-    public void importVariables_withThreeElements_and_withOne_withWrongPath_shouldReturn_emptyList()
+    public void importVariables_withThreeElements_and_withOne_withWrongPath_shouldReturn_onlyTwoCorrectInList()
             throws IOException {
         // prepare
         final File processedFile = temporaryFolder.newFile("importing.robot");
@@ -120,7 +120,8 @@ public class VariablesImporterTest {
     }
 
     @Test
-    public void importVariables_withTwoElements_and_withOne_withWrongPath_shouldReturn_emptyList() throws IOException {
+    public void importVariables_withTwoElements_and_withOne_withWrongPath_shouldReturn_onlyOneCorrectInList()
+            throws IOException {
         // prepare
         final File processedFile = temporaryFolder.newFile("robot.robot");
         temporaryFolder.newFile("robot.py");
