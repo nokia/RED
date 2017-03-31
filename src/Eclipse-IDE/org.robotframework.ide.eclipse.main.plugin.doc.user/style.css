@@ -20,7 +20,7 @@ div.code {
 }
 
 a.command {
-	background: url('../org.eclipse.help/command_link.png') no-repeat;
+	background: url('images/command_link.png') no-repeat;
 	background-position: 0 5px;
 	padding-left: 20px;
 }
