@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _Hs7GABU_EeeZSZgUeG7ZOA,_xG4GMBU-EeeZSZgUeG7ZOA,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_s-ctEA4_EeePcNCRX_abWA,_2Q6oEPOSEeaWpbE3jg39cA,_YLsq8BVSEeeZSZgUeG7ZOA
-Element-Name: TimeoutInScripConfigForDebug
+Element-Name: TimeoutInScriptConfigForDebug
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _RfmQQBVbEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/30/17 5:52 PM
+Save-Time: 3/31/17 10:13 AM
 Tags: Debug
 Testcase-Type: ecl
 
