@@ -26,6 +26,7 @@ RED 0.7.6 - 2017/03/30
     [RED-658] - Ask user if he really wants to proceed project execution with unresolved errors
     [RED-718] - Make Toolbar Run/Debug buttons contextual sensitive
     [RED-723] - Removing error about run configuration from .log
+    [RED-753] - [github #86] it should be possible to wrap contents of cells in table
 
 ** Feature
     [RED-717] - Run tests with user scripts - github #70
