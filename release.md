@@ -1,6 +1,6 @@
 # RED - Robot Editor v0.7.6
 ## Introduction
-RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
 Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
 
 ## Requirements 
@@ -19,6 +19,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - #70 - RED can execute tests using custom user scripts (*.bat,*.exe,*.sh,*.py). 
 **More info in help under User guide -> Launching Test -> Local launches scripting.** 
 - RED user scripts provides possibility to debug robot&python libraries in one RED instance together with PyDev. **More info in help under: User guide -> Launching Tests -> Debugging Robot&Python with RED&PyDev**
+- #86 - wrap content of cells in table editors. Check : **Preferences->Robot Framework->Editor->Folding**
 - changes in Run/Debug configuration - removed and merged configurations types,rearranged configuration fields
 - changes in how Run/Debug actions are executed - now it is contextual like in other Eclipse editors. It matters where is the focus/cursor when using general Run/Debug buttons. 
 **Check User guide -> Launching Tests -> Launching preferences.**
