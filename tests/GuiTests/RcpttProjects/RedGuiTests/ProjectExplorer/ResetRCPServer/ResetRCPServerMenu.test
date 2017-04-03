@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _n-QKcKS7EeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/19/17 2:15 PM
+Save-Time: 4/3/17 2:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -82,14 +82,14 @@ get-tab-folder -index 1 | get-tab-item "TestFile.robot" | click
 get-menu "Project/Clean..." | click
 get-window Clean | get-button OK | click
 
-//check that 1 error is shown
+//check that 2 errors are shown
 get-tab-folder -index 4 | get-tab-item Problems | click
 get-view Problems | get-tree | get-item ".*" -index 0 | expand-all
-get-view Problems | get-tree | select "Errors (1 item)"
+
 with [get-view Problems | get-tree] {
-    get-item "Errors \\(1 item\\)" | get-property childCount | equals 1 | verify-true
-    get-item "Errors \\(1 item\\)" | get-property "getText()" | equals "Errors (1 item)" | verify-true
-    get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Could not found any variable in variable file: var/var.py" | verify-true
+    get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Variable 'a' is used, but not defined" | verify-true
 }
 
