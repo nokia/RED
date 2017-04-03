@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/28/17 11:24 AM
+Save-Time: 3/31/17 4:02 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -103,6 +103,15 @@ proc concat_str_with_regex [val log_list]
 	concat [$log_list |each [val single ] 
 	{
 		concat $msg_log_regex_INFO $single
+	}] 
+
+}
+
+proc "concat-list-with-str" [val list] [val prefix ""] [val sufix ""]
+{
+	concat [$list |each [val item ] 
+	{
+		concat $prefix $item $sufix
 	}] 
 
 }
