@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _rfqskLkQEeWsFpIoyr2saw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/2/17 12:16 PM
+Save-Time: 4/4/17 4:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,10 +33,13 @@ wait 2000
 // 2 problems should be not visible - total 6
 get-view Problems | get-label "6 errors, 0 warnings, 0 others" | get-property caption 
     | equals "6 errors, 0 warnings, 0 others" | verify-true
-// check caption
-get-view "Project Explorer" | get-tree | get-item "RobotProject/a \\[excluded\\]" | get-property caption 
-    | equals "a [excluded]" | verify-true
-
+    
+get-view "Project Explorer" | get-tree | select "RobotProject/a [excluded]" | click
+try -times 3 -delay 1000 -command{    
+	// check caption
+	get-view "Project Explorer" | get-tree | get-item "RobotProject/a \\[excluded\\]" | get-property caption 
+	    | equals "a [excluded]" | verify-true
+}
 // open red.xml and check if folder tree item is marked as exluded
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 wait-for-loading-red-xml -editor_name "RobotProject/red.xml"
