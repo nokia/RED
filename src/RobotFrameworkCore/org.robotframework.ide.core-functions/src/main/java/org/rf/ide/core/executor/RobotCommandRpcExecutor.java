@@ -106,30 +106,25 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     private void startStdOutReadingThread(final Process process, final Semaphore semaphore) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                for (final PythonProcessListener listener : getListeners()) {
-                    listener.processStarted(interpreterPath, process);
-                }
-                semaphore.release();
-                final InputStream inputStream = process.getInputStream();
-                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        for (final PythonProcessListener listener : getListeners()) {
-                            listener.lineRead(serverProcess, line);
-                        }
-                        line = reader.readLine();
-                    }
-                } catch (final IOException e) {
-                    // that fine
-                } finally {
+        new Thread(() -> {
+            for (final PythonProcessListener listener : getListeners()) {
+                listener.processStarted(interpreterPath, process);
+            }
+            semaphore.release();
+            final InputStream inputStream = process.getInputStream();
+            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line = reader.readLine();
+                while (line != null) {
                     for (final PythonProcessListener listener : getListeners()) {
-                        listener.processEnded(serverProcess);
+                        listener.lineRead(serverProcess, line);
                     }
-                    serverProcess = null;
+                    line = reader.readLine();
+                }
+            } catch (final IOException e) {
+                // that fine
+            } finally {
+                for (final PythonProcessListener listener : getListeners()) {
+                    listener.processEnded(serverProcess);
                 }
             }
         }).start();
@@ -140,27 +135,23 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     private void startStdErrReadingThread(final Process process, final Semaphore semaphore) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    semaphore.acquire();
-                } catch (final InterruptedException e) {
-                    // that fine
-                }
-                final InputStream inputStream = process.getErrorStream();
-                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                    String line = reader.readLine();
-                    while (line != null) {
-                        for (final PythonProcessListener listener : getListeners()) {
-                            listener.errorLineRead(serverProcess, line);
-                        }
-                        line = reader.readLine();
+        new Thread(() -> {
+            try {
+                semaphore.acquire();
+            } catch (final InterruptedException e) {
+                // that fine
+            }
+            final InputStream inputStream = process.getErrorStream();
+            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                String line = reader.readLine();
+                while (line != null) {
+                    for (final PythonProcessListener listener : getListeners()) {
+                        listener.errorLineRead(serverProcess, line);
                     }
-                } catch (final IOException e) {
-                    // that fine
+                    line = reader.readLine();
                 }
+            } catch (final IOException e) {
+                // that fine
             }
         }).start();
     }
@@ -205,18 +196,16 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 }
             }
             if (System.currentTimeMillis() - start > (timeoutInSec * 1000)) {
-                serverProcess = null;
+                if (!isExternal()) {
+                    serverProcess.destroyForcibly();
+                }
                 break;
             }
         }
     }
 
-    Process getProcess() {
-        return serverProcess;
-    }
-
     boolean isAlive() {
-        return serverProcess != null;
+        return serverProcess.isAlive();
     }
 
     boolean isExternal() {
@@ -230,7 +219,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             } catch (final ProcessHelperException e) {
                 e.printStackTrace();
             }
-            serverProcess.destroy();
+            serverProcess.destroyForcibly();
             try {
                 serverProcess.waitFor();
             } catch (final InterruptedException e) {
