@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lJ-jYBiAEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/4/17 1:52 PM
+Save-Time: 4/4/17 4:21 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -127,24 +127,39 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 	    get-button Apply | click
 	    get-button Run | click
 	}
+	try -command{
+		get-view Console | get-text-viewer | get-property text 
+		    | equals [format "Command: .+%s %s %s .+(\.exe)? -m robot.run --listener .+TestRunnerAgent.py:43981 --argumentfile .+\.arg %s%sScriptProject\n"
+		    + "Suite Executor: Robot Framework .*\n"
+		    + "Argument: %s\n"
+		    + "Argument: %s\n"
+		    + "Argument: .+python(\.exe)?\n"
+		    + "Argument: -m\n"
+		    + "Argument: robot.run\n"
+		    + "Argument: --listener\n"
+		    + "Argument: .+TestRunnerAgent.py:43981\n"
+		    + "Argument: --argumentfile\n"
+		    + "Argument: .+\.arg\n"
+		    + "Argument: %s%sScriptProject\n"
+		    + "end" $script_name $wp $wp $wp [os-specific "\\\\" "/"] $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
+	}-catch{
+		get-view Console | get-text-viewer | get-property text 
+		    | equals [format  "Argument: %s\n"
+		    + "Argument: %s\n"
+		    + "Argument: .+python(\.exe)?\n"
+		    + "Argument: -m\n"
+		    + "Argument: robot.run\n"
+		    + "Argument: --listener\n"
+		    + "Argument: .+TestRunnerAgent.py:43981\n"
+		    + "Argument: --argumentfile\n"
+		    + "Argument: .+\.arg\n"
+		    + "Argument: %s%sScriptProject\n"
+		    + "end\n"
+		    + "Command: .+%s %s %s .+(\.exe)? -m robot.run --listener .+TestRunnerAgent.py:43981 --argumentfile .+\.arg %s%sScriptProject\n"
+		    + "Suite Executor: Robot Framework .*"  $wp $wp $wp [os-specific "\\\\" "/"] $script_name $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
+	    }
 	
-	get-view Console | get-text-viewer | get-property text 
-	    | equals [format "Command: .+%s %s %s .+(\.exe)? -m robot.run --listener .+TestRunnerAgent.py:43981 --argumentfile .+\.arg %s%sScriptProject\n"
-	    + "Suite Executor: Robot Framework .*\n"
-	    + "Argument: %s\n"
-	    + "Argument: %s\n"
-	    + "Argument: .+python.exe\n"
-	    + "Argument: -m\n"
-	    + "Argument: robot.run\n"
-	    + "Argument: --listener\n"
-	    + "Argument: .+TestRunnerAgent.py:43981\n"
-	    + "Argument: --argumentfile\n"
-	    + "Argument: .+\.arg\n"
-	    + "Argument: %s%sScriptProject\n"
-	    + "end" $script_name $wp $wp $wp [os-specific "\\\\" "/"] $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
-	
-	
-	    
+	 exec-with-options {   
 	//change interperet to jython    
 	get-menu "Run/Run Configurations..." | click
 	with [get-window "Run Configurations"] {
@@ -156,24 +171,47 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 	    get-button Apply | click
 	    get-button Run | click
 	}
-	get-view Console | get-text-viewer | get-property text 
-	    | equals [format "Command: .*\n"
-	    + "Suite Executor: Robot Framework .+\n"
-	    + "Argument: %s\n"
-	    + "Argument: %s\n"
-	    + "Argument: jython.exe\n"
-	    + "Argument: -J-Dpython.path\n"
-	    + "Argument: .+jython.+\n"
-	    + "Argument: -J-cp\n"
-	    + "Argument: .\n"
-	    + "Argument: -m\n"
-	    + "Argument: robot.run\n"
-	    + "Argument: --listener\n"
-	    + "Argument: .*TestRunnerAgent.py:43981\n"
-	    + "Argument: --argumentfile\n"
-	    + "Argument: .+\.arg\n"
-	    + "Argument: %s%sScriptProject\n"
-	    + "end" $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
+	} -allowStatusDialog
+	try -command{
+		get-view Console | get-text-viewer | get-property text 
+		    | equals [format "Command: .*\n"
+		    + "Suite Executor: Robot Framework .+\n"
+		    + "Argument: %s\n"
+		    + "Argument: %s\n"
+		    + "Argument: jython(\.exe)?\n"
+		    + "Argument: -J-Dpython.path\n"
+		    + "Argument: .+jython.+\n"
+		    + "Argument: -J-cp\n"
+		    + "Argument: .\n"
+		    + "Argument: -m\n"
+		    + "Argument: robot.run\n"
+		    + "Argument: --listener\n"
+		    + "Argument: .*TestRunnerAgent.py:43981\n"
+		    + "Argument: --argumentfile\n"
+		    + "Argument: .+\.arg\n"
+		    + "Argument: %s%sScriptProject\n"
+		    + "end" $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
+	}-catch{
+		
+    	get-view Console | get-text-viewer | get-property text 
+		    | equals [format  "Argument: %s\n"
+		    + "Argument: %s\n"
+		    + "Argument: jython(\.exe)?\n"
+		    + "Argument: -J-Dpython.path.*\n"
+		    + "Argument: .+jython.+\n"
+		    + "Argument: -J-cp\n"
+		    + "Argument: \.\n"
+		    + "Argument: -m\n"
+		    + "Argument: robot.run\n"
+		    + "Argument: --listener\n"
+		    + "Argument: .*TestRunnerAgent.py:43981\n"
+		    + "Argument: --argumentfile\n"
+		    + "Argument: .+\.arg\n"
+		    + "Argument: %s%sScriptProject\n"
+		    + "end\n"
+		    + "Command: .*\n"
+		    + "Suite Executor: Robot Framework .+\n" $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
+	    }
 }  
 
 //add script with no test to run
@@ -216,4 +254,5 @@ try -command{
 //check views
 get-view "Execution View" | get-tree | get-property itemCount | equals 0 | verify-true
 get-view "Message Log" | get-editbox | get-property text | equals "" | verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
