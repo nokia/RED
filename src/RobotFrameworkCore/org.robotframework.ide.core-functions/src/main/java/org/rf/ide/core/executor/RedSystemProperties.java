@@ -15,32 +15,32 @@ import com.google.common.base.Splitter;
  */
 public class RedSystemProperties {
 
+    public static final String RED_CONNECT_TO_SERVER_AT = "red.connectToServerAt";
+
     public static final String RED_USE_DIRECT_INTERPRETER = "red.useDirectInterpreter";
 
     public static final String RED_SHOW_SESSION_CONSOLE = "red.showSessionConsole";
 
-    public static final String RED_CONNECT_TO_SERVER_AT = "red.connectToServerAt";
-
     public static final String RED_USE_OLD_REPARSED_LINK_MODE = "red.useOldReparsedLinkMode";
 
     public static boolean shouldConnectToRunningServer() {
-        return System.getProperty("red.connectToServerAt") != null;
+        return System.getProperty(RED_CONNECT_TO_SERVER_AT) != null;
     }
 
     public static String getSessionServerAddress() {
-        return System.getProperty("red.connectToServerAt");
+        return System.getProperty(RED_CONNECT_TO_SERVER_AT);
     }
 
     public static boolean shouldUseDirectExecutor() {
-        return Boolean.valueOf(System.getProperty("red.useDirectInterpreter")).booleanValue();
+        return Boolean.valueOf(System.getProperty(RED_USE_DIRECT_INTERPRETER));
     }
 
     public static boolean shouldShowSessionConsole() {
-        return Boolean.valueOf(System.getProperty("red.showSessionConsole")).booleanValue();
+        return Boolean.valueOf(System.getProperty(RED_SHOW_SESSION_CONSOLE));
     }
 
     public static boolean shouldUseOldReparsedLinkMode() {
-        return Boolean.valueOf(System.getProperty(RED_USE_OLD_REPARSED_LINK_MODE)).booleanValue();
+        return Boolean.valueOf(System.getProperty(RED_USE_OLD_REPARSED_LINK_MODE));
     }
 
     public static boolean isWindowsPlatform() {
