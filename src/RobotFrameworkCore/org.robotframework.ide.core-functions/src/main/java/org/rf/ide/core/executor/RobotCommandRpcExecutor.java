@@ -224,23 +224,18 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     void kill() {
-        if (serverProcess != null) {
+        if (isAlive()) {
             try {
                 new OSProcessHelper().destroyProcessTree(serverProcess);
             } catch (final ProcessHelperException e) {
                 e.printStackTrace();
             }
-        }
-
-        if (serverProcess != null) {
             serverProcess.destroy();
-        }
-        try {
-            if (serverProcess != null) {
+            try {
                 serverProcess.waitFor();
+            } catch (final InterruptedException e) {
+                throw new RobotCommandExecutorException("Unable to kill rpc server", e);
             }
-        } catch (final InterruptedException e) {
-            throw new RobotCommandExecutorException("Unable to kill rpc server", e);
         }
     }
 
