@@ -52,6 +52,7 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
         this.eventMap = new HashMap<>();
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
+
     @Override
     public void processMessage(final String line, final AgentClient client) {
         try {
@@ -60,6 +61,7 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
         } catch (final IOException e) {
             e.printStackTrace();
         }
+
         if (eventMap.containsKey(AGENT_INITIALIZING_EVENT_NAME)) {
             try {
                 client.send(new InitializeAgent(TestsMode.RUN, false));
@@ -68,7 +70,7 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
             }
         } else if (eventMap.containsKey(VERSION_EVENT_NAME)) {
             try {
-                final List<?> arguments = eventMap.get("version");
+                final List<?> arguments = eventMap.get(VERSION_EVENT_NAME);
                 final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
                 final int protocolVersion = (Integer) attributes.get("protocol");
 
@@ -92,7 +94,6 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
             if (dryRunLibraryImportCollector != null) {
                 dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
             }
-
         } else if (eventMap.containsKey(MESSAGE_EVENT_NAME)) {
             final List<?> messageList = eventMap.get(MESSAGE_EVENT_NAME);
             final Map<String, String> details = (Map<String, String>) messageList.get(0);
@@ -111,7 +112,6 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
                     dryRunLKeywordSourceCollector.collectFromMessageEvent(message);
                 }
             }
-
         } else if (eventMap.containsKey(START_SUITE_EVENT_NAME)) {
             final List<?> suiteList = eventMap.get(START_SUITE_EVENT_NAME);
             final String suiteName = (String) suiteList.get(0);

@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**
@@ -19,19 +20,18 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
  */
 public class LibrariesSourcesCollector {
 
-    private RobotProject robotProject;
+    private final RobotProject robotProject;
 
-    private Set<String> pythonpathLocations = new HashSet<>();
+    private final Set<String> pythonpathLocations = new HashSet<>();
 
-    private Set<String> classpathLocations = new HashSet<>();
+    private final Set<String> classpathLocations = new HashSet<>();
 
     public LibrariesSourcesCollector(final RobotProject robotProject) {
         this.robotProject = robotProject;
     }
 
-    public void collectPythonAndJavaLibrariesSources(final boolean shouldCollectRecursively) throws CoreException {
-
-        if (shouldCollectRecursively) {
+    public void collectPythonAndJavaLibrariesSources() throws CoreException {
+        if (shouldCollectLibrariesRecursively()) {
             collectLocationsWithPythonAndJavaMembersRecursively(robotProject.getProject().members());
         } else {
             collectOnlyParentLocationsWithPythonAndJavaMembers(robotProject.getProject().members());
@@ -42,8 +42,13 @@ public class LibrariesSourcesCollector {
             pythonpathLocations.add(projectLocation.toOSString());
         }
         pythonpathLocations.addAll(robotProject.getPythonpath());
-        
+
         classpathLocations.addAll(robotProject.getClasspath());
+    }
+
+    private boolean shouldCollectLibrariesRecursively() {
+        return !robotProject.getRuntimeEnvironment().isVirtualenv()
+                || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
     }
 
     private void collectLocationsWithPythonAndJavaMembersRecursively(final IResource[] members) throws CoreException {
@@ -75,7 +80,7 @@ public class LibrariesSourcesCollector {
             }
         }
     }
-    
+
     public void checkFileExtensionAndAddToProperLocations(final IResource resource) {
         final String fileExtension = resource.getFileExtension();
         if (fileExtension != null) {
