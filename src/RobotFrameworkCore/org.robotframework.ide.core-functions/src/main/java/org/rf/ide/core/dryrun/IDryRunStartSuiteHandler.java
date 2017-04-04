@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.dryrun;
 
+@FunctionalInterface
 public interface IDryRunStartSuiteHandler {
 
     public void processStartSuiteEvent(final String suiteName);

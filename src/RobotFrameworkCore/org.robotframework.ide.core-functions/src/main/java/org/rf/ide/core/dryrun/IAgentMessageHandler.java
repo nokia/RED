@@ -7,6 +7,7 @@ package org.rf.ide.core.dryrun;
 
 import org.rf.ide.core.execution.server.AgentClient;
 
+@FunctionalInterface
 public interface IAgentMessageHandler {
 
     public void processMessage(final String line, AgentClient client);
