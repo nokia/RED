@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __tiIYBVQEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/31/17 11:39 AM
+Save-Time: 4/4/17 1:54 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,18 +17,18 @@ Entry-Name: .content
 
 prepere-run-config
 
-let [val scrip_name [os-specific "script_win.bat" "script_lin.sh"]]{
+let [val script_name [os-specific "script_win.bat" "script_lin.sh"]]{
 	//Add BP
 	get-view "Project Explorer" | get-tree | select "ScriptProject/TestFile.robot" | double-click
 	get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 5
 	
 	//open file annd chanage content
-	get-view "Project Explorer" | get-tree | select [format "ScriptProject/scripts/%s" $scrip_name ] | get-menu "Open With/Text Editor" | click
+	get-view "Project Explorer" | get-tree | select [format "ScriptProject/scripts/%s" $script_name ] | get-menu "Open With/Text Editor" | click
     
 	    
 	//add echo
 
-	with [get-editor $scrip_name | get-text-viewer] {
+	with [get-editor $script_name | get-text-viewer] {
 	    set-caret-pos 1 1
 	    key-type "M1+a"
 	    key-type BackSpace
@@ -43,11 +43,17 @@ let [val scrip_name [os-specific "script_win.bat" "script_lin.sh"]]{
 	    | click
 	
 	//check console    
-	get-view Console | get-text-viewer | get-property text 
-	    | equals [format "Command: .*%s .* .*python.* -m robot.run --listener .*TestRunnerAgent.py:43981 --argumentfile .*\.arg .*ScriptProject\n"
-	    + "Suite Executor: Robot Framework .*\n"
-	    + "Hello!" $scrip_name] | verify-true
-	    
+	try -command{
+		get-view Console | get-text-viewer | get-property text 
+		    | equals [format "Command: .*%s .* .*python.* -m robot.run --listener .*TestRunnerAgent.py:43981 --argumentfile .*\.arg .*ScriptProject\n"
+		    + "Suite Executor: Robot Framework .*\n"
+		    + "Hello!" $script_name] | verify-true
+	}-catch{
+		get-view Console | get-text-viewer | get-property text 
+		    | equals [format "Hello!\n"
+		    + "Command: .*%s .* .*python.* -m robot.run --listener .*TestRunnerAgent.py:43981 --argumentfile .*\.arg .*ScriptProject\n"
+		    + "Suite Executor: Robot Framework .*" $script_name] | verify-true
+	}    
 	get-view "Execution View" | get-tree | get-property itemCount | equals 0 | verify-true
 	
 	get-view "Message Log" | click
@@ -60,7 +66,7 @@ let [val scrip_name [os-specific "script_win.bat" "script_lin.sh"]]{
 	
 	//change to incorrect commend
 	get-button Robot | click	    
-    with [get-editor $scrip_name | get-text-viewer] {
+    with [get-editor $script_name | get-text-viewer] {
 	    set-caret-pos 1 7
 	    key-type "M1+a"
 	    key-type Del
@@ -69,7 +75,7 @@ let [val scrip_name [os-specific "script_win.bat" "script_lin.sh"]]{
 	}
 	
 	//debug
-	get-button "Debug TestFile.robot" | click
+	get-button "Debug.*" | click
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 		get-view Console | get-text-viewer | get-property text 
 		    | contains"'wrong_command' is not recognized as an internal or external command,\n"
