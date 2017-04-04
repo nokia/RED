@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _FUFBcBYSEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/3/17 11:22 AM
+Save-Time: 4/4/17 2:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,6 +16,7 @@ Entry-Name: .content
 
 proc "compare-console" [val new_args_list] [val inline_args] [val arg_file "Argument: --argumentfile\nArgument: .*\.arg\n"]{
 	let [val new_args [concat-list-with-str $new_args_list -prefix "Argument: "  -sufix "\n"]]{
+		try{
 			get-view Console | get-text-viewer | get-property text 
 			    | equals [format "Command: .*%s .*\n"
 			    + "Suite Executor: Robot Framework .*\n" 
@@ -28,6 +29,21 @@ proc "compare-console" [val new_args_list] [val inline_args] [val arg_file "Argu
 			    + "%s"
 			    + "Argument: .*ExecutorTab\n"
 			    + "end" $inline_args $new_args $arg_file]| verify-true
+		}-catch{
+			get-view Console | get-text-viewer | get-property text 
+			    | equals [format  "%s"
+			    + "Argument: .*python.*\n"
+			    + "Argument: -m\n"
+			    + "Argument: robot.run\n"
+			    + "Argument: --listener\n"
+			    + "Argument: .*TestRunnerAgent.py:\d{1,6}\n"
+			    + "%s"
+			    + "Argument: .*ExecutorTab\n"
+			    + "end" 
+			    + "Command: .*%s .*\n"
+			    + "Suite Executor: Robot Framework .*\n"  $new_args $arg_file $inline_args]| verify-true
+		
+		}
 	}
 		     
 }
