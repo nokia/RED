@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wd55QBiBEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/4/17 11:00 AM
+Save-Time: 4/4/17 4:38 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,18 +16,6 @@ Entry-Name: .content
 
 global [val script_name  [os-specific "script_win.bat" "script_lin.sh"]]
 
-//remove entire content of script file
-with [get-view "Project Explorer" | get-tree] {
-    select ScriptProject | double-click
-    select "ScriptProject/scripts/script_win.bat" | select [format "ScriptProject/scripts/%s" $script_name] 
-        | get-menu "Open With/Text Editor" | click
-}
-
-with [get-editor $script_name | get-text-viewer] {
-    key-type "M1+a"
-    key-type Del
-    key-type "M1+s"
-}
 //add new config
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
@@ -52,50 +40,74 @@ set-dialog-result File [format "platform:/resource/ScriptProject/scripts/%s" $sc
 with [get-window "Run Configurations"] {
     get-group "Executable file" | get-button "Browse..." | click
     get-button Apply | click
-    get-button Run | click
+    get-button Close | click
 }
+	
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+//remove entire content of script file
+	with [get-view "Project Explorer" | get-tree] {
+	    select ScriptProject | double-click
+	    select "ScriptProject/scripts/script_win.bat" |
+	        | get-menu "Open With/Text Editor" | click
+	}
+	
+	with [get-editor $script_name | get-text-viewer] {
+	    key-type "M1+a"
+	    key-type Del
+	    key-type "M1+s"
+	}
 
-//check error
-exec-with-options {
-    get-button "Run.*" | click
-    
-    //wait for window
-    try -times 5 -delay 500 -command{
-	    //first label
-	    get-window "Problem Occurred" | get-label "'Launching New_configuration' has encountered a problem." 
-	        | get-property caption | equals "'Launching New_configuration' has encountered a problem." | verify-true
-    }
-    //second label    
-    get-window "Problem Occurred" | get-label "Exception occurred executing command line." | get-property caption 
-        | equals "Exception occurred executing command line." | verify-true
-        
-    //details    
-    get-window "Problem Occurred" | get-button "Details >>" | click
-    
-    if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	//check error
+	exec-with-options {
+	    get-button "Run.*" | click -arrow
+		get-menu "Run Configurations..." | click
+		with [get-window "Run Configurations"] {
+		    get-tree | select "Robot/New_configuration" | double-click
+		    get-button Run | click
+		}
+	    
+	    //wait for window
+	    try -times 5 -delay 500 -command{
+		    //first label
+		    get-window "Problem Occurred" | get-label "'Launching New_configuration' has encountered a problem." 
+		        | get-property caption | equals "'Launching New_configuration' has encountered a problem." | verify-true
+	    }
+	    //second label    
+	    get-window "Problem Occurred" | get-label "Exception occurred executing command line." | get-property caption 
+	        | equals "Exception occurred executing command line." | verify-true
+	        
+	    //details    
+	    get-window "Problem Occurred" | get-button "Details >>" | click
+	    
+	 
 	    get-window "Problem Occurred" | get-editbox -after [get-label "Exception occurred executing command line."] 
 	        | get-property text | equals "Exception occurred executing command line.\n"
 	        + "Cannot run program .* CreateProcess error=193, %1 is not a valid Win32 application" 
 	        | verify-true
-    }-else{
-    	get-window "Problem Occurred" | get-editbox -after [get-label "Exception occurred executing command line."] 
-	        | get-property text | equals "Exception occurred executing command line.\n"
-	        + "Cannot run program .* CreateProcess error=193, %1 is not a valid Win32 application" 
-	        | verify-true
-    }   
-    get-window "Problem Occurred" | get-button OK | click 
-} -allowStatusDialog
-
+	 
+	    get-window "Problem Occurred" | get-button OK | click 
+	} -allowStatusDialog
+}
 
 // --------------------------------------- run wrong system command ----------------------------------------------------------
 
+get-view "Project Explorer" | get-tree | select "ScriptProject/scripts/script_lin.sh" 
+    | select [format"ScriptProject/scripts/%s" $script_name] | get-menu "Open With/Text Editor" | click
+  
 with [get-editor $script_name | get-text-viewer] {
+ 	key-type "M1+a"
+	key-type Del
     type-text "wrong_command"
     key-type "M1+s"
 }
 
 //run test with wrong command
-get-button "Run.*" | click
+get-button "Run.*" | click -arrow
+get-menu "Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/New_configuration" 
+    get-button Run | click
+}
 
 //check console    
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
@@ -131,8 +143,10 @@ with [get-window "Run Configurations"] {
 }
 exec-with-options {
     get-window "Run Configurations" | get-button Run | click
-    get-window "Problem Occurred" | get-label "There is no PyPy interpreter in system PATH environment variable" 
-        | get-property caption | equals "There is no PyPy interpreter in system PATH environment variable" | verify-true
+    try -times 4 -delay 500 -command{
+	    get-window "Problem Occurred" | get-label "There is no PyPy interpreter in system PATH environment variable" 
+	        | get-property caption | equals "There is no PyPy interpreter in system PATH environment variable" | verify-true
+     }  
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
 get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
