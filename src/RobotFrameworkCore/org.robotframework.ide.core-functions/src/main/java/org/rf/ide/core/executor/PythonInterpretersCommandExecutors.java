@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.rf.ide.core.executor.RobotCommandRcpExecutor.RobotCommandExecutorException;
+import org.rf.ide.core.executor.RobotCommandRpcExecutor.RobotCommandExecutorException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 
 /**
@@ -29,7 +29,7 @@ class PythonInterpretersCommandExecutors {
         return InstanceHolder.INSTANCE;
     }
 
-    private final Map<String, RobotCommandRcpExecutor> executors = new HashMap<>();
+    private final Map<String, RobotCommandRpcExecutor> executors = new HashMap<>();
 
     private final List<PythonProcessListener> processListeners = new ArrayList<>(0);
 
@@ -65,7 +65,7 @@ class PythonInterpretersCommandExecutors {
                 .resolve(interpreterPath.getInterpreter().executableName())
                 .toAbsolutePath()
                 .toString();
-        final RobotCommandRcpExecutor executor = executors.remove(pathAsName);
+        final RobotCommandRpcExecutor executor = executors.remove(pathAsName);
         if (executor != null) {
             executor.kill();
         }
@@ -86,7 +86,7 @@ class PythonInterpretersCommandExecutors {
             return new RobotCommandDirectExecutor(pathAsName, interpreter);
         }
 
-        RobotCommandRcpExecutor executor = executors.get(pathAsName);
+        RobotCommandRpcExecutor executor = executors.get(pathAsName);
         if (executor != null && (executor.isAlive() || executor.isExternal())) {
             return executor;
         } else if (executor != null) {
@@ -94,7 +94,7 @@ class PythonInterpretersCommandExecutors {
             executors.remove(pathAsName);
         }
         try {
-            executor = new RobotCommandRcpExecutor(pathAsName, interpreter, xmlRpcServerScriptFile);
+            executor = new RobotCommandRpcExecutor(pathAsName, interpreter, xmlRpcServerScriptFile);
             executor.waitForEstablishedConnection();
             if (executor.isAlive() || executor.isExternal()) {
                 executors.put(pathAsName, executor);

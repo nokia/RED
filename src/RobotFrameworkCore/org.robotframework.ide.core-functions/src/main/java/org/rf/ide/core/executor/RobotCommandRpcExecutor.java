@@ -52,7 +52,7 @@ import com.google.common.io.Files;
  * @author mmarzec
  */
 @SuppressWarnings("PMD.GodClass")
-class RobotCommandRcpExecutor implements RobotCommandExecutor {
+class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     private static final int CONNECTION_TIMEOUT = 30;
 
@@ -68,7 +68,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     private XmlRpcClient client;
 
-    RobotCommandRcpExecutor(final String interpreterPath, final SuiteExecutor interpreterType, final File scriptFile) {
+    RobotCommandRpcExecutor(final String interpreterPath, final SuiteExecutor interpreterType, final File scriptFile) {
         this.interpreterPath = interpreterPath;
         this.interpreterType = interpreterType;
         this.scriptFile = scriptFile;
@@ -240,7 +240,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
                 serverProcess.waitFor();
             }
         } catch (final InterruptedException e) {
-            throw new RobotCommandExecutorException("Unable to kill rcp server", e);
+            throw new RobotCommandExecutorException("Unable to kill rpc server", e);
         }
     }
 
@@ -327,9 +327,9 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
             final List<String> classPaths = newArrayList(paths.getClassPaths());
 
-            final String base64EncodedLibfileContent = (String) callRpcFunction("createLibdoc", libName, pythonPaths,
+            final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdoc", libName, pythonPaths,
                     classPaths);
-            final byte[] bytes = Base64.getDecoder().decode(base64EncodedLibfileContent);
+            final byte[] bytes = Base64.getDecoder().decode(base64EncodedLibFileContent);
             if (bytes.length > 0) {
                 final File libdocFile = new File(resultFilePath);
                 if (!libdocFile.exists()) {
@@ -372,7 +372,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
         }
     }
-    
+
     @Override
     public Boolean isVirtualenv() {
         try {
