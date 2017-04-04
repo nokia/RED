@@ -90,7 +90,6 @@ class PythonInterpretersCommandExecutors {
         if (executor != null && (executor.isAlive() || executor.isExternal())) {
             return executor;
         } else if (executor != null) {
-            //executor.kill();
             executors.remove(pathAsName);
         }
         try {
