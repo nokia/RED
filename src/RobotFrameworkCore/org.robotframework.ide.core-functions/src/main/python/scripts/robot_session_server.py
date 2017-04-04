@@ -158,6 +158,9 @@ def is_virtualenv():
 @encode_result_or_exception
 @logargs
 def create_libdoc(libname, python_paths, class_paths):
+    return _create_libdoc(libname, python_paths, class_paths)
+
+def _create_libdoc(libname, python_paths, class_paths):
     import robot
     from robot import pythonpathsetter
     import red_libraries
@@ -165,11 +168,29 @@ def create_libdoc(libname, python_paths, class_paths):
     __extend_classpath(class_paths)
     
     for path in python_paths + class_paths:
-        pythonpathsetter.add_path(path)    
-    libdoc = red_libraries.create_libdoc(libname)
+        pythonpathsetter.add_path(path)
+        
+    libdoc = __cleanup_modules(red_libraries.create_libdoc)(libname)
+    
     for path in python_paths + class_paths:
-        pythonpathsetter.remove_path(path)    
+        pythonpathsetter.remove_path(path)
     return libdoc
+
+# decorator which cleans up all the modules that were loaded
+# during decorated call
+def __cleanup_modules(to_call):
+    import traceback
+    import sys
+    def inner(*args, **kwargs):
+        old_modules = set(sys.modules.keys())
+        result = to_call(*args, **kwargs)
+        current_modules = set(sys.modules.keys())
+        to_remove = [m for m in current_modules if m not in old_modules]
+        for m in to_remove:
+            del(sys.modules[m])
+            del(m)
+        return result
+    return inner
     
 def __extend_classpath(class_paths):
     import platform
