@@ -1,0 +1,229 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_4UxogBh5Eee93KAG-tW51Q
+Element-Name: RunConfigurationValidation
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _h4fPYBh-Eee93KAG-tW51Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/4/17 10:10 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-if-no-error-is-shown"{
+	get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+	    | get-property text | equals "Edit interpreter parameters for launch configuration" | verify-true
+}
+
+proc "set-path-to-exe-file" [val path]{
+	get-window "Run Configurations" | get-group "Executable file" | get-editbox 
+	    -after [get-label "Setup executable file which will be used to run Robot Framework tests instead of interpreter selected above"] 
+	    | set-text $path
+}	
+
+proc "check-error-for-exe-path"{
+	get-window "Run Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
+	    | get-property text | equals "Executable file does not exist" | verify-true
+}    
+
+//open run config menu
+get-menu "Run/Run Configurations..." | click
+
+//select project
+with [get-window "Run Configurations"] {
+    get-tree | select Robot | double-click
+    get-group Project | get-button "Browse..." | click
+    with [get-window "Select project"] {
+        get-tree | select ScriptProject
+        get-button OK | click
+    }
+    //select suite
+    get-group "Test Suite(s)" | get-button "Browse..." | click
+    with [get-window "Select test suite"] {
+        get-tree | select "ScriptProject/TestFile.robot"
+        get-button OK | click
+    }
+    get-button Apply | click
+    
+    //go to Litener
+    get-tab-folder | get-tab-item Listener | click
+}
+
+with [get-window "Run Configurations"] {
+
+	//test runner group
+    with [get-group "Test Runner Agent"] {
+        get-property enablement | equals true | verify-true
+        get-property caption | equals "Test Runner Agent" | verify-true
+        get-property "getChildren().length" | equals 3 | verify-true
+        
+        //connection type
+        get-property "getChildren().Control[0].getText()" | equals "Choose listener connection type" | verify-true
+        get-property "getChildren().Control[1].getText()" 
+            | equals "Use local agent connection (localhost with free port and 30s timeout)" | verify-true
+        get-property "getChildren().Control[1].getSelection()" | equals true | verify-true
+        get-property "getChildren().Control[2].getText()" 
+            | equals "Use remote agent connection (custom server parameters)" | verify-true
+        get-property "getChildren().Control[2].getSelection()" | equals false | verify-true
+    }
+    
+    //RED server
+    with [get-group "RED Server"] {
+        get-property enablement | equals true | verify-true
+        get-property caption | equals "RED Server" | verify-true
+        get-property "getChildren().length" | equals 10 | verify-true
+        get-property "getChildren().Control[0].getText()" 
+            | equals "Setup server which will track execution of Robot tests running on remotely connected client" 
+            | verify-true
+        //ip
+        get-property "getChildren().Control[1].getText()" | equals "Local IP:" | verify-true
+        get-property "getChildren().Control[2].getText()" | equals "127.0.0.1" | verify-true
+        get-property "getChildren().Control[3].getText()" | equals "" | verify-true
+        
+        //port
+        get-property "getChildren().Control[4].getText()" | equals "Local port:" | verify-true
+        get-property "getChildren().Control[5].getText()" | equals 43981 | verify-true
+        get-property "getChildren().Control[6].getText()" | equals "" | verify-true
+        
+        //timeout
+        get-property "getChildren().Control[7].getText()" | equals "Connection timeout [s]:" | verify-true
+        get-property "getChildren().Control[8].getText()" | equals 30 | verify-true
+        get-property "getChildren().Control[9].getText()" | equals "" | verify-true
+    }
+    
+    //remote group
+    with [get-group "Remote Client"] {
+        get-property caption | equals "Remote Client" | verify-true
+        get-property "getChildren().length" | equals 4 | verify-true
+        get-property "getChildren().Control[0].getText()" 
+            | equals "Export script which should be added as listener of tests execution on client machine" 
+            | verify-true
+        get-property "getChildren().Control[1].getText()" | equals "Export Client Script" | verify-true
+        get-property "getChildren().Control[2].getText()" 
+            | equals "Add following argument to command line when running tests on client side" | verify-true
+        get-property "getChildren().Control[3].getText()" | equals "--listener TestRunnerAgent.py:127.0.0.1:43981" 
+            | verify-true
+    }
+}
+//check that all text box are not editable
+with [get-window "Run Configurations"] {
+    get-group "Remote Client" | get-button "Export Client Script" | get-property enablement | equals false | verify-true
+    with [get-group "RED Server"] {
+        get-editbox -after [get-label "Local IP:"] | get-property enablement | equals false | verify-true
+        get-editbox -after [get-label "Local port:"] | get-property enablement | equals false | verify-true
+        get-editbox -after [get-label "Connection timeout [s]:"] | get-property enablement | equals false | verify-true
+    }
+    get-group "Remote Client" | get-editbox 
+        -after [get-label "Add following argument to command line when running tests on client side"] 
+        | get-property enablement | equals false | verify-true
+}
+
+//click on Custom Remote
+get-window "Run Configurations" | get-group "Test Runner Agent" 
+    | get-button "Use remote agent connection (custom server parameters)" | click
+    
+//none text boxes are editable    
+with [get-window "Run Configurations" | get-group "RED Server"] {
+    get-editbox -after [get-label "Local IP:"] | get-property enablement | equals true | verify-true
+    get-editbox -after [get-label "Local port:"] | get-property enablement | equals true | verify-true
+    get-editbox -after [get-label "Connection timeout [s]:"] | get-property enablement | equals true | verify-true
+}
+
+//export script to workspace
+set-dialog-result Folder "platform:/resource/"
+with [get-window "Run Configurations"] {
+    get-group "Remote Client" | get-button "Export Client Script" | click
+    get-tab-folder | get-tab-item Executor | click
+}
+//check if file exists
+get-file [uri-from-path [format "%s/TestRunnerAgent.py" $RED_workspace_path] ]| get exists | verify-true
+
+
+//-------------------------------------------------- Executor tab -------------------------------------------------------
+
+//check executor tab
+with [get-window "Run Configurations"] {
+    get-tab-folder | get-tab-item Executor | click
+}
+with [get-window "Run Configurations"] {
+    with [get-group Interpreter] {
+        get-property childCount | equals 3 | verify-true
+        
+        //interpreters
+        get-property caption | equals Interpreter | verify-true
+        get-property "getChildren().Control[0].getChildren().length" | equals 5 | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getText()" 
+            | equals "Use interpreter as defined in project configuration" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getSelection()" | equals true | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[1].getText()" | equals Use | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[1].getSelection()" | equals false | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[2].getText()" | equals Python | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[3].getText()" 
+            | equals "interpreter taken from sytem PATH environment variable" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[4].getClassName()" 
+            | equals "org.eclipse.swt.widgets.Button" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[4].getText()" | equals "Check interpreter" 
+            | verify-true
+            
+        // Additional interpreter arguments
+        get-property "getChildren().Control[1].getText()" | equals "Additional interpreter arguments:" | verify-true
+        get-property "getChildren().Control[2].getMessage()" | equals "" | verify-true
+    }
+    with [get-group "Executable file"] {
+        get-property childCount | equals 4 | verify-true
+        //Executable fil
+        get-property caption | equals "Executable file" | verify-true
+        get-property "getChildren().Control[0].getText()" 
+            | equals "Setup executable file which will be used to run Robot Framework tests instead of interpreter selected above" 
+            | verify-true
+        get-property "getChildren().Control[1].getChildren().length" | equals 2 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getMessage()" | equals "" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals "Browse..." | verify-true
+        get-property "getChildren().Control[2].getText()" | equals "Additional executable file arguments:" | verify-true
+        get-property "getChildren().Control[3].getMessage()" | equals "" | verify-true
+    }
+}
+
+
+//set additional interp args
+get-window "Run Configurations" |  get-group Interpreter | get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "aa rr"
+check-if-no-error-is-shown
+get-window "Run Configurations" |  get-group Interpreter | get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "  "
+check-if-no-error-is-shown
+get-window "Run Configurations" |  get-group Interpreter | get-editbox -after [get-label "Additional interpreter arguments:"] | set-text ""
+ 	    
+//set incorrect single text path 	    
+set-path-to-exe-file "new_path"   
+check-error-for-exe-path
+
+//set wrong full path
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{    
+	set-path-to-exe-file "C:\\no_path\\file.exe"
+}-else{
+	set-path-to-exe-file "\home\no_path\file.sh"
+}	
+check-error-for-exe-path
+
+
+//set existing wrong path
+set-path-to-exe-file [format "%s/ScriptProject/red.xml" $RED_workspace_path ]
+check-if-no-error-is-shown
+
+//set empty path
+set-path-to-exe-file ""
+
+//set real path by button and add args
+set-dialog-result File [format"platform:/resource/ScriptProject/scripts/%s"  [os-specific "script_win.bat" "script_lin.sh"]]
+with [get-window "Run Configurations" | get-group "Executable file"] {
+    get-button "Browse..." | click
+    get-editbox -after [get-label "Additional executable file arguments:"] | set-text "ff  yyy"
+}
+
+check-if-no-error-is-shown
+get-window "Run Configurations" | get-button Close | click
+get-window "Save Changes" | get-button No | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
