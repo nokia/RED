@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _R0nm0PKlEeadkqPlInmy5w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/7/17 1:22 PM
+Save-Time: 4/4/17 3:40 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -174,6 +174,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 4 17
 
 get-button "Debug.*" | click
 
+wait-for-console
 //check that test was not stopped
 get-view "Message Log" | get-editbox | get-property text 
     | contains  "Ending test: RobotProject.TestFile.Continue Example" | verify-true
