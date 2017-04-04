@@ -1,9 +1,8 @@
 import unittest
-import xmlrunner
 
 from TestRunnerAgent import _truncate
 
-class AdderTests(unittest.TestCase):
+class TruncationTests(unittest.TestCase):
     
     def test_message_is_untouched_if_holds_limit(self):
         limit = 99
