@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cr2voLk0EeWzJthH3JoEWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/3/17 3:05 PM
+Save-Time: 4/5/17 12:28 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -169,7 +169,7 @@ get-editor "tsv_test.tsv" | get-text-viewer | key-type "M1+s"
 //check Problems
 try -times 5 -delay 1000 -command{
 	with [get-view Problems | get-tree] {
-	    get-item "Errors \\(1 item\\)/Could not found any variable in variable file: space in name\\/after  .py" 
+	    get-item "Errors \\(1 item\\)/Could not find any variable in variable file: space in name\\/after  .py" 
 	        | get-property index | equals 0 | verify-true
 	}
 }
