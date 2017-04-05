@@ -115,7 +115,7 @@ public class VariablesImporter {
 
                     // Report that this variable file import contains no obtainable information
                     if (varImportRef.getVariables().isEmpty()) {
-                        reportError("Could not found any variable in variable file: " + path, "" + currentRobotFile,
+                        reportError("Could not find any variable in variable file: " + path, "" + currentRobotFile,
                                 varImport, robotFile);
                     }
                     varsImported.add(varImportRef);

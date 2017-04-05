@@ -8,6 +8,8 @@ package org.rf.ide.core.validation;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.rf.ide.core.testdata.model.FileRegion;
+
 import com.google.common.collect.Range;
 
 public final class ProblemPosition {
@@ -23,6 +25,11 @@ public final class ProblemPosition {
     public ProblemPosition(final int line, final Range<Integer> range) {
         this.line = line;
         this.range = Optional.ofNullable(range);
+    }
+
+    public static ProblemPosition fromRegion(final FileRegion region) {
+        return new ProblemPosition(region.getStart().getLine(),
+                Range.closed(region.getStart().getOffset(), region.getEnd().getOffset()));
     }
 
     public int getLine() {
