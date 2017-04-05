@@ -24,6 +24,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ToggleComm
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
+import com.google.common.base.Predicates;
+
 public class ToggleCommentInTableHandler extends DIParameterizedHandler<E4ToggleCommentInTableHandler> {
 
     public ToggleCommentInTableHandler() {
@@ -32,31 +34,37 @@ public class ToggleCommentInTableHandler extends DIParameterizedHandler<E4Toggle
 
     public static class E4ToggleCommentInTableHandler {
 
+        @SuppressWarnings("unchecked")
         @Execute
         public void toggleCommentInTable(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
 
-            final List<RobotKeywordCall> commentable = Selections
-                    .getAdaptableElements(selection, RobotKeywordCall.class)
+            final List<Object> noncommentable = (List<Object>) (selection.toList()
                     .stream()
-                    .filter(kw -> (!kw.getName().isEmpty() || !kw.getComment().isEmpty()))
-                    .collect(Collectors.toList());
-            final SelectionLayerAccessor accessor = editor.getSelectionLayerAccessor();
-            final IDataProvider dataProvider = accessor.getDataProvider();
-            final PositionCoordinate[] positions = accessor.getSelectedPositions();
-            if (positions.length != commentable.size() || commentable.size() == 0) {
-                // something that should not be commented is selected or nothing selected
-                return;
+                    .filter(Predicates.not(RobotKeywordCall.class::isInstance))
+                    .collect(Collectors.toList()));
+            if (noncommentable.size() == 0) {
+                final List<RobotKeywordCall> commentable = Selections
+                        .getAdaptableElements(selection, RobotKeywordCall.class)
+                        .stream()
+                        .filter(kw -> (!kw.getName().isEmpty() || !kw.getComment().isEmpty()))
+                        .collect(Collectors.toList());
+                if (commentable.size() > 0) {
+                    final SelectionLayerAccessor accessor = editor.getSelectionLayerAccessor();
+                    final IDataProvider dataProvider = accessor.getDataProvider();
+                    final PositionCoordinate[] positions = accessor.getSelectedPositions();
+                    final Set<Integer> lines = Arrays.stream(positions)
+                            .map(PositionCoordinate::getRowPosition)
+                            .collect(Collectors.toSet());
+                    final boolean shouldComment = commentable.stream().anyMatch(RobotKeywordCall::shouldAddCommentMark);
+                    for (final Integer line : lines) {
+                        final String newName = shouldComment ? generateCommented(line, dataProvider)
+                                : generateUncommented(line, dataProvider);
+                        dataProvider.setDataValue(0, line, newName);
+                    }
+                }
             }
-            final Set<Integer> lines = Arrays.stream(positions)
-                    .map(PositionCoordinate::getRowPosition)
-                    .collect(Collectors.toSet());
-            final boolean shouldComment = commentable.stream().anyMatch(RobotKeywordCall::shouldAddCommentMark);
-            for (final Integer line : lines) {
-                final String newName = shouldComment ? generateCommented(line, dataProvider)
-                        : generateUncommented(line, dataProvider);
-                dataProvider.setDataValue(0, line, newName);
-            }
+
         }
 
         private String generateCommented(final int line, final IDataProvider dataProvider) {
