@@ -11,14 +11,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
+
+import com.google.common.collect.ImmutableSet;
 
 public class RobotDryRunOutputParserTest {
 
@@ -26,8 +26,7 @@ public class RobotDryRunOutputParserTest {
 
     @Before
     public void setUp() {
-        dryRunOutputParser = new RobotDryRunOutputParser();
-        dryRunOutputParser.setupRobotDryRunLibraryImportCollector(new HashSet<String>());
+        dryRunOutputParser = new RobotDryRunOutputParser(ImmutableSet.of());
     }
 
     @Test
@@ -133,10 +132,7 @@ public class RobotDryRunOutputParserTest {
     @Test
     public void testProcessLine_withStandardLibraryImport() {
         final String libName = "String";
-        final Set<String> standardLibs = new HashSet<>();
-        standardLibs.add(libName);
-        dryRunOutputParser = new RobotDryRunOutputParser();
-        dryRunOutputParser.setupRobotDryRunLibraryImportCollector(standardLibs);
+        dryRunOutputParser = new RobotDryRunOutputParser(ImmutableSet.of(libName));
         final List<String> args = newArrayList();
         final List<String> importers = newArrayList("testProject/testSuite.robot");
         final String source = "python/String.py";

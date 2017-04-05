@@ -6,7 +6,6 @@
 package org.rf.ide.core.dryrun;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,15 +40,16 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
 
     private Map<String, List<?>> eventMap;
 
-    private RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
+    private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
 
     private final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
 
     private IDryRunStartSuiteHandler startSuiteHandler;
 
-    public RobotDryRunOutputParser() {
+    public RobotDryRunOutputParser(final Set<String> standardLibrariesNames) {
         this.mapper = new ObjectMapper();
         this.eventMap = new HashMap<>();
+        this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(standardLibrariesNames);
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
 
@@ -91,9 +91,7 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
             final String source = (String) details.get("source");
             final List<String> args = (List<String>) details.get("args");
 
-            if (dryRunLibraryImportCollector != null) {
-                dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
-            }
+            dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
         } else if (eventMap.containsKey(MESSAGE_EVENT_NAME)) {
             final List<?> messageList = eventMap.get(MESSAGE_EVENT_NAME);
             final Map<String, String> details = (Map<String, String>) messageList.get(0);
@@ -101,12 +99,10 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
             final String message = details.get("message");
 
             if (messageLevel != null) {
-                if (dryRunLibraryImportCollector != null) {
-                    if (messageLevel.equalsIgnoreCase("FAIL")) {
-                        dryRunLibraryImportCollector.collectFromFailMessageEvent(message);
-                    } else if (messageLevel.equalsIgnoreCase("ERROR")) {
-                        dryRunLibraryImportCollector.collectFromErrorMessageEvent(message);
-                    }
+                if (messageLevel.equalsIgnoreCase("FAIL")) {
+                    dryRunLibraryImportCollector.collectFromFailMessageEvent(message);
+                } else if (messageLevel.equalsIgnoreCase("ERROR")) {
+                    dryRunLibraryImportCollector.collectFromErrorMessageEvent(message);
                 }
                 if (messageLevel.equalsIgnoreCase("NONE")) {
                     dryRunLKeywordSourceCollector.collectFromMessageEvent(message);
@@ -122,19 +118,14 @@ public class RobotDryRunOutputParser implements IAgentMessageHandler {
     }
 
     public List<RobotDryRunLibraryImport> getImportedLibraries() {
-        return dryRunLibraryImportCollector != null ? dryRunLibraryImportCollector.getImportedLibraries()
-                : new ArrayList<>();
-    }
-
-    public void setStartSuiteHandler(final IDryRunStartSuiteHandler startSuiteHandler) {
-        this.startSuiteHandler = startSuiteHandler;
-    }
-
-    public void setupRobotDryRunLibraryImportCollector(final Set<String> standardLibrariesNames) {
-        dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(standardLibrariesNames);
+        return dryRunLibraryImportCollector.getImportedLibraries();
     }
 
     public List<RobotDryRunKeywordSource> getKeywordSources() {
         return dryRunLKeywordSourceCollector.getKeywordSources();
+    }
+
+    public void setStartSuiteHandler(final IDryRunStartSuiteHandler startSuiteHandler) {
+        this.startSuiteHandler = startSuiteHandler;
     }
 }
