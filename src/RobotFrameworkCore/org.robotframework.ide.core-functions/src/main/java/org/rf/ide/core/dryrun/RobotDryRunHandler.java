@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
-import org.rf.ide.core.executor.TestRunnerAgentHandler;
 
 /**
  * @author mmarzec
@@ -25,30 +24,18 @@ public class RobotDryRunHandler {
 
     private Process dryRunProcess;
 
-    public Thread createDryRunHandlerThread(final int port, final List<IAgentMessageHandler> listeners) {
-        final TestRunnerAgentHandler testRunnerAgentHandler = new TestRunnerAgentHandler(port);
-        for (final IAgentMessageHandler listener : listeners) {
-            testRunnerAgentHandler.addListener(listener);
-        }
-        return new Thread(testRunnerAgentHandler);
-    }
-
     public void executeDryRunProcess(final RunCommandLine dryRunCommandLine, final File projectDir)
             throws InvocationTargetException {
-        if (dryRunCommandLine != null) {
-            try {
-                ProcessBuilder processBuilder = new ProcessBuilder(dryRunCommandLine.getCommandLine());
-                if (projectDir != null && projectDir.exists()) {
-                    processBuilder = processBuilder.directory(projectDir);
-                }
-                dryRunProcess = processBuilder.start();
-                drainProcessOutputAndErrorStreams(dryRunProcess);
-                if (dryRunProcess != null) {
-                    dryRunProcess.waitFor();
-                }
-            } catch (InterruptedException | IOException e) {
-                throw new InvocationTargetException(e);
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder(dryRunCommandLine.getCommandLine());
+            if (projectDir != null && projectDir.exists()) {
+                processBuilder = processBuilder.directory(projectDir);
             }
+            dryRunProcess = processBuilder.start();
+            drainDryRunProcessOutputAndErrorStreams();
+            dryRunProcess.waitFor();
+        } catch (InterruptedException | IOException e) {
+            throw new InvocationTargetException(e);
         }
     }
 
@@ -83,9 +70,9 @@ public class RobotDryRunHandler {
         return file;
     }
 
-    private void drainProcessOutputAndErrorStreams(final Process process) {
-        new Thread(createStreamDrainRunnable(process.getInputStream())).start();
-        new Thread(createStreamDrainRunnable(process.getErrorStream())).start();
+    private void drainDryRunProcessOutputAndErrorStreams() {
+        new Thread(createStreamDrainRunnable(dryRunProcess.getInputStream())).start();
+        new Thread(createStreamDrainRunnable(dryRunProcess.getErrorStream())).start();
     }
 
     private Runnable createStreamDrainRunnable(final InputStream inputStream) {

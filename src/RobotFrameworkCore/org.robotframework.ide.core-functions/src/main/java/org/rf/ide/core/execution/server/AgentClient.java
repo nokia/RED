@@ -16,8 +16,7 @@ public class AgentClient {
     private final int clientId;
     private final PrintWriter writer;
 
-    // FIXME : this should not be public - only server should create those objects
-    public AgentClient(final int clientId, final PrintWriter writer) {
+    AgentClient(final int clientId, final PrintWriter writer) {
         this.clientId = clientId;
         this.writer = writer;
     }

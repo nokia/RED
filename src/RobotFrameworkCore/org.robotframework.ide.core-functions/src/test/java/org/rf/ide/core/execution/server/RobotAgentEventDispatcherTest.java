@@ -255,8 +255,8 @@ public class RobotAgentEventDispatcherTest {
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("type", "Keyword",
-                "args", newArrayList("1", "2"));
+        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("type", "Keyword", "args",
+                newArrayList("1", "2"));
         final String json = toJson(ImmutableMap.of("start_keyword", newArrayList("kw", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
@@ -444,6 +444,59 @@ public class RobotAgentEventDispatcherTest {
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleOutputFile(new File("/a/b/file.xml"));
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void listenerIsNotifiedAboutLibraryImportEvent() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final Object attributes = ImmutableMap.of("importer", "importerPath", "source", "sourcePath", "args",
+                newArrayList("arg1", "arg2"));
+        final String json = toJson(ImmutableMap.of("library_import", newArrayList("lib1", attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener).setClient(nullable(AgentClient.class));
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleLibraryImport("lib1", "importerPath", "sourcePath", newArrayList("arg1", "arg2"));
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void listenerIsNotifiedAboutLibraryImportEvent_whenOriginalNameExists() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final Object attributes = ImmutableMap.of("importer", "importerPath", "source", "sourcePath", "args",
+                newArrayList("arg1", "arg2"), "originalname", "lib2");
+        final String json = toJson(ImmutableMap.of("library_import", newArrayList("lib1", attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener).setClient(nullable(AgentClient.class));
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleLibraryImport("lib2", "importerPath", "sourcePath", newArrayList("arg1", "arg2"));
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
+    public void listenerIsNotifiedAboutMessageEvent() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final Object attributes = ImmutableMap.of("message", "abc", "level", "ERROR");
+        final String json = toJson(ImmutableMap.of("message", newArrayList(attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener).setClient(nullable(AgentClient.class));
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleMessage("abc", "ERROR");
         verifyNoMoreInteractions(listener);
     }
 

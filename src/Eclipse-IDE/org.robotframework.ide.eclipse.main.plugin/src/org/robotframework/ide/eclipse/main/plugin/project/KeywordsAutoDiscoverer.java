@@ -48,7 +48,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                             if (monitor.isCanceled()) {
                                 return;
                             }
-                            startAddingKeywordsToProject(monitor, dryRunOutputParser.getKeywordSources());
+                            startAddingKeywordsToProject(monitor, dryRunLKeywordSourceCollector.getKeywordSources());
                         } finally {
                             monitor.done();
                             unlockDryRun();
