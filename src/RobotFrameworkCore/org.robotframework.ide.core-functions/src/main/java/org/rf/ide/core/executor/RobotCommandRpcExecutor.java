@@ -196,16 +196,14 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 }
             }
             if (System.currentTimeMillis() - start > (timeoutInSec * 1000)) {
-                if (!isExternal()) {
-                    serverProcess.destroyForcibly();
-                }
+                kill();
                 break;
             }
         }
     }
 
     boolean isAlive() {
-        return serverProcess.isAlive();
+        return !isExternal() && serverProcess.isAlive();
     }
 
     boolean isExternal() {
