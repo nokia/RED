@@ -58,6 +58,10 @@ public interface RobotAgentEventListener {
 
     void handlePaused();
 
+    void handleMessage(String message, String level);
+
+    void handleLibraryImport(String name, String importer, String source, List<String> args);
+
     public static class RobotAgentEventsListenerException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
