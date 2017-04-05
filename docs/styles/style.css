@@ -1,0 +1,105 @@
+body {
+	font-family: "Arial Unicode MS", "Arial";
+	font-size: 10pt;
+	margin-bottom: 10px;
+}
+
+p {
+	font-size: 10pt;
+}
+
+span.block {
+	font-family: "Courier New";
+}
+
+div.code {
+	font-family: monospace;
+    background: #eee;
+    margin: 8px;
+    padding: 6px;
+}
+
+a.command {
+	background: url('images/command_link.png') no-repeat;
+	background-position: 0 5px;
+	padding-left: 20px;
+}
+a.external {
+	background: url('images/globe.png') no-repeat;
+	background-position: 0 4px;
+	padding-left: 15px;
+}
+
+img.bordered {
+	margin: 5px;
+	border: 1px #999 solid;
+}
+
+dl.note {
+	margin: 10px;
+	padding-left: 50px;
+	padding-bottom: 30px;
+	background: url('images/note.png') no-repeat;
+}
+dl.note dt {
+	display: block;
+	font-weight: bold;
+}
+dl.note dd {
+	margin-left: 0;
+}
+
+dl.warning {
+	margin: 10px;
+	padding-left: 50px;
+	padding-bottom: 30px;
+	background: url('images/warning.png') no-repeat;
+}
+dl.warning dt {
+	display: block;
+	font-weight: bold;
+}
+dl.warning dd {
+	margin-left: 0;
+}
+
+table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	border: 1px black solid;
+	width: 100%;
+}
+table thead th {
+	text-align: left;
+	border: 1px black solid !important;
+	padding: 5px;
+	font-size: 10pt;
+	font-weight: bold;
+}
+table tbody td {
+	border: 1px black solid !important;
+	padding: 5px;
+	font-size: 10pt;
+}
+table tbody td.center {
+	text-align: center;
+}
+
+kbd {
+	margin: 0px 0.1em;
+	padding: 0.1em 0.6em;
+	border-radius: 3px;
+	border: 1px solid rgb(204, 204, 204);
+	color: rgb(51, 51, 51);
+	line-height: 1.4;
+	font-family: Arial,Helvetica,sans-serif;
+	font-size: 10px;
+	display: inline-block;
+	box-shadow: 0px 1px 0px rgba(0,0,0,0.2), inset 0px 0px 0px 2px #ffffff;
+	background-color: rgb(247, 247, 247);
+	-moz-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+	-webkit-box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	text-shadow: 0 1px 0 #fff;
+}
