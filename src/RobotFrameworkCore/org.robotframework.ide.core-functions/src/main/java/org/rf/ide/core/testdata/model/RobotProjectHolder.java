@@ -239,7 +239,7 @@ public class RobotProjectHolder {
         }
     }
 
-    protected RobotFileOutput findFile(final ISearchCriteria criteria) {
+    private RobotFileOutput findFile(final ISearchCriteria criteria) {
         for (int i = 0; i < readableProjectFiles.size(); i++) {
             final RobotFileOutput robotFile = readableProjectFiles.get(i);
             if (criteria.matchCriteria(robotFile)) {
