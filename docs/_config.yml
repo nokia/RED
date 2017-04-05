@@ -1,4 +1,4 @@
 theme: jekyll-theme-slate
 title: RED - Robor Editor
 description: Eclipse based editor for RobotFramework testcases
-show_downloads: true
+show_downloads: false
