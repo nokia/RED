@@ -51,8 +51,7 @@ public abstract class AbstractAutoDiscoverer {
 
     AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles) {
         this.robotProject = robotProject;
-        this.dryRunOutputParser = new RobotDryRunOutputParser();
-        this.dryRunOutputParser.setupRobotDryRunLibraryImportCollector(robotProject.getStandardLibraries().keySet());
+        this.dryRunOutputParser = new RobotDryRunOutputParser(robotProject.getStandardLibraries().keySet());
         this.dryRunHandler = new RobotDryRunHandler();
         this.suiteFiles.addAll(suiteFiles);
     }
