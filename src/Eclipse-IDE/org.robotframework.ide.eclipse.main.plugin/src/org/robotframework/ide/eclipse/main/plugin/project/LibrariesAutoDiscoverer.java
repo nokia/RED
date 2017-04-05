@@ -122,7 +122,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     private List<RobotDryRunLibraryImport> getLibraryImportsToProcess() {
-        final List<RobotDryRunLibraryImport> libraryImports = dryRunOutputParser.getImportedLibraries();
+        final List<RobotDryRunLibraryImport> libraryImports = dryRunLibraryImportCollector.getImportedLibraries();
         if (libraryNameToDiscover.isPresent()) {
             for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
                 if (libraryImport.getName().equalsIgnoreCase(libraryNameToDiscover.get())) {

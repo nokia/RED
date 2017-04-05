@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
+import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -38,7 +41,7 @@ public class LibrariesSourcesCollector {
         }
 
         final IPath projectLocation = robotProject.getProject().getLocation();
-        if(projectLocation != null) {
+        if (projectLocation != null) {
             pythonpathLocations.add(projectLocation.toOSString());
         }
         pythonpathLocations.addAll(robotProject.getPythonpath());
@@ -46,8 +49,13 @@ public class LibrariesSourcesCollector {
         classpathLocations.addAll(robotProject.getClasspath());
     }
 
-    private boolean shouldCollectLibrariesRecursively() {
-        return !robotProject.getRuntimeEnvironment().isVirtualenv()
+    private boolean shouldCollectLibrariesRecursively() throws CoreException {
+        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+        if (runtimeEnvironment == null) {
+            throw newCoreException(
+                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
+        }
+        return !runtimeEnvironment.isVirtualenv()
                 || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
     }
 

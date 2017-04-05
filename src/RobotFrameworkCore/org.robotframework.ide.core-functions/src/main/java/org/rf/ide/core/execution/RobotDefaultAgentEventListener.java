@@ -15,9 +15,10 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
 
     @Override
     public void setClient(final AgentClient client) {
-        // those listeners which want to talk back to client should use given object for this purposes
+        // those listeners which want to talk back to client should use given object for this
+        // purposes
     }
-    
+
     @Override
     public boolean isHandlingEvents() {
         return false;
@@ -123,6 +124,17 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
 
     @Override
     public void handlePaused() {
+        // implement in subclasses
+    }
+
+    @Override
+    public void handleMessage(final String message, final String level) {
+        // implement in subclasses
+    }
+
+    @Override
+    public void handleLibraryImport(final String name, final String importer, final String source,
+            final List<String> args) {
         // implement in subclasses
     }
 }

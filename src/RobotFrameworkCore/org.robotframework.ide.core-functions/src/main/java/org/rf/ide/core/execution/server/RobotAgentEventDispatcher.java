@@ -10,12 +10,10 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -24,6 +22,7 @@ import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.Status;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 class RobotAgentEventDispatcher {
@@ -122,6 +121,12 @@ class RobotAgentEventDispatcher {
                 case "output_file":
                     handleOutputFile(eventMap);
                     break;
+                case "library_import":
+                    handleLibraryImport(eventMap);
+                    break;
+                case "message":
+                    handleMessage(eventMap);
+                    break;
                 default:
                     break;
             }
@@ -169,7 +174,7 @@ class RobotAgentEventDispatcher {
         final String name = (String) arguments.get(0);
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
         final File suiteFilePath = new File((String) attributes.get("source"));
-        
+
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleSuiteStarted(name, suiteFilePath);
         }
@@ -182,7 +187,7 @@ class RobotAgentEventDispatcher {
         final int elapsedTime = (Integer) attributes.get("elapsedtime");
         final String errorMessage = (String) attributes.get("message");
         final Status suiteStatus = Status.valueOf((String) attributes.get("status"));
-        
+
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleSuiteEnded(name, elapsedTime, suiteStatus, errorMessage);
         }
@@ -225,14 +230,6 @@ class RobotAgentEventDispatcher {
         }
     }
 
-    private List<String> ensureListOfStrings(final List<?> list) {
-        final List<String> elements = new ArrayList<>();
-        for (final Object object : list) {
-            elements.add((String) object);
-        }
-        return elements;
-    }
-
     private void handleEndKeyword(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("end_keyword");
         final String name = (String) arguments.get(0);
@@ -253,14 +250,6 @@ class RobotAgentEventDispatcher {
         }
     }
 
-    private Map<String, Object> ensureMapOfStringsToObjects(final Map<?, ?> map) {
-        final Map<String, Object> mapping = new LinkedHashMap<>();
-        for (final Entry<?, ?> entry : map.entrySet()) {
-            mapping.put((String) entry.getKey(), entry.getValue());
-        }
-        return mapping;
-    }
-
     private void handleGlobalVariables(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("global_vars");
         final Map<String, String> globalVars = ensureMapOfStringsToStrings((Map<?, ?>) arguments.get(1));
@@ -268,14 +257,6 @@ class RobotAgentEventDispatcher {
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleGlobalVariables(globalVars);
         }
-    }
-
-    private Map<String, String> ensureMapOfStringsToStrings(final Map<?, ?> map) {
-        final Map<String, String> mapping = new LinkedHashMap<>();
-        for (final Entry<?, ?> entry : map.entrySet()) {
-            mapping.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return mapping;
     }
 
     private void handleCheckCondition() {
@@ -342,6 +323,32 @@ class RobotAgentEventDispatcher {
         }
     }
 
+    private void handleLibraryImport(final Map<String, Object> eventMap) {
+        final List<?> arguments = (List<?>) eventMap.get("library_import");
+        final String libraryName = (String) arguments.get(0);
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
+        final String originalName = (String) attributes.get("originalname");
+        final String name = Strings.isNullOrEmpty(originalName) ? libraryName : originalName;
+        final String importer = (String) attributes.get("importer");
+        final String source = (String) attributes.get("source");
+        final List<String> args = ensureListOfStrings((List<?>) attributes.get("args"));
+
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleLibraryImport(name, importer, source, args);
+        }
+    }
+
+    private void handleMessage(final Map<String, Object> eventMap) {
+        final List<?> arguments = (List<?>) eventMap.get("message");
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
+        final String message = (String) attributes.get("message");
+        final String level = (String) attributes.get("level");
+
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleMessage(message, level);
+        }
+    }
+
     private String getEventType(final Map<String, ?> eventMap) {
         if (eventMap == null) {
             return null;
@@ -356,5 +363,17 @@ class RobotAgentEventDispatcher {
             }
         }
         return false;
+    }
+
+    private static List<String> ensureListOfStrings(final List<?> list) {
+        return list.stream().map(String.class::cast).collect(Collectors.toList());
+    }
+
+    private static Map<String, Object> ensureMapOfStringsToObjects(final Map<?, ?> map) {
+        return map.entrySet().stream().collect(Collectors.toMap(e -> (String) e.getKey(), Map.Entry::getValue));
+    }
+
+    private static Map<String, String> ensureMapOfStringsToStrings(final Map<?, ?> map) {
+        return map.entrySet().stream().collect(Collectors.toMap(e -> (String) e.getKey(), e -> (String) e.getValue()));
     }
 }
