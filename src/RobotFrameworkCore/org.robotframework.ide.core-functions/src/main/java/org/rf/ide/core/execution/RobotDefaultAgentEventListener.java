@@ -128,7 +128,7 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleMessage(final String message, final String level) {
+    public void handleMessage(final String msg, final MessageLevel level) {
         // implement in subclasses
     }
 
