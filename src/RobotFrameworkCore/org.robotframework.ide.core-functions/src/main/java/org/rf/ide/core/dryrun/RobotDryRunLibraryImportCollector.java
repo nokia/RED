@@ -133,7 +133,7 @@ public class RobotDryRunLibraryImportCollector {
             final int beginIndex = failReason.indexOf(startText);
             final int endIndex = failReason.lastIndexOf(endText);
             if (beginIndex >= 0 && endIndex > 0) {
-                return failReason.substring(beginIndex + startText.length() + 1, endIndex)
+                return failReason.substring(beginIndex + startText.length() + 1, endIndex - 1)
                         .replace("<class 'robot.errors.DataError'>, DataError(", "");
             }
             return failReason;
