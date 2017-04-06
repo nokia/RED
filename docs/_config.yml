@@ -1,4 +1,7 @@
+gems:
+  - jekyll-redirect-from
 theme: jekyll-theme-slate
 title: RED - Robor Editor
 description: Eclipse based editor for RobotFramework testcases
 show_downloads: false
+redirect_from: "http://nokia.github.io/red/"
