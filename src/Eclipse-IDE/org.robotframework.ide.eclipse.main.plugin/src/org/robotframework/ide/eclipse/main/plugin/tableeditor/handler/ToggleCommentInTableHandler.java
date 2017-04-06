@@ -34,15 +34,13 @@ public class ToggleCommentInTableHandler extends DIParameterizedHandler<E4Toggle
 
     public static class E4ToggleCommentInTableHandler {
 
-        @SuppressWarnings("unchecked")
         @Execute
         public void toggleCommentInTable(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
 
-            final List<Object> noncommentable = (List<Object>) (selection.toList()
-                    .stream()
+            final List<Object> noncommentable = Arrays.stream(selection.toArray())
                     .filter(Predicates.not(RobotKeywordCall.class::isInstance))
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
             if (noncommentable.size() == 0) {
                 final List<RobotKeywordCall> commentable = Selections
                         .getAdaptableElements(selection, RobotKeywordCall.class)
