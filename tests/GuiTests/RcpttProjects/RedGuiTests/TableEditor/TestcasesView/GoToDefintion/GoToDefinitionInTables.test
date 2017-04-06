@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ERiB0PnjEea7hL0QdGOb6w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/2/17 5:30 PM
+Save-Time: 3/23/17 4:14 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -45,8 +45,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     key-type F3
 }
 
-//check taht KW tab waas open
-
+//check that KW tab was open
 get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Keywords | verify-true
 is-row-fully-selected -row 0 -table "User Keywords"
 
