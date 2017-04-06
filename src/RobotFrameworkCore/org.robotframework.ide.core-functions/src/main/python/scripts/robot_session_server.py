@@ -185,7 +185,7 @@ def __cleanup_modules(to_call):
         old_modules = set(sys.modules.keys())
         result = to_call(*args, **kwargs)
         current_modules = set(sys.modules.keys())
-        to_remove = [m for m in current_modules if m not in old_modules]
+        to_remove = current_modules - old_modules
         for m in to_remove:
             del(sys.modules[m])
             del(m)
