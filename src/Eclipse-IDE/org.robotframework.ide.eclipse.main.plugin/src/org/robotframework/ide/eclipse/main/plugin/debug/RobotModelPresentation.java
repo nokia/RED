@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILineBreakpoint;
@@ -48,24 +47,11 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
             } else if (element instanceof IStackFrame) {
                 return ((IStackFrame) element).getName();
             } else if (element instanceof RobotLineBreakpoint) {
-                final IMarker breakpointMarker = ((RobotLineBreakpoint) element).getMarker();
-                String breakpointName = "";
-                breakpointName += breakpointMarker.getAttribute(IMarker.LOCATION, "");
-                breakpointName += " [line: " + breakpointMarker.getAttribute(IMarker.LINE_NUMBER) + "]";
-                final int hitCount = breakpointMarker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                if (hitCount > 1) {
-                    breakpointName += " [hit count: " + hitCount + "]";
-                }
-                final String condition = breakpointMarker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
-                if (!"".equals(condition)) {
-                    breakpointName += " [conditional]";
-                }
-                return breakpointName;
+                return ((RobotLineBreakpoint) element).getLabel();
             }
         } catch (final CoreException e) {
             e.printStackTrace();
         }
-
         return "RED";
     }
 
@@ -80,8 +66,7 @@ public class RobotModelPresentation extends LabelProvider implements IDebugModel
     public IEditorInput getEditorInput(final Object element) {
         if (element instanceof IFile) {
             return new FileEditorInput((IFile) element);
-        }
-        if (element instanceof ILineBreakpoint) {
+        } else if (element instanceof ILineBreakpoint) {
             return new FileEditorInput((IFile) ((ILineBreakpoint) element).getMarker().getResource());
         }
         return null;

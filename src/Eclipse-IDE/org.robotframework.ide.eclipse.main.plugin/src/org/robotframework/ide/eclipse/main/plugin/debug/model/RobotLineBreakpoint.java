@@ -9,9 +9,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.LineBreakpoint;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author mmarzec
@@ -19,9 +20,13 @@ import org.eclipse.debug.core.model.LineBreakpoint;
  */
 public class RobotLineBreakpoint extends LineBreakpoint {
     
-    public static final String HIT_COUNT_ATTRIBUTE = "robot.breakpoint.hit.count";
-    
-    public static final String CONDITIONAL_ATTRIBUTE = "robot.breakpoint.conditional";
+    @VisibleForTesting static final String MARKER_ID = "org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker";
+
+    @VisibleForTesting static final String HIT_COUNT_ENABLED_ATTRIBUTE = "robot.breakpoint.hit.count.enablement";
+    @VisibleForTesting static final String HIT_COUNT_ATTRIBUTE = "robot.breakpoint.hit.count";
+
+    @VisibleForTesting static final String CONDITION_ENABLED_ATTRIBUTE = "robot.breakpoint.conditional.enablement";
+    @VisibleForTesting static final String CONDITION_ATTRIBUTE = "robot.breakpoint.conditional";
 
     /**
      * Default constructor is required for the breakpoint manager
@@ -30,6 +35,11 @@ public class RobotLineBreakpoint extends LineBreakpoint {
      * this breakpoint's attributes.
      */
     public RobotLineBreakpoint() {
+    }
+
+    @VisibleForTesting
+    RobotLineBreakpoint(final IMarker marker) throws CoreException {
+        setMarker(marker);
     }
 
     /**
@@ -44,20 +54,17 @@ public class RobotLineBreakpoint extends LineBreakpoint {
      *             if unable to create the breakpoint
      */
     public RobotLineBreakpoint(final IResource resource, final int lineNumber) throws CoreException {
-
-        final IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
-
-            @Override
-            public void run(final IProgressMonitor monitor) throws CoreException {
-                final IMarker marker = resource.createMarker("org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker");
-                setMarker(marker);
-                marker.setAttribute(IBreakpoint.ID, getModelIdentifier());
-                marker.setAttribute(IBreakpoint.ENABLED, Boolean.TRUE);
-                marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-                marker.setAttribute(IMarker.LOCATION, resource.getName());
-                marker.setAttribute(IMarker.MESSAGE, "Line breakpoint: " + resource.getName() + " [line: " + lineNumber
-                        + "]");
-            }
+        final IWorkspaceRunnable runnable = monitor -> {
+            final IMarker marker = resource.createMarker(MARKER_ID);
+            setMarker(marker);
+            marker.setAttribute(IBreakpoint.ID, RobotDebugElement.DEBUG_MODEL_ID);
+            marker.setAttribute(IBreakpoint.ENABLED, true);
+            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+            marker.setAttribute(IMarker.LOCATION, resource.getName());
+            marker.setAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, false);
+            marker.setAttribute(HIT_COUNT_ATTRIBUTE, 1);
+            marker.setAttribute(CONDITION_ENABLED_ATTRIBUTE, false);
+            marker.setAttribute(CONDITION_ATTRIBUTE, "");
         };
         run(getMarkerRule(resource), runnable);
     }
@@ -66,5 +73,66 @@ public class RobotLineBreakpoint extends LineBreakpoint {
     @Override
     public String getModelIdentifier() {
         return RobotDebugElement.DEBUG_MODEL_ID;
+    }
+
+    String getLocation() {
+        final IMarker marker = getMarker();
+        return marker == null ? "" : marker.getAttribute(IMarker.LOCATION, "");
+    }
+
+    public boolean isHitCountEnabled() {
+        final IMarker marker = getMarker();
+        return marker == null ? false : marker.getAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, false);
+    }
+
+    public void setHitCountEnabled(final boolean enabled) throws CoreException {
+        if (enabled != isHitCountEnabled()) {
+            setAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, enabled);
+        }
+    }
+
+    public int getHitCount() {
+        final IMarker marker = getMarker();
+        return marker == null ? 1 : marker.getAttribute(HIT_COUNT_ATTRIBUTE, 1);
+    }
+
+    public void setHitCount(final int hitCount) throws CoreException {
+        if (hitCount != getHitCount()) {
+            setAttribute(HIT_COUNT_ATTRIBUTE, hitCount);
+        }
+    }
+
+    public boolean isConditionEnabled() {
+        final IMarker marker = getMarker();
+        return marker == null ? false : marker.getAttribute(CONDITION_ENABLED_ATTRIBUTE, false);
+    }
+
+    public void setConditionEnabled(final boolean enabled) throws CoreException {
+        if (enabled != isConditionEnabled()) {
+            setAttribute(CONDITION_ENABLED_ATTRIBUTE, enabled);
+        }
+    }
+
+    public String getCondition() {
+        final IMarker marker = getMarker();
+        return marker == null ? "" : marker.getAttribute(CONDITION_ATTRIBUTE, "");
+    }
+
+    public void setCondition(final String condition) throws CoreException {
+        if (!condition.equals(getCondition())) {
+            setAttribute(CONDITION_ATTRIBUTE, condition);
+        }
+    }
+
+    public String getLabel() throws CoreException {
+        String label = getLocation() + " [line: " + getLineNumber() + "]";
+
+        if (isHitCountEnabled()) {
+            label += " [hit count: " + getHitCount() + "]";
+        }
+        if (isConditionEnabled()) {
+            label += " [conditional]";
+        }
+        return label;
     }
 }

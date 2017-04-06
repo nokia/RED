@@ -14,7 +14,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -95,15 +94,16 @@ public class KeywordExecutionManager {
         boolean hasBreakpoint = false;
         final IBreakpoint[] currentBreakpoints = breakpointManager.getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
         for (final IBreakpoint currentBreakpoint : currentBreakpoints) {
+            final RobotLineBreakpoint robotLineBreakpoint = (RobotLineBreakpoint) currentBreakpoint;
+            
             try {
-                if (currentBreakpoint.isEnabled() && isBreakpointSourceFileInCurrentExecutionContext(
-                        currentBreakpoint.getMarker().getResource(), executedSuite)) {
-                    final int breakpointLineNum = (int) currentBreakpoint.getMarker().getAttribute(IMarker.LINE_NUMBER);
+                if (robotLineBreakpoint.isEnabled() && isBreakpointSourceFileInCurrentExecutionContext(
+                        robotLineBreakpoint.getMarker().getResource(), executedSuite)) {
+                    final int breakpointLineNum = robotLineBreakpoint.getLineNumber();
                     if (keywordLineNumber == breakpointLineNum) {
-                        final boolean hasHitCountConditionFulfilled = checkHitCountCondition(currentBreakpoint);
+                        final boolean hasHitCountConditionFulfilled = checkHitCountCondition(robotLineBreakpoint);
                         if (hasHitCountConditionFulfilled) {
-                            breakpointCondition = currentBreakpoint.getMarker()
-                                    .getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
+                            breakpointCondition = robotLineBreakpoint.getCondition();
                             hasBreakpoint = true;
                             target.breakpointHit(currentBreakpoint);
                         }
@@ -130,10 +130,9 @@ public class KeywordExecutionManager {
                 && breakpointSourceFile.getParent().getName().equalsIgnoreCase(currentFileParentName);
     }
 
-    private boolean checkHitCountCondition(final IBreakpoint currentBreakpoint) {
+    private boolean checkHitCountCondition(final RobotLineBreakpoint currentBreakpoint) {
         boolean hasHitCountConditionFulfilled = false;
-        final int breakpointHitCount = currentBreakpoint.getMarker()
-                .getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
+        final int breakpointHitCount = currentBreakpoint.getHitCount();
         if (breakpointHitCount > 1) {
             if (breakpointHitCounts.containsKey(currentBreakpoint)) {
                 final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;

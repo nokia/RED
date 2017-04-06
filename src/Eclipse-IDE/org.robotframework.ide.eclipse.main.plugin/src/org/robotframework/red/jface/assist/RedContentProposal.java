@@ -8,6 +8,7 @@ package org.robotframework.red.jface.assist;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 
 public interface RedContentProposal extends IContentProposal {
@@ -23,5 +24,7 @@ public interface RedContentProposal extends IContentProposal {
     public static interface ModificationStrategy {
 
         void insert(final Text text, final IContentProposal proposal);
+
+        void insert(final Combo control, final IContentProposal proposal);
     }
 }

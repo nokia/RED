@@ -5425,6 +5425,13 @@
       </context>
    </extension>
    <extension
+         point="org.eclipse.debug.ui.detailPaneFactories">
+      <detailFactories
+            class="org.robotframework.ide.eclipse.main.plugin.debug.BreakpointDetailPaneFactory"
+            id="org.eclipse.debug.robot.detailFactories">
+      </detailFactories>
+   </extension>
+   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             class="org.robotframework.ide.eclipse.main.plugin.preferences.RobotPreferencesPage"
@@ -5491,13 +5498,6 @@
       <initializer
             class="org.robotframework.ide.eclipse.main.plugin.preferences.RedPreferencesInitializer">
       </initializer>
-   </extension>
-   <extension
-         point="org.eclipse.debug.ui.detailPaneFactories">
-      <detailFactories
-            class="org.robotframework.ide.eclipse.main.plugin.debug.BreakpointDetailPaneFactory"
-            id="org.eclipse.debug.robot.detailFactories">
-      </detailFactories>
    </extension>
    <extension
          id="robotProblem"
