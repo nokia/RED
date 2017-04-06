@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.rf.ide.core.execution.MessageLevel;
 import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
 
 public class RobotDryRunEventListener extends RobotDefaultAgentEventListener {
@@ -39,15 +40,13 @@ public class RobotDryRunEventListener extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleMessage(final String message, final String level) {
-        if (level != null) {
-            if (level.equalsIgnoreCase("FAIL")) {
-                dryRunLibraryImportCollector.collectFromFailMessageEvent(message);
-            } else if (level.equalsIgnoreCase("ERROR")) {
-                dryRunLibraryImportCollector.collectFromErrorMessageEvent(message);
-            } else if (level.equalsIgnoreCase("NONE")) {
-                dryRunLKeywordSourceCollector.collectFromMessageEvent(message);
-            }
+    public void handleMessage(final String msg, final MessageLevel level) {
+        if (level == MessageLevel.FAIL) {
+            dryRunLibraryImportCollector.collectFromFailMessageEvent(msg);
+        } else if (level == MessageLevel.ERROR) {
+            dryRunLibraryImportCollector.collectFromErrorMessageEvent(msg);
+        } else if (level == MessageLevel.NONE) {
+            dryRunLKeywordSourceCollector.collectFromMessageEvent(msg);
         }
     }
 }
