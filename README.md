@@ -31,6 +31,7 @@ Installation instructions can be found [here](https://github.com/nokia/RED/blob/
 Marketplace: Click Help -> Eclipse Marketplace -> and type into Find field "RED"
 
 Update Site: Click Help -> Install New Software -> Add and set address in Location to:
+
 ```http://master.dl.sourceforge.net/project/red-robot-editor/repository```
 
 ## RED Help
