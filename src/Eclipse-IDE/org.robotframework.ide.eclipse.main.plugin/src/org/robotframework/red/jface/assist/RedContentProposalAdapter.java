@@ -129,6 +129,23 @@ public class RedContentProposalAdapter {
         return adapter;
     }
 
+    public static RedContentProposalAdapter install(final Combo combo,
+            final RedContentProposalProvider proposalsProvider) {
+
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+
+        final RedControlContentAdapter controlAdapter = new RedComboContentAdapter();
+        final KeyStroke activationStroke = KeyStroke.getInstance(SWT.CTRL, ' ');
+        final char[] activationChars = preferences.getAssistantAutoActivationChars();
+        final int autoActivationDelay = preferences.getAssistantAutoActivationDelay();
+
+        final RedContentProposalAdapter adapter = new RedContentProposalAdapter(combo, null, controlAdapter,
+                proposalsProvider, activationStroke, activationChars, autoActivationDelay,
+                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        adapter.install();
+        return adapter;
+    }
+
     public static void markControlWithDecoration(final RedContentProposalAdapter adapter) {
         final Control control = adapter.control;
         final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP);
@@ -167,6 +184,10 @@ public class RedContentProposalAdapter {
 
     private void install() {
         addControlListener(control);
+    }
+
+    public void uninstall() {
+        removeControlListener(control);
     }
 
     /*
@@ -321,6 +342,14 @@ public class RedContentProposalAdapter {
             control.addListener(SWT.KeyDown, controlListener);
             control.addListener(SWT.Traverse, controlListener);
             control.addListener(SWT.Modify, controlListener);
+        }
+    }
+
+    private void removeControlListener(final Control control) {
+        if (!control.isDisposed()) {
+            control.removeListener(SWT.KeyDown, controlListener);
+            control.removeListener(SWT.Traverse, controlListener);
+            control.removeListener(SWT.Modify, controlListener);
         }
     }
 

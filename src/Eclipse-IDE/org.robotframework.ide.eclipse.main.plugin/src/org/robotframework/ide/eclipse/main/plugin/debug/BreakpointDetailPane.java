@@ -5,96 +5,149 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
-import org.eclipse.core.resources.IMarker;
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.debug.ui.IDetailPane;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.IDetailPane3;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.KeywordProposalsProvider;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.viewers.Selections;
+
+import com.google.common.primitives.Ints;
 
 /**
  * @author mmarzec
  */
-public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
+public class BreakpointDetailPane implements IDetailPane3 {
 
-    public static final String BREAKPOINT_DETAIL_PANE_ID = "robot.breakpoint.detail.pane.id";
+    public static final String ID = "robot.breakpoint.detail.pane.id";
+    static final String NAME = "Robot line breakpoint details";
+    static final String DESCRIPTION = "Displays details of Robot line breakpoints";
 
-    public static final String BREAKPOINT_DETAIL_PANE_NAME = "Breakpoint Detail Pane";
+    private static final String OLD_CONDITIONS_ID = ID + ".old_conditions";
+    private static final int OLD_CONDITIONS_LIMIT = 10;
 
-    public static final String BREAKPOINT_DETAIL_PANE_DESC = "Breakpoint Detail Pane";
+    private final ListenerList<IPropertyListener> listenersList = new ListenerList<>();
+
+    private Button hitCountBtn;
+    private Text hitCountTxt;
+    private Button conditionBtn;
+    private Combo conditionCombo;
+    
+    private final List<String> previousConditions = new ArrayList<>();
+
+    private boolean isInitializingValues = false;
 
     private boolean isDirty;
 
-    private Text hitCountTxt, conditionalTxt;
+    private RobotLineBreakpoint currentBreakpoint;
 
-    private Button hitCountBtn, conditionalBtn;
-
-    private IMarker currentMarker;
-
-    private final ListenerList<Object> listenersList = new ListenerList<>();
-
-    private HitCountSelectionListener selectionListener;
-
-    private HitCountModifyListener modifyListener;
-
-    private ConditionalSelectionListener conditionalSelectionListener;
-
-    private ConditionalModifyListener conditionalModifyListener;
+    private RedContentProposalAdapter proposalsAdapter;
 
     @Override
     public void init(final IWorkbenchPartSite partSite) {
         isDirty = false;
         listenersList.clear();
 
-        selectionListener = new HitCountSelectionListener();
-        modifyListener = new HitCountModifyListener();
-        conditionalSelectionListener = new ConditionalSelectionListener();
-        conditionalModifyListener = new ConditionalModifyListener();
+        previousConditions.addAll(getPreviouslyUsedConditions());
+    }
+
+    private Collection<String> getPreviouslyUsedConditions() {
+        final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
+        final IDialogSettings section = dialogSettings.getSection(ID);
+        if (section == null) {
+            return new ArrayList<>();
+        }
+        return newArrayList(section.getArray(OLD_CONDITIONS_ID));
     }
 
     @Override
     public Control createControl(final Composite parent) {
-        parent.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        final Composite panel = new Composite(parent, SWT.NONE);
+        panel.setBackground(panel.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(panel);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(panel);
 
-        final Composite control = new Composite(parent, SWT.NONE);
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(3, 3).applyTo(control);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(control);
-
-        hitCountBtn = new Button(control, SWT.CHECK);
+        hitCountBtn = new Button(panel, SWT.CHECK);
         hitCountBtn.setText("Hit count:");
+        hitCountBtn.addSelectionListener(new SelectionAdapter() {
 
-        hitCountTxt = new Text(control, SWT.BORDER);
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if (!isInitializingValues) {
+                    hitCountTxt.setEnabled(hitCountBtn.getSelection());
+                    setDirty(true);
+                }
+            }
+        });
+
+        hitCountTxt = new Text(panel, SWT.BORDER);
         hitCountTxt.setEnabled(false);
         GridDataFactory.fillDefaults()
                 .align(SWT.BEGINNING, SWT.CENTER)
                 .grab(true, false)
                 .minSize(80, 20)
                 .applyTo(hitCountTxt);
+        hitCountTxt.addModifyListener(event -> {
+            if (!isInitializingValues) {
+                setDirty(true);
+            }
+        });
 
-        conditionalBtn = new Button(control, SWT.CHECK);
-        conditionalBtn.setText("Conditional");
+        conditionBtn = new Button(panel, SWT.CHECK);
+        conditionBtn.setText("Conditional");
+        conditionBtn.addSelectionListener(new SelectionAdapter() {
 
-        conditionalTxt = new Text(control, SWT.BORDER);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(conditionalTxt);
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if (!isInitializingValues) {
+                    conditionCombo.setEnabled(conditionBtn.getSelection());
+                    setDirty(true);
+                }
+            };
+        });
+
+        conditionCombo = new Combo(panel, SWT.DROP_DOWN);
+        conditionCombo.setEnabled(false);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(conditionCombo);
+        conditionCombo.addModifyListener(event -> {
+            if (!isInitializingValues) {
+                setDirty(true);
+            }
+        });
+        conditionCombo.setItems(previousConditions.toArray(new String[0]));
 
         isDirty = false;
 
-        return control;
+        return panel;
     }
 
     @Override
@@ -104,23 +157,44 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     @Override
     public void display(final IStructuredSelection selection) {
-        if (selection != null && selection.size() > 0) {
-            removeAllListeners();
-
-            final Object element = selection.getFirstElement();
-            if (element instanceof RobotLineBreakpoint) {
-                final IMarker marker = ((RobotLineBreakpoint) element).getMarker();
-                currentMarker = marker;
-
-                final int hitCount = marker.getAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                setupHitCountControls(hitCount);
-
-                final String condition = marker.getAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
-                setupConditionalControls(condition);
-            }
-
-            addAllListeners();
+        isInitializingValues = true;
+        if (proposalsAdapter != null) {
+            proposalsAdapter.uninstall();
         }
+
+        if (selection != null && Selections.getElements(selection, RobotLineBreakpoint.class).size() == 1) {
+            currentBreakpoint = Selections.getSingleElement(selection, RobotLineBreakpoint.class);
+
+            final boolean hitCountEnabled = currentBreakpoint.isHitCountEnabled();
+            hitCountBtn.setEnabled(true);
+            hitCountBtn.setSelection(hitCountEnabled);
+            hitCountTxt.setEnabled(hitCountEnabled);
+            hitCountTxt.setText(Integer.toString(currentBreakpoint.getHitCount()));
+            hitCountTxt.setSelection(hitCountTxt.getText().length());
+
+            final boolean conditionEnabled = currentBreakpoint.isConditionEnabled();
+            conditionBtn.setEnabled(true);
+            conditionBtn.setSelection(conditionEnabled);
+            conditionCombo.setEnabled(conditionEnabled);
+            final String condition = currentBreakpoint.getCondition();
+            conditionCombo.setText(condition);
+            conditionCombo.setSelection(new Point(condition.length(), condition.length()));
+            
+            final RobotSuiteFile currentModel = RedPlugin.getModelManager()
+                    .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
+            final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel);
+            proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider);
+
+        } else {
+            for (final Control control : newArrayList(hitCountBtn, hitCountTxt, conditionBtn, conditionCombo)) {
+                control.setEnabled(false);
+            }
+            hitCountBtn.setSelection(false);
+            hitCountTxt.setText("");
+            conditionBtn.setSelection(false);
+            conditionCombo.setText("");
+        }
+        isInitializingValues = false;
     }
 
     @Override
@@ -130,51 +204,22 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
 
     @Override
     public String getID() {
-        return BREAKPOINT_DETAIL_PANE_ID;
+        return ID;
     }
 
     @Override
     public String getName() {
-        return BREAKPOINT_DETAIL_PANE_NAME;
+        return NAME;
     }
 
     @Override
     public String getDescription() {
-        return BREAKPOINT_DETAIL_PANE_DESC;
+        return DESCRIPTION;
     }
 
     @Override
-    public void doSave(final IProgressMonitor monitor) {
-        isDirty = false;
-        fireDirty();
-
-        if (currentMarker != null) {
-            try {
-                if (hitCountBtn.getSelection() && !"".equals(hitCountTxt.getText())) {
-                    final int hitCount = Integer.parseInt(hitCountTxt.getText());
-                    currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, hitCount);
-                } else {
-                    currentMarker.setAttribute(RobotLineBreakpoint.HIT_COUNT_ATTRIBUTE, 1);
-                }
-            } catch (NumberFormatException | CoreException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                if (conditionalBtn.getSelection() && !"".equals(conditionalTxt.getText())) {
-                    final String condition = conditionalTxt.getText();
-                    currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, condition);
-                } else {
-                    currentMarker.setAttribute(RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
-                }
-            } catch (final CoreException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void doSaveAs() {
+    public boolean isSaveOnCloseNeeded() {
+        return false;
     }
 
     @Override
@@ -183,13 +228,68 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
     }
 
     @Override
+    public void doSave(final IProgressMonitor monitor) {
+        saveUsedConditions();
+
+        if (currentBreakpoint != null) {
+            try {
+                currentBreakpoint.setHitCountEnabled(hitCountBtn.getSelection());
+                currentBreakpoint.setHitCount(getHitCount());
+                currentBreakpoint.setConditionEnabled(conditionBtn.getSelection());
+                currentBreakpoint.setCondition(conditionCombo.getText());
+            } catch (final CoreException e) {
+                ErrorDialog.openError(hitCountTxt.getShell(), "Cannot save breakpoint", "Cannot save breakpoint",
+                        new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Unable to set values of breakpoint"));
+            }
+        }
+        setDirty(false);
+    }
+
+    private void saveUsedConditions() {
+        final String text = conditionCombo.getText().trim();
+
+        // those lines will effectively move existing entry to the list begin
+        previousConditions.remove(text);
+        previousConditions.add(0, text);
+        if (previousConditions.size() > OLD_CONDITIONS_LIMIT) {
+            previousConditions.remove(previousConditions.size() - 1);
+        }
+        final String[] oldConditions = previousConditions.toArray(new String[0]);
+
+        conditionCombo.setItems(oldConditions);
+        conditionCombo.setText(text);
+        conditionCombo.setSelection(new Point(text.length(), text.length()));
+
+        final IDialogSettings settings = RedPlugin.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(ID);
+        if (section == null) {
+            section = settings.addNewSection(ID);
+        }
+        section.put(OLD_CONDITIONS_ID, oldConditions);
+    }
+
+    private int getHitCount() {
+        final String hitCountText = hitCountTxt.getText();
+        final Integer parsed = Ints.tryParse(hitCountText);
+        if (parsed != null && parsed >= 1) {
+            return parsed;
+        } else {
+            ErrorDialog.openError(hitCountTxt.getShell(), "Invalid value",
+                    "Value '" + hitCountText + "' is invalid '1' will be used instead.",
+                    new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Hit count has to be a number greater than zero"));
+            hitCountTxt.setText("1");
+            return 1;
+        }
+    }
+
+    @Override
     public boolean isSaveAsAllowed() {
         return false;
     }
 
     @Override
-    public boolean isSaveOnCloseNeeded() {
-        return false;
+    public void doSaveAs() {
+        // not allowed
     }
 
     @Override
@@ -202,92 +302,11 @@ public class BreakpointDetailPane implements IDetailPane, IDetailPane3 {
         listenersList.remove(listener);
     }
 
-    private void fireDirty() {
+    private void setDirty(final boolean dirty) {
+        this.isDirty = dirty;
         final Object[] listeners = listenersList.getListeners();
         for (int i = 0; i < listeners.length; i++) {
             ((IPropertyListener) listeners[i]).propertyChanged(this, PROP_DIRTY);
-        }
-    }
-
-    private void setupHitCountControls(final int hitCount) {
-        final boolean isEnabled = hitCount > 1;
-        hitCountBtn.setSelection(isEnabled);
-        hitCountTxt.setEnabled(isEnabled);
-        if (isEnabled) {
-            hitCountTxt.setText(Integer.toString(hitCount));
-        } else {
-            hitCountTxt.setText("");
-        }
-    }
-
-    private void setupConditionalControls(final String condition) {
-        final boolean isEnabled = !"".equals(condition);
-        conditionalBtn.setSelection(isEnabled);
-        conditionalTxt.setEnabled(isEnabled);
-        if (isEnabled) {
-            conditionalTxt.setText(condition);
-        } else {
-            conditionalTxt.setText("");
-        }
-    }
-
-    private void removeAllListeners() {
-        hitCountBtn.removeSelectionListener(selectionListener);
-        hitCountTxt.removeModifyListener(modifyListener);
-        conditionalBtn.removeSelectionListener(conditionalSelectionListener);
-        conditionalTxt.removeModifyListener(conditionalModifyListener);
-    }
-
-    private void addAllListeners() {
-        hitCountBtn.addSelectionListener(selectionListener);
-        hitCountTxt.addModifyListener(modifyListener);
-        conditionalBtn.addSelectionListener(conditionalSelectionListener);
-        conditionalTxt.addModifyListener(conditionalModifyListener);
-    }
-
-    private class HitCountSelectionListener implements SelectionListener {
-
-        @Override
-        public void widgetSelected(final SelectionEvent e) {
-            hitCountTxt.setEnabled(hitCountBtn.getSelection());
-            isDirty = true;
-            fireDirty();
-        }
-
-        @Override
-        public void widgetDefaultSelected(final SelectionEvent e) {
-        }
-    }
-
-    private class HitCountModifyListener implements ModifyListener {
-
-        @Override
-        public void modifyText(final ModifyEvent e) {
-            isDirty = true;
-            fireDirty();
-        }
-    }
-
-    private class ConditionalSelectionListener implements SelectionListener {
-
-        @Override
-        public void widgetSelected(final SelectionEvent e) {
-            conditionalTxt.setEnabled(conditionalBtn.getSelection());
-            isDirty = true;
-            fireDirty();
-        }
-
-        @Override
-        public void widgetDefaultSelected(final SelectionEvent e) {
-        }
-    }
-
-    private class ConditionalModifyListener implements ModifyListener {
-
-        @Override
-        public void modifyText(final ModifyEvent e) {
-            isDirty = true;
-            fireDirty();
         }
     }
 }

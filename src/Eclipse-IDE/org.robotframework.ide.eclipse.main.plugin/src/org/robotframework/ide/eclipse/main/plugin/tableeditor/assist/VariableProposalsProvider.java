@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Text;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
@@ -85,6 +86,23 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
             final String currentTextBeforeSelection = text.getText().substring(0, text.getSelection().x);
             final String currentTextAfterSelection = text.getText().substring(text.getSelection().x);
 
+            final int maxCommon = calculateMaxCommon(content, currentTextBeforeSelection);
+
+            String toInsert = currentTextBeforeSelection.substring(0, currentTextBeforeSelection.length() - maxCommon)
+                    + content;
+            final int newSelection = toInsert.length();
+            toInsert += findSuffix(currentTextAfterSelection);
+
+            text.setText(toInsert);
+            text.setSelection(newSelection);
+        }
+
+        @Override
+        public void insert(final Combo combo, final IContentProposal proposal) {
+            throw new IllegalStateException("Not implemented");
+        }
+
+        private int calculateMaxCommon(final String content, final String currentTextBeforeSelection) {
             int maxCommon = 0;
             for (int i = 0; i < content.length() && i <= currentTextBeforeSelection.length(); i++) {
                 final String currentSuffix = currentTextBeforeSelection
@@ -95,14 +113,7 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
                     maxCommon = toInsertPrefix.length();
                 }
             }
-
-            String toInsert = currentTextBeforeSelection.substring(0, currentTextBeforeSelection.length() - maxCommon)
-                    + content;
-            final int newSelection = toInsert.length();
-            toInsert += findSuffix(currentTextAfterSelection);
-
-            text.setText(toInsert);
-            text.setSelection(newSelection);
+            return maxCommon;
         }
 
         private String findSuffix(final String currentTextAfterSelection) {
