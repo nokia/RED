@@ -8,10 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.debug.core.DebugException;
@@ -47,7 +47,7 @@ public class RobotDebugVariablesManager {
     public RobotDebugVariablesManager(final RobotDebugTarget target) {
         this.target = target;
         this.previousVariables = new ConcurrentLinkedDeque<>();
-        this.globalVariables = new HashMap<>();
+        this.globalVariables = new TreeMap<>();
         this.nestedGlobalVars = new LinkedHashMap<>();
         this.sortedVariablesNames = new LinkedList<>();
     }
@@ -59,7 +59,7 @@ public class RobotDebugVariablesManager {
      * If current level of StackTrace has not any previous state, then previous state will be
      * variables from level below. This is
      * for saving previous order of variables in higher levels.
-     * 
+     *
      * @param stackTraceId
      * @param newVariables
      * @return
@@ -223,12 +223,12 @@ public class RobotDebugVariablesManager {
 
     public void setGlobalVariables(final Map<String, String> globalVariables) {
         if (globalVariables != null) {
-            this.globalVariables = globalVariables;
-            for (final String key : globalVariables.keySet()) {
-                final RobotDebugVariable variable = new RobotDebugVariable(target, key, globalVariables.get(key));
+            this.globalVariables = new TreeMap<String, String>(globalVariables);
+            this.globalVariables.entrySet().forEach(emtry -> {
+                final RobotDebugVariable variable = new RobotDebugVariable(target, emtry.getKey(), emtry.getValue());
                 variable.disableValueModificationSupport();
-                nestedGlobalVars.put(key, variable);
-            }
+                nestedGlobalVars.put(emtry.getKey(), variable);
+            });
         }
     }
 
