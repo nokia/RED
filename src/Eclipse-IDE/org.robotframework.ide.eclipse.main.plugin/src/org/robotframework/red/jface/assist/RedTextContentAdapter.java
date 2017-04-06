@@ -8,6 +8,7 @@ package org.robotframework.red.jface.assist;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.robotframework.red.jface.assist.RedContentProposal.ModificationStrategy;
@@ -78,6 +79,21 @@ public class RedTextContentAdapter implements RedControlContentAdapter {
             // is not what we wanted, reset the selection.
             if (cursorPosition < content.length()) {
                 text.setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
+            }
+        }
+
+        @Override
+        public void insert(final Combo combo, final IContentProposal proposal) {
+            final String content = proposal.getContent();
+            final int cursorPosition = proposal.getCursorPosition();
+
+            final Point selection = combo.getSelection();
+            combo.setText(content);
+            combo.setSelection(new Point(cursorPosition, cursorPosition));
+            // Insert will leave the cursor at the end of the inserted text. If this
+            // is not what we wanted, reset the selection.
+            if (cursorPosition < content.length()) {
+                combo.setSelection(new Point(selection.x + cursorPosition, selection.x + cursorPosition));
             }
         }
     }

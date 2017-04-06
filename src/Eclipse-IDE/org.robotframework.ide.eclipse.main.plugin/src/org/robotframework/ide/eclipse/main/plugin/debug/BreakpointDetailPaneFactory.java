@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,36 +22,39 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoin
 public class BreakpointDetailPaneFactory implements IDetailPaneFactory {
 
     @Override
-    public Set<String> getDetailPaneTypes(IStructuredSelection selection) {
-        Set<String> typeSet = new HashSet<String>();
-        if (selection != null && !selection.isEmpty() && selection.getFirstElement() instanceof RobotLineBreakpoint) {
-            typeSet.add(BreakpointDetailPane.BREAKPOINT_DETAIL_PANE_ID);
+    public Set<String> getDetailPaneTypes(final IStructuredSelection selection) {
+        if (selection != null && selection.size() == 1 && selection.getFirstElement() instanceof RobotLineBreakpoint) {
+            return newHashSet(BreakpointDetailPane.ID);
         }
-
-        return typeSet;
+        return new HashSet<>();
     }
 
     @Override
-    public String getDefaultDetailPane(IStructuredSelection selection) {
+    public String getDefaultDetailPane(final IStructuredSelection selection) {
         return null;
     }
 
     @Override
-    public IDetailPane createDetailPane(String paneID) {
-        if (BreakpointDetailPane.BREAKPOINT_DETAIL_PANE_ID.equals(paneID)) {
+    public IDetailPane createDetailPane(final String paneID) {
+        if (BreakpointDetailPane.ID.equals(paneID)) {
             return new BreakpointDetailPane();
         }
         return null;
     }
 
     @Override
-    public String getDetailPaneName(String paneID) {
-        return "Detail Pane Name";
+    public String getDetailPaneName(final String paneID) {
+        if (BreakpointDetailPane.ID.equals(paneID)) {
+            return BreakpointDetailPane.NAME;
+        }
+        return null;
     }
 
     @Override
-    public String getDetailPaneDescription(String paneID) {
-        return "Detail Pane Description";
+    public String getDetailPaneDescription(final String paneID) {
+        if (BreakpointDetailPane.ID.equals(paneID)) {
+            return BreakpointDetailPane.DESCRIPTION;
+        }
+        return null;
     }
-
 }
