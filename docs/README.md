@@ -37,11 +37,11 @@ Update Site: Click Help -> Install New Software -> Add and set address in Locati
 ## RED Help
 [RED Robot Editor's application help](http://nokia.github.io/RED/help/)
 ## Look & feel
-![](https://github.com/nokia/RED/blob/master/misc/img/red_overview_source_1.png "Robot perspective with text editor")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/red_overview_source_1.png "Robot perspective with text editor")
 
-![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/red_testcases_table.png "Table editor")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/red_testcases_table.png"Table editor")
 
-![](https://github.com/nokia/RED/blob/master/misc/img/red_overview_debug.png "Debug perspective")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/red_overview_debug.png "Debug perspective")
 
 
 
