@@ -20,6 +20,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescriber;
+import org.eclipse.debug.ui.actions.IToggleBreakpointsTarget;
 import org.eclipse.e4.core.contexts.ContextFunction;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -568,6 +569,8 @@ public class RobotFormEditor extends FormEditor {
     public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter == IContentOutlinePage.class) {
             return new RobotOutlinePage(this, suiteModel);
+        } else if (adapter == IToggleBreakpointsTarget.class) {
+            return new ToggleBreakpointTarget();
         }
         return super.getAdapter(adapter);
     }
