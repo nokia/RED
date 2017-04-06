@@ -25,7 +25,8 @@ RED is distributed as independent binary (RED as Eclipse product) and Eclipse fe
 Binaries can be found under Release folder:  https://github.com/nokia/RED/releases/latest
 
 Installation instructions can be found [here](https://github.com/nokia/RED/blob/master/installation.md)
-###Install form Marketplace/Update Site
+
+### Install form Marketplace/Update Site
 
 Marketplace: Click Help -> Eclipse Marketplace -> and type into Find field "RED"
 
@@ -33,7 +34,7 @@ Update Site: Click Help -> Install New Software -> Add and set address in Locati
 http://master.dl.sourceforge.net/project/red-robot-editor/repository
 
 ## RED Help
-![RED Robot Editor's application help](http://nokia.github.io/RED/help/)
+[RED Robot Editor's application help](http://nokia.github.io/RED/help/)
 ## Look & feel
 ![](https://github.com/nokia/RED/blob/master/misc/img/red_overview_source_1.png "Robot perspective with text editor")
 
