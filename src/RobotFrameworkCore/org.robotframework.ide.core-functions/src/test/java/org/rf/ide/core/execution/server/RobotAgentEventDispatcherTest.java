@@ -22,6 +22,7 @@ import java.util.Map;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.rf.ide.core.execution.LogLevel;
+import org.rf.ide.core.execution.MessageLevel;
 import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.Status;
 
@@ -496,7 +497,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleMessage("abc", "ERROR");
+        verify(listener).handleMessage("abc", MessageLevel.ERROR);
         verifyNoMoreInteractions(listener);
     }
 
