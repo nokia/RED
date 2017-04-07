@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nxmKoK_tEeaOOtfbYFWVRw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/3/17 3:10 PM
+Save-Time: 4/7/17 10:21 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -38,9 +38,6 @@ proc "check-warnings"{
         | verify-true
 	}
 }
-
-get-view "Project Explorer" | get-tree | select ResourceProject | select ResourceProject 
-    | get-menu "Robot Framework/Reset Robot Environment" | click
 get-menu "Project/Clean..." | click
 get-window Clean | get-button OK | click
 
