@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -166,13 +164,13 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private class DryRunTargetsCollector implements IDryRunTargetsCollector {
 
-        private final List<String> suiteNames = newArrayList();
+        private final List<String> suiteNames = new ArrayList<>();
 
-        private final List<File> additionalProjectsLocations = newArrayList();
+        private final List<File> additionalProjectsLocations = new ArrayList<>();
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations() {
-            final List<String> resourcesPaths = newArrayList();
+            final List<String> resourcesPaths = new ArrayList<>();
             for (final IResource resource : suiteFiles) {
                 RobotSuiteFile suiteFile = null;
                 if (resource.getType() == IResource.FILE) {
@@ -233,12 +231,12 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         List<RobotDryRunLibraryImport> getLibraryImportsToAdd(final List<RobotDryRunLibraryImport> libraryImports) {
-            final List<String> existingLibraryNames = newArrayList();
+            final List<String> existingLibraryNames = new ArrayList<>();
             for (final ReferencedLibrary existingLibrary : config.getLibraries()) {
                 existingLibraryNames.add(existingLibrary.getName());
             }
 
-            final List<RobotDryRunLibraryImport> result = newArrayList();
+            final List<RobotDryRunLibraryImport> result = new ArrayList<>();
             for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
                 if (libraryImport.getType() != DryRunLibraryType.UNKNOWN) {
                     if (existingLibraryNames.contains(libraryImport.getName())) {
@@ -307,7 +305,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         private void addReferencedLibrariesFromClasses(final RobotDryRunLibraryImport libraryImport,
                 final Collection<ILibraryClass> libraryClasses) {
-            final Collection<ReferencedLibrary> librariesToAdd = newArrayList();
+            final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
             for (final ILibraryClass libraryClass : libraryClasses) {
                 if (libraryClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
                     librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath()));

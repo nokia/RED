@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -78,9 +76,9 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private class DryRunTargetsCollector implements IDryRunTargetsCollector {
 
-        private final List<String> suiteNames = newArrayList();
+        private final List<String> suiteNames = new ArrayList<>();
 
-        private final List<File> additionalProjectsLocations = newArrayList();
+        private final List<File> additionalProjectsLocations = new ArrayList<>();
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations() {
@@ -96,7 +94,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         private List<String> collectLibraryNames() {
-            final List<String> libraryNames = newArrayList();
+            final List<String> libraryNames = new ArrayList<>();
             libraryNames.addAll(robotProject.getStandardLibraries().keySet());
             for (final ReferencedLibrary referencedLibrary : robotProject.getReferencedLibraries().keySet()) {
                 libraryNames.add(referencedLibrary.getName());
