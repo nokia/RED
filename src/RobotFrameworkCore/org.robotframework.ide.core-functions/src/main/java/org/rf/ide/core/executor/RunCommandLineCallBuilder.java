@@ -295,6 +295,8 @@ public class RunCommandLineCallBuilder {
                 robotArgs.add("NONE");
                 robotArgs.add("--log");
                 robotArgs.add("NONE");
+                robotArgs.add("--console");
+                robotArgs.add("NONE");
             }
             for (final String suite : suitesToRun) {
                 robotArgs.add("-s");
@@ -331,6 +333,7 @@ public class RunCommandLineCallBuilder {
                 argumentsFile.addLine("--output", "NONE");
                 argumentsFile.addLine("--report", "NONE");
                 argumentsFile.addLine("--log", "NONE");
+                argumentsFile.addLine("--console", "NONE");
             }
             for (final String suiteToRun : suitesToRun) {
                 argumentsFile.addLine("--suite", suiteToRun);
