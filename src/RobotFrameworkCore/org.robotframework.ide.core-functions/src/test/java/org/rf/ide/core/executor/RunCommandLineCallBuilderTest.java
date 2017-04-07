@@ -520,6 +520,7 @@ public class RunCommandLineCallBuilderTest {
         assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--output         NONE");
         assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--report         NONE");
         assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--log            NONE");
+        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--console        NONE");
     }
 
     @Test
@@ -532,9 +533,9 @@ public class RunCommandLineCallBuilderTest {
                 .build();
         final String[] commandLine = cmdLine.getCommandLine();
         assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
-        assertThat(commandLine).hasSize(15).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
+        assertThat(commandLine).hasSize(17).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
                 "--prerunmodifier", "--runemptysuite", "--dryrun", "--output", "NONE", "--report", "NONE", "--log",
-                "NONE");
+                "NONE", "--console", "NONE");
     }
 
     private static RobotRuntimeEnvironment prepareEnvironment(final SuiteExecutor executor,

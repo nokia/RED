@@ -5,11 +5,8 @@
  */
 package org.rf.ide.core.dryrun;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -32,7 +29,6 @@ public class RobotDryRunHandler {
                 processBuilder = processBuilder.directory(projectDir);
             }
             dryRunProcess = processBuilder.start();
-            drainDryRunProcessOutputAndErrorStreams();
             dryRunProcess.waitFor();
         } catch (InterruptedException | IOException e) {
             throw new InvocationTargetException(e);
@@ -66,23 +62,5 @@ public class RobotDryRunHandler {
             }
         }
         return file;
-    }
-
-    private void drainDryRunProcessOutputAndErrorStreams() {
-        new Thread(createStreamDrainRunnable(dryRunProcess.getInputStream())).start();
-        new Thread(createStreamDrainRunnable(dryRunProcess.getErrorStream())).start();
-    }
-
-    private Runnable createStreamDrainRunnable(final InputStream inputStream) {
-        return () -> {
-            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-                String line = reader.readLine();
-                while (line != null) {
-                    line = reader.readLine();
-                }
-            } catch (final IOException e) {
-                // nothing to do
-            }
-        };
     }
 }
