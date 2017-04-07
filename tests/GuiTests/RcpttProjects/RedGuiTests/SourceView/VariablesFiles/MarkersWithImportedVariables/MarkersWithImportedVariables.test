@@ -1,0 +1,104 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: __If_UHjQEeWYifgNPLzx_Q
+Element-Name: MarkersWithImportedVariables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _xgO5gBthEeey0JyDNslB8Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/7/17 10:28 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "wait-for-errors"[val amount]{
+	try -times 3 -delay 1000 -command{
+		get-view Problems | get-label ".* error, 0 warnings, 0 others" | get-property caption 
+	    | equals [format "%s error, 0 warnings, 0 others"  $amount ]| verify-true
+	}
+}
+
+// open test file
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/TestFile.robot" | double-click
+    select "RobotProject/TestFile.robot"
+}
+
+// import variables.py in Settings and use some variable from import
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 1
+    type-text "Variables    variables.py"
+    set-caret-pos 11 1
+    type-text t1
+    key-type Enter
+    type-text "log  ${VARIABLE}"
+}
+
+// reset environment
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | get-menu "Robot Framework/Reset Robot Environment" | click
+    key-type "M1+s"
+    }
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 14 1
+    type-text " "
+    key-type "M1+s"
+    wait 1000
+}
+
+// verify no errors after variable change
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+
+// change some variable in variables.py
+get-view Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+get-view "Project Explorer" | get-tree | select "RobotProject/variables.py" | select "RobotProject/variables.py" 
+    | get-menu "Open With/Text Editor" | click
+with [get-editor "variables.py" | get-text-viewer] {
+    set-caret-pos 1 5
+    type-text AA
+    key-type "M1+s"
+}
+
+// reset environment
+get-editor "TestFile.robot" | click
+with [get-view "Project Explorer" | get-tree] {
+	key-type "M1+s"
+    select RobotProject | get-menu "Robot Framework/Reset Robot Environment" | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 14 1
+    type-text " "
+    key-type "M1+s"
+    wait-for-errors -amount 1
+}
+
+// verify one error after variable change
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)/Variable 'VARIABLE' is used, but not defined" 
+    | get-property caption | equals "Variable 'VARIABLE' is used, but not defined" | verify-true
+with [get-editor "variables.py"] {
+    click
+    with [get-text-viewer] {
+        key-type BackSpace -times 2
+        key-type "M1+s"
+    }
+}
+
+// reset environment
+get-editor "TestFile.robot" | click
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | get-menu "Robot Framework/Reset Robot Environment" | click
+    key-type "M1+s"
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 14 1
+    type-text " "
+    key-type "M1+s"
+}
+
+// verify no errors after variable change
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
