@@ -51,8 +51,6 @@ public class RobotDryRunHandler {
         try {
             file = RobotRuntimeEnvironment.createTemporaryFile("DryRunTempSuite.robot");
             printWriter = new PrintWriter(file);
-            printWriter.println("*** Test Cases ***");
-            printWriter.println("T1");
             printWriter.println("*** Settings ***");
             for (final String path : resourcesPaths) {
                 printWriter.println("Resource  " + path);
