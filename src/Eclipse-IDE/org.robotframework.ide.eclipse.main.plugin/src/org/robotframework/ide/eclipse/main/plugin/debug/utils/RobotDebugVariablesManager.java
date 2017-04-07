@@ -224,10 +224,10 @@ public class RobotDebugVariablesManager {
     public void setGlobalVariables(final Map<String, String> globalVariables) {
         if (globalVariables != null) {
             this.globalVariables = new TreeMap<String, String>(globalVariables);
-            this.globalVariables.entrySet().forEach(emtry -> {
-                final RobotDebugVariable variable = new RobotDebugVariable(target, emtry.getKey(), emtry.getValue());
+            this.globalVariables.entrySet().forEach(entry -> {
+                final RobotDebugVariable variable = new RobotDebugVariable(target, entry.getKey(), entry.getValue());
                 variable.disableValueModificationSupport();
-                nestedGlobalVars.put(emtry.getKey(), variable);
+                nestedGlobalVars.put(entry.getKey(), variable);
             });
         }
     }
