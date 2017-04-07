@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fGM4sOxZEeWqTNBmS5Gi4w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/1/16 10:07 AM
+Save-Time: 4/7/17 10:48 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,7 +16,7 @@ Entry-Name: .content
 
 proc "wait-for-disapearing_progressbar"{	
 	try -times 5 -delay 1000 -command{
-	verify-error {get-window "Progress Information"}
+		verify-error {get-window "Progress Information"}
 	}
 }
 
@@ -58,8 +58,8 @@ wait-for-disapearing_progressbar
 
 //check PE
 get-view "Project Explorer" | get-tree 
-    | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)" | get-property index | equals 0 
-    | verify-true
+    | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)/Multiply 2" | get-property index 
+    | equals 0 | verify-true
     
 //delete first project    
 with [get-view "Project Explorer" | get-tree] {
@@ -95,17 +95,20 @@ get-view "Project Explorer" | get-tree
     
 //add the same project as was removed
 
-
 get-view "Project Explorer" | get-tree | select SecondProject | get-menu "New/Robot Project" | click
 with [get-window "New Robot project"] {
     get-editbox -after [get-label "Project name:"] | set-text RemovingProject
     get-button Finish | click
 }
+
+//add the same file
 get-view "Project Explorer" | get-tree | select RemovingProject | get-menu "New/Robot python file" | click
 with [get-window "New Robot python file"] {
     get-editbox -after [get-label "File name:"] | set-text "file1.py"
     get-button Finish | click
 }
+
+//add new function
 with [get-editor "file1.py" | get-text-viewer] {
     type-text "def new_fun():"
     key-type Enter
@@ -113,6 +116,8 @@ with [get-editor "file1.py" | get-text-viewer] {
     type-text "return 17"
     key-type "M1+s"
 }
+
+//add lib to red.xml
 get-view "Project Explorer" | get-tree | select "RemovingProject/red.xml" | double-click
 get-editor "RemovingProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 set-dialog-result File "platform:/resource/RemovingProject/file1.py"
@@ -123,6 +128,7 @@ with [get-editor "RemovingProject/red.xml" | get-section "Referenced libraries" 
 
 wait-for-disapearing_progressbar
 
+//check if new lib is in PE
 get-view "Project Explorer" | get-tree 
     | get-item "RemovingProject/Robot Referenced libraries/file1 RemovingProject \\(1\\)/New Fun" | get-property index 
     | equals 0 | verify-true
@@ -132,4 +138,5 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RemovingProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
         | equals 1 | verify-true
 }
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
