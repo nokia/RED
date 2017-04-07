@@ -19,20 +19,18 @@ public class ToggleBreakpointTarget implements IToggleBreakpointsTarget {
 
     @Override
     public boolean canToggleLineBreakpoints(final IWorkbenchPart part, final ISelection selection) {
-        return true;
+        if (part instanceof RobotFormEditor && selection instanceof ITextSelection) {
+            return ((RobotFormEditor) part).getEditorInput() instanceof IFileEditorInput;
+        }
+        return false;
     }
 
     @Override
     public void toggleLineBreakpoints(final IWorkbenchPart part, final ISelection selection) throws CoreException {
-        if (part instanceof RobotFormEditor && selection instanceof ITextSelection) {
-            final RobotFormEditor editor = (RobotFormEditor) part;
-            final IEditorInput input = editor.getEditorInput();
-            if (input instanceof IFileEditorInput) {
-                final IFile file = ((IFileEditorInput) input).getFile();
-                final ITextSelection textSelection = (ITextSelection) selection;
-                E4ToggleBreakpointHandler.toggle(file, textSelection.getStartLine() + 1);
-            }
-        }
+        final IEditorInput input = ((RobotFormEditor) part).getEditorInput();
+        final IFile file = ((IFileEditorInput) input).getFile();
+        final int line = ((ITextSelection) selection).getStartLine() + 1;
+        E4ToggleBreakpointHandler.toggle(file, line);
     }
 
     @Override
