@@ -99,3 +99,4 @@ Warning
 
     As for now RED cannot use Standalone JAR distribution of RF as environment, so while it would possible to run the tests using (2) method it is currently not possible to have other features of RED like validation, code assistance etc. working without having python interpreter installed. 
 
+[Return to Help index](http://nokia.github.io/RED/help/)

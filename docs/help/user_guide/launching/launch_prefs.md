@@ -29,3 +29,4 @@ change in
 [Window-&gt;Preferences-&gt;Run/Debug&gt;Launching](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage\)"\))
 under Launch Operation
 
+[Return to Help index](http://nokia.github.io/RED/help/)

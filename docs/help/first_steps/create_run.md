@@ -79,3 +79,4 @@ execution time. This view is in Robot perspective by default.
 ![](create_run/exec_1.png)  
 To open Execution go to: _Window-> Show View -> Robot -> Execution View_
 
+[Return to Help index](http://nokia.github.io/RED/help/)

@@ -17,3 +17,4 @@ $PROJECT_PATHS -projects $PROJECT_NAMES -report $RAPORT_FILE
   * **$PROJECT_PATHS** \- list of paths to projects to be imported into workspace, separated by space
   * **$PROJECT_NAMES** \- list of projects to be validated from workspace, separated by space
 
+[Return to Help index](http://nokia.github.io/RED/help/)

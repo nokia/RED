@@ -97,3 +97,4 @@ environmental variables. Each variable can be changed during test run during
 breakpoint event. When variable is changed, it is indicated by distinct colour
 in the list.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

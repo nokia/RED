@@ -95,3 +95,4 @@ selecting _Robot Framework -&gt; Reset Robot Enviroment_.
 For reloading selected libdoc, right click on library from Project Explorer
 and use _Reload action_.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

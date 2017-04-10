@@ -66,3 +66,4 @@ resources in a file system that is not case-sensitive, or that does have
 restrictions on resource names, then those restrictions will show through when
 you actually try to create and modify resources.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

@@ -56,3 +56,4 @@ To integrate jython.exe with RED:
   6. if everything is ok, information about Robot Framework version should be visible
   7. when you will create RED project or execute Clean\Build, you should see in Robot Standard libraries standard libraries like i.e. BultIn with information about keywords, which they contains.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

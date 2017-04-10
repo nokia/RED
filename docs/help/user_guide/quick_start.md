@@ -32,3 +32,4 @@ libraries links in red.xml. Use [Project ->
 Clean](javascript:executeCommand\('org.eclipse.ui.project.buildAll\(\)'\))
 from top menu.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

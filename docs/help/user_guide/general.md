@@ -84,3 +84,4 @@ and also by placing cursor on testcase body and using right click menu:
 ![](general/gen_8.png)  
   
 
+[Return to Help index](http://nokia.github.io/RED/help/)
