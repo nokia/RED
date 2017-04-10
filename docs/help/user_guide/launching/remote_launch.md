@@ -74,3 +74,4 @@ double check following:
   
   
 
+[Return to Help index](http://nokia.github.io/RED/help/)

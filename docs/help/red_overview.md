@@ -14,3 +14,4 @@ with Robot testware.
   * support for plugins via Eclipse mechanisms
   * support for Robot formats: .txt, .robot, .tsv (HTML format is not supported)
 
+[Return to Help index](http://nokia.github.io/RED/help/)

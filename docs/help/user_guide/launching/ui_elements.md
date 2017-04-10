@@ -78,3 +78,4 @@ RED uses standard eclipse **Debug** perspective when configuration is launched
 in debug mode. For more infromation about working with this perspective please
 take a look at [Debugging Robot](debug.md) topic.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

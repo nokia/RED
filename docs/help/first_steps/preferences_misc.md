@@ -41,3 +41,4 @@ Red.xml file opened with RED Project Editor should look like follows:
 ![](preferences_misc/red_xml.png)  
   
 
+[Return to Help index](http://nokia.github.io/RED/help/)

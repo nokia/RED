@@ -34,3 +34,4 @@ Revalidate current file in Source editor.
 
 Revalidate current project in Source editor.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

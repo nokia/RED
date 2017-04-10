@@ -61,3 +61,4 @@ is hardcoded to be reported as Fatal level.
   * **Python Robot Framework environment missing** \- occurs when there is no Robot Environment defined.\n Python main directory with Robot modules installed should be defined in preferences.\n Project may override this setting in its configuration file. 
   * **Library documentation file cannot be generated** \- occurs when for some reason Robot framework is unable to generate library specification file,probably due to missing library dependencies or errors in library source code.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

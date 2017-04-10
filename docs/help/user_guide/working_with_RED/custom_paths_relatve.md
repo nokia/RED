@@ -23,3 +23,4 @@ there is a need to change relativeness regards to Workspace.
 This can be changed in red.xml under Referenced Libraries -> Path part.  
 **Note that relativeness setting is used together with class/python path and libraries only.**
 
+[Return to Help index](http://nokia.github.io/RED/help/)

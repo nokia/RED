@@ -47,3 +47,4 @@ Linking files to project is the least recommended option.
 ![](importing/import_6.png)  
   
 
+[Return to Help index](http://nokia.github.io/RED/help/)

@@ -41,3 +41,4 @@ UserList = ['value1','value2']
 UserDict ={'key1':'value1', 'key2':'value2'}  
 `
 
+[Return to Help index](http://nokia.github.io/RED/help/)
