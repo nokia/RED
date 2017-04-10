@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/20/17 4:42 PM
+Save-Time: 4/10/17 2:31 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -44,6 +44,14 @@ proc "check-debug-marker-on-ruler" [val line] [val script_name]{
 	}
 
 }
+
+// checking breakpoint marker for special line in debug perspective (list of Breakpoint tab)
+proc "check-breakpoint-marker-in-line" [val line] [val script_name] [val index]{
+	with [get-view Breakpoints | get-tree] {
+		get-property [format "getItems().TreeItem[%s].getText()" $index] | equals [format "%s [line: %s]" $script_name $line] | verify-true
+	}
+}
+
 
 proc "wait-for-specific-nr-of-threads" [val nr_items_in_thread 3]{	
 	try -times 5 -delay 1000 -command{
