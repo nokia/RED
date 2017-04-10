@@ -101,9 +101,10 @@ public class KeywordExecutionManager {
                         robotLineBreakpoint.getMarker().getResource(), executedSuite)) {
                     final int breakpointLineNum = robotLineBreakpoint.getLineNumber();
                     if (keywordLineNumber == breakpointLineNum) {
-                        final boolean hasHitCountConditionFulfilled = checkHitCountCondition(robotLineBreakpoint);
-                        if (hasHitCountConditionFulfilled) {
-                            breakpointCondition = robotLineBreakpoint.getCondition();
+                        if (isHitCountFulfilled(robotLineBreakpoint)) {
+                            if (robotLineBreakpoint.isConditionEnabled()) {
+                                breakpointCondition = robotLineBreakpoint.getCondition();
+                            }
                             hasBreakpoint = true;
                             target.breakpointHit(currentBreakpoint);
                         }
@@ -130,23 +131,20 @@ public class KeywordExecutionManager {
                 && breakpointSourceFile.getParent().getName().equalsIgnoreCase(currentFileParentName);
     }
 
-    private boolean checkHitCountCondition(final RobotLineBreakpoint currentBreakpoint) {
-        boolean hasHitCountConditionFulfilled = false;
-        final int breakpointHitCount = currentBreakpoint.getHitCount();
-        if (breakpointHitCount > 1) {
-            if (breakpointHitCounts.containsKey(currentBreakpoint)) {
-                final int currentHitCount = breakpointHitCounts.get(currentBreakpoint) + 1;
-                if (currentHitCount == breakpointHitCount) {
-                    hasHitCountConditionFulfilled = true;
-                }
-                breakpointHitCounts.put(currentBreakpoint, currentHitCount);
-            } else {
-                breakpointHitCounts.put(currentBreakpoint, 1);
-            }
+    private boolean isHitCountFulfilled(final RobotLineBreakpoint currentBreakpoint) {
+        if (currentBreakpoint.isHitCountEnabled()) {
+            final int breakpointHitCount = currentBreakpoint.getHitCount();
+
+            breakpointHitCounts.putIfAbsent(currentBreakpoint, 0);
+            breakpointHitCounts.put(currentBreakpoint, breakpointHitCounts.get(currentBreakpoint) + 1);
+
+            return breakpointHitCount == breakpointHitCounts.get(currentBreakpoint).intValue();
+
         } else {
-            hasHitCountConditionFulfilled = true;
+            // user could disabled hit count in the meantime so we remove the counter
+            breakpointHitCounts.remove(currentBreakpoint);
+            return false;
         }
-        return hasHitCountConditionFulfilled;
     }
 
     private IFile extractSuiteFile(final String suiteName, final IPath suiteParentPath,
