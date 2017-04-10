@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _S92Q4PQzEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/7/17 12:27 PM
+Save-Time: 4/10/17 4:38 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -46,6 +46,8 @@ with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column Annotation
     double-click-ruler 3
     double-click-ruler 15
 }
+
+//-------------------------------------------------- 2 conditionals fails --------------------------------------
 //add to line 3 conditional
 get-button "Open Perspective" | click
 get-window "Open Perspective" | get-table | select Debug | double-click
@@ -53,26 +55,25 @@ get-window "Open Perspective" | get-table | select Debug | double-click
 with [get-view Breakpoints] {
     get-tree | select "TestFile.robot [line: 3]"
     get-button Conditional | check
-    with [get-editbox -index 1] {
-        set-text "my keyword"
-        key-type "M1+s"
-    }
-    //add to line 15 conditional - test that will fail and has arg
+    get-combo | set-text "my keyword"
+    get-tree | key-type "M1+s"
+   
+    //add to line 15 conditional - Kw that will fail and has arg
     get-tree | select "TestFile.robot \\[line: 15\\]" | double-click
     get-button Conditional | check
-    with [get-editbox -index 1] {
-        set-text "my kw with args  text"
-        key-type "M1+s"
-    }
+    get-combo | set-text "my kw with args  text"
+    get-tree | key-type "M1+s"
 }
 //run test - it should be not stopped
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 15 30
 get-button "Debug.*" | click
 
+
+//------------------------------------------------- 1 expected 2 got -------------------------------------------------
 //add 1 arg more (incorrect value)
-with [get-view Breakpoints | get-editbox -index 1] {
-    set-text "my kw with args  text  9"
-    key-type "M1+s"
+with [get-view Breakpoints] {
+	get-combo | set-text "my kw with args  text  9"
+    get-tree | key-type "M1+s"
 }
 
 //run test
@@ -91,10 +92,12 @@ exec-with-options -disableJobWaiting -command {
 	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	get-button "Resume (F8)" | click
 }
+
+//------------------------------------------------- 1 expected, 0 got -------------------------------------------------
 //remove all args	
-with [get-view Breakpoints | get-editbox -index 1] {
-    set-text "my kw with args"
-    key-type "M1+s"
+with [get-view Breakpoints] {
+    get-combo | set-text "my kw with args"
+    get-tree | key-type "M1+s"
 }
 
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 13 5
@@ -113,20 +116,19 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click
 }	
 
+//------------------------------------------------- 2 kw are True -------------------------------------------------
 //set built-in kw Should be equal with result = True
+
 with [get-view Breakpoints] {
-    with [get-editbox -index 1] {
-        click-text 1
-        set-text "Should be equal  1  1"
-        key-type "M1+s"
-    }
-    
+    get-combo | set-text "Should be equal  1  1"
+    get-tree | key-type "M1+s"
+}
+
+with [get-view Breakpoints] {    
     //set user kw with result = True
     get-tree | select "TestFile.robot [line: 3] [conditional]"
-    with [get-editbox -index 1] {
-        set-text "this will pass"
-        key-type "M1+s"
-    }
+    get-combo | set-text "this will pass"
+    get-tree | key-type "M1+s"
 }
 
 
@@ -147,11 +149,12 @@ exec-with-options -disableJobWaiting -command {
 	
 }
 
+//-------------------------------------------------  first kw: not existing kw,     second kw=true  -------------------------------------------------
 
 //set kw that not exist
-with [get-view Breakpoints | get-editbox -index 1] {
-    set-text "no kw"
-    key-type "M1+s"
+with [get-view Breakpoints] {
+    get-combo | set-text "no kw"
+    get-tree | key-type "M1+s"
 }
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 5 5
 
@@ -171,7 +174,7 @@ exec-with-options -disableJobWaiting -command {
 	}
 }	
 
-
+//------------------------------------------------ first kw: unchecked,     second kw=true -------------------------------------------------
 //uncheck failing BP
 get-view Breakpoints | get-tree | select "TestFile.robot [line: 3] [conditional]" 
     | get-item "TestFile.robot \\[line: 3\\] \\[conditional\\]" | uncheck
@@ -182,20 +185,23 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 11 11
 exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click
 	wait-for-thread -file "TestFile.robot"
+	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	get-button "Terminate (M1+F2)" | click
 }	
 
+//------------------------------------------------ first kw: removed,     second kw=true -------------------------------------------------
 //remove failing BP
 with [get-view Breakpoints] {
     get-tree | select "TestFile.robot [line: 3] [conditional]"
     get-button "Remove Selected Breakpoints (Delete)" | click
-    
-    //set empty BP in line 15
-    with [get-editbox -index 1] {
-        set-text ""
-        key-type "M1+s"
-    }
 }
+
+//set empty BP in line 15
+with [get-view Breakpoints] {
+    get-combo | set-text ""
+    get-tree | key-type "M1+s"
+}    
+    
 
 //add new BP and run test
 get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 8
@@ -209,4 +215,19 @@ exec-with-options -disableJobWaiting -command {
 	    click
 	}
 }
+
+//check history
+get-view Breakpoints | get-button Conditional | check
+
+with [get-view Breakpoints | get-combo] {
+    get-property "values[0]" | equals "" | verify-true
+    get-property "values[1]" | equals "no kw" | verify-true
+    get-property "values[2]" | equals "this will pass" | verify-true
+    get-property "values[3]" | equals "Should be equal  1  1" | verify-true
+    get-property "values[4]" | equals "my kw with args" | verify-true
+    get-property "values[5]" | equals "my kw with args  text  9" | verify-true
+    get-property "values[6]" | equals "my kw with args  text" | verify-true
+    get-property "values[7]" | equals "my keyword" | verify-true
+}
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
