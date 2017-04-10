@@ -7,21 +7,13 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ErbYMPglEea7hL0QdGOb6w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/20/17 3:17 PM
+Save-Time: 4/10/17 3:23 PM
 Testcase-Type: ecl
 Verifications: _kIYBEPhCEea7hL0QdGOb6w
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
-
-proc "wait-for-errors"[val amount]{
-	try -times 3 -delay 1000 -command{
-		get-view Problems | get-label ".* errors, 0 warnings, 0 others" | get-property caption 
-	    | equals [format "%s errors, 0 warnings, 0 others"  $amount ]| verify-true
-		
-	}
-}
 
 //select 2 files from 2 projects
 with [get-view "Project Explorer" | get-tree] {
@@ -37,7 +29,7 @@ get-editor "SecondProject/red.xml" | get-section "Excluded project parts" | get-
     | select "SecondProject/test/file_with_error.robot [excluded]"
 
 //check if are 6 errors
-wait-for-errors -amount 6    
+wait-for-errors -amount 6 -times 3 -delay 1000
 
 //exclude one file from PE
 with [get-view "Project Explorer" | get-tree] {
@@ -51,7 +43,7 @@ with [get-view "Project Explorer" | get-tree] {
 wait-for-loading-red-xml -editor_name "RobotProject/red.xml" 
 
 //check if are 5 errors
-wait-for-errors -amount 5
+wait-for-errors -amount 5 -times 3 -delay 1000
 
 //exclude from red.xml
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item Validation | click
@@ -63,7 +55,7 @@ get-button "Save (M1+S)" | click
 get-menu "Project/Clean..." | click
 get-window Clean | get-button OK | click
 
-wait-for-errors -amount 4
+wait-for-errors -amount 4 -times 3 -delay 1000
 
 //expand
 with [get-view "Project Explorer" | get-tree] {
@@ -112,7 +104,7 @@ with [get-view "Project Explorer" | get-tree] {
     get-menu "Robot Framework/Include for validation" | click
 }
 
-wait-for-errors -amount 6
+wait-for-errors -amount 6 -times 3 -delay 1000
 
 //include file from red.xml
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
@@ -123,7 +115,7 @@ get-button "Save (M1+S)" | click
 get-menu "Project/Clean..." | click
 get-window Clean | get-button OK | click
 
-wait-for-errors -amount 7
+wait-for-errors -amount 7 -times 3 -delay 1000
 
 //exclude file that will be removed
 get-view "Project Explorer" | get-tree | select "RobotProject/a/b/c1/tsv_test.tsv" 
