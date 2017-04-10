@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4qmyUPRNEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/31/17 1:24 PM
+Save-Time: 4/10/17 4:49 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -52,11 +52,12 @@ with [get-view Breakpoints] {
     get-button "Hit count:" | check
     get-editbox | set-text 15
     get-button Conditional | check
-    with [get-editbox -index 1] {
-        set-text "Should be equal  2  2"
-        key-type "M1+s"
-    }
 }
+
+with [get-view Breakpoints] {
+    get-combo | set-text  "Should be equal  2  2"
+    get-tree | key-type "M1+s"
+}    
 
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 8 5
 
@@ -74,10 +75,10 @@ exec-with-options -disableJobWaiting -command {
 wait-for-console
 	
 //add incorrect conditional
-with [get-view Breakpoints | get-editbox -index 1] {
-    set-text "Should be equal  3"
-    key-type "M1+s"
-}
+with [get-view Breakpoints] {
+    get-combo | set-text "Should be equal  3"
+    get-tree | key-type "M1+s"
+}    
 
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 8 5
 
