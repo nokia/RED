@@ -135,6 +135,20 @@ proc "compare-message-log2" [val ref_content]{
 
 }
 
+proc "wait-for-errors"[val amount] [val times] [val delay]{
+	try -times $times -delay $delay -command{
+		get-view Problems | get-label ".* error.*" | get-property caption 
+	    | equals [format "%s error.*"  $amount ]| verify-true
+	}
+}
+
+proc "wait-for-warnings"[val amount] [val times] [val delay]{
+	try -times $times -delay $delay -command{
+		get-view Problems | get-label ".* warning.*" | get-property caption 
+	    | equals [format ".* %s warning.*"  $amount ]| verify-true
+	}
+}
+
 proc "wait-for-console"{
 	try -times 10 -delay 1000 -command{
 		get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
