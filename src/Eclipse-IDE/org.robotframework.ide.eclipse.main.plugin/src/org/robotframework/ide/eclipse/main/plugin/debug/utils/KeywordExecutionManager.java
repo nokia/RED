@@ -143,7 +143,7 @@ public class KeywordExecutionManager {
         } else {
             // user could disabled hit count in the meantime so we remove the counter
             breakpointHitCounts.remove(currentBreakpoint);
-            return false;
+            return true;
         }
     }
 
