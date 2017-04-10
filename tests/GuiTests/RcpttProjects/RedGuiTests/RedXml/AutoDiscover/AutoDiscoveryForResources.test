@@ -1,0 +1,120 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw,_2JCD4B3CEeehL98jfxP8Sw
+Element-Name: AutoDiscoveryForResources
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _AessoB3CEeehL98jfxP8Sw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/10/17 9:55 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//==============================================================================================================
+//test with resource which imports library
+get-view "Project Explorer" | get-tree | select "RobotProject/tests/test_with_resource.robot" | double-click
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
+    set-caret-pos 8 11
+    key-type "NUMPAD_9" 9
+    key-type "M1+s"
+}
+
+
+
+//check that no window was shown
+verify-error{get-window "Discovering libraries summary"}
+
+//workaround
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+//uncomment lib that exist in suite file
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
+    set-caret-pos 4 2
+    key-type BackSpace
+}
+
+try -times 4 -delay 1 -command{
+	with [get-editor "test_with_resource.robot" | get-text-viewer] {
+	    get-property "styles[8].text" | equals "multiply.py" | verify-true
+	    get-property "styles[8].underlineColor" | equals "#FF0080" | verify-true
+	}
+}
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
+    key-type "M1+s"
+}
+
+wait-for-discover-window
+
+//check that now file are imported
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item res1 | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-item multiply | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+
+remove-all-libraries-from-xml
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//open resource file and add new line
+get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" | double-click
+with [get-editor "resource.robot" | get-text-viewer] {
+    set-caret-pos 2 37
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+s"
+}
+
+wait-for-discover-window
+//check icon that lib was added
+get-window "Discovering libraries summary" | get-tree | select res1
+    
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item res1 | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-property itemCount | equals 1 | verify-true
+}
+//select "Source" item
+get-window "Discovering libraries summary" | get-tree 
+    | select [format "res1/Source:.*res1.py" $RED_workspace_path]
+
+//check all items    
+with [get-window "Discovering libraries summary"] {
+    with [get-tree] {
+        get-property "getItems().TreeItem[0].getText()" | equals res1 | verify-true
+        get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+            | equals "Status: Added to project configuration" | verify-true
+        get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+            | equals [format "Source: %s%sRobotProject%slibs%sfor_resource%sres1.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep] | verify-true
+        get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+            | equals [format "Importers: %s%sRobotProject%sresources%sresource.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]| verify-true
+    }
+    //check text in window below
+    get-editbox -after [get-label "Discovered libraries (1):"] | get-property text 
+        | equals [format "Source: %s%sRobotProject%slibs%sfor_resource%sres1.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep] | verify-true
+}
+
+//switch between items in tree and check text in window below
+get-window "Discovering libraries summary" | get-tree | select "res1/Status: Added to project configuration"
+get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (1):"] 
+    | get-property text | equals "Status: Added to project configuration" | verify-true
+get-window "Discovering libraries summary" | get-tree 
+    | select "res1/Importers:.*"
+get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (1):"] 
+    | get-property text | equals [format "Importers: %s%sRobotProject%sresources%sresource.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep] | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+
+//check red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-item "res1 - RobotProject\\/libs\\/for_resource" | get-property index | equals 0 | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
