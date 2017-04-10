@@ -138,12 +138,12 @@ public class BreakpointDetailPane implements IDetailPane3 {
         conditionCombo = new Combo(panel, SWT.DROP_DOWN);
         conditionCombo.setEnabled(false);
         GridDataFactory.fillDefaults().grab(true, false).applyTo(conditionCombo);
+        conditionCombo.setItems(previousConditions.toArray(new String[0]));
         conditionCombo.addModifyListener(event -> {
             if (!isInitializingValues) {
                 setDirty(true);
             }
         });
-        conditionCombo.setItems(previousConditions.toArray(new String[0]));
 
         isDirty = false;
 
@@ -186,6 +186,7 @@ public class BreakpointDetailPane implements IDetailPane3 {
             proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider);
 
         } else {
+            currentBreakpoint = null;
             for (final Control control : newArrayList(hitCountBtn, hitCountTxt, conditionBtn, conditionCombo)) {
                 control.setEnabled(false);
             }
