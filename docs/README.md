@@ -40,6 +40,7 @@ Update Site: Click Help -> Install New Software -> Add and set address in Locati
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/basic_run.gif "Robot perspective with text editor")
 
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/editors.gif "Editors")
+
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/content_assist.gif "Content assist")
 
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/validation.gif "Validation")
