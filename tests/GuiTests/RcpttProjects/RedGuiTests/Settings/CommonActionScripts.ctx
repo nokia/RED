@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/31/17 4:02 PM
+Save-Time: 4/10/17 3:33 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -146,6 +146,13 @@ proc "wait-for-warnings"[val amount] [val times] [val delay]{
 	try -times $times -delay $delay -command{
 		get-view Problems | get-label ".* warning.*" | get-property caption 
 	    | equals [format ".* %s warning.*"  $amount ]| verify-true
+	}
+}
+
+proc "wait-for-zero-items"[val amount] [val times] [val delay]{
+	try -times $times -delay $delay -command{
+		get-view Problems | get-label "0 items" | get-property caption 
+	    | equals format "0 items" | verify-true
 	}
 }
 
