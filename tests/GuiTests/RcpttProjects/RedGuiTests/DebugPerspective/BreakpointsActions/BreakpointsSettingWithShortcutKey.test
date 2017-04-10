@@ -1,0 +1,84 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_dCes0BXWEeW05sQKg0mypw,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: BreakpointsSettingWithShortcutKey
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _XE7KQB3QEeeaa6EbsZptdA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/10/17 2:48 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Testcase:
+1. creates simple robot script with 2 breapoints and a variable
+2. runs the script in debug mode
+3. verifies, if value of the variable is correctly changed by "Set variable" command (if value of this variable is updated in Variables View)
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open editor
+get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" 
+    | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" | get-menu "Open With/Robot Table Editor" 
+    | click
+    
+// set Debug perspective
+get-menu "Window/Perspective/Open Perspective/Other..." | click
+get-window "Open Perspective" | get-table | select Debug | double-click
+
+//set 2 BP: first with shortcut key CTRL+SHIFT+B, second with ruler menu
+with [get-editor "SimpleLoggingTestCase.robot" | get-text-viewer] {
+    set-caret-pos 9 5
+    key-type "M1+M2+b"
+    set-caret-pos 10 5
+}
+with [get-editor "SimpleLoggingTestCase.robot" | get-left-ruler] {
+    get-menu "Toggle Breakpoint" | click
+}
+
+//run in debug
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" | get-menu "Debug As/1 Robot Test"| click
+
+	wait-for-thread -file "SimpleLoggingTestCase.robot" 
+	
+	
+	get-view Breakpoints | click
+	check-breakpoint-marker-in-line -line 9 -script_name "SimpleLoggingTestCase.robot" -index 0
+	get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n" 
+	[concat_str_with_regex [list  "1\\n"]]] 
+	
+	
+	get-button "Resume (F8)" | click	//Go to next breakpoint
+	
+	check-breakpoint-marker-in-line -line 10 -script_name "SimpleLoggingTestCase.robot" -index 1
+	get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n" 
+	[concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10\\n"]]]
+	
+
+	get-button "Resume (F8)" | click	//Go to next breakpoint
+}
+
+try -times 3 -delay 1000 -command{
+	get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 11 | verify-true
+	
+}
+
+//check Message log
+get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n" 
+[concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10\\n"  "10"]] "\nEnding test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.firstTest\n\n" 
+"Starting test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.secondTest\n" [concat_str_with_regex [list "Length is 6"]] 
+"\nEnding test: RunRobotScriptInDebugPerspective\.SimpleLoggingTestCase\.secondTest"]
+| verify-true
+
+//check if test is finished
+get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
