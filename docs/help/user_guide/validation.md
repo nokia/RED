@@ -17,3 +17,4 @@ project validation can be manually started using option **Project -> Clean**.
 The file which currently edited within Suite Editor is constantly validated in
 background giving quick feedback about potential problems.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

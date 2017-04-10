@@ -43,3 +43,4 @@ if user run tests with agent |
 Remote debug | Only server messages | Only if user run tests with agent | Only
 if user run tests with agent | Only if user run tests with agent
 
+[Return to Help index](http://nokia.github.io/RED/help/)

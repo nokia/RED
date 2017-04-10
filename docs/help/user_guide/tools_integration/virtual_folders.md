@@ -33,3 +33,4 @@ Warning
 
     It was seen that RSE might cause Eclipse to be unresponsive while waiting for establish connection.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

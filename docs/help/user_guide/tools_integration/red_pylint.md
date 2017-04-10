@@ -36,3 +36,4 @@ _pip install pylint_
   * sometimes it is necessary to set folder with sources for PyDev in Project properties: right click on **Project -&gt; Properties -&gt; PyDev - PYTHONPATH -&gt; Add source folder**, 
   * restart Eclipse/RED Product.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

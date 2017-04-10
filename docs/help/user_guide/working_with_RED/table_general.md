@@ -45,3 +45,4 @@ performed in another table editor in between.
 Note that due to table to source synchronisation, revertible actions are
 discarted when switching to Source editor.
 
+[Return to Help index](http://nokia.github.io/RED/help/)

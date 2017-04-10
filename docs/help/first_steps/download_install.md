@@ -55,3 +55,4 @@ Note
 
   * Verify RED installation by opening _Help -> Installation Details_ to check if RED is visible on installed features list  
 
+[Return to Help index](http://nokia.github.io/RED/help/)

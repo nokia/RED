@@ -24,3 +24,4 @@ validation can be excluded on files bigger than size threshold.
 Note that exclude folders are grayed out, exclude state is inherited from
 parent folders.
 
+[Return to Help index](http://nokia.github.io/RED/help/)
