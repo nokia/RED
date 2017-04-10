@@ -1,0 +1,164 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA
+Element-Name: SingleConditionalBreakPoint
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _LjxJUB3SEeehL98jfxP8Sw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/10/17 4:40 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add test to file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  9\n"
+    + "    log  10\n"
+    + "    \n"
+    + "test 2\n"
+    + "    log  7  \n"
+    + "    second kw  \n\n"
+    + "*** Keywords ***\n"
+    + "my keyword\n"
+    + "    Fail  \"Special filing kw\"\n"
+    + "    \n"
+    + "second kw\n"
+    + "    Should Be Equal    1    1\n"
+    + "    \n"
+    + "my kw with args\n"
+    + "    [Arguments]    ${x}\n"
+    + "    Fail  \"this will fail too\"    \n"
+    + "    \n"
+    + "this will pass\n"
+    + "    log  8" 
+
+get-button "Save \((Ctrl|M1)\+S\)" | click
+
+//add one BP
+with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+    double-click-ruler 4
+}
+
+//go to debug Perspective
+get-button "Open Perspective" | click
+get-window "Open Perspective" | get-table | select Debug | double-click
+
+with [get-view Breakpoints] {
+    get-tree | select "TestFile.robot [line: 4]"
+    get-button Conditional | check
+}
+
+//use content assist to select firat kw
+with [get-view Breakpoints | get-combo ] {
+    key-type "M1+SPACE"
+    wait 300
+    key-type Enter    
+}
+get-view Breakpoints | get-combo | get-property selection | equals "Call Method" | verify-true
+
+//use content assist to select Should be equal
+get-view Breakpoints | get-combo | set-text ""
+with [get-view Breakpoints | get-combo ] {
+    key-type "M1+SPACE"
+    key-type Up -times 17
+    key-type Enter    
+}
+//check id Kw was added
+get-view Breakpoints | get-combo | get-property selection | equals "Should Not Be Equal" | verify-true
+
+//cannot add someting after content asisst - text is written manualy now
+with [get-view Breakpoints | get-combo] {
+    set-text "Should Be Equal  2  2"
+}
+
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 7 13
+
+//run test
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	check-debug-marker-on-ruler -line 4 -script_name "TestFile.robot"	
+	get-button "Resume (F8)" | click
+}	
+
+
+//unselect condition
+with [get-view Breakpoints | get-button Conditional] {
+    uncheck
+    key-type "M1+s"
+}
+
+//run test - test should be run
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	check-debug-marker-on-ruler -line 4 -script_name "TestFile.robot"	
+	get-button "Resume (F8)" | click
+}	
+
+//set wrong condition - test will be not stopped
+with [get-view Breakpoints] {
+    get-button Conditional | check
+    get-combo | set-text "Should Be Equal  5  7"
+}
+get-button "Debug.*" | click
+
+
+//uncheck this condition - test should be stopped here
+with [get-view Breakpoints | get-button Conditional] {
+    uncheck
+    key-type "M1+s"
+}
+exec-with-options -disableJobWaiting -command {
+	get-button "Debug.*" | click
+	wait-for-thread -file "TestFile.robot"
+	check-debug-marker-on-ruler -line 4 -script_name "TestFile.robot"	
+	get-button "Resume (F8)" | click
+}	
+
+//remove all BP
+get-view Breakpoints | get-button "Remove All Breakpoints" | click
+get-window "Remove All Breakpoints" | get-button Yes | click
+
+//check if all vlaues are removed from boxes
+with [get-view Breakpoints] {
+    get-editbox | get-property text | equals "" | verify-true
+    get-combo | get-property selection | equals "" | verify-true
+    get-button Conditional | get-property selected | equals false | verify-true
+    get-button "Hit count:" | get-property selected | equals false | verify-true
+}
+
+//add new BO
+with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+    double-click-ruler 3
+}
+
+//check if only hit count has value
+with [get-view Breakpoints] {
+    get-combo | get-property selection | equals "" | verify-true
+    get-editbox | get-property text | equals 1 | verify-true
+    
+    //all firelds are enable
+    with [get-button "Hit count:"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button Conditional] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+}
+
+//check history
+get-view Breakpoints | get-button Conditional | check
+with [get-view Breakpoints | get-combo] {
+    get-property "values[0]" | equals "Should Be Equal  5  7" | verify-true
+    get-property "values[1]" | equals "Should Be Equal  2  2" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
