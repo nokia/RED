@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.IDetailPane3;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -157,6 +158,8 @@ public class BreakpointDetailPane implements IDetailPane3 {
 
     @Override
     public void display(final IStructuredSelection selection) {
+        doSave(new NullProgressMonitor());
+
         isInitializingValues = true;
         if (proposalsAdapter != null) {
             proposalsAdapter.uninstall();
@@ -232,7 +235,8 @@ public class BreakpointDetailPane implements IDetailPane3 {
     public void doSave(final IProgressMonitor monitor) {
         saveUsedConditions();
 
-        if (currentBreakpoint != null) {
+        if (currentBreakpoint != null && currentBreakpoint.getMarker() != null
+                && currentBreakpoint.getMarker().exists()) {
             try {
                 currentBreakpoint.setHitCountEnabled(hitCountBtn.getSelection());
                 currentBreakpoint.setHitCount(getHitCount());
