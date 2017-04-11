@@ -1,0 +1,89 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: LibspecForTheSameNameFileIn2Projects
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _zjQ2cB69Eee9TPFQf7JN1Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/11/17 4:05 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add new project
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text Abc
+    get-button Finish | click
+}
+
+// add new python file: sum
+get-view "Project Explorer" | get-tree | select Abc | get-menu "New/Robot python file" | click
+with [get-window "New Robot python file"] {
+    get-editbox -after [get-label "File name:"] | set-text sum
+    get-button Finish | click
+}
+get-editor "sum.py"| get-text-viewer | set-text "def fun1():\n"
+    + "\treturn  8"
+get-editor "sum.py"| get-text-viewer |  key-type "M1+s" 
+
+//add second fiel to second project
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+with [get-window "New Robot python file"] {
+    get-editbox -after [get-label "File name:"] | set-text "sum.py"
+    get-button Finish | click
+}
+with [get-editor "sum.py" -index 1 | get-text-viewer] {
+    type-text "def bar():"
+    key-type Enter
+    key-type Tab
+    type-text "return  9"
+    key-type "M1+s"
+}
+
+//add libs to red.xml from PE
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/sum.py" | get-menu "Robot Framework/Add Library to red.xml" | click
+    select "Abc/sum.py" | get-menu "Robot Framework/Add Library to red.xml" | click
+}
+//check if were generated
+with [get-view "Project Explorer" | get-tree] {
+    get-item "Abc/Robot Referenced libraries/sum Abc \\(1\\)/Fun 1" | get-property index | equals 0 | verify-true
+    get-item "RobotProject/Robot Referenced libraries/sum RobotProject \\(1\\)/Bar" | get-property index | equals 0 
+        | verify-true
+}
+
+//change first lib - chnage function name (foo)
+with [get-editor "sum.py" | get-text-viewer] {
+    set-caret-pos 1 9
+    key-type BackSpace -times 3
+    type-text oo
+    key-type "M1+s"
+}
+//check if was updated
+get-view "Project Explorer" | get-tree | get-item "Abc/Robot Referenced libraries/sum Abc \\(1\\)/Foo" 
+    | get-property index | equals 0 | verify-true
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/sum RobotProject \\(1\\)/Bar" | get-property index | equals 0 
+    | verify-true
+    
+//change second library    
+with [get-editor "sum.py" -index 1] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 1 8
+        type-text 2
+        key-type "M1+s"
+    }
+}
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/sum RobotProject \\(1\\)/Bar 2" | get-property index | equals 0 
+    | verify-true
+get-view "Project Explorer" | get-tree | get-item "Abc/Robot Referenced libraries/sum Abc \\(1\\)/Foo" 
+    | get-property index | equals 0 | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
