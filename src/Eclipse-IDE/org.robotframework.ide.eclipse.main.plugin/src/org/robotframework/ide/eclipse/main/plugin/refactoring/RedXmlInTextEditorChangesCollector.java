@@ -84,14 +84,9 @@ class RedXmlInTextEditorChangesCollector {
 
         final List<TextEdit> validationExcluded = redXmlEdits
                 .collectEditsInExcludedPaths(redXmlFile.getProject().getName(), document);
-        final List<TextEdit> movedLibriaries = redXmlEdits
-                .collectEditsInMovedLibraries(redXmlFile.getProject().getName(), document);
 
         final MultiTextEdit multiTextEdit = new MultiTextEdit();
         for (final TextEdit edit : validationExcluded) {
-            multiTextEdit.addChild(edit);
-        }
-        for (final TextEdit edit : movedLibriaries) {
             multiTextEdit.addChild(edit);
         }
 
@@ -101,9 +96,6 @@ class RedXmlInTextEditorChangesCollector {
             docChange.setEdit(multiTextEdit);
             docChange.addTextEditGroup(new TextEditGroup("Change paths excluded from validation",
                     validationExcluded.toArray(new TextEdit[0])));
-            docChange.addTextEditGroup(
-                    new TextEditGroup("Change paths of referenced libriaries",
-                            movedLibriaries.toArray(new TextEdit[0])));
             return Optional.<Change> of(docChange);
         } else {
             return Optional.empty();
