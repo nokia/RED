@@ -40,6 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoin
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.KeywordProposalsProvider;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.primitives.Ints;
@@ -158,7 +159,9 @@ public class BreakpointDetailPane implements IDetailPane3 {
 
     @Override
     public void display(final IStructuredSelection selection) {
-        doSave(new NullProgressMonitor());
+        if (isDirty) {
+            doSave(new NullProgressMonitor());
+        }
 
         isInitializingValues = true;
         if (proposalsAdapter != null) {
@@ -252,6 +255,9 @@ public class BreakpointDetailPane implements IDetailPane3 {
 
     private void saveUsedConditions() {
         final String text = conditionCombo.getText().trim();
+        if (text.isEmpty()) {
+            return;
+        }
 
         // those lines will effectively move existing entry to the list begin
         previousConditions.remove(text);
@@ -279,10 +285,10 @@ public class BreakpointDetailPane implements IDetailPane3 {
         if (parsed != null && parsed >= 1) {
             return parsed;
         } else {
-            ErrorDialog.openError(hitCountTxt.getShell(), "Invalid value",
+            SwtThread.asyncExec(() -> ErrorDialog.openError(hitCountTxt.getShell(), "Invalid value",
                     "Value '" + hitCountText + "' is invalid '1' will be used instead.",
                     new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "Hit count has to be a number greater than zero and " + "less than 2^31"));
+                            "Hit count has to be a number greater than zero and " + "less than 2^31")));
             hitCountTxt.setText("1");
             return 1;
         }
