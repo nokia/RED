@@ -60,7 +60,7 @@
        <topic href="doc/user_guide/launching/red_agent.html" label="RED Tests Runner Agent">
        </topic>
     </topic>
-    <topic href="doc/user_guide/tools_integration.html" label="Integraton with other tools">
+    <topic href="doc/user_guide/tools_integration.html" label="Integration with other tools">
        <topic href="doc/user_guide/tools_integration/virtual_folders.html" label="Mounting folders via SSH">
        </topic>
        <topic href="doc/user_guide/tools_integration/red_pylint.html" label="PyDev and PyLint">
