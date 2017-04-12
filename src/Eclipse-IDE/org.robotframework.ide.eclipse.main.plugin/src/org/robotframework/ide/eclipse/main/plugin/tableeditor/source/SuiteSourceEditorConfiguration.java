@@ -60,6 +60,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Cycl
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.GeneralSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInCodeAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsInSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LibrariesImportAssistProcessor;
@@ -223,6 +224,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new SectionsAssistProcessor(assistContext),
                 settingNamesProcessor,
                 new KeywordCallsInSettingsAssistProcessor(assistContext),
+                new ImportsInSettingsAssistProcessor(assistContext),
                 variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
@@ -331,6 +333,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 new CodeReservedWordsAssistProcessor(assistContext),
                 new KeywordCallsInSettingsAssistProcessor(assistContext),
                 keywordCallsProcessor,
+                new ImportsInSettingsAssistProcessor(assistContext),
                 new ImportsInCodeAssistProcessor(assistContext),
                 variablesProcessor);
 

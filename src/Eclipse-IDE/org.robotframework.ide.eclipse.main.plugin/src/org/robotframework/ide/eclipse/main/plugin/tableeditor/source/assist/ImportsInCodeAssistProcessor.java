@@ -47,10 +47,10 @@ public class ImportsInCodeAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
-        final List<? extends AssistProposal> wordsProposals = new RedImportProposals(assist.getModel())
+        final List<? extends AssistProposal> importsProposals = new RedImportProposals(assist.getModel())
                 .getImportsProposals(prefix);
         final List<ICompletionProposal> proposals = newArrayList();
-        for (final AssistProposal proposal : wordsProposals) {
+        for (final AssistProposal proposal : importsProposals) {
             final DocumentationModification modification = new DocumentationModification("",
                     new Position(offset - prefix.length(), cellLength), true);
 
