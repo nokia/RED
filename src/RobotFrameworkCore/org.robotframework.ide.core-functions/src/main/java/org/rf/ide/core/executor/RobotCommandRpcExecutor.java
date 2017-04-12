@@ -301,16 +301,11 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     private void createLibdoc(final String resultFilePath, final String libName, final String libPath,
-            final EnvironmentSearchPaths paths) {
+            final EnvironmentSearchPaths additionalPaths) {
         try {
-            final List<String> pythonPaths = newArrayList(paths.getPythonPaths());
-            if (interpreterType == SuiteExecutor.Jython) {
-                pythonPaths.addAll(RedSystemProperties.getPythonPaths());
-            }
-            final List<String> classPaths = newArrayList(paths.getClassPaths());
-
-            final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdoc", libName, pythonPaths,
-                    classPaths);
+            final String base64EncodedLibFileContent = (String) callRpcFunction("createLibdoc", libName,
+                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+                    newArrayList(additionalPaths.getClassPaths()));
             final byte[] bytes = Base64.getDecoder().decode(base64EncodedLibFileContent);
             if (bytes.length > 0) {
                 final File libdocFile = new File(resultFilePath);
@@ -348,7 +343,8 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
         try {
             final String path = (String) callRpcFunction("getModulePath", moduleName,
-                    newArrayList(additionalPaths.getPythonPaths()), newArrayList(additionalPaths.getClassPaths()));
+                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+                    newArrayList(additionalPaths.getClassPaths()));
             return Optional.of(new File(path));
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
