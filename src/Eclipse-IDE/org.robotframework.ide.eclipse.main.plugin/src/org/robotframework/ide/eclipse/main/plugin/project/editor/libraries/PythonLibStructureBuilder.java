@@ -78,7 +78,7 @@ public class PythonLibStructureBuilder {
                 if (last.equals(beforeLast) && !allowDuplicationOfFileAndClassName) {
                     splitted.remove(splitted.size() - 1);
                 }
-                return new PythonClass(String.join("", splitted));
+                return new PythonClass(String.join(".", splitted));
             } else {
                 return new PythonClass(name);
             }
