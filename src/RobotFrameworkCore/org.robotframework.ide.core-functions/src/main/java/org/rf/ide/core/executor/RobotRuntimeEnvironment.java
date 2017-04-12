@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
 
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
@@ -49,7 +49,7 @@ public class RobotRuntimeEnvironment {
         PythonInterpretersCommandExecutors.getInstance().removeProcessListener(listener);
     }
 
-    public static int runExternalProcess(final List<String> command, final ILineHandler linesHandler)
+    public static int runExternalProcess(final List<String> command, final Consumer<String> lineHandler)
             throws IOException {
         try {
             final Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
@@ -58,7 +58,7 @@ public class RobotRuntimeEnvironment {
             final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             while ((line = reader.readLine()) != null) {
-                linesHandler.processLine(line);
+                lineHandler.accept(line);
             }
             return process.waitFor();
         } catch (final InterruptedException e) {
@@ -85,13 +85,13 @@ public class RobotRuntimeEnvironment {
 
     public static String getVersion(final SuiteExecutor executor) throws RobotEnvironmentException {
         final Collection<PythonInstallationDirectory> interpreterLocations = whereIsPythonInterpreter(executor);
-        final PythonInstallationDirectory installationDirectory = Iterables.getFirst(interpreterLocations, null);
-        if (installationDirectory == null) {
+        final Optional<PythonInstallationDirectory> installationDirectory = interpreterLocations.stream().findFirst();
+        if (!installationDirectory.isPresent()) {
             throw new RobotEnvironmentException(
                     "There is no " + executor.name() + " interpreter in system PATH environment variable");
         }
         final RobotCommandExecutor cmdExec = PythonInterpretersCommandExecutors.getInstance()
-                .getDirectRobotCommandExecutor(installationDirectory);
+                .getDirectRobotCommandExecutor(installationDirectory.get());
         return exactVersion(executor, cmdExec.getRobotVersion());
     }
 
@@ -102,17 +102,11 @@ public class RobotRuntimeEnvironment {
 
     private static Collection<PythonInstallationDirectory> whereIsPythonInterpreter(final SuiteExecutor interpreter) {
         final List<String> paths = new ArrayList<>();
-        final ILineHandler linesProcessor = new ILineHandler() {
-
-            @Override
-            public void processLine(final String line) {
-                paths.add(line);
-            }
-        };
         try {
             final String cmd = RedSystemProperties.isWindowsPlatform() ? "where" : "which";
-            final int returnCode = runExternalProcess(Arrays.asList(cmd, interpreter.executableName()), linesProcessor);
-            if (returnCode == 0) {
+            final int exitCode = runExternalProcess(Arrays.asList(cmd, interpreter.executableName()),
+                    line -> paths.add(line));
+            if (exitCode == 0) {
                 final List<PythonInstallationDirectory> installationDirectories = new ArrayList<>();
 
                 for (final String path : paths) {
@@ -331,7 +325,7 @@ public class RobotRuntimeEnvironment {
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getModulesSearchPaths();
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
@@ -441,57 +435,47 @@ public class RobotRuntimeEnvironment {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("module_classes_printer.py");
             RobotRuntimeEnvironment.copyScriptFile("extend_pythonpath.py");
 
-            if (scriptFile != null) {
-                final SuiteExecutor interpreter = ((PythonInstallationDirectory) location).getInterpreter();
-                final String interpreterPath = location.toPath()
-                        .resolve(interpreter.executableName())
-                        .toAbsolutePath()
-                        .toString();
+            final SuiteExecutor interpreter = ((PythonInstallationDirectory) location).getInterpreter();
+            final String interpreterPath = location.toPath()
+                    .resolve(interpreter.executableName())
+                    .toAbsolutePath()
+                    .toString();
 
-                final List<String> cmdLine = newArrayList(interpreterPath);
-                if (interpreter == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
-                    cmdLine.add("-J-cp");
-                    final String classpath = Joiner.on(RedSystemProperties.getPathsSeparator())
-                            .join(additionalPaths.getClassPaths());
-                    cmdLine.add(wrapArgumentIfNeeded(classpath));
-                }
-                cmdLine.add(scriptFile.getAbsolutePath());
-                cmdLine.add(wrapArgumentIfNeeded(moduleLocation.getAbsolutePath()));
-                if (moduleName.isPresent()) {
-                    cmdLine.add("-modulename");
-                    cmdLine.add(moduleName.get());
-                }
-                if (additionalPaths.hasPythonPaths()) {
-                    cmdLine.add("-pythonpath");
-                    final List<String> additions = newArrayList(additionalPaths.getPythonPaths());
-                    if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
-                        // Both Jython and IronPython does not include paths from PYTHONPATH into
-                        // sys.path list
-                        additions.addAll(RedSystemProperties.getPythonPaths());
-                    }
-                    final String pythonpath = Joiner.on(';').join(additions);
-                    cmdLine.add(wrapArgumentIfNeeded(pythonpath));
-                }
-
-                final List<String> output = newArrayList();
-                final ILineHandler linesHandler = new ILineHandler() {
-
-                    @Override
-                    public void processLine(final String line) {
-                        output.add(line);
-                    }
-                };
-                final int result = RobotRuntimeEnvironment.runExternalProcess(cmdLine, linesHandler);
-                if (result == 0) {
-                    return output;
-                } else {
-                    throw new RobotEnvironmentException(
-                            "Python interpreter returned following errors:\n\n" + Joiner.on('\n').join(output));
-                }
+            final List<String> cmdLine = newArrayList(interpreterPath);
+            if (interpreter == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
+                cmdLine.add("-J-cp");
+                final String classpath = Joiner.on(RedSystemProperties.getPathsSeparator())
+                        .join(additionalPaths.getClassPaths());
+                cmdLine.add(wrapArgumentIfNeeded(classpath));
             }
-            return newArrayList();
+            cmdLine.add(scriptFile.getAbsolutePath());
+            cmdLine.add(wrapArgumentIfNeeded(moduleLocation.getAbsolutePath()));
+            if (moduleName.isPresent()) {
+                cmdLine.add("-modulename");
+                cmdLine.add(moduleName.get());
+            }
+            if (additionalPaths.hasPythonPaths()) {
+                cmdLine.add("-pythonpath");
+                final List<String> additions = newArrayList(additionalPaths.getPythonPaths());
+                if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
+                    // Both Jython and IronPython does not include paths from PYTHONPATH into
+                    // sys.path list
+                    additions.addAll(RedSystemProperties.getPythonPaths());
+                }
+                final String pythonpath = Joiner.on(';').join(additions);
+                cmdLine.add(wrapArgumentIfNeeded(pythonpath));
+            }
+
+            final List<String> output = new ArrayList<>();
+            final int exitCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> output.add(line));
+            if (exitCode == 0) {
+                return output;
+            } else {
+                throw new RobotEnvironmentException(
+                        "Python interpreter returned following errors:\n\n" + Joiner.on('\n').join(output));
+            }
         } catch (final IOException e) {
-            return newArrayList();
+            return new ArrayList<>();
         }
     }
 

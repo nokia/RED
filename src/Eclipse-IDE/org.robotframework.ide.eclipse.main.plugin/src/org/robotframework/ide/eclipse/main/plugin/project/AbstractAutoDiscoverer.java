@@ -34,6 +34,7 @@ import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
@@ -122,11 +123,12 @@ public abstract class AbstractAutoDiscoverer {
             throw newCoreException(
                     "There is no active runtime environment for project '" + robotProject.getName() + "'");
         }
+        final EnvironmentSearchPaths searchPaths = librariesSourcesCollector.getEnvironmentSearchPaths();
         return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port)
                 .useArgumentFile(true)
                 .suitesToRun(dryRunTargetsCollector.getSuiteNames())
-                .addLocationsToPythonPath(librariesSourcesCollector.getPythonpathLocations())
-                .addLocationsToClassPath(librariesSourcesCollector.getClasspathLocations())
+                .addLocationsToPythonPath(searchPaths.getPythonPaths())
+                .addLocationsToClassPath(searchPaths.getClassPaths())
                 .enableDryRun()
                 .withProject(getProjectLocationFile())
                 .withAdditionalProjectsLocations(dryRunTargetsCollector.getAdditionalProjectsLocations())

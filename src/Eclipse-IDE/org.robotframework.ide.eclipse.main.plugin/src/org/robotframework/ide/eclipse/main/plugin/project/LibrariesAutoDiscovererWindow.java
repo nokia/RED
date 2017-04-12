@@ -74,6 +74,30 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private static final String ELEMENT_SEPARATOR = ":";
 
+    private static final Comparator<RobotDryRunLibraryImport> LIBRARY_IMPORT_COMPARATOR = (import1, import2) -> {
+        if (import1.getStatus() == import2.getStatus()) {
+            return import1.getName().compareToIgnoreCase(import2.getName());
+        }
+        if (import1.getStatus() == DryRunLibraryImportStatus.ADDED
+                && import2.getStatus() != DryRunLibraryImportStatus.ADDED) {
+            return -1;
+        }
+        if (import1.getStatus() == DryRunLibraryImportStatus.NOT_ADDED
+                && import2.getStatus() != DryRunLibraryImportStatus.NOT_ADDED) {
+            return 1;
+        }
+        if (import1.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING
+                && import2.getStatus() == DryRunLibraryImportStatus.ADDED) {
+            return 1;
+        }
+        if (import1.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING
+                && import2.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
+            return -1;
+        }
+
+        return 0;
+    };
+
     private TreeViewer discoveredLibrariesViewer;
 
     private StyledText detailsText;
@@ -139,7 +163,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         discoveredLibrariesViewer.setContentProvider(new DiscoveredLibrariesViewerContentProvider());
         discoveredLibrariesViewer.setLabelProvider(new DiscoveredLibrariesViewerLabelProvider());
 
-        Collections.sort(importedLibraries, new DiscoveredLibrariesComparator());
+        Collections.sort(importedLibraries, LIBRARY_IMPORT_COMPARATOR);
         discoveredLibrariesViewer
                 .setInput(importedLibraries.toArray(new RobotDryRunLibraryImport[importedLibraries.size()]));
 
@@ -412,32 +436,6 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 return ImagesManager.getImage(RedImages.getElementImage());
             }
             return null;
-        }
-    }
-
-    private static class DiscoveredLibrariesComparator implements Comparator<RobotDryRunLibraryImport> {
-
-        @Override
-        public int compare(final RobotDryRunLibraryImport import1, final RobotDryRunLibraryImport import2) {
-            final DryRunLibraryImportStatus firstStatus = import1.getStatus();
-            final DryRunLibraryImportStatus secStatus = import2.getStatus();
-            if (firstStatus == secStatus) {
-                return import1.getName().compareToIgnoreCase(import2.getName());
-            }
-            if (firstStatus == DryRunLibraryImportStatus.ADDED && secStatus != DryRunLibraryImportStatus.ADDED) {
-                return -1;
-            } else if (firstStatus == DryRunLibraryImportStatus.NOT_ADDED
-                    && secStatus != DryRunLibraryImportStatus.NOT_ADDED) {
-                return 1;
-            } else if (firstStatus == DryRunLibraryImportStatus.ALREADY_EXISTING
-                    && secStatus == DryRunLibraryImportStatus.ADDED) {
-                return 1;
-            } else if (firstStatus == DryRunLibraryImportStatus.ALREADY_EXISTING
-                    && secStatus == DryRunLibraryImportStatus.NOT_ADDED) {
-                return -1;
-            }
-
-            return 0;
         }
     }
 
