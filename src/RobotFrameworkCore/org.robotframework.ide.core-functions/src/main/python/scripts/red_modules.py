@@ -43,8 +43,8 @@ def get_run_module_path():
     return robot.__file__
 
 
-import sys
 if __name__ == '__main__':
+    import sys
     import json
 
     if sys.argv[1] == '-pythonpath':
