@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _g-OVcBhQEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/4/17 4:46 PM
+Save-Time: 4/12/17 3:29 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -35,6 +35,7 @@ with [get-window "Run Configurations"] {
     get-button Apply | click
     get-button Run | click
 }
+wait-for-console
 
 //check that script that was running test is not connected to RED
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
