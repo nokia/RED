@@ -22,22 +22,20 @@ import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
 /**
  * @author Michal Anglart
- *
  */
 class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
-    private static final TypeReference<Map<String, Object>> STRING_TO_OBJECT_MAPPING_TYPE =
-            new TypeReference<Map<String, Object>>() { };
+    private static final TypeReference<Map<String, Object>> STRING_TO_OBJECT_MAPPING_TYPE = new TypeReference<Map<String, Object>>() {
+    };
 
-    private static final TypeReference<List<String>> STRING_LIST_TYPE =
-            new TypeReference<List<String>>() { };
+    private static final TypeReference<List<String>> STRING_LIST_TYPE = new TypeReference<List<String>>() {
+    };
 
     private final String interpreterPath;
 
@@ -100,7 +98,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
             return stdLibs;
         } catch (final IOException e) {
-            return newArrayList();
+            return new ArrayList<>();
         }
     }
 
@@ -151,15 +149,14 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     @Override
     public void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName,
-            final String libPath,
-            final EnvironmentSearchPaths additionalPaths) {
+            final String libPath, final EnvironmentSearchPaths additionalPaths) {
         final List<String> additions = newArrayList(libPath);
         additions.addAll(additionalPaths.getPythonPaths());
         additions.addAll(additionalPaths.getClassPaths());
         if (interpreterType == SuiteExecutor.Jython) {
             additions.addAll(RedSystemProperties.getPythonPaths());
         }
-        
+
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-libdoc",
@@ -175,17 +172,17 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     private byte[] runLibdoc(final String libName, final List<String> cmdLine) {
         try {
-            final List<String> lines = newArrayList();
+            final List<String> lines = new ArrayList<>();
             RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> lines.add(line));
 
             // when properly finished there is a path to the file in first line and encoded content
             // in second
             if (lines.size() != 2) {
-                throw new RobotEnvironmentDetailedException(Joiner.on('\n').join(lines),
+                throw new RobotEnvironmentDetailedException(String.join("\n", lines),
                         "Unable to generate library specification file for library '" + libName + "'");
             } else {
-                final String base64EncodedLibfileContent = lines.get(1);
-                return Base64.getDecoder().decode(base64EncodedLibfileContent);
+                final String base64EncodedLibFileContent = lines.get(1);
+                return Base64.getDecoder().decode(base64EncodedLibFileContent);
             }
         } catch (final IOException e) {
             throw new RobotEnvironmentDetailedException(e.getMessage(),
@@ -193,12 +190,12 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         }
     }
 
-    private void writeLibdocToFile(final String resultFilePath, final byte[] docededFileContent) throws IOException {
+    private void writeLibdocToFile(final String resultFilePath, final byte[] decodedFileContent) throws IOException {
         final File libdocFile = new File(resultFilePath);
         if (!libdocFile.exists()) {
             libdocFile.createNewFile();
         }
-        Files.write(docededFileContent, libdocFile);
+        Files.write(decodedFileContent, libdocFile);
     }
 
     @Override
@@ -229,16 +226,17 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
-            
+
             final List<String> cmdLine = newArrayList(interpreterPath);
             if (interpreterType == SuiteExecutor.Jython) {
                 cmdLine.add("-J-cp");
-                cmdLine.add(Joiner.on(RedSystemProperties.getPathsSeparator()).join(additionalPaths.getClassPaths()));
+                cmdLine.add(String.join(RedSystemProperties.getPathsSeparator(), additionalPaths.getClassPaths()));
             }
             cmdLine.add(scriptFile.getAbsolutePath());
             cmdLine.add("-modulename");
             cmdLine.add(moduleName);
-            cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(Joiner.on(";").join(additionalPaths.getPythonPaths())));
+            cmdLine.add(
+                    RobotRuntimeEnvironment.wrapArgumentIfNeeded(String.join(";", additionalPaths.getPythonPaths())));
 
             final List<String> lines = new ArrayList<>();
             RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> lines.add(line));
@@ -247,7 +245,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                 return Optional.of(new File(lines.get(0).toString()));
             } else {
                 final String indent = Strings.repeat(" ", 12);
-                final String exception = indent + Joiner.on("\n" + indent).join(lines);
+                final String exception = indent + String.join("\n" + indent, lines);
                 throw new RobotEnvironmentException(
                         "RED python session problem. Following exception has been thrown by python service:\n"
                                 + exception);
@@ -256,7 +254,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
         }
     }
-    
+
     @Override
     public Boolean isVirtualenv() {
         try {

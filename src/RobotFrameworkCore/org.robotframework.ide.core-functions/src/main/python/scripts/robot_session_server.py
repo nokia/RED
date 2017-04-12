@@ -79,14 +79,15 @@ def get_modules_search_paths():
 @logargs
 def get_module_path(module_name, python_paths, class_paths):
     import red_modules
-    import platform
     from robot import pythonpathsetter
 
     __extend_classpath(class_paths)
     
     for path in python_paths + class_paths:
-        pythonpathsetter.add_path(path)    
+        pythonpathsetter.add_path(path) 
+           
     module_path = red_modules.get_module_path(module_name)
+    
     for path in python_paths + class_paths:
         pythonpathsetter.remove_path(path)    
     return module_path
@@ -161,7 +162,6 @@ def create_libdoc(libname, python_paths, class_paths):
     return _create_libdoc(libname, python_paths, class_paths)
 
 def _create_libdoc(libname, python_paths, class_paths):
-    import robot
     from robot import pythonpathsetter
     import red_libraries
     
@@ -179,7 +179,6 @@ def _create_libdoc(libname, python_paths, class_paths):
 # decorator which cleans up all the modules that were loaded
 # during decorated call
 def __cleanup_modules(to_call):
-    import traceback
     import sys
     def inner(*args, **kwargs):
         old_modules = set(sys.modules.keys())
@@ -199,7 +198,6 @@ def __extend_classpath(class_paths):
         for class_path in class_paths:
             from classpath_updater import ClassPathUpdater
             cp_updater = ClassPathUpdater()
-            cp_updater.add_file(class_path) 
 
 def __shutdown_server_when_parent_process_becomes_unavailable(server):
     import sys
