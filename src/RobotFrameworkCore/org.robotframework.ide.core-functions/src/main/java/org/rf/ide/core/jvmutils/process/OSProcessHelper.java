@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 
-import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.jvmutils.process.IProcessTreeHandler.ProcessKillException;
 
@@ -58,13 +58,13 @@ public class OSProcessHelper {
         return exitCode;
     }
 
-    private class MyLineHandler implements ILineHandler {
+    private class MyLineHandler implements Consumer<String> {
 
         private final Queue<String> lines = new ConcurrentLinkedQueue<>();
 
         @Override
-        public void processLine(final String line) {
-            this.lines.add(line);
+        public void accept(final String line) {
+            lines.add(line);
         }
 
         public Queue<String> getCollectedOutput() {

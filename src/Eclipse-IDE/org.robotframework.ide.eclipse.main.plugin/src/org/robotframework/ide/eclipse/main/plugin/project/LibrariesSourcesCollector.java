@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -91,43 +92,18 @@ public class LibrariesSourcesCollector {
 
     public void checkFileExtensionAndAddToProperLocations(final IResource resource) {
         final String fileExtension = resource.getFileExtension();
-        if (fileExtension != null) {
-            if (isPythonMember(fileExtension)) {
-                addPythonPathLocation(resource);
-            } else if (isJavaMember(fileExtension)) {
-                addClassPathLocation(resource);
+        final IPath fileLocation = resource.getLocation();
+        if (fileExtension != null && fileLocation != null) {
+            if (fileExtension.equals("py")) {
+                pythonpathLocations.add(fileLocation.toFile().getParent());
+            } else if (fileExtension.equals("jar")) {
+                classpathLocations.add(fileLocation.toOSString());
             }
         }
     }
 
-    private boolean isPythonMember(final String fileExtension) {
-        return fileExtension.equals("py");
-    }
-
-    private boolean isJavaMember(final String fileExtension) {
-        return fileExtension.equals("jar");
-    }
-
-    private void addPythonPathLocation(final IResource resource) {
-        final IPath fileLocation = resource.getLocation();
-        if (fileLocation != null) {
-            pythonpathLocations.add(fileLocation.toFile().getParent());
-        }
-    }
-
-    private void addClassPathLocation(final IResource resource) {
-        final IPath fileLocation = resource.getLocation();
-        if (fileLocation != null) {
-            classpathLocations.add(fileLocation.toOSString());
-        }
-    }
-
-    public Set<String> getPythonpathLocations() {
-        return pythonpathLocations;
-    }
-
-    public Set<String> getClasspathLocations() {
-        return classpathLocations;
+    public EnvironmentSearchPaths getEnvironmentSearchPaths() {
+        return new EnvironmentSearchPaths(classpathLocations, pythonpathLocations);
     }
 
 }
