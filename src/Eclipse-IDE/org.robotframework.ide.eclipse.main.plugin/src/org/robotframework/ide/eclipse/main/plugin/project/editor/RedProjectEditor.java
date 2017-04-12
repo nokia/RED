@@ -226,8 +226,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 final List<RobotRuntimeEnvironment> allEnvironments = (List<RobotRuntimeEnvironment>) envLoadingJob
                         .getProperty(createKey(allEnvs));
 
-                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED,
-                        new Environments(allEnvironments, env));
+                SwtThread.syncExec(() -> eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED,
+                        new Environments(allEnvironments, env)));
             }
         });
         envLoadingJob.schedule();
