@@ -38,7 +38,7 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
                 && isKeywordBasedSetting(lineContent);
     }
 
-    private boolean isKeywordBasedSetting(final String lineContent) {
+    static boolean isKeywordBasedSetting(final String lineContent) {
         return startsWithOptionalSpace(lineContent, "test template")
                 || startsWithOptionalSpace(lineContent, "suite setup")
                 || startsWithOptionalSpace(lineContent, "suite teardown")
@@ -46,7 +46,7 @@ public class KeywordCallsInSettingsAssistProcessor extends KeywordCallsAssistPro
                 || startsWithOptionalSpace(lineContent, "test teardown");
     }
 
-    private boolean startsWithOptionalSpace(final String string, final String potentialPrefix) {
+    private static boolean startsWithOptionalSpace(final String string, final String potentialPrefix) {
         return string.toLowerCase().startsWith(potentialPrefix.toLowerCase())
                 || string.toLowerCase().startsWith(" " + potentialPrefix.toLowerCase());
     }
