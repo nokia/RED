@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6U5P0FsAEearwpaEcDJbag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/16/16 10:53 AM
+Save-Time: 4/12/17 2:21 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -39,6 +39,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}" 
     
 get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+wait 1000
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
 get-view Outline | get-tree | select "TestFile.robot/Keywords/Wait for ${timeDuration} seconds" | click
