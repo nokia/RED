@@ -5,6 +5,7 @@
 #
 
 def get_modules_search_paths():
+    import sys
     import robot  # Robot will add some paths to PYTHONPATH
     return sys.path
 
