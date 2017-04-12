@@ -40,7 +40,7 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         final List<IContentProposal> proposals = newArrayList();
 
         final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
-        if (tableContext.getColumn() == 1 && isKeywordBasedSetting(tableContext.getRow())) {
+        if (tableContext.getColumn() == 1 && isKeywordBasedSetting(dataProvider, tableContext.getRow())) {
             final List<? extends AssistProposal> keywordsEntities = new RedKeywordProposals(suiteFile)
                     .getKeywordProposals(prefix);
 
@@ -51,7 +51,7 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         return proposals.toArray(new RedContentProposal[0]);
     }
 
-    private boolean isKeywordBasedSetting(final int row) {
+    static boolean isKeywordBasedSetting(final IRowDataProvider<?> dataProvider, final int row) {
         final Entry<?, ?> entry = (Entry<?, ?>) dataProvider.getRowObject(row);
         final String settingName = (String) entry.getKey();
         final RobotTokenType actualType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
