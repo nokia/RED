@@ -12,7 +12,6 @@ import java.util.Optional;
 
 /**
  * @author Michal Anglart
- *
  */
 interface RobotCommandExecutor {
 
@@ -20,7 +19,7 @@ interface RobotCommandExecutor {
 
     Optional<File> getModulePath(String moduleName, EnvironmentSearchPaths additionalPaths);
 
-    Map<String, Object> getVariables(final String filePath, final List<String> fileArguments);
+    Map<String, Object> getVariables(String filePath, List<String> fileArguments);
 
     Map<String, Object> getGlobalVariables();
 
@@ -29,11 +28,11 @@ interface RobotCommandExecutor {
     String getStandardLibraryPath(final String libName);
 
     String getRobotVersion();
-    
+
     Boolean isVirtualenv();
 
-    void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath);
+    void createLibdocForStdLibrary(String resultFilePath, String libName, String libPath);
 
-    void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName, final String libPath,
+    void createLibdocForThirdPartyLibrary(String resultFilePath, String libName, String libPath,
             EnvironmentSearchPaths additionalPaths);
 }

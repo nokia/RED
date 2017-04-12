@@ -19,49 +19,59 @@ import com.google.common.collect.ImmutableSet;
  */
 public final class EnvironmentSearchPaths {
 
-    private final Set<String> additionalClassPaths = new HashSet<>();
+    private final Set<String> classPaths = new HashSet<>();
 
-    private final Set<String> additionalPythonPaths = new HashSet<>();
+    private final Set<String> pythonPaths = new HashSet<>();
 
     public EnvironmentSearchPaths() {
         this(new ArrayList<String>(), new ArrayList<String>());
     }
 
     public EnvironmentSearchPaths(final Collection<String> classPaths, final Collection<String> pythonPaths) {
-        this.additionalClassPaths.addAll(classPaths);
-        this.additionalPythonPaths.addAll(pythonPaths);
+        this.classPaths.addAll(classPaths);
+        this.pythonPaths.addAll(pythonPaths);
     }
 
     public Collection<String> getClassPaths() {
-        return ImmutableSet.copyOf(additionalClassPaths);
+        return ImmutableSet.copyOf(classPaths);
     }
 
     public boolean hasClassPaths() {
-        return !additionalClassPaths.isEmpty();
+        return !classPaths.isEmpty();
     }
 
     public void addClassPath(final String path) {
-        additionalClassPaths.add(path);
+        classPaths.add(path);
     }
 
     public void removeClassPath(final String path) {
-        additionalClassPaths.remove(path);
+        classPaths.remove(path);
     }
 
     public Collection<String> getPythonPaths() {
-        return ImmutableSet.copyOf(additionalPythonPaths);
+        return ImmutableSet.copyOf(pythonPaths);
     }
 
     public boolean hasPythonPaths() {
-        return !additionalPythonPaths.isEmpty();
+        return !pythonPaths.isEmpty();
     }
 
     public void addPythonPath(final String path) {
-        additionalPythonPaths.add(path);
+        pythonPaths.add(path);
     }
 
     public void removePythonPath(final String path) {
-        additionalPythonPaths.remove(path);
+        pythonPaths.remove(path);
+    }
+
+    public Collection<String> getExtendedPythonPaths(final SuiteExecutor interpreter) {
+        final Set<String> extendedPythonPaths = new HashSet<>(pythonPaths);
+        if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
+            // Both Jython and IronPython does not include paths from PYTHONPATH into
+            // sys.path list
+            extendedPythonPaths.addAll(RedSystemProperties.getPythonPaths());
+        }
+        return ImmutableSet.copyOf(extendedPythonPaths);
     }
 
     @Override
@@ -71,14 +81,14 @@ public final class EnvironmentSearchPaths {
         }
         if (obj instanceof EnvironmentSearchPaths) {
             final EnvironmentSearchPaths that = (EnvironmentSearchPaths) obj;
-            return this.additionalClassPaths.equals(that.additionalClassPaths)
-                    && this.additionalPythonPaths.equals(that.additionalPythonPaths);
+            return this.classPaths.equals(that.classPaths)
+                    && this.pythonPaths.equals(that.pythonPaths);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(additionalClassPaths, additionalPythonPaths);
+        return Objects.hashCode(classPaths, pythonPaths);
     }
 }

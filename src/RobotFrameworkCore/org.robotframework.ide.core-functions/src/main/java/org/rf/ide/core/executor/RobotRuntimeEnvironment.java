@@ -30,8 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import com.google.common.base.Joiner;
-
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
 
@@ -83,20 +81,20 @@ public class RobotRuntimeEnvironment {
         return paths;
     }
 
-    public static String getVersion(final SuiteExecutor executor) throws RobotEnvironmentException {
-        final Collection<PythonInstallationDirectory> interpreterLocations = whereIsPythonInterpreter(executor);
+    public static String getVersion(final SuiteExecutor interpreter) throws RobotEnvironmentException {
+        final Collection<PythonInstallationDirectory> interpreterLocations = whereIsPythonInterpreter(interpreter);
         final Optional<PythonInstallationDirectory> installationDirectory = interpreterLocations.stream().findFirst();
         if (!installationDirectory.isPresent()) {
             throw new RobotEnvironmentException(
-                    "There is no " + executor.name() + " interpreter in system PATH environment variable");
+                    "There is no " + interpreter.name() + " interpreter in system PATH environment variable");
         }
-        final RobotCommandExecutor cmdExec = PythonInterpretersCommandExecutors.getInstance()
+        final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                 .getDirectRobotCommandExecutor(installationDirectory.get());
-        return exactVersion(executor, cmdExec.getRobotVersion());
+        return exactVersion(interpreter, executor.getRobotVersion());
     }
 
-    private static String exactVersion(final SuiteExecutor executor, final String version) {
-        return version != null && executor == SuiteExecutor.IronPython64
+    private static String exactVersion(final SuiteExecutor interpreter, final String version) {
+        return version != null && interpreter == SuiteExecutor.IronPython64
                 ? version.replaceAll("IronPython", "IronPython x64") : version;
     }
 
@@ -444,8 +442,8 @@ public class RobotRuntimeEnvironment {
             final List<String> cmdLine = newArrayList(interpreterPath);
             if (interpreter == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
                 cmdLine.add("-J-cp");
-                final String classpath = Joiner.on(RedSystemProperties.getPathsSeparator())
-                        .join(additionalPaths.getClassPaths());
+                final String classpath = String.join(RedSystemProperties.getPathsSeparator(),
+                        additionalPaths.getClassPaths());
                 cmdLine.add(wrapArgumentIfNeeded(classpath));
             }
             cmdLine.add(scriptFile.getAbsolutePath());
@@ -456,13 +454,7 @@ public class RobotRuntimeEnvironment {
             }
             if (additionalPaths.hasPythonPaths()) {
                 cmdLine.add("-pythonpath");
-                final List<String> additions = newArrayList(additionalPaths.getPythonPaths());
-                if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
-                    // Both Jython and IronPython does not include paths from PYTHONPATH into
-                    // sys.path list
-                    additions.addAll(RedSystemProperties.getPythonPaths());
-                }
-                final String pythonpath = Joiner.on(';').join(additions);
+                final String pythonpath = String.join(";", additionalPaths.getExtendedPythonPaths(interpreter));
                 cmdLine.add(wrapArgumentIfNeeded(pythonpath));
             }
 
@@ -472,7 +464,7 @@ public class RobotRuntimeEnvironment {
                 return output;
             } else {
                 throw new RobotEnvironmentException(
-                        "Python interpreter returned following errors:\n\n" + Joiner.on('\n').join(output));
+                        "Python interpreter returned following errors:\n\n" + String.join("\n", output));
             }
         } catch (final IOException e) {
             return new ArrayList<>();
