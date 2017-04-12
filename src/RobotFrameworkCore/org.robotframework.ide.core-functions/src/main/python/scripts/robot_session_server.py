@@ -86,11 +86,13 @@ def get_module_path(module_name, python_paths, class_paths):
     for path in python_paths + class_paths:
         pythonpathsetter.add_path(path) 
            
-    module_path = red_modules.get_module_path(module_name)
-    
-    for path in python_paths + class_paths:
-        pythonpathsetter.remove_path(path)    
-    return module_path
+    try:
+        return red_modules.get_module_path(module_name)
+    except:
+        raise
+    finally:
+        for path in python_paths + class_paths:
+            pythonpathsetter.remove_path(path)
 
 @logresult
 @encode_result_or_exception
@@ -169,12 +171,14 @@ def _create_libdoc(libname, python_paths, class_paths):
     
     for path in python_paths + class_paths:
         pythonpathsetter.add_path(path)
-        
-    libdoc = __cleanup_modules(red_libraries.create_libdoc)(libname)
-    
-    for path in python_paths + class_paths:
-        pythonpathsetter.remove_path(path)
-    return libdoc
+     
+    try:
+        return __cleanup_modules(red_libraries.create_libdoc)(libname)
+    except:
+        raise
+    finally:
+        for path in python_paths + class_paths:
+            pythonpathsetter.remove_path(path)
 
 # decorator which cleans up all the modules that were loaded
 # during decorated call
@@ -182,13 +186,16 @@ def __cleanup_modules(to_call):
     import sys
     def inner(*args, **kwargs):
         old_modules = set(sys.modules.keys())
-        result = to_call(*args, **kwargs)
-        current_modules = set(sys.modules.keys())
-        to_remove = current_modules - old_modules
-        for m in to_remove:
-            del(sys.modules[m])
-            del(m)
-        return result
+        try:
+            return to_call(*args, **kwargs)
+        except:
+            raise
+        finally:
+            current_modules = set(sys.modules.keys())
+            to_remove = current_modules - old_modules
+            for m in to_remove:
+                del(sys.modules[m])
+                del(m)
     return inner
     
 def __extend_classpath(class_paths):
