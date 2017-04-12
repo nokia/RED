@@ -421,11 +421,31 @@ public class RobotRuntimeEnvironment {
      * be provided.
      *
      * @param moduleLocation
-     * @return
+     * @return list of class names or empty list
      * @throws RobotEnvironmentException
      */
-    public List<String> getClassesDefinedInModule(final File moduleLocation, final Optional<String> moduleName,
+    public List<String> getClassesDefinedInModule(final File moduleLocation,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
+        return getClassesDefinedInModule(moduleLocation, Optional.empty(), additionalPaths);
+    }
+
+    /**
+     * Return names of python classes contained in module point by argument and
+     * all of its submodules. For packages-module __init__.py file path should
+     * be provided.
+     *
+     * @param moduleLocation
+     * @param moduleName
+     * @return list of class names or empty list
+     * @throws RobotEnvironmentException
+     */
+    public List<String> getClassesDefinedInModule(final File moduleLocation, final String moduleName,
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
+        return getClassesDefinedInModule(moduleLocation, Optional.of(moduleName), additionalPaths);
+    }
+
+    private List<String> getClassesDefinedInModule(final File moduleLocation, final Optional<String> moduleName,
+            final EnvironmentSearchPaths additionalPaths) {
         // DO NOT split & move to direct/rpc executors since this code may
         // import quite a lot of modules; maybe we could restart xml-rpc
         // server from time to time; then we can consider moving this
