@@ -198,6 +198,7 @@ def __extend_classpath(class_paths):
         for class_path in class_paths:
             from classpath_updater import ClassPathUpdater
             cp_updater = ClassPathUpdater()
+            cp_updater.add_file(class_path) 
 
 def __shutdown_server_when_parent_process_becomes_unavailable(server):
     import sys
