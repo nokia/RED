@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Nokia Solutions and Networks
+ * Copyright 2017 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -14,7 +14,9 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -23,28 +25,32 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
 
-public class KeywordCallsInSettingsAssistProcessorTest {
+public class ImportsInSettingsAssistProcessorTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(
-            KeywordCallsInSettingsAssistProcessorTest.class);
+            ImportsInSettingsAssistProcessorTest.class);
 
     private static RobotModel robotModel;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
         robotModel = new RobotModel();
-        
+
+        robotModel.createRobotProject(projectProvider.getProject()).setReferencedLibraries(createReferencedLibraries());
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw");
 
         projectProvider.createFile("suite.robot",
@@ -59,9 +65,26 @@ public class KeywordCallsInSettingsAssistProcessorTest {
                 "Default Tags    abc  def  ghi",
                 "Documentation   abc  def  ghi",
                 "Metadata        abc  def  ghi",
-                "*** Keywords ***",
-                "akeyword",
-                "keyword");
+                "Library  lib",
+                "Library  lib2  WITH NAME  alias");
+    }
+
+    private static Map<ReferencedLibrary, LibrarySpecification> createReferencedLibraries() {
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new LinkedHashMap<>();
+
+        final ReferencedLibrary ref1 = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "");
+        final LibrarySpecification ref1LibSpec = new LibrarySpecification();
+        ref1LibSpec.setName("lib");
+        ref1LibSpec.setReferenced(ref1);
+        refLibs.put(ref1, ref1LibSpec);
+
+        final ReferencedLibrary ref2 = ReferencedLibrary.create(LibraryType.PYTHON, "lib2", "");
+        final LibrarySpecification ref2LibSpec = new LibrarySpecification();
+        ref2LibSpec.setName("lib2");
+        ref2LibSpec.setReferenced(ref2);
+        refLibs.put(ref2, ref2LibSpec);
+
+        return refLibs;
     }
 
     @AfterClass
@@ -70,18 +93,18 @@ public class KeywordCallsInSettingsAssistProcessorTest {
     }
 
     @Test
-    public void keywordsInSettingsProcessorIsValidOnlyForSettingsSections() {
+    public void importsInSettingsProcessorIsValidOnlyForSettingsSections() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Test
-    public void keywordsInSettingsProcessorHasTitleDefined() {
+    public void importsInSettingsProcessorHasTitleDefined() {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
@@ -97,7 +120,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.VARIABLES_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -116,7 +139,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -135,7 +158,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -154,7 +177,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -173,7 +196,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -192,7 +215,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -211,7 +234,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
@@ -230,35 +253,36 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(3).haveExactly(3,
-                proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
+        assertThat(proposals).hasSize(3)
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
+                .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments)
                 .containsOnly(
-                        new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     akeyword  def  ghi",
+                        new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     alias.  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
-                        new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     keyword  def  ghi",
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
+                        new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     lib.  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
-                        new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     kw  def  ghi",
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
+                        new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     res.  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"));
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"));
     }
 
     @Test
@@ -272,35 +296,36 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(3).haveExactly(3,
-                proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
+        assertThat(proposals).hasSize(3)
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
+                .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments)
                 .containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
-                                "Suite Teardown  akeyword  def  ghi", "Test Setup      abc  def  ghi",
+                                "Suite Teardown  alias.  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
-                                "Suite Teardown  keyword  def  ghi", "Test Setup      abc  def  ghi",
+                                "Suite Teardown  lib.  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
-                                "Suite Teardown  kw  def  ghi", "Test Setup      abc  def  ghi",
+                                "Suite Teardown  res.  def  ghi", "Test Setup      abc  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"));
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"));
     }
 
     @Test
@@ -314,35 +339,36 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(3).haveExactly(3,
-                proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
+        assertThat(proposals).hasSize(3)
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
+                .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments)
                 .containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
-                                "Suite Teardown  abc  def  ghi", "Test Setup      akeyword  def  ghi",
+                                "Suite Teardown  abc  def  ghi", "Test Setup      alias.  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
-                                "Suite Teardown  abc  def  ghi", "Test Setup      keyword  def  ghi",
+                                "Suite Teardown  abc  def  ghi", "Test Setup      lib.  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
-                                "Suite Teardown  abc  def  ghi", "Test Setup      kw  def  ghi",
+                                "Suite Teardown  abc  def  ghi", "Test Setup      res.  def  ghi",
                                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"));
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"));
     }
 
     @Test
@@ -356,35 +382,36 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(3).haveExactly(3,
-                proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
+        assertThat(proposals).hasSize(3)
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
+                .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments)
                 .containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                                "Test Teardown   akeyword  def  ghi", "Test Template   abc  def  ghi",
+                                "Test Teardown   alias.  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                                "Test Teardown   keyword  def  ghi", "Test Template   abc  def  ghi",
+                                "Test Teardown   lib.  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                                "Test Teardown   kw  def  ghi", "Test Template   abc  def  ghi",
+                                "Test Teardown   res.  def  ghi", "Test Template   abc  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"));
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"));
     }
 
     @Test
@@ -398,35 +425,36 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
-        assertThat(proposals).hasSize(3).haveExactly(3,
-                proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
+        assertThat(proposals).hasSize(3)
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())))
+                .haveExactly(1, proposalWithImage(ImagesManager.getImage(RedImages.getRobotFileImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments)
                 .containsOnly(
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                                "Test Teardown   abc  def  ghi", "Test Template   akeyword  def  ghi",
+                                "Test Teardown   abc  def  ghi", "Test Template   alias.  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                                "Test Teardown   abc  def  ghi", "Test Template   keyword  def  ghi",
+                                "Test Teardown   abc  def  ghi", "Test Template   lib.  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"),
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"),
                         new Document("*** Settings ***", "Resource  res.robot", "Suite Setup     abc  def  ghi",
                                 "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
-                                "Test Teardown   abc  def  ghi", "Test Template   kw  def  ghi",
+                                "Test Teardown   abc  def  ghi", "Test Template   res.  def  ghi",
                                 "Force Tags      abc  def  ghi", "Default Tags    abc  def  ghi",
-                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "*** Keywords ***",
-                                "akeyword", "keyword"));
+                                "Documentation   abc  def  ghi", "Metadata        abc  def  ghi", "Library  lib",
+                                "Library  lib2  WITH NAME  alias"));
     }
 
     @Test
@@ -440,20 +468,20 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
 
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
-        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+        final ImportsInSettingsAssistProcessor processor = new ImportsInSettingsAssistProcessor(
                 createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
 
         assertThat(proposals).hasSize(1).haveExactly(1,
-                proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())));
+                proposalWithImage(ImagesManager.getImage(RedImages.getLibraryImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(new Document("*** Settings ***", "Resource  res.robot",
-                "Suite Setup     akeyword  def  ghi", "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
+                "Suite Setup     alias.  def  ghi", "Suite Teardown  abc  def  ghi", "Test Setup      abc  def  ghi",
                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi", "Force Tags      abc  def  ghi",
                 "Default Tags    abc  def  ghi", "Documentation   abc  def  ghi", "Metadata        abc  def  ghi",
-                "*** Keywords ***", "akeyword", "keyword"));
+                "Library  lib", "Library  lib2  WITH NAME  alias"));
     }
 
     private static IDocument documentFromSuiteFile() throws Exception {
