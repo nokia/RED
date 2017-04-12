@@ -127,7 +127,7 @@ public abstract class AbstractAutoDiscoverer {
         return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port)
                 .useArgumentFile(true)
                 .suitesToRun(dryRunTargetsCollector.getSuiteNames())
-                .addLocationsToPythonPath(searchPaths.getPythonPaths())
+                .addLocationsToPythonPath(searchPaths.getExtendedPythonPaths(runtimeEnvironment.getInterpreter()))
                 .addLocationsToClassPath(searchPaths.getClassPaths())
                 .enableDryRun()
                 .withProject(getProjectLocationFile())

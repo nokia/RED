@@ -150,18 +150,15 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName,
             final String libPath, final EnvironmentSearchPaths additionalPaths) {
-        final List<String> additions = newArrayList(libPath);
-        additions.addAll(additionalPaths.getPythonPaths());
-        additions.addAll(additionalPaths.getClassPaths());
-        if (interpreterType == SuiteExecutor.Jython) {
-            additions.addAll(RedSystemProperties.getPythonPaths());
-        }
+        final List<String> paths = newArrayList(libPath);
+        paths.addAll(additionalPaths.getExtendedPythonPaths(interpreterType));
+        paths.addAll(additionalPaths.getClassPaths());
 
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-libdoc",
                     libName);
-            cmdLine.addAll(additions.stream().map(RobotRuntimeEnvironment::wrapArgumentIfNeeded).collect(toList()));
+            cmdLine.addAll(paths.stream().map(RobotRuntimeEnvironment::wrapArgumentIfNeeded).collect(toList()));
 
             final byte[] decodedFileContent = runLibdoc(libName, cmdLine);
             writeLibdocToFile(resultFilePath, decodedFileContent);
@@ -230,13 +227,15 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final List<String> cmdLine = newArrayList(interpreterPath);
             if (interpreterType == SuiteExecutor.Jython) {
                 cmdLine.add("-J-cp");
-                cmdLine.add(String.join(RedSystemProperties.getPathsSeparator(), additionalPaths.getClassPaths()));
+                final String classPath = String.join(RedSystemProperties.getPathsSeparator(),
+                        additionalPaths.getClassPaths());
+                cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(classPath));
             }
             cmdLine.add(scriptFile.getAbsolutePath());
             cmdLine.add("-modulename");
             cmdLine.add(moduleName);
-            cmdLine.add(
-                    RobotRuntimeEnvironment.wrapArgumentIfNeeded(String.join(";", additionalPaths.getPythonPaths())));
+            final String pythonPath = String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType));
+            cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(pythonPath));
 
             final List<String> lines = new ArrayList<>();
             RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> lines.add(line));
