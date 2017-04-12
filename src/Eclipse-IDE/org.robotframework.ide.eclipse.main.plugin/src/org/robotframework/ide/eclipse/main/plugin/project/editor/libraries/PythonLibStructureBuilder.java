@@ -5,14 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
-import static com.google.common.collect.Sets.newLinkedHashSet;
-
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -26,8 +24,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
@@ -43,26 +39,22 @@ public class PythonLibStructureBuilder {
         this.additionalSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(project);
     }
 
+    public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
+        final List<String> classes = environment.getClassesDefinedInModule(new File(path), additionalSearchPaths);
+        final List<PythonClass> pythonClasses = classes.stream()
+                .map(name -> PythonClass.create(name, false))
+                .collect(Collectors.toList());
+        return new LinkedHashSet<>(pythonClasses);
+    }
+
     public Collection<ILibraryClass> provideEntriesFromFile(final String path, final String moduleName)
             throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, Optional.of(moduleName), true);
-    }
-
-    public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
-        return provideEntriesFromFile(path, Optional.<String> empty(), false);
-    }
-
-    private Collection<ILibraryClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,
-            final boolean allowDuplicationOfFileAndClassName) throws RobotEnvironmentException {
         final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName,
                 additionalSearchPaths);
-        return newLinkedHashSet(transform(classes, new Function<String, ILibraryClass>() {
-
-            @Override
-            public PythonClass apply(final String name) {
-                return PythonClass.create(name, allowDuplicationOfFileAndClassName);
-            }
-        }));
+        final List<PythonClass> pythonClasses = classes.stream()
+                .map(name -> PythonClass.create(name, true))
+                .collect(Collectors.toList());
+        return new LinkedHashSet<>(pythonClasses);
     }
 
     public static final class PythonClass implements ILibraryClass {
@@ -74,7 +66,7 @@ public class PythonLibStructureBuilder {
         }
 
         static PythonClass create(final String name, final boolean allowDuplicationOfFileAndClassName) {
-            final List<String> splitted = newArrayList(Splitter.on('.').splitToList(name));
+            final List<String> splitted = new ArrayList<>(Splitter.on('.').splitToList(name));
             if (splitted.size() > 1) {
                 final String last = splitted.get(splitted.size() - 1);
                 final String beforeLast = splitted.get(splitted.size() - 2);
@@ -86,7 +78,7 @@ public class PythonLibStructureBuilder {
                 if (last.equals(beforeLast) && !allowDuplicationOfFileAndClassName) {
                     splitted.remove(splitted.size() - 1);
                 }
-                return new PythonClass(Joiner.on('.').join(splitted));
+                return new PythonClass(String.join("", splitted));
             } else {
                 return new PythonClass(name);
             }

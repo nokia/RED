@@ -4,8 +4,6 @@
 # see license.txt file for details.
 #
 
-from copy import copy
-
 def get_global_variables():
     import robot
     import tempfile
@@ -119,6 +117,7 @@ def _extract_dot_dict(dict):
 
 
 def _escape_unicode(data):
+    from copy import copy
     # basestring and long is not defined in python3
     import sys
     py_version = sys.version_info
