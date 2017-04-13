@@ -20,14 +20,15 @@ Note
 
 In order to work with Debug, save the file beforehand. If you made any changes
 in Table editors, close and reopen file so changes will be visible in Source
-tab (this will be non issue in close future). Activate Source page and change
-to Debug perspective:
+tab. Activate Source page and change to Debug perspective:
 
 ![](images/debug_1.png)
 
 Debug perspective looks as follows:
 
 ![](images/debug_2.png)
+
+#### Place breakpoint in RobotFramework executable code
 
 First thing with working with Debug is to place at least one breakpoint. This
 allows RED to pause Debug execution and activate Stepping options. To place

@@ -8,7 +8,7 @@ generated.
 In Robot Framework preferences (Window -> Preferences), Tab behavior can be
 changed if needed.  
   
-![](general/gen_4.png)  
+![](general/tab_behaviour.png)  
   
 
 ### Content assistance - mode of working & preference
@@ -19,7 +19,7 @@ It is invoked by pressing CTRL+SPACE key short-cut. It has multiple modes
 which are cycled by CTRL+SPACE, next mode type is visible at the bottom of
 assist window.  
   
-![](general/gen_2.png)  
+![](general/content-assist-modes.gif)  
   
 
 #### Content assistance preferences
@@ -30,7 +30,7 @@ Proposed items can be put into testcase by either by insert or override.
 It can also be configured if library/resource prefix should ba always used
 when accepting content proposal.  
   
-![](general/gen_3.png)  
+![](general/content_pref.png)  
   
 
 ### Validating & revalidating whole project/workspace
@@ -77,11 +77,11 @@ right click menu Quick Fix or directly by Ctrl+1.
 RED can run or debug one, selected testcase. This can be achieved by altering
 Run Configuration :  
   
-![](general/gen_7.png)  
+![](general/run-selected.gif)  
   
 and also by placing cursor on testcase body and using right click menu:  
   
-![](general/gen_8.png)  
+![](general/run-selected-editors.gif)  
   
 
 [Return to Help index](http://nokia.github.io/RED/help/)
