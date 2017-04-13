@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _2vapED-EEeaMlbNjowJCaw
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/8/16 2:28 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/13/17 12:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,25 +16,33 @@ Entry-Name: .content
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
+    wait 3000
     get-link "Section is not yet defined, do you want to create it?" | click
-    with [get-section General | get-editbox -index 1] {
-        click
-        set-focus
-        type-text abcdefghijklmnoprstuwxyz1abcdefghijklmnoprstuwxyz2abcdefghijklmnoprstuwxyz3abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz6abcdefghijklmnoprstuwxyz7abcdefghijklmnoprstuwxyz8
-    }
-}
-
-with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
-    get-property "getAlwaysShowScrollBars()" | equals true | verify-true
-    get-property text 
-        | equals abcdefghijklmnoprstuwxyz1abcdefghijklmnoprstuwxyz2abcdefghijklmnoprstuwxyz3abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz6abcdefghijklmnoprstuwxyz7abcdefghijklmnoprstuwxyz8 
-        | verify-true
-    get-property "caretPosition.line" | equals 1 | verify-true
-    get-property "caretPosition.column" | equals 201 | verify-true
-    get-property "getLineCount()" | equals 1 | verify-true
-    get-property "getHorizontalBar().getEnabled()" | equals true | verify-true
-    get-property "getHorizontalBar().isEnabled()" | equals true | verify-true
-    get-property "getHorizontalBar().isVisible()" | equals true | verify-true
+ 
+    
+}    
+exec-with-options -disableJobWaiting -command {  
+	with [get-editor "TestFile.robot"] {  
+	    with [get-section General | get-editbox -index 1] {
+	        click
+	        set-focus
+	        type-text abcdefghijklmnoprstuwxyz1abcdefghijklmnoprstuwxyz2abcdefghijklmnoprstuwxyz3abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz6abcdefghijklmnoprstuwxyz7abcdefghijklmnoprstuwxyz8
+	    }
+	}
+	
+	
+	with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
+	    get-property "getAlwaysShowScrollBars()" | equals true | verify-true
+	    get-property text 
+	        | equals abcdefghijklmnoprstuwxyz1abcdefghijklmnoprstuwxyz2abcdefghijklmnoprstuwxyz3abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz5abcdefghijklmnoprstuwxyz6abcdefghijklmnoprstuwxyz7abcdefghijklmnoprstuwxyz8 
+	        | verify-true
+	    get-property "caretPosition.line" | equals 1 | verify-true
+	    get-property "caretPosition.column" | equals 201 | verify-true
+	    get-property "getLineCount()" | equals 1 | verify-true
+	    get-property "getHorizontalBar().getEnabled()" | equals true | verify-true
+	    get-property "getHorizontalBar().isEnabled()" | equals true | verify-true
+	    get-property "getHorizontalBar().isVisible()" | equals true | verify-true
+	}
 }
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
