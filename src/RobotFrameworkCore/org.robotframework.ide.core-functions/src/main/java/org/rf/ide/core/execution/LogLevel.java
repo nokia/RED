@@ -7,7 +7,9 @@ package org.rf.ide.core.execution;
 
 
 public enum LogLevel {
+    NONE,
     FAIL,
+    ERROR,
     WARN,
     INFO,
     DEBUG,
