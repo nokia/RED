@@ -39,18 +39,26 @@ class RedXmlInFileChangesCollector {
         final RedXmlEditsCollector redXmlEdits = new RedXmlEditsCollector(pathBeforeRefactoring, pathAfterRefactoring);
         final List<TextEdit> validationExcluded = redXmlEdits
                 .collectEditsInExcludedPaths(redXmlFile.getProject().getName(), redXmlFile);
+        final List<TextEdit> libraryMoved = redXmlEdits.collectEditsInMovedLibraries(
+                redXmlFile.getProject().getName(),
+                redXmlFile);
 
         final MultiTextEdit multiTextEdit = new MultiTextEdit();
         for (final TextEdit edit : validationExcluded) {
             multiTextEdit.addChild(edit);
         }
+        for (final TextEdit edit : libraryMoved) {
+            multiTextEdit.addChild(edit);
+        }
         
         if (multiTextEdit.hasChildren()) {
             final TextFileChange fileChange = new TextFileChange(
-                    "'" + redXmlFile.getFullPath() + "': paths excluded from validation", redXmlFile);
+                    "'" + redXmlFile.getFullPath() + "': paths mentioned in red.xml", redXmlFile);
             fileChange.setEdit(multiTextEdit);
             fileChange.addTextEditGroup(new TextEditGroup("Change paths excluded from validation",
                     validationExcluded.toArray(new TextEdit[0])));
+            fileChange.addTextEditGroup(
+                    new TextEditGroup("Change paths in referenced libraries", libraryMoved.toArray(new TextEdit[0])));
             return Optional.<Change> of(fileChange);
         } else {
             return Optional.empty();
