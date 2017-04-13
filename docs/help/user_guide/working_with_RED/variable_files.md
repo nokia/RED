@@ -17,6 +17,10 @@ Since version 0.6.6, RED can automatically invoke refresh of variable files
 being changed.  
 This can be done manually by clicking on Project by RMB and selecting **Robot
 Framework -> Reset Robot Environment**  
+  
+  
+![](variable_files/reset_robot_env.gif)  
+  
 
 ## Local Python variable files to deal with missing variables
 
@@ -32,6 +36,10 @@ Variables from such file will be visible as Global variables for all Robot
 files inside Project.  
 Below is a sample body of such python variable file (examples can be also
 found in RobotFramework official manual and Python examples).  
+  
+![](variable_files/var-files-red-xml.gif)  
+  
+  
 `  
 #!python  
   
