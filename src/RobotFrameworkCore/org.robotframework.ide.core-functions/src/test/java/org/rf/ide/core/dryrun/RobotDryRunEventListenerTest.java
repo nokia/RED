@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.rf.ide.core.execution.MessageLevel;
+import org.rf.ide.core.execution.LogLevel;
 
 public class RobotDryRunEventListenerTest {
 
@@ -69,7 +69,7 @@ public class RobotDryRunEventListenerTest {
         final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage("fail_message_123", MessageLevel.FAIL);
+        listener.handleMessage("fail_message_123", LogLevel.FAIL);
 
         verify(libImportCollector).collectFromFailMessageEvent("fail_message_123");
         verifyNoMoreInteractions(libImportCollector);
@@ -82,7 +82,7 @@ public class RobotDryRunEventListenerTest {
         final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage("error_message_456", MessageLevel.ERROR);
+        listener.handleMessage("error_message_456", LogLevel.ERROR);
 
         verify(libImportCollector).collectFromErrorMessageEvent("error_message_456");
         verifyNoMoreInteractions(libImportCollector);
@@ -95,7 +95,7 @@ public class RobotDryRunEventListenerTest {
         final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage("kw_message_789", MessageLevel.NONE);
+        listener.handleMessage("kw_message_789", LogLevel.NONE);
 
         verify(kwSourceCollector).collectFromMessageEvent("kw_message_789");
         verifyNoMoreInteractions(kwSourceCollector);
@@ -104,20 +104,35 @@ public class RobotDryRunEventListenerTest {
     }
 
     @Test
+    public void unsupportedLevelMessageEventsAreIgnored() throws Exception {
+        final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
+                startSuiteHandler);
+
+        listener.handleMessage("msg", LogLevel.TRACE);
+        listener.handleMessage("msg", LogLevel.DEBUG);
+        listener.handleMessage("msg", LogLevel.INFO);
+        listener.handleMessage("msg", LogLevel.WARN);
+
+        verifyZeroInteractions(startSuiteHandler);
+        verifyZeroInteractions(libImportCollector);
+        verifyZeroInteractions(kwSourceCollector);
+    }
+
+    @Test
     public void multipleEventsAreHandledInRightOrder() throws Exception {
         final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
                 startSuiteHandler);
 
         listener.handleLibraryImport("lib2", "suite1.robot", "lib1.py", Arrays.asList("a", "b"));
-        listener.handleMessage("err_1", MessageLevel.ERROR);
-        listener.handleMessage("fail_2", MessageLevel.FAIL);
-        listener.handleMessage("fail_1", MessageLevel.FAIL);
-        listener.handleMessage("err_3", MessageLevel.ERROR);
-        listener.handleMessage("kw_2", MessageLevel.NONE);
-        listener.handleMessage("err_2", MessageLevel.ERROR);
+        listener.handleMessage("err_1", LogLevel.ERROR);
+        listener.handleMessage("fail_2", LogLevel.FAIL);
+        listener.handleMessage("fail_1", LogLevel.FAIL);
+        listener.handleMessage("err_3", LogLevel.ERROR);
+        listener.handleMessage("kw_2", LogLevel.NONE);
+        listener.handleMessage("err_2", LogLevel.ERROR);
         listener.handleLibraryImport("lib3", "suite1.robot", "lib6.py", Arrays.asList("c", "d"));
         listener.handleLibraryImport("lib1", "other.robot", "lib6.py", Arrays.asList("x"));
-        listener.handleMessage("kw_1", MessageLevel.NONE);
+        listener.handleMessage("kw_1", LogLevel.NONE);
 
         final InOrder inOrder = inOrder(libImportCollector, kwSourceCollector);
 

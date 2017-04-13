@@ -58,7 +58,7 @@ public interface RobotAgentEventListener {
 
     void handlePaused();
 
-    void handleMessage(String msg, MessageLevel level);
+    void handleMessage(String msg, LogLevel level);
 
     void handleLibraryImport(String name, String importer, String source, List<String> args);
 
