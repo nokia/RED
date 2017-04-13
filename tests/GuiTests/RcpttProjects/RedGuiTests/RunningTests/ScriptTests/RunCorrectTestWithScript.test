@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lJ-jYBiAEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/12/17 3:33 PM
+Save-Time: 4/13/17 4:00 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -167,18 +167,21 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 	    }
 	
 	 exec-with-options {   
-	//change interperet to jython    
-	get-menu "Run/Run Configurations..." | click
-	with [get-window "Run Configurations"] {
-	    get-tab-folder | get-tab-item Executor | click
-	    with [get-group Interpreter] {
-	        get-button Use | click
-	        get-combo | select Jython
-	    }
-	    get-button Apply | click
-	    get-button Run | click
-	}
+		//change interperet to jython    
+		get-menu "Run/Run Configurations..." | click
+		with [get-window "Run Configurations"] {
+		    get-tab-folder | get-tab-item Executor | click
+		    with [get-group Interpreter] {
+		        get-button Use | click
+		        get-combo | select Jython
+		    }
+		    get-button Apply | click
+		    get-button Run | click
+		    wait 3000
+		}
 	} -allowStatusDialog
+	
+	wait-for-console
 	try -command{
 		get-view Console | get-text-viewer | get-property text 
 		    | equals [format "Command: .*\n"
