@@ -19,6 +19,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.red.swt.SwtThread;
@@ -51,6 +52,7 @@ class RedXmlInProjectEditorChangesCollector {
                 redXmlFile.getName() + " - " + redXmlFile.getParent().getFullPath().toString());
 
         change.add(collectChangesInExcludedPaths(currentlyEditedConfig));
+        change.add(collectChangesInReferencedLibraries(currentlyEditedConfig));
         return Optional.of(Changes.normalizeCompositeChange(change));
     }
 
@@ -98,6 +100,31 @@ class RedXmlInProjectEditorChangesCollector {
                 }
             } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
                 change.add(new ExcludedPathRemoveChange(redXmlFile, config, excluded));
+            }
+        }
+        return Changes.normalizeCompositeChange(change);
+    }
+
+    private Change collectChangesInReferencedLibraries(final RobotProjectConfig config) {
+        final CompositeChange change = new CompositeChange(
+                "'" + redXmlFile.getFullPath() + "': referenced libriaries paths");
+
+        for (final ReferencedLibrary lib : config.getLibraries()) {
+
+            final IPath potentiallyAffectedPath = Path.fromPortableString(lib.getPath());
+            final IPath adjustedPathBeforeRefactoring = Changes
+                    .excapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
+            if (pathAfterRefactoring.isPresent()) {
+                final IPath adjustedPathAfterRefactoring = Changes
+                        .excapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
+
+                final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
+                        adjustedPathAfterRefactoring, potentiallyAffectedPath);
+                if (transformedPath.isPresent()) {
+                    change.add(new LibraryPathModifyChange(redXmlFile, lib, transformedPath.get()));
+                }
+            } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
+                change.add(new LibraryPathRemoveChange(redXmlFile, config, lib));
             }
         }
         return Changes.normalizeCompositeChange(change);
