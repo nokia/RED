@@ -16,7 +16,7 @@ Open red.xml file by Eclipse Default Editor, in Variables mappings assign
 static value for variable in path:  
   
   
-![](variable_mapping/variable_mapping_6.png)  
+![](variable_mapping/variable_mapping_6.gif)  
   
 When successful, path will be recognized and validation will take place.  
   

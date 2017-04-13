@@ -33,7 +33,7 @@
       * [Debugging Robot&amp;Python with RED&amp;PyDev](user_guide/launching/robot_python_debug.md)
       * [Launching preferences](user_guide/launching/launch_prefs.md)
       * [RED Tests Runner Agent](user_guide/launching/red_agent.md)
-    * [Integraton with other tools](user_guide/tools_integration.md)
+    * [Integration with other tools](user_guide/tools_integration.md)
       * [Mounting folders via SSH](user_guide/tools_integration/virtual_folders.md)
       * [PyDev and PyLint](user_guide/tools_integration/red_pylint.md)
       * [Robot Framework Maven plugin](user_guide/tools_integration/maven.md)

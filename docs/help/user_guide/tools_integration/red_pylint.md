@@ -33,7 +33,7 @@ _pip install pylint_
   * enable PyLint,
   * enable redirecting PyLint output to console,
   * provide proper PyLint executable paths in PyDev preferences: **Windows -&gt; Preferences -&gt; PyDev -&gt; PyLint**, 
-  * sometimes it is necessary to set folder with sources for PyDev in Project properties: right click on **Project -&gt; Properties -&gt; PyDev - PYTHONPATH -&gt; Add source folder**, 
+  * sometimes it is necessary to set folder with sources for PyDev in Project properties: right click on **Project -> PyDev -> Set as Source Folder (add to PYTHONPATH)**, 
   * restart Eclipse/RED Product.
 
 [Return to Help index](http://nokia.github.io/RED/help/)
