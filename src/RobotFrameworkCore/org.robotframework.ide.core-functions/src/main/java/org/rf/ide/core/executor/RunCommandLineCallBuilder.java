@@ -364,14 +364,9 @@ public class RunCommandLineCallBuilder {
         }
 
         private String classPath() {
-            final String sysPath = System.getenv("CLASSPATH");
-            final List<String> wholeClasspath = new ArrayList<>();
-            if (sysPath != null && !sysPath.isEmpty()) {
-                wholeClasspath.add(sysPath);
-            }
-            wholeClasspath.addAll(classPath);
-
-            return String.join(RedSystemProperties.getPathsSeparator(), wholeClasspath);
+            final List<String> fullClasspath = RedSystemProperties.getClassPaths();
+            fullClasspath.addAll(classPath);
+            return String.join(RedSystemProperties.getPathsSeparator(), fullClasspath);
         }
 
         private String pythonPath() {

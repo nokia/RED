@@ -45,6 +45,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -451,7 +452,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
             final RedTokensStore store, final ISyntaxColouringRule[] rules) {
-        final boolean useDirectScanner = Boolean.valueOf(System.getProperty("red.tmp.useDirectScanner")).booleanValue();
+        final boolean useDirectScanner = RedSystemProperties.shouldUseDirectScanner();
         final RedTokenScanner tokenScanner = new RedTokenScanner(rules);
         final ITokenScanner scanner = useDirectScanner ? tokenScanner : new RedCachingScanner(tokenScanner, store);
         final DefaultDamagerRepairer damagerRepairer = useDirectScanner ? new DefaultDamagerRepairer(scanner)
