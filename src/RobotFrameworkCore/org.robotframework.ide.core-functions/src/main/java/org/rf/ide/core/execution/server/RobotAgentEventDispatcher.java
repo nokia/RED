@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -243,7 +244,7 @@ class RobotAgentEventDispatcher {
 
     private void handleVariables(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("vars");
-        final Map<String, Object> vars = ensureMapOfStringsToObjects((Map<?, ?>) arguments.get(1));
+        final Map<String, Object> vars = ensureOrderedMapOfStringsToObjects((Map<?, ?>) arguments.get(1));
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleVariables(vars);
@@ -252,7 +253,7 @@ class RobotAgentEventDispatcher {
 
     private void handleGlobalVariables(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("global_vars");
-        final Map<String, String> globalVars = ensureMapOfStringsToStrings((Map<?, ?>) arguments.get(1));
+        final Map<String, String> globalVars = ensureOrderedMapOfStringsToStrings((Map<?, ?>) arguments.get(1));
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleGlobalVariables(globalVars);
@@ -369,11 +370,15 @@ class RobotAgentEventDispatcher {
         return list.stream().map(String.class::cast).collect(Collectors.toList());
     }
 
-    private static Map<String, Object> ensureMapOfStringsToObjects(final Map<?, ?> map) {
-        return map.entrySet().stream().collect(Collectors.toMap(e -> (String) e.getKey(), Map.Entry::getValue));
+    private static Map<String, Object> ensureOrderedMapOfStringsToObjects(final Map<?, ?> map) {
+        final LinkedHashMap<String, Object> result = new LinkedHashMap<>();
+        map.entrySet().stream().forEach(e -> result.put((String) e.getKey(), e.getValue()));
+        return result;
     }
 
-    private static Map<String, String> ensureMapOfStringsToStrings(final Map<?, ?> map) {
-        return map.entrySet().stream().collect(Collectors.toMap(e -> (String) e.getKey(), e -> (String) e.getValue()));
+    private static Map<String, String> ensureOrderedMapOfStringsToStrings(final Map<?, ?> map) {
+        final LinkedHashMap<String, String> result = new LinkedHashMap<>();
+        map.entrySet().stream().forEach(e -> result.put((String) e.getKey(), (String) e.getValue()));
+        return result;
     }
 }

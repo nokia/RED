@@ -11,7 +11,6 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.debug.core.DebugException;
@@ -28,11 +27,13 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable
 @SuppressWarnings("PMD.GodClass")
 public class RobotDebugVariablesManager {
 
-    public static final String GLOBAL_VARIABLE_NAME = "Global Variables";
+    private static final String GLOBAL_VARIABLE_NAME = "Global Variables";
 
-    public static final String SUITE_VARIABLE_PREFIX = "SUITE_";
+    private static final String SUITE_VARIABLE_PREFIX = "SUITE_";
 
-    public static final String TEST_VARIABLE_PREFIX = "TEST_";
+    private static final String TEST_VARIABLE_PREFIX = "TEST_";
+
+    private static final int VARIABLE_NAME_OFFSET = 2;
 
     private final RobotDebugTarget target;
 
@@ -47,7 +48,7 @@ public class RobotDebugVariablesManager {
     public RobotDebugVariablesManager(final RobotDebugTarget target) {
         this.target = target;
         this.previousVariables = new ConcurrentLinkedDeque<>();
-        this.globalVariables = new TreeMap<>();
+        this.globalVariables = new LinkedHashMap<>();
         this.nestedGlobalVars = new LinkedHashMap<>();
         this.sortedVariablesNames = new LinkedList<>();
     }
@@ -201,18 +202,15 @@ public class RobotDebugVariablesManager {
     }
 
     public void sortVariablesNames(final Map<String, Object> vars) {
-
         final String[] varArray = vars.keySet().toArray(new String[vars.keySet().size()]);
         for (int i = varArray.length - 1; i >= 0; i--) {
             final String varName = varArray[i];
-            if (!sortedVariablesNames.contains(varName)) {
-                if (varName.contains(SUITE_VARIABLE_PREFIX)) {
-                    sortedVariablesNames.addLast(varName);
-                } else if (varName.contains(TEST_VARIABLE_PREFIX)) {
-                    sortedVariablesNames.addLast(varName);
-                } else {
-                    sortedVariablesNames.addFirst(varName);
-                }
+            if (varName.startsWith(SUITE_VARIABLE_PREFIX, VARIABLE_NAME_OFFSET)) {
+                sortedVariablesNames.addLast(varName);
+            } else if (varName.startsWith(TEST_VARIABLE_PREFIX, VARIABLE_NAME_OFFSET)) {
+                sortedVariablesNames.addLast(varName);
+            } else {
+                sortedVariablesNames.addFirst(varName);
             }
         }
     }
@@ -223,7 +221,7 @@ public class RobotDebugVariablesManager {
 
     public void setGlobalVariables(final Map<String, String> globalVariables) {
         if (globalVariables != null) {
-            this.globalVariables = new TreeMap<String, String>(globalVariables);
+            this.globalVariables = globalVariables;
             this.globalVariables.entrySet().forEach(entry -> {
                 final RobotDebugVariable variable = new RobotDebugVariable(target, entry.getKey(), entry.getValue());
                 variable.disableValueModificationSupport();
