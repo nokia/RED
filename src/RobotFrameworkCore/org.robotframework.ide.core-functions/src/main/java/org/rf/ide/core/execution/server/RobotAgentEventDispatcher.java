@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.MessageLevel;
 import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.Status;
@@ -343,7 +342,7 @@ class RobotAgentEventDispatcher {
         final List<?> arguments = (List<?>) eventMap.get("message");
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
         final String msg = (String) attributes.get("message");
-        final MessageLevel level = MessageLevel.valueOf(((String) attributes.get("level")).toUpperCase());
+        final LogLevel level = LogLevel.valueOf(((String) attributes.get("level")).toUpperCase());
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleMessage(msg, level);
