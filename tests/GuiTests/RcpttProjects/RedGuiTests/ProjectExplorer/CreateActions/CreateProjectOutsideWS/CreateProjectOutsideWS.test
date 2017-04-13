@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XYaQ4GayEeWtd9WfYYPSCg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/12/17 3:58 PM
+Save-Time: 4/13/17 2:14 PM
 Testcase-Type: ecl
 Verifications: _soBX8JUbEeaXOtocAkFx_w
 
@@ -18,12 +18,15 @@ concat $user_folder "/new_folder"| let [val project_path_outside_ws -input] {
 	if [get-file [uri-from-path $project_path_outside_ws] | get exists]{
 		delete-file [uri-from-path $project_path_outside_ws]
 	}
+	
+	//create new project "new"
 	get-view "Project Explorer" | get-tree | get-menu "New/Robot Project" | click
 	with [get-window "New Robot project"] {
 	    get-editbox -after [get-label "Project name:"] | set-text new
 	    get-button "Use default location" | uncheck
 	}
 	
+	//select path outside workspace
 	with [get-window "New Robot project"] {
     get-editbox -after [get-label "Robot Project"] | get-property text 
         | equals "Project location directory must be specified" | verify-true
@@ -36,29 +39,36 @@ concat $user_folder "/new_folder"| let [val project_path_outside_ws -input] {
 	    get-button "Browse..." | click
 	    get-button Finish | click
 	}
+	
+	//create suite
 	get-view "Project Explorer" | get-tree | select new | get-menu "New/Robot Test Suite" | click
 	with [get-window "New Robot Test Suite"] {
 	    get-editbox -after [get-label "File name:"] | set-text "test.robot"
 	    get-button Finish | click
 	}
+	
+	//add test
 	with [get-editor "test.robot"] {
 	    with [get-text-viewer] {
 	        set-caret-pos 1 19
 	        key-type "NUMPAD_ENTER" "\\u000D"
 	        type-text aba
 	        key-type Enter
-	        key-type Tab
 	        type-text "Log   5"
 	        key-type "M1+s"
 	    }
 	    close
 	}
-	get-view "Project Explorer" | get-tree | select new | select new | get-menu Delete | click
+	
+	//remove project
+	get-view "Project Explorer" | get-tree | select new | get-menu Delete | click
 	get-window "Delete Resources" | get-button OK | click
+	
+	//import the same project
 	get-view "Project Explorer" | get-tree | get-menu "Import..." | click
 	with [get-window Import | get-tree] {
 	    select General | select General | double-click
-	    select "General/Existing Projects into Workspace" | select "General/Existing Projects into Workspace" | double-click
+	    select "General/Existing Projects into Workspace" | double-click
 	}
 	set-dialog-result Folder $project_path_outside_ws
 	with [get-window Import] {
@@ -73,6 +83,7 @@ if [get-view Problems | get-tree | get-property itemCount -raw | gt 0]{
 }
 get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 
+get-view "Project Explorer" | get-tree | get-item "new/test.robot" | expand-all
 get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder" | double-click
 
 wait 2000
