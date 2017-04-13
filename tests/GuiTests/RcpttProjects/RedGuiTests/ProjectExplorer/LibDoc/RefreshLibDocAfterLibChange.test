@@ -1,14 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
+Contexts: _t9mOYJ3DEeWVv_UItyy1RQ,_2JCD4B3CEeehL98jfxP8Sw
 Element-Name: RefreshLibDocAfterLibChange
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _qW9rQKJrEeWiTrudgyrHcQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:37 AM
-Tags: Unstable
+Save-Time: 4/13/17 3:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -215,5 +214,8 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries" 
         | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Zebra | verify-true
 }    
+
+remove-all-libraries-from-xml
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
