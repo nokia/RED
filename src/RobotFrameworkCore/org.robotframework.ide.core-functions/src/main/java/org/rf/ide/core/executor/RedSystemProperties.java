@@ -23,6 +23,8 @@ public class RedSystemProperties {
 
     public static final String RED_USE_OLD_REPARSED_LINK_MODE = "red.useOldReparsedLinkMode";
 
+    public static final String RED_USE_DIRECT_SCANNER = "red.useDirectScanner";
+
     public static boolean shouldConnectToRunningServer() {
         return System.getProperty(RED_CONNECT_TO_SERVER_AT) != null;
     }
@@ -43,6 +45,10 @@ public class RedSystemProperties {
         return Boolean.valueOf(System.getProperty(RED_USE_OLD_REPARSED_LINK_MODE));
     }
 
+    public static boolean shouldUseDirectScanner() {
+        return Boolean.valueOf(System.getProperty(RED_USE_DIRECT_SCANNER));
+    }
+
     public static boolean isWindowsPlatform() {
         return System.getProperty("os.name").toLowerCase().contains("win");
     }
@@ -52,7 +58,15 @@ public class RedSystemProperties {
     }
 
     public static List<String> getPythonPaths() {
-        final String paths = System.getenv("PYTHONPATH");
+        return getPaths("PYTHONPATH");
+    }
+
+    public static List<String> getClassPaths() {
+        return getPaths("CLASSPATH");
+    }
+
+    private static List<String> getPaths(final String name) {
+        final String paths = System.getenv(name);
         if (paths == null || paths.isEmpty()) {
             return new ArrayList<>();
         }

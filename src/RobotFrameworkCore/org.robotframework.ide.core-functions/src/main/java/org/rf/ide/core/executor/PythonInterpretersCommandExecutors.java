@@ -17,11 +17,11 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirect
 
 /**
  * @author Michal Anglart
- *
  */
 class PythonInterpretersCommandExecutors {
 
     private static class InstanceHolder {
+
         private static final PythonInterpretersCommandExecutors INSTANCE = new PythonInterpretersCommandExecutors();
     }
 
@@ -40,8 +40,8 @@ class PythonInterpretersCommandExecutors {
             xmlRpcServerScriptFile = RobotRuntimeEnvironment.copyScriptFile("robot_session_server.py");
             RobotRuntimeEnvironment.copyScriptFile("classpath_updater.py");
             RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_variables.py");
             RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
+            RobotRuntimeEnvironment.copyScriptFile("red_variables.py");
             RobotRuntimeEnvironment.copyScriptFile("red_virtualenv_check.py");
         } catch (final IOException e) {
             xmlRpcServerScriptFile = null;
@@ -77,33 +77,27 @@ class PythonInterpretersCommandExecutors {
                 .resolve(interpreter.executableName())
                 .toAbsolutePath()
                 .toString();
-        
-        if (RedSystemProperties.shouldUseDirectExecutor()) {
-            return new RobotCommandDirectExecutor(pathAsName, interpreter);
-        }
 
-        if (xmlRpcServerScriptFile == null) {
-            return new RobotCommandDirectExecutor(pathAsName, interpreter);
-        }
-
-        RobotCommandRpcExecutor executor = executors.get(pathAsName);
-        if (executor != null && (executor.isAlive() || executor.isExternal())) {
-            return executor;
-        } else if (executor != null) {
-            executors.remove(pathAsName);
-        }
-        try {
-            executor = new RobotCommandRpcExecutor(pathAsName, interpreter, xmlRpcServerScriptFile);
-            executor.waitForEstablishedConnection();
-            if (executor.isAlive() || executor.isExternal()) {
-                executors.put(pathAsName, executor);
+        if (!RedSystemProperties.shouldUseDirectExecutor() && xmlRpcServerScriptFile != null) {
+            RobotCommandRpcExecutor executor = executors.get(pathAsName);
+            if (executor != null && (executor.isAlive() || executor.isExternal())) {
                 return executor;
-            } else {
-                return new RobotCommandDirectExecutor(pathAsName, interpreter);
+            } else if (executor != null) {
+                executors.remove(pathAsName);
             }
-        } catch (final RobotCommandExecutorException e) {
-            return new RobotCommandDirectExecutor(pathAsName, interpreter);
+            try {
+                executor = new RobotCommandRpcExecutor(pathAsName, interpreter, xmlRpcServerScriptFile);
+                executor.waitForEstablishedConnection();
+                if (executor.isAlive() || executor.isExternal()) {
+                    executors.put(pathAsName, executor);
+                    return executor;
+                }
+            } catch (final RobotCommandExecutorException e) {
+                // direct executor will be returned
+            }
         }
+
+        return new RobotCommandDirectExecutor(pathAsName, interpreter);
     }
 
     RobotCommandExecutor getDirectRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
