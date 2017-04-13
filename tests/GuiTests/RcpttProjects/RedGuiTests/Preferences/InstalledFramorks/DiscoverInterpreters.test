@@ -6,8 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-qvG8Ae3EearkLC-7wHL-g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/6/17 11:16 AM
-Tags: Unstable
+Save-Time: 4/13/17 3:36 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -20,6 +19,12 @@ After restart is timout
 Content-Type: text/ecl
 Entry-Name: .content
 
+//
+//
+//									You must have installed python and jython. Other intrpreters are omitted.
+//
+//
+//
 //restart RED
 restart-aut
 wait-until-eclipse-is-ready
@@ -55,18 +60,18 @@ with [get-window Preferences | get-table] {
 }
 
 //remove all interpreters
-with [get-window Preferences] {
-    get-table | select"Robot Framework .*\\(Python .*\\)"
-    get-button Remove | click
-    get-table | select "Robot Framework .*\\(Jython .*\\)"
-    get-button Remove | click
+repeat  -times [get-window Preferences | get-table | get-property itemCount -raw] -command{
+	with [get-window Preferences] {
+	    get-table | get-item ".*" -index 0 | click
+	    get-button Remove | click
+	}
 }
 get-window Preferences | get-table | get-property itemCount | equals 0 | verify-true
 
 //select Discover button
 get-window Preferences | get-button Discover | click
 
-//check
+//check if pytohn and jython are visible
 with [get-window Preferences | get-table] {
     get-item"Robot Framework .*\\(Python .*\\)" | get-property selected | equals false | verify-true
     get-item"Robot Framework .*\\(Python .*\\)" | get-property checked | equals false | verify-true
@@ -74,6 +79,8 @@ with [get-window Preferences | get-table] {
         | equals $robot_version  | verify-true
     get-item"Robot Framework .*\\(Python .*\\)" | get-property "values['Path']" | equals $python_exe_path
         | verify-true
+        
+        
     get-item "Robot Framework .*\\(Jython .*\\)" | get-property selection | equals false 
         | verify-true
     get-item "Robot Framework .*\\(Jython .*\\)" | get-property enablement | equals false 
@@ -83,6 +90,8 @@ with [get-window Preferences | get-table] {
     get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Path']" 
         | equals $jython_path | verify-true
 }
+
+//select python is bold after selecting
 get-window Preferences | get-table | get-item"Robot Framework .*\\(Python .*\\)" | check
 with [get-window Preferences | get-table] {
     get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals bold 
@@ -96,6 +105,8 @@ with [get-window Preferences | get-table] {
     get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
         | equals normal | verify-true
 }
+
+//select jython now
 get-window Preferences | get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
 with [get-window Preferences | get-table] {
     get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals normal 
@@ -107,11 +118,15 @@ with [get-window Preferences | get-table] {
     get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
         | equals bold | verify-true
 }
+
+//select python again adn close window
 with [get-window Preferences] {
     get-table | get-item"Robot Framework .*\\(Python .*\\)" | check
     get-button OK | click
     get-window "Rebuild required" | get-button OK | click
 }
+
+//add test
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 1 19
@@ -121,11 +136,21 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     type-text "log  66"
     key-type "M1+s"
 }
+
+//run test
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
 get-tab-folder -index 5 | get-tab-item "Message Log" | click
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test\n"
     + ".* : INFO : 66\n"
     + "Ending test: RobotProject.TestFile.test" | verify-true
 
+//check i python was used to run test
+with [get-view Console] {
+    get-label "<terminated> TestFile.robot \[Robot\].*" | get-property caption 
+        | equals [format "<terminated> TestFile.robot [Robot] %s%s%s" $python_exe_path $sys_sep [get-by-os -win "python.exe" -linux "python" ]]| verify-true
+}
+
+get-view Console | get-text-viewer | get-object |invoke getLine  0 
+	 |  matches [format "Command: %s%s .*" [replace $python_exe_path -old "\\" -new "\\\\"]  [get-by-os -win "\\\\python.exe" -linux "/python" ]]|verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
