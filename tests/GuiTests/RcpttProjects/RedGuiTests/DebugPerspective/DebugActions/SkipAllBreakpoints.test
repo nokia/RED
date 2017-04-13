@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OdaRMJbhEeaa4JtzzKMFzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 4:55 PM
+Save-Time: 4/13/17 3:09 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -45,7 +45,8 @@ with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column Annotatio
 //run test
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
     | click
-wait 3000    
+
+wait-for-console  
 
 //check if test ended with no BP
 get-view Debug | get-tree 
@@ -96,9 +97,9 @@ with [get-view Console] {
 get-editor "BigScript.robot" | get-text-viewer | set-caret-pos 37 1
 get-button "Debug.*" | click
 
-wait 3000
-//check if test ended with no BP
+wait-for-console
 
+//check if test ended with no BP
 get-view Console | get-editbox -after [get-label "<terminated> .*"] 
     | get-property text -raw | not-eq "" | verify-true
     
