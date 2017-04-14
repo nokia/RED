@@ -151,7 +151,8 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
             debugTarget.clearStackFrames();
         }
 
-        if (keywordExecutionManager.getCurrentSuiteFile() == null) {
+        if (keywordExecutionManager.getCurrentSuiteFile() == null
+                && !executionContext.isSuiteSetupTeardownKeyword(type)) {
             final String message = String.format(
                     "Invalid execution context: suite='%s', name='%s', type='%s', args='%s'",
                     keywordExecutionManager.getCurrentSuiteName(), name, type, args);
