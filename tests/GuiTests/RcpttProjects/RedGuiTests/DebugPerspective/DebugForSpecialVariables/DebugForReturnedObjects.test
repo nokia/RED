@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _uTxjELYgEeazMIT-6yPcSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/30/17 11:35 AM
+Save-Time: 4/14/17 2:18 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -69,6 +69,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//go to map (3 items)
 	get-button "Step Into (F5)" | click
+	wait 1000
 	check-debug-marker-on-ruler -line 12 -script_name "test.robot"
 	
 	get-view Variables | get-tree | get-item ".*" -index 0 | expand-all
