@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RTKmUJNnEeWXp4iZQnTw0A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:49 AM
+Save-Time: 4/14/17 9:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -70,12 +70,9 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
 get-menu "Project/Clean..." | click
 get-window Clean | get-button OK | click
 
-try -times 5 -delay 1000 -command{
-	// there are no problems
-	get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
-}
-// check if libspec is generated from CalculatorLibrary
+wait-for-zero-items -times 5 -delay 1000
 
+// check if libspec is generated from CalculatorLibrary
 with [get-view "Project Explorer" | get-tree] {
     get-item "ProjectWithResource/Robot Referenced libraries/CalculatorLibrary ProjectWithResource\\/external_lib \\(4\\)" 
         | get-property caption | equals "CalculatorLibrary ProjectWithResource/external_lib (4)" | verify-true
@@ -120,7 +117,6 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     set-caret-pos 8 40
     type-text " "
 }
-wait 2000
-// there should be zero problems
-get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+wait-for-zero-items -times 2 -delay 1000
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
