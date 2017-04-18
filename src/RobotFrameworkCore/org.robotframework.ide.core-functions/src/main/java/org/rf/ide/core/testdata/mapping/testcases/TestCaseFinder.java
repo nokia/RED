@@ -6,7 +6,6 @@
 package org.rf.ide.core.testdata.mapping.testcases;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -104,14 +103,12 @@ public class TestCaseFinder {
             final int tableHeaderLineNumber = tableHeader.getTableHeader()
                     .getLineNumber();
             final int numberOfTestCases = testCasesAvail.size();
-            for (int i = numberOfTestCases - 1; i >= 0; i--) {
+            for (int i = 0; i < numberOfTestCases; i++) {
                 final TestCase test = testCasesAvail.get(i);
                 if (test.getTestName().getLineNumber() > tableHeaderLineNumber) {
                     testCases.add(test);
                 }
             }
-
-            Collections.reverse(testCases);
         }
 
         return testCases;

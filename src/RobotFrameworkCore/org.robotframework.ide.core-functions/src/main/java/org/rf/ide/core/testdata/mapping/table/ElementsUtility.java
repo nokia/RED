@@ -200,7 +200,7 @@ public class ElementsUtility {
                         }
                     }
                 }
-                if (exactlyOnPosition.getRaw().toString().equals(text)) {
+                if (exactlyOnPosition.getRaw().equals(text)) {
                     correct = exactlyOnPosition;
                 } else {
                     final RobotToken newRobotToken = new RobotToken();
@@ -225,7 +225,7 @@ public class ElementsUtility {
                 newRobotToken.setText(text);
                 newRobotToken.setRaw(text);
                 if (text != null
-                        && !(text.equals(token.getRaw().toString()) || text.trim().equals(token.getRaw().trim()))) {
+                        && !(text.equals(token.getRaw()) || text.trim().equals(token.getRaw().trim()))) {
                     newRobotToken.setType(RobotTokenType.UNKNOWN);
                 } else {
                     newRobotToken.getTypes().clear();
@@ -331,7 +331,7 @@ public class ElementsUtility {
         for (final RobotToken rt : robotTokens) {
             final List<IRobotTokenType> types = rt.getTypes();
             if (types.contains(RobotTokenType.START_HASH_COMMENT) || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
-                if (text.equals(rt.getRaw().toString())) {
+                if (text.equals(rt.getRaw())) {
                     comment = rt;
                     break;
                 }
@@ -647,7 +647,7 @@ public class ElementsUtility {
                 final IRobotLineElement elem = elements.get(elemIndex);
                 if (elem instanceof RobotToken) {
                     final RobotToken token = (RobotToken) elem;
-                    final String tokenText = token.getRaw().toString();
+                    final String tokenText = token.getRaw();
                     if (RobotTokenType.PREVIOUS_LINE_CONTINUE.getRepresentation().get(0).equals(tokenText)) {
                         lti.positionsOfLineContinoue.add(elemIndex);
                         if (lti.positionsOfNotEmptyElements.isEmpty()) {
