@@ -51,6 +51,14 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
+        if (!robotConfig.hasValidVersion()) {
+            throw newCoreException("This configuration is incompatible with RED version you are currently using."
+                    + "\nExpected: "
+                    + RobotLaunchConfiguration.ACTUAL_CONFIGURATION_VERSION + ", but was: "
+                    + robotConfig.getConfigurationVersion()
+                    + "\nResolution: Delete old configurations manually and create the new ones.");
+        }
+
         final String host = robotConfig.getAgentConnectionHost();
         final int port = robotConfig.getAgentConnectionPort();
         final int timeout = robotConfig.getAgentConnectionTimeout();
