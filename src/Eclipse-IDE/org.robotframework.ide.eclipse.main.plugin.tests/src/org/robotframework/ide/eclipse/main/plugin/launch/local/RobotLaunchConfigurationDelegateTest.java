@@ -15,6 +15,7 @@ import java.io.File;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -176,5 +177,20 @@ public class RobotLaunchConfigurationDelegateTest {
         robotConfig.fillDefaults();
         robotConfig.setProjectName(projectName);
         return robotConfig;
+    }
+
+    @Test(expected = CoreException.class)
+    public void whenConfigurationVersionIsInvalid_coreExceptionIsThrown() throws Exception {
+
+        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
+        final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+        robotConfig.fillDefaults();
+        robotConfig.setProjectName(PROJECT_NAME);
+
+        final ILaunchConfigurationWorkingCopy launchCopy = configuration.getWorkingCopy();
+        launchCopy.setAttribute("Version of configuration", "invalid");
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        launchDelegate.doLaunch(launchCopy, null, null, null);
     }
 }
