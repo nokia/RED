@@ -445,7 +445,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             ParsingState newStatus = parsingStateHelper.getStatus(robotToken);
             boolean wasRecognizedCorrectly = true;
             if (robotToken != null) {
-                if (!text.trim().equals(robotToken.getText().toString().trim())) {
+                if (!text.trim().equals(robotToken.getText().trim())) {
                     wasRecognizedCorrectly = false;
                     // FIXME: incorrect type
                     final RobotToken newRobotToken = new RobotToken();
