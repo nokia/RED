@@ -1,0 +1,134 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _u8PH4CQWEeeO6fW46SeMzw
+Element-Name: ContentAssistForLibsWithAliases
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _L2Q5ICQVEeeO6fW46SeMzw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/18/17 1:15 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open project
+with [get-view "Project Explorer" | get-tree] {
+    select AliasProject | double-click
+    select "AliasProject/TestSuite.robot" | double-click
+}
+
+// enter settings: libraries and resource
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    key-type Enter -times 2
+    key-type Up -times 2
+    type-text "*** Settings"
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text Libra
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text libra
+    key-type Enter -times 2
+    type-text Lib
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text library2
+    key-type Enter
+    type-text WITG
+    key-type BackSpace
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text alias
+    key-type Enter
+    type-text Res
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "res/"
+    key-type Enter -times 2
+    // enter Suite Setup for library
+    type-text Su
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text library1
+}
+// verify content assist for library name
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals library1 | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select library1 | click -default
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Add - library1" | click 
+    -default
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 5 28
+    key-type Enter
+    // enter Suite Teardown for library
+    type-text Su
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    type-text al
+}
+// verify content assist for library alias
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals alias | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select alias | click -default
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Function - alias" | click 
+    -default
+get-editor "TestSuite.robot" | get-text-viewer | set-caret-pos 6 33
+
+// verify if no errors
+wait-for-zero-items -times 2 -delay 500
+
+// delete Suite Setup and Suitne Teardown
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 6 27
+    select-range 6 33 6 24
+    set-caret-pos 6 23
+    select-range 6 33 6 23
+    set-caret-pos 6 22
+    select-range 6 33 6 22
+    set-caret-pos 6 21
+    select-range 6 33 5 1
+    key-type BackSpace
+    // enter Suite Setup for resource 
+    type-text SU
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text res1
+}
+// verify content assist for resource name
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals res1 | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select res1 | click -default
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "res from res 2 - res1.tsv" 
+    | click -default
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 5 44
+    select-range 5 45 5 39
+    type-text arg1
+    key-type Enter
+    // enter Suite Teardown for resource 
+    type-text Su
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    type-text res1
+}
+
+// verify content assist for resource name
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals res1 | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select res1 | click -default
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "res from res 2 - res1.tsv" 
+    | click -default
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    type-text arg1
+    key-type Enter
+    key-type "M1+s"
+}
+
+// verify if no errors
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
