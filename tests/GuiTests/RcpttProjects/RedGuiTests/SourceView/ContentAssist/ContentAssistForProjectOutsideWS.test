@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KcAh0J2aEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/31/17 4:32 PM
+Save-Time: 4/14/17 9:59 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -35,10 +35,9 @@ with [get-window "New Robot Resource file"] {
 with [get-view "Project Explorer" | get-tree] {
     select "MediumRobotTest/Script.robot" | double-click
 }
-wait 2000
-
 get-tab-folder -index 4 | get-tab-item Problems | click
-get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+wait-for-zero-items -times 4 -delay 500
 
 //add res2.tsv file
 with [get-editor "Script.robot" | get-text-viewer] {
@@ -125,7 +124,5 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "kw from res 1 - res1.robot" 
     | click -default
 
-wait 2000    
-get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
-
+wait-for-zero-items -times 4 -delay 500
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
