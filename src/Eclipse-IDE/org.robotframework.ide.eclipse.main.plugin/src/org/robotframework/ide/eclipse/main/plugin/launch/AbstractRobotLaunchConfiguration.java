@@ -32,6 +32,8 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
 
     private static final String AGENT_CONNECTION_TIMEOUT_ATTRIBUTE = "Agent connection timeout";
 
+    protected static final String VERSION_OF_CONFIGURATION = "Version of configuration";
+
     protected final ILaunchConfiguration configuration;
 
     protected AbstractRobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -172,6 +174,16 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
     }
 
     @Override
+    public String getConfigurationVersion() throws CoreException {
+        String version = configuration.getAttribute(VERSION_OF_CONFIGURATION, "0.0");
+        // hack for non-versioned otherwise valid RED 7.6 configs
+        version = "0.0".equals(version)
+                ? (configuration.getAttribute(DebugPlugin.ATTR_PROCESS_FACTORY_ID, "").isEmpty() ? "0.0" : "1.0")
+                : version;
+        return version;
+    }
+
+    @Override
     public void fillDefaults() throws CoreException {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         setUsingRemoteAgent(false);
@@ -180,6 +192,7 @@ public abstract class AbstractRobotLaunchConfiguration implements IRobotLaunchCo
         setAgentConnectionTimeoutValue(preferences.getLaunchAgentConnectionTimeout());
         setProjectName("");
         setProcessFactory(LaunchConfigurationsWrappers.FACTORY_ID);
+        setActualConfigurationVersion();
     }
 
     private void setProcessFactory(final String id) throws CoreException {
