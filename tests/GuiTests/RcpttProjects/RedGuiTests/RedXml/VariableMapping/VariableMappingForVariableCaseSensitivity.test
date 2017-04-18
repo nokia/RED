@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _8foS4Lg6EeWCL6HwBALbRw
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 1/13/16 4:35 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/14/17 11:58 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -76,8 +76,8 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     type-text P
     key-type "M1+s"
 }
-wait 2000
+
 // should work thus no problems
-get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+wait-for-zero-items -times 2 -delay 1000
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

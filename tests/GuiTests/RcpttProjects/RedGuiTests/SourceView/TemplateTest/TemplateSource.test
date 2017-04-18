@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _TcPhkJz9EeWVv_UItyy1RQ
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/12/16 11:02 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/14/17 1:24 PM
 Testcase-Type: ecl
 Verifications: _5cOf0Jz9EeWVv_UItyy1RQ,_n6u_AJz9EeWVv_UItyy1RQ,_-RFV8Jz9EeWVv_UItyy1RQ,_e3uGYJz9EeWVv_UItyy1RQ
 
@@ -19,11 +19,9 @@ with [get-view "Project Explorer" | get-tree] {
     select "Template/test.robot" | select "Template/test.robot" | double-click
     select "Template/test_template.robot" | double-click
 }
-try -times 4 -delay 1000 -command{
-	//check that is one warning
-	get-view Problems | get-label "0 errors, 1 warning, 0 others" | get-property caption 
-	    | equals "0 errors, 1 warning, 0 others" | verify-true
-}    
+
+wait-for-warnings -amount 1 -times 4 -delay 1000
+
 get-view Problems | get-tree | select "Warnings \\(1 item\\)" | double-click
 get-view Problems | get-tree | get-item "Warnings \\(1 item\\)/The \\[Template\\] test case setting is empty" 
     | get-property caption | equals "The [Template] test case setting is empty" | verify-true

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Vq8JMHM5EeWGwMKsQg8irg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/4/17 4:54 PM
+Save-Time: 4/14/17 11:10 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,24 +42,16 @@ proc "check-if-no-markers-exists" [val test_name]{
 					}
 				}
 			}
-		
 		}
-	
 		if [read-lines -uri [uri-from-path $marker_log_path]  |  length |gt 0 ]{
 			read-lines -uri [uri-from-path $marker_log_path]  |  length  | eq 0 | assert-true -message  [concat [read-lines -uri [uri-from-path $marker_log_path]]]
 			delete-file [uri-from-path  $marker_log_path] 
 		}
-		
 	}
-
 }
-
-get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | expand-all
 
 //wait to add markers
-try -times 5  -delay 1000 -command{
-	get-view Problems | get-tree | get-item "Errors \\(9 items\\)" | get-property childCount | equals 9 | verify-true
-}
+wait-for-errors -amount 9 -times 5 -delay 1000
 
 //open editor for Suite end check if no error is shown
 with [get-view "Project Explorer" | get-tree] {
