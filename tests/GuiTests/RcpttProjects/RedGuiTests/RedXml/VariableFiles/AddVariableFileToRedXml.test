@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _XgSTEJNrEeWXp4iZQnTw0A
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/15/16 4:17 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/14/17 9:51 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,8 +24,8 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     key-type Tab
     type-text "${externalvar}"
 	key-type "M1+s"
-	
 }
+
 // check if error exists for not known variable
 get-tab-folder -index 4 | get-tab-item Problems | click
 get-view Problems | get-tree | get-item "Errors \\(1 item\\)/Variable 'externalvar' is used, but not defined" 
@@ -38,7 +38,6 @@ with [get-editor "ProjectWithResource/red.xml"] {
     with [get-tab-folder] {
         get-tab-item "Variable files" | click
     }
-
 }
 
 get-editor "ProjectWithResource/red.xml" | get-section "Variable files" | get-table | select "...add new variable file"
@@ -57,11 +56,9 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
 }
 
 get-button "Save \((Ctrl|M1)\+S\)" | click
-wait 2000
-// check if there are not errors - variable is seen
 get-tab-folder -index 4 | get-tab-item Problems | click
-get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 
+wait-for-zero-items -times 4 -delay 500
 
 //add arguments
 get-tab-folder -index 1 | get-tab-item "ProjectWithResource/red.xml" | click
