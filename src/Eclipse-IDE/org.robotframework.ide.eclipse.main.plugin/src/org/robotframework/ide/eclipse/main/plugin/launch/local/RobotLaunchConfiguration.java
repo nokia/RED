@@ -71,6 +71,8 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     private static final String EXECUTABLE_FILE_ARGUMENTS_ATTRIBUTE = "Executable file arguments";
 
+    public static final String ACTUAL_CONFIGURATION_VERSION = "1.0";
+
     public static String[] getSystemDependentExecutableFileExtensions() {
         return RedSystemProperties.isWindowsPlatform() ? new String[] { "*.bat;*.com;*.exe", "*.*" }
                 : new String[] { "*.sh", "*.*" };
@@ -150,6 +152,17 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         setExcludedTags(new ArrayList<String>());
         setIsGeneralPurposeEnabled(true);
         super.fillDefaults();
+    }
+
+    @Override
+    public void setActualConfigurationVersion() throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(VERSION_OF_CONFIGURATION, ACTUAL_CONFIGURATION_VERSION);
+    }
+
+    @Override
+    public boolean hasValidVersion() throws CoreException {
+        return ACTUAL_CONFIGURATION_VERSION.equals(getConfigurationVersion());
     }
 
     public void setUsingInterpreterFromProject(final boolean usesProjectExecutor) throws CoreException {

@@ -22,6 +22,8 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
 
     public static final String TYPE_ID = "org.robotframework.ide.remoteRobotLaunchConfiguration";
 
+    public static final String ACTUAL_CONFIGURATION_VERSION = "1.0";
+
     public RemoteRobotLaunchConfiguration(final ILaunchConfiguration config) {
         super(config);
     }
@@ -34,6 +36,17 @@ public class RemoteRobotLaunchConfiguration extends AbstractRobotLaunchConfigura
     @Override
     public boolean isUsingRemoteAgent() throws CoreException {
         return true;
+    }
+
+    @Override
+    public void setActualConfigurationVersion() throws CoreException {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        launchCopy.setAttribute(VERSION_OF_CONFIGURATION, ACTUAL_CONFIGURATION_VERSION);
+    }
+
+    @Override
+    public boolean hasValidVersion() throws CoreException {
+        return ACTUAL_CONFIGURATION_VERSION.equals(getConfigurationVersion());
     }
 
     public static ILaunchConfigurationWorkingCopy prepareDefault(final IProject project) throws CoreException {
