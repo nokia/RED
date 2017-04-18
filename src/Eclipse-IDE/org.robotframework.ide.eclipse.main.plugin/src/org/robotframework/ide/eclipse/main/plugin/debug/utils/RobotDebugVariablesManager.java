@@ -205,12 +205,14 @@ public class RobotDebugVariablesManager {
         final String[] varArray = vars.keySet().toArray(new String[vars.keySet().size()]);
         for (int i = varArray.length - 1; i >= 0; i--) {
             final String varName = varArray[i];
-            if (varName.startsWith(SUITE_VARIABLE_PREFIX, VARIABLE_NAME_OFFSET)) {
-                sortedVariablesNames.addLast(varName);
-            } else if (varName.startsWith(TEST_VARIABLE_PREFIX, VARIABLE_NAME_OFFSET)) {
-                sortedVariablesNames.addLast(varName);
-            } else {
-                sortedVariablesNames.addFirst(varName);
+            if (!sortedVariablesNames.contains(varName)) {
+                if (varName.startsWith(SUITE_VARIABLE_PREFIX, VARIABLE_NAME_OFFSET)) {
+                    sortedVariablesNames.addLast(varName);
+                } else if (varName.startsWith(TEST_VARIABLE_PREFIX, VARIABLE_NAME_OFFSET)) {
+                    sortedVariablesNames.addLast(varName);
+                } else {
+                    sortedVariablesNames.addFirst(varName);
+                }
             }
         }
     }
