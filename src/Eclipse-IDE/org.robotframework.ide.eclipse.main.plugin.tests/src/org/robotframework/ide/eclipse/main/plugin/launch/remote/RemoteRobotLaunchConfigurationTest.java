@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.remote;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,6 +42,8 @@ public class RemoteRobotLaunchConfigurationTest {
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
+        assertThat(robotConfig.getConfigurationVersion())
+                .isEqualTo(RemoteRobotLaunchConfiguration.ACTUAL_CONFIGURATION_VERSION);
     }
 
     @Test
@@ -58,6 +61,8 @@ public class RemoteRobotLaunchConfigurationTest {
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
         assertThat(robotConfig.getAgentConnectionPort()).isEqualTo(43_981);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
+        assertThat(robotConfig.getConfigurationVersion())
+                .isEqualTo(RemoteRobotLaunchConfiguration.ACTUAL_CONFIGURATION_VERSION);
     }
 
     @Test
@@ -202,6 +207,21 @@ public class RemoteRobotLaunchConfigurationTest {
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setProjectName("");
         robotConfig.getProject();
+    }
+
+    @Test(expected = CoreException.class)
+    public void whenConfigurationVersionIsInvalid_coreExceptionIsThrown() throws Exception {
+
+        final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
+        final RemoteRobotLaunchConfiguration robotConfig = new RemoteRobotLaunchConfiguration(configuration);
+        robotConfig.fillDefaults();
+        robotConfig.setProjectName(PROJECT_NAME);
+
+        final ILaunchConfigurationWorkingCopy launchCopy = configuration.getWorkingCopy();
+        launchCopy.setAttribute("Version of configuration", "invalid");
+
+        final RemoteRobotLaunchConfigurationDelegate launchDelegate = new RemoteRobotLaunchConfigurationDelegate();
+        launchDelegate.doLaunch(launchCopy, null, null, null);
     }
 
     private RemoteRobotLaunchConfiguration getDefaultRemoteRobotLaunchConfiguration() throws CoreException {
