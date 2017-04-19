@@ -43,7 +43,7 @@ public class RemoteRobotLaunchConfigurationTest {
         assertThat(robotConfig.getAgentConnectionPort()).isBetween(1, 65_535);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
         assertThat(robotConfig.getConfigurationVersion())
-                .isEqualTo(RemoteRobotLaunchConfiguration.ACTUAL_CONFIGURATION_VERSION);
+                .isEqualTo(RemoteRobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class RemoteRobotLaunchConfigurationTest {
         assertThat(robotConfig.getAgentConnectionPort()).isEqualTo(43_981);
         assertThat(robotConfig.getAgentConnectionTimeout()).isEqualTo(30);
         assertThat(robotConfig.getConfigurationVersion())
-                .isEqualTo(RemoteRobotLaunchConfiguration.ACTUAL_CONFIGURATION_VERSION);
+                .isEqualTo(RemoteRobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
     }
 
     @Test
