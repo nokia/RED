@@ -7,10 +7,16 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:47 AM
+Save-Time: 4/19/17 2:13 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+This test has influance for AddingValuesToPYTHONPATH
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
@@ -72,6 +78,11 @@ with [get-editor "Script.robot" | get-text-viewer] {
     type-text "only_function.py"
     wait 500
     key-type "M1+s"
+    
+}
+
+wait-for-errors -amount 1 -times 3 -delay 1000    
+with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 5 18
     wait 300
     get-menu "Quick Fix" | click
