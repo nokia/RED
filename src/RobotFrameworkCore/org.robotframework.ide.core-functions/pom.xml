@@ -231,11 +231,9 @@
 			              	<resources>
 			                	<resource>
 			                  		<directory>${basedir}/src/main/python</directory>
-			                  		<filtering>true</filtering>
 			                	</resource>
 			                	<resource>
 			                  		<directory>${basedir}/src/test/python</directory>
-			                  		<filtering>true</filtering>
 			                	</resource>
 			              	</resources>              
 		            	</configuration>            
