@@ -16,6 +16,8 @@ class LibdocGenerationTests(unittest.TestCase):
         self.assertNotEqual(libdoc1, libdoc2)
     
     
+class ClassesRetrievingTests(unittest.TestCase):    
+    
     def test_retrieving_classes_from_python_module_with_init(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'module', '__init__.py')
@@ -57,8 +59,8 @@ class LibdocGenerationTests(unittest.TestCase):
         module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'module', '__init__.py')
         python_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'a')]
         class_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'b')]
-        old_sys_path = list(sys.path)
+        old_sys_path = sorted(sys.path)
         
         _get_classes_from_module(module_location, None, python_paths, class_paths)
 
-        self.assertCountEqual(old_sys_path, sys.path)       
+        self.assertListEqual(old_sys_path, sorted(sys.path))      
