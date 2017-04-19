@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pNdEgA47EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/12/17 4:17 PM
+Save-Time: 4/19/17 9:36 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,8 +33,10 @@ with [get-window "Run Configurations"] {
 //run test and check if error is shown
 exec-with-options {
     get-window "Run Configurations" | get-button Run | click
-    get-window "Problem Occurred" | get-label "'Agent connection server' has encountered a problem." 
-        | get-property caption | equals "'Agent connection server' has encountered a problem." | verify-true
+    try -times 4 -delay 1000 -command{
+	    get-window "Problem Occurred" | get-label "'Agent connection server' has encountered a problem." 
+	        | get-property caption | equals "'Agent connection server' has encountered a problem." | verify-true
+    }    
     get-window "Problem Occurred" | get-label "Unable to start server on www.niema-niema.com:43981Unknown host" 
         | get-property caption | equals "Unable to start server on www.niema-niema.com:43981\n"
         + "Unknown host" | verify-true
