@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.executor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -421,74 +419,20 @@ public class RobotRuntimeEnvironment {
      * be provided.
      *
      * @param moduleLocation
-     * @return list of class names or empty list
-     * @throws RobotEnvironmentException
-     */
-    public List<String> getClassesDefinedInModule(final File moduleLocation,
-            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        return getClassesDefinedInModule(moduleLocation, Optional.empty(), additionalPaths);
-    }
-
-    /**
-     * Return names of python classes contained in module point by argument and
-     * all of its submodules. For packages-module __init__.py file path should
-     * be provided.
-     *
-     * @param moduleLocation
+     *            Module location
      * @param moduleName
+     *            Module name or null
      * @return list of class names or empty list
      * @throws RobotEnvironmentException
      */
-    public List<String> getClassesDefinedInModule(final File moduleLocation, final String moduleName,
+    public List<String> getClassesFromModule(final File moduleLocation, final String moduleName,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
-        return getClassesDefinedInModule(moduleLocation, Optional.of(moduleName), additionalPaths);
-    }
-
-    private List<String> getClassesDefinedInModule(final File moduleLocation, final Optional<String> moduleName,
-            final EnvironmentSearchPaths additionalPaths) {
-        // DO NOT split & move to direct/rpc executors since this code may
-        // import quite a lot of modules; maybe we could restart xml-rpc
-        // server from time to time; then we can consider moving this
-        try {
-            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("module_classes_printer.py");
-            RobotRuntimeEnvironment.copyScriptFile("extend_pythonpath.py");
-
-            final SuiteExecutor interpreter = ((PythonInstallationDirectory) location).getInterpreter();
-            final String interpreterPath = location.toPath()
-                    .resolve(interpreter.executableName())
-                    .toAbsolutePath()
-                    .toString();
-
-            final List<String> cmdLine = newArrayList(interpreterPath);
-            if (interpreter == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
-                cmdLine.add("-J-cp");
-                final String classpath = String.join(RedSystemProperties.getPathsSeparator(),
-                        additionalPaths.getClassPaths());
-                cmdLine.add(wrapArgumentIfNeeded(classpath));
-            }
-            cmdLine.add(scriptFile.getAbsolutePath());
-            cmdLine.add(wrapArgumentIfNeeded(moduleLocation.getAbsolutePath()));
-            if (moduleName.isPresent()) {
-                cmdLine.add("-modulename");
-                cmdLine.add(moduleName.get());
-            }
-            if (additionalPaths.hasPythonPaths()) {
-                cmdLine.add("-pythonpath");
-                final String pythonpath = String.join(";", additionalPaths.getExtendedPythonPaths(interpreter));
-                cmdLine.add(wrapArgumentIfNeeded(pythonpath));
-            }
-
-            final List<String> output = new ArrayList<>();
-            final int exitCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> output.add(line));
-            if (exitCode == 0) {
-                return output;
-            } else {
-                throw new RobotEnvironmentException(
-                        "Python interpreter returned following errors:\n\n" + String.join("\n", output));
-            }
-        } catch (final IOException e) {
-            return new ArrayList<>();
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            return executor.getClassesFromModule(moduleLocation, moduleName, additionalPaths);
         }
+        return new ArrayList<>();
     }
 
     public Map<String, Object> getGlobalVariables() {

@@ -12,10 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -23,7 +23,6 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailed
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 
 /**
@@ -62,9 +61,9 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final String resultVars = jsonEncodedOutput.toString().trim();
             final Map<String, Object> variables = new ObjectMapper().readValue(resultVars,
                     STRING_TO_OBJECT_MAPPING_TYPE);
-            return Maps.newLinkedHashMap(variables);
+            return new LinkedHashMap<>(variables);
         } catch (final IOException e) {
-            return Maps.newLinkedHashMap();
+            return new LinkedHashMap<>();
         }
 
     }
@@ -81,9 +80,9 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final String resultVars = jsonEncodedOutput.toString().trim();
             final Map<String, Object> variables = new ObjectMapper().readValue(resultVars,
                     STRING_TO_OBJECT_MAPPING_TYPE);
-            return Maps.newLinkedHashMap(variables);
+            return new LinkedHashMap<>(variables);
         } catch (final IOException e) {
-            return Maps.newLinkedHashMap();
+            return new LinkedHashMap<>();
         }
     }
 
@@ -202,10 +201,10 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-pythonpath");
 
             final StringBuilder jsonEncodedOutput = new StringBuilder();
-            final int returnCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine,
+            final int exitCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine,
                     line -> jsonEncodedOutput.append(line));
 
-            if (returnCode != 0) {
+            if (exitCode != 0) {
                 throw new RobotEnvironmentException("Unable to obtain modules search paths");
             }
             final List<String> pathsFromJson = new ObjectMapper().readValue(jsonEncodedOutput.toString(),
@@ -213,7 +212,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             return pathsFromJson.stream()
                     .filter(input -> !"".equals(input) && !".".equals(input))
                     .map(path -> new File(path))
-                    .collect(Collectors.<File> toList());
+                    .collect(toList());
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to obtain modules search paths", e);
         }
@@ -225,17 +224,19 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
 
             final List<String> cmdLine = newArrayList(interpreterPath);
-            if (interpreterType == SuiteExecutor.Jython) {
+            if (interpreterType == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
                 cmdLine.add("-J-cp");
-                final String classPath = String.join(RedSystemProperties.getPathsSeparator(),
+                final String classpath = String.join(RedSystemProperties.getPathsSeparator(),
                         additionalPaths.getClassPaths());
-                cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(classPath));
+                cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(classpath));
             }
             cmdLine.add(scriptFile.getAbsolutePath());
             cmdLine.add("-modulename");
             cmdLine.add(moduleName);
-            final String pythonPath = String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType));
-            cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(pythonPath));
+            if (additionalPaths.hasPythonPaths()) {
+                final String pythonPath = String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType));
+                cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(pythonPath));
+            }
 
             final List<String> lines = new ArrayList<>();
             RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> lines.add(line));
@@ -251,6 +252,44 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             }
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
+        }
+    }
+
+    @Override
+    public List<String> getClassesFromModule(final File moduleLocation, final String moduleName,
+            final EnvironmentSearchPaths additionalPaths) {
+        try {
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_module_classes.py");
+
+            final List<String> cmdLine = newArrayList(interpreterPath);
+            if (interpreterType == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
+                cmdLine.add("-J-cp");
+                final String classpath = String.join(RedSystemProperties.getPathsSeparator(),
+                        additionalPaths.getClassPaths());
+                cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(classpath));
+            }
+            cmdLine.add(scriptFile.getAbsolutePath());
+            cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(moduleLocation.getAbsolutePath()));
+            if (moduleName != null) {
+                cmdLine.add("-modulename");
+                cmdLine.add(moduleName);
+            }
+            if (additionalPaths.hasPythonPaths()) {
+                final String pythonpath = String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType));
+                cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(pythonpath));
+            }
+
+            final StringBuilder jsonEncodedOutput = new StringBuilder();
+            final int exitCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine,
+                    line -> jsonEncodedOutput.append(line));
+
+            if (exitCode != 0) {
+                throw new RobotEnvironmentException(
+                        "Python interpreter returned following errors:\n\n" + String.join("\n", jsonEncodedOutput));
+            }
+            return new ObjectMapper().readValue(jsonEncodedOutput.toString(), STRING_LIST_TYPE);
+        } catch (final IOException e) {
+            return new ArrayList<>();
         }
     }
 
