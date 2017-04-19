@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Jc9QEJbWEeaa4JtzzKMFzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/13/17 4:09 PM
+Save-Time: 4/19/17 12:08 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -104,7 +104,7 @@ get-view Console | get-text-viewer | get-property text
     + "==============================================================================\n"
     + "DebugWithInitinroot                                                           \n"
     + "==============================================================================\n"
-    + "Bla, blabla" | verify-true
+    + "Bla, blabla(\n\[ ERROR \] Execution stopped by user.)?" | verify-true
 
 //set BP in __init__	
 get-button Robot | click
