@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 1:12 PM
+Save-Time: 4/19/17 10:15 AM
 Testcase-Type: ecl
 Verifications: _vFf3wM6GEeawFJWg5rP2EA
 
@@ -161,9 +161,10 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table
 //check wrong paths    
 with [get-editor "TestFile.robot"] {
     click
+    wait 200
     with [get-text-viewer] {
         set-caret-pos 24 32
-        wait 200
+        wait 300
         key-type "M1+1"
     }
 }
