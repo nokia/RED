@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _uuVDgK_-EeaOOtfbYFWVRw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:46 AM
+Save-Time: 4/19/17 9:59 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,8 +15,10 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 proc "check-errors" [val nr_of_errors ] [val childCount ]{
-	get-view Problems | get-tree | get-item "Errors \\(.*\\)" | get-property childCount  | equals $childCount| verify-true
-	
+
+	try -times 4 -delay 1000 -command{
+		get-view Problems | get-tree | get-item "Errors \\(.*\\)" | get-property childCount  | equals $childCount| verify-true
+	}
 	list "Errors \\(.*\\)/Unknown '..\\/only_function.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" //0
 		"Errors \\(.*\)/Unknown 'here_is_class.Cat' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"   //1
 		"Errors \\(.*\\)/Unknown 'libs\\/SumTwoDigits.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"  //2 
