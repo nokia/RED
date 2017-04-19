@@ -191,6 +191,6 @@ public class RobotLaunchConfigurationDelegateTest {
         launchCopy.setAttribute("Version of configuration", "invalid");
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        launchDelegate.doLaunch(launchCopy, null, null, null);
+        launchDelegate.launch(launchCopy, null, null, null);
     }
 }
