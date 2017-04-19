@@ -48,7 +48,7 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         try {
             testsLaunchContext = executionService.testExecutionStarting();
 
-            validateProject(configuration);
+            validateVersionAndProject(configuration);
             final LaunchExecution launchExecution = doLaunch(configuration, testsMode, launch, testsLaunchContext);
 
             // FIXME : don't need to wait when it would be possible to launch multiple
@@ -68,8 +68,16 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         return ILaunchManager.RUN_MODE.equals(mode) ? TestsMode.RUN : TestsMode.DEBUG;
     }
 
-    private void validateProject(final ILaunchConfiguration configuration) throws CoreException {
-        LaunchConfigurationsWrappers.robotLaunchConfiguration(configuration).getProject();
+    private void validateVersionAndProject(final ILaunchConfiguration configuration) throws CoreException {
+        final IRobotLaunchConfiguration robotConfig = LaunchConfigurationsWrappers
+                .robotLaunchConfiguration(configuration);
+        if (!robotConfig.hasValidVersion()) {
+            throw newCoreException("This configuration is incompatible with RED version you are currently using."
+                    + "\nExpected: " + robotConfig.getCurrentConfigurationVersion() + ", but was: "
+                    + robotConfig.getConfigurationVersion()
+                    + "\n\nResolution: Delete old configurations manually and create the new ones.");
+        }
+        robotConfig.getProject();
     }
 
     @Override
