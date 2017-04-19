@@ -94,6 +94,36 @@ def get_module_path(module_name, python_paths, class_paths):
         for path in python_paths + class_paths:
             pythonpathsetter.remove_path(path)
 
+
+@logresult
+@encode_result_or_exception
+@logargs
+def get_run_module_path():
+    import red_modules
+    return red_modules.get_run_module_path()
+
+
+@logresult
+@encode_result_or_exception
+@logargs
+def get_classes_from_module(module_location, module_name, python_paths, class_paths):
+    import red_module_classes
+    from robot import pythonpathsetter
+
+    __extend_classpath(class_paths)
+
+    for path in python_paths + class_paths:
+        pythonpathsetter.add_path(path)
+
+    try:
+        return __cleanup_modules(red_module_classes.get_classes_from_module)(module_location, module_name)
+    except:
+        raise
+    finally:
+        for path in python_paths + class_paths:
+            pythonpathsetter.remove_path(path)
+
+
 @logresult
 @encode_result_or_exception
 @logargs
@@ -139,14 +169,6 @@ def _get_robot_version():
         return None
     from robot import version
     return 'Robot Framework ' + version.get_full_version()
-
-
-@logresult
-@encode_result_or_exception
-@logargs
-def get_run_module_path():
-    import red_modules
-    return red_modules.get_run_module_path()
 
 
 @logresult
@@ -235,12 +257,13 @@ if __name__ == '__main__':
     server = SimpleXMLRPCServer((IP, PORT), allow_none=True)
     server.register_function(get_modules_search_paths, 'getModulesSearchPaths')
     server.register_function(get_module_path, 'getModulePath')
+    server.register_function(get_run_module_path, 'getRunModulePath')
+    server.register_function(get_classes_from_module, 'getClassesFromModule')
     server.register_function(get_variables, 'getVariables')
     server.register_function(get_global_variables, 'getGlobalVariables')
     server.register_function(get_standard_libraries_names, 'getStandardLibrariesNames')
     server.register_function(get_standard_library_path, 'getStandardLibraryPath')
     server.register_function(get_robot_version, 'getRobotVersion')
-    server.register_function(get_run_module_path, 'getRunModulePath')
     server.register_function(is_virtualenv, 'isVirtualenv')
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
