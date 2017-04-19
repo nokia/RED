@@ -106,7 +106,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getConfigurationVersion())
-                .isEqualTo(RobotLaunchConfiguration.ACTUAL_CONFIGURATION_VERSION);
+                .isEqualTo(RobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
 
         assertThat(robotConfig.isUsingRemoteAgent()).isFalse();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
@@ -150,7 +150,7 @@ public class RobotLaunchConfigurationTest {
         assertThat(robotConfig.getIncludedTags()).isEmpty();
         assertThat(robotConfig.getExcludedTags()).isEmpty();
         assertThat(robotConfig.getConfigurationVersion())
-                .isEqualTo(RobotLaunchConfiguration.ACTUAL_CONFIGURATION_VERSION);
+                .isEqualTo(RobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION);
 
         assertThat(robotConfig.isUsingRemoteAgent()).isFalse();
         assertThat(robotConfig.getAgentConnectionHost()).isEqualTo("127.0.0.1");
