@@ -40,19 +40,20 @@ public class PythonLibStructureBuilder {
     }
 
     public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
-        final List<String> classes = environment.getClassesDefinedInModule(new File(path), additionalSearchPaths);
-        final List<PythonClass> pythonClasses = classes.stream()
-                .map(name -> PythonClass.create(name, false))
-                .collect(Collectors.toList());
-        return new LinkedHashSet<>(pythonClasses);
+        return provideEntriesFromFile(path, null, false);
     }
 
     public Collection<ILibraryClass> provideEntriesFromFile(final String path, final String moduleName)
             throws RobotEnvironmentException {
-        final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName,
+        return provideEntriesFromFile(path, moduleName, true);
+    }
+
+    private Collection<ILibraryClass> provideEntriesFromFile(final String path, final String moduleName,
+            final boolean allowDuplicationOfFileAndClassName) {
+        final List<String> classes = environment.getClassesFromModule(new File(path), moduleName,
                 additionalSearchPaths);
         final List<PythonClass> pythonClasses = classes.stream()
-                .map(name -> PythonClass.create(name, true))
+                .map(name -> PythonClass.create(name, allowDuplicationOfFileAndClassName))
                 .collect(Collectors.toList());
         return new LinkedHashSet<>(pythonClasses);
     }

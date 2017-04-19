@@ -5,11 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -50,12 +49,12 @@ public class JarStructureBuilder {
         if (file.getName().endsWith(".jar")) {
             return provideEntriesFromJarFile(file);
         } else {
-            return newArrayList();
+            return new ArrayList<>();
         }
     }
 
     private Collection<ILibraryClass> provideEntriesFromJarFile(final File file) throws RobotEnvironmentException {
-        final List<ILibraryClass> jarClasses = newArrayList();
+        final List<ILibraryClass> jarClasses = new ArrayList<>();
         try (ZipInputStream zipStream = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry entry = zipStream.getNextEntry();
             while (entry != null) {
@@ -79,7 +78,7 @@ public class JarStructureBuilder {
         final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder
                 .provideEntriesFromFile(file.getPath());
 
-        final List<JarClass> jarClasses = newArrayList();
+        final List<JarClass> jarClasses = new ArrayList<>();
         for (final ILibraryClass pythonClass : pythonClasses) {
             jarClasses.add(JarClass.createFromZipPythonEntry(pythonClass.getQualifiedName()));
         }

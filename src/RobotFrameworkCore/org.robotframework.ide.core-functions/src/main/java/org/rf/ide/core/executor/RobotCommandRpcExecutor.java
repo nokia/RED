@@ -352,6 +352,24 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
+    public List<String> getClassesFromModule(final File moduleLocation, final String moduleName,
+            final EnvironmentSearchPaths additionalPaths) {
+        try {
+            final List<String> classes = newArrayList();
+            final Object[] libs = (Object[]) callRpcFunction("getClassesFromModule", moduleLocation.getAbsolutePath(),
+                    moduleName, newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+                    newArrayList(additionalPaths.getClassPaths()));
+            for (final Object o : libs) {
+                classes.add((String) o);
+            }
+            return classes;
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to find classes in module " + moduleLocation.getAbsolutePath(),
+                    e);
+        }
+    }
+
+    @Override
     public Boolean isVirtualenv() {
         try {
             return (Boolean) callRpcFunction("isVirtualenv");
