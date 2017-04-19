@@ -6,56 +6,48 @@
 
 
 def get_classes_from_module(module_location, module_name):
-    from robot import pythonpathsetter
-    import pkgutil
-    import sys
     import os
+    import pkgutil
+    from robot import pythonpathsetter
 
-    old_sys_path = list(sys.path)
+    if module_location.endswith('__init__.py'):
+        module_path = os.path.dirname(module_location)
+        module_name_from_location = os.path.basename(module_path)
 
-    try:
-        if module_location.endswith('__init__.py'):
-            module_path = os.path.dirname(module_location)
-            module_name_from_location = os.path.basename(module_path)
+        pythonpathsetter.add_path(os.path.dirname(module_path))
 
-            pythonpathsetter.add_path(os.path.dirname(module_path))
+        loaded_module = _load_module(module_location, module_name, module_name_from_location)
 
-            loaded_module = _load_module(module_location, module_name, module_name_from_location)
+        class_names = _find_names_in_module(loaded_module, module_name_from_location)
+        for loader, name, _ in pkgutil.walk_packages([module_path]):
+            loaded_module = loader.find_module(name).load_module(name)
+            class_names.extend(_find_names_in_module(loaded_module, module_name_from_location))
 
-            class_names = _find_names_in_module(loaded_module, module_name_from_location)
-            for loader, name, _ in pkgutil.walk_packages([module_path]):
-                loaded_module = loader.find_module(name).load_module(name)
-                class_names.extend(_find_names_in_module(loaded_module, module_name_from_location))
+        return _get_names_combinations(class_names, _get_module_name_by_path(module_location))
 
-            return _get_names_combinations(class_names, _get_module_name_by_path(module_location))
+    elif module_location.endswith('.py'):
+        module_name_from_location = os.path.basename(module_location)[:-3]
 
-        elif module_location.endswith('.py'):
-            module_name_from_location = os.path.basename(module_location)[:-3]
+        pythonpathsetter.add_path(os.path.dirname(module_location))
 
-            pythonpathsetter.add_path(os.path.dirname(module_location))
+        loaded_module = _load_module(module_location, module_name, module_name_from_location)
 
-            loaded_module = _load_module(module_location, module_name, module_name_from_location)
+        class_names = _find_names_in_module(loaded_module, module_name_from_location)
 
-            class_names = _find_names_in_module(loaded_module, module_name_from_location)
+        return _get_names_combinations(class_names, _get_module_name_by_path(module_location))
 
-            return _get_names_combinations(class_names, _get_module_name_by_path(module_location))
+    elif module_location.endswith(".zip") or module_location.endswith(".jar"):
+        pythonpathsetter.add_path(module_location)
 
-        elif module_location.endswith(".zip") or module_location.endswith(".jar"):
-            pythonpathsetter.add_path(module_location)
+        class_names = list()
+        for loader, name, _ in pkgutil.walk_packages([module_location]):
+            loaded_module = loader.load_module(name)
+            map(__import__, [name])
+            class_names.extend(_find_names_in_archive_module(loaded_module, name))
+        return class_names
 
-            class_names = list()
-            for loader, name, _ in pkgutil.walk_packages([module_location]):
-                loaded_module = loader.load_module(name)
-                map(__import__, [name])
-                class_names.extend(_find_names_in_archive_module(loaded_module, name))
-            return class_names
-
-        else:
-            raise Exception('Unrecognized library path: ' + module_location)
-    except:
-        raise
-    finally:
-        sys.path = old_sys_path
+    else:
+        raise Exception('Unrecognized library path: ' + module_location)
 
 
 def _load_module(module_location, module_name, module_name_from_location):
