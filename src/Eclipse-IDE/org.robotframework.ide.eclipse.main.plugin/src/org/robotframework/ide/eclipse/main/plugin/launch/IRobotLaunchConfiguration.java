@@ -48,6 +48,8 @@ public interface IRobotLaunchConfiguration {
 
     String getConfigurationVersion() throws CoreException;
 
+    String getCurrentConfigurationVersion() throws CoreException;
+
     void setUsingRemoteAgent(boolean isRemoteAgent) throws CoreException;
 
     void setAgentConnectionHostValue(String host) throws CoreException;
@@ -56,7 +58,7 @@ public interface IRobotLaunchConfiguration {
 
     void setAgentConnectionTimeoutValue(String timeout) throws CoreException;
 
-    void setActualConfigurationVersion() throws CoreException;
+    void setCurrentConfigurationVersion() throws CoreException;
 
     static boolean lockConfigurationLaunches() {
         return IS_CONFIGURATION_RUNNING.getAndSet(true);
