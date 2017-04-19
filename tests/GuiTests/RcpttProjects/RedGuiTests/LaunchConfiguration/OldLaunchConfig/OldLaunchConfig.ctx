@@ -1,0 +1,85 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.debug
+Debug-NoBreakpoints: true
+Debug-NoLaunchShortcuts: true
+Debug-NoLaunches: true
+Element-Name: OldLaunchConfig
+Element-Type: context
+Element-Version: 2.0
+Id: _1IcKYCTlEeesE7mkFuId1w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/19/17 11:52 AM
+
+------=_debug.launchtypes-7159add4-14d7-36f5-abc2-a36dec1fc18e
+Content-Type: q7/binary
+Entry-Name: debug.launchtypes
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAkALmNvbnRlbnRVVAUAAQAAAAB9kk1v2zAMhu8D9h8C
+3+dQEiWRQbNC1gcwYLsUHbBrmripscYOHGfJ/v2YJu1xNmBZJN/npSnf3Z93r7M/7Xjohn5ZqRqqWduv
+h03Xb5fVz8fyhar7r58/3Q3jtm7Xr93+0Nbjej9N9Xo615v26bhdfF8d+/XL4999OzvvusUHTV9owu8P
+C4kvq5dp2i/m89PpVA+7bS3I+a8f395L/uPwIX3PX6RvNXOpmb/VVLN+tWuX1cPwNEzVrNssqwtxvGyf
+R0mdhvF33W3aa+jacxz65257HFeTNCyi3WorCGILmNFDgqACBLheCRkJ0errVsHHSuBu76WYUtwtFRpR
+ICqLnjhyssYoyAQCiDlmkhuQskbviQCKB6ecMc7EaLkYKuIWojA4QIMouoYVpcZm35BVzmmKfDH3aEwk
+CsIrnpk0G1axgJOnUR7YkOFQIii0Dpl1jqQDWWFI0Fkdiw3JUhYj70OjwacQWBmkpFXjkjQdCoRoDQQt
+LhpSMSoZ0tqWBpMt2BSHFpOGDE7a8VqzV0WGAMG64nLRlAg5FkfoOCvx1BlkVVxkFiY6GXkE9pHJ+KyK
+ikGlgA6D00lz0vJ9yRUGw9RgTCoVjrZIv7eDAJmUFQiGjNoB6Wouf+4/UEsHCIzdmgXbAQAA4gIAAFBL
+AQIUABQACAgIAAAAIQCM3ZoF2wEAAOICAAAIAAkAAAAAAAAAAAAAAAAAAAAuY29udGVudFVUBQABAAAA
+AFBLBQYAAAAAAQABAD8AAAAaAgAAAAA=
+------=_debug.launchtypes-7159add4-14d7-36f5-abc2-a36dec1fc18e--
+------=_debug.breakpoints-5e4f72bb-803b-3bad-9f69-7f32fb7c3fae
+Content-Type: text/breakpoints
+Entry-Name: debug.breakpoints
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"/>
+
+------=_debug.breakpoints-5e4f72bb-803b-3bad-9f69-7f32fb7c3fae--
+------=_oldTest.robot.debug.launchconfiguration-16ce0f86-e299-382c-a419-1979975bae5d
+Content-Type: text/launchconfiguration
+Entry-Name: oldTest.robot.debug.launchconfiguration
+
+<?xml version="1.0" encoding="UTF-8"?>
+<org.eclipse.rcptt.ctx.debug:LaunchConfiguration xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:org.eclipse.rcptt.ctx.debug="http://eclipse.org/rcptt/ctx/debug" xmlns:org.eclipse.rcptt.ecl.core="http://www.eclipse.org/ecl/core.ecore" name="oldTest.robot" typeId="org.robotframework.ide.robotLaunchConfiguration">
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="Exclude option enabled">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclBoolean"/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:ListValue" name="Excluded tags"/>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="Executor">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclString" value="Python"/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="Executor arguments">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclString" value=""/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="General purpose option enabled">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclBoolean" value="true"/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="Include option enabled">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclBoolean"/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:ListValue" name="Included tags"/>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="Interpreter arguments">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclString" value=""/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="Project name">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclString" value="oldProject"/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="Remote debug host">
+    <value xsi:type="org.eclipse.rcptt.ecl.core:EclString" value=""/>
+  </attributes>
+  <attributes xsi:type="org.eclipse.rcptt.ctx.debug:MapValue" name="Test suites">
+    <entries xsi:type="org.eclipse.rcptt.ctx.debug:PrimitiveValue" name="oldTest.robot">
+      <value xsi:type="org.eclipse.rcptt.ecl.core:EclString" value=""/>
+    </entries>
+  </attributes>
+</org.eclipse.rcptt.ctx.debug:LaunchConfiguration>
+
+------=_oldTest.robot.debug.launchconfiguration-16ce0f86-e299-382c-a419-1979975bae5d--
+------=_debug.launches-be8ac185-ac72-3f40-ae87-94751ee91eea
+Content-Type: text/launch
+Entry-Name: debug.launches
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"/>
+
+------=_debug.launches-be8ac185-ac72-3f40-ae87-94751ee91eea--
