@@ -1,3 +1,39 @@
+RED 0.7.7 - 2017/04/20
+
+** Bug
+
+    [RED-337] - Incorrectly generation of libdoc for the same library name defined in different project
+    [RED-351] - Libs are not reload for project with the same name as was deleted
+    [RED-725] - Debug - hit counts/conditional problems
+    [RED-787] - User cannot comment fully selected line in table
+    [RED-811] - [GitHub #101] - Testcase Debugging Error
+    [RED-812] - [GitHub #102] - TestRunnerAgent crashes with error "No enum constant org.rf.ide.core.execution.LogLevel.ERROR"
+
+** Enhancement
+
+    [RED-385] - Adding action "comment out selected lines" in tables
+    [RED-630] - Add marker in case variables file in test suite was not imported correctly
+    [RED-707] - [GitHub #78] Breakpoint setting in debug perspective
+    [RED-760] - RED session server should not generate files directly
+    [RED-767] - It should be configurable how arguments are passed to scripts when launching tests
+    [RED-788] - Publish GitHub pages
+    [RED-806] - AutoDiscoveringLibraries - spiting the test
+    [RED-807] - Handling old Run/Debug configuration gracefully
+    [RED-813] - provide lib/resource name in content assist in Settings under Suite setup
+
+** Task
+
+    [RED-778] - move GitHub help from red_help to GitHub Pages
+    [RED-783] - Robot session server should unload modules loaded during libdoc creation
+    [RED-810] - add animations to gh-pages
+
+** Sub-task
+
+    [RED-720] - Activate Remote tab in Run configuration so localIP and localPort is used in Run
+    [RED-721] - Create new Robot Script Configuration to allow to execute custom script instead of local interpreter.
+    [RED-722] - Script handling
+
+
 RED 0.7.6 - 2017/03/30
 
 ** Bug

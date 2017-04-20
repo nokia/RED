@@ -1,3 +1,33 @@
+# RED - Robot Editor v0.7.7
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+
+## Updates
+
+- Handling old (pre-RED 0.7.6) Run/Debug configurations gracefully
+- #101 Fixed error while debugging with multiple __init__ files
+- #102 Added enum to handle all errors from Robot
+- #78 fixed setting breakpoints in Debug perspective
+- added marker for variable files when importing went wrong
+- provide resource/lib content assist for Suite Setup/Teardown in Settings
+- add preference how User Script arguments should be passed (wrapped by "" or space separated)
+- RED help moved to GitHub pages: (http://nokia.github.io/RED/)[http://nokia.github.io/RED/]
+- changed some help images to animations
+
+    
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
+        
+--------------------------------------------------------------------------------------------------------------------------   
 # RED - Robot Editor v0.7.6
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
