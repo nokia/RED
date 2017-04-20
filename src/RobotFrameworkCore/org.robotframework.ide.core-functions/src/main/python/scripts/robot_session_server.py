@@ -5,15 +5,16 @@
 #
 # Author: Mateusz Marzec
 #
-from sys import __excepthook__
 
 
 class Logger(object):
     def log(self, message):
+        import sys
         sys.stdout.write(message + '\n')
         sys.stdout.flush()
 
     def log_error(self, message):
+        import sys
         sys.stderr.write(message + '\n')
         sys.stderr.flush()
 
@@ -103,10 +104,6 @@ def get_run_module_path():
 @encode_result_or_exception
 @logargs
 def get_classes_from_module(module_location, module_name, python_paths, class_paths):
-    return _get_classes_from_module(module_location, module_name, python_paths, class_paths)
-
-
-def _get_classes_from_module(module_location, module_name, python_paths, class_paths):
     def to_call():
         import red_module_classes
         return __cleanup_modules(red_module_classes.get_classes_from_module)(module_location, module_name)
@@ -150,10 +147,10 @@ def get_standard_library_path(libname):
 @encode_result_or_exception
 @logargs
 def get_robot_version():
-    return _get_robot_version()
+    return __get_robot_version()
 
 
-def _get_robot_version():
+def __get_robot_version():
     try:
         import robot
     except ImportError:
@@ -174,10 +171,6 @@ def is_virtualenv():
 @encode_result_or_exception
 @logargs
 def create_libdoc(libname, python_paths, class_paths):
-    return _create_libdoc(libname, python_paths, class_paths)
-
-
-def _create_libdoc(libname, python_paths, class_paths):
     def to_call():
         import red_libraries
         return __cleanup_modules(red_libraries.create_libdoc)(libname)
@@ -279,7 +272,7 @@ if __name__ == '__main__':
     red_checking_thread.setDaemon(True)
     red_checking_thread.start()
 
-    robot_ver = _get_robot_version()
+    robot_ver = __get_robot_version()
     logger = Logger()
     logger.log('# RED session server started @' + str(PORT))
     logger.log('# python version: ' + sys.version)
