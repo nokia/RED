@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 public class GeneralTableStyleConfiguration extends DefaultNatTableStyleConfiguration {
 
     public GeneralTableStyleConfiguration(final TableTheme theme, final TextPainter textPainter) {
+        this.font = theme.getFont();
         this.bgColor = theme.getBodyBackgroundOddRowBackground();
         this.fgColor = theme.getBodyForeground();
         this.hAlign = HorizontalAlignmentEnum.LEFT;

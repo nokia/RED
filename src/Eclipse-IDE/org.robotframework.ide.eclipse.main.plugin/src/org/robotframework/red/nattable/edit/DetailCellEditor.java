@@ -11,14 +11,17 @@ import java.util.Optional;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
+import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
@@ -95,6 +98,10 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         final DetailCellEditorComposite<D> composite = new DetailCellEditorComposite<>(parent, editSupport,
                 assistSupport, validationJobScheduler);
         composite.setBackground(parent.getBackground());
+
+        composite.getText().setForeground(this.cellStyle.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR));
+        composite.getText().setFont(this.cellStyle.getAttributeValue(CellStyleAttributes.FONT));
+        composite.getText().setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
         composite.getText().setFocus();
         composite.getText().addTraverseListener(new TraverseListener() {

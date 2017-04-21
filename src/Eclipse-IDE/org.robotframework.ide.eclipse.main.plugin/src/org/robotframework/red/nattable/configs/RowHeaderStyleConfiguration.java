@@ -22,7 +22,7 @@ public class RowHeaderStyleConfiguration extends DefaultRowHeaderStyleConfigurat
         this.font = theme.getFont();
         this.bgColor = theme.getHeadersBackground();
         this.fgColor = theme.getHeadersForeground();
-        this.cellPainter = new UnderlinedCellBackgroundPainter(new TextPainter(false, false), Side.RIGHT,
+        this.cellPainter = new UnderlinedCellBackgroundPainter(new TextPainter(false, false, false, true), Side.RIGHT,
                 theme.getHeadersUnderlineColor().getRGB());
     }
 }
