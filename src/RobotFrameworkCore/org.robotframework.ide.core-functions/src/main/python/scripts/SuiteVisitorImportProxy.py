@@ -1,28 +1,29 @@
-from __future__ import with_statement
-import robot
-from robot.output import LOGGER, Message
-from robot.api import SuiteVisitor
-from robot.running.model import TestCase, Keyword
-from robot.running.namespace import Namespace
-import robot.running.importer
-from robot.running import TestLibrary
-from robot.running.testlibraries import _BaseTestLibrary, _DynamicLibrary
-from robot.running.handlers import _DynamicHandler, _JavaHandler
-from types import MethodType
-from threading import Lock
+#
+# Copyright 2017 Nokia Solutions and Networks
+# Licensed under the Apache License, Version 2.0,
+# see license.txt file for details.
+#
+
+import time
+import threading
+import sys
+import json
+import inspect
+import re
+
 from robot.running.builder import TestSuiteBuilder
+from robot.api import SuiteVisitor
 from robot.run import RobotFramework
 from robot.conf import RobotSettings
-import time
-import sys
-import threading
-import inspect
-import json
-import re
+from robot.running import TestLibrary
+from robot.running.testlibraries import _BaseTestLibrary
+from robot.running.model import TestCase, Keyword
+from robot.running.handlers import _DynamicHandler, _JavaHandler
+from robot.output import LOGGER, Message
 
 
 class MyTestSuiteBuilder(TestSuiteBuilder):
-    ''' switch off empty suite removing '''
+    """ switch off empty suite removing """
 
     def _parse_and_build(self, path):
         suite = self._build_suite(self._parse(path))
@@ -30,9 +31,8 @@ class MyTestSuiteBuilder(TestSuiteBuilder):
 
 
 class SuiteVisitorImportProxy(SuiteVisitor):
-    def __init__(self, lib_import_timeout=60):
-        robot.running.namespace.IMPORTER = MyIMPORTER(robot.running.namespace.IMPORTER, lib_import_timeout)
-        self.options, self.arguments = RobotFramework().parse_arguments(sys.argv[1:])
+    def __init__(self, *args):
+        self.options, self.arguments = RobotFramework().parse_arguments(list(args))
         self.settings = RobotSettings(**self.options)
         self.f_suites = self.settings.suite_config['include_suites']
 
@@ -61,10 +61,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
                 longpath = suite.longname.lower().replace('_', ' ')
                 normalized_s_name = s_name.lower().replace('_', ' ')
                 meet = False
-                if (len(longpath) >= len(normalized_s_name) and longpath.startswith(normalized_s_name)):
+                if len(longpath) >= len(normalized_s_name) and longpath.startswith(normalized_s_name):
                     meet = True
                     after_remove = longpath.replace(normalized_s_name, '')
-                elif (len(longpath) < len(normalized_s_name) and normalized_s_name.startswith(longpath)):
+                elif len(longpath) < len(normalized_s_name) and normalized_s_name.startswith(longpath):
                     meet = True
                     after_remove = normalized_s_name.replace(longpath, '')
 
@@ -98,7 +98,7 @@ class MyIMPORTER(object):
         self.obj = obj
         self.lib_import_timeout = int(lib_import_timeout)
         self.func = None
-        self.lock = Lock()
+        self.lock = threading.Lock()
         self.cached_lib_items = list()
         self.cached_kw_items = set()
 
@@ -129,7 +129,8 @@ class MyIMPORTER(object):
         return result
 
     def _wrap(self, func, argser, kwargs):
-        if type(func) == MethodType:
+        import types
+        if isinstance(func, types.MethodType):
             if func.__name__ == 'import_library':
                 q = []
                 errors = []
@@ -156,7 +157,8 @@ class MyIMPORTER(object):
                                                       variables=argser[2])
                         except:
                             try:
-                                result = _BaseTestLibrary(libcode=None, name=argser[0], args=[], source=None, variables=argser[3])
+                                result = _BaseTestLibrary(libcode=None, name=argser[0], args=[], source=None,
+                                                          variables=argser[3])
                             except:
                                 errors.append(sys.exc_info())
 
@@ -196,7 +198,7 @@ class MyIMPORTER(object):
                         msg = json.dumps({'keyword': dict(keyword_source.__dict__)}, sort_keys=True)
                         LOGGER.message(Message(message=msg, level='NONE'))
                     except:
-                        pass #TODO: add logging 
+                        pass  # TODO: add logging
                     finally:
                         self.cached_kw_items.add(keyword)
 
@@ -224,7 +226,8 @@ class PythonKeywordSource(object):
                 return path, line, offset, length
         return path, 0, 0, 0
 
-    def _resolve_function(self, keyword):
+    @staticmethod
+    def _resolve_function(keyword):
         if isinstance(keyword, _DynamicHandler):
             return keyword.library._libcode.__dict__[keyword._run_keyword_method_name]
         elif keyword._method:
