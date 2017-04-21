@@ -15,6 +15,7 @@ public class RedTheme {
 
     private static final String TEXT_EDITOR_FONT = "org.eclipse.jface.textfont";
     public static final String RED_SOURCE_EDITOR_FONT = "org.robotframework.ide.textfont";
+    private static final String RED_TABLE_EDITOR_FONT = "org.robotframework.ide.tablefont";
 
     private static final String SECTION_HEADER = "org.robotframework.ide.eclipse.section.header";
     private static final String ECLIPSE_DECORATION_COLOR = "DECORATIONS_COLOR";
@@ -77,5 +78,9 @@ public class RedTheme {
     
     public static Font getRedSourceEditorFont() {
         return getFontRegistry().get(RED_SOURCE_EDITOR_FONT);
+    }
+
+    public static Font getTablesEditorFont() {
+        return getFontRegistry().get(RED_TABLE_EDITOR_FONT);
     }
 }
