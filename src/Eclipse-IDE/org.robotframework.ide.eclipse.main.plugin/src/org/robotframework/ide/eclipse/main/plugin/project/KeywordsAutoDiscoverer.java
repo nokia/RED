@@ -18,6 +18,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
+import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -29,7 +30,7 @@ import com.google.common.io.Files;
 public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
     public KeywordsAutoDiscoverer(final RobotProject robotProject) {
-        super(robotProject, Collections.<IResource> emptyList());
+        super(robotProject, Collections.<IResource> emptyList(), new DryRunTargetsCollector());
     }
 
     @Override
@@ -42,7 +43,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
                     public void run(final IProgressMonitor monitor)
                             throws InvocationTargetException, InterruptedException {
                         try {
-                            startDiscovering(monitor, new DryRunTargetsCollector());
+                            startDiscovering(monitor);
                             if (monitor.isCanceled()) {
                                 return;
                             }
@@ -56,7 +57,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
             } catch (final InvocationTargetException e) {
                 throw new AutoDiscovererException("Problems occurred during discovering keywords.", e);
             } catch (final InterruptedException e) {
-                dryRunHandler.destroyDryRunProcess();
+                stopServer();
             }
         }
     }
@@ -74,26 +75,26 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
         }
     }
 
-    private class DryRunTargetsCollector implements IDryRunTargetsCollector {
+    private static class DryRunTargetsCollector implements IDryRunTargetsCollector {
 
         private final List<String> suiteNames = new ArrayList<>();
 
         private final List<File> additionalProjectsLocations = new ArrayList<>();
 
         @Override
-        public void collectSuiteNamesAndAdditionalProjectsLocations() {
-            final List<String> libraryNames = collectLibraryNames();
+        public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
+                final List<IResource> suiteFiles) {
+            final List<String> libraryNames = collectLibraryNames(robotProject);
             if (!libraryNames.isEmpty()) {
-                final File tempSuiteFileWithLibraries = dryRunHandler.createTempSuiteFile(new ArrayList<String>(),
-                        libraryNames);
-                if (tempSuiteFileWithLibraries != null) {
-                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithLibraries.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFileWithLibraries.getParentFile());
+                final File tempSuiteFile = RobotDryRunTemporarySuites.createLibraryFile(libraryNames);
+                if (tempSuiteFile != null) {
+                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFile.getPath()));
+                    additionalProjectsLocations.add(tempSuiteFile.getParentFile());
                 }
             }
         }
 
-        private List<String> collectLibraryNames() {
+        private List<String> collectLibraryNames(final RobotProject robotProject) {
             final List<String> libraryNames = new ArrayList<>();
             libraryNames.addAll(robotProject.getStandardLibraries().keySet());
             for (final ReferencedLibrary referencedLibrary : robotProject.getReferencedLibraries().keySet()) {

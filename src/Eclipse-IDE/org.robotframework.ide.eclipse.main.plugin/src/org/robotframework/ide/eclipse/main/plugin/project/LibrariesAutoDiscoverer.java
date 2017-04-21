@@ -29,6 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
+import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -74,7 +75,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
             final IEventBroker eventBroker, final boolean showSummary, final String libraryNameToDiscover) {
-        super(robotProject, suiteFiles);
+        super(robotProject, suiteFiles, new DryRunTargetsCollector());
         this.eventBroker = eventBroker == null ? PlatformUI.getWorkbench().getService(IEventBroker.class) : eventBroker;
         this.showSummary = showSummary;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
@@ -88,7 +89,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 @Override
                 public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
                     try {
-                        startDiscovering(monitor, new DryRunTargetsCollector());
+                        startDiscovering(monitor);
                         if (monitor.isCanceled()) {
                             return Status.CANCEL_STATUS;
                         }
@@ -111,7 +112,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
                 @Override
                 protected void canceling() {
-                    dryRunHandler.destroyDryRunProcess();
+                    stopServer();
                 }
             };
             wsJob.setUser(true);
@@ -162,14 +163,15 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         });
     }
 
-    private class DryRunTargetsCollector implements IDryRunTargetsCollector {
+    private static class DryRunTargetsCollector implements IDryRunTargetsCollector {
 
         private final List<String> suiteNames = new ArrayList<>();
 
         private final List<File> additionalProjectsLocations = new ArrayList<>();
 
         @Override
-        public void collectSuiteNamesAndAdditionalProjectsLocations() {
+        public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
+                final List<IResource> suiteFiles) {
             final List<String> resourcesPaths = new ArrayList<>();
             for (final IResource resource : suiteFiles) {
                 RobotSuiteFile suiteFile = null;
@@ -189,11 +191,10 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 }
             }
             if (!resourcesPaths.isEmpty()) {
-                final File tempSuiteFileWithResources = dryRunHandler.createTempSuiteFile(resourcesPaths,
-                        new ArrayList<String>());
-                if (tempSuiteFileWithResources != null) {
-                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithResources.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFileWithResources.getParentFile());
+                final File tempSuiteFile = RobotDryRunTemporarySuites.createResourceFile(resourcesPaths);
+                if (tempSuiteFile != null) {
+                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFile.getPath()));
+                    additionalProjectsLocations.add(tempSuiteFile.getParentFile());
                 }
             }
         }

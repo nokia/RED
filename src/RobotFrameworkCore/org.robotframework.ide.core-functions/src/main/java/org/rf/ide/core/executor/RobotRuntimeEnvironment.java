@@ -466,6 +466,36 @@ public class RobotRuntimeEnvironment {
         return false;
     }
 
+    /**
+     * Start library auto discovering with robot dryrun
+     *
+     * @param port
+     *            Port number for communication with AgentConnectionServer
+     * @param timeout
+     *            Library import timeout
+     * @param suiteNames
+     *            Suite names in robot format (no suite filtering if empty)
+     * @param dataSourcePaths
+     *            Robot data source paths
+     * @param additionalPaths
+     *            Additional pythonPaths and classPaths
+     * @return exit code
+     *         Zero means that tests were executed and no critical test failed, values up
+     *         to 250 denote the number of failed critical tests, and values between
+     *         251-255 are for other statuses documented in the Robot Framework User Guide.
+     * @throws RobotEnvironmentException
+     */
+    public Integer startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
+            final List<String> dataSourcePaths, final EnvironmentSearchPaths additionalPaths)
+            throws RobotEnvironmentException {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            return executor.startLibraryAutoDiscovering(port, timeout, suiteNames, dataSourcePaths, additionalPaths);
+        }
+        return -1;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(location, version);

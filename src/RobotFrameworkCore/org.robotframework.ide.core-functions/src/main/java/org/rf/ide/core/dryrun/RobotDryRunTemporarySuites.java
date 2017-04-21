@@ -8,40 +8,25 @@ package org.rf.ide.core.dryrun;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 
 /**
  * @author mmarzec
  */
-public class RobotDryRunHandler {
+public class RobotDryRunTemporarySuites {
 
-    private Process dryRunProcess;
-
-    public void executeDryRunProcess(final RunCommandLine dryRunCommandLine, final File projectDir)
-            throws InvocationTargetException {
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(dryRunCommandLine.getCommandLine());
-            if (projectDir != null && projectDir.exists()) {
-                processBuilder = processBuilder.directory(projectDir);
-            }
-            dryRunProcess = processBuilder.start();
-            dryRunProcess.waitFor();
-        } catch (InterruptedException | IOException e) {
-            throw new InvocationTargetException(e);
-        }
+    public static File createResourceFile(final List<String> resourcesPaths) {
+        return createFile(resourcesPaths, new ArrayList<String>());
     }
 
-    public void destroyDryRunProcess() {
-        if (dryRunProcess != null) {
-            dryRunProcess.destroy();
-        }
+    public static File createLibraryFile(final List<String> libraryNames) {
+        return createFile(new ArrayList<String>(), libraryNames);
     }
 
-    public File createTempSuiteFile(final List<String> resourcesPaths, final List<String> libraryNames) {
+    private static File createFile(final List<String> resourcesPaths, final List<String> libraryNames) {
         File file = null;
         PrintWriter printWriter = null;
         try {
