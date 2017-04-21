@@ -32,8 +32,6 @@ public class RunCommandLineCallBuilder {
 
         IRunCommandLineBuilder addUserArgumentsForInterpreter(final Collection<String> arguments);
 
-        IRunCommandLineBuilder enableDryRun();
-
         IRunCommandLineBuilder useArgumentFile(boolean shouldUseArgumentFile);
 
         IRunCommandLineBuilder addLocationsToPythonPath(final Collection<String> pythonPathLocations);
@@ -66,8 +64,6 @@ public class RunCommandLineCallBuilder {
         private final String executorPath;
 
         private final int listenerPort;
-
-        private boolean enableDryRun = false;
 
         private boolean useArgumentFile = false;
 
@@ -126,12 +122,6 @@ public class RunCommandLineCallBuilder {
         @Override
         public IRunCommandLineBuilder addUserArgumentsForInterpreter(final Collection<String> arguments) {
             this.interpreterUserArgs.addAll(arguments);
-            return this;
-        }
-
-        @Override
-        public IRunCommandLineBuilder enableDryRun() {
-            this.enableDryRun = true;
             return this;
         }
 
@@ -284,20 +274,6 @@ public class RunCommandLineCallBuilder {
                 robotArgs.add("-e");
                 robotArgs.add(tagToExclude);
             }
-            if (enableDryRun) {
-                robotArgs.add("--prerunmodifier");
-                robotArgs.add(RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py").toPath().toString());
-                robotArgs.add("--runemptysuite");
-                robotArgs.add("--dryrun");
-                robotArgs.add("--output");
-                robotArgs.add("NONE");
-                robotArgs.add("--report");
-                robotArgs.add("NONE");
-                robotArgs.add("--log");
-                robotArgs.add("NONE");
-                robotArgs.add("--console");
-                robotArgs.add("NONE");
-            }
             for (final String suite : suitesToRun) {
                 robotArgs.add("-s");
                 robotArgs.add(suite);
@@ -324,16 +300,6 @@ public class RunCommandLineCallBuilder {
             }
             for (final String tagToExclude : tagsToExclude) {
                 argumentsFile.addLine("--exclude", tagToExclude);
-            }
-            if (enableDryRun) {
-                argumentsFile.addLine("--prerunmodifier",
-                        RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py").toPath().toString());
-                argumentsFile.addLine("--runemptysuite");
-                argumentsFile.addLine("--dryrun");
-                argumentsFile.addLine("--output", "NONE");
-                argumentsFile.addLine("--report", "NONE");
-                argumentsFile.addLine("--log", "NONE");
-                argumentsFile.addLine("--console", "NONE");
             }
             for (final String suiteToRun : suitesToRun) {
                 argumentsFile.addLine("--suite", suiteToRun);

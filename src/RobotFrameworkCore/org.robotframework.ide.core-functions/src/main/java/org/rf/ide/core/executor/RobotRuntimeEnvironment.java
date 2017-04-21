@@ -261,10 +261,6 @@ public class RobotRuntimeEnvironment {
         });
     }
 
-    static String wrapArgumentIfNeeded(final String argument) {
-        return argument.contains(" ") ? "\"" + argument + "\"" : argument;
-    }
-
     private RobotRuntimeEnvironment(final File location, final String version) {
         this.location = location;
         this.version = version;
