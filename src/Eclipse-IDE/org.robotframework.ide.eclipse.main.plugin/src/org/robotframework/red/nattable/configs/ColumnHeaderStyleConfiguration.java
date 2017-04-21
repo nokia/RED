@@ -20,7 +20,7 @@ public class ColumnHeaderStyleConfiguration extends DefaultColumnHeaderStyleConf
         this.font = theme.getFont();
         this.bgColor = theme.getHeadersBackground();
         this.fgColor = theme.getHeadersForeground();
-        this.cellPainter = new UnderlinedCellBackgroundPainter(new TextPainter(false, false), Side.BOTTOM,
+        this.cellPainter = new UnderlinedCellBackgroundPainter(new TextPainter(false, false, false, true), Side.BOTTOM,
                 theme.getHeadersUnderlineColor().getRGB());
         this.renderGridLines = true;
     }

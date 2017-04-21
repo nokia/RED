@@ -54,7 +54,11 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
         
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.HOVER,
+                CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT,
+                CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT_HOVER,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
         
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,

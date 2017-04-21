@@ -62,7 +62,11 @@ public class KeywordsElementsStyleConfiguration extends AbstractRegistryConfigur
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, keywordStyle, DisplayMode.NORMAL,
                 KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, keywordStyle, DisplayMode.HOVER,
+                KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, keywordStyle, DisplayMode.SELECT,
+                KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, keywordStyle, DisplayMode.SELECT_HOVER,
                 KeywordsElementsLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, argumentStyle, DisplayMode.NORMAL,

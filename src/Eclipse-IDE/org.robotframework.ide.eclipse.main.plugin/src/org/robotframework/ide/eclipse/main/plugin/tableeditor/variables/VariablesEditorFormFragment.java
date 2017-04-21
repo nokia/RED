@@ -217,6 +217,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             final GridLayer gridLayer, final DataLayer dataLayer, final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
         final NatTable table = new NatTable(parent, style, gridLayer, false);
+        table.setFont(theme.getFont());
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
                 new RedNatGridLayerPainter(table, theme.getGridBorderColor(), theme.getHeadersBackground(),

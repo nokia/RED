@@ -5,6 +5,10 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import static com.google.common.collect.Sets.newHashSet;
+
+import java.util.Set;
+
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
@@ -54,25 +58,21 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, foregroundColor);
         style.setAttributeValue(CellStyleAttributes.FONT, getFont(font, SWT.ITALIC));
 
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
-                AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL);
-
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
-                AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
-
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
+        final Set<String> configLabels = newHashSet(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL,
+                AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL,
                 AddingElementLabelAccumulator.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
-                AddingElementLabelAccumulator.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
+        final Set<String> modes = newHashSet(DisplayMode.NORMAL, DisplayMode.SELECT, DisplayMode.HOVER,
+                DisplayMode.SELECT_HOVER);
+        for (final String configLabel : configLabels) {
+            for (final String mode : modes) {
+                configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, mode, configLabel);
+            }
+        }
         
         final ImageDescriptor addImage = RedImages.getAddImage();
         final Image imageToUse = ImagesManager.getImage(isEditable ? addImage : RedImages.getGrayedImage(addImage));
 
-        final TextPainter textPainter = new TextPainter(false, true, 2);
+        final TextPainter textPainter = new TextPainter(false, true, 2, false, true);
         final ICellPainter cellPainter = new CellPainterDecorator(textPainter, CellEdgeEnum.LEFT,
                 new ImagePainter(imageToUse));
 

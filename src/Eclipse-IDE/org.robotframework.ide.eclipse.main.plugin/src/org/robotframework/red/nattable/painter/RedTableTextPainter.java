@@ -62,7 +62,7 @@ public class RedTableTextPainter extends TextPainter {
     }
 
     public RedTableTextPainter(final boolean wrapContent, final int spacing) {
-        super(wrapContent, true, spacing, wrapContent);
+        super(wrapContent, true, spacing, wrapContent, true);
     }
 
     @Override

@@ -62,7 +62,7 @@ public class TableThemes {
 
         @Override
         public Font getFont() {
-            return null;
+            return RedTheme.getTablesEditorFont();
         }
 
         @Override
@@ -135,7 +135,7 @@ public class TableThemes {
 
         @Override
         public Font getFont() {
-            return null;
+            return RedTheme.getTablesEditorFont();
         }
 
         @Override

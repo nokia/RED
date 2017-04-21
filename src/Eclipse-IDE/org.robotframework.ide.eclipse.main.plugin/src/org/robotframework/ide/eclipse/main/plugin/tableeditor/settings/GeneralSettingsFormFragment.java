@@ -234,10 +234,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         Sections.switchGridCellGrabbingOnExpansion(generalSettingsSection);
         Sections.installMaximazingPossibility(generalSettingsSection);
 
+        final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
         final Composite panel = createPanel(generalSettingsSection);
-        createDocumentationControl(panel);
+        createDocumentationControl(panel, theme);
         if (!fileModel.isResourceFile()) {
-            setupNatTable(panel);
+            setupNatTable(panel, theme);
         }
         setInput();
     }
@@ -250,8 +251,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         return panel;
     }
 
-    private void createDocumentationControl(final Composite panel) {
+    private void createDocumentationControl(final Composite panel, final TableTheme theme) {
         documentation = new StyledText(panel, SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        documentation.setFont(theme.getFont());
         documentation.addPaintListener(new PaintListener() {
 
             @Override
@@ -512,10 +514,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         };
     }
 
-    private void setupNatTable(final Composite parent) {
-
-        final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
-
+    private void setupNatTable(final Composite parent, final TableTheme theme) {
         final ConfigRegistry configRegistry = new ConfigRegistry();
 
         final RedNattableDataProvidersFactory dataProvidersFactory = new RedNattableDataProvidersFactory();
@@ -596,6 +595,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
         final NatTable table = new NatTable(parent, style, gridLayer, false);
+        table.setFont(theme.getFont());
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
                 new RedNatGridLayerPainter(table, theme.getGridBorderColor(), theme.getHeadersBackground(),
