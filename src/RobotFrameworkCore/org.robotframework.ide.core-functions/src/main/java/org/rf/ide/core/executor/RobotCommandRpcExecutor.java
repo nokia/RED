@@ -131,7 +131,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     private List<PythonProcessListener> getListeners() {
-        return newArrayList(PythonInterpretersCommandExecutors.getInstance().getListeners());
+        return PythonInterpretersCommandExecutors.getInstance().getListeners();
     }
 
     private void startStdErrReadingThread(final Process process, final Semaphore semaphore) {
@@ -375,6 +375,18 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             return (Boolean) callRpcFunction("isVirtualenv");
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to check if is virtualenv.", e);
+        }
+    }
+
+    @Override
+    public Integer startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
+            final List<String> dataSourcePaths, final EnvironmentSearchPaths additionalPaths) {
+        try {
+            return (Integer) callRpcFunction("startLibraryAutoDiscovering", port, timeout, suiteNames, dataSourcePaths,
+                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+                    newArrayList(additionalPaths.getClassPaths()));
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to start library autodiscovering.", e);
         }
     }
 

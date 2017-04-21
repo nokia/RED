@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -27,17 +27,13 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunEventListener;
-import org.rf.ide.core.dryrun.RobotDryRunHandler;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
 import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder;
-import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -54,17 +50,23 @@ public abstract class AbstractAutoDiscoverer {
 
     final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
 
-    final RobotDryRunHandler dryRunHandler;
+    private final List<IResource> suiteFiles;
 
-    final List<IResource> suiteFiles;
+    private final IDryRunTargetsCollector dryRunTargetsCollector;
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles) {
+    private final LibrariesSourcesCollector librariesSourcesCollector;
+
+    private AgentConnectionServerJob serverJob;
+
+    AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+            final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
                 robotProject.getStandardLibraries().keySet());
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
-        this.dryRunHandler = new RobotDryRunHandler();
         this.suiteFiles = new ArrayList<IResource>(suiteFiles);
+        this.dryRunTargetsCollector = dryRunTargetsCollector;
+        this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
     }
 
     public void start() {
@@ -84,66 +86,62 @@ public abstract class AbstractAutoDiscoverer {
         IS_DRY_RUN_RUNNING.set(false);
     }
 
-    void startDiscovering(final IProgressMonitor monitor, final IDryRunTargetsCollector dryRunTargetsCollector)
-            throws InvocationTargetException, InterruptedException {
+    final void stopServer() {
+        if (serverJob != null) {
+            serverJob.stopServer();
+        }
+    }
+
+    void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");
-        subMonitor.setWorkRemaining(4);
+        subMonitor.setWorkRemaining(3);
 
         try {
-            final LibrariesSourcesCollector librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
             librariesSourcesCollector.collectPythonAndJavaLibrariesSources();
             subMonitor.worked(1);
 
-            dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations();
-            subMonitor.worked(1);
-
-            final int port = AgentConnectionServer.findFreePort();
-            final RunCommandLine dryRunCommandLine = createDryRunCommandLine(librariesSourcesCollector,
-                    dryRunTargetsCollector, port);
+            dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, suiteFiles);
             subMonitor.worked(1);
 
             subMonitor.subTask("Executing Robot dry run...");
             if (!subMonitor.isCanceled()) {
-                executeDryRun(dryRunCommandLine, port,
-                        suiteName -> subMonitor.subTask("Executing Robot dry run on suite: " + suiteName));
+                executeDryRun(suiteName -> subMonitor.subTask("Executing Robot dry run on suite: " + suiteName));
             }
             subMonitor.worked(1);
-        } catch (final CoreException | IOException e) {
+        } catch (final CoreException e) {
             throw new InvocationTargetException(e);
         } finally {
             subMonitor.done();
         }
     }
 
-    private RunCommandLine createDryRunCommandLine(final LibrariesSourcesCollector librariesSourcesCollector,
-            final IDryRunTargetsCollector dryRunTargetsCollector, final int port) throws CoreException, IOException {
+    private void executeDryRun(final Consumer<String> startSuiteHandler) throws InterruptedException, CoreException {
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment == null) {
             throw newCoreException(
                     "There is no active runtime environment for project '" + robotProject.getName() + "'");
         }
-        final EnvironmentSearchPaths searchPaths = librariesSourcesCollector.getEnvironmentSearchPaths();
-        return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port)
-                .useArgumentFile(true)
-                .suitesToRun(dryRunTargetsCollector.getSuiteNames())
-                .addLocationsToPythonPath(searchPaths.getExtendedPythonPaths(runtimeEnvironment.getInterpreter()))
-                .addLocationsToClassPath(searchPaths.getClassPaths())
-                .enableDryRun()
-                .withProject(getProjectLocationFile())
-                .withAdditionalProjectsLocations(dryRunTargetsCollector.getAdditionalProjectsLocations())
-                .build();
+
+        final String host = AgentConnectionServer.DEFAULT_CONNECTION_HOST;
+        final int port = AgentConnectionServer.findFreePort();
+        final int timeout = AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT;
+
+        serverJob = startDryRunServer(host, port, timeout, startSuiteHandler);
+
+        runtimeEnvironment.startLibraryAutoDiscovering(port, timeout, dryRunTargetsCollector.getSuiteNames(),
+                getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
+
+        serverJob.join();
     }
 
-    private void executeDryRun(final RunCommandLine dryRunCommandLine, final int port,
-            final Consumer<String> startSuiteHandler) throws InvocationTargetException, InterruptedException {
+    private AgentConnectionServerJob startDryRunServer(final String host, final int port, final int timeout,
+            final Consumer<String> startSuiteHandler) throws InterruptedException {
         final RobotDryRunEventListener dryRunEventListener = new RobotDryRunEventListener(dryRunLibraryImportCollector,
                 dryRunLKeywordSourceCollector, startSuiteHandler);
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
-
-        final AgentConnectionServerJob serverJob = AgentConnectionServerJob
-                .setupServerAt(AgentConnectionServer.DEFAULT_CONNECTION_HOST, port)
-                .withConnectionTimeout(AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT, TimeUnit.SECONDS)
+        final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
+                .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                 .agentEventsListenedBy(testsStarter)
                 .agentEventsListenedBy(dryRunEventListener)
                 .agentEventsListenedBy(new AgentServerKeepAlive())
@@ -152,19 +150,22 @@ public abstract class AbstractAutoDiscoverer {
 
         testsStarter.allowClientTestsStart();
 
-        dryRunHandler.executeDryRunProcess(dryRunCommandLine, getProjectLocationFile());
-
-        serverJob.join();
+        return serverJob;
     }
 
-    private File getProjectLocationFile() {
+    private List<String> getDataSourcePaths() {
+        final List<File> dataSources = new ArrayList<>();
         final IPath projectLocation = robotProject.getProject().getLocation();
-        return projectLocation != null ? projectLocation.toFile() : null;
+        if (projectLocation != null) {
+            dataSources.add(projectLocation.toFile());
+        }
+        dataSources.addAll(dryRunTargetsCollector.getAdditionalProjectsLocations());
+        return dataSources.stream().map(File::getAbsolutePath).collect(Collectors.toList());
     }
 
     public interface IDryRunTargetsCollector {
 
-        void collectSuiteNamesAndAdditionalProjectsLocations();
+        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject, List<IResource> suiteFiles);
 
         List<String> getSuiteNames();
 
