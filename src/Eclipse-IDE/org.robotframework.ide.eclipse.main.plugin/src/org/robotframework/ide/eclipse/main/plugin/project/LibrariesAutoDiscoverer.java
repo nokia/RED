@@ -112,7 +112,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
                 @Override
                 protected void canceling() {
-                    stopServer();
+                    stopDiscovering();
                 }
             };
             wsJob.setUser(true);

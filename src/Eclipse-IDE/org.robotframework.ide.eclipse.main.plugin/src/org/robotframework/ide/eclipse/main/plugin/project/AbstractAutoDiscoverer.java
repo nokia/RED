@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -33,7 +33,10 @@ import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RunCommandLineCallBuilder;
+import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -58,6 +61,8 @@ public abstract class AbstractAutoDiscoverer {
 
     private AgentConnectionServerJob serverJob;
 
+    private final RobotDryRunHandler dryRunHandler;
+
     AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
@@ -67,6 +72,7 @@ public abstract class AbstractAutoDiscoverer {
         this.suiteFiles = new ArrayList<IResource>(suiteFiles);
         this.dryRunTargetsCollector = dryRunTargetsCollector;
         this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
+        this.dryRunHandler = new RobotDryRunHandler();
     }
 
     public void start() {
@@ -86,10 +92,11 @@ public abstract class AbstractAutoDiscoverer {
         IS_DRY_RUN_RUNNING.set(false);
     }
 
-    final void stopServer() {
+    void stopDiscovering() {
         if (serverJob != null) {
             serverJob.stopServer();
         }
+        dryRunHandler.destroyDryRunProcess();
     }
 
     void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -109,14 +116,15 @@ public abstract class AbstractAutoDiscoverer {
                 executeDryRun(suiteName -> subMonitor.subTask("Executing Robot dry run on suite: " + suiteName));
             }
             subMonitor.worked(1);
-        } catch (final CoreException e) {
+        } catch (final CoreException | IOException e) {
             throw new InvocationTargetException(e);
         } finally {
             subMonitor.done();
         }
     }
 
-    private void executeDryRun(final Consumer<String> startSuiteHandler) throws InterruptedException, CoreException {
+    private void executeDryRun(final Consumer<String> startSuiteHandler)
+            throws CoreException, InterruptedException, IOException {
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment == null) {
             throw newCoreException(
@@ -131,8 +139,7 @@ public abstract class AbstractAutoDiscoverer {
 
         serverJob = startDryRunServer(host, port, timeout, dryRunEventListener);
 
-        runtimeEnvironment.startLibraryAutoDiscovering(port, timeout, dryRunTargetsCollector.getSuiteNames(),
-                getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
+        dryRunHandler.executeDryRunProcess(createDryRunCommandLine(runtimeEnvironment, port), getProjectLocationFile());
 
         serverJob.join();
     }
@@ -153,14 +160,23 @@ public abstract class AbstractAutoDiscoverer {
         return serverJob;
     }
 
-    private List<String> getDataSourcePaths() {
-        final List<File> dataSources = new ArrayList<>();
+    private RunCommandLine createDryRunCommandLine(final RobotRuntimeEnvironment runtimeEnvironment, final int port)
+            throws IOException {
+        final EnvironmentSearchPaths searchPaths = librariesSourcesCollector.getEnvironmentSearchPaths();
+        return RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port)
+                .useArgumentFile(true)
+                .suitesToRun(dryRunTargetsCollector.getSuiteNames())
+                .addLocationsToPythonPath(searchPaths.getExtendedPythonPaths(runtimeEnvironment.getInterpreter()))
+                .addLocationsToClassPath(searchPaths.getClassPaths())
+                .enableDryRun()
+                .withProject(getProjectLocationFile())
+                .withAdditionalProjectsLocations(dryRunTargetsCollector.getAdditionalProjectsLocations())
+                .build();
+    }
+
+    private File getProjectLocationFile() {
         final IPath projectLocation = robotProject.getProject().getLocation();
-        if (projectLocation != null) {
-            dataSources.add(projectLocation.toFile());
-        }
-        dataSources.addAll(dryRunTargetsCollector.getAdditionalProjectsLocations());
-        return dataSources.stream().map(File::getAbsolutePath).collect(Collectors.toList());
+        return projectLocation != null ? projectLocation.toFile() : null;
     }
 
     public interface IDryRunTargetsCollector {
@@ -178,6 +194,31 @@ public abstract class AbstractAutoDiscoverer {
 
         public AutoDiscovererException(final String message, final Throwable cause) {
             super(message, cause);
+        }
+    }
+
+    private class RobotDryRunHandler {
+
+        private Process dryRunProcess;
+
+        public void executeDryRunProcess(final RunCommandLine dryRunCommandLine, final File projectDir)
+                throws CoreException {
+            try {
+                ProcessBuilder processBuilder = new ProcessBuilder(dryRunCommandLine.getCommandLine());
+                if (projectDir != null && projectDir.exists()) {
+                    processBuilder = processBuilder.directory(projectDir);
+                }
+                dryRunProcess = processBuilder.start();
+                dryRunProcess.waitFor();
+            } catch (InterruptedException | IOException e) {
+                throw newCoreException("Unable to start dry run process.", e);
+            }
+        }
+
+        public void destroyDryRunProcess() {
+            if (dryRunProcess != null) {
+                dryRunProcess.destroy();
+            }
         }
     }
 
