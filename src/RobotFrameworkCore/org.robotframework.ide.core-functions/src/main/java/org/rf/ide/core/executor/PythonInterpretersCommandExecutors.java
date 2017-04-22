@@ -40,13 +40,10 @@ class PythonInterpretersCommandExecutors {
             xmlRpcServerScriptFile = RobotRuntimeEnvironment.copyScriptFile("robot_session_server.py");
             RobotRuntimeEnvironment.copyScriptFile("classpath_updater.py");
             RobotRuntimeEnvironment.copyScriptFile("red_libraries.py");
-            RobotRuntimeEnvironment.copyScriptFile("red_library_autodiscover.py");
             RobotRuntimeEnvironment.copyScriptFile("red_module_classes.py");
             RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
             RobotRuntimeEnvironment.copyScriptFile("red_variables.py");
             RobotRuntimeEnvironment.copyScriptFile("red_virtualenv_check.py");
-            RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
-            RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
         } catch (final IOException e) {
             xmlRpcServerScriptFile = null;
         }
