@@ -126,8 +126,10 @@ public abstract class AbstractAutoDiscoverer {
         final String host = AgentConnectionServer.DEFAULT_CONNECTION_HOST;
         final int port = AgentConnectionServer.findFreePort();
         final int timeout = AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT;
+        final RobotDryRunEventListener dryRunEventListener = new RobotDryRunEventListener(dryRunLibraryImportCollector,
+                dryRunLKeywordSourceCollector, startSuiteHandler);
 
-        serverJob = startDryRunServer(host, port, timeout, startSuiteHandler);
+        serverJob = startDryRunServer(host, port, timeout, dryRunEventListener);
 
         runtimeEnvironment.startLibraryAutoDiscovering(port, timeout, dryRunTargetsCollector.getSuiteNames(),
                 getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
@@ -136,9 +138,7 @@ public abstract class AbstractAutoDiscoverer {
     }
 
     private AgentConnectionServerJob startDryRunServer(final String host, final int port, final int timeout,
-            final Consumer<String> startSuiteHandler) throws InterruptedException {
-        final RobotDryRunEventListener dryRunEventListener = new RobotDryRunEventListener(dryRunLibraryImportCollector,
-                dryRunLKeywordSourceCollector, startSuiteHandler);
+            final RobotDryRunEventListener dryRunEventListener) throws InterruptedException {
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)

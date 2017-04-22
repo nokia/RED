@@ -35,7 +35,7 @@ def __create_arguments(port, suite_names, data_source_paths):
                  '--console',
                  'NONE']
     for suite_name in suite_names:
-        arguments.append('-s')
+        arguments.append('--suite')
         arguments.append(suite_name)
     for data_source_path in data_source_paths:
         arguments.append(data_source_path)
