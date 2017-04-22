@@ -31,8 +31,8 @@ class MyTestSuiteBuilder(TestSuiteBuilder):
 
 
 class SuiteVisitorImportProxy(SuiteVisitor):
-    def __init__(self, *args):
-        self.options, self.arguments = RobotFramework().parse_arguments(list(args))
+    def __init__(self):
+        self.options, self.arguments = RobotFramework().parse_arguments([])
         self.settings = RobotSettings(**self.options)
         self.f_suites = self.settings.suite_config['include_suites']
 
