@@ -31,8 +31,10 @@ class MyTestSuiteBuilder(TestSuiteBuilder):
 
 
 class SuiteVisitorImportProxy(SuiteVisitor):
-    def __init__(self):
-        self.options, self.arguments = RobotFramework().parse_arguments([])
+    def __init__(self, lib_import_timeout=60):
+        import robot.running.namespace
+        robot.running.namespace.IMPORTER = RedImporter(robot.running.namespace.IMPORTER, lib_import_timeout)
+        self.options, self.arguments = RobotFramework().parse_arguments(sys.argv[1:])
         self.settings = RobotSettings(**self.options)
         self.f_suites = self.settings.suite_config['include_suites']
 
@@ -93,7 +95,7 @@ class LibItem(object):
         return self.result
 
 
-class MyIMPORTER(object):
+class RedImporter(object):
     def __init__(self, obj, lib_import_timeout):
         self.obj = obj
         self.lib_import_timeout = int(lib_import_timeout)

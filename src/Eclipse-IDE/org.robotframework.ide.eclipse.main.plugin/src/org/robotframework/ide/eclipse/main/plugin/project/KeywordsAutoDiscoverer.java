@@ -57,7 +57,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
             } catch (final InvocationTargetException e) {
                 throw new AutoDiscovererException("Problems occurred during discovering keywords.", e);
             } catch (final InterruptedException e) {
-                stopServer();
+                stopDiscovering();
             }
         }
     }
