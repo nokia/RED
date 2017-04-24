@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _L2Q5ICQVEeeO6fW46SeMzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/18/17 1:15 PM
+Save-Time: 4/24/17 10:28 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -26,31 +26,43 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     key-type Up -times 2
     type-text "*** Settings"
     key-type "M1+SPACE"
+    wait 200
     key-type Enter
+    
+    //library1
     type-text Libra
     key-type "M1+SPACE"
+    wait 200
     key-type Enter
     type-text libra
     key-type Enter -times 2
+    
+    //library 2 iwth alias
     type-text Lib
     key-type "M1+SPACE"
+    wait 200
     key-type Enter
     type-text library2
     key-type Enter
-    type-text WITG
-    key-type BackSpace
+    type-text WIT
     key-type "M1+SPACE"
+    wait 200
     key-type Enter
     type-text alias
     key-type Enter
+    
+    //resource
     type-text Res
     key-type "M1+SPACE"
+    wait 200
     key-type Enter
     type-text "res/"
     key-type Enter -times 2
+    
     // enter Suite Setup for library
     type-text Su
     key-type "M1+SPACE"
+    wait 200
     key-type Enter
     type-text library1
 }
@@ -66,6 +78,7 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     // enter Suite Teardown for library
     type-text Su
     key-type "M1+SPACE"
+    wait 200
     key-type Down
     key-type Enter
     type-text al
@@ -79,7 +92,7 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
 get-editor "TestSuite.robot" | get-text-viewer | set-caret-pos 6 33
 
 // verify if no errors
-wait-for-zero-items -times 2 -delay 500
+wait-for-zero-items -times 4 -delay 500
 
 // delete Suite Setup and Suitne Teardown
 with [get-editor "TestSuite.robot" | get-text-viewer] {
