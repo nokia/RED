@@ -83,25 +83,31 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final RobotProjectConfig model = config.getConfigurationModel();
         final Map<Object, ProblemPosition> linesMapping = config.getLinesMapping();
 
-        for (final RemoteLocation location : model.getRemoteLocations()) {
-            validateRemoteLocation(monitor, location, linesMapping);
-        }
-        int index = 0;
-        for (final ReferencedLibrary library : model.getLibraries()) {
-            validateReferencedLibrary(monitor, library, index, linesMapping);
-            index++;
-        }
-        for (final SearchPath path : model.getPythonPath()) {
-            validateSearchPath(monitor, path, model, linesMapping);
-        }
-        for (final SearchPath path : model.getClassPath()) {
-            validateSearchPath(monitor, path, model, linesMapping);
-        }
-        for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
-            validateReferencedVariableFile(monitor, variableFile, linesMapping);
-        }
-        for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
-            validateExcludedPath(monitor, excludedPath, model.getExcludedPath(), linesMapping);
+        if (model.hasCurrentVersion()) {
+            for (final RemoteLocation location : model.getRemoteLocations()) {
+                validateRemoteLocation(monitor, location, linesMapping);
+            }
+            int index = 0;
+            for (final ReferencedLibrary library : model.getLibraries()) {
+                validateReferencedLibrary(monitor, library, index, linesMapping);
+                index++;
+            }
+            for (final SearchPath path : model.getPythonPath()) {
+                validateSearchPath(monitor, path, model, linesMapping);
+            }
+            for (final SearchPath path : model.getClassPath()) {
+                validateSearchPath(monitor, path, model, linesMapping);
+            }
+            for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
+                validateReferencedVariableFile(monitor, variableFile, linesMapping);
+            }
+            for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
+                validateExcludedPath(monitor, excludedPath, model.getExcludedPath(), linesMapping);
+            }
+        } else {
+            final RobotProblem invalidVersionProblem = RobotProblem.causedBy(ConfigFileProblem.INVALID_VERSION)
+                    .formatMessageWith(model.getVersion().getVersion(), RobotProjectConfig.CURRENT_VERSION);
+            reporter.handleProblem(invalidVersionProblem, configFile, linesMapping.get(model.getVersion()));
         }
     }
 

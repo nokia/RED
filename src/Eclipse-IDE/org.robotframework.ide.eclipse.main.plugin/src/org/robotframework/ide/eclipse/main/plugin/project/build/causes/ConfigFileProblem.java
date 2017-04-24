@@ -15,6 +15,13 @@ import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveLibraryFromConfigurationFileFixer;
 
 public enum ConfigFileProblem implements IProblemCause {
+    INVALID_VERSION {
+
+        @Override
+        public String getProblemDescription() {
+            return "Red.xml file is in version %s, but %s expected";
+        }
+    },
     UNREACHABLE_HOST {
         @Override
         public String getProblemDescription() {
