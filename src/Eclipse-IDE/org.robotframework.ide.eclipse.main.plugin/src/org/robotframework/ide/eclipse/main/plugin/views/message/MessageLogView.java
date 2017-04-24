@@ -105,6 +105,10 @@ public class MessageLogView {
         styledText.setFocus();
     }
 
+    protected void toggleWordsWrapping() {
+        styledText.setWordWrap(!styledText.getWordWrap());
+    }
+
     @PreDestroy
     public void dispose() {
         synchronized (executionService) {

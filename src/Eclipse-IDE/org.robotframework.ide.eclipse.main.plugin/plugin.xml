@@ -1326,6 +1326,14 @@
     </command>
  </extension>
  <extension
+       point="org.eclipse.ui.commands">
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.message.view.wrap"
+          name="Word Wrap">
+    </command>
+ </extension>
+ <extension
        point="org.eclipse.ui.handlers">
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ConfigureRobotNatureHandler"
@@ -3035,6 +3043,14 @@
                   </equals>
                </with>
             </activeWhen>
+         </handler>
+      </extension>
+      <extension
+            name="Message View handlers"
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.message.ToggleWordsWrappingHandler"
+               commandId="org.robotframework.ide.eclipse.message.view.wrap">
          </handler>
       </extension>
  <extension
@@ -5831,6 +5847,18 @@
                      </and>
                   </with>
                </visibleWhen>
+            </command>
+         </menuContribution>
+      </extension>
+      <extension
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.robotframework.ide.MessageLogView?after=additions">
+            <command
+                  commandId="org.robotframework.ide.eclipse.message.view.wrap"
+                  icon="resources/wordwrap.png"
+                  style="toggle">
             </command>
          </menuContribution>
       </extension>
