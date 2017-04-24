@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OVxNoN8BEeWvV6AMcH1t9Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 4:24 PM
+Save-Time: 4/24/17 4:29 PM
 Tags: Debug
 Testcase-Type: ecl
 Verifications: _ytMH0N-fEeWvV6AMcH1t9Q
@@ -87,8 +87,7 @@ get-view Console | get-text-viewer | get-property text
     + "3 tests total, 3 passed, 0 failed\n"
     + "==============================================================================\n"
     + "Output: .*output.xml\n"
-    + "Log:     .*log.html\n"
-    + "(Report:  .*report.html)?" | verify-true
+    + "Log:     .*log.html(\nReport:  .*report.html)?" | verify-true
 
 get-menu "Window/Show View/Execution View" | click
 
