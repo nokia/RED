@@ -57,6 +57,34 @@ class RedXmlEditsCollector {
         }
     }
 
+    List<TextEdit> collectEditsInMovedLibraries(final String projectName, final IDocument redXmlDocument) {
+        return collectEditsInMovedLibriaries(projectName, new MatchesInDocumentEngine(redXmlDocument));
+    }
+
+    List<TextEdit> collectEditsInMovedLibraries(final String projectName, final IFile redXmlFile) {
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(redXmlFile.getContents()))) {
+
+            final IDocument document = new Document(CharStreams.toString(fileReader));
+            return collectEditsInMovedLibriaries(projectName, new MatchesInDocumentEngine(document));
+        } catch (IOException | CoreException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    private List<TextEdit> collectEditsInMovedLibriaries(String projectName, final MatchingEngine engine) {
+        if (!projectName.equals(pathBeforeRefactoring.segment(0))) {
+            return new ArrayList<>();
+        }
+
+        final String toMatch = "\\s*(<referencedLibrary\\s*type=\"([^\"]*)\"\\s*name=\"([^\"]*)\"\\s*path=\"([^\"]*)\"/>)\\s*";
+
+        final Pattern toMatchPattern = Pattern.compile(toMatch);
+
+        final LibraryMovedMatchesAccess matchesAccess = new LibraryMovedMatchesAccess(toMatchPattern);
+        engine.searchForMatches(toMatch, matchesAccess);
+        return matchesAccess.getEdits();
+    }
+
     private List<TextEdit> collectEditsInExcludedPaths(final String projectName, final MatchingEngine engine) {
         if (!projectName.equals(pathBeforeRefactoring.segment(0))) {
             // the change affected something from different project, so excluded paths in the
@@ -64,7 +92,8 @@ class RedXmlEditsCollector {
             return new ArrayList<>();
         }
 
-        final String toMatch = "\\s*(<excludedPath\\s*path=\"([^\"]*)\"/>)\\s*";
+        final String toMatch = "\\.*(<excludedPath\\s*path=\"([^\"]*)\"/>)\\s*";
+
         final Pattern toMatchPattern = Pattern.compile(toMatch);
 
         final ExcludedPathsMatchesAccess matchesAccess = new ExcludedPathsMatchesAccess(toMatchPattern);
@@ -114,4 +143,76 @@ class RedXmlEditsCollector {
             }
         }
     }
+
+    private final class LibraryMovedMatchesAccess implements MatchAccess {
+
+        private final Pattern toMatchPattern;
+
+        private final List<TextEdit> edits;
+
+        private LibraryMovedMatchesAccess(final Pattern toMatchPattern) {
+            this.toMatchPattern = toMatchPattern;
+            this.edits = new ArrayList<>();
+        }
+
+        public List<TextEdit> getEdits() {
+            return edits;
+        }
+
+        @Override
+        public void onMatch(final String matchingContent, final Position matchPosition) {
+            final Matcher matcher = toMatchPattern.matcher(matchingContent);
+            matcher.find();
+            final String type = matcher.group(2);
+            final String name = matcher.group(3);
+
+
+            
+            final IPath potentiallyAffectedPath = Path.fromPortableString(matcher.group(4));
+            final IPath adjustedPathBeforeRefactoring = Changes
+                    .excapeXmlCharacters(pathBeforeRefactoring);
+            if (pathAfterRefactoring.isPresent()) {
+                final IPath adjustedPathAfterRefactoring = Changes
+                        .excapeXmlCharacters(pathAfterRefactoring.get());
+
+
+
+                Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
+                        adjustedPathAfterRefactoring, potentiallyAffectedPath);
+                String toInsert;
+                if (transformedPath.isPresent()) {
+                    String finalPath = transformedPath.get().toPortableString();
+
+                    toInsert = "<referencedLibrary type=\"" + type + "\"" + " name=\""
+                            + name
+                            + "\"" + " path=\""
+                            + finalPath.substring(1);
+
+                } else {
+
+                    String finalPath = adjustedPathAfterRefactoring.removeLastSegments(1).toPortableString();
+
+                    toInsert = "<referencedLibrary type=\"" + type + "\"" + " name=\""
+                            + adjustedPathAfterRefactoring.lastSegment().substring(0,
+                                    adjustedPathAfterRefactoring.lastSegment().lastIndexOf('.'))
+                            + "\""
+                            + " path=\""
+                            + finalPath.substring(1, finalPath.length());
+                }
+
+
+
+                    final int startShift = matcher.start(1);
+                final int endShift = matchingContent.length() - matcher.end(4) + startShift;
+                    edits.add(new ReplaceEdit(matchPosition.getOffset() + startShift,
+                            matchPosition.getLength() - endShift, toInsert));
+
+            } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
+                edits.add(new DeleteEdit(matchPosition.getOffset(), matchPosition.getLength()));
+            }
+
+
+        }
+    }
+
 }
