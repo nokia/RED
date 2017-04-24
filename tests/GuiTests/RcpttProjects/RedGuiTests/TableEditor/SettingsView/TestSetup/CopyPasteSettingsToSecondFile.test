@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3Aa-4FgBEeaKPZp2wD-8qw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/19/16 1:07 PM
+Save-Time: 4/24/17 4:14 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -67,6 +67,7 @@ with [get-editor "second_file2.robot" | get-section General | get-canvas] {
     key-type "M1+v"
 }
 
+get-editor "second_file2.robot" | maximize
 //check if text was pasted
 check-row-for-test-setup-default -file "second_file2.robot" -row 1 -setting "Suite Setup" 
 check-row-for-test-setup-default -file "second_file2.robot" -row 2 -setting "Suite Teardown" -c1 "Log"
