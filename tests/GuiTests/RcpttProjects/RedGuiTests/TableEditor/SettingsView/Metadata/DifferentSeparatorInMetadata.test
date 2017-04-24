@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xbGiMDbxEeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/26/17 4:40 PM
+Save-Time: 4/24/17 6:09 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -51,6 +51,8 @@ with [get-editor "TestFile.robot"] {
 }
 
 check-metadata-layer-size
+generate-coordinates
+
 get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 1|  invoke getDataValue| eq "zorro" |verify-true
 get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 1|  invoke getDataValue| eq "" |verify-true
 get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 1|  invoke getDataValue| eq "" |verify-true
@@ -69,12 +71,12 @@ with [get-editor "TestFile.robot"] {
     with [get-section Metadata] {
         //click
         with [get-canvas] {
-            mouse-move 461 31
-            mouse-press 461 31 button1
-            mouse-release 461 31 button1 524288
-            mouse-press 461 31 button1
-            mouse-double-click 461 31 button1
-            mouse-release 461 31 button1 524288
+            mouse-move $x2 $y1
+            mouse-press $x2 $y1 button1
+            mouse-release $x2 $y1 button1 524288
+            mouse-press $x2 $y1 button1
+            mouse-double-click $x2 $y1 button1
+            mouse-release $x2 $y1 button1 524288
         }
         //add 1 to zorro
         with [get-editbox] {
@@ -105,11 +107,11 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
 with [get-editor "TestFile.robot"] {
     with [get-section Metadata] {
         with [get-canvas] {
-            mouse-press 414 51 button1
-            mouse-release 414 51 button1 524288
-            mouse-press 414 51 button1
-            mouse-double-click 414 51 button1
-            mouse-release 414 51 button1 524288
+            mouse-press $x2 $y2 button1
+            mouse-release $x2 $y2 button1 524288
+            mouse-press $x2 $y2 button1
+            mouse-double-click $x2 $y2 button1
+            mouse-release $x2 $y2 button1 524288
         }
         //add 2 as rag
         with [get-editbox] {
@@ -144,17 +146,19 @@ wait 500
 with [get-editor "TestFile.robot" | get-section Metadata] {
     with [get-canvas] {
     	//data
-        mouse-press 136 74 button1
-        mouse-release 136 74 button1 524288
-        mouse-press 136 74 button1
-        mouse-double-click 136 74 button1
-        mouse-release 136 74 button1 524288
-        mouse-move 406 78
-        mouse-press 406 78 button1
-        mouse-release 406 78 button1 524288
-        mouse-press 406 78 button1
-        mouse-double-click 406 78 button1
-        mouse-release 406 78 button1 524288
+        mouse-press 136 [minus $y3 2] button1
+        mouse-release 136 [minus $y3 2] button1 524288
+        mouse-press 136 [minus $y3 2] button1
+        mouse-double-click 136 [minus $y3 2] button1
+        mouse-release 136 [minus $y3 2] button1 524288
+        
+        
+        mouse-move [plus $cell_width 30] $y3
+        mouse-press [plus $cell_width 3] $y3 button1
+        mouse-release [plus $cell_width 30] $y3 button1 524288
+        mouse-press [plus $cell_width 30] $y3 button1
+        mouse-double-click [plus $cell_width 30] $y3 button1
+        mouse-release [plus $cell_width 30] $y3 button1 524288
     }
     with [get-editbox] {
         type-text 3
@@ -228,44 +232,44 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
 with [get-editor "TestFile.robot" | get-section Metadata] {
     with [get-canvas] {
     	//add new metadata
-        mouse-press 132 99 button1
-        mouse-release 132 99 button1 524288
-        mouse-press 132 99 button1
-        mouse-double-click 132 99 button1
-        mouse-release 132 99 button1 524288
-        mouse-press 132 99 button1
-        mouse-release 132 99 button1 524288
-        mouse-press 132 99 button1
-        mouse-double-click 132 99 button1
-        mouse-release 132 99 button1 524288
+        mouse-press [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1
+        mouse-release [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1 524288
+        mouse-press [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1
+        mouse-double-click [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1
+        mouse-release [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1 524288
+        mouse-press [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1
+        mouse-release [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1 524288
+        mouse-press [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1
+        mouse-double-click [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1
+        mouse-release [minus $cell_width 10] [mult 4 $cell_hight| plus 3] button1 524288
     }
     //chane value to meta
     get-editbox | set-text meta
     
-    //add value
+    //add value = 55
     with [get-canvas] {
-        mouse-move 405 96
-        mouse-press 405 96 button1
-        mouse-release 405 96 button1 524288
-        mouse-press 405 96 button1
-        mouse-double-click 405 96 button1
-        mouse-release 405 96 button1 524288
+        mouse-move $x2 $y4
+        mouse-press $x2 $y4 button1
+        mouse-release $x2 $y4 button1 524288
+        mouse-press $x2 $y4 button1
+        mouse-double-click $x2 $y4 button1
+        mouse-release $x2 $y4 button1 524288
     }
     get-editbox | set-text 55
     with [get-canvas] {
-        mouse-move 741 95
-        mouse-press 741 95 button1
-        mouse-release 741 95 button1 524288
-        mouse-press 741 95 button1
-        mouse-double-click 741 95 button1
-        mouse-release 741 95 button1 524288
+        mouse-move $x3 $y4
+        mouse-press $x3 $y4 button1
+        mouse-release $x3 $y4 button1 524288
+        mouse-press $x3 $y4 button1
+        mouse-double-click $x3 $y4 button1
+        mouse-release $x3 $y4 button1 524288
     }
-    //set comment and click on Valu cell
+    //set comment and click on Value cell
     get-editbox | set-text text
     with [get-canvas] {
-        mouse-move 546 90
-        mouse-press 546 90 button1
-        mouse-release 546 90 button1 524288
+        mouse-move [plus $x2 30] [minus $y4 7]
+        mouse-press [plus $x2 30] [minus $y4 7] button1
+        mouse-release [plus $x2 30] [minus $y4 7] button1 524288
         mouse-move 1035 196
     }
 }
