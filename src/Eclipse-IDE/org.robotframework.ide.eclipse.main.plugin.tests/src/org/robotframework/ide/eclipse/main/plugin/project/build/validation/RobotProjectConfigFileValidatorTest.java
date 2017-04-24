@@ -69,6 +69,33 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
+    public void whenConfigHasOldVersionFormat_itHasNoValidationIssues() throws Exception {
+        // remove this test after red.xml version change
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.setVersion("1.0");
+        final Map<Object, ProblemPosition> locations = new HashMap<>();
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void whenConfigHasIncompatibleVersionFormat_InvalidVersionProblemIsReported() throws Exception {
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.setVersion("invalid");
+        final Map<Object, ProblemPosition> locations = new HashMap<>();
+        locations.put(config.getVersion(), new ProblemPosition(3));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+
+        validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
+
+        assertThat(reporter.getReportedProblems())
+                .containsExactly(new Problem(ConfigFileProblem.INVALID_VERSION, new ProblemPosition(3)));
+    }
+
+    @Test
     public void whenRemoteLocationHostDoesNotExist_unreachableHostProblemIsReported() throws Exception {
         // opens the socket in order to find port, but the socket gets closed immediately
         final RemoteLocation remoteLocation = RemoteLocation.create("http://127.0.0.1:" + findFreePort() + "/");
