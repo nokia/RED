@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _sp87ICTlEeesE7mkFuId1w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/19/17 4:22 PM
+Save-Time: 4/24/17 11:13 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -23,9 +23,10 @@ exec-with-options {
     get-window "Run Configurations" | get-tree | double-click
     
     //check error
-    get-window "Problem Occurred" | get-label "'Launching oldTest.robot' has encountered a problem." 
-        | get-property caption | equals "'Launching oldTest.robot' has encountered a problem." | verify-true
-
+    try -times 4 -delay 500 -command{
+	    get-window "Problem Occurred" | get-label "'Launching oldTest.robot' has encountered a problem." 
+	        | get-property caption | equals "'Launching oldTest.robot' has encountered a problem." | verify-true
+	}
     get-window "Problem Occurred" 
         | get-label "This configuration is incompatible with RED version you are currently using.Expected: 1, but was: 0Resolution: Delete old configurations manually and create the new ones." 
         | get-property caption | equals "This configuration is incompatible with RED version you are currently using.\n"
