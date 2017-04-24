@@ -7,30 +7,42 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1sKeQA-3EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/28/17 6:07 PM
+Save-Time: 4/24/17 4:23 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-//cha
+proc "get-cell-hight"{
+	div  [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-property "getLayer().getBodyLayer().getScrollableLayer().getHeight()" -raw]
+	[get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" -raw] 	
+}
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+global [val default_cell_high [get-cell-hight]]
+
+
+
 proc "check-if-row-is-higher" [val row] [val table][val file "TestFile.robot"]{
 	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object 
 		| invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 		| invoke getUnderlyingLayerByPosition 0 0 | invoke getRowHeightByPosition $row
-		| gt 22 | assert-true -message [format "In row: %s value is not equal 22" $row]
+		| gt $default_cell_high  | assert-true -message [format "In row: %s value is not equal %s" $row $default_cell_high]
+
 }
 
 proc "check-if-row-is-normal" [val row] [val table] [val file "TestFile.robot"]{
 	get-editor $file | get-canvas -after [get-label $table] -index 1  | get-object 
 		| invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 		| invoke getUnderlyingLayerByPosition 0 0 | invoke getRowHeightByPosition $row
-		| eq 22 | assert-true -message [format "In row: %s value is not equal 22" $row]
+		| eq $default_cell_high | assert-true -message [format "In row: %s value is not equal %s" $row $default_cell_high]
+	
 }
 
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
 
 //check if all rows has the same size
 repeat [val index] -times 7 -command{
