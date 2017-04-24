@@ -150,6 +150,10 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return fp;
     }
 
+    public void setFilePosition(final FilePosition fp) {
+        this.fp = fp;
+    }
+
     @Override
     public boolean isDirty() {
         return isDirty;
