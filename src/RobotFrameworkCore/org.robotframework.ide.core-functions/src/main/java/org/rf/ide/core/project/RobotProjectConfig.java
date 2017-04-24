@@ -39,12 +39,12 @@ public class RobotProjectConfig {
 
     public static final String FILENAME = "red.xml";
 
-    private static final String CURRENT_VERSION = "1.0";
+    public static final String CURRENT_VERSION = "1";
 
     private static final String VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB = "1024";
 
     @XmlElement(name = "configVersion", required = true)
-    private String version;
+    private ConfigVersion version;
 
     @XmlElement(name = "robotExecEnvironment", required = false)
     private ExecutionEnvironment executionEnvironment;
@@ -104,11 +104,16 @@ public class RobotProjectConfig {
     }
 
     public void setVersion(final String version) {
-        this.version = version;
+        this.version = ConfigVersion.create(version);
     }
 
-    public String getVersion() {
+    public ConfigVersion getVersion() {
         return version;
+    }
+
+    public boolean hasCurrentVersion() {
+        // workaround, or should be removed when moving to newer version
+        return CURRENT_VERSION.equals(version.getVersion()) || "1.0".equals(version.getVersion());
     }
 
     public void setExecutionEnvironment(final ExecutionEnvironment executionEnvironment) {
@@ -387,7 +392,8 @@ public class RobotProjectConfig {
 
     @Override
     public int hashCode() {
-        return Objects.hash(version, executionEnvironment == null ? null : executionEnvironment.path);
+        return Objects.hash(version == null ? null : version.getVersion(),
+                executionEnvironment == null ? null : executionEnvironment.path);
     }
 
     @Override
@@ -403,7 +409,33 @@ public class RobotProjectConfig {
         }
         final RobotProjectConfig other = (RobotProjectConfig) obj;
         return Objects.equals(executionEnvironment.path, other.executionEnvironment.path)
-                && Objects.equals(version, other.version);
+                && Objects.equals(version.getVersion(), other.version.getVersion());
+    }
+
+    @XmlRootElement(name = "configVersion")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class ConfigVersion {
+
+        public static ConfigVersion create(final String version) {
+            final ConfigVersion configVersion = new ConfigVersion();
+            configVersion.setVersion(version);
+            return configVersion;
+        }
+
+        // workaround xs:simpleType -> xs:complexType, which is required in this case
+        @XmlAttribute(required = false)
+        private String foo;
+
+        @XmlValue
+        private String version;
+
+        public void setVersion(final String version) {
+            this.version = version;
+        }
+
+        public String getVersion() {
+            return version;
+        }
     }
 
     @XmlRootElement(name = "robotExecEnvironment")

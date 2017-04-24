@@ -59,7 +59,7 @@ public class RobotProjectConfigFileValidatorTest {
 
     @Test
     public void whenConfigIsNewlyCreated_itHasNoValidationIssues() throws Exception {
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         final Map<Object, ProblemPosition> locations = new HashMap<>();
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
 
@@ -72,7 +72,7 @@ public class RobotProjectConfigFileValidatorTest {
     public void whenRemoteLocationHostDoesNotExist_unreachableHostProblemIsReported() throws Exception {
         // opens the socket in order to find port, but the socket gets closed immediately
         final RemoteLocation remoteLocation = RemoteLocation.create("http://127.0.0.1:" + findFreePort() + "/");
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addRemoteLocation(remoteLocation);
         
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -93,7 +93,7 @@ public class RobotProjectConfigFileValidatorTest {
         try (ServerSocket socket = new ServerSocket(0)) {
             final RemoteLocation remoteLocation = RemoteLocation
                     .create("http://127.0.0.1:" + socket.getLocalPort() + "/");
-            final RobotProjectConfig config = new RobotProjectConfig();
+            final RobotProjectConfig config = RobotProjectConfig.create();
             config.addRemoteLocation(remoteLocation);
 
             final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -114,7 +114,7 @@ public class RobotProjectConfigFileValidatorTest {
         
         final SearchPath searchPath = SearchPath.create(folder.getAbsolutePath());
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addClassPath(searchPath);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -134,7 +134,7 @@ public class RobotProjectConfigFileValidatorTest {
 
         final SearchPath searchPath = SearchPath.create(path);
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addClassPath(searchPath);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -153,7 +153,7 @@ public class RobotProjectConfigFileValidatorTest {
 
         final SearchPath searchPath = SearchPath.create(PROJECT_NAME + "/folder");
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addPythonPath(searchPath);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -169,7 +169,7 @@ public class RobotProjectConfigFileValidatorTest {
     public void whenRelativePathDoesNotExist_missingLocationProblemIsReported() throws Exception {
         final SearchPath searchPath = SearchPath.create(PROJECT_NAME + "/folder");
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addPythonPath(searchPath);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -189,7 +189,7 @@ public class RobotProjectConfigFileValidatorTest {
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile.create(PROJECT_NAME + "/a/vars.py");
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -208,7 +208,7 @@ public class RobotProjectConfigFileValidatorTest {
 
         final ReferencedVariableFile variableFile = ReferencedVariableFile.create(PROJECT_NAME + "a/vars.py");
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -229,7 +229,7 @@ public class RobotProjectConfigFileValidatorTest {
         final ReferencedVariableFile variableFile = ReferencedVariableFile
                 .create(projectProvider.getProject().getLocation() + "/a/vars.py");
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -251,7 +251,7 @@ public class RobotProjectConfigFileValidatorTest {
         final ReferencedVariableFile variableFile = ReferencedVariableFile
                 .create(projectProvider.getProject().getLocation() + "/a/vars.py");
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -269,7 +269,7 @@ public class RobotProjectConfigFileValidatorTest {
     public void whenValidationExcludedPathDoesNotExistInProject_warningIsReported() throws Exception {
         projectProvider.createDir(Path.fromPortableString("directory"));
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("does/not/exist");
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -286,7 +286,7 @@ public class RobotProjectConfigFileValidatorTest {
     public void whenValidationExcludedPathExistInProject_nothingIsReported() throws Exception {
         projectProvider.createDir(Path.fromPortableString("directory"));
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("directory");
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
@@ -306,7 +306,7 @@ public class RobotProjectConfigFileValidatorTest {
         projectProvider.createDir(Path.fromPortableString("directory/nested/1/2"));
         projectProvider.createDir(Path.fromPortableString("directory/nested/1/2/3"));
 
-        final RobotProjectConfig config = new RobotProjectConfig();
+        final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("directory/nested");
         config.addExcludedPath("directory/nested/1/2");
 
