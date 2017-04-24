@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 4:53 PM
+Save-Time: 4/24/17 6:04 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -126,25 +126,25 @@ proc "get-cell-width"{
 }
 
 proc "generate-coordinates"{
-	global [val cell_high [get-cell-hight | int]]
+	global [val cell_hight [get-cell-hight | int]]
 	global [val cell_width [get-cell-width | int]]
 	
-	global [val cell_half_high [div $cell_high 2 | int]] 
-	global [val cell_half_width [div $cell_width 2 |int ]] 
+	global [val cell_half_hight [div $cell_hight 2 | int]] 
+	global [val cell_half_width [div $cell_width 2 | int ]] 
 	
 	
 	global [val x1 $cell_half_width] 
 	global [val x2 [$cell_width | plus $cell_half_width] ]
 	global [val x3 [mult 2 $cell_width | plus $cell_half_width] ]
 	
-	global [val y1 [plus $cell_high $cell_half_high] ]
-	global [val y2 [mult 2 $cell_high |plus  $cell_half_high ]]
-	global [val y3 [mult 3 $cell_high |plus  $cell_half_high]]
-	global [val y4 [mult 4 $cell_high |plus  $cell_half_high]]
-	global [val y5 [mult 5 $cell_high |plus  $cell_half_high]]
-	global [val y6 [mult 6 $cell_high |plus  $cell_half_high]]
-	global [val y7 [mult 7 $cell_high |plus  $cell_half_high]]
-	global [val y8 [mult 8 $cell_high |plus  $cell_half_high]]
-	global [val y9 [mult 9 $cell_high |plus  $cell_half_high]]
+	global [val y1 [plus $cell_hight $cell_half_hight] ]
+	global [val y2 [mult 2 $cell_hight |plus  $cell_half_hight ]]
+	global [val y3 [mult 3 $cell_hight |plus  $cell_half_hight]]
+	global [val y4 [mult 4 $cell_hight |plus  $cell_half_hight]]
+	global [val y5 [mult 5 $cell_hight |plus  $cell_half_hight]]
+	global [val y6 [mult 6 $cell_hight |plus  $cell_half_hight]]
+	global [val y7 [mult 7 $cell_hight |plus  $cell_half_hight]]
+	global [val y8 [mult 8 $cell_hight |plus  $cell_half_hight]]
+	global [val y9 [mult 9 $cell_hight |plus  $cell_half_hight]]
 }	
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
