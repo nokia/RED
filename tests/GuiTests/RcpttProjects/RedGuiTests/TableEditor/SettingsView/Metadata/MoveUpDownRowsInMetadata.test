@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _MWfzsDiJEeas8aQC5hr2rw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/17/16 12:00 PM
+Save-Time: 4/24/17 4:53 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,15 +42,15 @@ with [get-editor "TestFile.robot"] {
 }
 
 check-metadata-layer-size
-
+generate-coordinates
 
 //move values
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 	//move a8 down by menu (8th row)
-    mouse-press 76 192 button1
-    mouse-release 76 192 button1 524288
-    mouse-press 76 192 button3
-    mouse-release 76 192 button3 2097152
+    mouse-press $x1 $y8 button1
+    mouse-release $x1 $y8 button1 524288
+    mouse-press $x1 $y8 button3
+    mouse-release $x1 $y8 button3 2097152
     get-menu "Row/Move up" | click
 }
 
@@ -58,52 +58,52 @@ is-row-fully-selected -row 6 -table "Metadata"
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     //move value 5 by arrows
-    mouse-move 323 117
-    mouse-press 323 117 button1
-    mouse-release 323 117 button1 524288
+    mouse-move $x1 $y5
+    mouse-press $x1 $y5 button1
+    mouse-release $x1 $y5 button1 524288
     key-type "M1+ARROW_UP"
 }
 
 is-row-fully-selected -row 3 -table "Metadata"
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move value a3 up by menu
-    mouse-move 606 78
-    mouse-press 606 78 button1
-    mouse-release 606 78 button1 524288
-    mouse-press 606 78 button3
-    mouse-release 606 78 button3 2097152
+    mouse-move $x2  $y3
+    mouse-press $x2  $y3 button1
+    mouse-release $x2  $y3 button1 524288
+    mouse-press $x2  $y3 button3
+    mouse-release $x2  $y3 button3 2097152
     get-menu "Row/Move up" | click
 }
 
 is-row-fully-selected -row 1 -table "Metadata"
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
-    //move comment4 down by menu
-    mouse-move 632 124
-    mouse-press 632 124 button1
-    mouse-release 632 124 button1 524288
-    mouse-press 632 124 button3
-    mouse-release 632 124 button3 2097152
+    //move comment4 down by menu  is in row 5
+    mouse-move $x3 $y5
+    mouse-press $x3 $y5 button1
+    mouse-release $x3 $y5 button1 524288
+    mouse-press $x3 $y5 button3
+    mouse-release $x3 $y5 button3 2097152
     get-menu "Row/Move down" | click
 }
 is-row-fully-selected -row 5 -table "Metadata"
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move a7 down by arrow
-    mouse-move 138 178
-    mouse-press 138 178 button1
-    mouse-release 138 178 button1 524288
+    mouse-move $x1 $y8
+    mouse-press $x1 $y8 button1
+    mouse-release $x1 $y8 button1 524288
     key-type "M1+ARROW_DOWN"
 }
 is-row-fully-selected -row 8 -table "Metadata"
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move first value up (nothing should happen)
-    mouse-move 88 32
-    mouse-press 88 32 button1
-    mouse-release 88 32 button1 524288
-    mouse-press 88 32 button3
-    mouse-release 88 32 button3 2097152
+    mouse-move $x1 $y1
+    mouse-press $x1 $y1 button1
+    mouse-release $x1 $y1 button1 524288
+    mouse-press $x1 $y1 button3
+    mouse-release $x1 $y1 button3 2097152
     get-menu "Row/Move up" | click
 }
 
@@ -120,11 +120,11 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move focus last value down (first column) -nothing should happen
-    mouse-move 250 208
-    mouse-press 250 208 button1
-    mouse-release 250 208 button1 524288
-    mouse-press 250 208 button3
-    mouse-release 250 208 button3 2097152
+    mouse-move $x1 $y9
+    mouse-press $x1 $y9 button1
+    mouse-release $x1 $y9 button1 524288
+    mouse-press $x1 $y9 button3
+    mouse-release $x1 $y9 button3 2097152
     get-menu "Row/Move down" | click
     mouse-move 830 328
 }
@@ -174,10 +174,10 @@ with [get-editor "TestFile.robot"] {
     }
 }
 wait 1000
-//move "4" times up
+//move "a4" times up
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
-    mouse-press 340 150 button1
-    mouse-release 340 150 button1 524288
+    mouse-press $x1 $y6 button1
+    mouse-release $x1 $y6 button1 524288
     key-type "M1+ARROW_UP" -times 3
 }
 
