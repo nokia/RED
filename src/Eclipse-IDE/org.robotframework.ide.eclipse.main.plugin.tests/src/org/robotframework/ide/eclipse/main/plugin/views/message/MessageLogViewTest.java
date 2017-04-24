@@ -85,4 +85,39 @@ public class MessageLogViewTest {
         assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
 
     }
+
+    @Test
+    public void messageLogViewDoesNotWrapWords_whenInitialized() {
+        final RobotTestExecutionService executionService = new RobotTestExecutionService();
+
+        final MessageLogView view = new MessageLogView(executionService);
+        view.postConstruct(shellProvider.getShell());
+
+        assertThat(view.getTextControl().getWordWrap()).isFalse();
+    }
+
+    @Test
+    public void messageLogProperlyWrapWords_whenToggledOnce() {
+        final RobotTestExecutionService executionService = new RobotTestExecutionService();
+
+        final MessageLogView view = new MessageLogView(executionService);
+        view.postConstruct(shellProvider.getShell());
+        
+        view.toggleWordsWrapping();
+
+        assertThat(view.getTextControl().getWordWrap()).isTrue();
+    }
+
+    @Test
+    public void messageLogDoesNotWrapWords_whenToggledTwice() {
+        final RobotTestExecutionService executionService = new RobotTestExecutionService();
+
+        final MessageLogView view = new MessageLogView(executionService);
+        view.postConstruct(shellProvider.getShell());
+
+        view.toggleWordsWrapping();
+        view.toggleWordsWrapping();
+
+        assertThat(view.getTextControl().getWordWrap()).isFalse();
+    }
 }
