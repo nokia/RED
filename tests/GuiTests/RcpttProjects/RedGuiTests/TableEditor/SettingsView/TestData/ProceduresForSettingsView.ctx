@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 2:57 PM
+Save-Time: 4/24/17 4:53 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -145,5 +145,6 @@ proc "generate-coordinates"{
 	global [val y6 [mult 6 $cell_high |plus  $cell_half_high]]
 	global [val y7 [mult 7 $cell_high |plus  $cell_half_high]]
 	global [val y8 [mult 8 $cell_high |plus  $cell_half_high]]
+	global [val y9 [mult 9 $cell_high |plus  $cell_half_high]]
 }	
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
