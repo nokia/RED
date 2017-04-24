@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IDMU4DesEeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/17/16 11:43 AM
+Save-Time: 4/24/17 5:28 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,51 +42,52 @@ with [get-editor "TestFile.robot"] {
 }
 
 check-metadata-layer-size
+generate-coordinates
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 	
 	//select entire row a1 and press del
-    mouse-press 3 28 button1
-    mouse-release 3 28 button1 524288
+    mouse-press 3 30 button1
+    mouse-release 3 30 button1 524288
     key-type Del
     
     //remove Metadata=a2
-    mouse-move 34 56
-    mouse-press 34 56 button1
-    mouse-release 34 56 button1 524288
+    mouse-move 34 [mult 2 $cell_high | plus 5]
+    mouse-press 34 [mult 2 $cell_high | plus 5] button1
+    mouse-release 34 [mult 2 $cell_high | plus 5] button1 524288
     key-type Del
     
     //remove value=3
-    mouse-move 424 71
-    mouse-press 424 71 button1
-    mouse-release 424 71 button1 524288
+    mouse-move [plus $cell_width  20] [plus $y3 5]
+    mouse-press [plus $cell_width  20] [plus $y3 5] button1
+    mouse-release [plus $cell_width  20] [plus $y3 5] button1 524288
     key-type Del
     
     //remove comment=comment4
-    mouse-move 788 101
-    mouse-press 788 101 button1
-    mouse-release 788 101 button1 524288
+    mouse-move [minus $x3 30] $y4
+    mouse-press [minus $x3 30] $y4 button1
+    mouse-release [minus $x3 30] $y4 button1 524288
     key-type Del
     mouse-move 1026 65
     
     
     //remove metadata=a5 by menu
-    mouse-press 109 115 button1
-    mouse-release 109 115 button1 524288
-    mouse-press 109 115 button3
-    mouse-release 109 115 button3 2097152
+    mouse-press [minus $cell_width 5] $y5 button1
+    mouse-release [minus $cell_width 5] $y5 button1 524288
+    mouse-press [minus $cell_width 5] $y5 button3
+    mouse-release [minus $cell_width 5] $y5 button3 2097152
     get-menu Delete | click
     
     //remove row a6 by menu
-    mouse-move 437 139
-    mouse-press 437 139 button3
-    mouse-release 437 139 button3 2097152
+    mouse-move $x2 $y6
+    mouse-press $x2 $y6 button3
+    mouse-release $x2 $y6 button3 2097152
     get-menu "Row/Delete row" | click
     
     //remove a8 row by keys
-    mouse-move 413 168
-    mouse-press 413 168 button1
-    mouse-release 413 168 button1 524288
+    mouse-move [mult 2 $cell_width| minus 1] $y7
+    mouse-press [mult 2 $cell_width| minus 1] $y7 button1
+    mouse-release [mult 2 $cell_width| minus 1] $y7 button1 524288
     key-type "M1+DEL"
 }
 //
@@ -115,16 +116,16 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     //remove removed item
-    mouse-move  158 29 
-    mouse-press 158 29 button1
-    mouse-release 158 29 button1 524288
+    mouse-move  20 [plus $cell_high 6]
+    mouse-press 20 [plus $cell_high 6] button1
+    mouse-release 20 [plus $cell_high 6] button1 524288
     key-type Del -times 2
     mouse-move 951 33
     
     //try to remove button "..add"
-    mouse-move 128 187
-    mouse-press 128 187 button1
-    mouse-release 128 187 button1 524288
+    mouse-move $x1 $y8
+    mouse-press $x1 $y8 button1
+    mouse-release $x1 $y8 button1 524288
     key-type Del
     mouse-move 1035 332
     key-type "M1+s"
