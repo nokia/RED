@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _emIDYDe5EeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/17/16 11:45 AM
+Save-Time: 4/24/17 3:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -48,33 +48,35 @@ try -times 3 -delay 1000 -command{
 }
    
     
+generate-coordinates
+    
 with [get-editor "TestFile.robot" | get-section Metadata] {
     with [get-canvas] {
     
     	//cut metadata=a1 by menu
-        mouse-press 238 35 button1
-        mouse-release 238 35 button1 524288
-        mouse-press 238 35 button3
-        mouse-release 238 35 button3 2097152
+        mouse-press $x1 $y1 button1
+        mouse-release $x1 $y1 button1 524288
+        mouse-press $x1 $y1 button3
+        mouse-release $x1 $y1 button3 2097152
         get-menu Cut | click
         
         //cut value=2 by menu
-        mouse-move 385 52
-        mouse-press 385 52 button3
-        mouse-release 385 52 button3 2097152
+        mouse-move $x2 $y2
+        mouse-press $x2 $y2 button3
+        mouse-release $x2 $y2 button3 2097152
         get-menu Cut | click
         
         //cut comment=comment3 by menu
-        mouse-press 735 76 button1
-	    mouse-release 735 76 button1 524288
-	    mouse-press 735 76 button3
-	    mouse-release 735 76 button3 2097152
+        mouse-press $x3 $y3 button1
+	    mouse-release $x3 $y3 button1 524288
+	    mouse-press $x3 $y3 button3
+	    mouse-release $x3 $y3 button3 2097152
 	    get-menu Cut | click
     
         //change a4 to new (because RCPTT cannot validate hexstrings ??)
-        mouse-move 180 91
-        mouse-press 180 91 button1
-        mouse-release 180 91 button1 524288
+        mouse-move $x1 $y4
+        mouse-press $x1 $y4 button1
+        mouse-release $x1 $y4 button1 524288
         key-type F2
     }
     with [get-editbox] {
@@ -82,53 +84,53 @@ with [get-editor "TestFile.robot" | get-section Metadata] {
         key-type Enter
     }
     with [get-canvas] {
-    	//cut a4
-    	mouse-press 101 101 button1
-        mouse-release 101 101 button1 524288
-        mouse-press 101 101 button3
-        mouse-release 101 101 button3 2097152
+    	//cut a4 ("new" valu is in fist column)
+    	mouse-press $x1 $y4 button1
+        mouse-release $x1 $y4  button1 524288
+        mouse-press $x1 $y4  button3
+        mouse-release $x1 $y4  button3 2097152
         key-type "M1+x"
         
         //paste new to"5"
-        mouse-move 381 117
-        mouse-press 381 117 button1
-        mouse-release 381 117 button1 524288
+        mouse-move $x2 $y5
+        mouse-press $x2 $y5 button1
+        mouse-release $y2 $y5 button1 524288
         key-type "M1+v"
         
         //paste new to metadata=a5
-        mouse-move 243 117
-        mouse-press 243 117 button1
-        mouse-release 243 117 button1 524288
+        mouse-move $x1 $y5
+        mouse-press $x1 $y5 button1
+        mouse-release $x1 $y5 button1 524288
         key-type "M1+v"
         
         //paste new to comment5
-        mouse-move 729 112
-	    mouse-press 729 112 button1
-	    mouse-release 729 112 button1 524288
+        mouse-move $x3 $y5
+	    mouse-press $x3 $y5 button1
+	    mouse-release $x3 $y5 button1 524288
 	    key-type "M1+v"
        
         //select entire row a6
-        mouse-move 6 142
-        mouse-press 6 142 button1
-    	mouse-release 6 142 button1 524288
+        mouse-move 6 $y6
+        mouse-press 6 $y6 button1
+    	mouse-release 6 $y6 button1 524288
     	key-type "M1+x"
 	    
 	    //cut entire row a7
-	    mouse-move 149 167
-	    mouse-press 149 167 button1
-	    mouse-release 149 167 button1 524288
-	    mouse-press 149 167 button3
-	    mouse-release 149 167 button3 2097152
+	    mouse-move $x1 $y7
+	    mouse-press $x1 $y7 button1
+	    mouse-release $x1 $y7 button1 524288
+	    mouse-press $x1 $y7 button3
+	    mouse-release $x1 $y7 button3 2097152
 	    get-menu "Row/Cut row" | click
 	    
 	     //paste row a7 above a9
-	    mouse-move 141 191
-	    mouse-press 141 191 button3
-	    mouse-release 141 191 button3 2097152
+	    mouse-move $x1 $y8
+	    mouse-press $x1 $y8 button3
+	    mouse-release $x1 $y8 button3 2097152
 	    get-menu "Row/Paste row" | click
 	    mouse-move 975 339
 	    key-type "M1+s"
-    }
+   }
 }
 wait 1000
 
@@ -184,8 +186,8 @@ with [get-editor "TestFile.robot"] {
     wait 2000
     with [get-section Metadata | get-canvas] {
     	//set first cell
-        mouse-press 81 33 button1
-        mouse-release 81 33 button1 524288
+        mouse-press $x1 $y1 button1
+        mouse-release $x1 $y1 button1 524288
         key-type Right
         //cut value "1"
         key-type "M1+x"
@@ -236,11 +238,11 @@ check-metadata-row -file "TestFile.robot" -row 9 -metadata "a9" -val "9" -commen
 //changed #comment3 to "not comment"
 with [get-editor "TestFile.robot" | get-section Metadata] {
     with [get-canvas] {
-        mouse-press 524 145 button1
-        mouse-release 524 145 button1 524288
-        mouse-press 524 145 button1
-        mouse-double-click 524 145 button1
-        mouse-release 524 145 button1 524288
+        mouse-press $x2 $y6 button1
+        mouse-release $x2 $y6 button1 524288
+        mouse-press $x2 $y6 button1
+        mouse-double-click $x2 $y6 button1
+        mouse-release $x2 $y6 button1 524288
     }
     with [get-editbox] {
         type-text "not comment"
