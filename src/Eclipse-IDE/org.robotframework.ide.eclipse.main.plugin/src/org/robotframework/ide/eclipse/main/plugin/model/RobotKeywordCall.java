@@ -116,8 +116,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     public boolean isExecutable() {
-        return linkedElement.getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW
-                || linkedElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        final ModelType type = linkedElement.getModelType();
+        return type == ModelType.TEST_CASE_EXECUTABLE_ROW || type == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
     }
 
     @Override
@@ -204,6 +204,34 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                     ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
         }
         return comment;
+    }
+
+    public Optional<List<RobotToken>> getCommentTokens() {
+        comment = null;
+        if (linkedElement instanceof RobotExecutableRow) {
+            return Optional.of(((RobotExecutableRow<?>) linkedElement).getComment());
+        }
+        return Optional.empty();
+    }
+
+    public Optional<List<RobotToken>> getArgumentTokens() {
+        arguments = null;
+        if (linkedElement instanceof RobotExecutableRow) {
+            return Optional.of(((RobotExecutableRow<?>) linkedElement).getArguments());
+        }
+        return Optional.empty();
+    }
+
+    public Optional<RobotToken> getAction() {
+        if (linkedElement instanceof RobotExecutableRow) {
+            return Optional.of(((RobotExecutableRow<?>) linkedElement).getAction());
+        }
+        return Optional.empty();
+    }
+
+    public void setComment(final String comment) {
+        ((ICommentHolder) linkedElement).setComment(comment);
+        getComment(); // this updates comment value
     }
 
     @Override
