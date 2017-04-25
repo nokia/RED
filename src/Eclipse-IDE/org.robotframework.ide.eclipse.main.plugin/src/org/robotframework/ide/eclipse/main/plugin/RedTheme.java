@@ -14,8 +14,9 @@ import org.eclipse.ui.PlatformUI;
 public class RedTheme {
 
     private static final String TEXT_EDITOR_FONT = "org.eclipse.jface.textfont";
-    public static final String RED_SOURCE_EDITOR_FONT = "org.robotframework.ide.textfont";
-    private static final String RED_TABLE_EDITOR_FONT = "org.robotframework.ide.tablefont";
+
+    public static final String RED_SOURCE_EDITOR_FONT = "org.robotframework.red.textfont";
+    private static final String RED_TABLE_EDITOR_FONT = "org.robotframework.red.tablefont";
 
     private static final String SECTION_HEADER = "org.robotframework.ide.eclipse.section.header";
     private static final String ECLIPSE_DECORATION_COLOR = "DECORATIONS_COLOR";
