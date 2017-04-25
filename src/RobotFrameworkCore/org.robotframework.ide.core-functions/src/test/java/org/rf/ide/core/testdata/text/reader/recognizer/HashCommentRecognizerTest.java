@@ -25,10 +25,10 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_threeHashsTheThridEscapedCommentSignsExists() {
-        StringBuilder text = new StringBuilder("##\\#comment");
+        final StringBuilder text = new StringBuilder("##\\#comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -38,10 +38,10 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_threeHashsTheSecondEscapedCommentSignsExists() {
-        StringBuilder text = new StringBuilder("#\\##comment");
+        final StringBuilder text = new StringBuilder("#\\##comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -51,10 +51,10 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_threeHashsCommentSignsExists() {
-        StringBuilder text = new StringBuilder("###comment");
+        final StringBuilder text = new StringBuilder("###comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -64,10 +64,10 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_twoHashsCommentSignsExists() {
-        StringBuilder text = new StringBuilder("##comment");
+        final StringBuilder text = new StringBuilder("##comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -77,10 +77,10 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_singleHashCommentExists() {
-        StringBuilder text = new StringBuilder("#comment");
+        final StringBuilder text = new StringBuilder("#comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isTrue();
-        RobotToken token = rec.next();
+        final RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
@@ -90,14 +90,14 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_singleHashCommentButEscapedExists() {
-        StringBuilder text = new StringBuilder("\\#comment");
+        final StringBuilder text = new StringBuilder("\\#comment");
 
         assertThat(rec.hasNext(text, 1, 0)).isFalse();
     }
 
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo("^(?!\\\\)#.*$");
+        assertThat(rec.getPattern().pattern()).isEqualTo("^[ ]?(?!\\\\)#.*$");
     }
 
     @Test
