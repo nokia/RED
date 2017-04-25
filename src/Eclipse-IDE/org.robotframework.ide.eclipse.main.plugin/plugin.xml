@@ -952,13 +952,13 @@
     <fontDefinition
           categoryId="org.robotframework.ide.eclipse.source.theme"
           defaultsTo="org.eclipse.jface.textfont"
-          id="org.robotframework.ide.textfont"
+          id="org.robotframework.red.textfont"
           isEditable="true"
           label="Text Font">
     </fontDefinition>
     <fontDefinition
           categoryId="org.robotframework.ide.eclipse.table.theme"
-          id="org.robotframework.ide.tablefont"
+          id="org.robotframework.red.tablefont"
           isEditable="true"
           label="Table Font">
     </fontDefinition>
