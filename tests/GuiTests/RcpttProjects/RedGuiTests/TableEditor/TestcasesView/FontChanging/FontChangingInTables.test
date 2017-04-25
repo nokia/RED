@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Vp4pICajEeesE7mkFuId1w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/25/17 4:34 PM
+Save-Time: 4/25/17 5:42 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -59,8 +59,8 @@ proc "check-fonts-in-all-tables" [val font_size] [val font_name]{
 	get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 	
 	with [get-editor "TestFile.robot" | get-text-viewer] {
-	    get-property "getFont().getFontData().FontData[0].height" | equals "9.75" | verify-true
-	    get-property "getFont().getFontData().FontData[0].getName()" | equals Consolas | verify-true
+	    get-property "getFont().getFontData().FontData[0].height" | equals [get-by-os -win "9.75" -linux "10.0"] | verify-true
+	    get-property "getFont().getFontData().FontData[0].getName()" | equals [get-by-os -win "Consolas" -linux "Monospace"] | verify-true
 	}
 }
 
@@ -137,5 +137,5 @@ get-editor "TestFile.robot" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
 
-check-fonts-in-all-tables -font_size "9.0" -font_name "Segoe UI"
+check-fonts-in-all-tables -font_size [get-by-os -win "9.0" -linux "11.0"] -font_name [get-by-os -win "Segoe UI" -linux "Cantarell"]
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
