@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _euLGgFWREeaLgpF-R5GRxw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/16/16 11:14 AM
+Save-Time: 4/25/17 1:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -133,7 +133,7 @@ compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount
 compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 2 -ref_table [list "[Documentation]"  "my kw"  ""  ""  ""  ""  ""  ]
 compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 3 -ref_table [list "[Teardown]"  "Log"  ""  ""  ""  ""]
 compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 4 -ref_table [list  "Should Be Equal As Integers"  "3333333564"  "secon43423498"  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 5 -ref_table [list "#com12"  "#text42442"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 5 -ref_table [list "#com12"  "text42442"  ""  ""  ""  ""]
 compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 6 -ref_table [list "..."  ""  ""  ""  ""  ""]
 
 
@@ -172,7 +172,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "my kw\n"
     + "    [Documentation]    my kw\n"
     + "    Should Be Equal As Integers    3333333564    secon43423498 \n"
-    + "    #com12    #text42442\n"
+    + "    #com12    text42442\n"
     + "    [Teardown]    Log    \n"
     + "second\n"
     + "    [Arguments]    ${a}    secon43423498\n"
