@@ -1329,7 +1329,7 @@
        point="org.eclipse.ui.commands">
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.message.view.wrap"
+          id="org.robotframework.red.view.message.wrap"
           name="Word Wrap">
     </command>
  </extension>
@@ -3050,7 +3050,7 @@
             point="org.eclipse.ui.handlers">
          <handler
                class="org.robotframework.ide.eclipse.main.plugin.views.message.ToggleWordsWrappingHandler"
-               commandId="org.robotframework.ide.eclipse.message.view.wrap">
+               commandId="org.robotframework.red.view.message.wrap">
          </handler>
       </extension>
  <extension
@@ -5856,7 +5856,7 @@
                allPopups="false"
                locationURI="toolbar:org.robotframework.ide.MessageLogView?after=additions">
             <command
-                  commandId="org.robotframework.ide.eclipse.message.view.wrap"
+                  commandId="org.robotframework.red.view.message.wrap"
                   icon="resources/wordwrap.png"
                   style="toggle">
             </command>
