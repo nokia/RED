@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IDMU4DesEeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 6:09 PM
+Save-Time: 4/25/17 6:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -93,21 +93,21 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 //
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 	//remove removed item a1
-    mouse-move 208 37
-    mouse-press 208 37 button1
-    mouse-release 208 37 button1 524288
+    mouse-move $x1  $y1
+    mouse-press $x1  $y1 button1
+    mouse-release $x1  $y1 button1 524288
     key-type Del -times 2
     mouse-move 962 260
 	
 	//remove value in fisrt line (is removed)
-    mouse-move 379 31
+    mouse-move $x2 $y1
     key-type Del -times 2
     
     //try to remove button "..add"
-    mouse-move 182 188
-    mouse-press 182 188 button1
-    mouse-release 182 188 button1 524288
-    mouse-move 182 185
+    mouse-move $x1 $y8
+    mouse-press $x1 $y8 button1
+    mouse-release $x1 $y8 button1 524288
+    mouse-move $x1 $y8
     key-type Del
     mouse-move 1043 100
     key-type "M1+s"
