@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 public class HashCommentRecognizer extends ATokenRecognizer {
 
     /**
-     * must not start from '\' and contains at the beginning '#'
+     * must not start from '\' and contains at the beginning '#' (space optional)
      */
-    public static final Pattern EXPECTED = Pattern.compile("^(?!\\\\)#.*$");
+    public static final Pattern EXPECTED = Pattern.compile("^[ ]?(?!\\\\)#.*$");
 
 
     public HashCommentRecognizer() {
