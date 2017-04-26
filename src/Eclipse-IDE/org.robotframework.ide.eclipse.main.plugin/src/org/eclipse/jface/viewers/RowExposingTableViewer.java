@@ -44,7 +44,7 @@ public class RowExposingTableViewer extends TableViewer {
     }
 
     public void moveLastColumnTo(final int position) {
-        final List<Integer> order = new LinkedList<Integer>(Ints.asList(getTable().getColumnOrder()));
+        final List<Integer> order = new LinkedList<>(Ints.asList(getTable().getColumnOrder()));
         final Integer last = order.remove(order.size() - 1);
         order.add(position, last);
         final int[] newOrder = Ints.toArray(order);
@@ -64,8 +64,7 @@ public class RowExposingTableViewer extends TableViewer {
     public void setFocusCell(final int index) {
         try {
             // This ugly workaround is due to the lack of API for setting
-            // focused cell
-            // the code is taken from
+            // focused cell the code is taken from
             // https://bugs.eclipse.org/bugs/show_bug.cgi?id=198260
             // and seem to be the only reasonable idea...
 
