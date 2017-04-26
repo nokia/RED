@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IDMU4DesEeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/25/17 6:22 PM
+Save-Time: 4/26/17 1:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,7 +42,7 @@ with [get-editor "TestFile.robot"] {
 }
 
 check-metadata-layer-size
-generate-coordinates
+generate-coordinates -setting Metadata
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 	
@@ -52,9 +52,9 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     key-type Del
     
     //remove Metadata=a2
-    mouse-move 34 [mult 2 $cell_hight | plus 5]
-    mouse-press 34 [mult 2 $cell_hight | plus 5] button1
-    mouse-release 34 [mult 2 $cell_hight | plus 5] button1 524288
+    mouse-move 34 [mult 2 $cell_height | plus 5]
+    mouse-press 34 [mult 2 $cell_height | plus 5] button1
+    mouse-release 34 [mult 2 $cell_height | plus 5] button1 524288
     key-type Del
     
     //remove value=3
@@ -116,9 +116,9 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     //remove removed item
-    mouse-move  20 [plus $cell_hight 6]
-    mouse-press 20 [plus $cell_hight 6] button1
-    mouse-release 20 [plus $cell_hight 6] button1 524288
+    mouse-move  20 [plus $cell_height 6]
+    mouse-press 20 [plus $cell_height 6] button1
+    mouse-release 20 [plus $cell_height 6] button1 524288
     key-type Del -times 2
     mouse-move 951 33
     
@@ -152,6 +152,5 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Metadata    a9    9    #comment9\n"
     + "*** Test Cases ***\n"
     + "test\n"
-    + "    log  7" | verify-true
-
+    + "    log  7" | verify-true 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
