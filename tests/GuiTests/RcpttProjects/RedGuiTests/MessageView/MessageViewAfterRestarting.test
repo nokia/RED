@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _IuOvoMaSEeWj5cLba_Ngag
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/29/16 3:30 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/26/17 3:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,10 +22,31 @@ with [get-tab-folder -index 4] {
     get-property tabCount | equals 2 | verify-true
 }   
 
+//check buttons
+with [get-view "Message Log" | get-button "Word Wrap"] {
+    get-property enablement | equals true | verify-true
+    get-property tooltip | equals "Word Wrap" | verify-true
+}
+with [get-button Minimize -index 4] {
+    get-property enablement | equals true | verify-true
+    get-property tooltip | equals Minimize | verify-true
+}
+with [get-button Maximize -index 4] {
+    get-property enablement | equals true | verify-true
+    get-property tooltip | equals Maximize | verify-true
+}
+
 
 //run test to populate MessageLog view
 get-view "Project Explorer" | get-tree | select "ExecutionViewProject/stopped_tests.robot" 
     | get-menu "Run As/1 Robot Test" | click
+
+//check if text is not wrapped
+get-view "Message Log" | get-editbox | get-property "getWordWrap()" | equals false | verify-true
+
+//wrap text
+get-view "Message Log" | get-button "Word Wrap" | click
+get-view "Message Log" | get-editbox | get-property "getWordWrap()" | equals true | verify-true
 
 //check that Message View is still acitve page (active page is Execution View when test is run for the first time)
 with [get-tab-folder -index 4] {
@@ -45,5 +66,6 @@ get-menu "Window/Show View/Message Log" | click
 // content should be visible
 get-view "Message Log" | get-editbox | get-property text | is-empty | verify-false
 
-
+//check if text is not wrapped
+get-view "Message Log" | get-editbox | get-property "getWordWrap()" | equals false | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
