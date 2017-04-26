@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/26/17 11:58 AM
+Save-Time: 4/26/17 1:01 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -118,7 +118,7 @@ proc "get-column-number" [val setting]{
 }
 
 
-proc "get-cell-hight" [val setting]{
+proc "get-cell-height" [val setting]{
 	div  [   get-editor "TestFile.robot" | get-section $setting | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getHeight()" -raw]
 	[   get-editor "TestFile.robot" | get-section $setting | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" -raw] 	
 }
@@ -135,10 +135,10 @@ proc "get-cell-width"  [val setting]{
 proc "generate-coordinates" [val setting ]{
 
 	//count cell size
-	global [val cell_high [get-cell-hight -setting $setting | int]]
+	global [val cell_height [get-cell-height -setting $setting | int]]
 	global [val cell_width [get-cell-width -setting $setting | int]]
 	
-	global [val cell_half_high [div $cell_high 2 | int]] 
+	global [val cell_half_height [div $cell_height 2 | int]] 
 	global [val cell_half_width [div $cell_width 2 |int ]] 
 	
 	//every  variable is coordinates of middle of cell
@@ -150,7 +150,7 @@ proc "generate-coordinates" [val setting ]{
 	}
 	// y coordinates
 	repeat [val index] -times 10 -command{
-		global [val  [concat y $index] [mult $index $cell_high |plus  $cell_half_high]]
+		global [val  [concat y $index] [mult $index $cell_height |plus  $cell_half_height]]
 	}		
 }	
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
