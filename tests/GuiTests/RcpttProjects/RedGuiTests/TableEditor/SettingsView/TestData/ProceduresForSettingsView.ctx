@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 6:04 PM
+Save-Time: 4/26/17 11:58 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -113,38 +113,44 @@ proc "check-metadata-layer-size"{
 	}
 }
 
-
-proc "get-cell-hight"{
-	div  [   get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getHeight()" -raw]
-	[   get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" -raw] 	
+proc "get-column-number" [val setting]{
+	get-editor "TestFile.robot" | get-section $setting | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getColumnCount()" -raw | int
 }
 
-proc "get-cell-width"{
-	div  [   get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getWidth()" -raw]
-	[   get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getColumnCount()" -raw] 
+
+proc "get-cell-hight" [val setting]{
+	div  [   get-editor "TestFile.robot" | get-section $setting | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getHeight()" -raw]
+	[   get-editor "TestFile.robot" | get-section $setting | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" -raw] 	
+}
+
+proc "get-cell-width"  [val setting]{
+	div  [get-editor "TestFile.robot" | get-section $setting | get-canvas | get-property "getLayer().getBodyLayer().getScrollableLayer().getWidth()" -raw]
+	[get-column-number -setting $setting] 
 	
 }
 
-proc "generate-coordinates"{
-	global [val cell_hight [get-cell-hight | int]]
-	global [val cell_width [get-cell-width | int]]
+
+
+//add Metada
+proc "generate-coordinates" [val setting ]{
+
+	//count cell size
+	global [val cell_high [get-cell-hight -setting $setting | int]]
+	global [val cell_width [get-cell-width -setting $setting | int]]
 	
-	global [val cell_half_hight [div $cell_hight 2 | int]] 
-	global [val cell_half_width [div $cell_width 2 | int ]] 
+	global [val cell_half_high [div $cell_high 2 | int]] 
+	global [val cell_half_width [div $cell_width 2 |int ]] 
 	
+	//every  variable is coordinates of middle of cell
 	
-	global [val x1 $cell_half_width] 
-	global [val x2 [$cell_width | plus $cell_half_width] ]
-	global [val x3 [mult 2 $cell_width | plus $cell_half_width] ]
+	//create x as many as is column: x1, x2, ...
+	repeat [val index] -times [get-column-number -setting $setting] -command{
+		global [val [concat x [plus $index 1]] [mult $index $cell_width | plus $cell_half_width]]
 	
-	global [val y1 [plus $cell_hight $cell_half_hight] ]
-	global [val y2 [mult 2 $cell_hight |plus  $cell_half_hight ]]
-	global [val y3 [mult 3 $cell_hight |plus  $cell_half_hight]]
-	global [val y4 [mult 4 $cell_hight |plus  $cell_half_hight]]
-	global [val y5 [mult 5 $cell_hight |plus  $cell_half_hight]]
-	global [val y6 [mult 6 $cell_hight |plus  $cell_half_hight]]
-	global [val y7 [mult 7 $cell_hight |plus  $cell_half_hight]]
-	global [val y8 [mult 8 $cell_hight |plus  $cell_half_hight]]
-	global [val y9 [mult 9 $cell_hight |plus  $cell_half_hight]]
+	}
+	// y coordinates
+	repeat [val index] -times 10 -command{
+		global [val  [concat y $index] [mult $index $cell_high |plus  $cell_half_high]]
+	}		
 }	
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
