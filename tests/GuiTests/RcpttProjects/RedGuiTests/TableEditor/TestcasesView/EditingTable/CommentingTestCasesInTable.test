@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IlBPkBq5EeexL8zyucnNEw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/6/17 2:08 PM
+Save-Time: 4/26/17 1:58 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -61,15 +61,15 @@ with [get-editor "TestFile.tsv" | get-canvas -after [get-label "Test Cases"] -in
     key-type Del -times 2
     key-type "M1+/"
     
-    //go up to doc setting and comment it - doc section will be moved down
+    //go up to doc setting and comment it - doc section is in the same place
     key-type Up -times 12
     key-type "M1+/"
     
-    //comment line
-    key-type Down -times 2
+    //comment line with Should be equal
+    key-type Down -times 3
     key-type "M1+/"
     
-    //go down and select whole single line 
+    //go down and select whole single line with But Convert
     key-type Down -times 2
     get-menu "Row/Select whole row(s)" | click
     
@@ -78,12 +78,12 @@ with [get-editor "TestFile.tsv" | get-canvas -after [get-label "Test Cases"] -in
 }
 
 check-test_case-row -file "TestFile.tsv" -row 1 -tc "test 1" 
-check-test_case-row -file "TestFile.tsv" -row 2 -tc "[Teardown]" -c1 "new_kw" 
-check-test_case-row -file "TestFile.tsv" -row 3 -tc "# [Documentation]"  -c1 "this is doc" -c2 "..." -c3 "continued here"
+check-test_case-row -file "TestFile.tsv" -row 2 -tc "# [Documentation]"  -c1 "this is doc" -c2 "..." -c3 "continued here"
+check-test_case-row -file "TestFile.tsv" -row 3 -tc "[Teardown]" -c1 "new_kw" 
 check-test_case-row -file "TestFile.tsv" -row 4 -tc "log" -c1 "7"
-check-test_case-row -file "TestFile.tsv" -row 5 -tc "# Should Be Equal" -c1 "#123g" -c2 "123g"
+check-test_case-row -file "TestFile.tsv" -row 5 -tc "# Should Be Equal" -c1 "123g" -c2 "123g"
 check-test_case-row -file "TestFile.tsv" -row 6 -tc "Catenate" -c1 "r" -c2 "s" -c3 "t" -c4 "u" -c5 "w"
-check-test_case-row -file "TestFile.tsv" -row 7 -tc "# But Convert To Hex" -c1 "#text"
+check-test_case-row -file "TestFile.tsv" -row 7 -tc "# But Convert To Hex" -c1 "text"
 check-test_case-row -file "TestFile.tsv" -row 8 -tc "..."
 
 check-test_case-row -file "TestFile.tsv" -row 9 -tc "test2"
@@ -103,10 +103,10 @@ get-editor "TestFile.tsv" | get-text-viewer | get-property text | equals "*** Te
     + "test 1\n"
     + "\t# [Documentation]\tthis is doc\t...\tcontinued here\n"
     + "\tlog\t7\n"
-    + "\t# Should Be Equal\t#123g\t123g\n"
+    + "\t# Should Be Equal\t123g\t123g\n"
     + "\tCatenate\tr\ts\tt\tu\tw\n"
     + "\t[Teardown]\tnew_kw\n"
-    + "\t# But Convert To Hex\t#text\n"
+    + "\t# But Convert To Hex\ttext\n"
     + "test2\n"
     + "\t[Setup]\tConvert To Boolean\t56new\n"
     + "\t# fgh\n"
@@ -119,7 +119,7 @@ with [get-editor "TestFile.tsv"] {
     get-tab-folder | get-tab-item "Test Cases" | click
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
     	
-    	//uncomment Bu Convert (gherkin) KW
+    	//uncomment But Convert (gherkin) KW
         get-menu "Toggle Comment" | click
         
         //go up and uncomment Doc section
@@ -148,16 +148,16 @@ with [get-editor "TestFile.tsv"] {
 get-editor "TestFile.tsv" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "test 1\n"
     + "\tlog\t7\n"
-    + "\t# Should Be Equal\t#123g\t123g\n"
+    + "\t# Should Be Equal\t123g\t123g\n"
     + "\t[Teardown]\tnew_kw\n"
     + "\t[Documentation]\tthis is doc\t...\tcontinued here\n"
     + "\tCatenate\tr\ts\tt\tu\tw\n"
-    + "\tBut Convert To Hex\t#text\n"
-    + "\t# But Convert To Hex\t#text\n"
+    + "\tBut Convert To Hex\t...\ttext\n"
+    + "\t# But Convert To Hex\ttext\n"
     + "test2\n"
-    + "\t[Setup]\tConvert To Boolean\t56new\n"
-    + "\t# # fgh\n"
-    + "\t# :FOR\t#${x}\tIN RANGE\t10\n"
+    + "\t [Setup]\tConvert To Boolean\t56new\n"
+    + "\t# #  fgh\n"
+    + "\t# :FOR\t${x}\tIN RANGE\t10\n"
     + "\t\\\tlog\t${x}\n"
     + "\t# \\" | verify-true
     
