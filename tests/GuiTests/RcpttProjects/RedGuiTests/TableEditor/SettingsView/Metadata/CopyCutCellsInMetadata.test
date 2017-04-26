@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _emIDYDe5EeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 3:05 PM
+Save-Time: 4/26/17 11:59 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -48,7 +48,7 @@ try -times 3 -delay 1000 -command{
 }
    
     
-generate-coordinates
+generate-coordinates -setting Metadata
     
 with [get-editor "TestFile.robot" | get-section Metadata] {
     with [get-canvas] {
