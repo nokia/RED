@@ -365,6 +365,7 @@ public class RunCommandLineCallBuilder {
 
         private String classPath() {
             final List<String> fullClasspath = RedSystemProperties.getClassPaths();
+            fullClasspath.addAll(RedSystemProperties.getClassPaths());
             fullClasspath.addAll(classPath);
             return String.join(RedSystemProperties.getPathsSeparator(), fullClasspath);
         }

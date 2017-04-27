@@ -5,10 +5,8 @@
  */
 package org.rf.ide.core.executor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Anglart
@@ -57,19 +55,19 @@ public class RedSystemProperties {
         return isWindowsPlatform() ? ";" : ":";
     }
 
-    public static List<String> getPythonPaths() {
+    public static ImmutableList<String> getPythonPaths() {
         return getPaths("PYTHONPATH");
     }
 
-    public static List<String> getClassPaths() {
+    public static ImmutableList<String> getClassPaths() {
         return getPaths("CLASSPATH");
     }
 
-    private static List<String> getPaths(final String name) {
+    private static ImmutableList<String> getPaths(final String name) {
         final String paths = System.getenv(name);
         if (paths == null || paths.isEmpty()) {
-            return new ArrayList<>();
+            return ImmutableList.of();
         }
-        return Splitter.on(getPathsSeparator()).splitToList(paths);
+        return ImmutableList.copyOf(Splitter.on(getPathsSeparator()).splitToList(paths));
     }
 }
