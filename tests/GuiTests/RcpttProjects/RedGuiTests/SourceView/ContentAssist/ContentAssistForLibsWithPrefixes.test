@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xe9eMMbZEeaVRsIP7EWHyA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/20/17 2:07 PM
+Save-Time: 4/27/17 2:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -56,6 +56,7 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
 	//add DateTime
     type-text li
     key-type "M1+SPACE"
+    wait 300
     key-type Enter
     key-type Down
     key-type Enter -times 2
@@ -63,6 +64,7 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     //add "many_classes.Geography"
     type-text li
     key-type "M1+SPACE"
+    wait 300
     key-type Enter
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "many_classes.Geography"  | click -default
@@ -73,6 +75,7 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     key-type Enter
     type-text "add."
     key-type "M1+SPACE"
+    wait 300
 }
 
 //check that are 2
