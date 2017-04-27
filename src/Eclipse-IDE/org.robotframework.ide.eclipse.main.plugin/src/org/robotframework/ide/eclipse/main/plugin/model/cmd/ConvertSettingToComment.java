@@ -10,9 +10,9 @@ import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -51,8 +51,9 @@ public class ConvertSettingToComment extends EditorCommand {
             return;
         }
 
-        final RobotExecutableRow<TestCase> newLinked = new RobotExecutableRow<>();
-        newLinked.getAction().setType(RobotTokenType.TEST_CASE_ACTION_NAME);
+        final RobotExecutableRow<?> newLinked = new RobotExecutableRow<>();
+        newLinked.getAction().setType(keywordCall.getParent() instanceof RobotCase
+                ? RobotTokenType.TEST_CASE_ACTION_NAME : RobotTokenType.KEYWORD_ACTION_NAME);
 
         final RobotToken first = tokens.get(0);
         first.setType(RobotTokenType.START_HASH_COMMENT);
