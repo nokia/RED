@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mHeMEKQYEeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/22/17 11:46 AM
+Save-Time: 4/27/17 2:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -171,8 +171,9 @@ with [get-editor "RobotProject/red.xml" | get-section Paths] {
     get-canvas -after [get-label "Relative paths defined below are relative to:"] -index 1 | get-property text 
         | equals "CLASSPATH\r\n" | verify-true
     with [get-table -after [get-label "Relative paths defined below are relative to:"] -index 1] {
-        get-property "getItems().length" | equals 1 | verify-true
-        get-property "getItems().TableItem[0].getText()" | equals "...add new search path" | verify-true
+        get-property "getItems().length" | equals 2 | verify-true
+        get-property "getItems().TableItem[0].getText()" | equals ".*LibsFromPythonPath \[already defined in CLASSPATH variable\]"| verify-true
+        get-property "getItems().TableItem[1].getText()" | equals "...add new search path" | verify-true
     }
 }
 
