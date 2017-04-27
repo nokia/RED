@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Fh1mIAFsEeaQD_aaetnnqw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/17/17 4:34 PM
+Save-Time: 4/27/17 2:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -63,14 +63,14 @@ try -times 10 -delay 1000 -command{
 //check console
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{  
-		let [val rp [format "((\.;%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar)|(%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar;\.))" $new_ws_path $new_ws_path]]{
+		let [val rp [format "((.*\\\\LibsFromPythonPath;\.;%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar)|(.*.*\\\\LibsFromPythonPath;%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar;\.))" $new_ws_path $new_ws_path]]{
 			get-view Console | get-text-viewer | get-object |invoke getLine  0 
 			| matches [format "Command: .*jython.exe -J-Dpython\.path=.*\\\\site-packages -J-cp %s -m .* --listener .*" $rp]
 			| verify-true
 		}
 	}
 }-else{
-	let [val rp [format  "((\.:%s/jython_simple_project/RED_TEST_JavaLib.jar)|(%s/jython_simple_project/RED_TEST_JavaLib.jar:\.))"  $RED_workspace_path $RED_workspace_path]]{
+	let [val rp [format  "((.*/LibsFromPythonPath:\.:%s/jython_simple_project/RED_TEST_JavaLib.jar)|(.*/LibsFromPythonPath:%s/jython_simple_project/RED_TEST_JavaLib.jar:\.))"  $RED_workspace_path $RED_workspace_path]]{
 		get-view Console | get-text-viewer | get-object |invoke getLine  0 
 			| matches [format "Command: .*jython -J-Dpython\.path=.*/site-packages -J-cp %s -m .* --listener .*" $rp]
 			| verify-true
@@ -125,13 +125,14 @@ with [get-window "Add new search path"] {
 
 //check if 5 items were added (new empty line is omitted)
 with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1] {
-    get-property itemCount | equals 5 | verify-true
-    get-property "getItems().TableItem[0].getText()" 
+    get-property itemCount | equals 6 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals ".*LibsFromPythonPath \[already defined in CLASSPATH variable\]"| verify-true
+    get-property "getItems().TableItem[1].getText()" 
         | equals [format "%s/jython_simple_project/RED_TEST_JavaLib.jar" $RED_workspace_path] | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "folder/folder2" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "/new/folder" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals a | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "...add new search path" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "folder/folder2" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "/new/folder" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals a | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "...add new search path" | verify-true
 }
 
 //change item
@@ -152,13 +153,14 @@ with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table
     apply-cell-edit -deactivate
 }
 with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1] {
-    get-property itemCount | equals 5 | verify-true
-    get-property "getItems().TableItem[0].getText()" 
+    get-property itemCount | equals 6 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals [format "%s%sTestData%sLibsFromPythonPath [already defined in CLASSPATH variable]" $RCPTT_project_path $sys_sep $sys_sep] | verify-true
+    get-property "getItems().TableItem[1].getText()" 
         | equals [format "%s/jython_simple_project/RED_TEST_JavaLib.jar" $RED_workspace_path ]| verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "changed_folder/new" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "/new/folder" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals b | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "...add new search path" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "changed_folder/new" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "/new/folder" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals b | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "...add new search path" | verify-true
 }
 
 //add Python path
@@ -183,19 +185,17 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
 		let [val rp [format "(%s\\\\b|\\\\new\\\\folder|%s\\\\changed_folder\\\\new|\.|%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar)" $new_ws_path $new_ws_path $new_ws_path]]{
 			get-view Console | get-text-viewer | get-object |invoke getLine  0
-			| matches [format "Command: .*jython.exe -J-Dpython.path=.*\\\\site-packages -J-cp %s;%s;%s;%s;%s.* -m robot.run --listener .* --argumentfile .* %s\\\\jython_simple_project" $rp $rp $rp $rp $rp $new_ws_path]
+			| matches [format "Command: .*jython.exe -J-Dpython.path=.*\\\\site-packages -J-cp %s\\\\TestData\\\\LibsFromPythonPath;%s;%s;%s;%s;%s.* -m robot.run --listener .* --argumentfile .* %s\\\\jython_simple_project" [replace $RCPTT_project_path -old "\\" -new "\\\\"]  $rp $rp $rp $rp $rp $new_ws_path]
 			| verify-true
 		}
 	
 	}
 }-else{ 
-		let [val rp [format "(%s/b|/new/folder|%s/changed_folder/new|\.|%s/jython_simple_project/RED_TEST_JavaLib.jar)" $RED_workspace_path $RED_workspace_path $RED_workspace_path]]{
-			get-view Console | get-text-viewer | get-object |invoke getLine  0
-			| matches [format "Command: .*jython -J-Dpython.path=.*/site-packages -J-cp %s:%s:%s:%s:%s.* -m robot.run --listener .* --argumentfile .* %s/jython_simple_project" $rp $rp $rp $rp $rp $RED_workspace_path]
-			| verify-true
-		}
-	
-	
+	let [val rp [format "(%s/b|/new/folder|%s/changed_folder/new|\.|%s/jython_simple_project/RED_TEST_JavaLib.jar)" $RED_workspace_path $RED_workspace_path $RED_workspace_path]]{
+		get-view Console | get-text-viewer | get-object |invoke getLine  0
+		| matches [format "Command: .*jython -J-Dpython.path=.*/site-packages -J-cp %s/TestData/LibsFromPythonPath:%s:%s:%s:%s:%s.* -m robot.run --listener .* --argumentfile .* %s/jython_simple_project" $RCPTT_project_path $rp $rp $rp $rp $rp $RED_workspace_path]
+		| verify-true
+	}	
 }
 
 set-dialog-result File [get-arg-file-path]
