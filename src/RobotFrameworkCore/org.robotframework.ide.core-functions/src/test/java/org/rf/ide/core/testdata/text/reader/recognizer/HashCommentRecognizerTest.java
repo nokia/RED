@@ -97,7 +97,7 @@ public class HashCommentRecognizerTest {
 
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo("^[ ]?(?!\\\\)#.*$");
+        assertThat(rec.getPattern().pattern()).isEqualTo("^[\\s]*(?!\\\\)#.*$");
     }
 
     @Test
