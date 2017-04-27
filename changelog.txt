@@ -1,3 +1,9 @@
+RED 0.7.7-fix - 2017/04/27
+
+** Bug
+    [RED-825] - GitHub #105 - ClassPath in sys env causes error while running tests
+
+
 RED 0.7.7 - 2017/04/20
 
 ** Bug
