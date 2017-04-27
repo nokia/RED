@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 8:08 AM
+Save-Time: 4/27/17 5:23 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -155,8 +155,8 @@ proc "wait-for-zero-items"[val times] [val delay]{
 	}
 }
 
-proc "wait-for-console"{
-	try -times 10 -delay 1000 -command{
+proc "wait-for-console" [val times 10] [val delay 1000]{
+	try -times $times -delay $delay -command{
 		get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
 	}
 }
