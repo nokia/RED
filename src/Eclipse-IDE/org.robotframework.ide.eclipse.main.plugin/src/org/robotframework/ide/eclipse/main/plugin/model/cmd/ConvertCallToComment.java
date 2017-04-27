@@ -11,6 +11,8 @@ import java.util.Optional;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -59,9 +61,23 @@ public class ConvertCallToComment extends EditorCommand {
                 final RobotToken action = actionToken.get();
                 final List<RobotToken> arguments = keywordCall.getArgumentTokens().get();
                 final List<RobotToken> comments = keywordCall.getCommentTokens().get();
-                final RobotExecutableRow<Object> newLinked = new RobotExecutableRow<>();
-                newLinked.getAction().setType(RobotTokenType.TEST_CASE_ACTION_NAME);
-                newLinked.setParent(keywordCall.getLinkedElement().getParent());
+                final Object parentObject = keywordCall.getLinkedElement().getParent();
+
+                RobotExecutableRow<?> newLinked = null;
+                if (parentObject instanceof TestCase) {
+                    final RobotExecutableRow<TestCase> tempLinked = new RobotExecutableRow<>();
+                    tempLinked.getAction().setType(RobotTokenType.TEST_CASE_ACTION_NAME);
+                    tempLinked.setParent((TestCase) parentObject);
+                    tempLinked.getParent().addTestExecutionRow(tempLinked);
+                    newLinked = tempLinked;
+                } else if (parentObject instanceof UserKeyword) {
+                    final RobotExecutableRow<UserKeyword> tempLinked = new RobotExecutableRow<>();
+                    tempLinked.getAction().setType(RobotTokenType.KEYWORD_ACTION_NAME);
+                    tempLinked.setParent((UserKeyword) parentObject);
+                    tempLinked.getParent().addKeywordExecutionRow(tempLinked);
+                    newLinked = tempLinked;
+                }
+
                 action.setType(RobotTokenType.START_HASH_COMMENT);
                 action.setText(newName);
 
