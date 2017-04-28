@@ -124,16 +124,16 @@ public class ExecutionView {
         GridDataFactory.fillDefaults().grab(true, false).indent(2, 8).applyTo(labelsComposite);
 
         testsCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(70, 15).applyTo(testsCounterLabel);
+        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(testsCounterLabel);
         testsCounterLabel.setText("Tests: 0/0");
 
         passCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(70, 15).applyTo(passCounterLabel);
+        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(passCounterLabel);
         passCounterLabel.setImage(ImagesManager.getImage(RedImages.getSuccessImage()));
         passCounterLabel.setText("Passed: 0");
 
         failCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(70, 15).applyTo(failCounterLabel);
+        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(failCounterLabel);
         failCounterLabel.setImage(ImagesManager.getImage(RedImages.getErrorImage()));
         failCounterLabel.setText("Failed: 0");
     }
@@ -195,7 +195,8 @@ public class ExecutionView {
                     elementsStore.addProgressListener(progressListener);
 
                     SwtThread.syncExec(() -> {
-                        executionViewer.setInput(newArrayList(elementsStore.getExecutionTree()));
+                        final ExecutionTreeNode root = elementsStore.getExecutionTree();
+                        executionViewer.setInput(root == null ? null : newArrayList(root));
                         refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
                                 elementsStore.getFailedTests(), elementsStore.getTotalTests());
                     });
@@ -224,6 +225,8 @@ public class ExecutionView {
         progressBar.reset();
 
         executionViewer.refresh();
+        
+        evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED);
     }
 
     @PreDestroy

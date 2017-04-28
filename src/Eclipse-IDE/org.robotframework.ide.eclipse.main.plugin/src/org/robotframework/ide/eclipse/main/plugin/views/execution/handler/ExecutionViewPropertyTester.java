@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution.handler;
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper;
 
@@ -19,6 +20,9 @@ public class ExecutionViewPropertyTester extends PropertyTester {
 
     @VisibleForTesting static final String CURRENT_LAUNCH_IS_TERMINATED = "currentLaunchIsTerminated";
     public static final String PROPERTY_CURRENT_LAUNCH_IS_TERMINATED = NAMESPACE + "." + CURRENT_LAUNCH_IS_TERMINATED;
+    
+    @VisibleForTesting static final String CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED = "currentLaunchExecStoreIsDisposed";
+    public static final String PROPERTY_CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED = NAMESPACE + "." + CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED;
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -41,6 +45,12 @@ public class ExecutionViewPropertyTester extends PropertyTester {
                     .map(RobotTestsLaunch::isTerminated)
                     .orElse(false);
             return isTerminated == expectedValue;
+        } else if (CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED.equals(property)) {
+            final boolean isDisposed = view.getCurrentlyShownLaunch()
+                    .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
+                    .map(ExecutionStatusStore::isDisposed)
+                    .orElse(false);
+            return isDisposed == expectedValue;
         }
         return false;
     }
