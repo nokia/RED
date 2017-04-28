@@ -498,12 +498,14 @@ public class ExecutionStatusStoreTest {
         store.addTreeListener((s, n) -> {});
 
         assertThat(store.getListeners()).hasSize(4);
+        assertThat(store.isDisposed()).isFalse();
 
         store.dispose();
 
         assertThat(store.getExecutionTree()).isNull();
         assertThat(store.getCurrent()).isNull();
         assertThat(store.getListeners()).isEmpty();
+        assertThat(store.isDisposed()).isTrue();
     }
 
     @Test
