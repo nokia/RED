@@ -6,6 +6,8 @@
 package org.rf.ide.core.dryrun;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +31,7 @@ public class RobotDryRunLibraryImportCollector {
         this.standardLibrariesNames = standardLibrariesNames;
     }
 
-    public void collectFromLibraryImportEvent(final String libraryName, final String importer, final String source,
+    public void collectFromLibraryImportEvent(final String libraryName, final URI importer, final URI source,
             final List<String> args) {
         if (importer != null) {
             RobotDryRunLibraryImport dryRunLibraryImport = null;
@@ -83,7 +85,7 @@ public class RobotDryRunLibraryImportCollector {
             final int endIndex = message.lastIndexOf("' does not exist");
             if (nameStartIndex > 0 && endIndex > nameStartIndex) {
                 final String libName = message.substring(nameStartIndex + nameStartTxt.length(), endIndex);
-                final String importer = extractImporter(message, nameStartIndex);
+                final URI importer = extractImporter(message, nameStartIndex);
                 final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libName);
                 final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
                 if (libIndex < 0) {
@@ -100,10 +102,16 @@ public class RobotDryRunLibraryImportCollector {
         }
     }
 
-    private String extractImporter(final String message, final int nameStartIndex) {
+    private URI extractImporter(final String message, final int nameStartIndex) {
         final String errorStartTxt = "Error in file '";
         final int errorStartIndex = message.indexOf(errorStartTxt);
-        return errorStartIndex == -1 ? "" : message.substring(errorStartIndex + errorStartTxt.length(), nameStartIndex);
+        try {
+            return errorStartIndex == -1 ? null
+                    : new URI("file", null, null, -1,
+                            message.substring(errorStartIndex + errorStartTxt.length(), nameStartIndex), null, null);
+        } catch (final URISyntaxException e) {
+            return null;
+        }
     }
 
     private String extractLibName(final String message) {

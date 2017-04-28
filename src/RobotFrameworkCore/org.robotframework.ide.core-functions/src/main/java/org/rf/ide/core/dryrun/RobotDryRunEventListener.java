@@ -5,7 +5,7 @@
  */
 package org.rf.ide.core.dryrun;
 
-import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -29,12 +29,13 @@ public class RobotDryRunEventListener extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleSuiteStarted(final String suiteName, final File suiteFilePath) {
-        startSuiteHandler.accept(suiteName);
+    public void handleSuiteStarted(final String name, final URI suiteFilePath, final int totalTests,
+            final List<String> childSuites, final List<String> childTests) {
+        startSuiteHandler.accept(name);
     }
 
     @Override
-    public void handleLibraryImport(final String name, final String importer, final String source,
+    public void handleLibraryImport(final String name, final URI importer, final URI source,
             final List<String> args) {
         dryRunLibraryImportCollector.collectFromLibraryImportEvent(name, importer, source, args);
     }
