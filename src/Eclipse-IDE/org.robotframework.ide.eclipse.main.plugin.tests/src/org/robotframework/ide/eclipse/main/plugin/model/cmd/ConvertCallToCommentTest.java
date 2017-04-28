@@ -15,6 +15,9 @@ import static org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCallC
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -45,6 +48,8 @@ public class ConvertCallToCommentTest {
                 .build();
         final RobotCase testCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
         final RobotKeywordCall keywordCall = testCase.getChildren().get(0);
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<TestCase> oldLinked = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -60,6 +65,8 @@ public class ConvertCallToCommentTest {
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
         assertThat(result).has(properlySetParent());
+        assertThat(testCase.getLinkedElement().getTestExecutionRows())
+                .doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
                 eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
@@ -74,6 +81,9 @@ public class ConvertCallToCommentTest {
                 .build();
         final RobotKeywordDefinition keyword = model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
         final RobotKeywordCall keywordCall = keyword.getChildren().get(0);
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<UserKeyword> oldLinked = (RobotExecutableRow<UserKeyword>) keywordCall
+                .getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -89,6 +99,7 @@ public class ConvertCallToCommentTest {
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
         assertThat(result).has(properlySetParent());
+        assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
                 .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
