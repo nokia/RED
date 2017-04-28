@@ -43,8 +43,8 @@ public class ExecutionMessagesStoreTest {
         final StringBuilder str1 = new StringBuilder();
         final StringBuilder str2 = new StringBuilder();
 
-        final ExecutionMessagesStoreListener listener1 = (s, msg) -> str1.append(msg);
-        final ExecutionMessagesStoreListener listener2 = (s, msg) -> str2.append(msg);
+        final ExecutionMessagesStoreListener listener1 = msg -> str1.append(msg);
+        final ExecutionMessagesStoreListener listener2 = msg -> str2.append(msg);
         
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
         store.addStoreListener(listener1);
@@ -61,8 +61,8 @@ public class ExecutionMessagesStoreTest {
         final StringBuilder str1 = new StringBuilder();
         final StringBuilder str2 = new StringBuilder();
 
-        final ExecutionMessagesStoreListener listener1 = (s, msg) -> str1.append(msg);
-        final ExecutionMessagesStoreListener listener2 = (s, msg) -> str2.append(msg);
+        final ExecutionMessagesStoreListener listener1 = msg -> str1.append(msg);
+        final ExecutionMessagesStoreListener listener2 = msg -> str2.append(msg);
 
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
         store.addStoreListener(listener1);
