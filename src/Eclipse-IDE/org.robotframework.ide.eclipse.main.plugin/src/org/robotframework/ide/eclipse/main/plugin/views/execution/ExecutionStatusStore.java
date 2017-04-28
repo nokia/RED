@@ -65,11 +65,11 @@ public class ExecutionStatusStore implements IDisposable {
         return currentTest;
     }
 
-    int getPassedTests() {
+    public int getPassedTests() {
         return passedTests;
     }
 
-    int getFailedTests() {
+    public int getFailedTests() {
         return failedTests;
     }
 
