@@ -7,6 +7,8 @@ package org.rf.ide.core.dryrun;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,11 +20,11 @@ public class RobotDryRunLibraryImport {
 
     private final String name;
 
-    private final String sourcePath;
+    private final URI sourcePath;
 
     private final DryRunLibraryType type;
 
-    private final List<String> importersPaths = newArrayList();
+    private final List<URI> importersPaths = newArrayList();
 
     private final List<String> args = newArrayList();
 
@@ -31,19 +33,19 @@ public class RobotDryRunLibraryImport {
     private String additionalInfo;
 
     public RobotDryRunLibraryImport(final String name) {
-        this(name, "", new ArrayList<String>());
+        this(name, null, new ArrayList<String>());
     }
 
-    public RobotDryRunLibraryImport(final String name, final String importerPath, final List<String> args) {
-        this(name, "", importerPath, args);
+    public RobotDryRunLibraryImport(final String name, final URI importerPath, final List<String> args) {
+        this(name, null, importerPath, args);
     }
 
-    public RobotDryRunLibraryImport(final String name, final String sourcePath, final String importerPath,
+    public RobotDryRunLibraryImport(final String name, final URI sourcePath, final URI importerPath,
             final List<String> args) {
         this.name = name;
-        this.sourcePath = sourcePath != null ? resolveSourcePath(sourcePath) : "";
+        this.sourcePath = resolveSourcePath(sourcePath);
         this.type = resolveType(this.sourcePath);
-        if (importerPath != null && !importerPath.isEmpty()) {
+        if (importerPath != null) {
             this.importersPaths.add(importerPath);
         }
         this.args.addAll(args);
@@ -51,20 +53,28 @@ public class RobotDryRunLibraryImport {
         this.additionalInfo = "";
     }
 
-    private String resolveSourcePath(final String sourcePath) {
-        if (!sourcePath.isEmpty()) {
-            if (sourcePath.endsWith(".pyc")) {
-                return sourcePath.substring(0, sourcePath.length() - 1);
-            } else if (sourcePath.endsWith("$py.class")) {
-                return sourcePath.replace("$py.class", ".py");
-            }
+    private URI resolveSourcePath(final URI sourcePath) {
+        if (sourcePath == null) {
+            return null;
         }
-        return sourcePath;
+
+        try {
+            final String path = sourcePath.getPath();
+            if (path.endsWith(".pyc")) {
+                return new URI("file", null, null, -1, path.substring(0, path.length() - 1), null, null);
+            } else if (path.endsWith("$py.class")) {
+                return new URI("file", null, null, -1, path.replace("$py.class", ".py"), null, null);
+            }
+            return sourcePath;
+        } catch (final URISyntaxException e) {
+            return sourcePath;
+        }
     }
 
-    private DryRunLibraryType resolveType(final String sourcePath) {
-        if (!sourcePath.isEmpty()) {
-            if (sourcePath.endsWith(".jar") || sourcePath.endsWith(".java") || sourcePath.endsWith(".class")) {
+    private DryRunLibraryType resolveType(final URI sourcePath) {
+        if (sourcePath != null) {
+            final String path = sourcePath.getPath();
+            if (path.endsWith(".jar") || path.endsWith(".java") || path.endsWith(".class")) {
                 return DryRunLibraryType.JAVA;
             } else {
                 return DryRunLibraryType.PYTHON;
@@ -77,11 +87,11 @@ public class RobotDryRunLibraryImport {
         return name;
     }
 
-    public String getSourcePath() {
+    public URI getSourcePath() {
         return sourcePath;
     }
 
-    public List<String> getImportersPaths() {
+    public List<URI> getImportersPaths() {
         return importersPaths;
     }
 
@@ -105,8 +115,8 @@ public class RobotDryRunLibraryImport {
         this.additionalInfo = additionalInfo;
     }
 
-    public void addImporterPath(final String path) {
-        if (!importersPaths.contains(path)) {
+    public void addImporterPath(final URI path) {
+        if (path != null && !importersPaths.contains(path)) {
             importersPaths.add(path);
         }
     }

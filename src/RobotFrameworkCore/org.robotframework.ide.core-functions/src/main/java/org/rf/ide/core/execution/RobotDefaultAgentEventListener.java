@@ -5,7 +5,7 @@
  */
 package org.rf.ide.core.execution;
 
-import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +40,8 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleSuiteStarted(final String suiteName, final File suiteFilePath) {
+    public void handleSuiteStarted(final String name, final URI suiteFilePath, final int totalTests,
+            final List<String> childSuites, final List<String> childTests) {
         // implement in subclasses
     }
 
@@ -73,7 +74,7 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleResourceImport(final File resourceFilePath) {
+    public void handleResourceImport(final URI resourceFilePath) {
         // implement in subclasses
     }
 
@@ -93,7 +94,7 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleOutputFile(final File outputFilepath) {
+    public void handleOutputFile(final URI outputFilepath) {
         // implement in subclasses
     }
 
@@ -133,7 +134,7 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleLibraryImport(final String name, final String importer, final String source,
+    public void handleLibraryImport(final String name, final URI importer, final URI source,
             final List<String> args) {
         // implement in subclasses
     }
