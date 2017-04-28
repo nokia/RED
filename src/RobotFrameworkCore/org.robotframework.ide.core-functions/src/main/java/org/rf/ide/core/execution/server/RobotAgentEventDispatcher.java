@@ -8,8 +8,9 @@ package org.rf.ide.core.execution.server;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -163,7 +164,7 @@ class RobotAgentEventDispatcher {
     private void handleResourceImport(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("resource_import");
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final File resourceFilePath = new File((String) attributes.get("source"));
+        final URI resourceFilePath = toFileUri((String) attributes.get("source"));
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleResourceImport(resourceFilePath);
@@ -174,10 +175,13 @@ class RobotAgentEventDispatcher {
         final List<?> arguments = (List<?>) eventMap.get("start_suite");
         final String name = (String) arguments.get(0);
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final File suiteFilePath = new File((String) attributes.get("source"));
+        final URI suiteFilePath = toFileUri((String) attributes.get("source"));
+        final List<String> childSuites = ensureListOfStrings((List<?>) attributes.get("suites"));
+        final List<String> childTests = ensureListOfStrings((List<?>) attributes.get("tests"));
+        final int totalTests = (Integer) attributes.get("totaltests");
 
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleSuiteStarted(name, suiteFilePath);
+            listener.handleSuiteStarted(name, suiteFilePath, totalTests, childSuites, childTests);
         }
     }
 
@@ -317,7 +321,7 @@ class RobotAgentEventDispatcher {
     private void handleOutputFile(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("output_file");
         final String filepath = (String) arguments.get(0);
-        final File path = filepath == null ? null : new File(filepath);
+        final URI path = filepath == null ? null : toFileUri(filepath);
 
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleOutputFile(path);
@@ -330,8 +334,8 @@ class RobotAgentEventDispatcher {
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
         final String originalName = (String) attributes.get("originalname");
         final String name = Strings.isNullOrEmpty(originalName) ? libraryName : originalName;
-        final String importer = (String) attributes.get("importer");
-        final String source = (String) attributes.get("source");
+        final URI importer = toFileUri((String) attributes.get("importer"));
+        final URI source = toFileUri((String) attributes.get("source"));
         final List<String> args = ensureListOfStrings((List<?>) attributes.get("args"));
 
         for (final RobotAgentEventListener listener : eventsListeners) {
@@ -364,6 +368,17 @@ class RobotAgentEventDispatcher {
             }
         }
         return false;
+    }
+
+    private URI toFileUri(final String source) {
+        if (source == null) {
+            return null;
+        }
+        try {
+            return new URI("file://" + (source.startsWith("/") ? "" : "/") + source.replaceAll("\\\\", "/"));
+        } catch (final URISyntaxException e) {
+            return null;
+        }
     }
 
     private static List<String> ensureListOfStrings(final List<?> list) {

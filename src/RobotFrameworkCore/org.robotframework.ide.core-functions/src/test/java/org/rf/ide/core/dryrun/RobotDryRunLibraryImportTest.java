@@ -7,6 +7,7 @@ package org.rf.ide.core.dryrun;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -16,27 +17,27 @@ public class RobotDryRunLibraryImportTest {
 
     @Test
     public void pythonSourceTypeIsResolved() throws Exception {
-        assertThat(new RobotDryRunLibraryImport("lib", "source.py", "suite.robot", Arrays.asList()).getType())
-                .isEqualTo(DryRunLibraryType.PYTHON);
-        assertThat(new RobotDryRunLibraryImport("lib", "source.pyc", "suite.robot", Arrays.asList()).getType())
-                .isEqualTo(DryRunLibraryType.PYTHON);
-        assertThat(new RobotDryRunLibraryImport("lib", "source$py.class", "suite.robot", Arrays.asList()).getType())
-                .isEqualTo(DryRunLibraryType.PYTHON);
+        assertThat(new RobotDryRunLibraryImport("lib", new URI("file:///source.py"), new URI("file:///suite.robot"),
+                Arrays.asList()).getType()).isEqualTo(DryRunLibraryType.PYTHON);
+        assertThat(new RobotDryRunLibraryImport("lib", new URI("file:///source.py"), new URI("file:///suite.robot"),
+                Arrays.asList()).getType()).isEqualTo(DryRunLibraryType.PYTHON);
+        assertThat(new RobotDryRunLibraryImport("lib", new URI("file:///source.$py.class"),
+                new URI("file:///suite.robot"), Arrays.asList()).getType()).isEqualTo(DryRunLibraryType.PYTHON);
     }
 
     @Test
     public void javaSourceTypeIsResolved() throws Exception {
-        assertThat(new RobotDryRunLibraryImport("lib", "source.java", "suite.robot", Arrays.asList()).getType())
-                .isEqualTo(DryRunLibraryType.JAVA);
-        assertThat(new RobotDryRunLibraryImport("lib", "source.jar", "suite.robot", Arrays.asList()).getType())
-                .isEqualTo(DryRunLibraryType.JAVA);
-        assertThat(new RobotDryRunLibraryImport("lib", "source.class", "suite.robot", Arrays.asList()).getType())
-                .isEqualTo(DryRunLibraryType.JAVA);
+        assertThat(new RobotDryRunLibraryImport("lib", new URI("file:///source.java"), new URI("file:///suite.robot"),
+                Arrays.asList()).getType()).isEqualTo(DryRunLibraryType.JAVA);
+        assertThat(new RobotDryRunLibraryImport("lib", new URI("file:///source.jar"), new URI("file:///suite.robot"),
+                Arrays.asList()).getType()).isEqualTo(DryRunLibraryType.JAVA);
+        assertThat(new RobotDryRunLibraryImport("lib", new URI("file:///source.class"), new URI("file:///suite.robot"),
+                Arrays.asList()).getType()).isEqualTo(DryRunLibraryType.JAVA);
     }
 
     @Test
     public void sourceTypeIsNotResolved() throws Exception {
-        assertThat(new RobotDryRunLibraryImport("lib", "", "suite.robot", Arrays.asList()).getType())
+        assertThat(new RobotDryRunLibraryImport("lib", null, new URI("file:///suite.robot"), Arrays.asList()).getType())
                 .isEqualTo(DryRunLibraryType.UNKNOWN);
     }
 }

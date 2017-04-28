@@ -5,7 +5,7 @@
  */
 package org.rf.ide.core.execution;
 
-import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +23,8 @@ public interface RobotAgentEventListener {
 
     void handleVersions(String pythonVersion, String robotVersion, int protocolVersion);
 
-    void handleSuiteStarted(String suiteName, File suiteFilePath);
+    void handleSuiteStarted(String name, URI suiteFilePath, int totalTests, List<String> childSuites,
+            List<String> childTests);
 
     void handleSuiteEnded(String suiteName, int elapsedTime, Status status, String errorMessage);
 
@@ -36,7 +37,7 @@ public interface RobotAgentEventListener {
 
     void handleKeywordEnded(String keywordName, String keywordType);
 
-    void handleResourceImport(File resourceFilePath);
+    void handleResourceImport(URI resourceFilePath);
 
     void handleGlobalVariables(Map<String, String> globalVars);
 
@@ -44,7 +45,7 @@ public interface RobotAgentEventListener {
 
     void handleLogMessage(String msg, LogLevel level, String timestamp);
 
-    void handleOutputFile(File path);
+    void handleOutputFile(URI path);
 
     void handleCheckCondition();
 
@@ -60,7 +61,7 @@ public interface RobotAgentEventListener {
 
     void handleMessage(String msg, LogLevel level);
 
-    void handleLibraryImport(String name, String importer, String source, List<String> args);
+    void handleLibraryImport(String name, URI importer, URI source, List<String> args);
 
     public static class RobotAgentEventsListenerException extends RuntimeException {
 

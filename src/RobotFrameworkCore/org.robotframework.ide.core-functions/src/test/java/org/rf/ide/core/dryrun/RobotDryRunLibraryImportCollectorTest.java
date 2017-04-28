@@ -7,6 +7,7 @@ package org.rf.ide.core.dryrun;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -22,7 +23,8 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of("String"));
 
-        libImportCollector.collectFromLibraryImportEvent("String", "suite.robot", "String.py", Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("String", new URI("file:///suite.robot"),
+                new URI("file:///String.py"), Arrays.asList());
 
         assertThat(libImportCollector.getImportedLibraries()).isEmpty();
     }
@@ -32,12 +34,15 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of("String", "Xml"));
 
-        libImportCollector.collectFromLibraryImportEvent("String", "suite.robot", "String.py", Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib", "suite.robot", "source.py", Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("Xml", "suite.robot", "Xml.py", Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("String", new URI("file:///suite.robot"),
+                new URI("file:///String.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite.robot"),
+                new URI("file:///source.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("Xml", new URI("file:///suite.robot"),
+                new URI("file:///Xml.py"), Arrays.asList());
 
-        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", "source.py", "suite.robot",
-                Arrays.asList());
+        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", new URI("file:///source.py"),
+                new URI("file:///suite.robot"), Arrays.asList());
 
         assertThat(libImportCollector.getImportedLibraries()).hasSize(1);
         assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(0), lib, DryRunLibraryType.PYTHON);
@@ -50,7 +55,7 @@ public class RobotDryRunLibraryImportCollectorTest {
 
         libImportCollector.collectFromFailMessageEvent(createFailMessage("lib"));
 
-        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", "", "", Arrays.asList());
+        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", null, null, Arrays.asList());
         lib.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
         lib.setAdditionalInfo("(Importing test library lib failed)");
 
@@ -63,11 +68,12 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of());
 
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib", "suite.robot"));
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib", "/suite.robot"));
 
-        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", "", "suite.robot", Arrays.asList());
+        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", null, new URI("file:///suite.robot"),
+                Arrays.asList());
         lib.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib.setAdditionalInfo("Error in file 'suite.robot': Test library 'lib' does not exist.");
+        lib.setAdditionalInfo("Error in file '/suite.robot': Test library 'lib' does not exist.");
 
         assertThat(libImportCollector.getImportedLibraries()).hasSize(1);
         assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(0), lib, DryRunLibraryType.UNKNOWN);
@@ -78,14 +84,17 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of());
 
-        libImportCollector.collectFromLibraryImportEvent("lib", "suite1.robot", "lib.py", Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib", "suite2.robot", "lib.py", Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib", "suite3.robot", "lib.py", Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite1.robot"),
+                new URI("file:///lib.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite2.robot"),
+                new URI("file:///lib.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite3.robot"),
+                new URI("file:///lib.py"), Arrays.asList());
 
-        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", "lib.py", "suite1.robot",
-                Arrays.asList());
-        lib.addImporterPath("suite2.robot");
-        lib.addImporterPath("suite3.robot");
+        final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", new URI("file:///lib.py"),
+                new URI("file:///suite1.robot"), Arrays.asList());
+        lib.addImporterPath(new URI("file:///suite2.robot"));
+        lib.addImporterPath(new URI("file:///suite3.robot"));
 
         assertThat(libImportCollector.getImportedLibraries()).hasSize(1);
         assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(0), lib, DryRunLibraryType.PYTHON);
@@ -96,38 +105,43 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of());
 
-        libImportCollector.collectFromLibraryImportEvent("lib1", "suite1.robot", "lib1.py", Arrays.asList());
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib2", "suite2.robot"));
+        libImportCollector.collectFromLibraryImportEvent("lib1", new URI("file:///suite1.robot"),
+                new URI("file:///lib1.py"), Arrays.asList());
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib2", "/suite2.robot"));
         libImportCollector.collectFromFailMessageEvent(createFailMessage("lib3"));
         libImportCollector.collectFromFailMessageEvent(createFailMessage("lib4"));
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "suite5.robot"));
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "other.robot"));
-        libImportCollector.collectFromLibraryImportEvent("lib6", "suite6.robot", "lib6.py", Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib6", "other.robot", "lib6.py", Arrays.asList());
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "/suite5.robot"));
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "/other.robot"));
+        libImportCollector.collectFromLibraryImportEvent("lib6", new URI("file:///suite6.robot"),
+                new URI("file:///lib6.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent("lib6", new URI("file:///other.robot"),
+                new URI("file:///lib6.py"), Arrays.asList());
 
-        final RobotDryRunLibraryImport lib1 = new RobotDryRunLibraryImport("lib1", "lib1.py", "suite1.robot",
-                Arrays.asList());
+        final RobotDryRunLibraryImport lib1 = new RobotDryRunLibraryImport("lib1", new URI("file:///lib1.py"),
+                new URI("file:///suite1.robot"), Arrays.asList());
 
-        final RobotDryRunLibraryImport lib2 = new RobotDryRunLibraryImport("lib2", "", "suite2.robot", Arrays.asList());
+        final RobotDryRunLibraryImport lib2 = new RobotDryRunLibraryImport("lib2", null,
+                new URI("file:///suite2.robot"), Arrays.asList());
         lib2.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib2.setAdditionalInfo("Error in file 'suite2.robot': Test library 'lib2' does not exist.");
+        lib2.setAdditionalInfo("Error in file '/suite2.robot': Test library 'lib2' does not exist.");
 
-        final RobotDryRunLibraryImport lib3 = new RobotDryRunLibraryImport("lib3", "", "", Arrays.asList());
+        final RobotDryRunLibraryImport lib3 = new RobotDryRunLibraryImport("lib3", null, null, Arrays.asList());
         lib3.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
         lib3.setAdditionalInfo("(Importing test library lib3 failed)");
 
-        final RobotDryRunLibraryImport lib4 = new RobotDryRunLibraryImport("lib4", "", "", Arrays.asList());
+        final RobotDryRunLibraryImport lib4 = new RobotDryRunLibraryImport("lib4", null, null, Arrays.asList());
         lib4.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
         lib4.setAdditionalInfo("(Importing test library lib4 failed)");
 
-        final RobotDryRunLibraryImport lib5 = new RobotDryRunLibraryImport("lib5", "", "suite5.robot", Arrays.asList());
-        lib5.addImporterPath("other.robot");
+        final RobotDryRunLibraryImport lib5 = new RobotDryRunLibraryImport("lib5", null,
+                new URI("file:///suite5.robot"), Arrays.asList());
+        lib5.addImporterPath(new URI("file:///other.robot"));
         lib5.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-        lib5.setAdditionalInfo("Error in file 'other.robot': Test library 'lib5' does not exist.");
+        lib5.setAdditionalInfo("Error in file '/other.robot': Test library 'lib5' does not exist.");
 
-        final RobotDryRunLibraryImport lib6 = new RobotDryRunLibraryImport("lib6", "lib6.py", "suite6.robot",
-                Arrays.asList());
-        lib6.addImporterPath("other.robot");
+        final RobotDryRunLibraryImport lib6 = new RobotDryRunLibraryImport("lib6", new URI("file:///lib6.py"),
+                new URI("file:///suite6.robot"), Arrays.asList());
+        lib6.addImporterPath(new URI("file:///other.robot"));
 
         assertThat(libImportCollector.getImportedLibraries()).hasSize(6);
         assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(0), lib1, DryRunLibraryType.PYTHON);
