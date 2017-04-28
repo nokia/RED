@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.DebugExecutionEventsLis
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
 public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigurationDelegate {
@@ -79,7 +79,7 @@ public class RemoteRobotLaunchConfigurationDelegate extends AbstractRobotLaunchC
                 .agentEventsListenedBy(remoteConnectionStatusTracker)
                 .agentEventsListenedBy(additionalListeners)
                 .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
-                .agentEventsListenedBy(new ExecutionElementsTracker(testsLaunchContext))
+                .agentEventsListenedBy(new ExecutionStatusTracker(testsLaunchContext))
                 .agentEventsListenedBy(new AgentServerKeepAlive())
                 .start()
                 .waitForServer();
