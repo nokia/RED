@@ -39,7 +39,7 @@ public class MessageLogView {
 
     private RobotTestExecutionListener executionListener;
 
-    private final ExecutionMessagesStoreListener storeListener = (store, msg) -> SwtThread.syncExec(() -> append(msg));
+    private final ExecutionMessagesStoreListener storeListener = this::append;
     
     public MessageLogView() {
         this(RedPlugin.getTestExecutionService());
@@ -88,16 +88,21 @@ public class MessageLogView {
                             ExecutionMessagesStore::new);
                     messagesStore.addStoreListener(storeListener);
 
-                    final String currentMessages = messagesStore.getMessage();
-                    SwtThread.syncExec(() -> append(currentMessages));
+                    append(messagesStore.getMessage());
                 }
             }
         }
     }
 
     private void append(final String msg) {
-        styledText.append(msg);
-        styledText.setTopIndex(styledText.getLineCount() - 1);
+        SwtThread.asyncExec(() -> {
+            // it could have been queued earlier in main thread...
+            if (styledText == null || styledText.isDisposed()) {
+                return;
+            }
+            styledText.append(msg);
+            styledText.setTopIndex(styledText.getLineCount() - 1);
+        });
     }
 
     @Focus

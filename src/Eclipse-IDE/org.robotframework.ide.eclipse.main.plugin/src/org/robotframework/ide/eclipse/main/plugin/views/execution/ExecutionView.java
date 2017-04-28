@@ -72,6 +72,8 @@ public class ExecutionView {
     private final ExecutionTreeElementListener storeListener = this::refreshChangedNode;
     private final ExecutionProgressListener progressListener = this::refreshProgress;
 
+    private Composite parent;
+
     private CLabel testsCounterLabel;
     private CLabel passCounterLabel;
     private CLabel failCounterLabel;
@@ -103,6 +105,7 @@ public class ExecutionView {
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part, final IMenuService menuService) {
+        this.parent = parent;
         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
         GridLayoutFactory.fillDefaults().applyTo(parent);
 
@@ -194,7 +197,7 @@ public class ExecutionView {
                     elementsStore.addTreeListener(storeListener);
                     elementsStore.addProgressListener(progressListener);
 
-                    SwtThread.syncExec(() -> {
+                    SwtThread.asyncExec(() -> {
                         final ExecutionTreeNode root = elementsStore.getExecutionTree();
                         executionViewer.setInput(root == null ? null : newArrayList(root));
                         refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
@@ -240,6 +243,11 @@ public class ExecutionView {
 
     private void refreshChangedNode(final ExecutionStatusStore store, final ExecutionTreeNode node) {
         SwtThread.asyncExec(() -> {
+            // it could have been queued earlier in main thread...
+            if (parent == null || parent.isDisposed()) {
+                return;
+            }
+
             if (executionViewer.getInput() == null) {
                 executionViewer.setInput(newArrayList(store.getExecutionTree()));
             }
@@ -265,6 +273,11 @@ public class ExecutionView {
     private void refreshProgress(final int currentTest, final int passedSoFar, final int failedSoFar,
             final int totalTests) {
         SwtThread.asyncExec(() -> {
+            // it could have been queued earlier in main thread...
+            if (parent == null || parent.isDisposed()) {
+                return;
+            }
+
             testsCounterLabel.setText(String.format("Tests: %d/%d", currentTest, totalTests));
             passCounterLabel.setText("Passed: " + passedSoFar);
             failCounterLabel.setText("Failed: " + failedSoFar);

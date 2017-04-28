@@ -32,7 +32,7 @@ class ExecutionMessagesStore implements IDisposable {
 
     void append(final String msg) {
         message.append(msg);
-        listeners.forEach(listener -> listener.storeAppended(this, msg));
+        listeners.forEach(listener -> listener.storeAppended(msg));
     }
 
     String getMessage() {
@@ -42,7 +42,7 @@ class ExecutionMessagesStore implements IDisposable {
     @FunctionalInterface
     static interface ExecutionMessagesStoreListener {
 
-        void storeAppended(ExecutionMessagesStore store, String appendedMsg);
+        void storeAppended(String appendedMsg);
     }
 
 }
