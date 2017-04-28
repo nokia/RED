@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,8 +42,8 @@ public class JarStructureBuilder {
 
     }
 
-    public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
-        return provideEntriesFromFile(new File(path));
+    public Collection<ILibraryClass> provideEntriesFromFile(final URI uri) throws RobotEnvironmentException {
+        return provideEntriesFromFile(new File(uri));
     }
 
     public Collection<ILibraryClass> provideEntriesFromFile(final File file) throws RobotEnvironmentException {
@@ -75,8 +76,7 @@ public class JarStructureBuilder {
     private Collection<JarClass> providePythonEntriesFromJarFile(final File file) throws RobotEnvironmentException {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
-        final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder
-                .provideEntriesFromFile(file.getPath());
+        final Collection<ILibraryClass> pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(file.toURI());
 
         final List<JarClass> jarClasses = new ArrayList<>();
         for (final ILibraryClass pythonClass : pythonClasses) {

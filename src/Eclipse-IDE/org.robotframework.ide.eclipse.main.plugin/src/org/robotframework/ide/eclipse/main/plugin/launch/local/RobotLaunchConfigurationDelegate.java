@@ -38,7 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsLis
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsTracker;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusTracker;
 import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesTracker;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -98,7 +98,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 .serverStatusHandledBy(new ServerProblemsHandler())
                 .agentEventsListenedBy(additionalListeners)
                 .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
-                .agentEventsListenedBy(new ExecutionElementsTracker(testsLaunchContext))
+                .agentEventsListenedBy(new ExecutionStatusTracker(testsLaunchContext))
                 .agentEventsListenedBy(new AgentServerKeepAlive())
                 .start()
                 .waitForServer();

@@ -5,8 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,109 +15,74 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.ui.di.Focus;
-import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.ui.IEditorDescriptor;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
-import org.rf.ide.core.execution.ExecutionElement;
-import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
+import org.eclipse.ui.menus.IMenuService;
+import org.eclipse.ui.services.IEvaluationService;
 import org.rf.ide.core.execution.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator.TestCaseDetector;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionElementsStore.ExecutionElementsStoreListener;
-import org.robotframework.red.actions.CollapseAllAction;
-import org.robotframework.red.actions.ExpandAllAction;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore.ExecutionProgressListener;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore.ExecutionTreeElementListener;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.GoToFileHandler.E4GoToFileHandler;
+import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.swt.SimpleProgressBar;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 
 /**
  * @author mmarzec
  *
  */
-@SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class ExecutionView {
     
-    public static final String ID = "org.robotframework.ide.ExecutionView";
-
     @Inject
-    protected IEventBroker eventBroker;
-    
+    private IEvaluationService evaluationService;
+
+    public static final String ID = "org.robotframework.ide.ExecutionView";
+    private static final String MENU_ID = "org.robotframework.ide.ExecutionView.viewer";
+
     private final RobotTestExecutionService executionService;
+    private RobotTestsLaunch launch;
+    private RobotTestExecutionListener executionListener;
+    private final ExecutionTreeElementListener storeListener = this::refreshChangedNode;
+    private final ExecutionProgressListener progressListener = this::refreshProgress;
 
-    private Label passCounterLabel;
-
-    private Label failCounterLabel;
+    private CLabel testsCounterLabel;
+    private CLabel passCounterLabel;
+    private CLabel failCounterLabel;
     
-    private int passCounter = 0;
+    private SimpleProgressBar progressBar;
 
-    private int failCounter = 0;
-    
     private TreeViewer executionViewer;
     
-    private ExecutionViewContentProvider executionViewContentProvider;
-    
     private StyledText messageText;
-    
-    private ShowFailedOnlyAction showFailedAction;
-    
-    private RerunFailedOnlyAction rerunFailedOnlyAction;
 
-    private final List<ExecutionStatus> executionViewerInput = new ArrayList<>();
-
-    private final LinkedList<ExecutionStatus> suitesStack = new LinkedList<>();
-
-    private RobotTestExecutionListener executionListener;
-    
-    private final ExecutionElementsStoreListener storeListener =
-            (store, elem) -> SwtThread.syncExec(() -> executionEvent(elem));
+    private IActionBars actionBars;
 
     public ExecutionView() {
         this(RedPlugin.getTestExecutionService());
@@ -127,79 +93,112 @@ public class ExecutionView {
         this.executionService = executionService;
     }
 
+    public TreeViewer getViewer() {
+        return executionViewer;
+    }
+
+    public Optional<RobotTestsLaunch> getCurrentlyShownLaunch() {
+        return Optional.ofNullable(launch);
+    }
+
     @PostConstruct
-    public void postConstruct(final Composite parent, final IViewPart part) {
+    public void postConstruct(final Composite parent, final IViewPart part, final IMenuService menuService) {
         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
-        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(parent);
+        GridLayoutFactory.fillDefaults().applyTo(parent);
 
+        createProgressLabels(parent);
+        createProgressBar(parent);
+        createExecutionTreeViewer(parent);
+        createFailureMessageText(parent);
+
+        createContextMenu(menuService);
+        part.getViewSite().setSelectionProvider(executionViewer);
+        actionBars = part.getViewSite().getActionBars();
+
+        setInput();
+    }
+
+    private void createProgressLabels(final Composite parent) {
         final Composite labelsComposite = new Composite(parent, SWT.NONE);
-        GridLayoutFactory.fillDefaults().numColumns(4).applyTo(labelsComposite);
-        GridDataFactory.fillDefaults().grab(true, false).indent(2, 2).applyTo(labelsComposite);
+        GridLayoutFactory.fillDefaults().numColumns(3).applyTo(labelsComposite);
+        GridDataFactory.fillDefaults().grab(true, false).indent(2, 8).applyTo(labelsComposite);
 
-        final Label passImageLabel = new Label(labelsComposite, SWT.NONE);
-        passImageLabel.setImage(ImagesManager.getImage(RedImages.getSuccessImage()));
-        passCounterLabel = new Label(labelsComposite, SWT.NONE);
+        testsCounterLabel = new CLabel(labelsComposite, SWT.NONE);
+        GridDataFactory.fillDefaults().hint(70, 15).applyTo(testsCounterLabel);
+        testsCounterLabel.setText("Tests: 0/0");
+
+        passCounterLabel = new CLabel(labelsComposite, SWT.NONE);
         GridDataFactory.fillDefaults().hint(70, 15).applyTo(passCounterLabel);
+        passCounterLabel.setImage(ImagesManager.getImage(RedImages.getSuccessImage()));
         passCounterLabel.setText("Passed: 0");
 
-        final Label failImageLabel = new Label(labelsComposite, SWT.NONE);
-        failImageLabel.setImage(ImagesManager.getImage(RedImages.getErrorImage()));
-        failCounterLabel = new Label(labelsComposite, SWT.NONE);
+        failCounterLabel = new CLabel(labelsComposite, SWT.NONE);
         GridDataFactory.fillDefaults().hint(70, 15).applyTo(failCounterLabel);
+        failCounterLabel.setImage(ImagesManager.getImage(RedImages.getErrorImage()));
         failCounterLabel.setText("Failed: 0");
+    }
 
+    private void createProgressBar(final Composite parent) {
+        progressBar = new SimpleProgressBar(parent);
+        GridDataFactory.fillDefaults().grab(true, false).span(5, 1).hint(SWT.DEFAULT, 15).applyTo(progressBar);
+    }
+
+    private void createExecutionTreeViewer(final Composite parent) {
         executionViewer = new TreeViewer(parent);
         executionViewer.getTree().setHeaderVisible(false);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(executionViewer.getTree());
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(executionViewer.getTree());
-        executionViewContentProvider = new ExecutionViewContentProvider();
-        executionViewer.setContentProvider(executionViewContentProvider);
+        executionViewer.setContentProvider(new ExecutionViewContentProvider());
 
         executionViewer.addSelectionChangedListener(createSelectionChangedListener());
         executionViewer.addDoubleClickListener(createDoubleClickListener());
-        final Menu menu = createContextMenu();
-        executionViewer.getTree().addMouseListener(createMouseListener(menu));
-        
+
         ViewerColumnsFactory.newColumn("")
                 .withWidth(300)
                 .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new ExecutionViewLabelProvider())
                 .createFor(executionViewer);
+    }
 
-        setViewerInput();
-
+    private void createFailureMessageText(final Composite parent) {
         messageText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         messageText.setFont(JFaceResources.getTextFont());
         GridDataFactory.fillDefaults().grab(true, false).indent(3, 0).hint(0, 50).applyTo(messageText);
         GridLayoutFactory.fillDefaults().applyTo(messageText);
         messageText.setEditable(false);
         messageText.setAlwaysShowScrollBars(false);
-        
-        createToolbarActions(part.getViewSite().getActionBars().getToolBarManager());
+    }
 
-        setInput();
+    private void createContextMenu(final IMenuService menuService) {
+        final MenuManager mgr = new MenuManager();
+        menuService.populateContributionManager(mgr, "popup:" + MENU_ID);
+        executionViewer.getTree().setMenu(mgr.createContextMenu(executionViewer.getTree()));
     }
     
     private void setInput() {
         // synchronize on service, so that any thread which would like to start another launch
         // will have to wait
         synchronized (executionService) {
-            executionListener = new ExecutionListener(storeListener);
+            executionListener = new ExecutionListener();
             executionService.addExecutionListener(executionListener);
 
             final Optional<RobotTestsLaunch> lastLaunch = executionService.getLastLaunch();
             if (lastLaunch.isPresent()) {
-                final RobotTestsLaunch launch = lastLaunch.get();
+                launch = lastLaunch.get();
 
                 // this launch may be currently running, so we have to synchronize in order
                 // to get proper state of messages, as other threads may change it in the meantime
                 synchronized (launch) {
-                    final ExecutionElementsStore elementsStore = launch.getExecutionData(ExecutionElementsStore.class,
-                            ExecutionElementsStore::new);
-                    elementsStore.addStoreListener(storeListener);
+                    final ExecutionStatusStore elementsStore = launch.getExecutionData(ExecutionStatusStore.class,
+                            ExecutionStatusStore::new);
+                    elementsStore.addTreeListener(storeListener);
+                    elementsStore.addProgressListener(progressListener);
 
-                    final List<ExecutionElement> currentElements = elementsStore.getElements();
-                    SwtThread.syncExec(() -> executionEvents(currentElements));
+                    SwtThread.syncExec(() -> {
+                        executionViewer.setInput(newArrayList(elementsStore.getExecutionTree()));
+                        refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
+                                elementsStore.getFailedTests(), elementsStore.getTotalTests());
+                    });
                 }
             }
         }
@@ -210,63 +209,78 @@ public class ExecutionView {
         executionViewer.getControl().setFocus();
     }
 
+    public void clearView() {
+        executionViewer.setInput(null);
+        messageText.setText("");
+
+        final ExecutionViewContentProvider provider = (ExecutionViewContentProvider) executionViewer
+                .getContentProvider();
+        provider.resetFailedFilter();
+
+        testsCounterLabel.setText("Tests: 0/0");
+        passCounterLabel.setText("Passed: 0");
+        failCounterLabel.setText("Failed: 0");
+
+        progressBar.reset();
+
+        executionViewer.refresh();
+    }
+
     @PreDestroy
     public void dispose() {
         synchronized (executionService) {
             executionService.removeExecutionListener(executionListener);
-            executionService.forEachLaunch(launch -> launch.getExecutionData(ExecutionElementsStore.class)
-                    .ifPresent(store -> store.removeStoreListener(storeListener)));
+            executionService.forEachLaunch(launch -> launch.getExecutionData(ExecutionStatusStore.class)
+                    .ifPresent(store -> store.removeStoreListener(storeListener, progressListener)));
         }
     }
 
-    private void executionEvents(final List<ExecutionElement> executionElements) {
-        for (final ExecutionElement executionElement : executionElements) {
-            executionEvent(executionElement);
-        }
+    private void refreshChangedNode(final ExecutionStatusStore store, final ExecutionTreeNode node) {
+        SwtThread.asyncExec(() -> {
+            if (executionViewer.getInput() == null) {
+                executionViewer.setInput(newArrayList(store.getExecutionTree()));
+            }
+            executionViewer.refresh(node);
+
+            final List<ExecutionTreeNode> p = new ArrayList<>();
+            ExecutionTreeNode e = node;
+            while (e != null) {
+                p.add(0, e);
+                e = e.getParent();
+            }
+
+            final TreePath path = new TreePath(p.toArray());
+            final Status status = node.getStatus().orElse(null);
+            if (status == Status.RUNNING || status == Status.FAIL) {
+                executionViewer.expandToLevel(path, 0);
+            } else {
+                executionViewer.collapseToLevel(path, p.size());
+            }
+        });
     }
 
-    private void executionEvent(final ExecutionElement executionElement) {
-        if (isSuiteStartEvent(executionElement)) {
-            handleSuiteStartEvent(executionElement);
-        } else if (isTestStartEvent(executionElement)) {
-            handleTestStartEvent(executionElement);
-        } else if (isSuiteEndEvent(executionElement)) {
-            handleSuiteEndEvent(executionElement);
-        } else if (isTestEndEvent(executionElement)) {
-            handleTestEndEvent(executionElement);
-        } else if (isOutputFileEvent(executionElement)) {
-            handleOutputFileEvent(executionElement);
-        }
-        refreshView();
+    private void refreshProgress(final int currentTest, final int passedSoFar, final int failedSoFar,
+            final int totalTests) {
+        SwtThread.asyncExec(() -> {
+            testsCounterLabel.setText(String.format("Tests: %d/%d", currentTest, totalTests));
+            passCounterLabel.setText("Passed: " + passedSoFar);
+            failCounterLabel.setText("Failed: " + failedSoFar);
+
+            final Color progressBarColor = failedSoFar > 0 ? ColorsManager.getColor(180, 0, 0)
+                    : ColorsManager.getColor(0, 180, 0);
+            progressBar.setBarColor(progressBarColor);
+            progressBar.setProgress(passedSoFar + failedSoFar, totalTests);
+        });
     }
 
-    private void clearView() {
-        suitesStack.clear();
-        executionViewerInput.clear();
-        setViewerInput();
-        passCounter = 0;
-        failCounter = 0;
-        messageText.setText("");
-        executionViewContentProvider.setFailedFilterEnabled(false);
-        showFailedAction.setChecked(false);
-        rerunFailedOnlyAction.setOutputFilePath(null);
-        refreshView();
-    }
-
-    private void refreshView() {
-        passCounterLabel.setText("Passed: " + passCounter);
-        failCounterLabel.setText("Failed: " + failCounter);
-        executionViewer.refresh();
-    }
-    
     private ISelectionChangedListener createSelectionChangedListener() {
         return new ISelectionChangedListener() {
 
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
-                final String message = Selections
-                        .getOptionalFirstElement((IStructuredSelection) event.getSelection(), ExecutionStatus.class)
-                        .map(status -> Strings.nullToEmpty(status.getMessage()))
+                final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+                final String message = Selections.getOptionalFirstElement(selection, ExecutionTreeNode.class)
+                        .map(ExecutionTreeNode::getMessage)
                         .orElse("");
                 messageText.setText(message);
             }
@@ -275,218 +289,42 @@ public class ExecutionView {
 
     private IDoubleClickListener createDoubleClickListener() {
         return event -> Selections
-                .getOptionalFirstElement((IStructuredSelection) event.getSelection(), ExecutionStatus.class)
-                        .ifPresent(status -> openExecutionStatusSourceFile(status));
-    }
-    
-    private Menu createContextMenu() {
-        final Menu menu = new Menu(executionViewer.getTree());
-        final MenuItem gotoItem = new MenuItem(menu, SWT.PUSH);
-        gotoItem.setText("Go to File");
-        gotoItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
-        gotoItem.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                final IStructuredSelection selection = (IStructuredSelection) executionViewer.getSelection();
-                Selections.getOptionalFirstElement(selection, ExecutionStatus.class)
-                        .ifPresent(status -> openExecutionStatusSourceFile(status));
-            }
-        });
-        return menu;
-    }
-    
-    private MouseAdapter createMouseListener(final Menu menu) {
-        return new MouseAdapter() {
-
-            @Override
-            public void mouseDown(final MouseEvent e) {
-                if (e.button == 3 && executionViewer.getTree().getSelectionCount() == 1) {
-                    final TreeSelection selection = (TreeSelection) executionViewer.getSelection();
-                    if (selection != null
-                            && ((ExecutionStatus) selection.getFirstElement()).getType() == ExecutionElementType.TEST) {
-                        menu.setVisible(true);
-                    }
-                }
-            }
-        };
-    }
-    
-    private void openExecutionStatusSourceFile(final ExecutionStatus executionStatus) {
-        if (executionStatus == null || executionStatus.getSource() == null) {
-            return;
-        }
-        final IPath sourcePath = new Path(executionStatus.getSource());
-        final IFile sourceFile = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(sourcePath);
-        if (sourceFile == null || !sourceFile.exists()) {
-            return;
-        }
-        new TestCasesDefinitionLocator(sourceFile)
-                .locateTestCaseDefinition(createDetector(sourceFile, executionStatus.getName()));
-    }
-
-    private TestCaseDetector createDetector(final IFile sourceFile, final String caseName) {
-        return new TestCaseDetector() {
-
-            @Override
-            public ContinueDecision testCaseDetected(final RobotSuiteFile file, final RobotCase testCase) {
-                if (testCase.getName().equals(caseName)) {
-                    final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                    final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
-                    try {
-                        final IEditorPart editor = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow()
-                                .getActivePage()
-                                .openEditor(new FileEditorInput(sourceFile), desc.getId());
-                        if (editor instanceof RobotFormEditor) {
-                            final SuiteSourceEditor sourcePage = ((RobotFormEditor) editor).activateSourcePage();
-                            final DefinitionPosition position = testCase.getDefinitionPosition();
-                            sourcePage.getSelectionProvider()
-                                    .setSelection(new TextSelection(position.getOffset(), position.getLength()));
-
-                        }
-                    } catch (final PartInitException e) {
-                        throw new RobotEditorOpeningException("Unable to open editor for file: " + sourceFile.getName(),
-                                e);
-                    }
-
-                    return ContinueDecision.STOP;
-                } else {
-                    return ContinueDecision.CONTINUE;
-                }
-            }
-        };
-    }
-    
-    private void createToolbarActions(final IToolBarManager toolBarManager) {
-        toolBarManager.add(new ExpandAllAction(executionViewer));
-        toolBarManager.add(new CollapseAllAction(executionViewer));
-        showFailedAction = new ShowFailedOnlyAction(executionViewer, executionViewContentProvider);
-        toolBarManager.add(showFailedAction);
-        toolBarManager.add(new RerunAction());
-        rerunFailedOnlyAction = new RerunFailedOnlyAction();
-        toolBarManager.add(rerunFailedOnlyAction);
-    }
-    
-    private boolean isSuiteStartEvent(final ExecutionElement executionElement) {
-        return executionElement.getStatus() == null && executionElement.getType() == ExecutionElementType.SUITE;
-    }
-    
-    private boolean isTestStartEvent(final ExecutionElement executionElement) {
-        return executionElement.getStatus() == null && executionElement.getType() == ExecutionElementType.TEST;
-    }
-    
-    private boolean isSuiteEndEvent(final ExecutionElement executionElement) {
-        return executionElement.getStatus() != null && executionElement.getType() == ExecutionElementType.SUITE;
-    }
-    
-    private boolean isTestEndEvent(final ExecutionElement executionElement) {
-        return executionElement.getStatus() != null && executionElement.getType() == ExecutionElementType.TEST;
-    }
-    
-    private boolean isOutputFileEvent(final ExecutionElement executionElement) {
-        return executionElement.getType() == ExecutionElementType.OUTPUT_FILE;
-    }
-    
-    private void handleSuiteStartEvent(final ExecutionElement executionElement) {
-        final ExecutionStatus newSuiteExecutionStatus = new ExecutionStatus(executionElement.getName(), Status.RUNNING,
-                executionElement.getType(), new ArrayList<ExecutionStatus>());
-        if (suitesStack.isEmpty()) {
-            suitesStack.add(newSuiteExecutionStatus);
-            executionViewerInput.add(newSuiteExecutionStatus);
-            setViewerInput();
-        } else {
-            final ExecutionStatus lastSuite = suitesStack.getLast();
-            newSuiteExecutionStatus.setParent(lastSuite);
-            newSuiteExecutionStatus.setSource(executionElement.getSource().getAbsolutePath());
-            lastSuite.addChildren(newSuiteExecutionStatus);
-            suitesStack.addLast(newSuiteExecutionStatus);
-        }
-        executionViewer.expandToLevel(newSuiteExecutionStatus, 1);
-    }
-    
-    private void handleTestStartEvent(final ExecutionElement executionElement) {
-        final ExecutionStatus newTestExecutionStatus = new ExecutionStatus(executionElement.getName(), Status.RUNNING,
-                executionElement.getType(), new ArrayList<ExecutionStatus>());
-        if (!suitesStack.isEmpty()) {
-            final ExecutionStatus lastSuite = suitesStack.getLast();
-            newTestExecutionStatus.setParent(lastSuite);
-            newTestExecutionStatus.setSource(lastSuite.getSource());
-            lastSuite.addChildren(newTestExecutionStatus);
-            executionViewer.reveal(newTestExecutionStatus);
-        }
-    }
-    
-    private void handleSuiteEndEvent(final ExecutionElement executionElement) {
-        if (!suitesStack.isEmpty()) {
-            final ExecutionStatus lastSuite = suitesStack.getLast();
-            final int elapsedTime = executionElement.getElapsedTime();
-            lastSuite.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
-            final Status status = executionElement.getStatus();
-            lastSuite.setStatus(status);
-            if (suitesStack.size() > 1) {
-                suitesStack.removeLast();
-                if (status == Status.PASS) {
-                    executionViewer.collapseToLevel(lastSuite, AbstractTreeViewer.ALL_LEVELS);
-                }
-            }
-        }
-    }
-    
-    private void handleTestEndEvent(final ExecutionElement executionElement) {
-        if (!suitesStack.isEmpty()) {
-            final ExecutionStatus lastSuite = suitesStack.getLast();
-            final List<ExecutionStatus> lastSuiteChildren = lastSuite.getChildren();
-            final Status status = executionElement.getStatus();
-            final int elapsedTime = executionElement.getElapsedTime();
-            for (final ExecutionStatus executionStatus : lastSuiteChildren) {
-                if (executionStatus.getName().equals(executionElement.getName()) && executionStatus.getStatus() == Status.RUNNING) {
-                    executionStatus.setStatus(status);
-                    final String message = executionElement.getMessage();
-                    if (message != null && !message.equals("")) {
-                        executionStatus.setMessage(message);
-                    }
-                    executionStatus.setElapsedTime(String.valueOf(((double) elapsedTime) / 1000));
-                    executionViewer.reveal(executionStatus);
-                    break;
-                }
-            }
-
-            if (status == Status.PASS) {
-                passCounter++;
-            } else {
-                failCounter++;
-            }
-        }
-    }
-    
-    private void handleOutputFileEvent(final ExecutionElement executionElement) {
-        rerunFailedOnlyAction.setOutputFilePath(executionElement.getName());
-    }
-    
-    private void setViewerInput() {
-        executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
+                .getOptionalFirstElement((IStructuredSelection) event.getSelection(), ExecutionTreeNode.class)
+                .ifPresent(node -> E4GoToFileHandler.openExecutionNodeSourceFile(node));
     }
 
     private class ExecutionListener implements RobotTestExecutionListener {
 
-        private final ExecutionElementsStoreListener storeListener;
-
-        ExecutionListener(final ExecutionElementsStoreListener storeListener) {
-            this.storeListener = storeListener;
-        }
-
         @Override
         public void executionStarting(final RobotTestsLaunch launch) {
-            SwtThread.syncExec(() -> clearView());
+            ExecutionView.this.launch = launch;
 
-            launch.getExecutionData(ExecutionElementsStore.class, ExecutionElementsStore::new)
-                    .addStoreListener(storeListener);
+            evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
+            SwtThread.syncExec(() -> {
+                actionBars.updateActionBars();
+                clearView();
+            });
+
+            synchronized (ExecutionView.this.launch) {
+                final ExecutionStatusStore elementsStore = launch.getExecutionData(ExecutionStatusStore.class,
+                        ExecutionStatusStore::new);
+                elementsStore.addTreeListener(storeListener);
+                elementsStore.addProgressListener(progressListener);
+
+                SwtThread.syncExec(() -> {
+                    refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
+                            elementsStore.getFailedTests(), elementsStore.getTotalTests());
+                });
+            }
         }
 
         @Override
         public void executionEnded(final RobotTestsLaunch launch) {
             // nothing to do
+            evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
+            SwtThread.syncExec(() -> {
+                actionBars.updateActionBars();
+            });
         }
     }
 }

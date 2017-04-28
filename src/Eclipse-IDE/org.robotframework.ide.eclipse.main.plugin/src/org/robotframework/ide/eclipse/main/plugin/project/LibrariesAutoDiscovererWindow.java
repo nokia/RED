@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
+import static java.util.stream.Collectors.toList;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -301,12 +304,17 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             children.add(
                     new DryRunLibraryImportChildElement(STATUS_ELEMENT_NAME, libraryImport.getStatus().getMessage()));
         }
-        if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
-            children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, libraryImport.getSourcePath(), true));
+        if (libraryImport.getSourcePath() != null) {
+            children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME,
+                    new File(libraryImport.getSourcePath()).getAbsolutePath(), true));
         } else {
             children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, "Unknown"));
         }
-        final List<String> importersPaths = libraryImport.getImportersPaths();
+        final List<String> importersPaths = libraryImport.getImportersPaths()
+                .stream()
+                .map(File::new)
+                .map(File::getAbsolutePath)
+                .collect(toList());
         if (importersPaths.size() == 1) {
             children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, importersPaths.get(0), true));
         } else {

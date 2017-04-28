@@ -1326,14 +1326,6 @@
     </command>
  </extension>
  <extension
-       point="org.eclipse.ui.commands">
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.view.message.wrap"
-          name="Word Wrap">
-    </command>
- </extension>
- <extension
        point="org.eclipse.ui.handlers">
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ConfigureRobotNatureHandler"
@@ -3045,14 +3037,6 @@
             </activeWhen>
          </handler>
       </extension>
-      <extension
-            name="Message View handlers"
-            point="org.eclipse.ui.handlers">
-         <handler
-               class="org.robotframework.ide.eclipse.main.plugin.views.message.ToggleWordsWrappingHandler"
-               commandId="org.robotframework.red.view.message.wrap">
-         </handler>
-      </extension>
  <extension
        point="org.eclipse.ui.bindings">
     <key
@@ -4553,6 +4537,20 @@
           properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
+    <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewNodesPropertyTester"
+          id="org.robotframework.red.view.executionNodes"
+          namespace="org.robotframework.red.view.execution.node"
+          properties="kind"
+          type="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode">
+    </propertyTester>
+    <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester"
+          id="org.robotframework.red.view.executionProgress"
+          namespace="org.robotframework.red.view.execution"
+          properties="currentLaunchIsTerminated"
+          type="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
+    </propertyTester>
  </extension>
  <extension
        point="org.eclipse.core.expressions.definitions">
@@ -5850,15 +5848,212 @@
             </command>
          </menuContribution>
       </extension>
+ <extension
+       name="Message View commands"
+       point="org.eclipse.ui.commands">
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.view.message.wrap"
+          name="Word Wrap">
+    </command>
+ </extension>
       <extension
+            name="Message View handlers"
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.message.ToggleWordsWrappingHandler"
+               commandId="org.robotframework.red.view.message.wrap">
+         </handler>
+      </extension>
+      <extension
+            name="Message View menus"
             point="org.eclipse.ui.menus">
          <menuContribution
                allPopups="false"
-               locationURI="toolbar:org.robotframework.ide.MessageLogView?after=additions">
+               locationURI="toolbar:org.robotframework.ide.MessageLogView">
             <command
                   commandId="org.robotframework.red.view.message.wrap"
                   icon="resources/wordwrap.png"
                   style="toggle">
+            </command>
+         </menuContribution>
+      </extension>
+      <extension
+            name="Execution View commands"
+            point="org.eclipse.ui.commands">
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.execution.goToFile"
+               name="Go to File">
+         </command>
+         <command
+               id="org.robotframework.red.view.execution.showFailedOnly"
+               name="Show Failures Only">
+         </command>
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.execution.rerunTests"
+               name="Rerun Tests">
+         </command>
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.execution.rerunFailedTests"
+               name="Rerun Failed Tests">
+         </command>
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.execution.clearExecutionData"
+               name="Clear">
+         </command>
+      </extension>
+      <extension
+            name="Execution View handlers"
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.GoToFileHandler"
+               commandId="org.robotframework.red.view.execution.goToFile">
+            <enabledWhen>
+               <with
+                     variable="selection">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <test
+                              property="org.robotframework.red.view.execution.node.kind"
+                              value="test">
+                        </test>
+                     </iterate>
+                  </and>
+               </with>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExpandAllHandler"
+               commandId="org.robotframework.ide.eclipse.expandAll">
+            <activeWhen>
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="org.robotframework.ide.ExecutionView">
+                  </equals>
+               </with>
+            </activeWhen>
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.CollapseAllHandler"
+               commandId="org.robotframework.ide.eclipse.collapseAll">
+            <activeWhen>
+               <with
+                     variable="activePartId">
+                  <equals
+                        value="org.robotframework.ide.ExecutionView">
+                  </equals>
+               </with>
+            </activeWhen>
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ShowFailedOnlyHandler"
+               commandId="org.robotframework.red.view.execution.showFailedOnly">
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunHandler"
+               commandId="org.robotframework.red.view.execution.rerunTests">
+            <enabledWhen>
+               <with
+                     variable="activePart">
+                  <test
+                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
+                        value="true">
+                  </test>
+               </with>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.RerunFailedHandler"
+               commandId="org.robotframework.red.view.execution.rerunFailedTests">
+            <enabledWhen>
+               <with
+                     variable="activePart">
+                  <test
+                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
+                        value="true">
+                  </test>
+               </with>
+            </enabledWhen>
+         </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ClearExecutionHandler"
+               commandId="org.robotframework.red.view.execution.clearExecutionData">
+            <enabledWhen>
+               <with
+                     variable="activePart">
+                  <test
+                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
+                        value="true">
+                  </test>
+               </with>
+            </enabledWhen>
+         </handler>
+      </extension>
+      <extension
+            name="Execution View menus"
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="popup:org.robotframework.ide.ExecutionView.viewer">
+            <command
+                  commandId="org.robotframework.red.view.execution.goToFile"
+                  icon="resources/goto.png"
+                  label="Go to File"
+                  style="push">
+            </command>
+         </menuContribution>
+         <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.robotframework.ide.ExecutionView">
+            <command
+                  commandId="org.robotframework.ide.eclipse.expandAll"
+                  icon="resources/expandall.png"
+                  label="Expand All"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.robotframework.ide.eclipse.collapseAll"
+                  icon="resources/collapseall.png"
+                  label="Collapse All"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.robotframework.red.view.execution.showFailedOnly"
+                  icon="resources/failures.png"
+                  label="Show Failures Only"
+                  style="toggle">
+            </command>
+            <separator
+                  name="execution"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.robotframework.red.view.execution.clearExecutionData"
+                  icon="resources/close.png"
+                  label="Clear"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.robotframework.red.view.execution.rerunTests"
+                  icon="resources/relaunch.png"
+                  label="Rerun Tests"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.robotframework.red.view.execution.rerunFailedTests"
+                  icon="resources/relaunchf.png"
+                  label="Rerun Failed Tests Only"
+                  style="push">
             </command>
          </menuContribution>
       </extension>

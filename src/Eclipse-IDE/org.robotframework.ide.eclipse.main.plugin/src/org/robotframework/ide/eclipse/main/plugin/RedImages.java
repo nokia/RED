@@ -256,6 +256,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/goto.png");
     }
 
+    public static ImageDescriptor getTestImage() {
+        return RedPlugin.getImageDescriptor("resources/test.png");
+    }
+
     public static ImageDescriptor getTestPassImage() {
         return RedPlugin.getImageDescriptor("resources/testok.png");
     }
@@ -266,6 +270,10 @@ public class RedImages {
 
     public static ImageDescriptor getTestInProgressImage() {
         return RedPlugin.getImageDescriptor("resources/testrun.png");
+    }
+
+    public static ImageDescriptor getSuiteImage() {
+        return RedPlugin.getImageDescriptor("resources/tsuite.png");
     }
 
     public static ImageDescriptor getSuitePassImage() {
