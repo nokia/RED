@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.swt.widgets.Display;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
@@ -37,15 +38,19 @@ public class MessageLogViewTest {
         launch1.getExecutionData(ExecutionMessagesStore.class, () -> store1);
         store1.append("message1\n");
         store1.append("message2\n");
+        executionService.testExecutionEnded(launch1);
 
         final RobotTestsLaunch launch2 = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store2 = new ExecutionMessagesStore();
         launch2.getExecutionData(ExecutionMessagesStore.class, () -> store2);
         store2.append("message3\n");
         store2.append("message4\n");
+        executionService.testExecutionEnded(launch2);
 
         final MessageLogView view = new MessageLogView(executionService);
         view.postConstruct(shellProvider.getShell());
+
+        execAllAwaitingMessages();
 
         assertThat(view.getTextControl().getText()).isEqualTo("message3\nmessage4\n");
     }
@@ -63,10 +68,12 @@ public class MessageLogViewTest {
         final MessageLogView view = new MessageLogView(executionService);
         view.postConstruct(shellProvider.getShell());
 
+        execAllAwaitingMessages();
         assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
 
         executionService.testExecutionStarting(null);
 
+        execAllAwaitingMessages();
         assertThat(view.getTextControl().getText()).isEmpty();
     }
 
@@ -81,6 +88,8 @@ public class MessageLogViewTest {
         final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class).get();
         store.append("message1\n");
         store.append("message2\n");
+
+        execAllAwaitingMessages();
 
         assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
 
@@ -119,5 +128,11 @@ public class MessageLogViewTest {
         view.toggleWordsWrapping();
 
         assertThat(view.getTextControl().getWordWrap()).isFalse();
+    }
+
+    private void execAllAwaitingMessages() {
+        while (Display.getDefault().readAndDispatch()) {
+            // nothing to do
+        }
     }
 }
