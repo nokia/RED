@@ -4548,7 +4548,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester"
           id="org.robotframework.red.view.executionProgress"
           namespace="org.robotframework.red.view.execution"
-          properties="currentLaunchIsTerminated"
+          properties="currentLaunchIsTerminated,currentLaunchExecStoreIsDisposed"
           type="org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper">
     </propertyTester>
  </extension>
@@ -5965,10 +5965,16 @@
             <enabledWhen>
                <with
                      variable="activePart">
-                  <test
-                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
-                        value="true">
-                  </test>
+                  <and>
+                     <test
+                           property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
+                           value="true">
+                     </test>
+                     <test
+                           property="org.robotframework.red.view.execution.currentLaunchExecStoreIsDisposed"
+                           value="false">
+                     </test>
+                  </and>
                </with>
             </enabledWhen>
          </handler>
@@ -5978,10 +5984,16 @@
             <enabledWhen>
                <with
                      variable="activePart">
-                  <test
-                        property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
-                        value="true">
-                  </test>
+                  <and>
+                     <test
+                           property="org.robotframework.red.view.execution.currentLaunchIsTerminated"
+                           value="true">
+                     </test>
+                     <test
+                           property="org.robotframework.red.view.execution.currentLaunchExecStoreIsDisposed"
+                           value="false">
+                     </test>
+                  </and>
                </with>
             </enabledWhen>
          </handler>

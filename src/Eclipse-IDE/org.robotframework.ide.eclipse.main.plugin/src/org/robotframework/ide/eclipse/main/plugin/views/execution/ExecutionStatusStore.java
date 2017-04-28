@@ -20,8 +20,9 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class ExecutionStatusStore implements IDisposable {
 
-    private ExecutionTreeNode root;
+    private boolean isDisposed;
 
+    private ExecutionTreeNode root;
     private ExecutionTreeNode current;
 
     private int currentTest;
@@ -78,9 +79,21 @@ public class ExecutionStatusStore implements IDisposable {
 
     @Override
     public void dispose() {
+        outputFile = null;
+        currentTest = 0;
+        totalTests = 0;
+        passedTests = 0;
+        failedTests = 0;
+
         root = null;
         current = null;
+
         storeListeners.clear();
+        isDisposed = true;
+    }
+
+    public boolean isDisposed() {
+        return isDisposed;
     }
 
     protected void suiteStarted(final String suiteName, final URI suiteFilePath, final int totalTests,
