@@ -202,10 +202,42 @@ public class ExecutionView {
                         executionViewer.setInput(root == null ? null : newArrayList(root));
                         refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
                                 elementsStore.getFailedTests(), elementsStore.getTotalTests());
+
+                        if (root != null) {
+                            expandAllFailedOrRunning(root);
+                        }
                     });
                 }
             }
         }
+    }
+
+    private void expandAllFailedOrRunning(final ExecutionTreeNode root) {
+        final List<TreePath> elementsToExpand = new ArrayList<>();
+        collectElementsToExpand(elementsToExpand, root);
+
+        executionViewer.setExpandedTreePaths(elementsToExpand.toArray(new TreePath[0]));
+    }
+
+    private void collectElementsToExpand(final List<TreePath> elementsToExpand, final ExecutionTreeNode node) {
+        final Status status = node.getStatus().orElse(null);
+        if (status == Status.FAIL || status == Status.RUNNING) {
+            elementsToExpand.add(new TreePath(getPath(node).toArray()));
+            for (final ExecutionTreeNode child : node.getChildren()) {
+                collectElementsToExpand(elementsToExpand, child);
+            }
+        }
+        
+    }
+
+    private List<ExecutionTreeNode> getPath(final ExecutionTreeNode node) {
+        final List<ExecutionTreeNode> path = new ArrayList<>();
+        ExecutionTreeNode current = node;
+        while (current != null) {
+            path.add(0, current);
+            current = current.getParent();
+        }
+        return path;
     }
 
     @Focus
