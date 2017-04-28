@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import org.eclipse.core.runtime.IPath;
+import java.io.File;
+import java.net.URI;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -33,30 +35,30 @@ public class JarStructureBuilderTest {
 
     private RobotProjectConfig config;
 
-    private IPath moduleLocation;
+    private URI moduleLocation;
 
     @Before
     public void before() throws Exception {
         config = new RobotProjectConfig();
-        moduleLocation = projectProvider.createFile("module.jar").getFullPath();
+        moduleLocation = projectProvider.createFile("module.jar").getLocationURI();
     }
 
     @Test
     public void testGettingPythonClassesFromJarByPath() throws Exception {
         final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
 
-        builder.provideEntriesFromFile(moduleLocation.toOSString());
+        builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(moduleLocation.toFile(), null, new EnvironmentSearchPaths());
+        verify(environment).getClassesFromModule(new File(moduleLocation), null, new EnvironmentSearchPaths());
     }
 
     @Test
     public void testGettingPythonClassesFromJarByFile() throws Exception {
         final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
 
-        builder.provideEntriesFromFile(moduleLocation.toFile());
+        builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(moduleLocation.toFile(), null, new EnvironmentSearchPaths());
+        verify(environment).getClassesFromModule(new File(moduleLocation), null, new EnvironmentSearchPaths());
     }
 
     @Test
@@ -77,9 +79,9 @@ public class JarStructureBuilderTest {
 
         final JarStructureBuilder builder = new JarStructureBuilder(environment, config, projectProvider.getProject());
 
-        builder.provideEntriesFromFile(moduleLocation.toOSString());
+        builder.provideEntriesFromFile(moduleLocation);
 
-        verify(environment).getClassesFromModule(moduleLocation.toFile(), null,
+        verify(environment).getClassesFromModule(new File(moduleLocation), null,
                 new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(projectProvider.getProject()));
     }
 
