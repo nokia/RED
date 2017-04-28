@@ -42,7 +42,7 @@ public class ResourceMoveParticipant extends MoveParticipant {
     }
 
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
+    public Change createPreChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
         if (!getArguments().getUpdateReferences()) {
             return null;
         }
@@ -53,4 +53,8 @@ public class ResourceMoveParticipant extends MoveParticipant {
         return change.isPresent() && !(change.get() instanceof NullChange) ? change.get() : null;
     }
 
+    @Override
+    public Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
+        return null;
+    }
 }

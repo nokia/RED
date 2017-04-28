@@ -6,11 +6,9 @@
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,9 +19,6 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 
@@ -45,7 +40,7 @@ class LibraryPathModifyChange extends Change {
 
     LibraryPathModifyChange(final IFile redXmlFile, final ReferencedLibrary lib, final IPath newPath) {
         this(redXmlFile, lib, newPath,
-                (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+                PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
@@ -77,14 +72,12 @@ class LibraryPathModifyChange extends Change {
         final IPath oldPath = Path.fromPortableString(libraryPath.getPath());
         libraryPath.setPath(newPath.toPortableString());
 
-
         final List<ReferencedLibrary> changedPaths = new ArrayList<>();
         changedPaths.add(libraryPath);
         final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
                 redXmlFile, changedPaths);
-        final RobotProject robotProject = RedPlugin.getModelManager().createProject(redXmlFile.getProject());
+
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-        new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(), eventBroker).start();
 
         return new LibraryPathModifyChange(redXmlFile, libraryPath, oldPath);
     }
