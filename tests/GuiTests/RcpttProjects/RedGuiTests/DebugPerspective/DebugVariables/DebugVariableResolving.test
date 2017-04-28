@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Qz9jYLX5EeWiPpdsqt1XOg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 5:33 PM
+Save-Time: 4/28/17 11:35 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -27,21 +27,19 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
 +"    Log  ${x1}\n"
 
 
-	with [get-editor "TestFile.robot"] {
-	    with [get-left-ruler] {
-	        get-ruler-column LineNumberColumn | click-ruler -line 7 -button Right
-	        get-menu "Toggle Breakpoint" | click
-	    }
-	}
+with [get-editor "TestFile.robot"] {
+    with [get-left-ruler] {
+        get-ruler-column LineNumberColumn | click-ruler -line 7 -button Right
+        get-menu "Toggle Breakpoint" | click
+    }
+    with [get-text-viewer] {
+	    key-type "M1+s"
+	}	    
+}
 	
-	exec-with-options -disableJobWaiting -command {
-	with [get-editor "TestFile.robot"] {
-	    with [get-text-viewer] {
-	        key-type "M1+s"
-	        key-type F11
-	    }
-	}
-
+exec-with-options -disableJobWaiting -command {
+	get-editor "TestFile.robot" | get-text-viewer | key-type F11
+	 
 	wait 3000
 	try -times 5 -delay 1000 -command{
 		get-view Variables | get-tree | get-property itemCount -raw| not-eq 0 | verify-true
