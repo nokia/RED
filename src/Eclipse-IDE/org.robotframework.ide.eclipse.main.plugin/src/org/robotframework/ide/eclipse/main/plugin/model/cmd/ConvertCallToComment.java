@@ -36,6 +36,7 @@ public class ConvertCallToComment extends EditorCommand {
         this.oldName = keywordCall.getName();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
         if (oldName.equals(newName)) {
@@ -68,12 +69,16 @@ public class ConvertCallToComment extends EditorCommand {
                     final RobotExecutableRow<TestCase> tempLinked = new RobotExecutableRow<>();
                     tempLinked.getAction().setType(RobotTokenType.TEST_CASE_ACTION_NAME);
                     tempLinked.setParent((TestCase) parentObject);
+                    tempLinked.getParent()
+                            .removeExecutableRow((RobotExecutableRow<TestCase>) keywordCall.getLinkedElement());
                     tempLinked.getParent().addTestExecutionRow(tempLinked);
                     newLinked = tempLinked;
                 } else if (parentObject instanceof UserKeyword) {
                     final RobotExecutableRow<UserKeyword> tempLinked = new RobotExecutableRow<>();
                     tempLinked.getAction().setType(RobotTokenType.KEYWORD_ACTION_NAME);
                     tempLinked.setParent((UserKeyword) parentObject);
+                    tempLinked.getParent()
+                            .removeExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
                     tempLinked.getParent().addKeywordExecutionRow(tempLinked);
                     newLinked = tempLinked;
                 }
