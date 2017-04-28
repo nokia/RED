@@ -315,8 +315,8 @@ public class ExecutionView {
         public void executionStarting(final RobotTestsLaunch launch) {
             ExecutionView.this.launch = launch;
 
-            evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
             SwtThread.syncExec(() -> {
+                evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
                 clearView();
             });
@@ -327,7 +327,7 @@ public class ExecutionView {
                 elementsStore.addTreeListener(storeListener);
                 elementsStore.addProgressListener(progressListener);
 
-                SwtThread.syncExec(() -> {
+                SwtThread.asyncExec(() -> {
                     refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
                             elementsStore.getFailedTests(), elementsStore.getTotalTests());
                 });
@@ -337,8 +337,8 @@ public class ExecutionView {
         @Override
         public void executionEnded(final RobotTestsLaunch launch) {
             // nothing to do
-            evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
             SwtThread.syncExec(() -> {
+                evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
             });
         }
