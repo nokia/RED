@@ -23,6 +23,9 @@ public class ExecutionViewPropertyTester extends PropertyTester {
     
     @VisibleForTesting static final String CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED = "currentLaunchExecStoreIsDisposed";
     public static final String PROPERTY_CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED = NAMESPACE + "." + CURRENT_LAUNCH_EXEC_STORE_IS_DISPOSED;
+    
+    @VisibleForTesting static final String CURRENT_LAUNCH_HAS_FAILED_TEST = "currentLaunchHasFailedTest";
+    public static final String PROPERTY_CURRENT_LAUNCH_HAS_FAILED_TEST = NAMESPACE + "." + CURRENT_LAUNCH_HAS_FAILED_TEST;
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -51,6 +54,12 @@ public class ExecutionViewPropertyTester extends PropertyTester {
                     .map(ExecutionStatusStore::isDisposed)
                     .orElse(false);
             return isDisposed == expectedValue;
+        } else if (CURRENT_LAUNCH_HAS_FAILED_TEST.equals(property)) {
+            final int numberOfFailedTests = view.getCurrentlyShownLaunch()
+                    .flatMap(launch -> launch.getExecutionData(ExecutionStatusStore.class))
+                    .map(ExecutionStatusStore::getFailedTests)
+                    .orElse(0);
+            return numberOfFailedTests > 0 == expectedValue;
         }
         return false;
     }
