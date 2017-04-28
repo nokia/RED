@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ui.services.IDisposable;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
@@ -31,8 +32,10 @@ public class RobotTestExecutionServiceTest {
     public void thereIsLastLaunch_whenSingleTestsWerePerformed() {
         final RobotTestExecutionService service = new RobotTestExecutionService();
 
-        final RobotTestsLaunch launch = service.testExecutionStarting();
+        final ILaunchConfiguration config = mock(ILaunchConfiguration.class);
+        final RobotTestsLaunch launch = service.testExecutionStarting(config);
 
+        assertThat(launch.getLaunchConfiguration()).isSameAs(config);
         assertThat(service.getLastLaunch().get()).isSameAs(launch);
     }
 
@@ -41,9 +44,9 @@ public class RobotTestExecutionServiceTest {
         final RobotTestExecutionService service = new RobotTestExecutionService();
 
         for (int i = 0; i < 20; i++) {
-            service.testExecutionStarting();
+            service.testExecutionStarting(null);
         }
-        final RobotTestsLaunch launch = service.testExecutionStarting();
+        final RobotTestsLaunch launch = service.testExecutionStarting(null);
 
         assertThat(service.getLastLaunch().get()).isSameAs(launch);
     }
@@ -52,12 +55,12 @@ public class RobotTestExecutionServiceTest {
     public void olderLaunchesAreRemovedAndDisposed_whenExecutionHistoryExceedsLimit() {
         final RobotTestExecutionService service = new RobotTestExecutionService();
 
-        final RobotTestsLaunch oldestLaunch = service.testExecutionStarting();
+        final RobotTestsLaunch oldestLaunch = service.testExecutionStarting(null);
         oldestLaunch.getExecutionData(ExecutionData.class, ExecutionData::new);
         service.testExecutionEnded(oldestLaunch);
 
         for (int i = 0; i < RobotTestExecutionService.LAUNCHES_HISTORY_LIMIT; i++) {
-            final RobotTestsLaunch launch = service.testExecutionStarting();
+            final RobotTestsLaunch launch = service.testExecutionStarting(null);
             service.testExecutionEnded(launch);
         }
         
@@ -76,10 +79,10 @@ public class RobotTestExecutionServiceTest {
         final RobotTestExecutionService service = new RobotTestExecutionService();
         service.addExecutionListener(listener);
 
-        final RobotTestsLaunch launch1 = service.testExecutionStarting();
-        final RobotTestsLaunch launch2 = service.testExecutionStarting();
+        final RobotTestsLaunch launch1 = service.testExecutionStarting(null);
+        final RobotTestsLaunch launch2 = service.testExecutionStarting(null);
         service.removeExecutionListener(listener);
-        service.testExecutionStarting();
+        service.testExecutionStarting(null);
 
         verify(listener).executionStarting(launch1);
         verify(listener).executionStarting(launch2);

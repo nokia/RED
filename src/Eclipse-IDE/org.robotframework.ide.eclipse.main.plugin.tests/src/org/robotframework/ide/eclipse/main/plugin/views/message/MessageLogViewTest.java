@@ -32,13 +32,13 @@ public class MessageLogViewTest {
     public void messageLogViewHasMessagesFromLastLaunchAfterConstruction_whenThereWereLaunches() {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
-        final RobotTestsLaunch launch1 = executionService.testExecutionStarting();
+        final RobotTestsLaunch launch1 = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store1 = new ExecutionMessagesStore();
         launch1.getExecutionData(ExecutionMessagesStore.class, () -> store1);
         store1.append("message1\n");
         store1.append("message2\n");
 
-        final RobotTestsLaunch launch2 = executionService.testExecutionStarting();
+        final RobotTestsLaunch launch2 = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store2 = new ExecutionMessagesStore();
         launch2.getExecutionData(ExecutionMessagesStore.class, () -> store2);
         store2.append("message3\n");
@@ -54,7 +54,7 @@ public class MessageLogViewTest {
     public void messageLogViewIsCleared_whenItIsOpenedAndNewLaunchIsStarting() {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
-        final RobotTestsLaunch launch = executionService.testExecutionStarting();
+        final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
         launch.getExecutionData(ExecutionMessagesStore.class, () -> store);
         store.append("message1\n");
@@ -65,7 +65,7 @@ public class MessageLogViewTest {
 
         assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
 
-        executionService.testExecutionStarting();
+        executionService.testExecutionStarting(null);
 
         assertThat(view.getTextControl().getText()).isEmpty();
     }
@@ -77,7 +77,7 @@ public class MessageLogViewTest {
         final MessageLogView view = new MessageLogView(executionService);
         view.postConstruct(shellProvider.getShell());
 
-        final RobotTestsLaunch launch = executionService.testExecutionStarting();
+        final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class).get();
         store.append("message1\n");
         store.append("message2\n");
