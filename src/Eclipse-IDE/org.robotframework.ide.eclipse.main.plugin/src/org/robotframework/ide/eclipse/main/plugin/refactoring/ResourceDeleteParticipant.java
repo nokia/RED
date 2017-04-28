@@ -41,11 +41,15 @@ public class ResourceDeleteParticipant extends DeleteParticipant {
     }
 
     @Override
-    public Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
+    public Change createPreChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
         final Optional<IPath> newPath = Optional.empty();
 
         final Optional<Change> change = new RedXmlChangesCollector().collect(deletedResource, newPath);
         return change.isPresent() && !(change.get() instanceof NullChange) ? change.get() : null;
     }
 
+    @Override
+    public Change createChange(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
+        return null;
+    }
 }
