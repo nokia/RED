@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/10/17 2:31 PM
+Save-Time: 4/28/17 10:59 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -18,6 +18,12 @@ proc "wait-for-thread" [val file]{
 	}
 }
 
+proc "wait-for-thread-in-remote" [val child_count 1]{
+	get-view Debug | get-tree 
+	    | get-item "RemoteProject \\[Robot Remote\\]/Remote Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
+	    	| get-property childCount | equals $child_count | verify-true
+}    
+    
 proc "wait-for-remote-connection"{
 	try -times 8 -delay 1000 -command{
 		with [get-view Debug | get-tree] {
