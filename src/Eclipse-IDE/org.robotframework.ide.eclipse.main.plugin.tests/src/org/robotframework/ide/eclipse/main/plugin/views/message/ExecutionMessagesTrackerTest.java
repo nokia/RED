@@ -16,7 +16,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void messageStoreIsAdded_whenAgentIsInitializedAndStoreDoesNotExist() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
 
         assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).isPresent()).isFalse();
@@ -27,7 +27,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void messageStoreIsNotAdded_whenAgentIsInitializedButStoreAlreadyExist() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
         launchContext.getExecutionData(ExecutionMessagesStore.class, () -> store);
 
@@ -41,7 +41,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void testStartMessageIsStored_whenThereIsAStoreDefined() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);
 
@@ -53,7 +53,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void testStartMessageIsNotStored_whenThereIsNoStoreDefined() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.handleTestStarted("tc", "test_case");
@@ -65,7 +65,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void testEndMessageIsStored_whenThereIsAStoreDefined() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);
 
@@ -77,7 +77,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void testEndMessageIsNotStored_whenThereIsNoStoreDefined() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.handleTestEnded("tc", "test_case", 100, Status.PASS, "");
@@ -89,7 +89,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void logMessageIsStored_whenThereIsAStoreDefined() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);
 
@@ -101,7 +101,7 @@ public class ExecutionMessagesTrackerTest {
 
     @Test
     public void logMessageIsNotStored_whenThereIsNoStoreDefined() {
-        final RobotTestsLaunch launchContext = new RobotTestsLaunch();
+        final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
         tracker.handleLogMessage("msg", LogLevel.INFO, "stamp");
