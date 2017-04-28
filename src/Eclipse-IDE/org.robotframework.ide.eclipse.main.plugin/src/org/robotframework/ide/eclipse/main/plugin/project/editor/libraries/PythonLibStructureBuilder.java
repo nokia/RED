@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -39,16 +40,16 @@ public class PythonLibStructureBuilder {
         this.additionalSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(project);
     }
 
-    public Collection<ILibraryClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
+    public Collection<ILibraryClass> provideEntriesFromFile(final URI path) throws RobotEnvironmentException {
         return provideEntriesFromFile(path, null, false);
     }
 
-    public Collection<ILibraryClass> provideEntriesFromFile(final String path, final String moduleName)
+    public Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName)
             throws RobotEnvironmentException {
         return provideEntriesFromFile(path, moduleName, true);
     }
 
-    private Collection<ILibraryClass> provideEntriesFromFile(final String path, final String moduleName,
+    private Collection<ILibraryClass> provideEntriesFromFile(final URI path, final String moduleName,
             final boolean allowDuplicationOfFileAndClassName) {
         final List<String> classes = environment.getClassesFromModule(new File(path), moduleName,
                 additionalSearchPaths);

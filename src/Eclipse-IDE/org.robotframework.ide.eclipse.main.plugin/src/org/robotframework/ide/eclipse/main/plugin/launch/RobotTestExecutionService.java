@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.ui.services.IDisposable;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -54,8 +55,8 @@ public class RobotTestExecutionService {
         return launches.stream().findFirst();
     }
 
-    public synchronized RobotTestsLaunch testExecutionStarting() {
-        final RobotTestsLaunch newLaunch = new RobotTestsLaunch();
+    public synchronized RobotTestsLaunch testExecutionStarting(final ILaunchConfiguration configuration) {
+        final RobotTestsLaunch newLaunch = new RobotTestsLaunch(configuration);
         launches.addFirst(newLaunch);
 
         if (launches.size() > LAUNCHES_HISTORY_LIMIT) {
@@ -88,6 +89,16 @@ public class RobotTestExecutionService {
         private final Map<Class<?>, Object> executionData = new HashMap<>();
 
         private boolean isTerminated;
+
+        private final ILaunchConfiguration configuration;
+
+        public RobotTestsLaunch(final ILaunchConfiguration configuration) {
+            this.configuration = configuration;
+        }
+
+        public ILaunchConfiguration getLaunchConfiguration() {
+            return configuration;
+        }
 
         public synchronized <T extends IDisposable> T getExecutionData(final Class<? extends T> clazz,
                 final Supplier<T> supplyWhenAbsent) {

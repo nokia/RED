@@ -46,7 +46,7 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
 
         RobotTestsLaunch testsLaunchContext = null;
         try {
-            testsLaunchContext = executionService.testExecutionStarting();
+            testsLaunchContext = executionService.testExecutionStarting(configuration);
 
             validateVersionAndProject(configuration);
             final LaunchExecution launchExecution = doLaunch(configuration, testsMode, launch, testsLaunchContext);

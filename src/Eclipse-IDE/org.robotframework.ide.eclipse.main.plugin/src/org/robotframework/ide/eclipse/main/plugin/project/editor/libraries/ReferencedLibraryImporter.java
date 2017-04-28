@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,8 +60,10 @@ public class ReferencedLibraryImporter {
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
                     try {
-                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath));
-                    } catch (final RobotEnvironmentException e) {
+                        pythonClasses.addAll(
+                                pythonLibStructureBuilder
+                                        .provideEntriesFromFile(new URI("file:///" + fullLibraryPath)));
+                    } catch (final RobotEnvironmentException | URISyntaxException e) {
                         throw new InvocationTargetException(e);
                     }
                 }
@@ -106,7 +110,12 @@ public class ReferencedLibraryImporter {
                 @Override
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Reading classes from module '" + fullLibraryPath + "'", 100);
-                    classesFromJar.addAll(jarStructureBuilder.provideEntriesFromFile(fullLibraryPath));
+                    try {
+                        classesFromJar.addAll(
+                                jarStructureBuilder.provideEntriesFromFile(new URI("file:///" + fullLibraryPath)));
+                    } catch (RobotEnvironmentException | URISyntaxException e) {
+                        throw new InvocationTargetException(e);
+                    }
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {

@@ -6,13 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
-import org.rf.ide.core.execution.ExecutionElement.ExecutionElementType;
 import org.rf.ide.core.execution.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
@@ -20,41 +18,51 @@ class ExecutionViewLabelProvider extends RedCommonLabelProvider {
 
     @Override
     public StyledString getStyledText(final Object element) {
-        final ExecutionStatus status = (ExecutionStatus) element;
-        final String time = status.getElapsedTime();
+        final ExecutionTreeNode node = (ExecutionTreeNode) element;
 
-        final StyledString label = new StyledString(status.getName());
-        if (time != null) {
-            label.append(" (" + time + " s)", new Styler() {
-
-                @Override
-                public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
-                }
-            });
+        final StyledString label = new StyledString(node.getName());
+        final int time = node.getElapsedTime();
+        if (time > 0) {
+            label.append(" (" + String.valueOf(((double) time) / 1000) + " s)",
+                    Stylers.Common.ECLIPSE_DECORATION_STYLER);
         }
         return label;
     }
     
     @Override
     public Image getImage(final Object element) {
-        final ExecutionStatus status = (ExecutionStatus) element;
+        final ExecutionTreeNode node = (ExecutionTreeNode) element;
 
-        if (status.getType() == ExecutionElementType.SUITE) {
-            if (status.getStatus() == Status.RUNNING) {
-                return ImagesManager.getImage(RedImages.getSuiteInProgressImage());
-            } else if (status.getStatus() == Status.PASS) {
-                return ImagesManager.getImage(RedImages.getSuitePassImage());
+        if (node.getKind() == ElementKind.SUITE) {
+
+            if (node.getStatus().isPresent()) {
+                if (node.getStatus().get() == Status.RUNNING) {
+                    return ImagesManager.getImage(RedImages.getSuiteInProgressImage());
+                } else if (node.getStatus().get() == Status.PASS) {
+                    return ImagesManager.getImage(RedImages.getSuitePassImage());
+                } else if (node.getStatus().get() == Status.FAIL) {
+                    return ImagesManager.getImage(RedImages.getSuiteFailImage());
+                }
+            } else {
+                return ImagesManager.getImage(RedImages.getSuiteImage());
             }
-            return ImagesManager.getImage(RedImages.getSuiteFailImage());
-        } else {
-            if (status.getStatus() == Status.RUNNING) {
-                return ImagesManager.getImage(RedImages.getTestInProgressImage());
-            } else if (status.getStatus() == Status.PASS) {
-                return ImagesManager.getImage(RedImages.getTestPassImage());
+
+        } else if (node.getKind() == ElementKind.TEST) {
+
+            if (node.getStatus().isPresent()) {
+                if (node.getStatus().get() == Status.RUNNING) {
+                    return ImagesManager.getImage(RedImages.getTestInProgressImage());
+                } else if (node.getStatus().get() == Status.PASS) {
+                    return ImagesManager.getImage(RedImages.getTestPassImage());
+                } else if (node.getStatus().get() == Status.FAIL) {
+                    return ImagesManager.getImage(RedImages.getTestFailImage());
+                }
+            } else {
+                return ImagesManager.getImage(RedImages.getTestImage());
             }
-            return ImagesManager.getImage(RedImages.getTestFailImage());
         }
+
+        return null;
     }
     
 }

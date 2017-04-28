@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.execution.LogLevel;
 import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.Status;
 import org.rf.ide.core.execution.context.KeywordPosition;
@@ -77,8 +77,9 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     }
 
     @Override
-    public void handleSuiteStarted(final String suiteName, final File suiteFilePath) {
-        final IPath suitePath = Path.fromOSString(suiteFilePath.getAbsolutePath());
+    public void handleSuiteStarted(final String name, final URI suiteFilePath, final int totalTests,
+            final List<String> childSuites, final List<String> childTests) {
+        final IPath suitePath = Path.fromOSString(new File(suiteFilePath).getAbsolutePath());
 
         final IFile currentSuiteFile = keywordExecutionManager.extractCurrentSuite(suitePath);
         if (currentSuiteFile != null) {
@@ -233,8 +234,8 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     }
 
     @Override
-    public void handleResourceImport(final File resourceFilePath) {
-        executionContext.resourceImport(resourceFilePath);
+    public void handleResourceImport(final URI resourceFilePath) {
+        executionContext.resourceImport(new File(resourceFilePath));
     }
 
     @Override
@@ -246,14 +247,6 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     public void handleVariables(final Map<String, Object> vars) {
         debugTarget.getLastKeywordFromCurrentContext().setVariables(vars);
         debugTarget.getRobotVariablesManager().sortVariablesNames(vars);
-    }
-
-    @Override
-    public void handleLogMessage(final String msg, final LogLevel level, final String timestamp) {
-    }
-
-    @Override
-    public void handleOutputFile(final File outputFilepath) {
     }
 
     @Override

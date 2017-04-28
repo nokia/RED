@@ -309,7 +309,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
             for (final ILibraryClass libraryClass : libraryClasses) {
                 if (libraryClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
-                    librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath()));
+                    librariesToAdd.add(libraryClass.toReferencedLibrary(libraryImport.getSourcePath().getPath()));
                 }
             }
             if (!librariesToAdd.isEmpty()) {

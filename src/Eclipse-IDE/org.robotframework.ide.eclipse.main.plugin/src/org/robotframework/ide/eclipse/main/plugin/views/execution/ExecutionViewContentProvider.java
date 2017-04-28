@@ -6,55 +6,48 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.rf.ide.core.execution.Status;
 import org.robotframework.red.viewers.TreeContentProvider;
 
-class ExecutionViewContentProvider extends TreeContentProvider {
+public class ExecutionViewContentProvider extends TreeContentProvider {
 
     private boolean isFailedFilterEnabled;
 
-    void setFailedFilterEnabled(final boolean isFailedFilterEnabled) {
-        this.isFailedFilterEnabled = isFailedFilterEnabled;
+    void resetFailedFilter() {
+        this.isFailedFilterEnabled = false;
     }
 
-    void switchFailedFilter() {
+    public void switchFailedFilter() {
         isFailedFilterEnabled = !isFailedFilterEnabled;
     }
 
     @Override
     public Object[] getElements(final Object inputElement) {
-        return (ExecutionStatus[]) inputElement;
+        return ((List<?>) inputElement).toArray(new Object[0]);
     }
 
     @Override
     public Object[] getChildren(final Object element) {
-        if (element instanceof ExecutionStatus) {
-            final List<ExecutionStatus> children = ((ExecutionStatus) element).getChildren();
+        final List<ExecutionTreeNode> children = ((ExecutionTreeNode) element).getChildren();
 
-            if (isFailedFilterEnabled) {
-                return children.stream()
-                        .filter(status -> status.getStatus() == Status.FAIL)
-                        .toArray(ExecutionStatus[]::new);
-            }
-            return children.toArray(new ExecutionStatus[0]);
+        if (isFailedFilterEnabled) {
+            return children.stream()
+                    .filter(child -> child.getStatus().equals(Optional.of(Status.FAIL)))
+                    .toArray(ExecutionTreeNode[]::new);
+        } else {
+            return children.toArray(new ExecutionTreeNode[0]);
         }
-        return null;
     }
 
     @Override
     public Object getParent(final Object element) {
-        if (element instanceof ExecutionStatus) {
-            return ((ExecutionStatus) element).getParent();
-        }
-        return null;
+        return ((ExecutionTreeNode) element).getParent();
     }
 
     @Override
     public boolean hasChildren(final Object element) {
-        if (element instanceof ExecutionStatus) {
-            return ((ExecutionStatus) element).getChildren().size() > 0;
-        }
-        return false;
+        return ((ExecutionTreeNode) element).getChildren().size() > 0;
     }
 }
