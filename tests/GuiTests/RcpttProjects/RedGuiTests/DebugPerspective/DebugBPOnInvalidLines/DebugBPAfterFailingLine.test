@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA
 Element-Name: DebugBPAfterFailingLine
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _EJvdYBEPEeWWSplrwZ3vkg
-Runtime-Version: 1.5.5.201503020312
-Save-Time: 7/2/15 12:11 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 4/28/17 11:16 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -37,12 +37,12 @@ try -times 10 -delay 300 -command {
 get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
 get-view Variables | get-tree | get-property itemCount | equals 0 | verify-true
 
-get-button Resume | get-property containMenu | equals false | verify-true
+get-button "Resume( \(F8\))?" | get-property containMenu | equals false | verify-true
 get-button Suspend | get-property enablement | equals false | verify-true
 
-get-button "Terminate" | get-property enablement | equals false | verify-true
-get-button "Step Into" | get-property enablement | equals false | verify-true
-get-button "Step Over" | get-property enablement | equals false | verify-true
-get-button "Step Return" | get-property enablement | equals false | verify-true
+get-button "Terminate( \(M1+F2\))?" | get-property enablement | equals false | verify-true
+get-button "Step Into( \(F5\))?" | get-property enablement | equals false | verify-true
+get-button "Step Over( \(F6\))?" | get-property enablement | equals false | verify-true
+get-button "Step Return( \(F7\))?"  | get-property enablement | equals false | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
