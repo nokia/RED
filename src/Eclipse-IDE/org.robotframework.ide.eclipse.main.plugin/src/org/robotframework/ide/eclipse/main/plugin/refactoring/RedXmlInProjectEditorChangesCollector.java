@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -30,7 +32,7 @@ import org.robotframework.red.swt.SwtThread.Evaluation;
  */
 class RedXmlInProjectEditorChangesCollector {
 
-    private final IFile redXmlFile;
+    private IFile redXmlFile;
 
     private final IPath pathBeforeRefactoring;
 
@@ -106,9 +108,22 @@ class RedXmlInProjectEditorChangesCollector {
     }
 
     private Change collectChangesInReferencedLibraries(final RobotProjectConfig config) {
+        if (pathAfterRefactoring.isPresent()) {
+            if (!pathAfterRefactoring.get().segment(0).equals(pathBeforeRefactoring.segment(0)))
+
+            {
+                IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+                redXmlFile = root.getFile(pathAfterRefactoring.get()
+                        .removeLastSegments(pathAfterRefactoring.get().segmentCount() - 1)
+                        .append(redXmlFile.getName()));
+            }
+
+        }
+        
         final CompositeChange change = new CompositeChange(
                 "'" + redXmlFile.getFullPath() + "': referenced libriaries paths");
 
+        
         for (final ReferencedLibrary lib : config.getLibraries()) {
 
             final IPath potentiallyAffectedPath = Path.fromPortableString(lib.getPath());
