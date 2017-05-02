@@ -75,10 +75,18 @@ class RedXmlEditsCollector {
         if (!projectName.equals(pathBeforeRefactoring.segment(0))) {
             return new ArrayList<>();
         }
+        String tryk;
+        if (pathBeforeRefactoring.lastSegment().contains(".py")
+                || pathBeforeRefactoring.lastSegment().contains(".java")) {
+            tryk = pathBeforeRefactoring.lastSegment().substring(0,
+                pathBeforeRefactoring.lastSegment().lastIndexOf("."));
+        } else {
+            tryk = "^\"";
+        }
 
-        final String toMatch = "\\s*(<referencedLibrary\\s*type=\"([^\"]*)\"\\s*name=\"([^\"]*)\"\\s*path=\"([^\"]*)\"/>)\\s*";
-
-        final Pattern toMatchPattern = Pattern.compile(toMatch);
+        final String toMatch = "\\s*(<referencedLibrary\\s*type=\"([^\"]*)\"\\s*name=\"([" + tryk
+                + "])\"\\s*path=\"([^\"]*)\"/>)()\\s*";
+       final Pattern toMatchPattern = Pattern.compile(toMatch);
 
         final LibraryMovedMatchesAccess matchesAccess = new LibraryMovedMatchesAccess(toMatchPattern);
         engine.searchForMatches(toMatch, matchesAccess);
