@@ -120,6 +120,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         this.testContext.clear();
     }
 
+    public void replaceTestExecutionRow(final RobotExecutableRow<TestCase> oldRow,
+            final RobotExecutableRow<TestCase> newRow) {
+        newRow.setParent(this);
+        testContext.set(testContext.indexOf(oldRow), newRow);
+    }
+
     public List<RobotExecutableRow<TestCase>> getTestExecutionRows() {
         return Collections.unmodifiableList(testContext);
     }
