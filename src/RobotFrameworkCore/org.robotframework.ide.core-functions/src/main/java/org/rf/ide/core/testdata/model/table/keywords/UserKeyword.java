@@ -90,6 +90,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
         keywordContext.clear();
     }
 
+    public void replaceKeywordExecutionRow(final RobotExecutableRow<UserKeyword> oldRow,
+            final RobotExecutableRow<UserKeyword> newRow) {
+        newRow.setParent(this);
+        keywordContext.set(keywordContext.indexOf(oldRow), newRow);
+    }
+
     public List<RobotExecutableRow<UserKeyword>> getKeywordExecutionRows() {
         return Collections.unmodifiableList(keywordContext);
     }
