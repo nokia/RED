@@ -1,0 +1,80 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _1lEyQF06EeWeit3EM6sPPA
+Element-Name: ExecutionViewIsClosedDuringTest
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: __L5ekMjSEeWPuqMw6GC70Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/4/17 11:36 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//clear view and close it
+get-view "Execution View" | get-button Clear | click
+get-view "Execution View" | get-tree | get-property itemCount | equals 0 | verify-true
+get-view "Execution View" | close
+get-view "Message Log" | click
+
+//run test
+with [get-view "Project Explorer" | get-tree] {
+    select "ExecutionViewProject/all_pass_tests.robot" | get-menu "Run As/1 Robot Test" | click
+}
+wait 2000
+
+get-menu "Window/Show View/Execution View" | click
+
+//check labels
+with [get-view "Execution View"] {
+    get-label "Tests: 3/3" | get-property enablement | equals true | verify-true
+    get-label "Passed: 3" | get-property enablement | equals true | verify-true
+    get-label "Failed: 0" | get-property enablement | equals true | verify-true
+}
+
+//check tree
+get-view "Execution View" | get-button "Expand All" | click
+with [get-view "Execution View" | get-tree] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | matches "ExecutionViewProject \\(0\.\d\d{0,2} s\\)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | matches "All Pass Tests \\(0\.\d\d{0,2} s\\)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | matches "pass test \\(0\.\d\d{0,2} s\\)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | matches "pass test 2 \\(0\.\d\d{0,2} s\\)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | matches "pass test 3 \\(0\.\d\d{0,2} s\\)" | verify-true
+}
+
+//check buttons
+with [get-view "Execution View"] {
+    get-button "Expand All" | get-property enablement | equals true | verify-true
+    get-button "Collapse All" | get-property enablement | equals true | verify-true
+    get-button "Show Failures Only" | get-property enablement | equals true | verify-true
+    get-button Clear | get-property enablement | equals true | verify-true
+    get-button "Rerun Tests" | get-property enablement | equals true | verify-true
+    get-button "Rerun Failed Tests" | get-property enablement | equals false | verify-true
+}
+
+//check indexes
+get-view "Execution View" | get-button "Expand All" | get-property index | equals 0 | verify-true
+get-view "Execution View" | get-button "Collapse All" | get-property index | equals 1 | verify-true
+get-view "Execution View" | get-button "Show Failures Only" | get-property index | equals 2 | verify-true
+
+//separator is on index = 3
+get-view "Execution View" | get-button Clear | get-property index | equals 4 | verify-true
+get-view "Execution View" | get-button "Rerun Tests" | get-property index | equals 5 | verify-true
+get-view "Execution View" | get-button "Rerun Failed Tests" | get-property index | equals 6 | verify-true
+
+
+get-button Minimize -index 4 | get-property index | equals 0 | verify-true
+with [get-button Maximize -index 4] {
+    get-property enablement | equals true | verify-true
+    get-property index | equals 1 | verify-true
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
