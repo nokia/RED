@@ -106,9 +106,11 @@ public class RobotDryRunLibraryImportCollector {
         final String errorStartTxt = "Error in file '";
         final int errorStartIndex = message.indexOf(errorStartTxt);
         try {
-            return errorStartIndex == -1 ? null
-                    : new URI("file", null, null, -1,
-                            message.substring(errorStartIndex + errorStartTxt.length(), nameStartIndex), null, null);
+            if (errorStartIndex == -1) {
+                return null;
+            }
+            final String importer = message.substring(errorStartIndex + errorStartTxt.length(), nameStartIndex);
+            return new URI("file://" + (importer.startsWith("/") ? "" : "/") + importer.replaceAll("\\\\", "/"));
         } catch (final URISyntaxException e) {
             return null;
         }
