@@ -5,50 +5,16 @@
  */
 package org.rf.ide.core.project;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
-import org.rf.ide.core.executor.RedSystemProperties;
+import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
-
 public final class ResolvedImportPath {
-
-    public static final Escaper URI_SPECIAL_CHARS_ESCAPER = Escapers.builder()
-            .addEscape(' ', "%20")
-            .addEscape('!', "%21")
-            .addEscape('"', "%22")
-            .addEscape('#', "%23")
-            .addEscape('$', "%24")
-            .addEscape('%', "%25")
-            .addEscape('&', "%26")
-            .addEscape('(', "%28")
-            .addEscape(')', "%29")
-            .addEscape(';', "%3b")
-            .addEscape('@', "%40")
-            .addEscape('^', "%5e")
-            .build();
-
-    public static String reverseUriSpecialCharsEscapes(final String uriWithEscapedChars) {
-        return uriWithEscapedChars.replaceAll("%20", " ")
-                .replaceAll("%21", "!")
-                .replaceAll("%22", "\"")
-                .replaceAll("%23", "#")
-                .replaceAll("%24", "\\$")
-                .replaceAll("%25", "%")
-                .replaceAll("%26", "&")
-                .replaceAll("%28", "\\(")
-                .replaceAll("%29", "\\)")
-                .replaceAll("%3b", ";")
-                .replaceAll("%40", "@")
-                .replaceAll("%5e", "\\^");
-    }
 
     public static Optional<ResolvedImportPath> from(final ImportPath importPath) {
         return from(importPath, Collections.<String, String> emptyMap());
@@ -76,13 +42,7 @@ public final class ResolvedImportPath {
     }
 
     private static ResolvedImportPath create(final String path) throws URISyntaxException {
-        final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
-        final String sep = RedSystemProperties.isWindowsPlatform() ? "/" : "//";
-        final String escapedPathWithScheme = new File(path).isAbsolute() ? "file:" + sep + escapedPath : escapedPath;
-        final String normalizedPath = RedSystemProperties.isWindowsPlatform() ? 
-        		escapedPathWithScheme.replaceAll("\\\\", "/") :
-        		escapedPathWithScheme.replaceAll("\\\\", "%5c");
-		return new ResolvedImportPath(new URI(normalizedPath));
+        return new ResolvedImportPath(RedURI.fromString(path));
     }
 
     private final URI uri;
