@@ -1,0 +1,33 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: CheckExecutionView
+Element-Type: context
+Element-Version: 2.0
+Id: _QflXwDDFEee-I-80nLsBOw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/4/17 2:36 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "check-execution-view" [val pass 0] [val fail 0] [val all 0] [val pb "1.0"] [val color] {
+	with [get-view "Execution View"] {
+	    get-label [format "Tests: %s/%s" $all $all]| get-property enablement | equals true | verify-true
+	    get-label [format "Passed: %s" $pass]| get-property enablement | equals true | verify-true
+	    get-label [format "Failed: %s" $fail] | get-property enablement | equals true  | verify-true
+	}
+	
+	//progress bar
+	get-view "Execution View" | get-canvas | get-property "getProgress()" | equals $pb | verify-true
+	
+	//color	
+	if [$color | eq "red"]{
+		get-view "Execution View" | get-canvas | get-property "getBarColor()" | equals "#B40000" | verify-true
+	}
+	if [$color | eq "green"]{
+		get-view "Execution View" | get-canvas | get-property "getBarColor()" | equals "#00B400"  | verify-true
+	}
+}	
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
