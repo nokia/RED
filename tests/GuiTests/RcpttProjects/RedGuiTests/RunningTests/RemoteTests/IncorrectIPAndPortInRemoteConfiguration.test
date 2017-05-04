@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pNdEgA47EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/19/17 9:36 AM
+Save-Time: 5/4/17 5:53 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -93,6 +93,9 @@ exec-with-options {
 	 
 	    get-button Run | click
 	}
+	try -times 4 -delay 1000 -command{
+		get-window "Problem Occurred" 
+	}	
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	    get-window "Problem Occurred" 
 	        | get-label "Unable to start server on wrbboxv01.emea.nsn-net.net:8080Cannot assign requested address: JVM_Bind" 
