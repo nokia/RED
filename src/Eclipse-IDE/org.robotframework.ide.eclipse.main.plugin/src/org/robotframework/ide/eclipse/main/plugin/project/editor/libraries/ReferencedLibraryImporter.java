@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -61,8 +61,7 @@ public class ReferencedLibraryImporter {
                     monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
                     try {
                         pythonClasses.addAll(
-                                pythonLibStructureBuilder
-                                        .provideEntriesFromFile(new URI("file:///" + fullLibraryPath)));
+                                pythonLibStructureBuilder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
                     } catch (final RobotEnvironmentException | URISyntaxException e) {
                         throw new InvocationTargetException(e);
                     }
@@ -112,7 +111,7 @@ public class ReferencedLibraryImporter {
                     monitor.beginTask("Reading classes from module '" + fullLibraryPath + "'", 100);
                     try {
                         classesFromJar.addAll(
-                                jarStructureBuilder.provideEntriesFromFile(new URI("file:///" + fullLibraryPath)));
+                                jarStructureBuilder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
                     } catch (RobotEnvironmentException | URISyntaxException e) {
                         throw new InvocationTargetException(e);
                     }
