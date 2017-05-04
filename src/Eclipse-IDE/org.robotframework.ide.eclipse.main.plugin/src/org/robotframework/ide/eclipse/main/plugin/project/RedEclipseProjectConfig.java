@@ -18,7 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.project.ResolvedImportPath;
+import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
 import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
@@ -60,12 +60,12 @@ public class RedEclipseProjectConfig {
             return child;
         } else {
             try {
-                final Escaper escaper = ResolvedImportPath.URI_SPECIAL_CHARS_ESCAPER;
+                final Escaper escaper = RedURI.URI_SPECIAL_CHARS_ESCAPER;
 
                 final String portablePath = base.toPortableString();
                 final URI filePath = new URI(escaper.escape(portablePath));
                 final URI pathUri = filePath.resolve(escaper.escape(child.toString()));
-                return new Path(ResolvedImportPath.reverseUriSpecialCharsEscapes(pathUri.toString()));
+                return new Path(RedURI.reverseUriSpecialCharsEscapes(pathUri.toString()));
             } catch (final Exception e) {
                 throw new PathResolvingException("Unable to parse path", e);
             }
