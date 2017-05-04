@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.MarkedUri;
@@ -194,7 +195,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             final IPath importPath, final URI absoluteUri) {
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
-        final String absolutePath = ResolvedImportPath
+        final String absolutePath = RedURI
                 .reverseUriSpecialCharsEscapes(
                         new File(absoluteUri).getAbsolutePath().replaceAll("\\\\", "/"));
         reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH)

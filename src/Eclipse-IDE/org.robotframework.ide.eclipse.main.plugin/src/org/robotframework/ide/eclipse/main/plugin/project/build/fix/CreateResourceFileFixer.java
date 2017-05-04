@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.rf.ide.core.executor.RedURI;
 import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ResolvedImportPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -62,7 +63,7 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         if (workspaceDir.matchingFirstSegments(fullPath) != workspaceDir.segmentCount()) {
             return null;
         }
-        final IPath pathToCreate = new Path(ResolvedImportPath
+        final IPath pathToCreate = new Path(RedURI
                 .reverseUriSpecialCharsEscapes(fullPath.removeFirstSegments(workspaceDir.segmentCount()).toString()));
         if (pathToCreate == null || pathToCreate.segmentCount() < 2
                 || !ResourcesPlugin.getWorkspace().getRoot().getProject(pathToCreate.segment(0)).isAccessible()
