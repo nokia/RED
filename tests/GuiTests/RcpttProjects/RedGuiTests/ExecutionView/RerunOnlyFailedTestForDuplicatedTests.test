@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _7Q8I4F06EeWeit3EM6sPPA
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/19/15 3:21 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/4/17 2:20 PM
 Testcase-Type: ecl
 Verifications: _d4v7EF3jEeWeit3EM6sPPA
 
@@ -27,7 +27,14 @@ wait 1000
 with [get-view "Execution View"] {
     get-label "Passed: 2" | get-property caption | equals "Passed: 2" | verify-true
     get-label "Failed: 2" | get-property caption | equals "Failed: 2" | verify-true
+    get-label "Tests: 4/4" | get-property caption | equals "Tests: 4/4" | verify-true
 }
+
+with [get-view "Execution View" | get-canvas] {
+    get-property "getProgress()" | equals "1.0" | verify-true
+    get-property "getBarColor()" | equals "#B40000" | verify-true
+}
+
 //check execution view with times
 with [get-view "Execution View" | get-tree] {
     get-property "getItems().TreeItem[0].getItems().length" | equals 1 | verify-true
@@ -49,9 +56,19 @@ get-view "Execution View" | get-tree | get-item "ExecutionViewProject .*" | get-
     | equals true | verify-true
     
 //run only fail cases (pass with the same name will be run)
-get-view "Execution View" | get-button "Rerun Failed Tests Only" | click
+get-view "Execution View" | get-button "Rerun Failed Tests" | click
 wait 3000
 
+with [get-view "Execution View"] {
+    get-label "Passed: 1" | get-property caption | equals "Passed: 1" | verify-true
+    get-label "Failed: 2" | get-property caption | equals "Failed: 2" | verify-true
+    get-label "Tests: 3/3" | get-property caption | equals "Tests: 3/3" | verify-true
+}
+
+with [get-view "Execution View" | get-canvas] {
+    get-property "getProgress()" | equals "1.0" | verify-true
+    get-property "getBarColor()" | equals "#B40000" | verify-true
+}
 //check view with times    
 with [get-view "Execution View" | get-tree] {
     get-property "getItems().length" | equals 1 | verify-true
@@ -74,8 +91,8 @@ get-view "Execution View" | get-tree | get-item "ExecutionViewProject .*" | get-
 //check if "Rerun Failed Tests Only"  is not selected
 with [get-view "Execution View"] {
     }
-    with [get-button "Rerun Failed Tests Only"] {
-        get-property tooltip | equals "Rerun Failed Tests Only" | verify-true
+    with [get-button "Rerun Failed Tests" | click] {
+        get-property tooltip | equals "Rerun Failed Tests" | verify-true
         get-property selected | equals false | verify-true
     }
 
