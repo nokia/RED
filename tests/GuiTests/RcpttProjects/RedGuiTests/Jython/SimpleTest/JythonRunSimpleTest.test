@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TLsXYOFJEeWu0tyN3Pwjmg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 10:35 AM
+Save-Time: 5/4/17 10:33 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -89,13 +89,19 @@ with [get-editor "test.robot" | get-text-viewer] {
 }
 
 //wait to stop test
-try -times 8 -delay 2000 -command{
-	get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
-}
+wait-for-console -times 10 -delay 2000
 
-// test should pass , no errors, keywords should be generated
-get-view "Execution View" | get-control Any -index 8 | get-property "getChildren().Control[1].toString()" 
-    | equals "Label {Passed: 1}" | verify-true
+// test should pass, no errors, keywords should be generated
+with [get-view "Execution View"] {
+    get-label "Tests: 1/1" | get-property enablement | equals true | verify-true
+    get-label "Passed: 1" | get-property caption | equals "Passed: 1" | verify-true
+    get-label "Failed: 0" | get-property enablement | equals true | verify-true
+    with [get-canvas] {
+        get-property "getProgress()" | equals "1.0" | verify-true
+        get-property "getBarColor()" | equals "#00B400" | verify-true
+    }
+    get-tree | get-item "Jython Simple Project \\(.* s\\)" | get-property index | equals 0 | verify-true
+}
 
 get-view "Project Explorer" | get-tree 
     | get-item "jython_simple_project/Robot Referenced libraries/MathOperator jython_simple_project\\/RED_TEST_JavaLib.jar \\(2\\)" 
