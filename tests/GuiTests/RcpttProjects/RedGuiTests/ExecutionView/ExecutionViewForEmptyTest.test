@@ -6,21 +6,25 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ROyUcGBVEeW-9bGOK0urnw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/20/17 4:15 PM
+Save-Time: 5/4/17 12:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-proc "wait-for-end-of-test"{
-	try -times 4 -delay 1000 -command{
-		get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
+proc "check-execution-view" [val pass 0] [val fail 0] [val items 0] [val pb NaN]{
+	with [get-view "Execution View"] {
+	    get-tree | get-property itemCount | equals $items | verify-true
+	    get-label "Tests: .*" | get-property caption | equals [format "Tests: %s/%s" $pass $pass] | verify-true
+	    get-label "Passed: .*" | get-property caption | equals [format "Passed: %s" $pass] | verify-true
+	    get-label "Failed: .*" | get-property caption | equals [format "Failed: %s" $fail] | verify-true
 	}
+	//progress bar
+	get-view "Execution View" | get-canvas | get-property "getProgress()" | equals $pb | verify-true
 }
 
 //create empty robot file an run it 
-
 get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
     | click
 with [get-window "New Robot Test Suite"] {
@@ -49,11 +53,7 @@ if [not [get-view Console | get-text-viewer | get-property text -raw
  
 //check that view is empty     
 get-tab-folder -index 5 | get-tab-item "Execution View" | click
-with [get-view "Execution View"] {
-    get-tree | get-property itemCount | equals 0 | verify-true
-    get-label "Passed: 0" | get-property caption | equals "Passed: 0" | verify-true
-    get-label "Failed: 0" | get-property caption | equals "Failed: 0" | verify-true
-}
+check-execution-view
 
 //add pass case
 with [get-editor "empty_tests.robot" | get-text-viewer] {
@@ -67,9 +67,8 @@ with [get-editor "empty_tests.robot" | get-text-viewer] {
 //run test
 get-view "Project Explorer" | get-tree | select "RobotProject/empty_tests.robot" | get-menu "Run As/1 Robot Test" 
     | click
-wait-for-end-of-test  
-
-get-view "Execution View" | get-tree | get-property itemCount | equals 1 | verify-true
+wait-for-console  -times 4 -delay 1000
+check-execution-view -pass 1 -pb "1.0" -items 1
 
 //remove content and run test
 with [get-editor "empty_tests.robot" | get-text-viewer] {
@@ -80,14 +79,10 @@ with [get-editor "empty_tests.robot" | get-text-viewer] {
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/empty_tests.robot" | get-menu "Run As/1 Robot Test" 
     | click
-wait-for-end-of-test
+wait-for-console  -times 4 -delay 1000
 
 //check that view is empty     
 get-tab-folder -index 5 | get-tab-item "Execution View" | click
-with [get-view "Execution View"] {
-    get-tree | get-property itemCount | equals 0 | verify-true
-    get-label "Passed: 0" | get-property caption | equals "Passed: 0" | verify-true
-    get-label "Failed: 0" | get-property caption | equals "Failed: 0" | verify-true
-}
+check-execution-view
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
