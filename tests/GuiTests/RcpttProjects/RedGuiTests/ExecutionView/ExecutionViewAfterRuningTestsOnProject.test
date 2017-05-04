@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _yrzhQF1JEeWeit3EM6sPPA
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/22/16 1:56 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/4/17 11:44 AM
 Testcase-Type: ecl
 Verifications: _-dwU0F3XEeWeit3EM6sPPA
 
@@ -21,16 +21,32 @@ with [get-view "Project Explorer" | get-tree] {
     select ExecutionViewProject | get-menu "Run As/1 Robot Test" | click
 }
 
-try -times 5 -delay 1000 -command{
-	get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
-}
-wait 2000
-//check test status
-with [get-view "Execution View"] {
-    get-label "Passed: 16" | get-property caption | equals "Passed: 16" | verify-true
-    get-label "Failed: 9" | get-property caption | equals "Failed: 9" | verify-true
-}
+wait-for-console -times 6 -delay 1000
 
+get-view "Execution View" | click
+wait 2000
+
+//check test status - this is checking order in composite
+with [get-view "Execution View"] {
+    with [get-control Any -index 8] {
+    	// labels
+        get-property "getChildren().Control[0].getChildren().length" | equals 3 | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getText()" | equals "Tests: 25/25" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[1].getText()" | equals "Passed: 16" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[2].getText()" | equals "Failed: 9" | verify-true
+        
+        //progress bar
+        get-property "getChildren().length" | equals 4 | verify-true
+        get-property "getChildren().Control[1].getProgress()" | equals "1.0" | verify-true
+        get-property "getChildren().Control[1].getBarColor()" | equals "#B40000" | verify-true
+        
+        //tree
+        get-property "getChildren().Control[2].getItemCount()" | equals 1 | verify-true
+        
+        //text below tree
+        get-property "getChildren().Control[3].getText()" | equals "" | verify-true
+    }
+}
 //check that pass cases are not expanded
 with [get-view "Execution View" | get-tree] {
     get-item "ExecutionViewProject \\(.*\)" | get-property "getExpanded()" | equals true | verify-true
