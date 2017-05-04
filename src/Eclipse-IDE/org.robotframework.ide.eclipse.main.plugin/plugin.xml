@@ -5934,26 +5934,10 @@
          <handler
                class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExpandAllHandler"
                commandId="org.robotframework.ide.eclipse.expandAll">
-            <activeWhen>
-               <with
-                     variable="activePartId">
-                  <equals
-                        value="org.robotframework.ide.ExecutionView">
-                  </equals>
-               </with>
-            </activeWhen>
          </handler>
          <handler
                class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.CollapseAllHandler"
                commandId="org.robotframework.ide.eclipse.collapseAll">
-            <activeWhen>
-               <with
-                     variable="activePartId">
-                  <equals
-                        value="org.robotframework.ide.ExecutionView">
-                  </equals>
-               </with>
-            </activeWhen>
          </handler>
          <handler
                class="org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ShowFailedOnlyHandler"
