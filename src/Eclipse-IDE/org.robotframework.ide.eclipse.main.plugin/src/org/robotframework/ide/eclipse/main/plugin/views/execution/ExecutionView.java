@@ -46,6 +46,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatu
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore.ExecutionTreeElementListener;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.GoToFileHandler.E4GoToFileHandler;
+import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ShowFailedOnlyHandler;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.swt.SimpleProgressBar;
@@ -251,7 +252,8 @@ public class ExecutionView {
 
         final ExecutionViewContentProvider provider = (ExecutionViewContentProvider) executionViewer
                 .getContentProvider();
-        provider.resetFailedFilter();
+        provider.setFailedFilter(false);
+        ShowFailedOnlyHandler.setCommandState(false);
 
         testsCounterLabel.setText("Tests: 0/0");
         passCounterLabel.setText("Passed: 0");

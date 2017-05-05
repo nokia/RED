@@ -15,12 +15,8 @@ public class ExecutionViewContentProvider extends TreeContentProvider {
 
     private boolean isFailedFilterEnabled;
 
-    void resetFailedFilter() {
-        this.isFailedFilterEnabled = false;
-    }
-
-    public void switchFailedFilter() {
-        isFailedFilterEnabled = !isFailedFilterEnabled;
+    public void setFailedFilter(final boolean isEnabled) {
+        this.isFailedFilterEnabled = isEnabled;
     }
 
     @Override

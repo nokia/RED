@@ -5889,6 +5889,10 @@
          <command
                id="org.robotframework.red.view.execution.showFailedOnly"
                name="Show Failures Only">
+            <state
+                  class="org.eclipse.jface.commands.ToggleState"
+                  id="org.robotframework.red.view.execution.showFailedOnly.state">
+            </state>
          </command>
          <command
                categoryId="org.robotframework.ide.eclipse.robotCommands"
