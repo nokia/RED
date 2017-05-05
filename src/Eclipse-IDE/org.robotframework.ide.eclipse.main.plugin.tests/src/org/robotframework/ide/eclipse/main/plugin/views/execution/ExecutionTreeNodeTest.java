@@ -35,7 +35,7 @@ public class ExecutionTreeNodeTest {
                 .isEqualTo(new URI("file:///f.robot"));
 
         assertThat(new ExecutionTreeNode(null, null, "").getMessage()).isEmpty();
-        assertThat(new ExecutionTreeNode(null, null, "").getElapsedTime()).isEqualTo(0);
+        assertThat(new ExecutionTreeNode(null, null, "").getElapsedTime()).isEqualTo(-1);
         assertThat(new ExecutionTreeNode(null, null, "").getStatus()).isEqualTo(Optional.empty());
         assertThat(new ExecutionTreeNode(null, null, "").getChildren()).isEmpty();
     }
