@@ -133,7 +133,7 @@ public class MessageLogView {
 
         @Override
         public void executionStarting(final RobotTestsLaunch launch) {
-            SwtThread.syncExec(() -> styledText.setText(""));
+            SwtThread.asyncExec(() -> styledText.setText(""));
 
             launch.getExecutionData(ExecutionMessagesStore.class, ExecutionMessagesStore::new)
                     .addStoreListener(storeListener);
