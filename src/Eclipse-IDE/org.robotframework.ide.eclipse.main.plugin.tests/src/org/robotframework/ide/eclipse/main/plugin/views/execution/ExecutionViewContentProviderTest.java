@@ -57,7 +57,7 @@ public class ExecutionViewContentProviderTest {
     @Test
     public void onlyFailedNodeChildrenAreProvided_whenProviderIsAskedForChildrenAdnFilterIsSwitched() {
         final ExecutionViewContentProvider provider = new ExecutionViewContentProvider();
-        provider.switchFailedFilter();
+        provider.setFailedFilter(true);
 
         final ExecutionTreeNode c1 = node(null, Status.PASS);
         final ExecutionTreeNode c2 = node(null, Status.FAIL);
@@ -76,9 +76,9 @@ public class ExecutionViewContentProviderTest {
         final ExecutionTreeNode c4 = node(null);
 
         assertThat(provider.getChildren(node(null, c1, c2, c3, c4))).containsExactly(c1, c2, c3, c4);
-        provider.switchFailedFilter();
+        provider.setFailedFilter(true);
         assertThat(provider.getChildren(node(null, c1, c2, c3, c4))).containsExactly(c2);
-        provider.switchFailedFilter();
+        provider.setFailedFilter(false);
         assertThat(provider.getChildren(node(null, c1, c2, c3, c4))).containsExactly(c1, c2, c3, c4);
     }
 
@@ -92,8 +92,8 @@ public class ExecutionViewContentProviderTest {
         final ExecutionTreeNode c4 = node(null);
 
         assertThat(provider.getChildren(node(null, c1, c2, c3, c4))).containsExactly(c1, c2, c3, c4);
-        provider.switchFailedFilter();
-        provider.resetFailedFilter();
+        provider.setFailedFilter(true);
+        provider.setFailedFilter(false);
         assertThat(provider.getChildren(node(null, c1, c2, c3, c4))).containsExactly(c1, c2, c3, c4);
     }
 
