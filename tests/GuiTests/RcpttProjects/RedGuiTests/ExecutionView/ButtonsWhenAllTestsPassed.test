@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HRCJsF4XEeWeit3EM6sPPA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/5/17 11:38 AM
+Save-Time: 5/5/17 2:09 PM
 Testcase-Type: ecl
 Verifications: _gFIx8F4WEeWeit3EM6sPPA
 
@@ -22,7 +22,7 @@ with [get-view "Project Explorer" | get-tree] {
         | get-menu "Run As/1 Robot Test" | click
 } 
 wait 1000
-check-execution-view-labels -pass 3 -fail 0 -all 3 -color "green"
+check-execution-view-labels -pass 3 -fail 0 -current_test 3 -all 3 -bar_color "green"
 
 //check buttons
 with [get-view "Execution View"] {
