@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _2aQkYF4XEeWeit3EM6sPPA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/4/17 4:47 PM
+Save-Time: 5/5/17 2:09 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -27,7 +27,7 @@ with [get-view "Execution View"] {
     get-button Clear | click
 }
 
-check-execution-view-labels -pass 0 -fail 0 -all 0 -pb "NaN" -color "no_color"
+check-execution-view-labels -pass 0 -fail 0 -current_test 0 -all 0 -pb "NaN" -bar_color "no_color"
 //check buttons
 with [get-view "Execution View"] {
     get-button "Show Failures Only" | get-property enablement | equals true | verify-true
@@ -64,6 +64,6 @@ with [get-view "Execution View"] {
     get-editbox -after [get-label "Failed: 0"] | get-property text | equals "" | verify-true
 }
 
-check-execution-view-labels -pass 0 -fail 0 -all 0 -pb "NaN" -color "no_color"
+check-execution-view-labels -pass 0 -fail 0  -current_test 0 -all 0 -pb "NaN" -bar_color "no_color"
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
