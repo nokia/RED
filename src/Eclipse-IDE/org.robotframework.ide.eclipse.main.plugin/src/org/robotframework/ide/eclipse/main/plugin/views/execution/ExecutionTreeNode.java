@@ -35,11 +35,15 @@ public class ExecutionTreeNode {
     ExecutionTreeNode(final ExecutionTreeNode parent, final ElementKind kind, final String name,
             final URI path) {
         this.parent = parent;
-        this.kind = kind;
-        this.name = name;
-        this.status = null;
         this.children = new ArrayList<>();
+
+        this.name = name;
         this.path = path;
+        this.kind = kind;
+
+        this.status = null;
+        this.message = null;
+        this.elapsedTime = -1;
     }
 
     ExecutionTreeNode getParent() {
