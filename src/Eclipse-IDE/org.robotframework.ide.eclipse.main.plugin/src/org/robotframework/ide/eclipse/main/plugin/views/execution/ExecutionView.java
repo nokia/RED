@@ -349,7 +349,7 @@ public class ExecutionView {
         public void executionStarting(final RobotTestsLaunch launch) {
             ExecutionView.this.launch = launch;
 
-            SwtThread.syncExec(() -> {
+            SwtThread.asyncExec(() -> {
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
                 clearView();
@@ -371,7 +371,7 @@ public class ExecutionView {
         @Override
         public void executionEnded(final RobotTestsLaunch launch) {
             // nothing to do
-            SwtThread.syncExec(() -> {
+            SwtThread.asyncExec(() -> {
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
             });
