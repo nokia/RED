@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _1lEyQF06EeWeit3EM6sPPA
+Contexts: _1lEyQF06EeWeit3EM6sPPA,_QflXwDDFEee-I-80nLsBOw
 Element-Name: ShowingOnlyFailedCasesForAllPassedTests
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Vf8hcF4BEeWeit3EM6sPPA
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/9/15 12:06 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/5/17 2:59 PM
 Testcase-Type: ecl
 Verifications: _gFIx8F4WEeWeit3EM6sPPA
 
@@ -24,10 +24,7 @@ with [get-view "Project Explorer" | get-tree] {
 
 wait 500
 //check view after execution
-with [get-view "Execution View"] {
-    get-label "Passed: 3" | get-property caption | equals "Passed: 3" | verify-true
-    get-label "Failed: 0" | get-property caption | equals "Failed: 0" | verify-true
-}
+check-execution-view-labels -pass 3 -fail 0 -current_test 3 -all 3  -bar_color "green"
 //expand all because pass test are collpased
 get-view "Execution View" | get-button "Expand All" | click
 with [get-view "Execution View" | get-tree] {
@@ -48,10 +45,7 @@ get-view "Execution View" | get-button "Show Failures Only" | click
 get-view "Execution View" | get-tree | get-item "ExecutionViewProject \\(.* s\\)" | get-property childCount 
     | equals 0 | verify-true
     
-with [get-view "Execution View"] {
-    get-label "Passed: 3" | get-property caption | equals "Passed: 3" | verify-true
-    get-label "Failed: 0" | get-property caption | equals "Failed: 0" | verify-true
-}
+check-execution-view-labels -pass 3 -fail 0 -current_test 3 -all 3  -bar_color "green"
 
 //button is selected
 with [get-view "Execution View" | get-button "Show Failures Only"] {
