@@ -26,13 +26,16 @@ public class DIParameterizedHandler<C> extends AbstractHandler {
     }
 
     private static IEclipseContext getParentContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getService(IEclipseContext.class);
+        return PlatformUI.getWorkbench().getService(IEclipseContext.class);
     }
 
     @Override
     public Object execute(final ExecutionEvent event) throws ExecutionException {
         final IEclipseContext child = getActiveContext().createChild();
         
+        for (final String stateId : event.getCommand().getStateIds()) {
+            child.set(stateId, event.getCommand().getState(stateId));
+        }
         for (final Object key : event.getParameters().keySet()) {
             if (key instanceof String) {
                 child.set((String) key, event.getParameters().get(key));
