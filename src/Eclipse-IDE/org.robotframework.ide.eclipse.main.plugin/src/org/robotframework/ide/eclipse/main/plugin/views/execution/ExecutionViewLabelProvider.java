@@ -22,8 +22,8 @@ class ExecutionViewLabelProvider extends RedCommonLabelProvider {
 
         final StyledString label = new StyledString(node.getName());
         final int time = node.getElapsedTime();
-        if (time > 0) {
-            label.append(" (" + String.valueOf(((double) time) / 1000) + " s)",
+        if (time >= 0) {
+            label.append(String.format(" (%.3f s)", ((double) time) / 1000),
                     Stylers.Common.ECLIPSE_DECORATION_STYLER);
         }
         return label;
