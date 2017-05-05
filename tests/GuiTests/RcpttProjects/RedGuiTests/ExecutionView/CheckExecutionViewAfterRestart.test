@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UOYUcF4YEeWeit3EM6sPPA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/4/17 3:35 PM
+Save-Time: 5/5/17 2:09 PM
 Testcase-Type: ecl
 Verifications: _vb2c4GA9EeW-9bGOK0urnw
 
@@ -34,7 +34,7 @@ get-view "Execution View" | close
 get-menu "Window/Show View/Execution View" | click
 
 //view should not be empty 
-check-execution-view-labels -pass 4 -fail 3 -all 7 -color "red"
+check-execution-view-labels -pass 4 -fail 3 -current_test 7 -all 7 -bar_color "red"
 with [get-view "Execution View"] {
     get-button "Expand All" | get-property enablement | equals true | verify-true
     get-button "Collapse All" | get-property enablement | equals true | verify-true
