@@ -85,7 +85,7 @@ class RedXmlEditsCollector {
         }
 
         final String toMatch = "\\s*(<referencedLibrary\\s*type=\"([^\"]*)\"\\s*name=\"([" + tryk
-                + "])\"\\s*path=\"([^\"]*)\"/>)()\\s*";
+                + "]*)\"\\s*path=\"([^\"]*)\"/>)\\s*";
        final Pattern toMatchPattern = Pattern.compile(toMatch);
 
         final LibraryMovedMatchesAccess matchesAccess = new LibraryMovedMatchesAccess(toMatchPattern);

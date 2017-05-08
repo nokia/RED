@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
@@ -24,7 +22,7 @@ import org.eclipse.text.edits.TextEditGroup;
  */
 class RedXmlInFileChangesCollector {
 
-    private IFile redXmlFile;
+    private final IFile redXmlFile;
 
     private final Optional<IPath> pathAfterRefactoring;
 
@@ -38,17 +36,6 @@ class RedXmlInFileChangesCollector {
     }
 
     Optional<Change> collect() {
-        if (pathAfterRefactoring.isPresent()) {
-            if (!pathAfterRefactoring.get().segment(0).equals(pathBeforeRefactoring.segment(0)))
-
-            {
-                IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-                redXmlFile = root.getFile(pathAfterRefactoring.get()
-                        .removeLastSegments(pathAfterRefactoring.get().segmentCount() - 1)
-                        .append(redXmlFile.getName()));
-            }
-
-        }
         final RedXmlEditsCollector redXmlEdits = new RedXmlEditsCollector(pathBeforeRefactoring, pathAfterRefactoring);
         final List<TextEdit> validationExcluded = redXmlEdits
                 .collectEditsInExcludedPaths(redXmlFile.getProject().getName(), redXmlFile);
