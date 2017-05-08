@@ -1,0 +1,79 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
+Element-Name: RenameProjectNameRedXml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Y5c34CjREeeF0_hmqEfhuQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/8/17 9:43 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// add library to red.xml
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/here_is_class.py" | get-menu "Robot Framework/Add Library to red.xml" | click
+}
+// verify if library is in Robot Referenced libraries
+get-window "Select library class" | get-table | select "here_is_class" | click -default
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/here_is_class RobotProject \\(0\\)" | get-property caption 
+    | equals "here_is_class RobotProject (0)" | verify-true
+// verify red.xml if name of project is correct for added library
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" 
+    | get-menu "Open With/Text Editor" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+// close red.xml
+get-view "Project Explorer" | click
+get-editor "red.xml" | close
+// rename project
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Rename..." | click
+with [get-window "Rename Resource"] {
+    get-editbox -after [get-label "New name:"] | set-text RobotProjectNewName
+    get-button OK | click
+}
+// verify if library is in Robot Referenced libraries
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProjectNewName | double-click
+    select "RobotProjectNewName/Robot Referenced libraries" | double-click
+}
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProjectNewName/Robot Referenced libraries/here_is_class RobotProjectNewName \\(0\\)" 
+    | get-property caption | equals "here_is_class RobotProjectNewName (0)" | verify-true
+// verify red.xml if name of project is correct for added library
+get-view "Project Explorer" | get-tree | select "RobotProjectNewName/red.xml" | get-menu "Open With/Text Editor" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewName\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
