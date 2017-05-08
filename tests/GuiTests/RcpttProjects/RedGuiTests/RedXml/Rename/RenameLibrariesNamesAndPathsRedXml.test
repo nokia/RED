@@ -1,0 +1,144 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
+Element-Name: RenameLibrariesNamesAndPathsRedXml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _m_PqIB6aEeeW-PmLWrUUww
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/8/17 10:37 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// create second project
+get-view "Project Explorer" | get-tree | select RobotProject | double-click
+get-menu "File/New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text RobotProjectTwo
+    get-button Finish | click
+}
+// add libraries to red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/here_is_class.py" 
+    | get-menu "Robot Framework/Add Library to red.xml" | click
+get-window "Select library class" | get-table | select "here_is_class" | click -default
+get-view "Project Explorer" | get-tree | select "RobotProject/only_function.py" 
+    | get-menu "Robot Framework/Add Library to red.xml" | click
+// verify if libraries are in Robot Referenced libraries
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/here_is_class RobotProject \\(0\\)" | get-property caption 
+        | equals "here_is_class RobotProject (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" | get-property caption 
+        | equals "only_function RobotProject (1)" | verify-true
+}
+// verify red.xml if name of libraries are correct
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" 
+    | get-menu "Open With/Text Editor" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+// close red.xml
+get-view "Project Explorer" | click
+get-editor "red.xml" | close
+// rename one of the libraries
+get-view "Project Explorer" | get-tree | select "RobotProject/here_is_class.py" | get-menu "Rename..." | click
+with [get-window "Rename Resource"] {
+    get-editbox -after [get-label "New name:"] | set-text "here_is_classNewName.py"
+    get-button OK | click
+}
+// verify red.xml if name of libraries are correct
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | get-menu "Open With/Text Editor" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+// close red.xml
+get-view "Project Explorer" | click
+get-editor "red.xml" | close
+// put library to some folder
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/here_is_classNewName.py"
+    get-item "RobotProject/here_is_classNewName.py" | drag-start 23 12
+    get-item "RobotProject/calculator.pyc" | drag-enter 34 6 -detail move
+    get-item "RobotProject/calculator.pyc" | drag-over 34 0
+    get-item "RobotProject/calculator.py" | drag-over 35 0
+    get-item "RobotProject/simpleModule" | drag-over 35 0 -detail move
+    get-item "RobotProject/libs" | drag-over 36 2 -detail move
+    get-item "RobotProject/folder" | drag-over 37 4 -detail move
+    get-item "RobotProject/calculator.pyc" | drag-exit
+    get-item "RobotProject/folder" | drag-accept 37 4 -detail move
+    drag-set-data
+    get-item "RobotProject/folder" | drop 37 4 -detail move
+    drag-end -detail move
+}
+// verify if libraries are in Robot Referenced libraries
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "here_is_classNewName RobotProject/folder (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "only_function RobotProject (1)" | verify-true
+}
+// verify red.xml if name of libraries are correct
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | get-menu "Open With/Text Editor" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+// cory library to second project
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/only_function.py" | get-menu Copy | click
+    select RobotProjectTwo | get-menu Paste | click
+    select "RobotProjectTwo/only_function.py" | get-menu "Robot Framework/Add Library to red.xml" | click
+}
+// verify if libraries is in Robot Referenced libraries of second project
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProjectTwo/Robot Referenced libraries/only_function RobotProjectTwo \\(1\\)" 
+    | get-property caption | equals "only_function RobotProjectTwo (1)" | verify-true
+// verify if libraries is in Robot Referenced libraries of first project
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "here_is_classNewName RobotProject/folder (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "only_function RobotProject (1)" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
