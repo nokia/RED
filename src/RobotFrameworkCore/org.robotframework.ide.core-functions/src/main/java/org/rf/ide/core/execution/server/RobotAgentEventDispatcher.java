@@ -23,6 +23,7 @@ import org.rf.ide.core.execution.LogLevel;
 import org.rf.ide.core.execution.RobotAgentEventListener;
 import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.executor.RedURI;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
@@ -375,7 +376,8 @@ class RobotAgentEventDispatcher {
             return null;
         }
         try {
-            return new URI("file://" + (source.startsWith("/") ? "" : "/") + source.replaceAll("\\\\", "/"));
+            final String escaped = RedURI.URI_SPECIAL_CHARS_ESCAPER.escape(source);
+            return new URI("file://" + (escaped.startsWith("/") ? "" : "/") + escaped.replaceAll("\\\\", "/"));
         } catch (final URISyntaxException e) {
             return null;
         }
