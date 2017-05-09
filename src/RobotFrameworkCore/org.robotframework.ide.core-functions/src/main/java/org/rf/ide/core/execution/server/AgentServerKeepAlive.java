@@ -23,10 +23,6 @@ public class AgentServerKeepAlive extends RobotDefaultAgentEventListener {
         return isHandlingEvents;
     }
 
-    public void stopHandlingEvents() {
-        isHandlingEvents = false;
-    }
-
     @Override
     public void handleClosed() {
         isHandlingEvents = false;
