@@ -8,7 +8,7 @@ package org.rf.ide.core.execution.server.response;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.TestsMode;
+import org.rf.ide.core.execution.agent.TestsMode;
 
 public class InitializeAgentTest {
 

@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import org.rf.ide.core.execution.RobotAgentEventListener;
-import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 
 public class AgentConnectionServer {
 

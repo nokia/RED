@@ -3,12 +3,19 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.execution;
+package org.rf.ide.core.execution.agent;
 
-import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
+import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.server.AgentClient;
 
 public interface RobotAgentEventListener {
@@ -23,21 +30,19 @@ public interface RobotAgentEventListener {
 
     void handleVersions(String pythonVersion, String robotVersion, int protocolVersion);
 
-    void handleSuiteStarted(String name, URI suiteFilePath, int totalTests, List<String> childSuites,
-            List<String> childTests);
+    void handleSuiteStarted(SuiteStartedEvent event);
 
-    void handleSuiteEnded(String suiteName, int elapsedTime, Status status, String errorMessage);
+    void handleSuiteEnded(SuiteEndedEvent event);
 
-    void handleTestStarted(String testCaseName, String testCaseLongName);
+    void handleTestStarted(TestStartedEvent event);
 
-    void handleTestEnded(String testCaseName, String testCaseLongName, int elapsedTime, Status status,
-            String errorMessage);
+    void handleTestEnded(TestEndedEvent event);
 
-    void handleKeywordStarted(String keywordName, String keywordType, List<String> keywordArgs);
+    void handleKeywordStarted(KeywordStartedEvent event);
 
-    void handleKeywordEnded(String keywordName, String keywordType);
+    void handleKeywordEnded(KeywordEndedEvent event);
 
-    void handleResourceImport(URI resourceFilePath);
+    void handleResourceImport(ResourceImportEvent event);
 
     void handleGlobalVariables(Map<String, String> globalVars);
 
@@ -45,7 +50,7 @@ public interface RobotAgentEventListener {
 
     void handleLogMessage(String msg, LogLevel level, String timestamp);
 
-    void handleOutputFile(URI path);
+    void handleOutputFile(OutputFileEvent event);
 
     void handleCheckCondition();
 
@@ -61,7 +66,7 @@ public interface RobotAgentEventListener {
 
     void handleMessage(String msg, LogLevel level);
 
-    void handleLibraryImport(String name, URI importer, URI source, List<String> args);
+    void handleLibraryImport(LibraryImportEvent event);
 
     public static class RobotAgentEventsListenerException extends RuntimeException {
 

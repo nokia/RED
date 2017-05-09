@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
-import org.rf.ide.core.execution.RobotAgentEventListener;
-import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 
 import com.google.common.collect.ImmutableMap;
 

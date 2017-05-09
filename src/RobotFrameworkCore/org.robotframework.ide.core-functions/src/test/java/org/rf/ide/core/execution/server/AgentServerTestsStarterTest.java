@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
-import org.rf.ide.core.execution.TestsMode;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
+import org.rf.ide.core.execution.agent.TestsMode;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.server.response.StartExecution;
 
 public class AgentServerTestsStarterTest {

@@ -3,12 +3,19 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.execution;
+package org.rf.ide.core.execution.agent;
 
-import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
+import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.server.AgentClient;
 
 public abstract class RobotDefaultAgentEventListener implements RobotAgentEventListener {
@@ -40,41 +47,37 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleSuiteStarted(final String name, final URI suiteFilePath, final int totalTests,
-            final List<String> childSuites, final List<String> childTests) {
+    public void handleSuiteStarted(final SuiteStartedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleSuiteEnded(final String suiteName, final int elapsedTime, final Status status,
-            final String errorMessage) {
+    public void handleSuiteEnded(final SuiteEndedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleTestStarted(final String testCaseName, final String testCaseLongName) {
+    public void handleTestStarted(final TestStartedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleTestEnded(final String testCaseName, final String testCaseLongName, final int elapsedTime,
-            final Status status, final String errorMessage) {
+    public void handleTestEnded(final TestEndedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleKeywordStarted(final String keywordName, final String keywordType,
-            final List<String> keywordArgs) {
+    public void handleKeywordStarted(final KeywordStartedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleKeywordEnded(final String keywordName, final String keywordType) {
+    public void handleKeywordEnded(final KeywordEndedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleResourceImport(final URI resourceFilePath) {
+    public void handleResourceImport(final ResourceImportEvent event) {
         // implement in subclasses
     }
 
@@ -94,7 +97,7 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleOutputFile(final URI outputFilepath) {
+    public void handleOutputFile(final OutputFileEvent event) {
         // implement in subclasses
     }
 
@@ -134,8 +137,7 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleLibraryImport(final String name, final URI importer, final URI source,
-            final List<String> args) {
+    public void handleLibraryImport(final LibraryImportEvent event) {
         // implement in subclasses
     }
 }

@@ -7,7 +7,7 @@ package org.rf.ide.core.execution.server;
 
 import java.io.IOException;
 
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.server.response.ProtocolVersion;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
