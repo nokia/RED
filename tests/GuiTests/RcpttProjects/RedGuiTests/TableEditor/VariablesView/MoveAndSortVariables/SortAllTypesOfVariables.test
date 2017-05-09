@@ -1,181 +1,184 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _9mJtcCGJEeWIFM1C_X1kYg
+Contexts: _9mJtcCGJEeWIFM1C_X1kYg,_9iuJED04EeaUDrMBSMf5Ag
 Element-Name: SortAllTypesOfVariables
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _2ctFsCFhEeWIFM1C_X1kYg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/23/15 1:08 PM
-Tags: notTestable
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/9/17 6:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+proc "click-on-col-header" [val col]{
+	get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getStartXOfColumnPosition $col | let [val column_start -input]{
+		with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
+		    mouse-press [plus $column_start 20]  15 button1
+		    mouse-release [plus $column_start 20] 15  button1 524288
+		}
+	}
+}
+
+proc "click-to-sort" [val header_name]{
+	if [$header_name | eq "Variable"]{
+		click-on-col-header -col 1
+	}
+	if [$header_name | eq "Value"]{
+		click-on-col-header -col 2
+	}
+}
+
+proc "check-not-sorted-vars"{
+	check-variable-row -file "TestFile.robot" -row "0" -var "Variable" -value "Value" -comment "Comment"
+	check-variable-row -file "TestFile.robot" -row "1" -var "${a}" -value "text" -comment "# test1"
+	check-variable-row -file "TestFile.robot" -row "2" -var "${A}" -value "a" -comment "# test2"
+	check-variable-row -file "TestFile.robot" -row "3" -var "${zrr}" -value "Z" -comment "# test2"
+	check-variable-row -file "TestFile.robot" -row "4" -var "${1}" -value "abba" -comment "# Zorro"
+	check-variable-row -file "TestFile.robot" -row "5" -var "${5}" -value "!not touch" -comment "# 4"
+	check-variable-row -file "TestFile.robot" -row "6" -var "${a}" -value "1 2 3 4 5" -comment "# 6"
+	check-variable-row -file "TestFile.robot" -row "7" -var "${calar}" -value "not tab!" -comment "# 200"
+	check-variable-row -file "TestFile.robot" -row "8" -var "${c}" -value "$a" -comment "# _comment"
+	check-variable-row -file "TestFile.robot" -row "9" -var "@{a}" -value "[$1 @tab2]" -comment "# comment"
+	check-variable-row -file "TestFile.robot" -row "10" -var "${a}" -value "one two $three" -comment "# Belt"
+	check-variable-row -file "TestFile.robot" -row "11" -var "@{101}" -value "[&dict]"
+	check-variable-row -file "TestFile.robot" -row "12" -var "&{dict}" -value "{$key = value, [list] = }"
+	check-variable-row -file "TestFile.robot" -row "13" -var "${var1}" -value "@map"
+	check-variable-row -file "TestFile.robot" -row "14" -var "&{Dict2}" -value "{}"
+	check-variable-row -file "TestFile.robot" -row "15" -var "${var2}" -value "[@map, $parm \"1\" list 89]" -comment "# space 2"
+	check-variable-row -file "TestFile.robot" -row "16" -var "...add new scalar" -value ""
+}
+
+proc "check-source"{
+	get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+	get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+	    + "${a}    text    # test1\n"
+	    + "${A}    a    # test2\n"
+	    + "${zrr}    Z    # test2\n"
+	    + "${1}    abba    # Zorro\n"
+	    + "${5}    !not touch    # 4\n"
+	    + "${a}    1 2 3 4 5    # 6\n"
+	    + "${calar}    not tab!    # 200\n"
+	    + "${c}    $a    # _comment\n"
+	    + "@{a}    $1 @tab2    # comment\n"
+	    + "${a}    one two $three    # Belt\n"
+	    + "@{101}    &dict\n"
+	    + "&{dict}    $key=value  [list]\n"
+	    + "${var1}    @map\n"
+	    + "&{Dict2}\n"
+	    + "${var2}    @map  $parm \"1\" list 89    # space 2" | verify-true
+	    get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+}    
+
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
 
-        
-//----------------------------------------  sort by name ----------------------------------------------------
-//not sorted
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_not_sorted.csv" $RCPTT_project_path]]]
 
-//sort asc
-with [get-editor "TestFile.robot" | get-table | get-column-header Variable] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_sorted_asc_by_name.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 128 | verify-true
-
-//sort dec by name
-with [get-editor "TestFile.robot" | get-table | get-column-header Variable] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_sorted_des_by_name.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 1024 | verify-true
-
-//not sorted
-with [get-editor "TestFile.robot" | get-table | get-column-header Variable] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_not_sorted.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 0 | verify-true
-//-----------------------------------      sort by value  ----------------------------------
+//---------------------------------------- not sorted ------------------------------
+check-not-sorted-vars
 
 
-//sort asc by value
-with [get-editor "TestFile.robot" | get-table | get-column-header Value] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_sorted_asc_by_value.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 128 | verify-true
+//---------------------------------------- sorte asc ------------------------------
+click-to-sort -header_name "Variable"
 
-//sort dec by name
-with [get-editor "TestFile.robot" | get-table | get-column-header Value] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_sorted_des_by_value.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 1024 | verify-true
+check-variable-row -file "TestFile.robot" -row "0" -var "Variable" -value "Value" -comment "Comment"
+check-variable-row -file "TestFile.robot" -row "1" -var "${1}" -value "abba" -comment "# Zorro"
+check-variable-row -file "TestFile.robot" -row "2" -var "${5}" -value "!not touch" -comment "# 4"
+check-variable-row -file "TestFile.robot" -row "3" -var "${A}" -value "a" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "4" -var "${a}" -value "text" -comment "# test1"
+check-variable-row -file "TestFile.robot" -row "5" -var "${a}" -value "1 2 3 4 5" -comment "# 6"
+check-variable-row -file "TestFile.robot" -row "6" -var "${a}" -value "one two $three" -comment "# Belt"
+check-variable-row -file "TestFile.robot" -row "7" -var "${calar}" -value "not tab!" -comment "# 200"
+check-variable-row -file "TestFile.robot" -row "8" -var "${c}" -value "$a" -comment "# _comment"
+check-variable-row -file "TestFile.robot" -row "9" -var "${var1}" -value "@map"
+check-variable-row -file "TestFile.robot" -row "10" -var "${var2}" -value "[@map, $parm \"1\" list 89]" -comment "# space 2"
+check-variable-row -file "TestFile.robot" -row "11" -var "${zrr}" -value "Z" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "12" -var "&{Dict2}" -value "{}"
+check-variable-row -file "TestFile.robot" -row "13" -var "&{dict}" -value "{$key = value, [list] = }"
+check-variable-row -file "TestFile.robot" -row "14" -var "@{101}" -value "[&dict]"
+check-variable-row -file "TestFile.robot" -row "15" -var "@{a}" -value "[$1 @tab2]" -comment "# comment"
+check-variable-row -file "TestFile.robot" -row "16" -var "...add new scalar" -value ""
 
-//not sorted
-with [get-editor "TestFile.robot" | get-table | get-column-header Value] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_not_sorted.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 0 | verify-true
+check-source
 
-//-----------------------------------      sort by comment  ----------------------------------
+//---------------------------------------- sort desc ------------------------------
+click-to-sort -header_name "Variable"
+
+check-variable-row -file "TestFile.robot" -row "0" -var "Variable" -value "Value" -comment "Comment"
+check-variable-row -file "TestFile.robot" -row "1" -var "@{a}" -value "[$1 @tab2]" -comment "# comment"
+check-variable-row -file "TestFile.robot" -row "2" -var "@{101}" -value "[&dict]"
+check-variable-row -file "TestFile.robot" -row "3" -var "&{dict}" -value "{$key = value, [list] = }"
+check-variable-row -file "TestFile.robot" -row "4" -var "&{Dict2}" -value "{}"
+check-variable-row -file "TestFile.robot" -row "5" -var "${zrr}" -value "Z" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "6" -var "${var2}" -value "[@map, $parm \"1\" list 89]" -comment "# space 2"
+check-variable-row -file "TestFile.robot" -row "7" -var "${var1}" -value "@map"
+check-variable-row -file "TestFile.robot" -row "8" -var "${c}" -value "$a" -comment "# _comment"
+check-variable-row -file "TestFile.robot" -row "9" -var "${calar}" -value "not tab!" -comment "# 200"
+check-variable-row -file "TestFile.robot" -row "10" -var "${a}" -value "text" -comment "# test1"
+check-variable-row -file "TestFile.robot" -row "11" -var "${a}" -value "1 2 3 4 5" -comment "# 6"
+check-variable-row -file "TestFile.robot" -row "12" -var "${a}" -value "one two $three" -comment "# Belt"
+check-variable-row -file "TestFile.robot" -row "13" -var "${A}" -value "a" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "14" -var "${5}" -value "!not touch" -comment "# 4"
+check-variable-row -file "TestFile.robot" -row "15" -var "${1}" -value "abba" -comment "# Zorro"
+check-variable-row -file "TestFile.robot" -row "16" -var "...add new scalar" -value ""
 
 
-//sort asc by name
-with [get-editor "TestFile.robot" | get-table | get-column-header Comment] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_sorted_asc_by_comment.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 128 | verify-true
+//---------------------------------------- not sorted ------------------------------
+click-to-sort -header_name "Variable"
+check-not-sorted-vars
 
-//sort dec by name
-with [get-editor "TestFile.robot" | get-table | get-column-header Comment] {
-    click
-}
-assert-tables-match [get-editor "TestFile.robot" | get-table | get-table-data]
-[ read-csv-file [uri-from-path [format "%s/TableEditor/VariablesView/MoveAndSortVariables/TestData/all_var_sorted_des_by_comment.csv" $RCPTT_project_path]]]
-get-editor "TestFile.robot" | get-table | get-property "getSortDirection()" | equals 1024 | verify-true
-  
-//sort by name again and save  
-with [get-editor "TestFile.robot" | get-table] {
-    get-column-header Variable | click
-}        
-//check if soring not changed  Source      
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
-    + "${a}    text    # test1\n"
-    + "${A}    a    # test2\n"
-    + "${zrr}    Z    # test2\n"
-    + "${1}    abba    # Zorro\n"
-    + "${5}    !not touch    # 4\n"
-    + "${a}    1 2 3 4 5    # 6\n"
-    + "${calar}    not tab!    # 200\n"
-    + "${c}    $a    # _comment\n"
-    + "@{a}    $1 @tab2    # comment\n"
-    + "${a}    one two $three    # Belt\n"
-    + "@{101}    &dict\n"
-    + "&{dict}    $key=value  [list]\n"
-    + "${var1}    @map\n"
-    + "&{Dict2}\n"
-    + "${var2}    @map  $parm \"1\" list 89    # space 2" | verify-true
-    
- 
-//close editor and check if Souce was chanaged  (sorting is reset)
- get-editor "TestFile.robot" | close
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
-    + "${a}    text    # test1\n"
-    + "${A}    a    # test2\n"
-    + "${zrr}    Z    # test2\n"
-    + "${1}    abba    # Zorro\n"
-    + "${5}    !not touch    # 4\n"
-    + "${a}    1 2 3 4 5    # 6\n"
-    + "${calar}    not tab!    # 200\n"
-    + "${c}    $a    # _comment\n"
-    + "@{a}    $1 @tab2    # comment\n"
-    + "${a}    one two $three    # Belt\n"
-    + "@{101}    &dict\n"
-    + "&{dict}    $key=value  [list]\n"
-    + "${var1}    @map\n"
-    + "&{Dict2}\n"
-    + "${var2}    @map  $parm \"1\" list 89    # space 2" | verify-true
 
-//add new varaible, sort, and save
-with [get-editor "TestFile.robot"] {
-    get-tab-folder | get-tab-item Variables | click
-    with [get-table] {
-        select "...add new scalar" | key-type Enter
-        select "${var3}" | activate-cell-edit
-        apply-cell-edit -deactivate
-        select "${var3}" | double-click
-        select "${var3}" | activate-cell-edit -column 1
-        with [get-editbox] {
-            set-text "new value"
-            key-type "NUMPAD_ENTER" "\\u000D"
-        }
-        apply-cell-edit -deactivate
-        get-column-header Value | click
-        key-type "M1+s"
-    }
-    get-tab-folder | get-tab-item Source | click
-    close
-}
+//-----------------------------------      sort by value - asc     ----------------------------------
 
-//check if new scalar was added to the end
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
-    + "${a}    text    # test1\n"
-    + "${A}    a    # test2\n"
-    + "${zrr}    Z    # test2\n"
-    + "${1}    abba    # Zorro\n"
-    + "${5}    !not touch    # 4\n"
-    + "${a}    1 2 3 4 5    # 6\n"
-    + "${calar}    not tab!    # 200\n"
-    + "${c}    $a    # _comment\n"
-    + "@{a}    $1 @tab2    # comment\n"
-    + "${a}    one two $three    # Belt\n"
-    + "@{101}    &dict\n"
-    + "&{dict}    $key=value  [list]\n"
-    + "${var1}    @map\n"
-    + "&{Dict2}\n"
-    + "${var2}    @map  $parm \"1\" list 89    # space 2\n"
-    + "${var3}    new value" | verify-true   
-    
+click-to-sort -header_name "Value"
+check-variable-row -file "TestFile.robot" -row "0" -var "Variable" -value "Value" -comment "Comment"
+check-variable-row -file "TestFile.robot" -row "1" -var "${5}" -value "!not touch" -comment "# 4"
+check-variable-row -file "TestFile.robot" -row "2" -var "${c}" -value "$a" -comment "# _comment"
+check-variable-row -file "TestFile.robot" -row "3" -var "${a}" -value "1 2 3 4 5" -comment "# 6"
+check-variable-row -file "TestFile.robot" -row "4" -var "${var1}" -value "@map"
+check-variable-row -file "TestFile.robot" -row "5" -var "${zrr}" -value "Z" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "6" -var "@{a}" -value "[$1 @tab2]" -comment "# comment"
+check-variable-row -file "TestFile.robot" -row "7" -var "@{101}" -value "[&dict]"
+check-variable-row -file "TestFile.robot" -row "8" -var "${var2}" -value "[@map, $parm \"1\" list 89]" -comment "# space 2"
+check-variable-row -file "TestFile.robot" -row "9" -var "${A}" -value "a" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "10" -var "${1}" -value "abba" -comment "# Zorro"
+check-variable-row -file "TestFile.robot" -row "11" -var "${calar}" -value "not tab!" -comment "# 200"
+check-variable-row -file "TestFile.robot" -row "12" -var "${a}" -value "one two $three" -comment "# Belt"
+check-variable-row -file "TestFile.robot" -row "13" -var "${a}" -value "text" -comment "# test1"
+check-variable-row -file "TestFile.robot" -row "14" -var "&{dict}" -value "{$key = value, [list] = }"
+check-variable-row -file "TestFile.robot" -row "15" -var "&{Dict2}" -value "{}"
+check-variable-row -file "TestFile.robot" -row "16" -var "...add new scalar" -value ""
+
+//-----------------------------------      sort by value - desc ----------------------------------
+
+click-to-sort -header_name "Value"
+
+check-variable-row -file "TestFile.robot" -row "0" -var "Variable" -value "Value" -comment "Comment"
+check-variable-row -file "TestFile.robot" -row "1" -var "&{Dict2}" -value "{}"
+check-variable-row -file "TestFile.robot" -row "2" -var "&{dict}" -value "{$key = value, [list] = }"
+check-variable-row -file "TestFile.robot" -row "3" -var "${a}" -value "text" -comment "# test1"
+check-variable-row -file "TestFile.robot" -row "4" -var "${a}" -value "one two $three" -comment "# Belt"
+check-variable-row -file "TestFile.robot" -row "5" -var "${calar}" -value "not tab!" -comment "# 200"
+check-variable-row -file "TestFile.robot" -row "6" -var "${1}" -value "abba" -comment "# Zorro"
+check-variable-row -file "TestFile.robot" -row "7" -var "${A}" -value "a" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "8" -var "${var2}" -value "[@map, $parm \"1\" list 89]" -comment "# space 2"
+check-variable-row -file "TestFile.robot" -row "9" -var "@{101}" -value "[&dict]"
+check-variable-row -file "TestFile.robot" -row "10" -var "@{a}" -value "[$1 @tab2]" -comment "# comment"
+check-variable-row -file "TestFile.robot" -row "11" -var "${zrr}" -value "Z" -comment "# test2"
+check-variable-row -file "TestFile.robot" -row "12" -var "${var1}" -value "@map"
+check-variable-row -file "TestFile.robot" -row "13" -var "${a}" -value "1 2 3 4 5" -comment "# 6"
+check-variable-row -file "TestFile.robot" -row "14" -var "${c}" -value "$a" -comment "# _comment"
+check-variable-row -file "TestFile.robot" -row "15" -var "${5}" -value "!not touch" -comment "# 4"
+check-variable-row -file "TestFile.robot" -row "16" -var "...add new scalar" -value ""
+
+check-source
+
+//-----------------------------------      sort by value - not sorted  ----------------------------------
+click-to-sort -header_name "Value"
+
+check-not-sorted-vars
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
