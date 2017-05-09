@@ -9,7 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
 
 public class ExecutionViewContentProviderTest {
 

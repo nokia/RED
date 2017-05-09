@@ -8,8 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 public class ExecutionMessagesTrackerTest {
@@ -46,7 +48,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestStarted("tc", "test_case");
+        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case"));
 
         assertThat(store.getMessage()).isEqualTo("Starting test: test_case\n");
     }
@@ -56,7 +58,7 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestStarted("tc", "test_case");
+        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case"));
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);
@@ -70,7 +72,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestEnded("tc", "test_case", 100, Status.PASS, "");
+        tracker.handleTestEnded(new TestEndedEvent("tc", "test_case", 100, Status.PASS, ""));
 
         assertThat(store.getMessage()).isEqualTo("Ending test: test_case\n\n");
     }
@@ -80,7 +82,7 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestEnded("tc", "test_case", 100, Status.PASS, "");
+        tracker.handleTestEnded(new TestEndedEvent("tc", "test_case", 100, Status.PASS, ""));
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);
