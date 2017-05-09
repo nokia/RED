@@ -9,23 +9,26 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.RobotAgentEventListener;
-import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
-import org.rf.ide.core.execution.Status;
-import org.rf.ide.core.executor.RedURI;
+import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
+import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
 class RobotAgentEventDispatcher {
@@ -163,87 +166,51 @@ class RobotAgentEventDispatcher {
     }
 
     private void handleResourceImport(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("resource_import");
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final URI resourceFilePath = toFileUri((String) attributes.get("source"));
-
+        final ResourceImportEvent event = ResourceImportEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleResourceImport(resourceFilePath);
+            listener.handleResourceImport(event);
         }
     }
 
     private void handleStartSuite(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("start_suite");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final URI suiteFilePath = toFileUri((String) attributes.get("source"));
-        final List<String> childSuites = ensureListOfStrings((List<?>) attributes.get("suites"));
-        final List<String> childTests = ensureListOfStrings((List<?>) attributes.get("tests"));
-        final int totalTests = (Integer) attributes.get("totaltests");
-
+        final SuiteStartedEvent event = SuiteStartedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleSuiteStarted(name, suiteFilePath, totalTests, childSuites, childTests);
+            listener.handleSuiteStarted(event);
         }
     }
 
     private void handleEndSuite(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("end_suite");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final int elapsedTime = (Integer) attributes.get("elapsedtime");
-        final String errorMessage = (String) attributes.get("message");
-        final Status suiteStatus = Status.valueOf((String) attributes.get("status"));
-
+        final SuiteEndedEvent event = SuiteEndedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleSuiteEnded(name, elapsedTime, suiteStatus, errorMessage);
+            listener.handleSuiteEnded(event);
         }
     }
 
     private void handleStartTest(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("start_test");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final String longName = (String) attributes.get("longname");
-
+        final TestStartedEvent event = TestStartedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleTestStarted(name, longName);
+            listener.handleTestStarted(event);
         }
     }
 
     private void handleEndTest(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("end_test");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final String longName = (String) attributes.get("longname");
-        final int elapsedTime = (Integer) attributes.get("elapsedtime");
-        final String errorMessage = (String) attributes.get("message");
-        final Status testStatus = Status.valueOf((String) attributes.get("status"));
-
+        final TestEndedEvent event = TestEndedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleTestEnded(name, longName, elapsedTime, testStatus, errorMessage);
+            listener.handleTestEnded(event);
         }
     }
 
     private void handleStartKeyword(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("start_keyword");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final String keywordType = (String) attributes.get("type");
-        final List<String> keywordArgs = ensureListOfStrings((List<?>) attributes.get("args"));
-
+        final KeywordStartedEvent event = KeywordStartedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleKeywordStarted(name, keywordType, keywordArgs);
+            listener.handleKeywordStarted(event);
         }
     }
 
     private void handleEndKeyword(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("end_keyword");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final String keywordType = (String) attributes.get("type");
-
+        final KeywordEndedEvent event = KeywordEndedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleKeywordEnded(name, keywordType);
+            listener.handleKeywordEnded(event);
         }
     }
 
@@ -320,27 +287,16 @@ class RobotAgentEventDispatcher {
     }
 
     private void handleOutputFile(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("output_file");
-        final String filepath = (String) arguments.get(0);
-        final URI path = filepath == null ? null : toFileUri(filepath);
-
+        final OutputFileEvent event = OutputFileEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleOutputFile(path);
+            listener.handleOutputFile(event);
         }
     }
 
     private void handleLibraryImport(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("library_import");
-        final String libraryName = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final String originalName = (String) attributes.get("originalname");
-        final String name = Strings.isNullOrEmpty(originalName) ? libraryName : originalName;
-        final URI importer = toFileUri((String) attributes.get("importer"));
-        final URI source = toFileUri((String) attributes.get("source"));
-        final List<String> args = ensureListOfStrings((List<?>) attributes.get("args"));
-
+        final LibraryImportEvent event = LibraryImportEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleLibraryImport(name, importer, source, args);
+            listener.handleLibraryImport(event);
         }
     }
 
@@ -369,22 +325,6 @@ class RobotAgentEventDispatcher {
             }
         }
         return false;
-    }
-
-    private URI toFileUri(final String source) {
-        if (source == null) {
-            return null;
-        }
-        try {
-            final String escaped = RedURI.URI_SPECIAL_CHARS_ESCAPER.escape(source);
-            return new URI("file://" + (escaped.startsWith("/") ? "" : "/") + escaped.replaceAll("\\\\", "/"));
-        } catch (final URISyntaxException e) {
-            return null;
-        }
-    }
-
-    private static List<String> ensureListOfStrings(final List<?> list) {
-        return list.stream().map(String.class::cast).collect(Collectors.toList());
     }
 
     private static Map<String, Object> ensureOrderedMapOfStringsToObjects(final Map<?, ?> map) {

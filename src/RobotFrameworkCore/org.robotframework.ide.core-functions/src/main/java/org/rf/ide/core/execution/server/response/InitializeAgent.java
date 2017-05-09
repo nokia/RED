@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.rf.ide.core.execution.TestsMode;
+import org.rf.ide.core.execution.agent.TestsMode;
 
 import com.google.common.collect.ImmutableMap;
 

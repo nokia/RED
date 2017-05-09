@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 
 import com.google.common.io.Files;
 
@@ -31,27 +32,28 @@ public class RobotDryRunLibraryImportCollector {
         this.standardLibrariesNames = standardLibrariesNames;
     }
 
-    public void collectFromLibraryImportEvent(final String libraryName, final URI importer, final URI source,
-            final List<String> args) {
-        if (importer != null) {
+    public void collectFromLibraryImportEvent(final LibraryImportEvent event) {
+        if (event.getImporter() != null) {
             RobotDryRunLibraryImport dryRunLibraryImport = null;
-            if (source != null) {
+            if (event.getSource() != null) {
                 if (currentLibraryImportWithFail != null
-                        && libraryName.equals(currentLibraryImportWithFail.getName())) {
+                        && event.getName().equals(currentLibraryImportWithFail.getName())) {
                     dryRunLibraryImport = currentLibraryImportWithFail;
                 } else {
-                    dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName, source, importer, args);
+                    dryRunLibraryImport = new RobotDryRunLibraryImport(event.getName(), event.getSource(),
+                            event.getImporter(), event.getArguments());
                 }
             } else {
-                dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName, importer, args);
+                dryRunLibraryImport = new RobotDryRunLibraryImport(event.getName(), event.getImporter(),
+                        event.getArguments());
             }
             final int index = importedLibraries.indexOf(dryRunLibraryImport);
             if (index < 0) {
-                if (!standardLibrariesNames.contains(libraryName)) {
+                if (!standardLibrariesNames.contains(event.getName())) {
                     importedLibraries.add(dryRunLibraryImport);
                 }
             } else {
-                importedLibraries.get(index).addImporterPath(importer);
+                importedLibraries.get(index).addImporterPath(event.getImporter());
             }
         }
         resetCurrentLibraryImportWithFail();

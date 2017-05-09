@@ -13,6 +13,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -23,8 +24,8 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of("String"));
 
-        libImportCollector.collectFromLibraryImportEvent("String", new URI("file:///suite.robot"),
-                new URI("file:///String.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("String",
+                new URI("file:///suite.robot"), new URI("file:///String.py"), Arrays.asList()));
 
         assertThat(libImportCollector.getImportedLibraries()).isEmpty();
     }
@@ -34,12 +35,12 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of("String", "Xml"));
 
-        libImportCollector.collectFromLibraryImportEvent("String", new URI("file:///suite.robot"),
-                new URI("file:///String.py"), Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite.robot"),
-                new URI("file:///source.py"), Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("Xml", new URI("file:///suite.robot"),
-                new URI("file:///Xml.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("String",
+                new URI("file:///suite.robot"), new URI("file:///String.py"), Arrays.asList()));
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib", new URI("file:///suite.robot"),
+                new URI("file:///source.py"), Arrays.asList()));
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("Xml", new URI("file:///suite.robot"),
+                new URI("file:///Xml.py"), Arrays.asList()));
 
         final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", new URI("file:///source.py"),
                 new URI("file:///suite.robot"), Arrays.asList());
@@ -84,12 +85,12 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of());
 
-        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite1.robot"),
-                new URI("file:///lib.py"), Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite2.robot"),
-                new URI("file:///lib.py"), Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib", new URI("file:///suite3.robot"),
-                new URI("file:///lib.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib", new URI("file:///suite1.robot"),
+                new URI("file:///lib.py"), Arrays.asList()));
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib", new URI("file:///suite2.robot"),
+                new URI("file:///lib.py"), Arrays.asList()));
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib", new URI("file:///suite3.robot"),
+                new URI("file:///lib.py"), Arrays.asList()));
 
         final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", new URI("file:///lib.py"),
                 new URI("file:///suite1.robot"), Arrays.asList());
@@ -105,17 +106,17 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of());
 
-        libImportCollector.collectFromLibraryImportEvent("lib1", new URI("file:///suite1.robot"),
-                new URI("file:///lib1.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib1", new URI("file:///suite1.robot"),
+                new URI("file:///lib1.py"), Arrays.asList()));
         libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib2", "/suite2.robot"));
         libImportCollector.collectFromFailMessageEvent(createFailMessage("lib3"));
         libImportCollector.collectFromFailMessageEvent(createFailMessage("lib4"));
         libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "/suite5.robot"));
         libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "/other.robot"));
-        libImportCollector.collectFromLibraryImportEvent("lib6", new URI("file:///suite6.robot"),
-                new URI("file:///lib6.py"), Arrays.asList());
-        libImportCollector.collectFromLibraryImportEvent("lib6", new URI("file:///other.robot"),
-                new URI("file:///lib6.py"), Arrays.asList());
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib6", new URI("file:///suite6.robot"),
+                new URI("file:///lib6.py"), Arrays.asList()));
+        libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib6", new URI("file:///other.robot"),
+                new URI("file:///lib6.py"), Arrays.asList()));
 
         final RobotDryRunLibraryImport lib1 = new RobotDryRunLibraryImport("lib1", new URI("file:///lib1.py"),
                 new URI("file:///suite1.robot"), Arrays.asList());

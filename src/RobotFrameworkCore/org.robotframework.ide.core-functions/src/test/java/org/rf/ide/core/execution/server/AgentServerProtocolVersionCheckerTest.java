@@ -11,7 +11,7 @@ import static org.mockito.Mockito.verify;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.server.response.ProtocolVersion;
 
 public class AgentServerProtocolVersionCheckerTest {

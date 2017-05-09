@@ -8,8 +8,8 @@ package org.rf.ide.core.execution.server;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
-import org.rf.ide.core.execution.TestsMode;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.server.response.InitializeAgent;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.rf.ide.core.execution.server.response.StartExecution;
