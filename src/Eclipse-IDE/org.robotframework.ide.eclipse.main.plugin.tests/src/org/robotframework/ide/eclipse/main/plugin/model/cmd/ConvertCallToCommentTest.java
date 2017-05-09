@@ -104,4 +104,71 @@ public class ConvertCallToCommentTest {
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
                 .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
     }
+
+    @Test
+    public void testCaseExecutableRowIsProperlyCommented_whenThereAreMoreCalls() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  Log  nothing")
+                .appendLine("  call  1  2  #comment")
+                .appendLine("  Log  something")
+                .build();
+        final RobotCase testCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
+        final RobotKeywordCall keywordCall = testCase.getChildren().get(1);
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<TestCase> oldLinked = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
+
+        ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new ConvertCallToComment(eventBroker, keywordCall, "# call"))
+                .execute();
+
+        assertThat(testCase.getChildren().size()).isEqualTo(3);
+        final RobotKeywordCall result = testCase.getChildren().get(1);
+        assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
+        assertThat(result.getLinkedElement().getDeclaration().getTypes())
+                .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
+        assertThat(result.getName()).isEqualTo("");
+        assertThat(result.getArguments()).isEmpty();
+        assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
+        assertThat(result).has(properlySetParent());
+        assertThat(testCase.getLinkedElement().getTestExecutionRows()).doesNotContain(oldLinked);
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
+    }
+
+    @Test
+    public void keywordExecutableRowIsProperlyCommented_whenThereAreMoreCalls() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("kw")
+                .appendLine("  Log nothing")
+                .appendLine("  call  1  2  #comment")
+                .appendLine("  Log  something")
+                .build();
+        final RobotKeywordDefinition keyword = model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
+        final RobotKeywordCall keywordCall = keyword.getChildren().get(1);
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<UserKeyword> oldLinked = (RobotExecutableRow<UserKeyword>) keywordCall
+                .getLinkedElement();
+
+        ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new ConvertCallToComment(eventBroker, keywordCall, "# call"))
+                .execute();
+
+        assertThat(keyword.getChildren().size()).isEqualTo(3);
+        final RobotKeywordCall result = keyword.getChildren().get(1);
+        assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
+        assertThat(result.getLinkedElement().getDeclaration().getTypes())
+                .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
+        assertThat(result.getName()).isEqualTo("");
+        assertThat(result.getArguments()).isEmpty();
+        assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
+        assertThat(result).has(properlySetParent());
+        assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+    }
 }
