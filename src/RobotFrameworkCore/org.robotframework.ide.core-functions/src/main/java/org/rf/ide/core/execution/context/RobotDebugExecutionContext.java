@@ -87,7 +87,7 @@ public class RobotDebugExecutionContext {
         return false;
     }
 
-    public void startKeyword(final String name, final String type, final List<String> arguments) {
+    public void startKeyword(final String name, final String type) {
         currentKeywords.add(new KeywordContext(name, type));
         checkStartKeywordType(type);
     }
