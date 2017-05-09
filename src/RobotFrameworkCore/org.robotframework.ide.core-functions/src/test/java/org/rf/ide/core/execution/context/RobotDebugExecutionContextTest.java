@@ -11,7 +11,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -109,66 +108,64 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
         debugExecutionContext.startTest("Test");
 
-        debugExecutionContext.startKeyword("res.Given And total fee is 'nie'", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("res.Given And total fee is 'nie'", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("here"));
-        checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("BuiltIn.Set Test Variable", "Keyword",
-                Arrays.asList("${total_fee}", "${total_fee}"));
-        checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("res.And total fee is '10.00'", "Keyword", Arrays.asList(""));
-        checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("here"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("BuiltIn.Set Test Variable", "Keyword",
-                Arrays.asList("${total_fee}", "${total_fee}"));
+        debugExecutionContext.startKeyword("BuiltIn.Set Test Variable", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("res.And total fee is '10.00'", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("BuiltIn.Set Test Variable", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("and value is 10.00", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("and value is 10.00", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Should Be Equal", "Keyword", Arrays.asList("10.00", "${c}"));
-        checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("value is 10.00", "Keyword", Arrays.asList(""));
-        checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${c}"));
+        debugExecutionContext.startKeyword("BuiltIn.Should Be Equal", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("test.txt", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("value is 10.00", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("txt"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("res.test", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("test.txt", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("doNow"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("test.txt", "Keyword", Arrays.asList(""));
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res.test", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("txt"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("test.txt", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("res.test.txt", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("res.test.txt", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("hahaha res.test.txt")); // here
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword"); // here
                                                                                                             // could
                                                                                                             // be
                                                                                                             // inconsistency
@@ -185,29 +182,29 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("res.test", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("res.test", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("doNow"));
-        checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("test.txt", "Keyword", Arrays.asList(""));
-        checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("txt"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("res.data.Put", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("test.txt", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("put"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("And res.test.txt", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("res.data.Put", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("hahaha res.test.txt")); // here
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("And res.test.txt", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword"); // here
         // could
         // be
         // inconsistency
@@ -224,24 +221,24 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("res.data.NonDot", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("res.data.NonDot", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("jupi here"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("Lib.opa.opa_hop", "Keyword", Arrays.asList(""));
-        checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("dataAccessLayer.opa.opa_hop", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("Lib.opa.opa_hop", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("res_nested.KeyNested", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("dataAccessLayer.opa.opa_hop", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("ok"));
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res_nested.KeyNested", "Keyword");
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
@@ -274,32 +271,32 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startTest("Test");
 
-        debugExecutionContext.startKeyword("key", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("internal_test_case_keyword"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("scope_test_res.key_from_resource", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("scope_test_res.key_from_resource", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("key", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("internal_test_case_keyword"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("scope_test_res.key", "Keyword", Arrays.asList(""));
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("call_keyword_from_resource"));
+        debugExecutionContext.startKeyword("scope_test_res.key", "Keyword");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
         checkLineIfWasHit(linesSequenceToHit);
 
-        debugExecutionContext.startKeyword("scope_test_res.key", "Keyword", Arrays.asList(""));
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("call_keyword_from_resource"));
+        debugExecutionContext.startKeyword("scope_test_res.key", "Keyword");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
@@ -322,10 +319,10 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startTest("test a");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${scalar}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine1();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${a}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine1();
         debugExecutionContext.endKeyword("Keyword");
         startBuiltInLogKeyword1();
@@ -333,7 +330,7 @@ public class RobotDebugExecutionContextTest {
         startKey3Keyword();
         startBuiltInLogKeyword1();
 
-        debugExecutionContext.startKeyword("resource1.MyLog2", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.MyLog2", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
@@ -349,7 +346,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startTest("test b");
 
         startBuiltInLogKeyword1();
-        debugExecutionContext.startKeyword("key5", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key5", "Keyword");
         checkKeywordLine1();
         startKey1Keyword();
         startKey3Keyword();
@@ -366,7 +363,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test a");
-        debugExecutionContext.startKeyword("key1", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key1", "Keyword");
         checkKeywordLine2();
         startBuiltInLogKeyword2();
         debugExecutionContext.endKeyword("Keyword");
@@ -374,17 +371,17 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startTest("test b");
 
-        debugExecutionContext.startKeyword("key2", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key2", "Keyword");
         checkKeywordLine2();
-        debugExecutionContext.startKeyword("resource1.Keyword1", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.Keyword1", "Keyword");
         checkKeywordLine2();
-        debugExecutionContext.startKeyword("resource2.Keyword2", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource2.Keyword2", "Keyword");
         checkKeywordLine2();
-        debugExecutionContext.startKeyword("resource3.Keyword3", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource3.Keyword3", "Keyword");
         checkKeywordLine2();
         startBuiltInLogKeyword2();
         startBuiltInLogKeyword2();
-        debugExecutionContext.startKeyword("Keyword4", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("Keyword4", "Keyword");
         checkKeywordLine2();
         startBuiltInLogKeyword2();
         debugExecutionContext.endKeyword("Keyword");
@@ -407,78 +404,78 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
         debugExecutionContext.startTest("test a");
 
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For");
         checkKeywordLine3();
-        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem", Arrays.asList(""));
-        checkKeywordLine3();
-        startBuiltInLogKeyword3();
-        startBuiltInLogKeyword3();
-        debugExecutionContext.endKeyword("Test Foritem");
-        debugExecutionContext.startKeyword("${i} = 2", "Test Foritem", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem");
         checkKeywordLine3();
         startBuiltInLogKeyword3();
         startBuiltInLogKeyword3();
         debugExecutionContext.endKeyword("Test Foritem");
-        debugExecutionContext.startKeyword("${i} = 3", "Test Foritem", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} = 2", "Test Foritem");
         checkKeywordLine3();
         startBuiltInLogKeyword3();
         startBuiltInLogKeyword3();
         debugExecutionContext.endKeyword("Test Foritem");
-        debugExecutionContext.endKeyword("Test For");
-
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("${i} = 3", "Test Foritem");
         checkKeywordLine3();
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("testFor", "Keyword", Arrays.asList(""));
-        checkKeywordLine3();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
-        checkKeywordLine3();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For", Arrays.asList(""));
-        checkKeywordLine3();
-        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem", Arrays.asList(""));
-        checkKeywordLine3();
-        startBuiltInLogKeyword3();
-        debugExecutionContext.endKeyword("Test Foritem");
-        debugExecutionContext.startKeyword("${i} = 2", "Test Foritem", Arrays.asList(""));
-        checkKeywordLine3();
-        startBuiltInLogKeyword3();
-        debugExecutionContext.endKeyword("Test Foritem");
-        debugExecutionContext.startKeyword("${i} = 3", "Test Foritem", Arrays.asList(""));
-        checkKeywordLine3();
-        startBuiltInLogKeyword3();
-        debugExecutionContext.endKeyword("Test Foritem");
-        debugExecutionContext.endKeyword("Test For");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
-        checkKeywordLine3();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
-        checkKeywordLine3();
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("resource3.LoopKeyword", "Keyword", Arrays.asList(""));
-        checkKeywordLine3();
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For", Arrays.asList(""));
-        checkKeywordLine3();
-        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem", Arrays.asList(""));
-        checkKeywordLine3();
-        startBuiltInLogKeyword3();
-        startBuiltInLogKeyword3();
-        startBuiltInLogKeyword3();
-        debugExecutionContext.endKeyword("Test Foritem");
-        debugExecutionContext.startKeyword("${i} = 2", "Test Foritem", Arrays.asList(""));
-        checkKeywordLine3();
-        startBuiltInLogKeyword3();
         startBuiltInLogKeyword3();
         startBuiltInLogKeyword3();
         debugExecutionContext.endKeyword("Test Foritem");
         debugExecutionContext.endKeyword("Test For");
+
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine3();
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("testFor", "Keyword");
+        checkKeywordLine3();
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine3();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For");
+        checkKeywordLine3();
+        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem");
+        checkKeywordLine3();
+        startBuiltInLogKeyword3();
+        debugExecutionContext.endKeyword("Test Foritem");
+        debugExecutionContext.startKeyword("${i} = 2", "Test Foritem");
+        checkKeywordLine3();
+        startBuiltInLogKeyword3();
+        debugExecutionContext.endKeyword("Test Foritem");
+        debugExecutionContext.startKeyword("${i} = 3", "Test Foritem");
+        checkKeywordLine3();
+        startBuiltInLogKeyword3();
+        debugExecutionContext.endKeyword("Test Foritem");
+        debugExecutionContext.endKeyword("Test For");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine3();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine3();
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("resource3.LoopKeyword", "Keyword");
+        checkKeywordLine3();
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For");
+        checkKeywordLine3();
+        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem");
+        checkKeywordLine3();
+        startBuiltInLogKeyword3();
+        startBuiltInLogKeyword3();
+        startBuiltInLogKeyword3();
+        debugExecutionContext.endKeyword("Test Foritem");
+        debugExecutionContext.startKeyword("${i} = 2", "Test Foritem");
+        checkKeywordLine3();
+        startBuiltInLogKeyword3();
+        startBuiltInLogKeyword3();
+        startBuiltInLogKeyword3();
+        debugExecutionContext.endKeyword("Test Foritem");
+        debugExecutionContext.endKeyword("Test For");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine3();
         debugExecutionContext.endKeyword("Keyword");
 
@@ -492,10 +489,10 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test a");
-        debugExecutionContext.startKeyword("key1", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key1", "Keyword");
         checkKeywordLine4();
         startBuiltInLogKeyword4();
-        debugExecutionContext.startKeyword("key2", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key2", "Keyword");
         checkKeywordLine4();
         startBuiltInLogKeyword4();
         startBuiltInLogKeyword4();
@@ -505,7 +502,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endTest();
 
         debugExecutionContext.startTest("test b");
-        debugExecutionContext.startKeyword("key2", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key2", "Keyword");
         checkKeywordLine4();
         startBuiltInLogKeyword4();
         startBuiltInLogKeyword4();
@@ -520,61 +517,61 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test5");
-        debugExecutionContext.startKeyword("my_setup", "Test Setup", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_setup", "Test Setup");
         checkKeywordLine5();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup", Arrays.asList("setup"));
-        checkKeywordLine5();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Test Setup", Arrays.asList(""));
-        checkKeywordLine5();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup", Arrays.asList("12345"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Test Setup");
+        checkKeywordLine5();
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup");
+        checkKeywordLine5();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Test Setup");
 
-        debugExecutionContext.startKeyword("BuiltIn.Should Be True", "Keyword", Arrays.asList("True"));
+        debugExecutionContext.startKeyword("BuiltIn.Should Be True", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("my_teardown", "Test Teardown", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_teardown", "Test Teardown");
         checkKeywordLine5();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Teardown", Arrays.asList("close"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Teardown");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Teardown", Arrays.asList("close2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Teardown");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Test Teardown");
         debugExecutionContext.endTest();
 
         debugExecutionContext.startTest("test5_2");
-        debugExecutionContext.startKeyword("testCaseSetup", "Test Setup", Arrays.asList(""));
+        debugExecutionContext.startKeyword("testCaseSetup", "Test Setup");
         checkKeywordLine5();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup", Arrays.asList("setup"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Setup");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Test Setup");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("testCaseTeardown", "Test Teardown", Arrays.asList(""));
+        debugExecutionContext.startKeyword("testCaseTeardown", "Test Teardown");
         checkKeywordLine5();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Teardown", Arrays.asList("teardown"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Teardown");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Test Teardown");
@@ -588,29 +585,29 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test5");
-        debugExecutionContext.startKeyword("my_setup", "Setup", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_setup", "Setup");
         checkKeywordLine5();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("setup"));
-        checkKeywordLine5();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword", Arrays.asList(""));
-        checkKeywordLine5();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("12345"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword");
+        checkKeywordLine5();
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine5();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Setup");
 
-        debugExecutionContext.startKeyword("BuiltIn.Should Be True", "Keyword", Arrays.asList("True"));
+        debugExecutionContext.startKeyword("BuiltIn.Should Be True", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine5();
         debugExecutionContext.endKeyword("Keyword");
 
@@ -623,31 +620,31 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
-        debugExecutionContext.startKeyword("my_setup", "Suite Setup", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_setup", "Suite Setup");
         checkKeywordLine6();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Setup", Arrays.asList("setup"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Setup");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Suite Setup");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Setup", Arrays.asList("setup2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Setup");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Suite Setup");
         debugExecutionContext.endKeyword("Suite Setup");
 
         debugExecutionContext.startTest("test6");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endTest();
 
-        debugExecutionContext.startKeyword("my_teardown", "Suite Teardown", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_teardown", "Suite Teardown");
         checkKeywordLine6();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Teardown", Arrays.asList("close"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Teardown");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Suite Teardown");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Teardown", Arrays.asList("close2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Teardown");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Suite Teardown");
         debugExecutionContext.endKeyword("Suite Teardown");
@@ -660,31 +657,31 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
-        debugExecutionContext.startKeyword("my_setup", "Setup", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_setup", "Setup");
         checkKeywordLine6();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("setup"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("setup2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Setup");
 
         debugExecutionContext.startTest("test6");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endTest();
 
-        debugExecutionContext.startKeyword("my_teardown", "Teardown", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_teardown", "Teardown");
         checkKeywordLine6();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("close"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("close2"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine6();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Teardown");
@@ -698,23 +695,23 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
         debugExecutionContext.startTest("test7");
-        debugExecutionContext.startKeyword("${var} = resource1.KeywordReturnValue", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${var} = resource1.KeywordReturnValue", "Keyword");
         checkKeywordLine7();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("Return value"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine7();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${var}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine7();
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("${var2} = SecondKeywordReturnValue", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${var2} = SecondKeywordReturnValue", "Keyword");
         checkKeywordLine7();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("Return value"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine7();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${var2}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine7();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endTest();
@@ -729,33 +726,33 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startTest("test8");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("start"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword");
         checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("some log"));
-        checkKeywordLine8();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword", Arrays.asList(""));
-        checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("12345"));
-        checkKeywordLine8();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("resource2.testN", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword");
         checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("resource2.testN", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
@@ -774,33 +771,33 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startTest("test8");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("start"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword");
         checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("some log"));
-        checkKeywordLine8();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword", Arrays.asList(""));
-        checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("12345"));
-        checkKeywordLine8();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("resource2.testN", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword");
         checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("resource2.testN", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
@@ -816,36 +813,36 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startTest("test8");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("start"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
 
         debugExecutionContext
                 .resourceImport(new File(getClass().getResource("resources/resource1.robot").toURI()));
 
-        debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.MyKeyword1", "Keyword");
         checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("some log"));
-        checkKeywordLine8();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.endKeyword("Keyword");
-
-        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword", Arrays.asList(""));
-        checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("12345"));
-        checkKeywordLine8();
-        debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
 
-        debugExecutionContext.startKeyword("resource2.testN", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.SetupKeyword", "Keyword");
         checkKeywordLine8();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("resource2.testN", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
+        checkKeywordLine8();
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine8();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
@@ -860,17 +857,17 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
         debugExecutionContext.startTest("test a");
 
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For");
         checkKeywordLine9();
-        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem", Arrays.asList(""));
-        checkKeywordLine9();
-        startBuiltInLogKeyword9();
-        debugExecutionContext.startKeyword("testFor", "Test Foritem", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem");
         checkKeywordLine9();
         startBuiltInLogKeyword9();
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For", Arrays.asList(""));
+        debugExecutionContext.startKeyword("testFor", "Test Foritem");
         checkKeywordLine9();
-        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem", Arrays.asList(""));
+        startBuiltInLogKeyword9();
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Test For");
+        checkKeywordLine9();
+        debugExecutionContext.startKeyword("${i} = 1", "Test Foritem");
         checkKeywordLine9();
         startBuiltInLogKeyword9();
         debugExecutionContext.endKeyword("Test Foritem");
@@ -881,7 +878,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword("Test Foritem");
         debugExecutionContext.endKeyword("Test For");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("end"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine9();
         debugExecutionContext.endKeyword("Keyword");
 
@@ -895,17 +892,17 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
         debugExecutionContext.startTest("test a");
 
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "For", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "For");
         checkKeywordLine9();
-        debugExecutionContext.startKeyword("${i} = 1", "For Item", Arrays.asList(""));
-        checkKeywordLine9();
-        startBuiltInLogKeyword9_newType();
-        debugExecutionContext.startKeyword("testFor", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} = 1", "For Item");
         checkKeywordLine9();
         startBuiltInLogKeyword9_newType();
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "For", Arrays.asList(""));
+        debugExecutionContext.startKeyword("testFor", "Keyword");
         checkKeywordLine9();
-        debugExecutionContext.startKeyword("${i} = 1", "For Item", Arrays.asList(""));
+        startBuiltInLogKeyword9_newType();
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "For");
+        checkKeywordLine9();
+        debugExecutionContext.startKeyword("${i} = 1", "For Item");
         checkKeywordLine9();
         startBuiltInLogKeyword9_newType();
         debugExecutionContext.endKeyword("For Item");
@@ -916,7 +913,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword("For Item");
         debugExecutionContext.endKeyword("For");
 
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("end"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine9();
         debugExecutionContext.endKeyword("Keyword");
 
@@ -929,19 +926,19 @@ public class RobotDebugExecutionContextTest {
 
         debugExecutionContext.startSuite(modelFile.getParent(), parser);
 
-        debugExecutionContext.startKeyword("my_setup", "Setup", Arrays.asList(""));
+        debugExecutionContext.startKeyword("my_setup", "Setup");
         checkKeywordLine11();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("setup"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine11();
         debugExecutionContext.endKeyword("Keyword");
-        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Suite For", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} IN [ @{t} ]", "Suite For");
         checkKeywordLine11();
-        debugExecutionContext.startKeyword("${i} = 1", "Suite Foritem", Arrays.asList(""));
+        debugExecutionContext.startKeyword("${i} = 1", "Suite Foritem");
         checkKeywordLine11();
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Foritem", Arrays.asList("${i}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Foritem");
         checkKeywordLine11();
         debugExecutionContext.endKeyword("Suite Foritem");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Foritem", Arrays.asList("${i}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Suite Foritem");
         checkKeywordLine11();
         debugExecutionContext.endKeyword("Suite Foritem");
         debugExecutionContext.endKeyword("Suite Foritem");
@@ -949,7 +946,7 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endKeyword("Setup");
 
         debugExecutionContext.startTest("test11");
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("123"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine11();
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endTest();
@@ -1006,18 +1003,18 @@ public class RobotDebugExecutionContextTest {
 
         // execute & verify
         debugExecutionContext.startSuite(initModelFile.getParent(), parser);
-        debugExecutionContext.startKeyword("Init Setup Kw", "Setup", Arrays.asList(""));
+        debugExecutionContext.startKeyword("Init Setup Kw", "Setup");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("suite setup"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Setup");
 
         debugExecutionContext.startSuite(suiteModelFile.getParent(), parser);
         debugExecutionContext.startTest("Test");
-        debugExecutionContext.startKeyword("Local Kw", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("Local Kw", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("local"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
@@ -1025,63 +1022,63 @@ public class RobotDebugExecutionContextTest {
         debugExecutionContext.endSuite();
 
         debugExecutionContext.startSuite(initModelFile.getParent(), parser);
-        debugExecutionContext.startKeyword("Init Teardown Kw", "Teardown", Arrays.asList(""));
+        debugExecutionContext.startKeyword("Init Teardown Kw", "Teardown");
         checkLineIfWasHit(linesSequenceToHit);
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("init teardown"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkLineIfWasHit(linesSequenceToHit);
         debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endKeyword("Keyword");
     }
 
     private void startBuiltInLogKeyword1() {
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine1();
         debugExecutionContext.endKeyword("Keyword");
     }
 
     private void startBuiltInLogKeyword2() {
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine2();
         debugExecutionContext.endKeyword("Keyword");
     }
 
     private void startBuiltInLogKeyword3() {
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Foritem", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Foritem");
         checkKeywordLine3();
         debugExecutionContext.endKeyword("Test Foritem");
     }
 
     private void startBuiltInLogKeyword4() {
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("1234"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine4();
         debugExecutionContext.endKeyword("Keyword");
     }
 
     private void startBuiltInLogKeyword9() {
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Foritem", Arrays.asList("${i}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Test Foritem");
         checkKeywordLine9();
         debugExecutionContext.endKeyword("Test Foritem");
     }
 
     private void startBuiltInLogKeyword9_newType() {
-        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${i}"));
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword");
         checkKeywordLine9();
         debugExecutionContext.endKeyword("Keyword");
     }
 
     private void startKey1Keyword() {
-        debugExecutionContext.startKeyword("key1", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key1", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
-        debugExecutionContext.startKeyword("key2", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key2", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
-        debugExecutionContext.startKeyword("resource3.MyLog3", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource3.MyLog3", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
-        debugExecutionContext.startKeyword("testP", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("testP", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
@@ -1092,10 +1089,10 @@ public class RobotDebugExecutionContextTest {
     }
 
     private void startKey3Keyword() {
-        debugExecutionContext.startKeyword("key3", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key3", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
-        debugExecutionContext.startKeyword("key4", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("key4", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
@@ -1105,11 +1102,11 @@ public class RobotDebugExecutionContextTest {
     }
 
     private void startMyLogKeyword() {
-        debugExecutionContext.startKeyword("resource2.MyLog", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource2.MyLog", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
-        debugExecutionContext.startKeyword("testN", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("testN", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
@@ -1118,12 +1115,12 @@ public class RobotDebugExecutionContextTest {
     }
 
     private void startTestKKeyword() {
-        debugExecutionContext.startKeyword("resource1.testK", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("resource1.testK", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
         startMyLogKeyword();
-        debugExecutionContext.startKeyword("testM", "Keyword", Arrays.asList(""));
+        debugExecutionContext.startKeyword("testM", "Keyword");
         checkKeywordLine1();
         startBuiltInLogKeyword1();
         startBuiltInLogKeyword1();
