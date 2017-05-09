@@ -17,13 +17,6 @@ public class AgentServerKeepAliveTest {
     }
 
     @Test
-    public void keepAliveObjectDoesNotHandleEventsAnymore_whenItIsStopped() {
-        final AgentServerKeepAlive keepAlive = new AgentServerKeepAlive();
-        keepAlive.stopHandlingEvents();
-        assertThat(keepAlive.isHandlingEvents()).isFalse();
-    }
-
-    @Test
     public void keepAliveObjectDoesNotHandleEventsAnymore_whenCloseEventsIsHandled() {
         final AgentServerKeepAlive keepAlive = new AgentServerKeepAlive();
         keepAlive.handleClosed();
