@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
 
 import com.google.common.base.Strings;
 

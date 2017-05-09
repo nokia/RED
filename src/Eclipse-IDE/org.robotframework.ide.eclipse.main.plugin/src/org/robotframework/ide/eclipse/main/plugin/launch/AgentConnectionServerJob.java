@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.rf.ide.core.execution.RobotAgentEventListener;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerStatusListener;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;

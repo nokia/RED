@@ -5,9 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.message;
 
-import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
@@ -30,15 +31,14 @@ public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleTestStarted(final String testCaseName, final String testCaseLongName) {
+    public void handleTestStarted(final TestStartedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
-                store -> store.append("Starting test: " + testCaseLongName + '\n'));
+                store -> store.append("Starting test: " + event.getLongName() + '\n'));
     }
 
     @Override
-    public void handleTestEnded(final String testCaseName, final String testCaseLongName, final int elapsedTime,
-            final Status status, final String errorMessage) {
+    public void handleTestEnded(final TestEndedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
-                store -> store.append("Ending test: " + testCaseLongName + "\n\n"));
+                store -> store.append("Ending test: " + event.getLongName() + "\n\n"));
     }
 }

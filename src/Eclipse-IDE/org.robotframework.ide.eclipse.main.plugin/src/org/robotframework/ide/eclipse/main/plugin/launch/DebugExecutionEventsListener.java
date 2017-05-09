@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +24,14 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
+import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
+import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.context.KeywordPosition;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
 import org.rf.ide.core.execution.server.AgentClient;
@@ -77,9 +83,8 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     }
 
     @Override
-    public void handleSuiteStarted(final String name, final URI suiteFilePath, final int totalTests,
-            final List<String> childSuites, final List<String> childTests) {
-        final IPath suitePath = Path.fromOSString(new File(suiteFilePath).getAbsolutePath());
+    public void handleSuiteStarted(final SuiteStartedEvent event) {
+        final IPath suitePath = Path.fromOSString(new File(event.getPath()).getAbsolutePath());
 
         final IFile currentSuiteFile = keywordExecutionManager.extractCurrentSuite(suitePath);
         if (currentSuiteFile != null) {
@@ -90,28 +95,28 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     }
 
     @Override
-    public void handleSuiteEnded(final String suiteName, final int elapsedTime, final Status status,
-            final String errorMessage) {
+    public void handleSuiteEnded(final SuiteEndedEvent event) {
         debugTarget.clearStackFrames();
         executionContext.endSuite();
     }
 
     @Override
-    public void handleTestStarted(final String testCaseName, final String testCaseLongName) {
-        executionContext.startTest(testCaseName);
+    public void handleTestStarted(final TestStartedEvent event) {
+        executionContext.startTest(event.getName());
     }
 
     @Override
-    public void handleTestEnded(final String testCaseName, final String testCaseLongName, final int elapsedTime,
-            final Status status, final String errorMessage) {
+    public void handleTestEnded(final TestEndedEvent event) {
         executionContext.endTest();
     }
 
     @Override
-    public void handleKeywordStarted(final String name, final String type, final List<String> args) {
-        prepareKeywordStart(name, type, args);
+    public void handleKeywordStarted(final KeywordStartedEvent event) {
+        final String name = event.getName();
+        final String type = event.getKeywordType();
+        prepareKeywordStart(name, type);
 
-        executionContext.startKeyword(name, type, args);
+        executionContext.startKeyword(name, type, new ArrayList<>());
 
         String executedFileName = keywordExecutionManager.getCurrentSuiteName();
 
@@ -144,7 +149,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
                 .syncExec(() -> RobotFormEditor.activateSourcePageInActiveEditor(workbench.getActiveWorkbenchWindow()));
     }
 
-    private void prepareKeywordStart(final String name, final String type, final List<String> args) {
+    private void prepareKeywordStart(final String name, final String type) {
         if (executionContext.isSuiteSetupTeardownKeyword(type) && !executionContext.isInSuite()
                 && keywordExecutionManager.getCurrentSuiteLocation() != null) {
             handleInitFile();
@@ -155,8 +160,8 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         if (keywordExecutionManager.getCurrentSuiteFile() == null
                 && !executionContext.isSuiteSetupTeardownKeyword(type)) {
             final String message = String.format(
-                    "Invalid execution context: suite='%s', name='%s', type='%s', args='%s'",
-                    keywordExecutionManager.getCurrentSuiteName(), name, type, args);
+                    "Invalid execution context: suite='%s', name='%s', type='%s'",
+                    keywordExecutionManager.getCurrentSuiteName(), name, type);
             showError("Debug Execution Context Error", message);
             throw new RobotAgentEventsListenerException(message);
         }
@@ -228,14 +233,14 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
     }
 
     @Override
-    public void handleKeywordEnded(final String name, final String type) {
-        debugTarget.getCurrentKeywordsContext().remove(name);
-        executionContext.endKeyword(type);
+    public void handleKeywordEnded(final KeywordEndedEvent event) {
+        debugTarget.getCurrentKeywordsContext().remove(event.getName());
+        executionContext.endKeyword(event.getKeywordType());
     }
 
     @Override
-    public void handleResourceImport(final URI resourceFilePath) {
-        executionContext.resourceImport(new File(resourceFilePath));
+    public void handleResourceImport(final ResourceImportEvent event) {
+        executionContext.resourceImport(new File(event.getPath()));
     }
 
     @Override
