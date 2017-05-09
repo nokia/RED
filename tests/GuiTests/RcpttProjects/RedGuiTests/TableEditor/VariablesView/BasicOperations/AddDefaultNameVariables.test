@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _9iuJED04EeaUDrMBSMf5Ag
 Element-Name: AddDefaultNameVariables
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _p1kRQB_8EeWIFM1C_X1kYg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/20/15 1:26 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/9/17 2:04 PM
 Tags: notTestable
 Testcase-Type: ecl
 
@@ -15,113 +16,139 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
     select "RobotProject/TestFile.robot" | double-click
 }
-// add Variable section in Source 
+// add Variable section and one variable ${text} in Source
 with [get-editor "TestFile.robot"] {
-    get-tab-folder | get-tab-item Source | click
     with [get-text-viewer] {
         set-caret-pos 1 19
-        key-type "NUMPAD_ENTER" "\\u000D"
+        key-type Enter
+        type-text "*"
         key-type "M1+SPACE"
         key-type Down -times 3
         key-type Enter
+        type-text "${text}"
+        key-type Enter
+        key-type "M1+s"
     }
     get-tab-folder | get-tab-item Variables | click
 }
-
-//add first varaiables
+// go to Variable section through Outline view
+get-view Outline | get-tree | select "TestFile.robot/Variables/text" | double-click
 with [get-editor "TestFile.robot"] {
-    get-tab-folder | get-tab-item Variables | click
-    with [get-table] {
-    	//add first new scalar
-    	select "...add new scalar"
-        get-item "...add new scalar"| double-click
-        select "${var}" | activate-cell-edit
-        with [get-editbox] {
-            set-text "${text}"
-            key-type Enter
-        }
-        apply-cell-edit -deactivate
-    
-        
-        //add var24 - next will have incresed index
-        select "...add new scalar"|  key-type Enter
-        select "${var}" | activate-cell-edit
-        // FIXME wyglada na to,ze add new scalar jest nie-aktywny po dodaniu pierwszej zmiennej
-        with [get-editbox] {
-            set-text "${var24}"
-            key-type Enter
-        }
-        apply-cell-edit -deactivate
-        select "...add new scalar"|  key-type Enter
-        select "${var25}" | activate-cell-edit
-        get-editbox | click-text 3 8
-        select "...add new scalar"| apply-cell-edit -deactivate
-        select "...add new scalar"|  key-type Enter
-        select "${var26}" | activate-cell-edit
-        get-editbox | click-text 3 8
-        select "...add new scalar"| apply-cell-edit -deactivate
-        select "...add new scalar"|  key-type Enter
-        select "${var27}" | activate-cell-edit
-        get-editbox | click-text 3 8
-        apply-cell-edit -deactivate
- 
-		//add list
-	    select "...add new scalar" | key-type Enter
-	    select "${var28}" | activate-cell-edit
-	    with [get-editbox] {
-	        set-text "@{tab}"
-	        key-type "NUMPAD_ENTER" "\\u000D"
-	    }
-	    apply-cell-edit -deactivate
-	    //add dictionary
-	    select "...add new scalar" | key-type Enter
-	    select "${var28}" | activate-cell-edit
-	    with [get-editbox] {
-	        set-text "&{dict}"
-	         key-type Enter
-	    }
-	    //add new scalar
-	    select "...add new scalar" |  key-type Enter
-	    select "${var28}" | activate-cell-edit
-	    with [get-editbox] {
-	        click-text 3 8
-	        key-type "NUMPAD_ENTER" "\\u000D"
-	    }
-	    apply-cell-edit -deactivate
-	    
-	    //add values to first column
-	    select "${text}" | double-click
-	    select "${text}" | activate-cell-edit -column 1
-	    get-editbox | set-text 1
-	    select "${var24}" | apply-cell-edit -deactivate
-	    select "${var24}" | double-click
-	    select "${var24}" | activate-cell-edit -column 1
-	    get-editbox | click-text
-	    apply-cell-edit -deactivate
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter -times 2
+    }
+    // add second variable ${var24} with '...add new scalar'
+    with [get-editbox -after [get-label Variables] -index 1] {
+        set-text "${var24}"
+    }
+	// add next three variables - it should be var25, var26, var27 
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Left
+        key-type Down
+        key-type Enter
+        key-type Down
+        key-type Enter
+        key-type Down
+        key-type Enter
+        key-type Down
+        key-type Enter -times 2
+    }
+    // add list variable @{tab} 
+    with [get-editbox -after [get-label Variables] -index 1] {
+        set-text "@{tab}"
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type "M2+7" "&"
+    }
+    // add dictonary variable &{dict}
+    with [get-editbox -after [get-label Variables] -index 1] {
+        set-text "&{dict}"
+    }
+}
+// add scalar variable - it should be var28 - and values for every variable
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type Up -times 7
+        key-type Right
+        type-text 1
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type Down
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text 2
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text 3
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text 4
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text 5
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "1"
+        key-type Enter
+        type-text "2"
+        key-type Enter
+        key-type "TRAVERSE_TAB_NEXT"
+    }
+     with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Left
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "d=1"
+        key-type Enter
+        key-type "TRAVERSE_TAB_NEXT"
 	}
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Left
+        key-type Enter
+        type-text 6
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        key-type Left
+        key-type "TRAVERSE_TAB_NEXT"
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Left -times 2
+        key-type "M1+s"
+    }
 }
-//check ia after selecting scalar 'value' field for scalar is empty
-with [get-editor "TestFile.robot" | get-table] {
-    get-item "${var24}" | get-property "values['Variable']" | equals "${var24}" | verify-true
-    get-item "${var24}" | get-property "values['Value']" | equals "" | verify-true
-    get-item "${var24}" | get-property "values['Comment']" | equals "" | verify-true
-}
-//check ia after selecting scalar 'value' field for list is empty
-with [get-editor "TestFile.robot" | get-table] {
-    select "@{tab}" | double-click
-    select "@{tab}" | activate-cell-edit -column 1
-    get-editbox | click-text
-    apply-cell-edit -deactivate
-}
-with [get-editor "TestFile.robot" | get-table] {
-    get-item "@{tab}" | get-property "values['Variable']" | equals "@{tab}" | verify-true
-    get-item "@{tab}" | get-property "values['Value']" | equals "" | verify-true
-    get-item "@{tab}" | get-property "values['Comment']" | equals "" | verify-true
-}
-
-
-
-
+// check if every variable name and value are ok
+check-variable-row -file "TestFile.robot" -row 1 -var "${text}" -value "1" -comment ""
+check-variable-row -file "TestFile.robot" -row 2 -var "${var24}" -value "2" -comment ""
+check-variable-row -file "TestFile.robot" -row 3 -var "${var25}" -value "3" -comment ""
+check-variable-row -file "TestFile.robot" -row 4 -var "${var26}" -value "4" -comment ""
+check-variable-row -file "TestFile.robot" -row 5 -var "${var27}" -value "5" -comment ""
+check-variable-row -file "TestFile.robot" -row 6 -var "@{tab}" -value "[1, 2]" -comment ""
+check-variable-row -file "TestFile.robot" -row 7 -var "&{dict}" -value "{d = 1}" -comment ""
+check-variable-row -file "TestFile.robot" -row 8 -var "${var28}" -value "6" -comment ""
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
