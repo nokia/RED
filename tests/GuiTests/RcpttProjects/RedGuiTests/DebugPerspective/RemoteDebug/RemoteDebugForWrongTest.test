@@ -43,9 +43,9 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		run-remote-test-in-background -path  $remote_project_path -project_name "RemoteProject"
  
 		get-window "Debug Execution Context Error" 
-		    | get-label "Invalid execution context: suite='TestFile.robot', name='BuiltIn.Log', type='Keyword', args='[]'" 
+		    | get-label "Invalid execution context: suite='TestFile.robot', name='BuiltIn.Log', type='Keyword'" 
 		    | get-property caption 
-		    | equals "Invalid execution context: suite='TestFile.robot', name='BuiltIn.Log', type='Keyword', args='[]'" 
+		    | equals "Invalid execution context: suite='TestFile.robot', name='BuiltIn.Log', type='Keyword'" 
 		    | verify-true
 		get-window "Debug Execution Context Error" | get-button OK | click	
 
