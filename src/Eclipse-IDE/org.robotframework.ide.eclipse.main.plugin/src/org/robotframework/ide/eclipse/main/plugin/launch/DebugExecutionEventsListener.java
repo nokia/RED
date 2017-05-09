@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +115,7 @@ public class DebugExecutionEventsListener extends RobotDefaultAgentEventListener
         final String type = event.getKeywordType();
         prepareKeywordStart(name, type);
 
-        executionContext.startKeyword(name, type, new ArrayList<>());
+        executionContext.startKeyword(name, type);
 
         String executedFileName = keywordExecutionManager.getCurrentSuiteName();
 
