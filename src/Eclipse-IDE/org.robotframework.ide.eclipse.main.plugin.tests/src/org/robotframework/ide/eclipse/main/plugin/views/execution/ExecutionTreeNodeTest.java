@@ -12,7 +12,7 @@ import java.net.URI;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 public class ExecutionTreeNodeTest {

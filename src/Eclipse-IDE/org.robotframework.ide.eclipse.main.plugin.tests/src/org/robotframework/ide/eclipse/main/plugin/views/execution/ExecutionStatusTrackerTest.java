@@ -15,7 +15,12 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 public class ExecutionStatusTrackerTest {
@@ -62,7 +67,8 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleSuiteStarted("suite", new URI("file:///suite.robot"), 2, new ArrayList<>(), new ArrayList<>());
+        tracker.handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///suite.robot"), 2, new ArrayList<>(),
+                new ArrayList<>()));
 
         verify(store).suiteStarted("suite", new URI("file:///suite.robot"), 2, new ArrayList<>(), new ArrayList<>());
         verifyNoMoreInteractions(store);
@@ -76,7 +82,7 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleSuiteEnded("suite", 100, Status.PASS, "");
+        tracker.handleSuiteEnded(new SuiteEndedEvent("suite", 100, Status.PASS, ""));
 
         verify(store).elementEnded(100, Status.PASS, "");
         verifyNoMoreInteractions(store);
@@ -90,7 +96,7 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleTestStarted("test", "teeeeest");
+        tracker.handleTestStarted(new TestStartedEvent("test", "teeeeest"));
 
         verify(store).testStarted();
         verifyNoMoreInteractions(store);
@@ -104,7 +110,7 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleTestEnded("test", "teeeeest", 100, Status.FAIL, "error");
+        tracker.handleTestEnded(new TestEndedEvent("test", "teeeeest", 100, Status.FAIL, "error"));
 
         verify(store).elementEnded(100, Status.FAIL, "error");
         verifyNoMoreInteractions(store);
@@ -118,7 +124,7 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleOutputFile(new URI("file:///output.xml"));
+        tracker.handleOutputFile(new OutputFileEvent(new URI("file:///output.xml")));
 
         verify(store).setOutputFilePath(new URI("file:///output.xml"));
         verifyNoMoreInteractions(store);

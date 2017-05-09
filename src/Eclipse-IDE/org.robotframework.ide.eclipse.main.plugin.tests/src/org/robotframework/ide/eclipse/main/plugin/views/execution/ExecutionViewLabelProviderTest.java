@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.custom.StyleRange;
 import org.junit.Test;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;

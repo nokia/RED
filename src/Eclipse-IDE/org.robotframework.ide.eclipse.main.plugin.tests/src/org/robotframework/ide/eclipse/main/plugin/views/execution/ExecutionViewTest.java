@@ -27,7 +27,7 @@ import org.eclipse.ui.menus.IMenuService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 import org.robotframework.red.junit.ShellProvider;
