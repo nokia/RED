@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.google.common.io.Files;;
+import com.google.common.io.Files;
 
 public class RobotDryRunTemporarySuitesTest {
 

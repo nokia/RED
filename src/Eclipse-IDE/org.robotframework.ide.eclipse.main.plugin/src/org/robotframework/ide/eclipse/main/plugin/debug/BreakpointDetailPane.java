@@ -134,7 +134,7 @@ public class BreakpointDetailPane implements IDetailPane3 {
                     conditionCombo.setEnabled(conditionBtn.getSelection());
                     setDirty(true);
                 }
-            };
+            }
         });
 
         conditionCombo = new Combo(panel, SWT.DROP_DOWN);
