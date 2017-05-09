@@ -29,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
-import org.rf.ide.core.execution.TestsMode;
+import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;

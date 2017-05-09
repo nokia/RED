@@ -23,7 +23,7 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.server.AgentClient;
 import org.rf.ide.core.execution.server.response.ChangeVariable;
 import org.rf.ide.core.execution.server.response.InterruptExecution;

@@ -12,7 +12,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.server.AgentServerStatusListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 

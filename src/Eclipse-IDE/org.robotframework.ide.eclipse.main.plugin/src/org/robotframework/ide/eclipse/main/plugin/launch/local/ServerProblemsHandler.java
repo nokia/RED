@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
-import org.rf.ide.core.execution.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.server.AgentServerStatusListener;
 
 

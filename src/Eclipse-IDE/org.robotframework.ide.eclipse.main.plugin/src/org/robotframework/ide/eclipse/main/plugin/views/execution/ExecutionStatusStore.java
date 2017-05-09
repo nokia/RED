@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ui.services.IDisposable;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 import com.google.common.annotations.VisibleForTesting;

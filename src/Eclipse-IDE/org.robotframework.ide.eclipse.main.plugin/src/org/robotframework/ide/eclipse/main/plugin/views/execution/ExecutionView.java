@@ -36,7 +36,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.services.IEvaluationService;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
