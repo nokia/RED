@@ -5,11 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
-import java.net.URI;
-import java.util.List;
-
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
 
 
@@ -27,36 +28,34 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleSuiteStarted(final String suiteName, final URI suiteFilePath, final int totalTests,
-            final List<String> childSuites, final List<String> childTests) {
+    public void handleSuiteStarted(final SuiteStartedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.suiteStarted(suiteName, suiteFilePath, totalTests, childSuites, childTests));
+                store -> store.suiteStarted(event.getName(), event.getPath(), event.getNumberOfTests(),
+                        event.getChildrenSuites(), event.getChildrenTests()));
     }
 
     @Override
-    public void handleSuiteEnded(final String suiteName, final int elapsedTime, final Status status,
-            final String errorMessage) {
+    public void handleSuiteEnded(final SuiteEndedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.elementEnded(elapsedTime, status, errorMessage));
+                store -> store.elementEnded(event.getElapsedTime(), event.getStatus(), event.getErrorMessage()));
     }
 
     @Override
-    public void handleTestStarted(final String testCaseName, final String testCaseLongName) {
+    public void handleTestStarted(final TestStartedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class, 
                 store -> store.testStarted());
     }
 
     @Override
-    public void handleTestEnded(final String testCaseName, final String testCaseLongName, final int elapsedTime,
-            final Status status, final String errorMessage) {
+    public void handleTestEnded(final TestEndedEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.elementEnded(elapsedTime, status, errorMessage));
+                store -> store.elementEnded(event.getElapsedTime(), event.getStatus(), event.getErrorMessage()));
     }
 
     @Override
-    public void handleOutputFile(final URI outputFilepath) {
+    public void handleOutputFile(final OutputFileEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
-                store -> store.setOutputFilePath(outputFilepath));
+                store -> store.setOutputFilePath(event.getPath().orElse(null)));
     }
 
 }
