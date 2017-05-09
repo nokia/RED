@@ -20,7 +20,9 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.rf.ide.core.execution.LogLevel;
+import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 
 public class RobotDryRunEventListenerTest {
 
@@ -43,7 +45,8 @@ public class RobotDryRunEventListenerTest {
         final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleSuiteStarted("abc", new URI("file:///path"), 5, newArrayList(), newArrayList());
+        listener.handleSuiteStarted(
+                new SuiteStartedEvent("abc", new URI("file:///path"), 5, newArrayList(), newArrayList()));
 
         verify(startSuiteHandler).accept("abc");
         verifyNoMoreInteractions(startSuiteHandler);
@@ -56,11 +59,11 @@ public class RobotDryRunEventListenerTest {
         final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleLibraryImport("String", new URI("file:///suite.robot"), new URI("file:///String.py"),
-                Arrays.asList("a1", "a2"));
+        listener.handleLibraryImport(new LibraryImportEvent("String", new URI("file:///suite.robot"),
+                new URI("file:///String.py"), Arrays.asList("a1", "a2")));
 
-        verify(libImportCollector).collectFromLibraryImportEvent("String", new URI("file:///suite.robot"),
-                new URI("file:///String.py"), Arrays.asList("a1", "a2"));
+        verify(libImportCollector).collectFromLibraryImportEvent(new LibraryImportEvent("String",
+                new URI("file:///suite.robot"), new URI("file:///String.py"), Arrays.asList("a1", "a2")));
         verifyNoMoreInteractions(libImportCollector);
         verifyZeroInteractions(startSuiteHandler);
         verifyZeroInteractions(kwSourceCollector);
@@ -125,34 +128,34 @@ public class RobotDryRunEventListenerTest {
         final RobotDryRunEventListener listener = new RobotDryRunEventListener(libImportCollector, kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleLibraryImport("lib2", new URI("file:///suite1.robot"), new URI("file:///lib1.py"),
-                Arrays.asList("a", "b"));
+        listener.handleLibraryImport(new LibraryImportEvent("lib2", new URI("file:///suite1.robot"),
+                new URI("file:///lib1.py"), Arrays.asList("a", "b")));
         listener.handleMessage("err_1", LogLevel.ERROR);
         listener.handleMessage("fail_2", LogLevel.FAIL);
         listener.handleMessage("fail_1", LogLevel.FAIL);
         listener.handleMessage("err_3", LogLevel.ERROR);
         listener.handleMessage("kw_2", LogLevel.NONE);
         listener.handleMessage("err_2", LogLevel.ERROR);
-        listener.handleLibraryImport("lib3", new URI("file:///suite1.robot"), new URI("file:///lib6.py"),
-                Arrays.asList("c", "d"));
-        listener.handleLibraryImport("lib1", new URI("file:///other.robot"), new URI("file:///lib6.py"),
-                Arrays.asList("x"));
+        listener.handleLibraryImport(new LibraryImportEvent("lib3", new URI("file:///suite1.robot"),
+                new URI("file:///lib6.py"), Arrays.asList("c", "d")));
+        listener.handleLibraryImport(new LibraryImportEvent("lib1", new URI("file:///other.robot"),
+                new URI("file:///lib6.py"), Arrays.asList("x")));
         listener.handleMessage("kw_1", LogLevel.NONE);
 
         final InOrder inOrder = inOrder(libImportCollector, kwSourceCollector);
 
-        inOrder.verify(libImportCollector).collectFromLibraryImportEvent("lib2", new URI("file:///suite1.robot"),
-                new URI("file:///lib1.py"), Arrays.asList("a", "b"));
+        inOrder.verify(libImportCollector).collectFromLibraryImportEvent(new LibraryImportEvent("lib2",
+                new URI("file:///suite1.robot"), new URI("file:///lib1.py"), Arrays.asList("a", "b")));
         inOrder.verify(libImportCollector).collectFromErrorMessageEvent("err_1");
         inOrder.verify(libImportCollector).collectFromFailMessageEvent("fail_2");
         inOrder.verify(libImportCollector).collectFromFailMessageEvent("fail_1");
         inOrder.verify(libImportCollector).collectFromErrorMessageEvent("err_3");
         inOrder.verify(kwSourceCollector).collectFromMessageEvent("kw_2");
         inOrder.verify(libImportCollector).collectFromErrorMessageEvent("err_2");
-        inOrder.verify(libImportCollector).collectFromLibraryImportEvent("lib3", new URI("file:///suite1.robot"),
-                new URI("file:///lib6.py"), Arrays.asList("c", "d"));
-        inOrder.verify(libImportCollector).collectFromLibraryImportEvent("lib1", new URI("file:///other.robot"),
-                new URI("file:///lib6.py"), Arrays.asList("x"));
+        inOrder.verify(libImportCollector).collectFromLibraryImportEvent(new LibraryImportEvent("lib3",
+                new URI("file:///suite1.robot"), new URI("file:///lib6.py"), Arrays.asList("c", "d")));
+        inOrder.verify(libImportCollector).collectFromLibraryImportEvent(new LibraryImportEvent("lib1",
+                new URI("file:///other.robot"), new URI("file:///lib6.py"), Arrays.asList("x")));
         inOrder.verify(kwSourceCollector).collectFromMessageEvent("kw_1");
         verifyNoMoreInteractions(libImportCollector);
         verifyNoMoreInteractions(kwSourceCollector);

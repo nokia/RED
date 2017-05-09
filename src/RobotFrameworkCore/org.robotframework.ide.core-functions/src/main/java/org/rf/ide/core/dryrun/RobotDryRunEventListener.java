@@ -5,39 +5,37 @@
  */
 package org.rf.ide.core.dryrun;
 
-import java.net.URI;
-import java.util.List;
 import java.util.function.Consumer;
 
-import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 
 public class RobotDryRunEventListener extends RobotDefaultAgentEventListener {
 
     private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
 
-    private final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
+    private final RobotDryRunKeywordSourceCollector dryRunKeywordSourceCollector;
 
     private final Consumer<String> startSuiteHandler;
 
     public RobotDryRunEventListener(final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector,
-            final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector,
+            final RobotDryRunKeywordSourceCollector dryRunKeywordSourceCollector,
             final Consumer<String> startSuiteHandler) {
         this.dryRunLibraryImportCollector = dryRunLibraryImportCollector;
-        this.dryRunLKeywordSourceCollector = dryRunLKeywordSourceCollector;
+        this.dryRunKeywordSourceCollector = dryRunKeywordSourceCollector;
         this.startSuiteHandler = startSuiteHandler;
     }
 
     @Override
-    public void handleSuiteStarted(final String name, final URI suiteFilePath, final int totalTests,
-            final List<String> childSuites, final List<String> childTests) {
-        startSuiteHandler.accept(name);
+    public void handleSuiteStarted(final SuiteStartedEvent event) {
+        startSuiteHandler.accept(event.getName());
     }
 
     @Override
-    public void handleLibraryImport(final String name, final URI importer, final URI source,
-            final List<String> args) {
-        dryRunLibraryImportCollector.collectFromLibraryImportEvent(name, importer, source, args);
+    public void handleLibraryImport(final LibraryImportEvent event) {
+        dryRunLibraryImportCollector.collectFromLibraryImportEvent(event);
     }
 
     @Override
@@ -47,7 +45,7 @@ public class RobotDryRunEventListener extends RobotDefaultAgentEventListener {
         } else if (level == LogLevel.ERROR) {
             dryRunLibraryImportCollector.collectFromErrorMessageEvent(msg);
         } else if (level == LogLevel.NONE) {
-            dryRunLKeywordSourceCollector.collectFromMessageEvent(msg);
+            dryRunKeywordSourceCollector.collectFromMessageEvent(msg);
         }
     }
 }

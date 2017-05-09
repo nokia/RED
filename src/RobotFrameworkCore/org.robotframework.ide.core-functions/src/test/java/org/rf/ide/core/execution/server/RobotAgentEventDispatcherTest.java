@@ -21,9 +21,18 @@ import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
-import org.rf.ide.core.execution.LogLevel;
-import org.rf.ide.core.execution.RobotAgentEventListener;
-import org.rf.ide.core.execution.Status;
+import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener;
+import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
+import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
+import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
+import org.rf.ide.core.execution.agent.event.TestEndedEvent;
+import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -174,7 +183,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleResourceImport(new URI("file:///a/b/file.robot"));
+        verify(listener).handleResourceImport(new ResourceImportEvent(new URI("file:///a/b/file.robot")));
         verifyNoMoreInteractions(listener);
     }
 
@@ -192,8 +201,8 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleSuiteStarted("suite", new URI("file:///a/b/suite.robot"), 7, newArrayList("a", "b"),
-                newArrayList("t1", "t2"));
+        verify(listener).handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///a/b/suite.robot"), 7,
+                newArrayList("a", "b"), newArrayList("t1", "t2")));
         verifyNoMoreInteractions(listener);
     }
 
@@ -211,7 +220,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleSuiteEnded("suite", 10, Status.PASS, "msg");
+        verify(listener).handleSuiteEnded(new SuiteEndedEvent("suite", 10, Status.PASS, "msg"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -228,7 +237,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleTestStarted("test", "suite-a-b-test");
+        verify(listener).handleTestStarted(new TestStartedEvent("test", "suite-a-b-test"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -246,7 +255,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleTestEnded("test", "suite-a-b-test", 10, Status.FAIL, "msg");
+        verify(listener).handleTestEnded(new TestEndedEvent("test", "suite-a-b-test", 10, Status.FAIL, "msg"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -257,14 +266,13 @@ public class RobotAgentEventDispatcherTest {
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("type", "Keyword", "args",
-                newArrayList("1", "2"));
+        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("type", "Keyword", "libname", "lib");
         final String json = toJson(ImmutableMap.of("start_keyword", newArrayList("kw", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleKeywordStarted("kw", "Keyword", newArrayList("1", "2"));
+        verify(listener).handleKeywordStarted(new KeywordStartedEvent("kw", "Keyword", "lib"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -281,7 +289,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleKeywordEnded("kw", "Setup");
+        verify(listener).handleKeywordEnded(new KeywordEndedEvent("kw", "Setup"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -445,7 +453,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleOutputFile(new URI("file:///a/b/file.xml"));
+        verify(listener).handleOutputFile(new OutputFileEvent(new URI("file:///a/b/file.xml")));
         verifyNoMoreInteractions(listener);
     }
 
@@ -463,8 +471,8 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleLibraryImport("lib1", new URI("file:///importerPath"), new URI("file:///sourcePath"),
-                newArrayList("arg1", "arg2"));
+        verify(listener).handleLibraryImport(new LibraryImportEvent("lib1", new URI("file:///importerPath"),
+                new URI("file:///sourcePath"), newArrayList("arg1", "arg2")));
         verifyNoMoreInteractions(listener);
     }
 
@@ -482,8 +490,8 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).setClient(nullable(AgentClient.class));
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleLibraryImport("lib2", new URI("file:///importerPath"), new URI("file:///sourcePath"),
-                newArrayList("arg1", "arg2"));
+        verify(listener).handleLibraryImport(new LibraryImportEvent("lib2", new URI("file:///importerPath"), new URI("file:///sourcePath"),
+                        newArrayList("arg1", "arg2")));
         verifyNoMoreInteractions(listener);
     }
 

@@ -5,7 +5,7 @@
  */
 package org.rf.ide.core.execution.server;
 
-import org.rf.ide.core.execution.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 
 /**
  * Objects of this class can be used to keep server alive: this can be
