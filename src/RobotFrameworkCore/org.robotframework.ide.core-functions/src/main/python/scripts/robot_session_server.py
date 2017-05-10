@@ -116,7 +116,7 @@ def get_classes_from_module(module_location, module_name, python_paths, class_pa
 @logargs
 def get_variables(dir, args):
     import red_variables
-    return red_variables.get_variables(dir, args)
+    return __cleanup_modules(red_variables.get_variables)(dir, args)
 
 
 @logresult
