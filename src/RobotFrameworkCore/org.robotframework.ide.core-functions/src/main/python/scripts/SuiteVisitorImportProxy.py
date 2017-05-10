@@ -22,7 +22,7 @@ from robot.running.handlers import _DynamicHandler, _JavaHandler
 from robot.output import LOGGER, Message
 
 
-class MyTestSuiteBuilder(TestSuiteBuilder):
+class RedTestSuiteBuilder(TestSuiteBuilder):
     """ switch off empty suite removing """
 
     def _parse_and_build(self, path):
@@ -47,7 +47,7 @@ class SuiteVisitorImportProxy(SuiteVisitor):
                 suite.tests.append(t)
             else:
                 if len(suite.tests) == 0 or suite.test_count == 0:
-                    current_suite = MyTestSuiteBuilder().build(suite.source)
+                    current_suite = RedTestSuiteBuilder().build(suite.source)
                     if len(self.f_suites) == 0:
                         suite.suites = current_suite.suites
                     else:
@@ -85,8 +85,8 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
 
 class RedImporter(object):
-    def __init__(self, default_importer, lib_import_timeout):
-        self.default_importer = default_importer
+    def __init__(self, importer, lib_import_timeout):
+        self.importer = importer
         self.lib_import_timeout = int(lib_import_timeout)
         self.func = None
         self.lock = threading.Lock()
@@ -96,8 +96,8 @@ class RedImporter(object):
     def __getattr__(self, name):
         self.lock.acquire()
         try:
-            if hasattr(self.default_importer, name):
-                func = getattr(self.default_importer, name)
+            if hasattr(self.importer, name):
+                func = getattr(self.importer, name)
                 return lambda *args, **kwargs: self._wrap(func, args, kwargs)
             raise AttributeError(name)
         finally:
@@ -111,7 +111,7 @@ class RedImporter(object):
             else:
                 return func(*args, **kwargs)
         else:
-            return func(self.default_importer, *args, **kwargs)
+            return func(self.importer, *args, **kwargs)
 
     def _handle_lib_import(self, func, args, kwargs):
         libs = []
