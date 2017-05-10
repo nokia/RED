@@ -1,0 +1,159 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: EditVariableFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _gMWiUDVJEeeavtAkTqR2FA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/10/17 10:31 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select RobotProject | get-menu "New/Robot python file" | click
+}
+// add new variables.py file
+with [get-window "New Robot python file"] {
+    get-editbox -after [get-label "File name:"] | set-text variables
+    get-button Finish | click
+}
+// add one variable to variables.py
+with [get-editor "variables.py" | get-text-viewer] {
+    type-text "var_scalar = 1"
+    key-type "M1+s"
+}
+// add Settings section with variables.py file and one tets using variable grom variables.py file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type Enter
+    key-type Up
+    type-text "*** Settings ***"
+    key-type Enter
+    type-text "Variables  variables.py"
+    key-type Down
+    key-type Enter
+    type-text test
+    key-type Enter
+    type-text "log  ${var_scalar}"
+    key-type Enter
+    key-type "M1+s"
+}
+// verify if there is no problems
+get-view Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+// run test and verify variable value in Message Log
+get-button "Run TestFile.robot" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test\n"
+    + ".* : INFO : 1\n"
+    + "Ending test: RobotProject.TestFile.test" | verify-true
+// add two new variables to variable.py file
+with [get-editor "variables.py"] {
+    click
+    with [get-text-viewer] {
+        key-type Enter
+        type-text "var_scalar_new = 2"
+        key-type Enter
+        type-text "var_string_new = 'new'"
+        key-type "M1+s"
+    }
+}
+// use this variables in test
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        type-text "log  ${var_scalar_new}"
+        key-type Enter
+        type-text "log  ${var_string_new}"
+        key-type Enter
+        key-type "M1+s"
+    }
+}
+// verify if there is no problems
+get-view Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+// run test and verify variables value in Message Log
+get-button "Run TestFile.robot" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test\n"
+    + ".* : INFO : 1\n"
+    + ".* : INFO : 2\n"
+    + ".* : INFO : new\n"
+    + "Ending test: RobotProject.TestFile.test" | verify-true
+// use another two variables in test (variables not declair in variables.py file)
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        type-text "log  ${var_dict_new}"
+        key-type Enter
+        type-text "log  ${var_list_new}"
+        key-type Enter
+    }
+}
+// verify if there is 2 errors in Problems
+get-view Problems | click
+wait-for-errors -amount 2 -times 3 -delay 500
+// add this used variables to variables.py file
+with [get-editor "variables.py"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 3 23
+        key-type Enter
+        type-text "var_dict_new = {'d1':1, 'd2':2}"
+        key-type Enter
+        type-text "var_list_new = [1, 2, 3]"
+        key-type "M1+s"
+    }
+}
+// save TestFile.robot
+with [get-editor "TestFile.robot"] {
+    click
+    get-text-viewer | key-type "M1+s"
+}
+// verify if there is no problems
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+get-button "Run TestFile.robot" | click
+// run test and verify values of all variables
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test\n"
+    + ".* : INFO : 1\n"
+    + ".* : INFO : 2\n"
+    + ".* : INFO : new\n"
+    + ".* : INFO : \{'d2': 2, 'd1': 1\}\n"
+    + ".* : INFO : \[1, 2, 3\]\n"
+    + "Ending test: RobotProject.TestFile.test" | verify-true
+// edit one variable (name and value) in variables.py file
+with [get-editor "variables.py"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 3 22
+        type-text "_change"
+        set-caret-pos 3 15
+        type-text "_change"
+        key-type "M1+s"
+    }
+}
+// correct this variable (name and value) in test
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 7 26
+        type-text "_change"
+        key-type "M1+s"
+    }
+}
+// verify if there is no problems
+get-view Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+// run test and verify values for all variables
+get-button "Run TestFile.robot" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test\n"
+    + ".* : INFO : 1\n"
+    + ".* : INFO : 2\n"
+    + ".* : INFO : new_change\n"
+    + ".* : INFO : \{'d2': 2, 'd1': 1\}\n"
+    + ".* : INFO : \[1, 2, 3\]\n"
+    + "Ending test: RobotProject.TestFile.test" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
