@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _j2wUgCr0EeW667Afdo4DcA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/19/17 10:19 AM
+Save-Time: 5/10/17 10:09 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,9 +15,6 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 proc "compare-message-log" -body{
-	try -times 8 -delay 500 -command{
-		get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 10 | verify-true
-	}
 	get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: REDProject\.New Test\.test 1\n" 
 		[concat_str_with_regex [list  "Length is 5\n" "test1"]] "\nEnding test: REDProject\.New Test\.test 1\n\n" 
 		"Starting test: REDProject\.New Test\.test 2\n" [concat_str_with_regex [list "test2"]] 
@@ -26,7 +23,9 @@ proc "compare-message-log" -body{
 }
 
 proc "check-and-clean-console"{
-	get-view Console | get-text-viewer  | get-property "getLineCount()" | equals 23 | verify-true
+	try -times 5 -delay 1000 -command{
+		get-view Console | get-text-viewer  | get-property "getLineCount()" | equals 23 | verify-true
+	}	
 	get-view Console | get-button "Clear Console" | click
 }
 
@@ -43,40 +42,38 @@ with [get-view "Project Explorer" | get-tree] {
     select "REDProject/new_test.robot" | double-click
 }
 get-button "Run.*" -index 0 | click
-try -times 5 -delay 1000 -command{
-	get-view Console | get-text-viewer  | get-property "getLineCount()" | equals 23 | verify-true
-}
-compare-message-log
 check-and-clean-console
+compare-message-log
+
 
 //run again to check if console and Message Log were clear
 get-editor "new_test.robot" | get-text-viewer | set-caret-pos 11 7
 get-button "Run.*" -index 0 | click
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run test from project explorer
 get-view "Project Explorer" | get-tree | select "REDProject/new_test.robot" | get-menu "Run As/1 Robot Test" | click
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run test from run button (last run configuration)
 get-button "Run.*" -index 0 | click -arrow
 get-menu "1 new_test.robot" | click
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //set focus on Outline and run test - test will be run 
 get-view Outline | get-tree | select "new_test.robot/Variables/x"
 get-button "Run.*" -index 0 | click
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //set focus on Message log and run test by button
 get-view "Message Log" | get-editbox | set-text-offset 39 8
 get-button "Run.*" -index 0 | click
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 
 // ---------------------------------- shortcut -------------------------------------------
@@ -87,8 +84,8 @@ with [get-editor "new_test.robot" | get-text-viewer] {
     set-caret-pos 21 41
     key-type "M1+F11"
 }
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run test using keys (focus is on Settings tab on editor)
 with [get-editor "new_test.robot"] {
@@ -98,8 +95,8 @@ with [get-editor "new_test.robot"] {
         key-type "M1+F11"
     }
 }
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run test using keys (focus is on Variables tab on editor)
 with [get-editor "new_test.robot"] {
@@ -110,8 +107,8 @@ with [get-editor "new_test.robot" | get-editbox -after [get-label Variables]] {
     click-text
     key-type "M1+F11"
 }
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run test using keys (focus is on Keywords tab on editor)
 with [get-editor "new_test.robot"] {
@@ -122,8 +119,8 @@ with [get-editor "new_test.robot" | get-editbox -after [get-label "User Keywords
     click-text
     key-type "M1+F11"
 }
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //set focus on filter in Test cases
 get-editor "new_test.robot" | get-tab-folder | get-tab-item "Test Cases" | click
@@ -131,29 +128,29 @@ with [get-editor "new_test.robot" | get-editbox -after [get-label "Test Cases"]]
     click-text
     key-type "M1+F11"
 }
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run test using keys (focus is on Outline)
 get-view Outline | get-tree | key-type "M1+F11"
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run from Message view
 with [get-view "Message Log" | get-editbox] {
     set-text-offset 16 13
     key-type "M1+F11"
 }
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //run test using keys (focus is on Console)
 with [get-view Console | get-text-viewer] {
     set-caret-pos 18 34
     key-type "M1+F11"
 }
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //for now is only one run config
 get-menu "Run/Run Configurations..." | click
@@ -167,8 +164,8 @@ get-window "Run Configurations" | get-button Close | click
 //close editor, ste focuson project and run test using keys
 get-editor "new_test.robot" | close
 get-view "Project Explorer" | get-tree | select REDProject | key-type "M1+F11"
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //now new launch config is cretaed for project
 get-menu "Run/Run Configurations..." | click
@@ -182,8 +179,8 @@ get-window "Run Configurations" | get-button Close | click
 //run using button
 get-view "Project Explorer" | get-tree | select REDProject
 get-button "Run.*" -index 0 | click
-compare-message-log
 check-and-clean-console
+compare-message-log
 
 //---------------------------------------
 
