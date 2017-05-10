@@ -84,20 +84,9 @@ class SuiteVisitorImportProxy(SuiteVisitor):
             test.keywords.append(Keyword(name='BuiltIn.No Operation'))
 
 
-class LibItem(object):
-    def __init__(self, name, args):
-        self.name = name
-        self.args = args
-        self.result = None
-        self.errors = list()
-
-    def get_result_test_object(self):
-        return self.result
-
-
 class RedImporter(object):
-    def __init__(self, obj, lib_import_timeout):
-        self.obj = obj
+    def __init__(self, default_importer, lib_import_timeout):
+        self.default_importer = default_importer
         self.lib_import_timeout = int(lib_import_timeout)
         self.func = None
         self.lock = threading.Lock()
@@ -107,89 +96,80 @@ class RedImporter(object):
     def __getattr__(self, name):
         self.lock.acquire()
         try:
-            if hasattr(self.obj, name):
-                func = getattr(self.obj, name)
+            if hasattr(self.default_importer, name):
+                func = getattr(self.default_importer, name)
                 return lambda *args, **kwargs: self._wrap(func, args, kwargs)
             raise AttributeError(name)
         finally:
             self.lock.release()
 
-    def get_from_cache(self, name, args):
-        result = None
-        for cached_lib in self.cached_lib_items:
-            if cached_lib.name == name:
-                if len(cached_lib.args) == len(args):
-                    correct = True
-                    arg_size = len(cached_lib.args)
-                    for arg_id in range(0, arg_size):
-                        if cached_lib.args[arg_id] != args[arg_id]:
-                            correct = False
-                            break
-                    if correct:
-                        result = cached_lib
-                        break
-        return result
-
-    def _wrap(self, func, argser, kwargs):
+    def _wrap(self, func, args, kwargs):
         import types
         if isinstance(func, types.MethodType):
             if func.__name__ == 'import_library':
-                q = []
-                errors = []
-                lib_cached = self.get_from_cache(argser[0], argser[1])
-                if lib_cached:
-                    q.append(lib_cached.result)
-                    errors = lib_cached.errors
-                else:
+                return self._handle_lib_import(func, args, kwargs)
+            else:
+                return func(*args, **kwargs)
+        else:
+            return func(self.default_importer, *args, **kwargs)
+
+    def _handle_lib_import(self, func, args, kwargs):
+        libs = []
+        errors = []
+        lib_cached = self._get_lib_from_cache(args[0], args[1])
+        if lib_cached:
+            libs.append(lib_cached.lib)
+            errors = lib_cached.errors
+        else:
+            try:
+                def to_call():
                     try:
-                        t = threading.Thread(target=self._imp, args=(func, q, errors, argser), kwargs=kwargs)
-                        t.setDaemon(True)
-                        t.start()
-                        t.join(timeout=self.lib_import_timeout)
+                        libs.append(func(*args, **kwargs))
                     except:
                         errors.append(sys.exc_info())
-                if len(q) > 0:
-                    result = q[0]
-                else:
-                    try:
-                        result = TestLibrary(argser[0], argser[1], argser[2], create_handlers=False)
-                    except:
-                        try:
-                            result = _BaseTestLibrary(libcode=None, name=argser[0], args=argser[1], source=None,
-                                                      variables=argser[2])
-                        except:
-                            try:
-                                result = _BaseTestLibrary(libcode=None, name=argser[0], args=[], source=None,
-                                                          variables=argser[3])
-                            except:
-                                errors.append(sys.exc_info())
 
-                if lib_cached is None:
-                    lib = LibItem(argser[0], argser[1])
-                    lib.result = result
-                    lib.errors = errors
-                    self.cached_lib_items.append(lib)
+                t = threading.Thread(target=to_call)
+                t.setDaemon(True)
+                t.start()
+                t.join(timeout=self.lib_import_timeout)
+            except:
+                errors.append(sys.exc_info())
 
-                for p in errors:
-                    msg = '{LIB_ERROR: ' + argser[0] + ', value: VALUE_START(' + str(
-                        p) + ')VALUE_END, lib_file_import:' + str(result.source) + '}'
-                    LOGGER.message(Message(message=msg, level='FAIL'))
-            else:
-                result = func(*argser, **kwargs)
+        if len(libs) > 0:
+            library = libs[0]
         else:
-            result = func(self.obj, *argser, **kwargs)
+            try:
+                library = TestLibrary(args[0], args[1], args[2], create_handlers=False)
+            except:
+                try:
+                    library = _BaseTestLibrary(libcode=None, name=args[0], args=args[1], source=None, variables=args[2])
+                except:
+                    try:
+                        library = _BaseTestLibrary(libcode=None, name=args[0], args=[], source=None, variables=args[3])
+                    except:
+                        errors.append(sys.exc_info())
 
-        self._handle_keywords(result)
+        if lib_cached is None:
+            self.cached_lib_items.append(LibItem(args[0], args[1], library, errors))
 
-        return result
+        for e in errors:
+            msg = '{LIB_ERROR: ' + args[0] + ', value: VALUE_START(' + str(e) + ')VALUE_END, lib_file_import:' + str(
+                library.source) + '}'
+            LOGGER.message(Message(message=msg, level='FAIL'))
 
-    def _imp(self, func, q, errors, args, kwargs={}):
-        try:
-            res = func(*args, **kwargs)
-            q.append(res)
-        except:
-            ''' (type, value, traceback) '''
-            errors.append(sys.exc_info())
+        self._handle_keywords(library)
+
+        return library
+
+    def _get_lib_from_cache(self, name, args):
+        for cached_lib in self.cached_lib_items:
+            if cached_lib.name == name:
+                if len(cached_lib.args) == len(args):
+                    for cached_arg, arg in zip(cached_lib.args, args):
+                        if cached_arg != arg:
+                            return None
+                    return cached_lib
+        return None
 
     def _handle_keywords(self, library):
         if library and hasattr(library, 'handlers'):
@@ -203,6 +183,14 @@ class RedImporter(object):
                         pass  # TODO: add logging
                     finally:
                         self.cached_kw_items.add(keyword)
+
+
+class LibItem(object):
+    def __init__(self, name, args, lib=None, errors=list()):
+        self.name = name
+        self.args = args
+        self.lib = lib
+        self.errors = errors
 
 
 class PythonKeywordSource(object):
