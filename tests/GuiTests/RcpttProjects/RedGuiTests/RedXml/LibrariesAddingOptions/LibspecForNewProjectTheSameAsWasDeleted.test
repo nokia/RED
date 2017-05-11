@@ -1,12 +1,12 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Element-Name: ReloadLibspecForNewProjectAsWasDeleted
+Element-Name: LibspecForNewProjectTheSameAsWasDeleted
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _rKHzEC1_EeanG46zhUFEYg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/4/17 5:20 PM
+Save-Time: 5/11/17 11:26 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
