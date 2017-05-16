@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -39,6 +42,7 @@ public class ConvertSettingToComment extends EditorCommand {
         this.settingCall = null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
         if (oldName.equals(newName)) {
@@ -68,8 +72,17 @@ public class ConvertSettingToComment extends EditorCommand {
 
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
 
+        if (parent instanceof RobotCase) {
+            final TestCase testCase = (TestCase) (parent.getLinkedElement());
+            testCase.removeUnitSettings((AModelElement<TestCase>) keywordCall.getLinkedElement());
+        } else {
+            final UserKeyword userKeyword = (UserKeyword) (parent.getLinkedElement());
+            userKeyword.removeUnitSettings((AModelElement<UserKeyword>) keywordCall.getLinkedElement());
+        }
+
         final int index = keywordCall.getIndex();
         parent.removeChild(keywordCall);
+
         final RobotKeywordCall newCall = new RobotKeywordCall(parent, newLinked);
         parent.insertKeywordCall(index, newCall);
 
