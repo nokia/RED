@@ -86,7 +86,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
 
                 fireEvents();
             }
-        } catch (final ProposalApplyingException | CoreException e) {
+        } catch (final CoreException e) {
             StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e));
         }
     }
@@ -106,7 +106,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
         // nothing to do here
     }
 
-    public abstract boolean apply(final IFile externalFile, RobotProjectConfig config) throws ProposalApplyingException;
+    public abstract boolean apply(final IFile externalFile, RobotProjectConfig config);
 
     @Override
     public Point getSelection(final IDocument document) {
@@ -131,18 +131,5 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
     @Override
     public IContextInformation getContextInformation() {
         return null;
-    }
-
-    static class ProposalApplyingException extends RuntimeException {
-
-        private static final long serialVersionUID = 1L;
-
-        public ProposalApplyingException(final String message) {
-            super(message);
-        }
-
-        public ProposalApplyingException(final String message, final Throwable cause) {
-            super(message, cause);
-        }
     }
 }

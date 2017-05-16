@@ -77,8 +77,7 @@ public class DefineGlobalVariableInConfigFixer extends RedXmlConfigMarkerResolut
         }
 
         @Override
-        public boolean apply(final IFile externalFile, final RobotProjectConfig config)
-                throws ProposalApplyingException {
+        public boolean apply(final IFile externalFile, final RobotProjectConfig config) {
             variableMapping = SwtThread.syncEval(new Evaluation<VariableMapping>() {
                 @Override
                 public VariableMapping runCalculation() {
