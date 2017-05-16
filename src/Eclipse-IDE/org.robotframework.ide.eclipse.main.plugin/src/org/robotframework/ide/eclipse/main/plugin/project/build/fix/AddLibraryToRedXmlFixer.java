@@ -44,10 +44,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.red.graphics.ImagesManager;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
@@ -84,8 +82,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         }
 
         @Override
-        public boolean apply(final IFile externalFile, final RobotProjectConfig config)
-                throws ProposalApplyingException {
+        public boolean apply(final IFile externalFile, final RobotProjectConfig config) {
             return isPath ? importLibraryByPath(config, pathOrName) : importLibraryByName(externalFile, config);
         }
 
@@ -114,7 +111,9 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                             resolvedAbsPath.toString()));
 
                     if (addedLibraries.isEmpty()) {
-                        throw new ProposalApplyingException("Unable to apply proposal");
+                        MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
+                                "Unable to apply proposal");
+                        return false;
                     } else {
                         for (final ReferencedLibrary addedLibrary : addedLibraries) {
                             config.addReferencedLibrary(addedLibrary);
@@ -164,7 +163,9 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                         new File(absolutePath.get()).getAbsolutePath()));
 
                 if (addedLibraries.isEmpty()) {
-                    throw new ProposalApplyingException("Unable to apply proposal");
+                    MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
+                            "Unable to apply proposal");
+                    return false;
                 } else {
                     for (final ReferencedLibrary addedLibrary : addedLibraries) {
                         config.addReferencedLibrary(addedLibrary);
