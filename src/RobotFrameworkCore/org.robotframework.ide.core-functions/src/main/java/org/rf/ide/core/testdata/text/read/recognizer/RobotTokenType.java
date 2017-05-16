@@ -604,20 +604,18 @@ public enum RobotTokenType implements IRobotTokenType {
 
     private static RobotTokenType findTypeOfDeclaration(final List<RobotTokenType> availableTypes,
             final String textSettingDeclaration) {
-        RobotTokenType found = RobotTokenType.UNKNOWN;
 
         for (final RobotTokenType type : availableTypes) {
             if (type.isSettingDeclaration()) {
                 for (final String representation : type.getRepresentation()) {
                     if (representation.equalsIgnoreCase(textSettingDeclaration.trim())) {
-                        found = type;
-                        break;
+                        return type;
                     }
                 }
             }
         }
 
-        return found;
+        return RobotTokenType.UNKNOWN;
     }
 
     @Override

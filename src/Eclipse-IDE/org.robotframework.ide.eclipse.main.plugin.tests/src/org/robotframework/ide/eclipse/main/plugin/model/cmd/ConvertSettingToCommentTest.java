@@ -16,6 +16,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -75,6 +76,7 @@ public class ConvertSettingToCommentTest {
                 .build();
         final RobotKeywordDefinition keyword = model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
         final RobotKeywordCall keywordCall = keyword.getChildren().get(0);
+        final KeywordTeardown oldLinked = (KeywordTeardown) keywordCall.getLinkedElement();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -90,6 +92,8 @@ public class ConvertSettingToCommentTest {
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# [Teardown] | Log | 1 | #comment");
         assertThat(result).has(properlySetParent());
+        assertThat(keyword.getLinkedElement().getTeardowns()).doesNotContain(oldLinked);
+        assertThat(keyword.getLinkedElement().getExecutionContext().size()).isEqualTo(1);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
                 .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));

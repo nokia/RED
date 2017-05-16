@@ -67,6 +67,7 @@ public class ConvertCallToCommentTest {
         assertThat(result).has(properlySetParent());
         assertThat(testCase.getLinkedElement().getTestExecutionRows())
                 .doesNotContain(oldLinked);
+        assertThat(testCase.getLinkedElement().getTestExecutionRows().size()).isEqualTo(1);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
                 eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,

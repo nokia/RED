@@ -108,7 +108,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
         this.text = (text != null) ? text.intern() : null;
     }
 
-    private void markAsDirty() {
+    public void markAsDirty() {
         isDirty = true;
     }
 
