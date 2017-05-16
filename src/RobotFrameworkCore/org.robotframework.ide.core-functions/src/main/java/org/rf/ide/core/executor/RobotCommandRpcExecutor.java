@@ -131,7 +131,8 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     private List<PythonProcessListener> getListeners() {
-        return PythonInterpretersCommandExecutors.getInstance().getListeners();
+        // copy for avoiding concurrent modification
+        return newArrayList(PythonInterpretersCommandExecutors.getInstance().getListeners());
     }
 
     private void startStdErrReadingThread(final Process process, final Semaphore semaphore) {
