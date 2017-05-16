@@ -18,7 +18,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService.ConversionFromCommentCommand;
 import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertCallToComment extends EditorCommand {
@@ -105,7 +104,7 @@ public class ConvertCallToComment extends EditorCommand {
     @Override
     public List<EditorCommand> getUndoCommands() {
         final List<EditorCommand> undoCommands = new ArrayList<>(1);
-        undoCommands.add(new ConversionFromCommentCommand(keywordCall, oldName, 0));
+        undoCommands.add(new ConvertCommentToCall(eventBroker, keywordCall, oldName));
         return undoCommands;
     }
 
