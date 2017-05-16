@@ -111,8 +111,6 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                             resolvedAbsPath.toString()));
 
                     if (addedLibraries.isEmpty()) {
-                        MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
-                                "Unable to apply proposal");
                         return false;
                     } else {
                         for (final ReferencedLibrary addedLibrary : addedLibraries) {
@@ -163,8 +161,6 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                         new File(absolutePath.get()).getAbsolutePath()));
 
                 if (addedLibraries.isEmpty()) {
-                    MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
-                            "Unable to apply proposal");
                     return false;
                 } else {
                     for (final ReferencedLibrary addedLibrary : addedLibraries) {
