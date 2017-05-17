@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -31,6 +32,20 @@ public class GeneralSettingsModel {
     private static final String SUITE_TEARDOWN = "Suite Teardown";
     private static final String SUITE_SETUP = "Suite Setup";
     
+    static Map<String, ModelType> labelsToTypes() {
+        Map<String, ModelType> returned = new HashMap<>();
+        returned.put(DEFAULT_TAGS, ModelType.DEFAULT_TAGS_SETTING);
+        returned.put(FORCE_TAGS, ModelType.FORCE_TAGS_SETTING);
+        returned.put(TEST_TIMEOUT, ModelType.TEST_CASE_TIMEOUT);
+        returned.put(TEST_TEMPLATE, ModelType.TEST_CASE_TEMPLATE);
+        returned.put(TEST_TEARDOWN, ModelType.TEST_CASE_TEARDOWN);
+        returned.put(TEST_SETUP, ModelType.TEST_CASE_SETUP);
+        returned.put(SUITE_TEARDOWN, ModelType.SUITE_TEARDOWN);
+        returned.put(SUITE_SETUP, ModelType.SUITE_SETUP);
+        return returned;
+    };
+
+
     public static List<RobotElement> findGeneralSettingsList(final RobotSettingsSection section) {
         if (section == null) {
             return newArrayList();
@@ -44,18 +59,16 @@ public class GeneralSettingsModel {
         final Map<String, RobotElement> initialMapping = AccessibleSettings.forFile(section.getSuiteFile())
                 .createInitialMapping();
 
+        final Map<String, ModelType> labels = labelsToTypes();
         if (section != null) {
-            for (final RobotKeywordCall setting : section.getChildren()) {
-                final String settingName = setting.getName();
-
-                for (String sr : initialMapping.keySet()) {
-                    if (sr.equalsIgnoreCase(settingName)) {
-                        initialMapping.put(sr, setting);
-                            break;
-                        }
-
-                    }
-            }
+            for (RobotKeywordCall setting : section.getChildren()) {
+                for (String label : initialMapping.keySet()) {
+                    if (labels.get(label) == setting.getLinkedElement().getModelType()) {
+                         initialMapping.put(label, setting);
+                         break;
+                   }
+                }
+             }
         }
         return initialMapping;
     }
