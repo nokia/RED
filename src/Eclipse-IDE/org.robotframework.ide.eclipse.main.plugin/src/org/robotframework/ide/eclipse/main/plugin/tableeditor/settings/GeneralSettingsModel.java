@@ -47,9 +47,14 @@ public class GeneralSettingsModel {
         if (section != null) {
             for (final RobotKeywordCall setting : section.getChildren()) {
                 final String settingName = setting.getName();
-                if (initialMapping.containsKey(settingName)) {
-                    initialMapping.put(settingName, setting);
-                }
+
+                for (String sr : initialMapping.keySet()) {
+                    if (sr.equalsIgnoreCase(settingName)) {
+                        initialMapping.put(sr, setting);
+                            break;
+                        }
+
+                    }
             }
         }
         return initialMapping;
