@@ -33,7 +33,7 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
             final String comment) {
         final TestCaseTeardown teardown = testCase.newTeardown();
         teardown.getDeclaration().setText(settingName);
-        teardown.getDeclaration().getRaw();
+        teardown.getDeclaration().setRaw(settingName);
 
         if (!args.isEmpty()) {
             teardown.setKeywordName(args.get(0));
@@ -73,7 +73,7 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
         final TestCaseTeardown teardown = (TestCaseTeardown) modelElement;
 
         teardown.setKeywordName(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
-        int elementsToRemove = teardown.getArguments().size();
+        final int elementsToRemove = teardown.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             teardown.removeElementToken(0);
         }
