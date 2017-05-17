@@ -1,0 +1,58 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g
+Element-Name: RecognizingOfKeywordsFromSettings
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3dIBQDrHEeebF7uRJF8pRw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/17/17 8:55 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type Enter
+    key-type Up
+    type-text "*** Settings ***"
+    key-type Enter
+    type-text "suite SETUP  log  2"
+    key-type Enter
+    type-text "SUITE teardown  log  3"
+    key-type Enter
+    type-text "test setup  Catenate"
+    key-type Enter
+    type-text "tESt teaRDOWN  If  2"
+    key-type Enter
+    type-text "test templatE  Catenate"
+    key-type Enter
+    type-text "TEST timeOUt  400"
+    key-type Enter
+    type-text for
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "force tag"
+    key-type Enter
+    type-text def
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "my tag"
+    key-type Enter
+    type-text "library  Collections"
+    key-type Enter
+    type-text me
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text data
+    key-type "M1+s"
+}
+get-view Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
