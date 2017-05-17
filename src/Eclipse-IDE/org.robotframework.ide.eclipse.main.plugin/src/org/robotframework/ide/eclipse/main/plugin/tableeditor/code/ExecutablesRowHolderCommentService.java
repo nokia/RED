@@ -196,7 +196,7 @@ public class ExecutablesRowHolderCommentService {
             final List<RobotToken> execRowView = execRowView(call);
             int startColumn = column;
             if (column == 0) {
-                if (value.isEmpty()) {
+                if (value == null || value.isEmpty()) {
                     final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,
                             execRowView.get(0).getText());
                     changeTmpName.execute();
