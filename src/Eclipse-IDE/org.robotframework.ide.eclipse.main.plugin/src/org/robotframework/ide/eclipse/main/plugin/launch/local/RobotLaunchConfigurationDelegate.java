@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -166,7 +167,6 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             builder.addUserArgumentsForExecutableFile(parseArguments(robotConfig.getExecutableFileArguments()));
             builder.useSingleRobotCommandLineArg(preferences.shouldUseSingleCommandLineArgument());
         }
-        builder.withProject(robotProject.getProject().getLocation().toFile());
         builder.addLocationsToClassPath(robotProject.getClasspath());
         builder.addLocationsToPythonPath(robotProject.getPythonpath());
         builder.addUserArgumentsForInterpreter(parseArguments(robotConfig.getInterpreterArguments()));
@@ -174,8 +174,15 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         builder.addVariableFiles(robotProject.getVariableFilePaths());
 
-        builder.suitesToRun(robotConfig.getSuitesToRun());
-        builder.testsToRun(robotConfig.getTestsToRun());
+        if (preferences.shouldUseSingleFileDataSource() && robotConfig.getSuiteResources().size() == 1
+                && robotConfig.getSuiteResources().get(0) instanceof IFile) {
+            builder.withProject(robotConfig.getSuiteResources().get(0).getLocation().toFile());
+            builder.testsToRun(robotConfig.getTestsToRunWithoutSuitePrefixes());
+        } else {
+            builder.withProject(robotProject.getProject().getLocation().toFile());
+            builder.suitesToRun(robotConfig.getSuitesToRun());
+            builder.testsToRun(robotConfig.getTestsToRun());
+        }
 
         if (robotConfig.isIncludeTagsEnabled()) {
             builder.includeTags(robotConfig.getIncludedTags());
