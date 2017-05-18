@@ -36,10 +36,10 @@ public class GeneralSettingsModel {
         Map<String, ModelType> returned = new HashMap<>();
         returned.put(DEFAULT_TAGS, ModelType.DEFAULT_TAGS_SETTING);
         returned.put(FORCE_TAGS, ModelType.FORCE_TAGS_SETTING);
-        returned.put(TEST_TIMEOUT, ModelType.TEST_CASE_TIMEOUT);
-        returned.put(TEST_TEMPLATE, ModelType.TEST_CASE_TEMPLATE);
-        returned.put(TEST_TEARDOWN, ModelType.TEST_CASE_TEARDOWN);
-        returned.put(TEST_SETUP, ModelType.TEST_CASE_SETUP);
+        returned.put(TEST_TIMEOUT, ModelType.SUITE_TEST_TIMEOUT);
+        returned.put(TEST_TEMPLATE, ModelType.SUITE_TEST_TEMPLATE);
+        returned.put(TEST_TEARDOWN, ModelType.SUITE_TEST_TEARDOWN);
+        returned.put(TEST_SETUP, ModelType.SUITE_TEST_SETUP);
         returned.put(SUITE_TEARDOWN, ModelType.SUITE_TEARDOWN);
         returned.put(SUITE_SETUP, ModelType.SUITE_SETUP);
         return returned;
