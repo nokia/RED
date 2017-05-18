@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _zDCd4LV4EeazMIT-6yPcSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 5:08 PM
+Save-Time: 5/18/17 10:00 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -22,9 +22,7 @@ get-editor "test.robot" | get-left-ruler | get-ruler-column AnnotationColumn | d
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "ProjectWithNones/test.robot" | get-menu "Debug As/1 Robot Test" | click
 	
-		try -times 10 -delay 300 -command{
-		get-view Debug | get-tree |get-item "test.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
-	}
+	wait-for-thread -file "test.robot"
 	
 
 	check-debug-marker-on-ruler -line 12 -script_name "test.robot"
