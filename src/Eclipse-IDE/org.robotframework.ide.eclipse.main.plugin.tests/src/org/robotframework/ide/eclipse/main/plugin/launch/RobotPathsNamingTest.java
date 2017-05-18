@@ -7,21 +7,22 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.red.junit.ProjectProvider;
 
-public class RobotSuitesNamingTest {
+public class RobotPathsNamingTest {
 
-    private static final String PROJECT_NAME = RobotSuitesNamingTest.class.getSimpleName();
+    private static final String PROJECT_NAME = RobotPathsNamingTest.class.getSimpleName();
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Test
-    public void testDifferentPathsToNamesConversions() {
+    public void testDifferentPathsToSuiteNamesConversions() {
         assertThat(suiteNameFor("")).isEqualTo(PROJECT_NAME);
         assertThat(suiteNameFor("a")).isEqualTo(PROJECT_NAME + ".A");
         assertThat(suiteNameFor("a/b/c")).isEqualTo(PROJECT_NAME + ".A.B.C");
@@ -30,8 +31,21 @@ public class RobotSuitesNamingTest {
         assertThat(suiteNameFor("a/001__b/c")).isEqualTo(PROJECT_NAME + ".A.B.C");
     }
 
+    @Test
+    public void testSuiteNameConversionForResource() throws Exception {
+        final IFile suite = projectProvider.createFile("some test suite.robot");
+        assertThat(RobotPathsNaming.createSuiteName(suite)).isEqualTo(PROJECT_NAME + ".Some Test Suite");
+    }
+
+    @Test
+    public void testTestNameConversion() throws Exception {
+        final IProject project = projectProvider.getProject();
+        assertThat(RobotPathsNaming.createTestName(project, new Path("suite.robot"), "test case"))
+                .isEqualTo(PROJECT_NAME + ".Suite.test case");
+    }
+
     private static String suiteNameFor(final String path) {
         final IProject project = projectProvider.getProject();
-        return RobotSuitesNaming.createSuiteName(project, new Path(path));
+        return RobotPathsNaming.createSuiteName(project, new Path(path));
     }
 }
