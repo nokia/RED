@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -20,43 +21,40 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService.ConversionFromCommentCommand;
 import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertSettingToComment extends EditorCommand {
 
-    private final RobotKeywordCall keywordCall;
+    private final RobotKeywordCall settingCall;
 
-    private RobotKeywordCall settingCall;
+    private RobotKeywordCall commentCall;
 
     private final String newName;
 
-    private final String oldName;
-
-    public ConvertSettingToComment(final IEventBroker eventBroker, final RobotKeywordCall keywordCall,
+    public ConvertSettingToComment(final IEventBroker eventBroker, final RobotKeywordCall settingCall,
             final String name) {
         this.eventBroker = eventBroker;
-        this.keywordCall = keywordCall;
+        this.settingCall = settingCall;
         this.newName = name;
-        this.oldName = keywordCall.getLinkedElement().getDeclaration().getRaw();
-        this.settingCall = null;
+        this.commentCall = null;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
-        if (oldName.equals(newName)) {
-            return;
-        }
 
-        final List<RobotToken> tokens = keywordCall.getLinkedElement().getElementTokens();
+        final List<RobotToken> tokens = settingCall.getLinkedElement()
+                .getElementTokens()
+                .stream()
+                .map(RobotToken::copy)
+                .collect(Collectors.toList());
 
         if (tokens.isEmpty()) {
             return;
         }
 
         final RobotExecutableRow<?> newLinked = new RobotExecutableRow<>();
-        newLinked.getAction().setType(keywordCall.getParent() instanceof RobotCase
+        newLinked.getAction().setType(settingCall.getParent() instanceof RobotCase
                 ? RobotTokenType.TEST_CASE_ACTION_NAME : RobotTokenType.KEYWORD_ACTION_NAME);
 
         final RobotToken first = tokens.get(0);
@@ -70,32 +68,30 @@ public class ConvertSettingToComment extends EditorCommand {
             newLinked.addCommentPart(token);
         }
 
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
+        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) settingCall.getParent();
 
         if (parent instanceof RobotCase) {
             final TestCase testCase = (TestCase) (parent.getLinkedElement());
-            testCase.removeUnitSettings((AModelElement<TestCase>) keywordCall.getLinkedElement());
+            testCase.removeUnitSettings((AModelElement<TestCase>) settingCall.getLinkedElement());
         } else {
             final UserKeyword userKeyword = (UserKeyword) (parent.getLinkedElement());
-            userKeyword.removeUnitSettings((AModelElement<UserKeyword>) keywordCall.getLinkedElement());
+            userKeyword.removeUnitSettings((AModelElement<UserKeyword>) settingCall.getLinkedElement());
         }
 
-        final int index = keywordCall.getIndex();
-        parent.removeChild(keywordCall);
+        final int index = settingCall.getIndex();
+        parent.removeChild(settingCall);
 
-        final RobotKeywordCall newCall = new RobotKeywordCall(parent, newLinked);
-        parent.insertKeywordCall(index, newCall);
+        commentCall = new RobotKeywordCall(parent, newLinked);
+        parent.insertKeywordCall(index, commentCall);
 
-        settingCall = newCall;
-
-        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newCall).send(
+        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(commentCall).send(
                 RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
         final List<EditorCommand> undoCommands = new ArrayList<>(1);
-        undoCommands.add(new ConversionFromCommentCommand(settingCall, oldName, 0));
+        undoCommands.add(new ReplaceRobotKeywordCallCommand(eventBroker, commentCall, settingCall));
         return undoCommands;
     }
 
