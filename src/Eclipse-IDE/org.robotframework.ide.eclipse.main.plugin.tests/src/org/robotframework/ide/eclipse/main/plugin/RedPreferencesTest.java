@@ -35,10 +35,10 @@ public class RedPreferencesTest {
 
             final EnumSet<FoldableElements> elements = preferences.getFoldableElements();
 
-            assertThat(elements).is(contatingElementOnlyWhen(FoldableElements.SECTIONS, (i & 8) != 0));
-            assertThat(elements).is(contatingElementOnlyWhen(FoldableElements.CASES, (i & 4) != 0));
-            assertThat(elements).is(contatingElementOnlyWhen(FoldableElements.KEYWORDS, (i & 2) != 0));
-            assertThat(elements).is(contatingElementOnlyWhen(FoldableElements.DOCUMENTATION, (i & 1) != 0));
+            assertThat(elements).is(containingElementOnlyWhen(FoldableElements.SECTIONS, (i & 8) != 0));
+            assertThat(elements).is(containingElementOnlyWhen(FoldableElements.CASES, (i & 4) != 0));
+            assertThat(elements).is(containingElementOnlyWhen(FoldableElements.KEYWORDS, (i & 2) != 0));
+            assertThat(elements).is(containingElementOnlyWhen(FoldableElements.DOCUMENTATION, (i & 1) != 0));
         }
     }
 
@@ -62,9 +62,10 @@ public class RedPreferencesTest {
         assertThat(preferences.getElementOpenMode()).isEqualTo(ElementOpenMode.OPEN_IN_TABLES);
     }
 
-    private static <T extends Iterable<?>> Condition<T> contatingElementOnlyWhen(final Object element,
+    private static <T extends Iterable<?>> Condition<T> containingElementOnlyWhen(final Object element,
             final boolean condition) {
         return new Condition<T>() {
+
             @Override
             public boolean matches(final T iterable) {
                 if (condition) {
