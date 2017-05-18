@@ -126,6 +126,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     private void initializeDefaultLaunchConfigurationPreferences(final IEclipsePreferences preferences) {
         preferences.putBoolean(RedPreferences.LAUNCH_USE_ARGUMENT_FILE, true);
         preferences.putBoolean(RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT, false);
+        preferences.putBoolean(RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, false);
         preferences.put(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, AgentConnectionServer.DEFAULT_CONNECTION_HOST);
         preferences.putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, AgentConnectionServer.DEFAULT_CONNECTION_PORT);
         preferences.putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,

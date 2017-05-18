@@ -313,7 +313,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return suiteNames;
     }
 
-    private List<IResource> getSuiteResources() throws CoreException {
+    List<IResource> getSuiteResources() throws CoreException {
         final List<IResource> resources = new ArrayList<>();
         final Set<String> problems = new HashSet<>();
         for (final String suitePath : getSuitePaths().keySet()) {
@@ -339,6 +339,14 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
             for (final String testName : entry.getValue()) {
                 tests.add(RobotPathsNaming.createTestName(project, path, testName));
             }
+        }
+        return tests;
+    }
+
+    public List<String> getTestsToRunWithoutSuitePrefixes() throws CoreException {
+        final List<String> tests = new ArrayList<>();
+        for (final List<String> suiteTestNames : getSuitePaths().values()) {
+            tests.addAll(suiteTestNames);
         }
         return tests;
     }

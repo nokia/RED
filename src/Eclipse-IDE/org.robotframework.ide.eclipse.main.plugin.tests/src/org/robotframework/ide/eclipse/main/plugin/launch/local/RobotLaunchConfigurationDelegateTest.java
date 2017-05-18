@@ -197,6 +197,110 @@ public class RobotLaunchConfigurationDelegateTest {
         launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345, preferences);
     }
 
+    @Test
+    public void pathToSuiteIsUsed_whenSingleSuiteIsRunAndPreferenceIsSet() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", newArrayList()));
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String suitePath = projectProvider.createFile("001__suites_a/s1.robot").getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).endsWith(suitePath).doesNotContain("-s", "-t");
+    }
+
+    @Test
+    public void pathToSuiteIsUsed_whenTestsFromSingleSuiteAreRunAndPreferenceIsSet() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", newArrayList("001__case1")));
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String suitePath = projectProvider.createFile("001__suites_a/s1.robot").getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).endsWith("-t", "001__case1", suitePath).doesNotContain("-s");
+    }
+
+    @Test
+    public void pathToSuiteIsNotUsed_whenSeveralResourcesAreRunAndPreferenceIsSet() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setSuitePaths(
+                ImmutableMap.of("001__suites_a", newArrayList(), "001__suites_a/s1.robot", newArrayList()));
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getCommandLine())
+                .endsWith("-s", PROJECT_NAME + ".Suites_a", "-s", PROJECT_NAME + ".Suites_a.S1", projectPath)
+                .doesNotContain("-t");
+    }
+
+    @Test
+    public void pathToSuiteIsNotUsed_whenSingleFolderIsRunAndPreferenceIsSet() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+        when(preferences.shouldUseSingleFileDataSource()).thenReturn(true);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a", newArrayList()));
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).endsWith("-s", PROJECT_NAME + ".Suites_a", projectPath)
+                .doesNotContain("-t");
+    }
+
+    @Test
+    public void pathToSuiteIsNotUsed_whenSingleSuiteIsRunAndPreferenceIsNotSet() throws Exception {
+        final RedPreferences preferences = mock(RedPreferences.class);
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        robotConfig.setSuitePaths(ImmutableMap.of("001__suites_a/s1.robot", newArrayList()));
+
+        final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
+                preferences);
+
+        final String projectPath = projectProvider.getProject().getLocation().toOSString();
+        assertThat(commandLine.getCommandLine()).endsWith("-s", PROJECT_NAME + ".Suites_a.S1", projectPath)
+                .doesNotContain("-t");
+    }
+
     private RobotLaunchConfiguration createRobotLaunchConfiguration(final String projectName) throws CoreException {
         final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
