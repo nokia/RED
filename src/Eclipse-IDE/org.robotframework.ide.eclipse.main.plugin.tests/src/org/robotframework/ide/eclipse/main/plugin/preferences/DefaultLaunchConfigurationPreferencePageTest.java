@@ -60,8 +60,7 @@ public class DefaultLaunchConfigurationPreferencePageTest {
             } else if (editor instanceof StringFieldEditor) {
                 stringPrefNames.remove(editor.getPreferenceName());
             } else if (editor instanceof FileFieldEditor) {
-                final FileFieldEditor fileFieldEditor = (FileFieldEditor) editor;
-                assertThat(fileFieldEditor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH);
+                assertThat(editor.getPreferenceName()).isEqualTo(RedPreferences.LAUNCH_EXECUTABLE_FILE_PATH);
             }
         }
         assertThat(integerPrefNames).isEmpty();

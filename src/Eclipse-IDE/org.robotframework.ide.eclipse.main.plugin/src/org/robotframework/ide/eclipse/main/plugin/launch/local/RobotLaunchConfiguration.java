@@ -35,7 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationNaming.RobotLaunchConfigurationType;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotSuitesNaming;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Function;
@@ -308,7 +308,7 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
     public List<String> getSuitesToRun() throws CoreException {
         final List<String> suiteNames = new ArrayList<>();
         for (final IResource suite : getSuiteResources()) {
-            suiteNames.add(RobotSuitesNaming.createSuiteName(suite));
+            suiteNames.add(RobotPathsNaming.createSuiteName(suite));
         }
         return suiteNames;
     }
@@ -333,10 +333,11 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
 
     public List<String> getTestsToRun() throws CoreException {
         final List<String> tests = new ArrayList<>();
-        for (final Entry<String, List<String>> entries : getSuitePaths().entrySet()) {
-            for (final String testName : entries.getValue()) {
-                tests.add(RobotSuitesNaming.createSuiteName(getProject(), Path.fromPortableString(entries.getKey()))
-                        + "." + testName);
+        for (final Entry<String, List<String>> entry : getSuitePaths().entrySet()) {
+            final IProject project = getProject();
+            final IPath path = Path.fromPortableString(entry.getKey());
+            for (final String testName : entry.getValue()) {
+                tests.add(RobotPathsNaming.createTestName(project, path, testName));
             }
         }
         return tests;
