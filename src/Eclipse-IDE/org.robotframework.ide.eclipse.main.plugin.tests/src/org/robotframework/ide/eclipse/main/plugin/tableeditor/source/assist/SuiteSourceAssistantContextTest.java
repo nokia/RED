@@ -26,7 +26,7 @@ public class SuiteSourceAssistantContextTest {
     @Test
     public void contextProvidesModelSuppliedByGivenSupplier() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        
+
         assertThat(createContext(null).getModel()).isNull();
         assertThat(createContext(model).getModel()).isSameAs(model);
     }
@@ -124,7 +124,7 @@ public class SuiteSourceAssistantContextTest {
             assertThat(context.getAssistantAutoActivationChars()).containsExactly('a', 'b', 'c');
         }
 
-        preferences.setAssistatntAutoActivationChars(new char[] { 'x', 'y', 'z' });
+        preferences.setAssistantAutoActivationChars(new char[] { 'x', 'y', 'z' });
         for (int i = 0; i < 10; i++) {
             assertThat(context.getAssistantAutoActivationChars()).containsExactly('a', 'b', 'c');
         }

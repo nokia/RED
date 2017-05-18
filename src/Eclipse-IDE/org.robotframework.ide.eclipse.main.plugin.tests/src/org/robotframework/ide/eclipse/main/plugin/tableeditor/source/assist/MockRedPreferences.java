@@ -62,7 +62,7 @@ public class MockRedPreferences extends RedPreferences {
         return assistantAutoActivationChars;
     }
 
-    void setAssistatntAutoActivationChars(final char[] assistantAutoActivationChars) {
+    void setAssistantAutoActivationChars(final char[] assistantAutoActivationChars) {
         this.assistantAutoActivationChars = assistantAutoActivationChars;
     }
 }
