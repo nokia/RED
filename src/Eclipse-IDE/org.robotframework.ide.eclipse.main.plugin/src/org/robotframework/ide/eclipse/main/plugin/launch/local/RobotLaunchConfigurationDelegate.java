@@ -107,7 +107,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             return new LaunchExecution(serverJob, null, null);
         }
 
-        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port);
+        final RunCommandLine cmdLine = prepareCommandLine(robotConfig, robotProject, port,
+                RedPlugin.getDefault().getPreferences());
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
         final String processLabel = createConsoleDescription(robotConfig, robotRuntimeEnvironment);
@@ -149,9 +150,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
     @VisibleForTesting
     RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
-            final int port) throws CoreException, IOException {
-
-        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+            final int port, final RedPreferences preferences) throws CoreException, IOException {
 
         final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
                 ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
