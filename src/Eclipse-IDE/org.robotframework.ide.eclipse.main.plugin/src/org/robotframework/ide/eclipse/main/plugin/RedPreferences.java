@@ -75,6 +75,8 @@ public class RedPreferences {
 
     public static final String LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT = "red.launch.useSingleCommandLineArgument";
 
+    public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
+
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -221,6 +223,10 @@ public class RedPreferences {
 
     public boolean shouldUseSingleCommandLineArgument() {
         return store.getBoolean(LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT);
+    }
+
+    public boolean shouldUseSingleFileDataSource() {
+        return store.getBoolean(LAUNCH_USE_SINGLE_FILE_DATA_SOURCE);
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {

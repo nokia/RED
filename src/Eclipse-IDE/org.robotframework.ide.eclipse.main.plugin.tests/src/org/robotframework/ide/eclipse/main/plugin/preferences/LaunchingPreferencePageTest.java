@@ -41,10 +41,11 @@ public class LaunchingPreferencePageTest {
         page.createControl(shellProvider.getShell());
 
         final List<String> booleanPrefNames = newArrayList(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
+                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE,
                 RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT);
 
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(2);
+        assertThat(editors).hasSize(3);
         for (final FieldEditor editor : editors) {
             if (editor instanceof BooleanFieldEditor) {
                 booleanPrefNames.remove(editor.getPreferenceName());
