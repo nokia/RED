@@ -6,10 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCallConditions.properlySetParent;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -28,8 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-
-import com.google.common.collect.ImmutableMap;
 
 public class ConvertCallToCommentTest {
 
@@ -69,9 +67,8 @@ public class ConvertCallToCommentTest {
                 .doesNotContain(oldLinked);
         assertThat(testCase.getLinkedElement().getTestExecutionRows().size()).isEqualTo(1);
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
-                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
-                        result)));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, testCase);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -102,8 +99,8 @@ public class ConvertCallToCommentTest {
         assertThat(result).has(properlySetParent());
         assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keyword);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -135,8 +132,8 @@ public class ConvertCallToCommentTest {
         assertThat(result).has(properlySetParent());
         assertThat(testCase.getLinkedElement().getTestExecutionRows()).doesNotContain(oldLinked);
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, testCase);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -169,7 +166,7 @@ public class ConvertCallToCommentTest {
         assertThat(result).has(properlySetParent());
         assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keyword);
+        verifyNoMoreInteractions(eventBroker);
     }
 }
