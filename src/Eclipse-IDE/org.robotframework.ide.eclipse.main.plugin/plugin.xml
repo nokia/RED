@@ -5856,6 +5856,10 @@
           id="org.robotframework.red.view.message.wrap"
           name="Word Wrap">
     </command>
+    <command
+          id="org.robotframework.red.view.message.saveContent"
+          name="Save Logs">
+    </command>
  </extension>
       <extension
             name="Message View handlers"
@@ -5864,6 +5868,10 @@
                class="org.robotframework.ide.eclipse.main.plugin.views.message.ToggleWordsWrappingHandler"
                commandId="org.robotframework.red.view.message.wrap">
          </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.message.SaveLogViewContentHandler"
+               commandId="org.robotframework.red.view.message.saveContent">
+         </handler>
       </extension>
       <extension
             name="Message View menus"
@@ -5871,6 +5879,12 @@
          <menuContribution
                allPopups="false"
                locationURI="toolbar:org.robotframework.ide.MessageLogView">
+            <command
+                  commandId="org.robotframework.red.view.message.saveContent"
+                  icon="resources/saveas.png"
+                  label="Save Logs"
+                  style="push">
+            </command>
             <command
                   commandId="org.robotframework.red.view.message.wrap"
                   icon="resources/wordwrap.png"
