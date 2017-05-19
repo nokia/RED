@@ -1,0 +1,214 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _-6GGQDvREeeLGrABQJe5GQ,_d8aMACuvEeW667Afdo4DcA
+Element-Name: RunningSuitUsingFullPath
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _D_G4QDvSEeeLGrABQJe5GQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/19/17 2:40 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//run test and check errors for all files with the same name
+get-view "Project Explorer" | get-tree | select "DuplicatedTests/scout_test.robot" 
+    | select "DuplicatedTests/scout_test.robot" | get-menu "Run As/1 Robot Test" | click
+    
+get-view Console | get-text-viewer | get-object |invoke getLine 2
+    | matches "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot': Setting 'Suite Setup' used multiple times."
+    | verify-true
+    
+get-view Console | get-text-viewer | get-object |invoke getLine 3
+    | matches "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot': Setting 'Documentation' used multiple times."
+    | verify-true
+    
+get-view Console | get-text-viewer | get-property text 
+    | contains "==============================================================================\n"
+    + "DuplicatedTests                                                               \n"
+    + "==============================================================================\n"
+    + "DuplicatedTests.Scout Test                                                    \n"
+    + "==============================================================================\n"
+    + "test from root                                                        | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "i love bacon                                                          | PASS |\n"
+    + "------------------------------------------------------------------------------\n"
+    + "DuplicatedTests.Scout Test                                            | PASS |\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "DuplicatedTests                                                       | PASS |\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"  | verify-true
+    
+//clear console    
+get-view Console | get-button "Clear Console" | click
+
+//run test from folder1
+get-view "Project Explorer" | get-tree | select "DuplicatedTests/folder1/scout_test.robot" 
+	| get-menu "Run As/1 Robot Test" | click
+
+//2 errors from files inside folders    
+get-view Console | get-text-viewer | get-object |invoke getLine 2
+    | matches "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot': Setting 'Suite Setup' used multiple times."
+    | verify-true
+    
+get-view Console | get-text-viewer | get-object |invoke getLine 3
+    | matches "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot': Setting 'Documentation' used multiple times."
+    | verify-true
+    	
+get-view Console | get-button "Clear Console" | click
+
+//check preference to show args in console and run test with full path
+get-preferences-menu | click
+with [get-window Preferences] {
+	get-group Robot | get-button "Pass Robot arguments using arguments file" | uncheck
+    get-tree | select "Robot Framework/Launching"
+    get-group Robot | get-button "Run single suite using suite path" | check
+    get-button Apply | click
+    get-button OK | click
+}
+
+//====================================================== main test ===========================================
+//run main test
+get-view "Project Explorer" | get-tree | select "DuplicatedTests/scout_test.robot" 
+	| get-menu "Run As/1 Robot Test" | click
+	
+//check execution view	
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Scout Test.test from root\n"
+    + ".* : INFO : 9\n"
+    + "Ending test: Scout Test.test from root\n\n"
+    + "Starting test: Scout Test.i love bacon\n"
+    + ".* : INFO : how does not\?\n"
+    + "Ending test: Scout Test.i love bacon" | verify-true
+
+//expand execution view    
+with [get-view "Execution View"] {
+    click
+    get-tree | select "Scout Test \(.* s\)"
+    get-button "Expand All" | click
+}
+//check if execution view has shorter paths
+with [get-view "Execution View" | get-tree] {
+    get-property "getItems().length" | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Scout Test \(.* s\)" | verify-true
+    get-item "Scout Test \\(.* s\\)" | get-property "getItems().length" | equals 2 | verify-true
+    get-item "Scout Test \\(.* s\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "test from root \(.* s\)" | verify-true
+    get-item "Scout Test \\(.* s\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "i love bacon \(.* s\)" | verify-true
+}
+
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* --listener .*TestRunnerAgent.py:.* .*[\\\\/]DuplicatedTests[\\\\/]scout_test.robot\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "==============================================================================\n"
+    + "Scout Test                                                                    \n"
+    + "==============================================================================\n"
+    + "test from root                                                        \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "i love bacon                                                          \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Scout Test                                                            \| PASS \|\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
+
+
+//====================================================== test from folder 2 ===========================================
+
+//run test from folder2
+get-view "Project Explorer" | get-tree | select "DuplicatedTests/folder2/folder_2_1/scout_test.robot" 
+	| get-menu "Run As/1 Robot Test" | click
+	
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* --listener .*TestRunnerAgent.py:.* .*[\\\\/]DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot': Setting 'Documentation' used multiple times.\n"
+    + "==============================================================================\n"
+    + "Scout Test                                                                    \n"
+    + "==============================================================================\n"
+    + "test from 2 dirs                                                      \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "i love bacon                                                          \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Scout Test                                                            \| PASS \|\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
+    
+with [get-view "Execution View"] {
+    click
+    get-button "Expand All" | click
+}
+with [get-view "Execution View" | get-tree] {
+    get-item "Scout Test \\(.* s\\)" | get-property childCount | equals 2 | verify-true
+    get-item "Scout Test \\(.* s\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "test from 2 dirs \(.* s\)" | verify-true
+    get-item "Scout Test \\(.* s\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "i love bacon \(.* s\)" | verify-true
+}
+
+//====================================================== single case in test from folder1 ===========================================
+
+get-view "Project Explorer" | get-tree | select "DuplicatedTests/folder1/scout_test.robot/Test Cases/i love bacon" 
+    | get-menu Run | click
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* -m robot.run --listener .*TestRunnerAgent.py:.* -t \"i love bacon\" .*DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "\[ ERROR \] Error in file '.*[\\\\/]DuplicatedTests[\\\\/]folder1[\\\\/]scout_test.robot': Setting 'Suite Setup' used multiple times.\n"
+    + "==============================================================================\n"
+    + "Scout Test                                                                    \n"
+    + "==============================================================================\n"
+    + "i love bacon                                                          \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Scout Test                                                            \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
+    
+with [get-view "Execution View"] {
+    click
+    get-button "Expand All" | click
+}
+
+with [get-view "Execution View" | get-tree] {
+    get-item "Scout Test \\(.* s\\)" | get-property childCount | equals 1 | verify-true
+    get-item "Scout Test \\(.* s\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "i love bacon \(.* s\)" | verify-true
+}
+
+
+//====================================================== case in test from main test ===========================================
+
+get-view "Project Explorer" | get-tree | select "DuplicatedTests/scout_test.robot/Test Cases/i love bacon" 
+    | get-menu Run | click
+get-view Console | get-text-viewer | get-property text 
+    | contains "Command: .* -m robot.run --listener .*TestRunnerAgent.py:60402 -t \"i love bacon\" .*DuplicatedTests[\\\\/]scout_test.robot\n"
+
+    
+//======================================== run entire folder - old mechanism with  -s switch will be used ==========================
+get-view "Project Explorer" | get-tree | select "DuplicatedTests/folder2" | get-menu "Run As/1 Robot Test" | click
+get-view Console | get-text-viewer | get-object |invoke getLine 0
+    | matches "Command: .* -m robot\.run --listener .* -s DuplicatedTests\.Folder2 .*DuplicatedTests"
+	| verify-true
+    
+    
+get-view Console | get-text-viewer | get-object |invoke getLine 2
+    | matches "\[ ERROR \] Error in file '.*DuplicatedTests[\\\\/]folder2[\\\\/]folder_2_1[\\\\/]scout_test.robot': Setting 'Documentation' used multiple times."
+    | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
