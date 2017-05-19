@@ -522,6 +522,19 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         }
     }
 
+    @Inject
+    @Optional
+    private void whenKeywordCallCommentIsConverted(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE) final Event event) {
+
+        final RobotCase testCase = Events.get(event, IEventBroker.DATA, RobotCase.class);
+
+        if (testCase != null && testCase.getSuiteFile() == fileModel) {
+            sortModel.clear();
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+        }
+    }
+
     private Runnable tableInputIsReplaced() {
         return new Runnable() {
 

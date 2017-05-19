@@ -18,29 +18,28 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.services.event.RedEventBroker;
 
 import com.google.common.base.Joiner;
 
 public class ConvertCommentToSetting extends EditorCommand {
 
-    private RobotKeywordCall newCall;
+    private RobotKeywordCall settingCall;
 
-    private final RobotKeywordCall oldCall;
+    private final RobotKeywordCall commentCall;
 
     private final String newName;
 
     public ConvertCommentToSetting(final IEventBroker eventBroker, final RobotKeywordCall commentCall,
             final String name) {
         this.eventBroker = eventBroker;
-        this.newCall = null;
-        this.oldCall = commentCall;
+        this.settingCall = null;
+        this.commentCall = commentCall;
         this.newName = name;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        final Optional<List<RobotToken>> commentTokens = oldCall.getCommentTokens();
+        final Optional<List<RobotToken>> commentTokens = commentCall.getCommentTokens();
         if (commentTokens.isPresent()) {
             final List<RobotToken> comments = commentTokens.get();
             final RobotToken firstToken = comments.get(0);
@@ -63,8 +62,8 @@ public class ConvertCommentToSetting extends EditorCommand {
                 }
             }
 
-            final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) oldCall.getParent();
-            parent.removeChild(oldCall);
+            final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) commentCall.getParent();
+            parent.removeChild(commentCall);
             final RobotDefinitionSetting setting = parent.createSetting(0, newName,
                     newArgs.stream().map(a -> a.getText()).collect(Collectors.toList()),
                     Joiner.on(" | ").join(newComments.stream().map(c -> c.getText()).collect(Collectors.toList())));
@@ -73,19 +72,16 @@ public class ConvertCommentToSetting extends EditorCommand {
             setting.getLinkedElement().getDeclaration().getTypes().remove(RobotTokenType.UNKNOWN);
             setting.getLinkedElement().getDeclaration().markAsDirty();
 
-            newCall = setting;
+            settingCall = setting;
 
-            RedEventBroker.using(eventBroker)
-                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                    .to(newCall)
-                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, newCall.getParent());
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, parent);
         }
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
         final List<EditorCommand> undoCommands = new ArrayList<>(1);
-        undoCommands.add(new ReplaceRobotKeywordCallCommand(eventBroker, newCall, oldCall));
+        undoCommands.add(new ReplaceRobotKeywordCallCommand(eventBroker, settingCall, commentCall));
         return undoCommands;
     }
 
