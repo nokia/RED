@@ -343,14 +343,6 @@ public class RobotLaunchConfiguration extends AbstractRobotLaunchConfiguration {
         return tests;
     }
 
-    public List<String> getTestsToRunWithoutSuitePrefixes() throws CoreException {
-        final List<String> tests = new ArrayList<>();
-        for (final List<String> suiteTestNames : getSuitePaths().values()) {
-            tests.addAll(suiteTestNames);
-        }
-        return tests;
-    }
-
     public void setIsGeneralPurposeEnabled(final boolean isGeneralPurposeEnabled) throws CoreException {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         launchCopy.setAttribute(GENERAL_PURPOSE_OPTION_ENABLED_ATTRIBUTE, isGeneralPurposeEnabled);
