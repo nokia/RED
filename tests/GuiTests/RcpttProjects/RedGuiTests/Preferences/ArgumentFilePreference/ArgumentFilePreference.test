@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _LISQcBCbEeeG6d5optx6Vw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/18/17 4:05 PM
+Save-Time: 5/22/17 2:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,7 +18,7 @@ get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Launching"
 
 // Argument file preferences default should be set to ON
-with [get-window Preferences | get-group General | get-button "Pass Robot arguments using arguments file"] {
+with [get-window Preferences | get-group Robot | get-button "Pass Robot arguments using arguments file"] {
     get-property enablement | equals true | verify-true
     get-property caption | equals "Pass Robot arguments using arguments file" | verify-true
 }
@@ -52,7 +52,7 @@ get-view Console | get-text-viewer | get-property text
 get-preferences-menu | click
 // switch preference to use argument file to OFF
 with [get-window Preferences] {
-    get-group General | get-button "Pass Robot arguments using arguments file" | uncheck
+    get-group Robot | get-button "Pass Robot arguments using arguments file" | uncheck
     get-button Apply | click
     get-button OK | click
 }
@@ -86,7 +86,7 @@ get-view Console | get-text-viewer | get-property text
 get-preferences-menu | click
 // switch pereference use argument file to ON
 with [get-window Preferences] {
-    get-group General | get-button "Pass Robot arguments using arguments file" | check
+    get-group Robot | get-button "Pass Robot arguments using arguments file" | check
     get-button Apply | click
     get-button OK | click
 }
@@ -116,4 +116,5 @@ get-view Console | get-text-viewer | get-property text
     + "Output:  .*output.xml\n"
     + "Log:     .*log.html\n"
     + "Report:  .*report.html" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
