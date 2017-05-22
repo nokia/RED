@@ -553,7 +553,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         if (definition != null && definition.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
     }
 
