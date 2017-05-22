@@ -177,7 +177,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         if (preferences.shouldUseSingleFileDataSource() && robotConfig.getSuiteResources().size() == 1
                 && robotConfig.getSuiteResources().get(0) instanceof IFile) {
             builder.withProject(robotConfig.getSuiteResources().get(0).getLocation().toFile());
-            builder.testsToRun(robotConfig.getTestsToRunWithoutSuitePrefixes());
+            builder.testsToRun(robotConfig.getSuitePaths().values().iterator().next());
         } else {
             builder.withProject(robotProject.getProject().getLocation().toFile());
             builder.suitesToRun(robotConfig.getSuitesToRun());
