@@ -194,6 +194,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
     private boolean shouldUseSingleTestPathInCommandLine(final RobotLaunchConfiguration robotConfig,
             final RedPreferences preferences) throws CoreException {
+        // FIXME temporary fix for https://github.com/robotframework/robotframework/issues/2564
         return preferences.shouldUseSingleFileDataSource() && robotConfig.getSuiteResources().size() == 1
                 && robotConfig.getSuiteResources().get(0) instanceof IFile;
     }
