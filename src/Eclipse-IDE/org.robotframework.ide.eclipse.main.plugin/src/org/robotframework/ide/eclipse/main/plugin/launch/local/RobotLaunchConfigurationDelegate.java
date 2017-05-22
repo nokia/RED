@@ -174,8 +174,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         builder.addVariableFiles(robotProject.getVariableFilePaths());
 
-        if (preferences.shouldUseSingleFileDataSource() && robotConfig.getSuiteResources().size() == 1
-                && robotConfig.getSuiteResources().get(0) instanceof IFile) {
+        if (shouldUseSingleTestPathInCommandLine(robotConfig, preferences)) {
             builder.withProject(robotConfig.getSuiteResources().get(0).getLocation().toFile());
             builder.testsToRun(robotConfig.getSuitePaths().values().iterator().next());
         } else {
@@ -191,6 +190,12 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             builder.excludeTags(robotConfig.getExcludedTags());
         }
         return builder.build();
+    }
+
+    private boolean shouldUseSingleTestPathInCommandLine(final RobotLaunchConfiguration robotConfig,
+            final RedPreferences preferences) throws CoreException {
+        return preferences.shouldUseSingleFileDataSource() && robotConfig.getSuiteResources().size() == 1
+                && robotConfig.getSuiteResources().get(0) instanceof IFile;
     }
 
     private List<String> parseArguments(final String arguments) {
