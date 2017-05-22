@@ -94,7 +94,10 @@ public class ReplaceRobotKeywordCallCommandTest {
                 .appendLine("kw1")
                 .appendLine("  call2  3  4  #comment2")
                 .build();
-        final RobotCase anotherKwDef = anotherModel.findSection(RobotCasesSection.class).get().getChildren().get(0);
+        final RobotKeywordDefinition anotherKwDef = anotherModel.findSection(RobotKeywordsSection.class)
+                .get()
+                .getChildren()
+                .get(0);
         final RobotKeywordCall anotherKeywordCall = anotherKwDef.getChildren().get(0);
 
         @SuppressWarnings("unchecked")
@@ -111,7 +114,7 @@ public class ReplaceRobotKeywordCallCommandTest {
         assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
         assertThat(result).isEqualTo(anotherKeywordCall);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
+                .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
         assertThat(result).has(properlySetParent());
         assertThat(kwDef.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
         assertThat(kwDef.getLinkedElement().getKeywordExecutionRows().size()).isEqualTo(1);
