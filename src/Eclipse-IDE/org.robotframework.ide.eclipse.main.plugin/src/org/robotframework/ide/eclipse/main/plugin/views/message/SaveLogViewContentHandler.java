@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import javax.inject.Named;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -42,6 +43,7 @@ public class SaveLogViewContentHandler extends DIParameterizedHandler<E4SaveLogV
 
             final FileDialog dialog = new FileDialog(control.getShell(), SWT.SAVE);
             dialog.setOverwrite(true);
+            dialog.setFilterPath(ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
             final String path = dialog.open();
             if (path == null) {
                 return;
