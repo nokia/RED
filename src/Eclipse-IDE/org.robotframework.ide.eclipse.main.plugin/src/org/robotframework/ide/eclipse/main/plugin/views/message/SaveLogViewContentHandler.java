@@ -43,6 +43,9 @@ public class SaveLogViewContentHandler extends DIParameterizedHandler<E4SaveLogV
             final FileDialog dialog = new FileDialog(control.getShell(), SWT.SAVE);
             dialog.setOverwrite(true);
             final String path = dialog.open();
+            if (path == null) {
+                return;
+            }
 
             try {
                 final String content = control.getText();
