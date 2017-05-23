@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yr34UDPuEeebFPUdPe-j2A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/15/17 10:56 AM
+Save-Time: 5/23/17 2:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -89,9 +89,9 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "*** Keyword ***\n"
     + "Keyword\n"
     + "    [Documentation]    adsd\n"
+    + "    [Return]    7\n"
     + "     log  8\n"
-    + "    # log  #9\n"
-    + "    [Return]    7" | verify-true
+    + "    # log  #9" | verify-true
 
 get-button "Save \((Ctrl|M1)\+S\)" | click
 
@@ -127,7 +127,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Keyword\n"
     + "    [Documentation]    adsd\n"
     + "    [Return]    7\n"
-    + "    # log    8\n"
+    + "     # log  8\n"
     + "    # log  #9" | verify-true
 
 
