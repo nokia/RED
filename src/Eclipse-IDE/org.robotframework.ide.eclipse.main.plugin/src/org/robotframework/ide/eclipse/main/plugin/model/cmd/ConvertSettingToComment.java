@@ -5,15 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.ArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -38,7 +36,6 @@ public class ConvertSettingToComment extends EditorCommand {
         this.commentCall = null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
 
@@ -69,13 +66,7 @@ public class ConvertSettingToComment extends EditorCommand {
 
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) settingCall.getParent();
 
-        if (parent instanceof RobotCase) {
-            final TestCase testCase = (TestCase) (parent.getLinkedElement());
-            testCase.removeUnitSettings((AModelElement<TestCase>) settingCall.getLinkedElement());
-        } else {
-            final UserKeyword userKeyword = (UserKeyword) (parent.getLinkedElement());
-            userKeyword.removeUnitSettings((AModelElement<UserKeyword>) settingCall.getLinkedElement());
-        }
+        parent.removeUnitSettings(settingCall);
 
         final int index = settingCall.getIndex();
         parent.removeChild(settingCall);
@@ -88,9 +79,7 @@ public class ConvertSettingToComment extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        final List<EditorCommand> undoCommands = new ArrayList<>(1);
-        undoCommands.add(new ReplaceRobotKeywordCallCommand(eventBroker, commentCall, settingCall));
-        return undoCommands;
+        return newArrayList(new ReplaceRobotKeywordCallCommand(eventBroker, commentCall, settingCall));
     }
 
 }

@@ -206,20 +206,20 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         return comment;
     }
 
-    public Optional<List<RobotToken>> getCommentTokens() {
+    public List<RobotToken> getCommentTokens() {
         comment = null;
         if (linkedElement instanceof RobotExecutableRow) {
-            return Optional.of(((RobotExecutableRow<?>) linkedElement).getComment());
+            return ((RobotExecutableRow<?>) linkedElement).getComment();
         }
-        return Optional.empty();
+        return new ArrayList<>();
     }
 
-    public Optional<List<RobotToken>> getArgumentTokens() {
+    public List<RobotToken> getArgumentTokens() {
         arguments = null;
         if (linkedElement instanceof RobotExecutableRow) {
-            return Optional.of(((RobotExecutableRow<?>) linkedElement).getArguments());
+            return ((RobotExecutableRow<?>) linkedElement).getArguments();
         }
-        return Optional.empty();
+        return new ArrayList<>();
     }
 
     public Optional<RobotToken> getAction() {

@@ -5,9 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -18,8 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-
-import com.google.common.base.Joiner;
 
 public class ConvertCommentToSetting extends EditorCommand {
 
@@ -39,9 +38,8 @@ public class ConvertCommentToSetting extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final Optional<List<RobotToken>> commentTokens = commentCall.getCommentTokens();
-        if (commentTokens.isPresent()) {
-            final List<RobotToken> comments = commentTokens.get();
+        final List<RobotToken> comments = commentCall.getCommentTokens();
+        if (!comments.isEmpty()) {
             final RobotToken firstToken = comments.get(0);
 
             final List<RobotToken> newArgs = new ArrayList<>();
@@ -65,8 +63,8 @@ public class ConvertCommentToSetting extends EditorCommand {
             final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) commentCall.getParent();
             parent.removeChild(commentCall);
             final RobotDefinitionSetting setting = parent.createSetting(0, newName,
-                    newArgs.stream().map(a -> a.getText()).collect(Collectors.toList()),
-                    Joiner.on(" | ").join(newComments.stream().map(c -> c.getText()).collect(Collectors.toList())));
+                    newArgs.stream().map(RobotToken::getText).collect(Collectors.toList()),
+                    newComments.stream().map(RobotToken::getText).collect(Collectors.joining(" | ")));
 
             setting.getLinkedElement().getDeclaration().setFilePosition(firstToken.getFilePosition());
             setting.getLinkedElement().getDeclaration().getTypes().remove(RobotTokenType.UNKNOWN);
@@ -80,9 +78,7 @@ public class ConvertCommentToSetting extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        final List<EditorCommand> undoCommands = new ArrayList<>(1);
-        undoCommands.add(new ReplaceRobotKeywordCallCommand(eventBroker, settingCall, commentCall));
-        return undoCommands;
+        return newArrayList(new ReplaceRobotKeywordCallCommand(eventBroker, settingCall, commentCall));
     }
 
     private static boolean looksLikeComment(final String text) {

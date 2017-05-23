@@ -104,6 +104,12 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     public List<RobotDefinitionSetting> getTagsSetting() {
         return findSettings(ModelType.TEST_CASE_TAGS);
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void removeUnitSettings(final RobotKeywordCall call) {
+        getLinkedElement().removeUnitSettings((AModelElement<TestCase>) call.getLinkedElement());
+    }
     
     public Optional<String> getTemplateInUse() {
         return Optional.ofNullable(getLinkedElement().getTemplateKeywordName());
