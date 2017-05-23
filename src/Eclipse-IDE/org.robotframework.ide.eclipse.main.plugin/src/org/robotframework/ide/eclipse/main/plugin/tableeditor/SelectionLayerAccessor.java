@@ -256,6 +256,9 @@ public class SelectionLayerAccessor {
 
     private void reestablishSelection(final SelectionLayer layer, final PositionCoordinate[] positions,
             final Function<PositionCoordinate, PositionCoordinate> mapping) {
+        final PositionCoordinate anchor = layer.getSelectionAnchor();
+        final int anchorColumn = anchor.getColumnPosition();
+        final int anchorRow = anchor.getRowPosition();
         layer.clear();
 
         // transform, remove nulls, remove duplicates, sort
@@ -274,6 +277,9 @@ public class SelectionLayerAccessor {
             layer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(),
                     coordinate.getRowPosition(), false, shouldAdd));
             shouldAdd = true;
+        }
+        if (layer.isCellPositionSelected(anchorColumn, anchorRow)) {
+            layer.moveSelectionAnchor(anchorColumn, anchorRow);
         }
     }
 }
