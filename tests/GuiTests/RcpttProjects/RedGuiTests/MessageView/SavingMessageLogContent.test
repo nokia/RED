@@ -1,0 +1,65 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: SavingMessageLogContent
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ZpWrwD-DEeejtMr_2XCc8w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/23/17 10:55 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    double-click
+    select "RobotProject/TestFile.robot" | double-click
+    select "RobotProject/TestFile.robot"
+}
+// add tests
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	set-text "*** Test cases ***\n"
+		+"test1\n"
+		+"    Log  First Message\n"
+		+"    Log  Second Message\n"
+		+"test2\n"
+		+"    Log  Third Message\n"
+		+"    Log  Fourth Message\n"
+	key-type "M1+s"
+}
+// run test
+get-menu "Run/Run" | click
+// verify Message Log
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test1\n"
+    + ".* : INFO : First Message\n"
+    + ".* : INFO : Second Message\n"
+    + "Ending test: RobotProject.TestFile.test1\n\n"
+    + "Starting test: RobotProject.TestFile.test2\n"
+    + ".* : INFO : Third Message\n"
+    + ".* : INFO : Fourth Message\n"
+    + "Ending test: RobotProject.TestFile.test2" | verify-true
+// save Massage Log content to txt file
+get-view "Message Log" | click
+set-dialog-result File "platform:/resource/RobotProject/messagelogfile.txt"
+with [get-view "Message Log"] {
+    get-button "Save Logs" | click
+}
+// refresh workspace
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu Refresh | click
+// verify if file exist
+get-file [uri-from-path "platform:/resource/RobotProject/messagelogfile.txt"] | get exists
+// verify content of file
+get-view "Project Explorer" | get-tree | select "RobotProject/messagelogfile.txt" 
+    | select "RobotProject/messagelogfile.txt" | double-click
+get-editor "messagelogfile.txt" | get-text-viewer | get-property text 
+    | equals "Starting test: RobotProject.TestFile.test1\n"
+    + ".* : INFO : First Message\n"
+    + ".* : INFO : Second Message\n"
+    + "Ending test: RobotProject.TestFile.test1\n\n"
+    + "Starting test: RobotProject.TestFile.test2\n"
+    + ".* : INFO : Third Message\n"
+    + ".* : INFO : Fourth Message\n"
+    + "Ending test: RobotProject.TestFile.test2" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
