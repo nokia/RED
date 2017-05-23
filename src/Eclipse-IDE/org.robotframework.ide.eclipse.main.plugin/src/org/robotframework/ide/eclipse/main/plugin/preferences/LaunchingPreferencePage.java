@@ -59,15 +59,14 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
         addField(agentFileEditor);
 
         final BooleanFieldEditor singleFileDataSourceEditor = new BooleanFieldEditor(
-                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, "Run single suite using suite path",
-                robotGroup);
+                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, "Run single suite using suite path", robotGroup);
         final Button singleFileDataSourceButton = (Button) singleFileDataSourceEditor.getDescriptionControl(robotGroup);
         GridDataFactory.fillDefaults().indent(5, 15).applyTo(singleFileDataSourceButton);
         addField(singleFileDataSourceEditor);
 
         final Label singleFileDataSourceDescription = new Label(robotGroup, SWT.WRAP);
         singleFileDataSourceDescription.setText(
-                "When single suite, or test cases from one suite are run, path to test suite will be used instead of path to project. "
+                "When single suite or test cases from one suite are run, path to test suite will be used instead of path to project. "
                         + "Robot __init__ files will not be used then.");
         GridDataFactory.fillDefaults()
                 .hint(150, SWT.DEFAULT)
