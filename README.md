@@ -5,6 +5,17 @@ RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow q
 
 **Latest release - [RED 0.7.7-fix (2017-04-27)](https://github.com/nokia/RED/releases/latest)**
 
+### Install form Marketplace/Update Site
+
+Marketplace: Click Help -> Eclipse Marketplace -> and type into Find field "RED"
+
+Update Site: Click Help -> Install New Software -> Add and set address in Location to:
+
+```http://master.dl.sourceforge.net/project/red-robot-editor/repository```
+
+## RED Help
+[RED Robot Editor's application help](http://nokia.github.io/RED/help/)
+
 ## What RED provides:
 * text editor with validation and code coloring
 * table editors like in Ride fully synced with source
@@ -26,16 +37,6 @@ Binaries can be found under Release folder:  [https://github.com/nokia/RED/relea
 
 Installation instructions can be found [here](https://github.com/nokia/RED/blob/master/installation.md)
 
-### Install form Marketplace/Update Site
-
-Marketplace: Click Help -> Eclipse Marketplace -> and type into Find field "RED"
-
-Update Site: Click Help -> Install New Software -> Add and set address in Location to:
-
-```http://master.dl.sourceforge.net/project/red-robot-editor/repository```
-
-## RED Help
-[RED Robot Editor's application help](http://nokia.github.io/RED/help/)
 ## Look & feel
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/basic_run.gif "Robot perspective with text editor")
 
