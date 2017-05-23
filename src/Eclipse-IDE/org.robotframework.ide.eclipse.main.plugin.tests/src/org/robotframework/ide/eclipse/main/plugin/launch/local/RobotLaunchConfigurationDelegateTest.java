@@ -111,7 +111,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
                 preferences);
 
-        assertThat(commandLine.getCommandLine()).startsWith("UNKNOWN", "-a1", "-a2", "-m", "robot.run");
+        assertThat(commandLine.getCommandLine()).startsWith("UNKNOWN_INTERPRETER", "-a1", "-a2", "-m", "robot.run");
     }
 
     @Test

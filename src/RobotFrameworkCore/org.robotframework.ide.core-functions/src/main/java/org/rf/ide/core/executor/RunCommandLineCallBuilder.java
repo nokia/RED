@@ -414,7 +414,7 @@ public class RunCommandLineCallBuilder {
     }
 
     public static IRunCommandLineBuilder forUnknown(final int listenerPort) {
-        return new Builder(null, "UNKNOWN", listenerPort);
+        return new Builder(null, "UNKNOWN_INTERPRETER", listenerPort);
     }
 
     public static class RunCommandLine {
