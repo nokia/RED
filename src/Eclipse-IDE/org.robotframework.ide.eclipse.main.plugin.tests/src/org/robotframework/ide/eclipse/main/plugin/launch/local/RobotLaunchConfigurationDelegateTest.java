@@ -21,6 +21,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -42,6 +43,9 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     @Rule
     public RunConfigurationProvider runConfigurationProvider = new RunConfigurationProvider(
@@ -155,8 +159,9 @@ public class RobotLaunchConfigurationDelegateTest {
     public void commandLineStartsWitExecutableFilePath() throws Exception {
         final RedPreferences preferences = mock(RedPreferences.class);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         final String executablePath = projectProvider.createFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
 
@@ -171,8 +176,9 @@ public class RobotLaunchConfigurationDelegateTest {
     public void commandLineContainsExecutableFilePathWithArguments() throws Exception {
         final RedPreferences preferences = mock(RedPreferences.class);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         final String executablePath = projectProvider.createFile("executable_script.bat").getLocation().toOSString();
         robotConfig.setExecutableFilePath(executablePath);
         robotConfig.setExecutableFileArguments("-arg1 abc -arg2 xyz");
@@ -184,13 +190,18 @@ public class RobotLaunchConfigurationDelegateTest {
         assertThat(commandLine.getCommandLine()).containsSubsequence(executablePath, "-arg1", "abc", "-arg2", "xyz");
     }
 
-    @Test(expected = CoreException.class)
+    @Test
     public void coreExceptionIsThrown_whenExecutableFileDoesNotExist() throws Exception {
+        final String executablePath = projectProvider.getFile("not_existing.bat").getLocation().toOSString();
+
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("Executable file '" + executablePath + "' does not exist");
+
         final RedPreferences preferences = mock(RedPreferences.class);
 
-        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        final String executablePath = projectProvider.getFile("not_existing.bat").getLocation().toOSString();
+
+        final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         robotConfig.setExecutableFilePath(executablePath);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
@@ -309,8 +320,13 @@ public class RobotLaunchConfigurationDelegateTest {
         return robotConfig;
     }
 
-    @Test(expected = CoreException.class)
+    @Test
     public void whenConfigurationVersionIsInvalid_coreExceptionIsThrown() throws Exception {
+        thrown.expect(CoreException.class);
+        thrown.expectMessage("This configuration is incompatible with RED version you are currently using."
+                + "\nExpected: " + RobotLaunchConfiguration.CURRENT_CONFIGURATION_VERSION + ", but was: invalid"
+                + "\n\nResolution: Delete old configurations manually and create the new ones.");
+
         final ILaunchConfiguration configuration = runConfigurationProvider.create("robot");
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.fillDefaults();
@@ -320,6 +336,6 @@ public class RobotLaunchConfigurationDelegateTest {
         launchCopy.setAttribute("Version of configuration", "invalid");
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
-        launchDelegate.launch(launchCopy, null, null, null);
+        launchDelegate.launch(launchCopy, "run", null, null);
     }
 }
