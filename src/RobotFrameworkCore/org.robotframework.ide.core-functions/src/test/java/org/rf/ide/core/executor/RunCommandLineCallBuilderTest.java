@@ -35,7 +35,8 @@ public class RunCommandLineCallBuilderTest {
     @Test
     public void testCall_forUnknown() throws IOException {
         final RunCommandLine cmdLine = RunCommandLineCallBuilder.forUnknown(12345).build();
-        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith("UNKNOWN", "-m", "robot.run", "--listener");
+        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith("UNKNOWN_INTERPRETER", "-m", "robot.run",
+                "--listener");
     }
 
     @Test
