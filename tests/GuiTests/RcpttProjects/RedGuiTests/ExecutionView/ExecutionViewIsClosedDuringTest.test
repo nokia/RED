@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __L5ekMjSEeWPuqMw6GC70Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/5/17 2:09 PM
+Save-Time: 5/23/17 2:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,7 +15,11 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 //clear view and close it
-get-view "Execution View" | get-button Clear | click
+
+//if no test was run, then view is clean. Check it
+if [get-view "Execution View" | get-button Clear | get-property enablement -raw]{
+	get-view "Execution View" | get-button Clear | click
+}
 get-view "Execution View" | get-tree | get-property itemCount | equals 0 | verify-true
 get-view "Execution View" | close
 get-view "Message Log" | click
