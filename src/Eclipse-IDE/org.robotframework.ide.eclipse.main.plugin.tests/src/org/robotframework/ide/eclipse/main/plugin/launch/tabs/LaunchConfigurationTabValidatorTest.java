@@ -280,11 +280,25 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void nothingIsThrown_whenEverythingIsOkWithExecutorTab() throws Exception {
         final IFile executableFile = projectProvider.createFile("robot_executable_file.txt", "run robot command");
-        final IFile testFile = projectProvider.createFile("test.robot", "*** Test Cases ***", "case1", "  Log  1");
 
         final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setExecutableFilePath(executableFile.getLocation().toOSString());
-        launchConfig.setSuitePaths(ImmutableMap.of(testFile.getName(), newArrayList("case1")));
+        validator.validateExecutorTab(launchConfig);
+    }
+
+    @Test
+    public void nothingIsThrown_whenProjectIsUsingInvalidEnvironmentButExecutableFileIsSet() throws Exception {
+        final IFile executableFile = projectProvider.createFile("robot_executable_file.txt", "run robot command");
+
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
+        final RobotProject robotProject = mock(RobotProject.class);
+        final RobotModel model = mock(RobotModel.class);
+        when(model.createRobotProject(projectProvider.getProject())).thenReturn(robotProject);
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final LaunchConfigurationTabValidator validator = new LaunchConfigurationTabValidator(model);
+        final RobotLaunchConfiguration launchConfig = createRobotLaunchConfiguration(PROJECT_NAME);
+        launchConfig.setExecutableFilePath(executableFile.getLocation().toOSString());
         validator.validateExecutorTab(launchConfig);
     }
 

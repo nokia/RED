@@ -95,10 +95,8 @@ class LaunchConfigurationTabValidator {
         try {
             final List<String> warnings = new ArrayList<>();
 
-            final String projectName = robotConfig.getProjectName();
-
             if (robotConfig.isUsingInterpreterFromProject()) {
-                validateRuntimeEnvironment(projectName);
+                validateRuntimeEnvironment(robotConfig.getProjectName(), robotConfig.getExecutableFilePath());
             } else {
                 warnings.add("Tests will be launched using '" + robotConfig.getInterpreter().name()
                         + "' interpreter as defined in PATH environment variable");
@@ -116,8 +114,8 @@ class LaunchConfigurationTabValidator {
         }
     }
 
-    private void validateRuntimeEnvironment(final String projectName) {
-        if (!projectName.isEmpty()) {
+    private void validateRuntimeEnvironment(final String projectName, final String executableFilePath) {
+        if (!projectName.isEmpty() && executableFilePath.isEmpty()) {
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
             final RobotProject robotProject = model.createRobotProject(project);
             final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();

@@ -27,6 +27,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -91,8 +92,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
         final RobotModel model = RedPlugin.getModelManager().getModel();
         final RobotProject robotProject = model.createRobotProject(robotConfig.getProject());
-        final RobotRuntimeEnvironment robotRuntimeEnvironment = getRobotRuntimeEnvironment(robotProject);
-        final String suiteExecutorVersion = getSuiteExecutorVersion(robotConfig, robotRuntimeEnvironment);
+        final ConsoleData consoleData = ConsoleData.create(robotConfig, robotProject);
 
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
@@ -112,50 +112,34 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
                 RedPlugin.getDefault().getPreferences());
         final Process execProcess = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile(), robotConfig.getEnvironmentVariables());
-        final String processLabel = createConsoleDescription(robotConfig, robotRuntimeEnvironment);
-        final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess, processLabel);
+        final IRobotProcess robotProcess = (IRobotProcess) DebugPlugin.newProcess(launch, execProcess,
+                consoleData.getProcessLabel());
 
         robotProcess.onTerminate(serverJob::stopServer);
 
-        final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(processLabel);
+        final RobotConsoleFacade redConsole = robotProcess.provideConsoleFacade(consoleData.getProcessLabel());
         redConsole.addHyperlinksSupport(new RobotConsolePatternsListener(robotProject));
         redConsole.writeLine("Command: " + DebugPlugin.renderArguments(cmdLine.getCommandLine(), null));
-        redConsole.writeLine("Suite Executor: " + suiteExecutorVersion);
+        redConsole.writeLine("Suite Executor: " + consoleData.getSuiteExecutorVersion());
 
         return new LaunchExecution(serverJob, execProcess, robotProcess);
-    }
-
-    private RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotProject robotProject) throws CoreException {
-
-        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-        if (runtimeEnvironment == null) {
-            throw newCoreException(
-                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
-        }
-        if (!runtimeEnvironment.hasRobotInstalled()) {
-            throw newCoreException("The runtime environment " + runtimeEnvironment.getFile().getAbsolutePath()
-                    + " is either not a python installation or it has no Robot installed");
-        }
-        return runtimeEnvironment;
-    }
-
-    private String getSuiteExecutorVersion(final RobotLaunchConfiguration robotConfig,
-            final RobotRuntimeEnvironment env) throws CoreException {
-        try {
-            return robotConfig.isUsingInterpreterFromProject() ? env.getVersion()
-                    : RobotRuntimeEnvironment.getVersion(robotConfig.getInterpreter());
-        } catch (final RobotEnvironmentException e) {
-            throw newCoreException(e.getMessage(), e.getCause());
-        }
     }
 
     @VisibleForTesting
     RunCommandLine prepareCommandLine(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject,
             final int port, final RedPreferences preferences) throws CoreException, IOException {
 
-        final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
-                ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment(), port)
-                : RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
+        final IRunCommandLineBuilder builder;
+        if (robotConfig.isUsingInterpreterFromProject()) {
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            if (runtimeEnvironment != null) {
+                builder = RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
+            } else {
+                builder = RunCommandLineCallBuilder.forUnknown(port);
+            }
+        } else {
+            builder = RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
+        }
 
         builder.useArgumentFile(preferences.shouldLaunchUsingArgumentsFile());
         if (!robotConfig.getExecutableFilePath().isEmpty()) {
@@ -203,9 +187,56 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         return Arrays.asList(DebugPlugin.parseArguments(arguments));
     }
 
-    private String createConsoleDescription(final RobotLaunchConfiguration robotConfig,
-            final RobotRuntimeEnvironment env) throws CoreException {
-        return robotConfig.isUsingInterpreterFromProject() ? env.getPythonExecutablePath()
-                : robotConfig.getInterpreter().executableName();
+    @VisibleForTesting
+    static class ConsoleData {
+
+        private final String processLabel;
+
+        private final String suiteExecutorVersion;
+
+        private ConsoleData(final String processLabel, final String suiteExecutorVersion) {
+            this.processLabel = processLabel;
+            this.suiteExecutorVersion = suiteExecutorVersion;
+        }
+
+        String getProcessLabel() {
+            return processLabel;
+        }
+
+        String getSuiteExecutorVersion() {
+            return suiteExecutorVersion;
+        }
+
+        static ConsoleData create(final RobotLaunchConfiguration robotConfig, final RobotProject robotProject)
+                throws CoreException {
+            if (robotConfig.getExecutableFilePath().isEmpty()) {
+                if (robotConfig.isUsingInterpreterFromProject()) {
+                    return ConsoleData.create(robotProject.getRuntimeEnvironment(), robotProject.getName());
+                }
+                return ConsoleData.create(robotConfig.getInterpreter());
+            }
+            return new ConsoleData(robotConfig.getExecutableFilePath(), "<unknown>");
+        }
+
+        private static ConsoleData create(final RobotRuntimeEnvironment env, final String projectName)
+                throws CoreException {
+            if (env == null) {
+                throw newCoreException("There is no active runtime environment for project '" + projectName + "'");
+            }
+            if (!env.hasRobotInstalled()) {
+                throw newCoreException("The runtime environment " + env.getFile().getAbsolutePath()
+                        + " is either not a python installation or it has no Robot installed");
+            }
+            return new ConsoleData(env.getPythonExecutablePath(), env.getVersion());
+        }
+
+        private static ConsoleData create(final SuiteExecutor interpreter) throws CoreException {
+            try {
+                return new ConsoleData(interpreter.executableName(), RobotRuntimeEnvironment.getVersion(interpreter));
+            } catch (final RobotEnvironmentException e) {
+                throw newCoreException(e.getMessage(), e.getCause());
+            }
+        }
+
     }
 }
