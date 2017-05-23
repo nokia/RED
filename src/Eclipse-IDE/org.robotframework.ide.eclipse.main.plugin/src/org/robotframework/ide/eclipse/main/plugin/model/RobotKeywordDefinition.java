@@ -118,6 +118,12 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         return findSetting(ModelType.USER_KEYWORD_ARGUMENTS);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public void removeUnitSettings(final RobotKeywordCall call) {
+        getLinkedElement().removeUnitSettings((AModelElement<UserKeyword>) call.getLinkedElement());
+    }
+
     public String getDocumentation() {
         final RobotDefinitionSetting documentationSetting = findSetting(ModelType.USER_KEYWORD_DOCUMENTATION);
         if (documentationSetting != null) {

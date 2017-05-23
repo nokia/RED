@@ -5,7 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.ArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -48,9 +49,8 @@ public class ConvertCallToComment extends EditorCommand {
             if (hasNoComments) {
                 keywordCall.setComment(newName);
             } else {
-                final Optional<List<RobotToken>> commentTokens = keywordCall.getCommentTokens();
-                if (commentTokens.isPresent()) {
-                    final List<RobotToken> comments = commentTokens.get();
+                final List<RobotToken> comments = keywordCall.getCommentTokens();
+                if (!comments.isEmpty()) {
                     comments.get(0).setText(newName);
                 }
             }
@@ -58,8 +58,8 @@ public class ConvertCallToComment extends EditorCommand {
             final Optional<RobotToken> actionToken = keywordCall.getAction();
             if (actionToken.isPresent()) {
                 final RobotToken action = actionToken.get();
-                final List<RobotToken> arguments = keywordCall.getArgumentTokens().get();
-                final List<RobotToken> comments = keywordCall.getCommentTokens().get();
+                final List<RobotToken> arguments = keywordCall.getArgumentTokens();
+                final List<RobotToken> comments = keywordCall.getCommentTokens();
                 final Object parentObject = keywordCall.getLinkedElement().getParent();
 
                 RobotExecutableRow<?> newLinked = null;
@@ -101,9 +101,7 @@ public class ConvertCallToComment extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        final List<EditorCommand> undoCommands = new ArrayList<>(1);
-        undoCommands.add(new ConvertCommentToCall(eventBroker, keywordCall, oldName));
-        return undoCommands;
+        return newArrayList(new ConvertCommentToCall(eventBroker, keywordCall, oldName));
     }
 
 }
