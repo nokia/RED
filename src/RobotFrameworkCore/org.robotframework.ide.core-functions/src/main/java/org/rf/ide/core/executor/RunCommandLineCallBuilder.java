@@ -413,6 +413,10 @@ public class RunCommandLineCallBuilder {
         return new Builder(executor, executor.executableName(), listenerPort);
     }
 
+    public static IRunCommandLineBuilder forUnknown(final int listenerPort) {
+        return new Builder(null, "UNKNOWN", listenerPort);
+    }
+
     public static class RunCommandLine {
 
         private final List<String> commandLine;

@@ -19,6 +19,26 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 public class RunCommandLineCallBuilderTest {
 
     @Test
+    public void testCall_forEnvironment() throws IOException {
+        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345).build();
+        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith("/x/y/z/python", "-m", "robot.run", "--listener");
+    }
+
+    @Test
+    public void testCall_forExecutor() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forExecutor(SuiteExecutor.Python, 12345).build();
+        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith(SuiteExecutor.Python.executableName(), "-m",
+                "robot.run", "--listener");
+    }
+
+    @Test
+    public void testCall_forUnknown() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forUnknown(12345).build();
+        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith("UNKNOWN", "-m", "robot.run", "--listener");
+    }
+
+    @Test
     public void testSimpleCall_withRuntimeEnvironment_argsFile() throws IOException {
         final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
 
