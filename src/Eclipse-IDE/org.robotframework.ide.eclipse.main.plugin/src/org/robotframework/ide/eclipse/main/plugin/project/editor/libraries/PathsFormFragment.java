@@ -106,7 +106,7 @@ class PathsFormFragment implements ISectionFormFragment {
         final ScrolledComposite scrolledParent = new ScrolledComposite(section, SWT.H_SCROLL | SWT.V_SCROLL);
         toolkit.adapt(scrolledParent);
         section.setClient(scrolledParent);
-        
+
         final Composite internalComposite = toolkit.createComposite(scrolledParent);
         scrolledParent.setContent(internalComposite);
         scrolledParent.setExpandVertical(true);
@@ -302,7 +302,7 @@ class PathsFormFragment implements ISectionFormFragment {
         pythonPathViewer.getTable().setEnabled(isEditable);
         classPathViewer.getTable().setEnabled(isEditable && projectIsInterpretedByJython);
 
-        if (!projectIsInterpretedByJython) {
+        if (envs.getActiveEnvironment() != null && !projectIsInterpretedByJython) {
             decoration = new ControlDecoration(classPathViewer.getTable(), SWT.LEFT | SWT.TOP);
             final SuiteExecutor executor = envs.getActiveEnvironment().getInterpreter();
             final String interpreter = executor == null ? "unknown" : executor.toString();
