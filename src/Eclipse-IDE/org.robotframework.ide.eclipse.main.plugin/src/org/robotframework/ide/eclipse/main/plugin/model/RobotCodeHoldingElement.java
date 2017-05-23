@@ -72,6 +72,8 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         return setting;
     }
 
+    public abstract void removeUnitSettings(final RobotKeywordCall call);
+
     public void insertKeywordCall(final int index, final RobotKeywordCall call) {
         call.setParent(this);
 

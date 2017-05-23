@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.ArrayList;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -32,15 +32,14 @@ public class ConvertCommentToCall extends EditorCommand {
         this.eventBroker = eventBroker;
         this.commentCall = commentCall;
         this.newName = name;
-        this.oldName = commentCall.getCommentTokens().get().get(0).getText();
+        this.oldName = commentCall.getCommentTokens().get(0).getText();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
-        final Optional<List<RobotToken>> commentTokens = commentCall.getCommentTokens();
-        if (commentTokens.isPresent()) {
-            final List<RobotToken> comments = commentTokens.get();
+        final List<RobotToken> comments = commentCall.getCommentTokens();
+        if (!comments.isEmpty()) {
             final RobotToken firstToken = comments.get(0);
             final Object parentObject = commentCall.getLinkedElement().getParent();
 
@@ -92,9 +91,7 @@ public class ConvertCommentToCall extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        final List<EditorCommand> undoCommands = new ArrayList<>(1);
-        undoCommands.add(new ConvertCallToComment(eventBroker, commentCall, oldName));
-        return undoCommands;
+        return newArrayList(new ConvertCallToComment(eventBroker, commentCall, oldName));
     }
 
     private static boolean looksLikeComment(final String text) {
