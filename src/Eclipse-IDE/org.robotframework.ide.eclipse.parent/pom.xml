@@ -70,6 +70,12 @@
                     <layout>p2</layout>
                 </repository>
                 <repository>
+                    <!-- This is IP of download.eclipse.org to verify if building problems are due to DNS/Proxy -->
+                    <id>eclipse-neon-ip</id>
+                    <url>http://198.41.30.199/releases/neon/</url>
+                    <layout>p2</layout>
+                </repository>
+                <repository>
                     <id>nattable</id>
                     <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
                     <layout>p2</layout>
