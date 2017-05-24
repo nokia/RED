@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertCallToComment extends EditorCommand {
 
@@ -96,7 +97,8 @@ public class ConvertCallToComment extends EditorCommand {
         }
         keywordCall.resetStored();
 
-        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordCall.getParent());
+        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(keywordCall).send(
+                RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordCall.getParent());
     }
 
     @Override
