@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wd55QBiBEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/24/17 2:08 PM
+Save-Time: 5/24/17 2:29 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -126,6 +126,8 @@ with [get-editor $script_name | get-text-viewer] {
 	set-caret-pos 1 1
     key-type "M1+a"
     key-type Del
+    type-text "@echo off"
+    key-type Enter
     type-text "echo Hello world!"
     key-type "M1+s"
 }
@@ -146,8 +148,7 @@ exec-with-options {
 }
 // verify if script was runned
 get-view Console | get-text-viewer | get-property text 
-    | equals ".*\n"
-    + "Hello world!\n"
+    | equals "Hello world!\n"
     + "Command: .* -m robot.run --listener .* --argumentfile .* .*\n"
     + "Suite Executor: <unknown>" | verify-true
 // verify if no test was runned
