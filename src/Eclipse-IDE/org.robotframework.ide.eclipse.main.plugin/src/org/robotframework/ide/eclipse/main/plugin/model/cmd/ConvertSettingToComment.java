@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertSettingToComment extends EditorCommand {
 
@@ -74,7 +75,8 @@ public class ConvertSettingToComment extends EditorCommand {
         commentCall = new RobotKeywordCall(parent, newLinked);
         parent.insertKeywordCall(index, commentCall);
 
-        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, parent);
+        RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(commentCall).send(
+                RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, parent);
     }
 
     @Override
