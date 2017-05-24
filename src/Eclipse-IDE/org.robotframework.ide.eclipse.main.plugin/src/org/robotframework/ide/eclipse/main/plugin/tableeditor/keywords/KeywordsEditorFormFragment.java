@@ -550,10 +550,11 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE) final Event event) {
 
         final RobotKeywordDefinition definition = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
+        final RobotKeywordCall call = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotKeywordCall.class);
 
         if (definition != null && definition.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            selectionLayerAccessor.preserveSelectionIfNotEditingArgumentWhen(call, tableInputIsReplaced());
         }
     }
 

@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class ConvertCommentToSetting extends EditorCommand {
 
@@ -72,7 +73,10 @@ public class ConvertCommentToSetting extends EditorCommand {
 
             settingCall = setting;
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, parent);
+            RedEventBroker.using(eventBroker)
+                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                    .to(settingCall)
+                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, parent);
         }
     }
 

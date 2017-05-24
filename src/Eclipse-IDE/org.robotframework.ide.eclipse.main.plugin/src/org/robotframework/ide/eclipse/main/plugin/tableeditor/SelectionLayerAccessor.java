@@ -254,6 +254,15 @@ public class SelectionLayerAccessor {
         });
     }
 
+    public void preserveSelectionIfNotEditingArgumentWhen(final Object elementToSelect, final Runnable operation) {
+        final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
+        if (positions.length == 1 && positions[0].getColumnPosition() == 0) {
+            selectElementPreservingSelectedColumnsAfterOperation(elementToSelect, operation);
+        } else {
+            preserveSelectionWhen(operation, Functions.<PositionCoordinate> identity());
+        }
+    }
+
     private void reestablishSelection(final SelectionLayer layer, final PositionCoordinate[] positions,
             final Function<PositionCoordinate, PositionCoordinate> mapping) {
         final PositionCoordinate anchor = layer.getSelectionAnchor();
