@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _vURJgAffEee0EKWnoBYU9g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/24/17 10:02 AM
+Save-Time: 5/24/17 10:24 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -41,9 +41,9 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 			
 			run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
 			
-			get-view Breakpoints | click
-			get-view Breakpoints | get-tree | get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot [line: 9]" 
-    		| verify-true
+//			get-view Breakpoints | click
+//			get-view Breakpoints | get-tree | get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot [line: 9]" 
+//    		| verify-true
 //			check-debug-marker-on-ruler -line 9	-script_name "TestFile.robot" 
 			get-button "Step Into (F5)" | click
 			wait-for-thread-in-remote -child_count 2 
