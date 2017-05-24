@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wd55QBiBEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 5:31 PM
+Save-Time: 5/24/17 9:37 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -143,14 +143,14 @@ with [get-window "Run Configurations"] {
 }
 exec-with-options {
     get-window "Run Configurations" | get-button Run | click
-    try -times 4 -delay 500 -command{
-	    get-window "Problem Occurred" | get-label "There is no PyPy interpreter in system PATH environment variable" 
-	        | get-property caption | equals "There is no PyPy interpreter in system PATH environment variable" | verify-true
-     }  
-    get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog
-get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1 
-    | get-property "getText()" | equals "" | verify-true
+}
+// verify if script was runned
+get-view Console | get-text-viewer | get-property text 
+    | equals ".*echo Hello world! \n"
+    + "Hello world!\n"
+    + "Command: .* -m robot.run --listener .* --argumentfile .* .*\n"
+    + "Suite Executor: <unknown>" | verify-true
+// verify if no test was runned
 get-view "Message Log" | get-editbox | get-property text | equals "" | verify-true
 
 // --------------------------------------- run removed script ----------------------------------------------------------
@@ -179,7 +179,7 @@ exec-with-options {
 	    //first label
 	    get-window "Problem Occurred" | get-label "'Launching New_configuration' has encountered a problem." 
 	        | get-property caption | equals "'Launching New_configuration' has encountered a problem." | verify-true
-    }    
+    }
     //second label    
     get-window "Problem Occurred" 
         | get-label "Executable file.*" 
@@ -196,5 +196,4 @@ exec-with-options {
         | verify-true
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
-
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
