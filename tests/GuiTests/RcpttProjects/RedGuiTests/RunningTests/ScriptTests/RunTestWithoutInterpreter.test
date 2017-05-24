@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _E3JM0D-eEeejtMr_2XCc8w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/24/17 10:45 AM
+Save-Time: 5/24/17 12:15 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -32,29 +32,33 @@ repeat  -times [get-window Preferences | get-table | get-property itemCount -raw
 get-window Preferences | get-button OK | click
 get-window Preferences | get-window "Rebuild required" | get-button OK | click
 // change script content
-get-view "Project Explorer" | get-tree | select "ScriptProject/scripts/script_win.bat" 
-	    | get-menu "Open With/Text Editor" | click    
+//get-view "Project Explorer" | get-tree | select "ScriptProject/scripts/script_win.bat" 
+//	    | get-menu "Open With/Text Editor" | click    
 	    
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{    
-		get-editor "script_win.bat" | get-text-viewer | set-text "@echo off\n\n"
-		    + ":loop1\n\n"
-		    + "if \"%~1%\"==\"\" goto after_loop\n"
-		    + "\techo Argument: %~1%\n"
-		    + "\tshift\n"
-		    + "\tgoto loop1\n\n"
-		    + ":after_loop\n"
-		    + "echo end" 
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	get-view "Project Explorer" | get-tree | select "ScriptProject/scripts/script_win.bat" 
+	    | get-menu "Open With/Text Editor" | click        
+	get-editor "script_win.bat" | get-text-viewer | set-text "@echo off\n\n"
+	    + ":loop1\n\n"
+	    + "if \"%~1%\"==\"\" goto after_loop\n"
+	    + "\techo Argument: %~1%\n"
+	    + "\tshift\n"
+	    + "\tgoto loop1\n\n"
+	    + ":after_loop\n"
+	    + "echo end" 
 	get-editor script_win.bat | get-text-viewer  |key-type "M1+s"
-	}-else{    
-		get-editor "script_lin.sh" | get-text-viewer | set-text "#!/bin/sh \n"
-		    + "while [ \"$1\" != \"\" ]; do\n"
-		    + "\techo Argument: $1\n"
-		    + "    shift\n"
-		    + "done\n\n"
-		    + "echo end" 
+}-else{
+	get-view "Project Explorer" | get-tree | select "ScriptProject/scripts/script_lin.sh" 
+	    | get-menu "Open With/Text Editor" | click    
+	get-editor "script_lin.sh" | get-text-viewer | set-text "#!/bin/sh \n"
+	    + "while [ \"$1\" != \"\" ]; do\n"
+	    + "\techo Argument: $1\n"
+	    + "    shift\n"
+	    + "done\n\n"
+	    + "echo end" 
 	get-editor script_lin.sh | get-text-viewer  |key-type "M1+s"
-	}	    
-	
+}	    
+
 // configure 'Run Configurations...' - set project name, add bat file
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
