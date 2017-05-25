@@ -78,8 +78,8 @@ public class VariablesImporter {
                             continue;
                         }
                     } catch (final Exception e) {
-                        reportError("Problem with importing variable file " + path + " with error stack:\n"
-                                + e.getMessage(), currentRobotFile, varImport, robotFile);
+                        reportError("Problem with importing variable file " + path + ", details: " + e.getMessage(),
+                                currentRobotFile, varImport, robotFile);
                         continue;
                     }
 
@@ -90,8 +90,8 @@ public class VariablesImporter {
                         varImportRef = findInProjectVariablesImport(pathsProvider, robotProject, varImport,
                                 varFile.toPath().normalize().toFile());
                     } catch (final InvalidPathException e) {
-                        reportError("Problem with importing variable file " + path + " with error stack:\n"
-                                + e.getMessage(), currentRobotFile, varImport, robotFile);
+                        reportError("Problem with importing variable file " + path + ", details: " + e.getMessage(),
+                                currentRobotFile, varImport, robotFile);
                         continue;
                     }
 
@@ -102,8 +102,8 @@ public class VariablesImporter {
                             variablesFromFile = robotRunEnv.getVariablesFromFile(varFile.getAbsolutePath(),
                                     varFileArguments);
                         } catch (final Exception e) {
-                            reportError("Problem with importing variable file " + path + " with error stack:\n"
-                                    + e.getMessage(), currentRobotFile, varImport, robotFile);
+                            reportError("Problem with importing variable file " + path + ", details: " + e.getMessage(),
+                                    currentRobotFile, varImport, robotFile);
                             continue;
                         }
                         varImportRef = new VariablesFileImportReference(varImport);
