@@ -71,7 +71,7 @@ public class ConvertCallToCommentTest {
         assertThat(testCase.getLinkedElement().getTestExecutionRows().size()).isEqualTo(1);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -104,7 +104,7 @@ public class ConvertCallToCommentTest {
         assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -138,7 +138,7 @@ public class ConvertCallToCommentTest {
         assertThat(testCase.getLinkedElement().getTestExecutionRows()).doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -173,7 +173,7 @@ public class ConvertCallToCommentTest {
         assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 }

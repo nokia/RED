@@ -78,7 +78,7 @@ public class ReplaceRobotKeywordCallCommandTest {
         assertThat(anotherTestCase.getChildren()).containsExactly(anotherKeywordCall);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -123,7 +123,7 @@ public class ReplaceRobotKeywordCallCommandTest {
         assertThat(anotherKwDef.getChildren()).containsExactly(anotherKeywordCall);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(
-                ImmutableMap.<String, Object> of(IEventBroker.DATA, kwDef, RobotModelEvents.ADDITIONAL_DATA, result)));
+                ImmutableMap.of(IEventBroker.DATA, kwDef, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 }
