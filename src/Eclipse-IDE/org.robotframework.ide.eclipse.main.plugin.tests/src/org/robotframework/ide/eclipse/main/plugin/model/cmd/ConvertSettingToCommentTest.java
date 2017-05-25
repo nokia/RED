@@ -66,7 +66,7 @@ public class ConvertSettingToCommentTest {
         assertThat(result).has(properlySetParent());
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
+                .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 
@@ -98,7 +98,7 @@ public class ConvertSettingToCommentTest {
         assertThat(keyword.getLinkedElement().getExecutionContext().size()).isEqualTo(1);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 
