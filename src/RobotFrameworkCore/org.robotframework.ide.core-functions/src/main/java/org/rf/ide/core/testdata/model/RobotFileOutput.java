@@ -284,6 +284,46 @@ public class RobotFileOutput {
             return String.format("BuildMessage [type=%s, message=%s, fileName=%s, fileRegion=%s]", type, message,
                     fileName, fileRegion);
         }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((fileName == null) ? 0 : fileName.hashCode());
+            result = prime * result + ((fileRegion == null) ? 0 : fileRegion.hashCode());
+            result = prime * result + ((message == null) ? 0 : message.hashCode());
+            result = prime * result + ((type == null) ? 0 : type.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            BuildMessage other = (BuildMessage) obj;
+            if (fileName == null) {
+                if (other.fileName != null)
+                    return false;
+            } else if (!fileName.equals(other.fileName))
+                return false;
+            if (fileRegion == null) {
+                if (other.fileRegion != null)
+                    return false;
+            } else if (!fileRegion.equals(other.fileRegion))
+                return false;
+            if (message == null) {
+                if (other.message != null)
+                    return false;
+            } else if (!message.equals(other.message))
+                return false;
+            if (type != other.type)
+                return false;
+            return true;
+        }
     }
 
     public Status getStatus() {

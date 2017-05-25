@@ -223,13 +223,20 @@ public class VariablesImporter {
             final RobotFileOutput robotFile) {
         final BuildMessage buildMsg = BuildMessage.createErrorMessage(message, currentRobotFile.getPath());
         buildMsg.setFileRegion(new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
-        robotFile.addBuildMessage(buildMsg);
+        addBuildMessageIfNotExists(robotFile, buildMsg);
     }
 
     private static void reportWarning(final String message, final File currentRobotFile,
             final VariablesImport varImport, final RobotFileOutput robotFile) {
         final BuildMessage buildMsg = BuildMessage.createWarnMessage(message, currentRobotFile.getPath());
         buildMsg.setFileRegion(new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
-        robotFile.addBuildMessage(buildMsg);
+        addBuildMessageIfNotExists(robotFile, buildMsg);
+    }
+
+    private static void addBuildMessageIfNotExists(final RobotFileOutput robotFile, final BuildMessage buildMsg) {
+        final List<BuildMessage> buildingMessages = robotFile.getBuildingMessages();
+        if (!buildingMessages.contains(buildMsg)) {
+            robotFile.addBuildMessage(buildMsg);
+        }
     }
 }
