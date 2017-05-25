@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _QcX10PsxEeW7_PzjO98BIw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/12/17 10:33 AM
+Save-Time: 5/25/17 4:37 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -54,24 +54,24 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
     | get-property text 
     | equals "Tests will be launched using 'IronPython' interpreter as defined in PATH environment variable" 
     | verify-true
-    
-//select Check interpreter and check error    
-wait 3000
-exec-with-options {
-    get-window "Run Configurations" | get-group Interpreter | get-button "Check interpreter" | click
-    get-window "Run Configurations" | get-window "Problem Occurred" 
-        | get-label "Unable to find ipy(.exe)? executable in the system." | get-property caption 
-        | equals "Unable to find ipy(.exe)? executable in the system." | verify-true
-    get-window "Run Configurations" | get-window "Problem Occurred" 
-        | get-label "There is no IronPython interpreter in system PATH environment variable" | get-property caption 
-        | equals "There is no IronPython interpreter in system PATH environment variable" | verify-true
-    get-window "Run Configurations" | get-window "Problem Occurred" | get-button "Details >>" | click
-    get-window "Run Configurations" | get-window "Problem Occurred" | get-editbox 
-        -after [get-label "There is no IronPython interpreter in system PATH environment variable"] | get-property text 
-        | equals "Unable to find ipy(.exe)? executable in the system.\n"
-        + "There is no IronPython interpreter in system PATH environment variable" | verify-true
-   get-window "Run Configurations" | get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog
+//    
+////select Check interpreter and check error    
+//wait 3000
+//exec-with-options {
+//    get-window "Run Configurations" | get-group Interpreter | get-button "Check interpreter" | click
+//    get-window "Run Configurations" | get-window "Problem Occurred" 
+//        | get-label "Unable to find ipy(.exe)? executable in the system." | get-property caption 
+//        | equals "Unable to find ipy(.exe)? executable in the system." | verify-true
+//    get-window "Run Configurations" | get-window "Problem Occurred" 
+//        | get-label "There is no IronPython interpreter in system PATH environment variable" | get-property caption 
+//        | equals "There is no IronPython interpreter in system PATH environment variable" | verify-true
+//    get-window "Run Configurations" | get-window "Problem Occurred" | get-button "Details >>" | click
+//    get-window "Run Configurations" | get-window "Problem Occurred" | get-editbox 
+//        -after [get-label "There is no IronPython interpreter in system PATH environment variable"] | get-property text 
+//        | equals "Unable to find ipy(.exe)? executable in the system.\n"
+//        + "There is no IronPython interpreter in system PATH environment variable" | verify-true
+//   get-window "Run Configurations" | get-window "Problem Occurred" | get-button OK | click
+//} -allowStatusDialog
 
 
 //select Jython
@@ -84,11 +84,9 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
 
 //run test    
 get-window "Run Configurations" | get-button Run | click
+wait 3000
+wait-for-console -times 8 -delay 1000
 
-try -times 8 -delay 2000 -command{
-	get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
-}
-	
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: SecondProject.SingleTest.test1\n"
     + ".* : INFO : 12\n"
     + "Ending test: SecondProject.SingleTest.test1\n\n"
@@ -150,9 +148,10 @@ get-editor "SecondProject/red.xml" | get-section "Robot framework" | get-table
 	    get-group Interpreter | get-button "Use interpreter as defined in project configuration" | click
 	    get-button Run | click
 	}
-	wait-for-console
+	wait 3000
+	wait-for-console -times 8 -delay 1000
 	get-view Console | get-label ".*" -index 0 
 	    | get-property caption | equals [format "<terminated> SingleTest.tsv [Robot] %s%s" $jython_path [os-specific "\jython.exe" "/jython"]] | verify-true 
-	}    
+}    
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
