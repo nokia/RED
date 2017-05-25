@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mRBHMBVPEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/31/17 1:26 PM
+Save-Time: 5/25/17 10:32 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -38,7 +38,7 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     
 get-view Console | get-text-viewer | get-property text 
     | equals "Command: .*\n"
-    + "Suite Executor: Robot Framework .*\n"
+    + "Suite Executor: <unknown>\n"
     + "==============================================================================\n"
     + "ScriptProject                                                                 \n"
     + "==============================================================================\n"
