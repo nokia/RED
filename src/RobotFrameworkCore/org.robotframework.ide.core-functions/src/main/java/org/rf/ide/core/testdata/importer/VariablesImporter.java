@@ -78,8 +78,8 @@ public class VariablesImporter {
                             continue;
                         }
                     } catch (final Exception e) {
-                        reportError("Problem with importing variable file " + path + " with error stack: " + e,
-                                "" + currentRobotFile, varImport, robotFile);
+                        reportError("Problem with importing variable file " + path + " with error stack:\n"
+                                + e.getMessage(), currentRobotFile, varImport, robotFile);
                         continue;
                     }
 
@@ -89,9 +89,9 @@ public class VariablesImporter {
                     try {
                         varImportRef = findInProjectVariablesImport(pathsProvider, robotProject, varImport,
                                 varFile.toPath().normalize().toFile());
-                    } catch (final InvalidPathException ipe) {
-                        reportError("Problem with importing variable file " + path + " with error stack: " + ipe,
-                                "" + currentRobotFile, varImport, robotFile);
+                    } catch (final InvalidPathException e) {
+                        reportError("Problem with importing variable file " + path + " with error stack:\n"
+                                + e.getMessage(), currentRobotFile, varImport, robotFile);
                         continue;
                     }
 
@@ -102,8 +102,8 @@ public class VariablesImporter {
                             variablesFromFile = robotRunEnv.getVariablesFromFile(varFile.getAbsolutePath(),
                                     varFileArguments);
                         } catch (final Exception e) {
-                            reportError("Problem with importing variable file " + path + " with error stack: " + e,
-                                    "" + currentRobotFile, varImport, robotFile);
+                            reportError("Problem with importing variable file " + path + " with error stack:\n"
+                                    + e.getMessage(), currentRobotFile, varImport, robotFile);
                             continue;
                         }
                         varImportRef = new VariablesFileImportReference(varImport);
@@ -115,7 +115,7 @@ public class VariablesImporter {
 
                     // Report that this variable file import contains no obtainable information
                     if (varImportRef.getVariables().isEmpty()) {
-                        reportError("Could not find any variable in variable file: " + path, "" + currentRobotFile,
+                        reportWarning("Could not find any variable in variable file " + path, currentRobotFile,
                                 varImport, robotFile);
                     }
                     varsImported.add(varImportRef);
@@ -138,8 +138,8 @@ public class VariablesImporter {
             final RobotProjectHolder robotProject, final VariablesImport varImport, final File varFile) {
 
         VariablesFileImportReference varImportRef = null;
-        final RobotFileOutput fileWhichImportsVariables = robotProject
-                .findFileWithImportedVariableFile(pathsProvider, varFile);
+        final RobotFileOutput fileWhichImportsVariables = robotProject.findFileWithImportedVariableFile(pathsProvider,
+                varFile);
         if (fileWhichImportsVariables != null) {
             final VariablesFileImportReference variableFile = findVariableFileByPath(pathsProvider, robotProject,
                     fileWhichImportsVariables, varFile);
@@ -152,9 +152,9 @@ public class VariablesImporter {
 
     @VisibleForTesting
     protected VariablesFileImportReference findVariableFileByPath(final PathsProvider pathsProvider,
-            final RobotProjectHolder robotProject, final RobotFileOutput rfo, final File varFile) {
+            final RobotProjectHolder robotProject, final RobotFileOutput robotFile, final File varFile) {
 
-        final List<VariablesFileImportReference> variablesImportReferences = rfo
+        final List<VariablesFileImportReference> variablesImportReferences = robotFile
                 .getVariablesImportReferences(robotProject, pathsProvider);
         for (final VariablesFileImportReference varFileImport : variablesImportReferences) {
             if (varFileImport.getVariablesFile().getAbsolutePath().equals(varFile.getAbsolutePath())) {
@@ -219,10 +219,17 @@ public class VariablesImporter {
         return arguments;
     }
 
-    private static void reportError(final String message, final String filename, final VariablesImport varImport,
+    private static void reportError(final String message, final File currentRobotFile, final VariablesImport varImport,
             final RobotFileOutput robotFile) {
-        final BuildMessage errorMsg = BuildMessage.createErrorMessage(message, filename);
-        errorMsg.setFileRegion(new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
-        robotFile.addBuildMessage(errorMsg);
+        final BuildMessage buildMsg = BuildMessage.createErrorMessage(message, currentRobotFile.getPath());
+        buildMsg.setFileRegion(new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
+        robotFile.addBuildMessage(buildMsg);
+    }
+
+    private static void reportWarning(final String message, final File currentRobotFile,
+            final VariablesImport varImport, final RobotFileOutput robotFile) {
+        final BuildMessage buildMsg = BuildMessage.createWarnMessage(message, currentRobotFile.getPath());
+        buildMsg.setFileRegion(new FileRegion(varImport.getPathOrName().getFilePosition(), varImport.getEndPosition()));
+        robotFile.addBuildMessage(buildMsg);
     }
 }
