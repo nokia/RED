@@ -103,7 +103,7 @@ class VariablesRetrievingTests(unittest.TestCase):
         vars = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'variables', 'not_existing.py'), [])
 
         self.assertEqual(vars['result'], None)
-        self.assertTrue('robot.errors.DataError: ' in vars['exception'])
+        self.assertTrue('DataError: ' in vars['exception'], 'Exception stack trace should contain DataError')
 
     def test_if_syntax_error_is_returned_for_file_with_error(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
@@ -111,4 +111,4 @@ class VariablesRetrievingTests(unittest.TestCase):
         vars = get_variables(os.path.join(parent_path, 'res_test_robot_session_server', 'variables', 'vars_with_syntax_error.py'), [])
 
         self.assertEqual(vars['result'], None)
-        self.assertTrue('SyntaxError: ' in vars['exception'])
+        self.assertTrue('SyntaxError: ' in vars['exception'], 'Exception stack trace should contain SyntaxError')
