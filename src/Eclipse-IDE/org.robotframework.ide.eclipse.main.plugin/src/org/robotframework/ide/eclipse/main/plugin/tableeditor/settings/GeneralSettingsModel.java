@@ -43,7 +43,7 @@ public class GeneralSettingsModel {
         returned.put(SUITE_TEARDOWN, ModelType.SUITE_TEARDOWN);
         returned.put(SUITE_SETUP, ModelType.SUITE_SETUP);
         return returned;
-    };
+    }
 
 
     public static List<RobotElement> findGeneralSettingsList(final RobotSettingsSection section) {

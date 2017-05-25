@@ -66,7 +66,7 @@ public class VariablesImporterTest {
         assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
         assertThat(buildMessage.getMessage()).contains(
-                "Problem with importing variable file \\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases *** with error stack: ");
+                "Problem with importing variable file \\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases *** with error stack:\n");
         final FileRegion fileRegion = buildMessage.getFileRegion();
         assertThat(fileRegion).isNotNull();
         assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 9, 9))).isTrue();
@@ -81,7 +81,7 @@ public class VariablesImporterTest {
         final File processedFile = temporaryFolder.newFile("importing.robot");
         temporaryFolder.newFile("robot.py");
         temporaryFolder.newFile("robot2.py");
-        
+
         final VariablesImporter varImporter = new VariablesImporter();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);

@@ -4,6 +4,7 @@
 # see license.txt file for details.
 #
 
+
 def get_global_variables():
     import robot
     import tempfile
@@ -70,34 +71,23 @@ def get_global_variables():
             data[k] = global_variables[k]
     return data
 
+
 def _wrap_variable_if_needed(varname):
     if varname.startswith('${') or varname.startswith('@{') or varname.startswith('&{'):
         return varname
     else:
         return '${' + varname + '}'
 
-def get_variables(dir, arguments):
-    import robot
+def get_variables(path, arguments):
+    import inspect
     try:
         from robot.utils.dotdict import DotDict
     except:  # for robot <2.9
         class DotDict:
             pass
-    import inspect
-    
-    vars = robot.variables.Variables()
-    try:
-        vars.set_from_file(dir, arguments)
-    except Exception as e:
-        print(str(e))
-        pass
-    
-    vars_from_file = {}
-    try:
-        vars_from_file = vars.data
-    except AttributeError:  # for robot >2.9
-        vars_from_file = vars.store.data._data
-    
+
+    vars_from_file = _get_variables_from_file(path, arguments)
+
     filtered_vars = {}
     for k, v in vars_from_file.items():
         try:
@@ -111,6 +101,18 @@ def get_variables(dir, arguments):
         except Exception as e:
             filtered_vars[k] = 'None'
     return filtered_vars
+
+
+def _get_variables_from_file(path, arguments):
+    import robot
+
+    variables = robot.variables.Variables()
+    variables.set_from_file(path, arguments)
+    try:
+        return variables.data
+    except AttributeError:  # for robot >2.9
+        return variables.store.data._data
+
 
 def _extract_dot_dict(dict):
     return {_escape_unicode(k) : _escape_unicode(v) for k, v in dict.items()}
@@ -157,7 +159,8 @@ def _escape_unicode(data):
     else:
       return _escape_unicode(str(data))
     return data
-    
+
+
 if __name__ == '__main__':
     import json
     import sys
