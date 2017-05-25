@@ -38,7 +38,7 @@ public class VariablesImporterTest {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test
-    public void importVariables_withWrongPath_shouldReturn_anEmptyList() throws IOException {
+    public void importVariables_withWrongPath_shouldReturn_anEmptyList_andSetErrorMessage() throws IOException {
         // prepare
         final File processedFile = temporaryFolder.newFile("robot.robot");
 
@@ -66,7 +66,44 @@ public class VariablesImporterTest {
         assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
         assertThat(buildMessage.getMessage()).contains(
-                "Problem with importing variable file \\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases *** with error stack:\n");
+                "Problem with importing variable file \\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases ***, details: ");
+        final FileRegion fileRegion = buildMessage.getFileRegion();
+        assertThat(fileRegion).isNotNull();
+        assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 9, 9))).isTrue();
+        final int importTextLength = "Variables".length() + varImport.length();
+        assertThat(fileRegion.getEnd().isSamePlace(new FilePosition(1, importTextLength, importTextLength))).isTrue();
+    }
+
+    @Test
+    public void importVariables_fromEmptyFile_shouldReturn_anEmptyList_andSetWarningMessage() throws IOException {
+        // prepare
+        final File processedFile = temporaryFolder.newFile("robot.robot");
+        temporaryFolder.newFile("empty.py");
+
+        final VariablesImporter varImporter = new VariablesImporter();
+
+        final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
+        robotFile.setProcessedFile(processedFile);
+        final RobotFile fileModel = robotFile.getFileModel();
+        fileModel.includeSettingTableSection();
+        final SettingTable settingTable = fileModel.getSettingTable();
+        final String varImport = "empty.py";
+        addNewVariableImport(settingTable, varImport);
+        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
+        final RobotRuntimeEnvironment robotRunEnv = mock(RobotRuntimeEnvironment.class);
+
+        // execute
+        final List<VariablesFileImportReference> importVariables = varImporter.importVariables(null, robotRunEnv,
+                robotProject, robotFile);
+
+        // verify
+        assertThat(importVariables).hasSize(1);
+        final List<BuildMessage> buildingMessages = robotFile.getBuildingMessages();
+        assertThat(buildingMessages.size()).isEqualTo(1);
+        final BuildMessage buildMessage = buildingMessages.get(0);
+        assertThat(buildMessage.getFileName()).contains("robot.robot");
+        assertThat(buildMessage.getType()).isEqualTo(LogLevel.WARN);
+        assertThat(buildMessage.getMessage()).isEqualTo("Could not find any variable in variable file empty.py");
         final FileRegion fileRegion = buildMessage.getFileRegion();
         assertThat(fileRegion).isNotNull();
         assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 9, 9))).isTrue();
