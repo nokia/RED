@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yr34UDPuEeebFPUdPe-j2A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/25/17 11:34 AM
+Save-Time: 5/25/17 12:47 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -116,17 +116,17 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         //comment, uncomment
         key-type "M1+/"
-        wait 1000
+        wait 500
         key-type "M1+/"
-        wait 1000
+        wait 500
         
         //save  and comment 3x
         key-type "M1+s"
         wait 500
         key-type "M1+/"
-        wait 1000
+        wait 500
         key-type "M1+/"
-        wait 1000
+        wait 500
         key-type "M1+/"
     }
 }
@@ -145,6 +145,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 
 
 //============================================== RED-820 ================================================== 
+
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases***\n"
     + "k1\n"
     + "    Catenate    1  2  3\n"
@@ -153,6 +154,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases***\n"
 get-button "Save \((Ctrl|M1)\+S\)" | click
     
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-button "Expand All" | click
 get-view Outline | get-tree | select "TestFile.robot/Test Cases/k1/Catenate"| click
 wait 200
 
@@ -184,6 +186,7 @@ with [get-editor "TestFile.robot"] {
         set-caret-pos 3 11
         hover-text 3 9
         key-type "M1+/"
+        wait 300
         key-type "M1+s"
     }
     wait 500
