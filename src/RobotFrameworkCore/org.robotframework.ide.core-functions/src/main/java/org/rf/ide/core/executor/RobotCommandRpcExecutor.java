@@ -237,7 +237,6 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return variables;
         } catch (final XmlRpcException e) {
-            e.printStackTrace();
             throw new RobotEnvironmentException(
                     "Unable to communicate with XML-RPC server. File " + filePath + " with arguments " + fileArguments,
                     e);
