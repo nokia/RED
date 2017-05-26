@@ -87,18 +87,18 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotLaunchConfiguration robotConfig = createRobotLaunchConfiguration(PROJECT_NAME);
         robotConfig.setInterpreterArguments("-a1 -a2");
         robotConfig.setUsingInterpreterFromProject(false);
-        robotConfig.setInterpreter(SuiteExecutor.Python);
+        robotConfig.setInterpreter(SuiteExecutor.PyPy);
 
         final RobotLaunchConfigurationDelegate launchDelegate = new RobotLaunchConfigurationDelegate();
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
                 preferences);
 
-        assertThat(commandLine.getCommandLine()).startsWith(SuiteExecutor.Python.executableName(), "-a1", "-a2", "-m",
+        assertThat(commandLine.getCommandLine()).startsWith(SuiteExecutor.PyPy.executableName(), "-a1", "-a2", "-m",
                 "robot.run");
     }
 
     @Test
-    public void commandLineStartsWithUnknownInterpreterPath_whenThereIsNoActiveRuntimeEnvironment() throws Exception {
+    public void commandLineStartsWithDefaultInterpreterName_whenThereIsNoActiveRuntimeEnvironment() throws Exception {
         final RedPreferences preferences = mock(RedPreferences.class);
 
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
@@ -111,7 +111,8 @@ public class RobotLaunchConfigurationDelegateTest {
         final RunCommandLine commandLine = launchDelegate.prepareCommandLine(robotConfig, robotProject, 12345,
                 preferences);
 
-        assertThat(commandLine.getCommandLine()).startsWith("UNKNOWN_INTERPRETER", "-a1", "-a2", "-m", "robot.run");
+        assertThat(commandLine.getCommandLine()).startsWith(SuiteExecutor.Python.executableName(), "-a1", "-a2", "-m",
+                "robot.run");
     }
 
     @Test
