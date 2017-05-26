@@ -86,7 +86,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private Button addJavaLibButton;
     private Button addLibspecButton;
     private Button addRemoteButton;
-    
+
     private Button autoLibDiscoverButton;
     private Button showAutoLibDiscoverDialogButton;
     private Button autoLibReloadButton;
@@ -120,7 +120,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         createContextMenu();
 
         createButtons(internalComposite);
-        
+
         createAutoReloadAndDiscoverButtons(internalComposite);
 
         scrolledParent.setMinSize(internalComposite.computeSize(-1, -1));
@@ -380,7 +380,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         input.addAll(config.getRemoteLocations());
         input.addAll(config.getLibraries());
         viewer.setInput(input);
-        
+
         autoLibDiscoverButton.setSelection(config.isReferencedLibrariesAutoDiscoveringEnabled());
         showAutoLibDiscoverDialogButton.setSelection(config.isLibrariesAutoDiscoveringSummaryWindowEnabled());
         autoLibReloadButton.setSelection(config.isReferencedLibrariesAutoReloadEnabled());
@@ -423,10 +423,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         this.environment = envs.getActiveEnvironment();
 
         final boolean isEditable = editorInput.isEditable();
-        final boolean projectIsInterpretedByJython = environment != null && environment.getInterpreter() == SuiteExecutor.Jython;
+        final boolean projectMayBeInterpretedByJython = envs.getActiveEnvironment() == null
+                || envs.getActiveEnvironment().getInterpreter() == SuiteExecutor.Jython;
 
         addPythonLibButton.setEnabled(isEditable);
-        addJavaLibButton.setEnabled(isEditable && projectIsInterpretedByJython);
+        addJavaLibButton.setEnabled(isEditable && projectMayBeInterpretedByJython);
         addLibspecButton.setEnabled(isEditable);
         addRemoteButton.setEnabled(isEditable);
         autoLibDiscoverButton.setEnabled(isEditable);
@@ -434,7 +435,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         autoLibReloadButton.setEnabled(isEditable);
         viewer.getTable().setEnabled(isEditable);
 
-        if (!projectIsInterpretedByJython) {
+        if (!projectMayBeInterpretedByJython) {
             final String envName = java.util.Optional.ofNullable(environment)
                     .map(RobotRuntimeEnvironment::getInterpreter)
                     .map(SuiteExecutor::toString)
