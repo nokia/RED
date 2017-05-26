@@ -413,8 +413,8 @@ public class RunCommandLineCallBuilder {
         return new Builder(executor, executor.executableName(), listenerPort);
     }
 
-    public static IRunCommandLineBuilder forUnknown(final int listenerPort) {
-        return new Builder(null, "UNKNOWN_INTERPRETER", listenerPort);
+    public static IRunCommandLineBuilder forDefault(final int listenerPort) {
+        return forExecutor(SuiteExecutor.Python, listenerPort);
     }
 
     public static class RunCommandLine {

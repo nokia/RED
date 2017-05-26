@@ -135,7 +135,7 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
             if (runtimeEnvironment != null) {
                 builder = RunCommandLineCallBuilder.forEnvironment(runtimeEnvironment, port);
             } else {
-                builder = RunCommandLineCallBuilder.forUnknown(port);
+                builder = RunCommandLineCallBuilder.forDefault(port);
             }
         } else {
             builder = RunCommandLineCallBuilder.forExecutor(robotConfig.getInterpreter(), port);
