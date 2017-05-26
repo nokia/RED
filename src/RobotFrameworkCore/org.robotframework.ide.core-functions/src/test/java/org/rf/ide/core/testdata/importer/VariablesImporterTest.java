@@ -5,9 +5,9 @@
  */
 package org.rf.ide.core.testdata.importer;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,9 +40,11 @@ public class VariablesImporterTest {
     @Test
     public void importVariables_withWrongPath_shouldReturn_anEmptyList_andSetErrorMessage() throws IOException {
         // prepare
-        final File processedFile = temporaryFolder.newFile("robot.robot");
+        final PathsProvider pathsProvider = mock(PathsProvider.class);
+        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
+        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
 
-        final VariablesImporter varImporter = new VariablesImporter();
+        final File processedFile = temporaryFolder.newFile("robot.robot");
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);
@@ -51,12 +53,10 @@ public class VariablesImporterTest {
         final SettingTable settingTable = fileModel.getSettingTable();
         final String varImport = "\\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases ***";
         addNewVariableImport(settingTable, varImport);
-        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        final RobotRuntimeEnvironment robotRunEnv = mock(RobotRuntimeEnvironment.class);
 
         // execute
-        final List<VariablesFileImportReference> importVariables = varImporter.importVariables(null, robotRunEnv,
-                robotProject, robotFile);
+        final List<VariablesFileImportReference> importVariables = new VariablesImporter()
+                .importVariables(pathsProvider, robotProject, robotFile);
 
         // verify
         assertThat(importVariables).isEmpty();
@@ -77,10 +77,12 @@ public class VariablesImporterTest {
     @Test
     public void importVariables_fromEmptyFile_shouldReturn_anEmptyList_andSetWarningMessage() throws IOException {
         // prepare
+        final PathsProvider pathsProvider = mock(PathsProvider.class);
+        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
+        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+
         final File processedFile = temporaryFolder.newFile("robot.robot");
         temporaryFolder.newFile("empty.py");
-
-        final VariablesImporter varImporter = new VariablesImporter();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);
@@ -89,12 +91,10 @@ public class VariablesImporterTest {
         final SettingTable settingTable = fileModel.getSettingTable();
         final String varImport = "empty.py";
         addNewVariableImport(settingTable, varImport);
-        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        final RobotRuntimeEnvironment robotRunEnv = mock(RobotRuntimeEnvironment.class);
 
         // execute
-        final List<VariablesFileImportReference> importVariables = varImporter.importVariables(null, robotRunEnv,
-                robotProject, robotFile);
+        final List<VariablesFileImportReference> importVariables = new VariablesImporter()
+                .importVariables(pathsProvider, robotProject, robotFile);
 
         // verify
         assertThat(importVariables).hasSize(1);
@@ -115,11 +115,13 @@ public class VariablesImporterTest {
     public void importVariables_withThreeElements_and_withOne_withWrongPath_shouldReturn_onlyTwoCorrectInList()
             throws IOException {
         // prepare
+        final PathsProvider pathsProvider = mock(PathsProvider.class);
+        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
+        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+
         final File processedFile = temporaryFolder.newFile("importing.robot");
         temporaryFolder.newFile("robot.py");
         temporaryFolder.newFile("robot2.py");
-
-        final VariablesImporter varImporter = new VariablesImporter();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);
@@ -129,24 +131,10 @@ public class VariablesImporterTest {
         addNewVariableImport(settingTable, "robot.py");
         addNewVariableImport(settingTable, "new /robot.py");
         addNewVariableImport(settingTable, "robot2.py");
-        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        final RobotRuntimeEnvironment robotRunEnv = mock(RobotRuntimeEnvironment.class);
 
-        final PathsProvider pathsProvider = new PathsProvider() {
-
-            @Override
-            public List<File> provideUserSearchPaths() {
-                return newArrayList(new File(""));
-            }
-
-            @Override
-            public List<File> providePythonModulesSearchPaths() {
-                return newArrayList(new File(""));
-            }
-        };
         // execute
-        final List<VariablesFileImportReference> importVariables = varImporter.importVariables(pathsProvider,
-                robotRunEnv, robotProject, robotFile);
+        final List<VariablesFileImportReference> importVariables = new VariablesImporter()
+                .importVariables(pathsProvider, robotProject, robotFile);
 
         // verify
         assertThat(importVariables).hasSize(2);
@@ -160,10 +148,12 @@ public class VariablesImporterTest {
     public void importVariables_withTwoElements_and_withOne_withWrongPath_shouldReturn_onlyOneCorrectInList()
             throws IOException {
         // prepare
+        final PathsProvider pathsProvider = mock(PathsProvider.class);
+        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
+        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
+
         final File processedFile = temporaryFolder.newFile("robot.robot");
         temporaryFolder.newFile("robot.py");
-
-        final VariablesImporter varImporter = new VariablesImporter();
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         robotFile.setProcessedFile(processedFile);
@@ -173,12 +163,9 @@ public class VariablesImporterTest {
         addNewVariableImport(settingTable, "new /robot.py");
         addNewVariableImport(settingTable, "robot.py");
 
-        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
-        final RobotRuntimeEnvironment robotRunEnv = mock(RobotRuntimeEnvironment.class);
-
         // execute
-        final List<VariablesFileImportReference> importVariables = varImporter.importVariables(null, robotRunEnv,
-                robotProject, robotFile);
+        final List<VariablesFileImportReference> importVariables = new VariablesImporter()
+                .importVariables(pathsProvider, robotProject, robotFile);
 
         // verify
         assertThat(importVariables).hasSize(1);
@@ -189,7 +176,9 @@ public class VariablesImporterTest {
     @Test
     public void importVariables_withOneElement_and_withWrongPath_shouldReturn_emptyList() {
         // prepare
-        final VariablesImporter varImporter = new VariablesImporter();
+        final PathsProvider pathsProvider = mock(PathsProvider.class);
+        final RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
+        when(robotProject.getRobotRuntime()).thenReturn(mock(RobotRuntimeEnvironment.class));
 
         final RobotFileOutput robotFile = new RobotFileOutput(RobotVersion.UNKNOWN);
         final RobotFile fileModel = robotFile.getFileModel();
@@ -197,12 +186,9 @@ public class VariablesImporterTest {
         final SettingTable settingTable = fileModel.getSettingTable();
         addNewVariableImport(settingTable, "new /");
 
-        final RobotProjectHolder robotProject = null;
-        final RobotRuntimeEnvironment robotRunEnv = null;
-
         // execute
-        final List<VariablesFileImportReference> importVariables = varImporter.importVariables(null, robotRunEnv,
-                robotProject, robotFile);
+        final List<VariablesFileImportReference> importVariables = new VariablesImporter()
+                .importVariables(pathsProvider, robotProject, robotFile);
 
         // verify
         assertThat(importVariables).isEmpty();
