@@ -1,0 +1,34 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<h1>General information about red.xml</h1>
+<p>Red.xml is file which stores Project related settings,some of those controls editing phase,other can influence RobotFramework execution.It is mandatory</p>
+
+<h2>Creating/recreating red.xml</h2>
+<p>Red.xml is automatically created when Robot project is created by using action from <i>File -> New -> Robot Project</i>.</p>
+<p>In case of importing robot files to generic Eclipse project, right click on Project in Project Explorer and select "Configure as Robot project"</p>
+<br><br><img src="red_xml/configure_as_robot.png"> <br><br> 
+<p>In any case, red.xml shall be visible in Project Explorer</p>
+<h2>Red.xml parts</h2>
+<p>Red.xml can be viewed using default editor by double click. It will load red.xml with graphical representation of file content. Alternatively,as this is xml file,it can be viewed and edited by any text editor.</p>
+<p>Red.xml is divided in 4 tabs: General,Referenced Libraries,Variable files,Validation.</p>
+<br><br><img src="red_xml/red_xml_editor.png"> <br><br> 
+<h3>General tab</h3>
+<p>This place holds settings which controls overall behavior of RED Robot Editor.</p>
+<p><b>Robot Framework</b> - this section allows to set python interpreter regardless of interpreter setting in <a href='../launching/launch_prefs.html'>Preferences</a>.</p>
+<p><b>Variables mappings</b> - values can be assigned to variables, this is used to resolved parametrized paths. More details can be found under topic <a href='variable_mapping.html'>Variable mapping</a> </p>
+<h3>Referenced Libraries tab</h3>
+<p>This section holds anything related to libraries and RED mechanisms for dealing with libraries.</p>
+<p><b>Referenced libraries</b> - holds a list of discovered or manually added libraries in current Project.At the bottom of pane, library auto discovery settings can be changed. More detail can be found under topic <a href="libs.html">Recognizing external libraries and variable files in RED<a></p>
+<p><b>Paths</b> - holds settings for user defined Python/ClassPath which are used for Libraries discovery and testcase execution,additionally relative paths relativity can be changed from Workspace to Project.More info under topic <a href="custom_paths_relatve.html">Custom python/class paths and path relativeness</a> </p>
+<h3>Variable files tab</h3>
+<p><b>Variable files</b> - this tab specify variable files which should be visible on global scope (Project wise). Those global variable files are used during testcase edit and running testcases by using Robot commandline parameter <i>-V</i>.More info under topic <a href="variable_files.html">Variable Files - dealing with missing variables</a>.</p>
+<h3>Validation tab</h3>
+<p><b>Excluded project parts</b> - this section allows user to limit validation to selected folder or exclude selected folder from validation.Files can be excluded by fixed size. More info under topic <a href='../validation/scope.html'>Limiting validation scope</a>.</p>
+</body>
+</html>

@@ -26,13 +26,15 @@
         </topic>
         <topic href="doc/user_guide/working_with_RED/variable_mapping.html" label="Variable mapping - dealing with parametrized paths to libraries and resources">
         </topic>
-        <topic href="doc/user_guide/working_with_RED/variable_files.html" label="Variable Files - dealing with missing variables">
+        <topic href="doc/user_guide/working_with_RED/variable_files.html" label="Variable Files - using files with variable accessible anywhere inside Project">
         </topic>
         <topic href="doc/user_guide/working_with_RED/custom_paths_relatve.html" label="Custom python/class paths and path relativeness">
         </topic>
         <topic href="doc/user_guide/working_with_RED/importing.html" label="Importing files and projects to workspace">
         </topic>
         <topic href="doc/user_guide/working_with_RED/remote_library.html" label="Remote library">
+        </topic>
+         <topic href="doc/user_guide/working_with_RED/red_xml.html" label="Red.xml description">
         </topic>
     
     </topic>
