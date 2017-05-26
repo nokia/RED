@@ -27,16 +27,16 @@ public class RunCommandLineCallBuilderTest {
 
     @Test
     public void testCall_forExecutor() throws IOException {
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forExecutor(SuiteExecutor.Python, 12345).build();
-        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith(SuiteExecutor.Python.executableName(), "-m",
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forExecutor(SuiteExecutor.PyPy, 12345).build();
+        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith(SuiteExecutor.PyPy.executableName(), "-m",
                 "robot.run", "--listener");
     }
 
     @Test
-    public void testCall_forUnknown() throws IOException {
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forUnknown(12345).build();
-        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith("UNKNOWN_INTERPRETER", "-m", "robot.run",
-                "--listener");
+    public void testCall_forDefault() throws IOException {
+        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forDefault(12345).build();
+        assertThat(cmdLine.getCommandLine()).hasSize(5).startsWith(SuiteExecutor.Python.executableName(), "-m",
+                "robot.run", "--listener");
     }
 
     @Test
