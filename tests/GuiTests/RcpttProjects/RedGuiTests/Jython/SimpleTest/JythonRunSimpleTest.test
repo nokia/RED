@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TLsXYOFJEeWu0tyN3Pwjmg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/4/17 10:33 AM
+Save-Time: 5/26/17 2:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -108,5 +108,6 @@ get-view "Project Explorer" | get-tree
     | get-property caption | equals "MathOperator jython_simple_project/RED_TEST_JavaLib.jar (2)" | verify-true
     
 
-
+get-view "Project Explorer" | get-tree | select jython_simple_project 
+    | get-menu "Robot Framework/Reset Robot Environment" | click
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
