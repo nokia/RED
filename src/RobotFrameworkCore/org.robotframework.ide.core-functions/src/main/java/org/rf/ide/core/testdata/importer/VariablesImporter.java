@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotExpressions;
@@ -38,12 +37,6 @@ public class VariablesImporter {
 
     public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
             final RobotProjectHolder robotProject, final RobotFileOutput robotFile) {
-        return importVariables(pathsProvider, robotProject.getRobotRuntime(), robotProject, robotFile);
-    }
-
-    public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
-            final RobotRuntimeEnvironment robotRunEnv, final RobotProjectHolder robotProject,
-            final RobotFileOutput robotFile) {
 
         final List<VariablesFileImportReference> varsImported = new ArrayList<>();
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
@@ -99,8 +92,8 @@ public class VariablesImporter {
                         // could not find import reference in project, so will ask interpreter
                         Map<?, ?> variablesFromFile = new HashMap<>();
                         try {
-                            variablesFromFile = robotRunEnv.getVariablesFromFile(varFile.getAbsolutePath(),
-                                    varFileArguments);
+                            variablesFromFile = robotProject.getRobotRuntime()
+                                    .getVariablesFromFile(varFile.getAbsolutePath(), varFileArguments);
                         } catch (final Exception e) {
                             reportError("Problem with importing variable file " + path + ", details: " + e.getMessage(),
                                     currentRobotFile, varImport, robotFile);
