@@ -13,14 +13,12 @@ import org.rf.ide.core.project.RobotProjectConfig;
 
 /**
  * @author Michal Anglart
- *
  */
 public abstract class RedXmlConfigMarkerResolution implements IMarkerResolution {
 
     @Override
     public final void run(final IMarker marker) {
-        final IFile file = marker.getResource().getProject().getFile(RobotProjectConfig.FILENAME);
-        asContentProposal(marker, file).apply(null);
+        asContentProposal(marker).apply(null);
     }
 
     public ICompletionProposal asContentProposal(final IMarker marker) {
