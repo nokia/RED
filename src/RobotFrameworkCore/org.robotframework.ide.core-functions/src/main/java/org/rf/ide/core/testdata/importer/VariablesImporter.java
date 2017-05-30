@@ -71,8 +71,8 @@ public class VariablesImporter {
                             continue;
                         }
                     } catch (final Exception e) {
-                        reportError("Problem with importing variable file " + path + ", details: " + e.getMessage(),
-                                currentRobotFile, varImport, robotFile);
+                        reportError(String.format("Problem with importing variable file '%s'. Details: %s", path,
+                                e.getMessage()), currentRobotFile, varImport, robotFile);
                         continue;
                     }
 
@@ -83,8 +83,8 @@ public class VariablesImporter {
                         varImportRef = findInProjectVariablesImport(pathsProvider, robotProject, varImport,
                                 varFile.toPath().normalize().toFile());
                     } catch (final InvalidPathException e) {
-                        reportError("Problem with importing variable file " + path + ", details: " + e.getMessage(),
-                                currentRobotFile, varImport, robotFile);
+                        reportError(String.format("Problem with importing variable file '%s'. Details: %s", path,
+                                e.getMessage()), currentRobotFile, varImport, robotFile);
                         continue;
                     }
 
@@ -95,8 +95,8 @@ public class VariablesImporter {
                             variablesFromFile = robotProject.getRobotRuntime()
                                     .getVariablesFromFile(varFile.getAbsolutePath(), varFileArguments);
                         } catch (final Exception e) {
-                            reportError("Problem with importing variable file " + path + ", details: " + e.getMessage(),
-                                    currentRobotFile, varImport, robotFile);
+                            reportError(String.format("Problem with importing variable file '%s'. Details: %s", path,
+                                    e.getMessage()), currentRobotFile, varImport, robotFile);
                             continue;
                         }
                         varImportRef = new VariablesFileImportReference(varImport);
@@ -108,8 +108,8 @@ public class VariablesImporter {
 
                     // Report that this variable file import contains no obtainable information
                     if (varImportRef.getVariables().isEmpty()) {
-                        reportWarning("Could not find any variable in variable file " + path, currentRobotFile,
-                                varImport, robotFile);
+                        reportWarning(String.format("Could not find any variable in variable file '%s'", path),
+                                currentRobotFile, varImport, robotFile);
                     }
                     varsImported.add(varImportRef);
                 }

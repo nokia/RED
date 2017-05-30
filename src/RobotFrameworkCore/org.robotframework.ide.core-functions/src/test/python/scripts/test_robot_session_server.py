@@ -127,6 +127,15 @@ class VariablesRetrievingTests(unittest.TestCase):
         self.assertEqual(response['result'], None)
         self.assertTrue('DataError: ' in response['exception'], 'Exception stack trace should contain DataError')
 
+    def test_if_data_error_is_returned_for_file_with_unsupported_extension(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        vars_location = os.path.join(parent_path, 'res_test_robot_session_server', 'variables', 'vars_in_unsupported.robot')
+
+        response = get_variables(vars_location, [])
+
+        self.assertEqual(response['result'], None)
+        self.assertTrue('DataError: ' in response['exception'], 'Exception stack trace should contain DataError')
+
     def test_if_syntax_error_is_returned_for_file_with_error(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         vars_location = os.path.join(parent_path, 'res_test_robot_session_server', 'variables', 'vars_with_syntax.py')
