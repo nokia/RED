@@ -27,14 +27,12 @@ public class RedEclipseProjectConfigReader extends RobotProjectConfigReader {
 
     public RobotProjectConfig readConfiguration(final IFile file) {
         if (file == null || !file.exists()) {
-            throw new CannotReadProjectConfigurationException(
-                    "Project configuration file '" + file.getName() + "' does not exist");
+            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
         }
         try (InputStream stream = file.getContents()) {
             return readConfiguration(stream);
         } catch (final IOException | CoreException e) {
-            throw new CannotReadProjectConfigurationException(
-                    "Project configuration file '" + file.getName() + "' does not exist");
+            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
         }
     }
 
@@ -42,8 +40,7 @@ public class RedEclipseProjectConfigReader extends RobotProjectConfigReader {
         try (InputStream stream = file.getContents()) {
             return readConfigurationWithLines(stream);
         } catch (final IOException | CoreException e) {
-            throw new CannotReadProjectConfigurationException(
-                    "Project configuration file '" + file.getName() + "' does not exist");
+            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
         }
     }
 }

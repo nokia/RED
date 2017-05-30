@@ -30,16 +30,17 @@ import org.xml.sax.SAXParseException;
 
 public class RobotProjectConfigReader {
 
+    public static final String MISSING_FILE_MESSAGE = "Project configuration file '" + RobotProjectConfig.FILENAME
+            + "' does not exist";
+
     public RobotProjectConfig readConfiguration(final File file) {
         if (file == null || !file.isFile() || !file.exists()) {
-            throw new CannotReadProjectConfigurationException(
-                    "Project configuration file '" + file.getName() + "' does not exist");
+            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
         }
         try (InputStream stream = new FileInputStream(file)) {
             return readConfiguration(stream);
         } catch (final IOException e) {
-            throw new CannotReadProjectConfigurationException(
-                    "Project configuration file '" + file.getName() + "' does not exist");
+            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
         }
     }
 
@@ -49,14 +50,12 @@ public class RobotProjectConfigReader {
 
     public RobotProjectConfigWithLines readConfigurationWithLines(final File file) {
         if (file == null || !file.isFile() || !file.exists()) {
-            throw new CannotReadProjectConfigurationException(
-                    "Project configuration file '" + file.getName() + "' does not exist");
+            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
         }
         try (InputStream stream = new FileInputStream(file)) {
             return readConfigurationWithLines(stream);
         } catch (final IOException e) {
-            throw new CannotReadProjectConfigurationException(
-                    "Project configuration file '" + file.getName() + "' does not exist");
+            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
         }
     }
 
@@ -104,6 +103,7 @@ public class RobotProjectConfigReader {
     public static class RobotProjectConfigWithLines {
 
         private final Map<Object, ProblemPosition> locations;
+
         private final RobotProjectConfig config;
 
         public RobotProjectConfigWithLines(final RobotProjectConfig config,
@@ -122,6 +122,7 @@ public class RobotProjectConfigReader {
     }
 
     private static class LocationListener extends Listener {
+
         private final XMLStreamReader streamReader;
 
         private final Deque<Location> locationsStack = new LinkedList<>();
