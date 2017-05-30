@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lJ-jYBiAEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/30/17 10:12 AM
+Save-Time: 5/30/17 10:24 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -151,9 +151,7 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 		    + "end" $script_name $wp $wp $wp [os-specific "\\\\" "/"] $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
 	}-catch{
 		get-view Console | get-text-viewer | get-property text 
-		    | equals [format  "Command: .+%s %s %s .+(\.exe)? -m robot.run --listener .+TestRunnerAgent.py:43981 --argumentfile .+\.arg %s%sScriptProject\n"
-		    + "Suite Executor: <unknown>"
-		    + "Argument: %s\n"
+		    | equals [format  "Argument: %s\n"
 		    + "Argument: %s\n"
 		    + "Argument: .+python(\.exe)?\n"
 		    + "Argument: -m\n"
@@ -163,7 +161,9 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 		    + "Argument: --argumentfile\n"
 		    + "Argument: .+\.arg\n"
 		    + "Argument: %s%sScriptProject\n"
-		    + "end\n"  $wp $wp $wp [os-specific "\\\\" "/"] $script_name $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
+		    + "end\n"  
+		    + "Command: .+%s %s %s .+(\.exe)? -m robot.run --listener .+TestRunnerAgent.py:43981 --argumentfile .+\.arg %s%sScriptProject\n"
+		    + "Suite Executor: <unknown>"$wp $wp $wp [os-specific "\\\\" "/"] $script_name $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
 	    }
 	
 	 exec-with-options {   
