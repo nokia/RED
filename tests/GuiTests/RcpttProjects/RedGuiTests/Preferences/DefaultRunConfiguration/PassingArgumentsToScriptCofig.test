@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _FUFBcBYSEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/25/17 3:12 PM
+Save-Time: 5/30/17 6:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,7 @@ proc "compare-console" [val new_args_list] [val inline_args] [val arg_file "Argu
 		try{
 			get-view Console | get-text-viewer | get-property text 
 			    | equals [format "Command: .*%s .*\n"
-			    + "Suite Executor: Robot Framework .*\n" 
+			    + "Suite Executor: <unknown>\n" 
 				+ "%s"
 			    + "Argument: .*python.*\n"
 			    + "Argument: -m\n"
@@ -108,7 +108,7 @@ get-menu "1 TestFile.robot" | click
 try -command{
 	get-view Console | get-text-viewer | get-property text 
 	    | equals "Command: .*\n"
-		    + "Suite Executor: Robot Framework .*\n"
+		    + "Suite Executor: <unknown>\n"
 		    + "Argument: arg1\n"
 		    + "Argument: arg2\n"
 		    + "Argument: arg 3\n"
