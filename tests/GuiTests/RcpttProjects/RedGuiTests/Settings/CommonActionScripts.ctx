@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/27/17 5:23 PM
+Runtime-Version: 2.1.0.201603192319
+Save-Time: 5/30/17 12:39 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -180,5 +180,11 @@ proc "get-arg-file-path"{
 		      [$lol | invoke lastIndexOf ".arg" | int | plus 4] 
 	}
 }
+// release files handle when files are locked under Windows. Proc used in Jython tests
+proc "release-files-handle"{
+	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	exec-process -command "c:\\Handle\\RemoveFilesHandle.bat" -args  $RED_workspace_path  
+    }
 
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
