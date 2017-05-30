@@ -51,7 +51,7 @@ public class VariablesImporterTest {
         final RobotFile fileModel = robotFile.getFileModel();
         fileModel.includeSettingTableSection();
         final SettingTable settingTable = fileModel.getSettingTable();
-        final String varImport = "\\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases ***";
+        final String varImport = "\\VariableFiles\u0000/UnicodeInVariables.py";
         addNewVariableImport(settingTable, varImport);
 
         // execute
@@ -66,7 +66,7 @@ public class VariablesImporterTest {
         assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
         assertThat(buildMessage.getMessage()).contains(
-                "Problem with importing variable file \\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases ***, details: ");
+                "Problem with importing variable file '\\VariableFiles\u0000/UnicodeInVariables.py'. Details: ");
         final FileRegion fileRegion = buildMessage.getFileRegion();
         assertThat(fileRegion).isNotNull();
         assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 9, 9))).isTrue();
@@ -103,7 +103,7 @@ public class VariablesImporterTest {
         final BuildMessage buildMessage = buildingMessages.get(0);
         assertThat(buildMessage.getFileName()).contains("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.WARN);
-        assertThat(buildMessage.getMessage()).isEqualTo("Could not find any variable in variable file empty.py");
+        assertThat(buildMessage.getMessage()).isEqualTo("Could not find any variable in variable file 'empty.py'");
         final FileRegion fileRegion = buildMessage.getFileRegion();
         assertThat(fileRegion).isNotNull();
         assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 9, 9))).isTrue();
