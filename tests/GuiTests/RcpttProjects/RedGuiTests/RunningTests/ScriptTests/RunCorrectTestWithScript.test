@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lJ-jYBiAEee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/13/17 4:00 PM
+Save-Time: 5/30/17 9:49 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -69,7 +69,7 @@ with [get-window "Run Configurations"] {
 let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 	get-view Console | get-text-viewer | get-property text 
 	    | equals [format "Command: .*%s %s %s .*python(\.exe)? -m robot.run --listener .*TestRunnerAgent.py:\d{1,5} --argumentfile .*\.arg %s%sScriptProject\n"
-	    + "Suite Executor: Robot Framework .*\n"
+	    + "Suite Executor: <unknown>\n"
 	    + "==============================================================================\n"
 	    + "ScriptProject                                                                 \n"
 	    + "==============================================================================\n"
@@ -163,7 +163,7 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 		    + "Argument: %s%sScriptProject\n"
 		    + "end\n"
 		    + "Command: .+%s %s %s .+(\.exe)? -m robot.run --listener .+TestRunnerAgent.py:43981 --argumentfile .+\.arg %s%sScriptProject\n"
-		    + "Suite Executor: Robot Framework .*"  $wp $wp $wp [os-specific "\\\\" "/"] $script_name $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
+		    + "Suite Executor: <unknown>"  $wp $wp $wp [os-specific "\\\\" "/"] $script_name $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
 	    }
 	
 	 exec-with-options {   
@@ -220,7 +220,7 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 		    + "Argument: %s%sScriptProject\n"
 		    + "end\n"
 		    + "Command: .*\n"
-		    + "Suite Executor: Robot Framework .+\n" $wp $wp  [get-by-os -win "Argument: .+jython.+\n" -default ""] $wp [os-specific "\\\\" "/"]]| verify-true
+		    + "Suite Executor: <unknown>\n" $wp $wp  [get-by-os -win "Argument: .+jython.+\n" -default ""] $wp [os-specific "\\\\" "/"]]| verify-true
 		
 	    }
 }  
@@ -259,7 +259,7 @@ try -command{
 	get-view Console | get-text-viewer | get-property text 
 	    | equals [format "Hello world!\n"
 	    + "Command: .*%s .* .*python.* -m robot.run --listener .*TestRunnerAgent.py:43981 --argumentfile .*\.arg .*ScriptProject\n"
-	    + "Suite Executor: Robot Framework .*" $script_name] | verify-true
+	    + "Suite Executor: <unknown>" $script_name] | verify-true
 }  
 
 //check views
