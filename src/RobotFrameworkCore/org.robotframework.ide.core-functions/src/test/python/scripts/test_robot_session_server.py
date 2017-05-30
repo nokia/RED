@@ -109,6 +109,15 @@ class VariablesRetrievingTests(unittest.TestCase):
 
         self.assertEqual(response, {'result': {'a': '1_arg', 'b': '2_arg', 'c': '3_arg'}, 'exception': None})
 
+    def test_if_data_error_is_returned_for_file_without_arguments(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        vars_location = os.path.join(parent_path, 'res_test_robot_session_server', 'variables', 'vars_with_argument.py')
+
+        response = get_variables(vars_location, [])
+
+        self.assertEqual(response['result'], None)
+        self.assertTrue('DataError: ' in response['exception'], 'Exception stack trace should contain DataError')
+
     def test_if_data_error_is_returned_for_not_existing_file(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         vars_location = os.path.join(parent_path, 'res_test_robot_session_server', 'variables', 'not_existing.py')
