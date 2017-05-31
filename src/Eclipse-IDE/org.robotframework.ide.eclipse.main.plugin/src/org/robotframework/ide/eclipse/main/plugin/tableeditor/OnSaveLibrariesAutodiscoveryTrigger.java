@@ -6,28 +6,35 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.ResourceImportsPathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -35,8 +42,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
-
-import com.google.common.base.Function;
 
 class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
@@ -94,14 +99,10 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
             if (!suitesForDiscover.isEmpty()) {
                 final RobotProject project = suitesForDiscover.get(0).getProject();
-                startAutoDiscovering(project,
-                        newArrayList(transform(suitesForDiscover, new Function<RobotSuiteFile, IFile>() {
-
-                    @Override
-                    public IFile apply(final RobotSuiteFile suite) {
-                        return suite.getFile();
-                    }
-                })));
+                final List<IFile> suites = suitesForDiscover.stream()
+                        .map(RobotSuiteFile::getFile)
+                        .collect(Collectors.toList());
+                startAutoDiscovering(project, suites);
             }
             suitesForDiscover.clear();
         }
@@ -123,19 +124,19 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     }
 
     private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {
+        final boolean projectHasRobotNature = RobotProjectNature.hasRobotNature(suite.getProject().getProject());
         final RobotProjectConfig projectConfig = suite.getProject().getRobotProjectConfig();
         final boolean isAutodiscoveryEnabled = projectConfig != null
                 && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled();
-        return isAutodiscoveryEnabled && currentModelHaveUnknownLibrary(suite);
+        return projectHasRobotNature && isAutodiscoveryEnabled && currentModelHaveUnknownLibrary(suite);
     }
 
     private boolean currentModelHaveUnknownLibrary(final RobotSuiteFile suite) {
-        final List<LibraryImport> imports = collectLibraryImports(suite);
+        final List<LibraryImport> imports = collectLibraryImportsIncludingNestedResources(suite, new HashSet<>());
 
         final UnknownLibraryDetectingReportingStrategy reporter = new UnknownLibraryDetectingReportingStrategy();
 
-        final ValidationContext generalContext = new ValidationContext(suite.getProject(),
-                new BuildLogger());
+        final ValidationContext generalContext = new ValidationContext(suite.getProject(), new BuildLogger());
         final FileValidationContext fileContext = new FileValidationContext(generalContext, suite.getFile());
         final GeneralSettingsLibrariesImportValidator importsValidator = new GeneralSettingsLibrariesImportValidator(
                 fileContext, suite, imports, reporter);
@@ -145,6 +146,27 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         } catch (final CoreException e) {
             return false;
         }
+    }
+
+    private List<LibraryImport> collectLibraryImportsIncludingNestedResources(final RobotSuiteFile suite,
+            final Set<IResource> alreadyVisited) {
+        final IWorkspaceRoot workspaceRoot = suite.getFile().getWorkspace().getRoot();
+        final RobotModel model = (RobotModel) suite.getProject().getParent();
+
+        final List<LibraryImport> imports = collectLibraryImports(suite);
+        ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(suite)
+                .stream()
+                .distinct()
+                .map(path -> workspaceRoot.findMember(path))
+                .filter(res -> res != null && res.exists() && res.getType() == IResource.FILE
+                        && !alreadyVisited.contains(res))
+                .map(IFile.class::cast)
+                .forEach(file -> {
+                    alreadyVisited.add(file);
+                    final RobotSuiteFile resourceSuite = model.createSuiteFile(file);
+                    imports.addAll(collectLibraryImportsIncludingNestedResources(resourceSuite, alreadyVisited));
+                });
+        return imports;
     }
 
     private List<LibraryImport> collectLibraryImports(final RobotSuiteFile currentModel) {
