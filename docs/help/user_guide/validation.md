@@ -17,4 +17,15 @@ project validation can be manually started using option **Project -> Clean**.
 The file which currently edited within Suite Editor is constantly validated in
 background giving quick feedback about potential problems.
 
+### Validation preferences
+
+Validation problems severity level settings are covered under topic
+[Configuring problems severity](validation/scope.md)
+
+Validation scope is covered under topic [Limiting validation
+scope](validation/scope.md)
+
+Validation as command line tool (without GUI,headless) is covered under topic
+[Running validation in command line](validation/headless.md)
+
 [Return to Help index](http://nokia.github.io/RED/help/)
