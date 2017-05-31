@@ -498,7 +498,6 @@ public class RobotProject extends RobotContainer {
                 }
             }
             librariesWatchHandler.clearRemovedSpecs();
-            getRuntimeEnvironment().resetCommandExecutors();    //needed when user will add a library again after removal
         }
     }
 
