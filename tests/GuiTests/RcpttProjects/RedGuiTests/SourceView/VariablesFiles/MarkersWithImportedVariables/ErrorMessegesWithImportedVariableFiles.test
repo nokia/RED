@@ -1,0 +1,229 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ErrorMessegesWithImportedVariableFiles
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _h5uwAEU1EeetgfqNXz7zjg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 5/31/17 10:51 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// add new variable file
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select RobotProject | get-menu "New/Robot python file" | click
+}
+with [get-window "New Robot python file"] {
+    get-button "Variables file" | click
+    get-editbox -after [get-label "File name:"] | set-text "var_file"
+    get-button Finish | click
+}
+// update variable file with two arguments
+with [get-editor "var_file.py" | get-text-viewer] {
+    set-caret-pos 1 27
+    key-type BackSpace -times 5
+    type-text "1, arg2"
+    key-type Down
+    key-type Right -times 4
+    key-type BackSpace -times 7
+    type-text "arg1, 'var2' : arg2"
+    key-type "M1+s"
+}
+// add variable file in Settings section 
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type Enter
+    key-type Up
+    type-text "*** Settings ***"
+    key-type Enter
+    type-text "Variables  var_file.py  one  two"
+    key-type "M1+s"
+}
+// verify if there is no errors/warnings
+get-view Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+// remove one argument from variable file declaration in Settings
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 33
+    key-type BackSpace -times 5
+    key-type "M1+s"
+}
+// verify error messege in Information Window on ruler and in Problems tab
+get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
+get-window -from "Information Window" | get-editbox | get-property text | contains  "TypeError: get_variables() takes exactly 2 arguments (1 given)" 
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    | contains "TypeError: get_variables() takes exactly 2 arguments (1 given)" 
+// back to correct version    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 28
+    type-text "  two"
+    key-type "M1+s"
+}
+// make another error: use wrong variable name in function in variable file
+with [get-editor "var_file.py"] {
+    click
+    with [get-text-viewer] {
+        key-type Left
+        type-text g
+        key-type "M1+s"
+    }
+}
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        key-type Enter
+    }
+}
+// verify error messege in Information Window on ruler and in Problems tab
+wait-for-errors -amount 1 -times 2 -delay 1000
+get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
+get-window -from "Information Window" | get-editbox | get-property text | contains  "NameError: global name 'argg2' is not defined" 
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    | contains "NameError: global name 'argg2' is not defined" 
+// back to correct version and make some syntax error (in return)
+with [get-editor "var_file.py"] {
+    click
+    with [get-text-viewer] {
+        key-type BackSpace
+        set-caret-pos 3 8
+        type-text t
+        key-type "M1+s"
+    }
+}
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        key-type BackSpace
+        key-type Enter
+        key-type "M1+s"
+    }
+}
+// verify error messege in Information Window on ruler and in Problems tab
+wait-for-errors -amount 1 -times 2 -delay 1000
+get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
+get-window -from "Information Window" | get-editbox | get-property text | contains  "Importing variable file .* failed: SyntaxError: invalid syntax (var_file.py, line 3)\n" 
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    | contains "Importing variable file .* failed: SyntaxError: invalid syntax (var_file.py, line 3)\n" 
+// back to correct version and make next error: remove one argument from function declaration in variable file
+with [get-editor "var_file.py"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 1 29
+        key-type BackSpace -times 6
+        key-type "M1+s"
+        set-caret-pos 3 9
+        key-type BackSpace
+        key-type "M1+s"
+    }
+}
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        key-type BackSpace -times 1
+        key-type Enter
+        key-type "M1+s"
+    }
+}
+// verify error messege in Information Window on ruler and in Problems tab
+wait-for-errors -amount 1 -times 2 -delay 1000
+get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
+get-window -from "Information Window" | get-editbox | get-property text | contains  "TypeError: get_variables() takes exactly 1 argument (2 given)" 
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    | contains "TypeError: get_variables() takes exactly 1 argument (2 given)" 
+// back to correct version 
+with [get-editor "var_file.py"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 1 23
+        type-text ", arg2"
+        key-type "M1+s"
+    }
+}
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        key-type BackSpace
+        key-type Enter
+        key-type "M1+s"
+        set-caret-pos 3 18
+        key-type Enter
+        key-type BackSpace
+    }
+}
+// use capital letter for extention of variable file
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 23
+    key-type BackSpace -times 2
+    type-text PY
+    key-type "M1+s"
+}
+// verify error messege in Information Window on ruler and in Problems tab
+wait-for-errors -amount 1 -times 2 -delay 1000
+get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
+get-window -from "Information Window" | get-editbox | get-property text | contains  "Importing variable file .* failed: Not a valid file or directory to import." 
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+    | contains "Importing variable file .* failed: Not a valid file or directory to import." 
+// add second variable file
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+with [get-window "New Robot python file"] {
+    get-button "Variables file" | click
+    get-editbox -after [get-label "File name:"] | set-text "var_file2.py"
+    get-button Finish | click
+}
+// update function arguments in this variable file
+with [get-editor "var_file2.py" | get-text-viewer] {
+    set-caret-pos 1 23
+    select-range 1 22 1 27
+    key-type BackSpace
+    key-type "M1+s"
+}
+// add second variable file in Settings section with error: without argument
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 3 1
+        type-text "Variables  var_file2.py"
+        key-type Down
+        key-type Enter
+        key-type "M1+s"
+        hover-text 3 18
+    }
+}
+// verify error messege in Information Window on ruler and in Problems tab
+wait-for-errors -amount 2 -times 2 -delay 1000
+get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 3
+get-window -from "Information Window" | get-editbox | get-property text | contains  "TypeError: get_variables() takes exactly 1 argument (0 given)" 
+get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    | contains "TypeError: get_variables() takes exactly 1 argument (0 given)" 
+// make var_file.py empty
+get-editor "var_file.py" | click
+with [get-editor "var_file.py" | get-text-viewer] {
+    set-caret-pos 3 4
+    select-range 4 1 1 1
+    key-type BackSpace
+    key-type "M1+s"
+}
+// back to correct Settings declaration
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 2 23
+        key-type BackSpace -times 2
+        type-text py
+        key-type Down
+        key-type Right
+        type-text "  one"
+        key-type Enter
+    }
+}
+// verify warnings massege in Problems tab
+wait-for-warnings -amount 1 -times 2 -delay 1000
+get-view Problems | get-tree 
+    | get-item "Warnings \\(1 item\\)/Could not find any variable in variable file 'var_file.py'" 
+    | get-property caption | equals "Could not find any variable in variable file 'var_file.py'" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
