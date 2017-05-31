@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -35,8 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.OnSaveLibrariesAutodiscoveryTrigger.DiscovererFactory;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.collect.Lists;
-
 public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
     @ClassRule
@@ -58,6 +57,15 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         projectProvider.createFile("suite_with_unknown_library_2.robot",
                 "*** Settings ***",
                 "Library  unknown_2");
+        projectProvider.createFile("suite_with_unknown_library_in_resource.robot", "*** Settings ***",
+                "Resource  resource.robot");
+        projectProvider.createFile("resource.robot", "*** Settings ***", "Library  unknown");
+        projectProvider.createFile("suite_with_unknown_library_in_resources_with_cycle.robot", "*** Settings ***",
+                "Resource  resource_with_cycle_1.robot");
+        projectProvider.createFile("resource_with_cycle_1.robot", "*** Settings ***",
+                "Resource  resource_with_cycle_2.robot");
+        projectProvider.createFile("resource_with_cycle_2.robot", "*** Settings ***",
+                "Resource  resource_with_cycle_1.robot", "Library  unknown");
 
         final ReferencedLibrary knownLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "known1", "");
         final LibrarySpecification knownLib1spec = new LibrarySpecification();
@@ -73,12 +81,13 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         config.addReferencedLibrary(knownLib1);
         config.addReferencedLibrary(knownLib2);
         projectProvider.configure(config);
+        projectProvider.addRobotNature();
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setReferencedLibraries(libs);
         robotProject.setStandardLibraries(new HashMap<String, LibrarySpecification>());
     }
-    
+
     @AfterClass
     public static void afterSuite() {
         model = null;
@@ -92,7 +101,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
@@ -111,7 +120,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
@@ -119,6 +128,27 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         verifyZeroInteractions(discoverer);
 
         turnOnAutoDiscoveringInProjectConfig();
+    }
+
+    @Test
+    public void autodiscovererIsNotStarted_whenProjectDoesNotHaveRobotNature() throws Exception {
+        turnOnAutoDiscoveringInProjectConfig();
+        projectProvider.removeRobotNature();
+
+        final RobotSuiteFile suite = model
+                .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
+        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyList())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        verifyZeroInteractions(discoverer);
+
+        turnOffAutoDiscoveringInProjectConfig();
+        projectProvider.addRobotNature();
     }
 
     @Test
@@ -130,13 +160,60 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         trigger.startLibrariesAutoDiscoveryIfRequired(suite);
 
-        final List<IFile> suites = Lists
-                .<IFile> newArrayList(projectProvider.getFile("suite_with_unknown_library_1.robot"));
+        final List<IFile> suites = newArrayList(projectProvider.getFile("suite_with_unknown_library_1.robot"));
+        verify(factory).create(any(RobotProject.class), eq(suites));
+
+        verify(discoverer).start();
+        verifyNoMoreInteractions(discoverer);
+
+        turnOffAutoDiscoveringInProjectConfig();
+    }
+
+    @Test
+    public void autodiscovererStarts_whenUnknownLibraryIsDetectedInImportedResource() {
+        turnOnAutoDiscoveringInProjectConfig();
+
+        final RobotSuiteFile suite = model
+                .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_in_resource.robot"));
+        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyList())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        final List<IFile> suites = newArrayList(
+                projectProvider.getFile("suite_with_unknown_library_in_resource.robot"));
+        verify(factory).create(any(RobotProject.class), eq(suites));
+
+        verify(discoverer).start();
+        verifyNoMoreInteractions(discoverer);
+
+        turnOffAutoDiscoveringInProjectConfig();
+    }
+
+    @Test
+    public void autodiscovererStarts_whenUnknownLibraryIsDetectedInImportedResourcesWithCycle() {
+        turnOnAutoDiscoveringInProjectConfig();
+
+        final RobotSuiteFile suite = model
+                .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_in_resources_with_cycle.robot"));
+        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyList())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        final List<IFile> suites = newArrayList(
+                projectProvider.getFile("suite_with_unknown_library_in_resources_with_cycle.robot"));
         verify(factory).create(any(RobotProject.class), eq(suites));
 
         verify(discoverer).start();
@@ -156,7 +233,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
-        when(factory.create(any(RobotProject.class), ArgumentMatchers.<IFile> anyList())).thenReturn(discoverer);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyList())).thenReturn(discoverer);
 
         final OnSaveLibrariesAutodiscoveryTrigger trigger1 = new OnSaveLibrariesAutodiscoveryTrigger(factory);
         final OnSaveLibrariesAutodiscoveryTrigger trigger2 = new OnSaveLibrariesAutodiscoveryTrigger(factory);
@@ -170,7 +247,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         trigger1.postExecuteSuccess(OnSaveLibrariesAutodiscoveryTrigger.SAVE_ALL_COMMAND_ID, new Object());
         trigger2.postExecuteSuccess(OnSaveLibrariesAutodiscoveryTrigger.SAVE_ALL_COMMAND_ID, new Object());
 
-        final List<IFile> suites = Lists.<IFile> newArrayList(
+        final List<IFile> suites = newArrayList(
                 projectProvider.getFile("suite_with_unknown_library_1.robot"),
                 projectProvider.getFile("suite_with_unknown_library_2.robot"));
         verify(factory).create(any(RobotProject.class), eq(suites));

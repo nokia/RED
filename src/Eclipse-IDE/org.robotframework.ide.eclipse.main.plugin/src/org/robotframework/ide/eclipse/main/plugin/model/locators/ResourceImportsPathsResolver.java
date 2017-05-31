@@ -26,9 +26,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
  * @author Michal Anglart
  *
  */
-class ResourceImportsPathsResolver {
+public class ResourceImportsPathsResolver {
 
-    static List<IPath> getWorkspaceRelativeResourceFilesPaths(final RobotSuiteFile file) {
+    public static List<IPath> getWorkspaceRelativeResourceFilesPaths(final RobotSuiteFile file) {
         return getWorkspaceRelativePaths(file.getResourcesPaths(), file);
     }
 
