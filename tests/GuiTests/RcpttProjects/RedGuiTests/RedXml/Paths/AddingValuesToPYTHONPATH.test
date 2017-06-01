@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/19/17 2:15 PM
+Save-Time: 6/1/17 2:56 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -258,7 +258,11 @@ get-view Console | get-text-viewer | get-property text
 
 //add more items to path    
 get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
-get-editor "RobotProject/red.xml" | get-section Paths | get-table | select  [get-item "...add new search path" ]
+with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+    select a | key-type End
+    select "...add new search path"
+}
+
 get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
 with [get-window "Add new search path"] {
     with [get-editbox 
