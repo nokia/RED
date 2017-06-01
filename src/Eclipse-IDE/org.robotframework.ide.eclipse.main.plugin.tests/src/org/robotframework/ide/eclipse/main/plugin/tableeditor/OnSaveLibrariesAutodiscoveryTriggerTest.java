@@ -57,15 +57,22 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         projectProvider.createFile("suite_with_unknown_library_2.robot",
                 "*** Settings ***",
                 "Library  unknown_2");
-        projectProvider.createFile("suite_with_unknown_library_in_resource.robot", "*** Settings ***",
+        projectProvider.createFile("suite_with_unknown_library_in_resource.robot", 
+                "*** Settings ***",
                 "Resource  resource.robot");
-        projectProvider.createFile("resource.robot", "*** Settings ***", "Library  unknown");
-        projectProvider.createFile("suite_with_unknown_library_in_resources_with_cycle.robot", "*** Settings ***",
+        projectProvider.createFile("resource.robot", 
+                "*** Settings ***", 
+                "Library  unknown");
+        projectProvider.createFile("suite_with_unknown_library_in_resources_with_cycle.robot", 
+                "*** Settings ***",
                 "Resource  resource_with_cycle_1.robot");
-        projectProvider.createFile("resource_with_cycle_1.robot", "*** Settings ***",
+        projectProvider.createFile("resource_with_cycle_1.robot", 
+                "*** Settings ***",
                 "Resource  resource_with_cycle_2.robot");
-        projectProvider.createFile("resource_with_cycle_2.robot", "*** Settings ***",
-                "Resource  resource_with_cycle_1.robot", "Library  unknown");
+        projectProvider.createFile("resource_with_cycle_2.robot", 
+                "*** Settings ***",
+                "Resource  resource_with_cycle_1.robot", 
+                "Library  unknown");
 
         final ReferencedLibrary knownLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "known1", "");
         final LibrarySpecification knownLib1spec = new LibrarySpecification();
