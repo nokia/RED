@@ -1,3 +1,66 @@
+RED 0.7.8 - 2017/06/01
+
+** Bug
+
+    [RED-126] - Resources are not visible in project outside of workspace
+    [RED-201] - Adding support for esceping space in path
+    [RED-252] - Hanging up of editors for marking many occurrence
+    [RED-262] - Quick Fix with adding missing variable should not be in Settings section
+    [RED-275] - Error window while changing Installed frameworks
+    [RED-290] - Folding is not working when are two identical section
+    [RED-306] - Quick Fix on lib from PythonPath cerates wrong entry in red.xml - adds filename to path
+    [RED-360] - [table] show in Source F4 in dirty file performance drop
+    [RED-375] - No error when path is incorrect and is relative to other project
+    [RED-381] - "\" is not shown in Setting table when tab/Enter is used
+    [RED-399] - Lib is not accessable for the new class in new project for the same lib name
+    [RED-541] - Wrong paths in Quick fix window after selecting file from pythonpath
+    [RED-569] - Error after selecting 'Show library source' for lib from site-packages
+    [RED-578] - Exception after closing and opening Documentation view
+    [RED-592] - Exeption in test during opening libdoc
+    [RED-765] - KWs are copied after removing comment in table view
+    [RED-768] - Exception during undo in commented setting in table
+    [RED-770] - Not adding comment to second cell after commenting first cell
+    [RED-774] - Common space handling in tsv file for spaces in table
+    [RED-786] - Commenting problems in table view
+    [RED-795] - Commented line with error in table view still shows error
+    [RED-797] - Wrong coloring for commented Library in source
+    [RED-820] - Adding triple dots after commenting/uncommenting in table
+    [RED-826] - Refactoring of <referencedLibrary/> tags in red.xml
+    [RED-834] - GitHub #107 - Settings KWs should not be case sensitive
+    [RED-846] - Focus is set on last cell after block selection and commenting
+    [RED-851] - Setting focus after block comment
+    [RED-854] - Wrong focus and seclection after changing value in commented cell
+
+** Enhancement
+
+    [RED-85] - Inserting variable should activate cell edit just like adding new variable
+    [RED-166] - Changing red.xml file after renaming of project
+    [RED-237] - Headless RED project validation customized output about progress
+    [RED-378] - Variables taken from external python file are not reloaded after edition
+    [RED-636] - Variable file extension should be checked
+    [RED-763] - Message Log view could wrap its content
+    [RED-764] - Message Log view content could be saveable
+    [RED-782] - [github #98] it should be possible to launch tests event without interpreter defined
+    [RED-802] - GitHub #99 Font size not changing in TestCases and Keywords tab
+    [RED-816] - Adding Clear view for execution view
+    [RED-818] - Handling old red.xml version
+    [RED-827] - Use different path to suite and test to run for Scout team
+    [RED-849] - Display python/robot internal error with Error marker on Variable files when something goes wrong
+
+** Feature
+
+    [RED-835] - Remove/rewrite test with tag notTestable in regression
+
+** Task
+
+    [RED-742] - Add Total covarage reports (jUnits+rcptt) for every build
+    [RED-842] - Github #108 - update docs with red.xml and how to use Remote Server for libs
+
+** Sub-task
+
+    [RED-741] - Execution view can show all the childrens of running suite
+
+
 RED 0.7.7-fix - 2017/04/27
 
 ** Bug
