@@ -60,16 +60,10 @@ class RobotFormEditorPartListener implements IPartListener {
             final RobotFormEditor editor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
             if (suiteModel.getParent() != null) {
-                reparseModelInEditor(suiteModel, editor);
                 cancelValidationJobIfScheduled();
                 scheduleValidationJob(suiteModel);
             }
         }
-    }
-
-    private void reparseModelInEditor(final RobotSuiteFile suiteModel, final RobotFormEditor editor) {
-        final String fileContent = editor.getSourceEditor().getDocument().get();
-        suiteModel.reparseEverything(fileContent);
     }
 
     private void cancelValidationJobIfScheduled() {
