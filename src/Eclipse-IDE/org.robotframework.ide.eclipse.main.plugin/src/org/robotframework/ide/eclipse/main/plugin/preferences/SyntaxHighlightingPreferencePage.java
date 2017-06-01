@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
@@ -129,17 +128,10 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     }
 
     private void refreshPreview() {
-        @SuppressWarnings("unchecked")
         final List<StyleRange> ranges = newArrayList(Iterables.concat(getSectionHeaderRanges(), getCommentsRanges(),
                 getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges(),
                 getGherkinRanges(), getSpecialTokenRanges()));
-        Collections.sort(ranges, new Comparator<StyleRange>() {
-
-            @Override
-            public int compare(final StyleRange range1, final StyleRange range2) {
-                return Integer.compare(range1.start, range2.start);
-            }
-        });
+        Collections.sort(ranges, (range1, range2) -> Integer.compare(range1.start, range2.start));
         previewText.setStyleRanges(ranges.toArray(new StyleRange[0]));
     }
 
@@ -155,8 +147,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         return newArrayList(new StyleRange(0, 16, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(142, 17, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(263, 16, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(640, 18, preference.getColor(), null, preference.getFontStyle())
-        );
+                new StyleRange(640, 18, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getSettingRanges() {
@@ -168,8 +159,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
                 new StyleRange(291, 11, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(312, 15, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(619, 8, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(672, 9, preference.getColor(), null, preference.getFontStyle())
-        );
+                new StyleRange(672, 9, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getDefinitionRanges() {
@@ -177,8 +167,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
 
         return newArrayList(new StyleRange(280, 9, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(659, 11, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(832, 13, preference.getColor(), null, preference.getFontStyle())
-        );
+                new StyleRange(832, 13, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getKeywordCallRanges() {
@@ -201,8 +190,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
                 new StyleRange(853, 19, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(879, 19, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(904, 25, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(936, 17, preference.getColor(), null, preference.getFontStyle())
-        );
+                new StyleRange(936, 17, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getVariableRanges() {
@@ -229,8 +217,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
                 new StyleRange(745, 6, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(791, 5, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(800, 6, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(815, 15, preference.getColor(), null, preference.getFontStyle())
-        );
+                new StyleRange(815, 15, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getGherkinRanges() {
@@ -239,8 +226,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         return newArrayList(new StyleRange(847, 5, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(874, 4, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(900, 3, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(931, 4, preference.getColor(), null, preference.getFontStyle())
-        );
+                new StyleRange(931, 4, preference.getColor(), null, preference.getFontStyle()));
     }
 
     private List<StyleRange> getSpecialTokenRanges() {
@@ -251,8 +237,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     }
 
     @Override
-    
-protected void performDefaults() {
+    protected void performDefaults() {
         for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
             currentPreferences.put(category, category.getDefault());
         }
@@ -278,6 +263,7 @@ protected void performDefaults() {
     }
 
     private class SyntaxHighlightingCategoriesLabelProvider extends LabelProvider {
+
         @Override
         public String getText(final Object element) {
             return ((SyntaxHighlightingCategory) element).getShortDescription();
@@ -285,10 +271,11 @@ protected void performDefaults() {
     }
 
     private class SyntaxHighlightingCategoriesSelectionListener implements ISelectionChangedListener {
+
         @Override
         public void selectionChanged(final SelectionChangedEvent event) {
-            final Optional<SyntaxHighlightingCategory> selected = Selections.getOptionalFirstElement((IStructuredSelection) event.getSelection(),
-                    SyntaxHighlightingCategory.class);
+            final Optional<SyntaxHighlightingCategory> selected = Selections.getOptionalFirstElement(
+                    (IStructuredSelection) event.getSelection(), SyntaxHighlightingCategory.class);
             if (selected.isPresent()) {
                 final SyntaxHighlightingCategory selectedCategory = selected.get();
                 final ColoringPreference currentPreference = currentPreferences.get(selectedCategory);
@@ -342,9 +329,8 @@ protected void performDefaults() {
 
         @Override
         public void widgetSelected(final SelectionEvent e) {
-            final Optional<SyntaxHighlightingCategory> selected =
-                    Selections.getOptionalFirstElement((IStructuredSelection) viewer.getSelection(),
-                            SyntaxHighlightingCategory.class);
+            final Optional<SyntaxHighlightingCategory> selected = Selections.getOptionalFirstElement(
+                    (IStructuredSelection) viewer.getSelection(), SyntaxHighlightingCategory.class);
             if (selected.isPresent()) {
                 final SyntaxHighlightingCategory selectedCategory = selected.get();
                 final ColoringPreference currentPreference = currentPreferences.get(selectedCategory);
