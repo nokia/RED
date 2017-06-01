@@ -9,9 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.regex.Pattern;
-
-import com.google.common.base.Joiner;
 
 public abstract class AProcessTreeHandler implements IProcessTreeHandler {
 
@@ -28,20 +25,21 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
         final List<Long> childPids = new ArrayList<>(0);
 
         try {
-            final Pattern columnSeparator = Pattern.compile(",");
-
             final Queue<String> collectedOutput = new ConcurrentLinkedQueue<>();
             final int returnCode = getHelper().execCommandAndCollectOutput(getChildPidsCommand(processPid),
                     collectedOutput);
 
             if (returnCode == OSProcessHelper.SUCCESS) {
-                for (String line : collectedOutput) {
+                for (final String line : collectedOutput) {
                     if (!line.isEmpty()) {
-                        String[] columns = columnSeparator.split(line);
+                        final String[] columns = line.split(",");
                         if (columns.length > 1) {
                             try {
-                                childPids.add(Long.parseLong(columns[1]));
-                            } catch (NumberFormatException nfe) {
+                                final long childProcessPid = Long.parseLong(columns[1]);
+                                if (childProcessPid != processPid) {
+                                    childPids.add(childProcessPid);
+                                }
+                            } catch (final NumberFormatException nfe) {
                             }
                         }
                     }
@@ -68,9 +66,9 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
 
             if (returnCode != OSProcessHelper.SUCCESS) {
                 throw new ProcessKillException("Couldn't stop process, exitCode=" + returnCode + ", output="
-                        + Joiner.on('\n').join(collectedOutput));
+                        + String.join("\n", collectedOutput));
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             throw new ProcessKillException(e);
         }
@@ -92,9 +90,9 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
                 }
             } else {
                 throw new ProcessKillException("Couldn't stop process tree for PID=" + procInformation.pid()
-                        + ", exitCode=" + returnCode + ", output=" + Joiner.on('\n').join(collectedOutput));
+                        + ", exitCode=" + returnCode + ", output=" + String.join("\n", collectedOutput));
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             throw new ProcessKillException(e);
         }
