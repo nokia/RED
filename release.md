@@ -1,3 +1,38 @@
+# RED - Robot Editor v0.7.8
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+
+## Updates
+
+- #98 It should be possible to launch tests event without interpreter defined
+- #99 Fixed font size in TestCases and Keywords tab
+- #107 Settings KWs are not case sensitive
+- #108 Update docs with red.xml and how to use Remote Server for libs
+- Fixes in table view
+- Resources are visible in project outside of workspace
+- Resolved paths problems
+	- Quick Fix on lib from PythonPath creates correct entry in red.xml
+- Improved dealing with variable files
+	- Display python/robot internal error with Error marker on Variable files when something goes wrong
+	- Variables taken from external python file are reloaded after edition
+	- Variable file extension should be checked
+- Messege Log view could wrap its content and save it
+- Changing red.xml file after renaming of project
+
+    
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+    
+    
+--------------------------------------------------------------------------------------------------------------------------   
 # RED - Robot Editor v0.7.7-fix
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
