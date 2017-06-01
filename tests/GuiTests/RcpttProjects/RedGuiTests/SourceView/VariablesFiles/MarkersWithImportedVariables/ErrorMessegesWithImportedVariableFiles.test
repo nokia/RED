@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _h5uwAEU1EeetgfqNXz7zjg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/31/17 10:51 AM
+Save-Time: 6/1/17 11:31 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -53,7 +53,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type BackSpace -times 5
     key-type "M1+s"
 }
-// verify error messege in Information Window on ruler and in Problems tab
+// verify error message in Information Window on ruler and in Problems tab
 get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
 get-window -from "Information Window" | get-editbox | get-property text | contains  "TypeError: get_variables() takes exactly 2 arguments (1 given)" 
 get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
@@ -79,7 +79,7 @@ with [get-editor "TestFile.robot"] {
         key-type Enter
     }
 }
-// verify error messege in Information Window on ruler and in Problems tab
+// verify error message in Information Window on ruler and in Problems tab
 wait-for-errors -amount 1 -times 2 -delay 1000
 get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
 get-window -from "Information Window" | get-editbox | get-property text | contains  "NameError: global name 'argg2' is not defined" 
@@ -103,7 +103,7 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+s"
     }
 }
-// verify error messege in Information Window on ruler and in Problems tab
+// verify error message in Information Window on ruler and in Problems tab
 wait-for-errors -amount 1 -times 2 -delay 1000
 get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
 get-window -from "Information Window" | get-editbox | get-property text | contains  "Importing variable file .* failed: SyntaxError: invalid syntax (var_file.py, line 3)\n" 
@@ -129,7 +129,7 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+s"
     }
 }
-// verify error messege in Information Window on ruler and in Problems tab
+// verify error message in Information Window on ruler and in Problems tab
 wait-for-errors -amount 1 -times 2 -delay 1000
 get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
 get-window -from "Information Window" | get-editbox | get-property text | contains  "TypeError: get_variables() takes exactly 1 argument (2 given)" 
@@ -162,7 +162,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     type-text PY
     key-type "M1+s"
 }
-// verify error messege in Information Window on ruler and in Problems tab
+// verify error message in Information Window on ruler and in Problems tab
 wait-for-errors -amount 1 -times 2 -delay 1000
 get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
 get-window -from "Information Window" | get-editbox | get-property text | contains  "Importing variable file .* failed: Not a valid file or directory to import." 
@@ -194,7 +194,7 @@ with [get-editor "TestFile.robot"] {
         hover-text 3 18
     }
 }
-// verify error messege in Information Window on ruler and in Problems tab
+// verify error message in Information Window on ruler and in Problems tab
 wait-for-errors -amount 2 -times 2 -delay 1000
 get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 3
 get-window -from "Information Window" | get-editbox | get-property text | contains  "TypeError: get_variables() takes exactly 1 argument (0 given)" 
@@ -221,7 +221,7 @@ with [get-editor "TestFile.robot"] {
         key-type Enter
     }
 }
-// verify warnings massege in Problems tab
+// verify warnings message in Problems tab
 wait-for-warnings -amount 1 -times 2 -delay 1000
 get-view Problems | get-tree 
     | get-item "Warnings \\(1 item\\)/Could not find any variable in variable file 'var_file.py'" 
