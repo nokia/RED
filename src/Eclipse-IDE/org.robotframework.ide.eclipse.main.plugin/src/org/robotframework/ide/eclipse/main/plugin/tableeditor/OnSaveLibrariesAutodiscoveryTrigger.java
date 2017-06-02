@@ -150,23 +150,27 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
     private List<LibraryImport> collectLibraryImportsIncludingNestedResources(final RobotSuiteFile suite,
             final Set<IResource> alreadyVisited) {
-        final IWorkspaceRoot workspaceRoot = suite.getFile().getWorkspace().getRoot();
         final RobotModel model = (RobotModel) suite.getProject().getParent();
 
         final List<LibraryImport> imports = collectLibraryImports(suite);
-        ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(suite)
+        for (final IFile resourceFile : findResourceImportFiles(suite, alreadyVisited)) {
+            alreadyVisited.add(resourceFile);
+            final RobotSuiteFile resourceSuite = model.createSuiteFile(resourceFile);
+            imports.addAll(collectLibraryImportsIncludingNestedResources(resourceSuite, alreadyVisited));
+        }
+        return imports;
+    }
+
+    private List<IFile> findResourceImportFiles(final RobotSuiteFile suite, final Set<IResource> alreadyVisited) {
+        final IWorkspaceRoot workspaceRoot = suite.getFile().getWorkspace().getRoot();
+        return ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(suite)
                 .stream()
                 .distinct()
                 .map(path -> workspaceRoot.findMember(path))
                 .filter(res -> res != null && res.exists() && res.getType() == IResource.FILE
                         && !alreadyVisited.contains(res))
                 .map(IFile.class::cast)
-                .forEach(file -> {
-                    alreadyVisited.add(file);
-                    final RobotSuiteFile resourceSuite = model.createSuiteFile(file);
-                    imports.addAll(collectLibraryImportsIncludingNestedResources(resourceSuite, alreadyVisited));
-                });
-        return imports;
+                .collect(Collectors.toList());
     }
 
     private List<LibraryImport> collectLibraryImports(final RobotSuiteFile currentModel) {
