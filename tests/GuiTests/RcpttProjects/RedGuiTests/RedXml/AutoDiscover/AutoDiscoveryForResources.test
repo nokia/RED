@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _AessoB3CEeehL98jfxP8Sw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/10/17 9:55 AM
+Save-Time: 6/5/17 11:39 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,22 +22,12 @@ with [get-editor "test_with_resource.robot" | get-text-viewer] {
     key-type "NUMPAD_9" 9
     key-type "M1+s"
 }
-
-
-
-//check that no window was shown
-verify-error{get-window "Discovering libraries summary"}
-
-//workaround
-get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
-
+get-window "Discovering libraries summary" | get-button OK | click
 //uncomment lib that exist in suite file
 with [get-editor "test_with_resource.robot" | get-text-viewer] {
     set-caret-pos 4 2
     key-type BackSpace
 }
-
 try -times 4 -delay 1 -command{
 	with [get-editor "test_with_resource.robot" | get-text-viewer] {
 	    get-property "styles[8].text" | equals "multiply.py" | verify-true
@@ -47,30 +37,56 @@ try -times 4 -delay 1 -command{
 with [get-editor "test_with_resource.robot" | get-text-viewer] {
     key-type "M1+s"
 }
-
 wait-for-discover-window
-
-//check that now file are imported
+//check that now file are imported wrong
 with [get-window "Discovering libraries summary" | get-tree] {
-    get-item res1 | get-property "image.path" 
-        | equals ".*/success_big.png" | verify-true
     get-item multiply | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-item res1 | get-property "image.path" 
+        | equals ".*/warning_big.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+// clean red.xml
+remove-all-libraries-from-xml
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | close
+// set correct path to library in project
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
+    set-caret-pos 4 12
+    type-text "../"
+    key-type "M1+s"
+}
+// check if libraries are imported correct
+wait-for-discover-window
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item multiply | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-item res1 | get-property "image.path" 
         | equals ".*/success_big.png" | verify-true
 }
 get-window "Discovering libraries summary" | get-button OK | click
-
-remove-all-libraries-from-xml
-
-
-//----------------------------------------------------------------------------------------------------------------------
-//open resource file and add new line
-get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" | double-click
-with [get-editor "resource.robot" | get-text-viewer] {
-    set-caret-pos 2 37
-    key-type "NUMPAD_ENTER" "\\u000D"
+// validate
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
+    set-caret-pos 8 12
+    type-text 6
     key-type "M1+s"
 }
-
+get-window "Discovering libraries summary" | get-button OK | click
+// clean red.xml
+remove-all-libraries-from-xml
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | close
+//----------------------------------------------------------------------------------------------------------------------
+//open resource file and add new line
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/resources" | select "RobotProject/resources" | double-click
+    select "RobotProject/resources/resource.robot" | double-click
+}
+with [get-editor "resource.robot" | get-text-viewer] {
+    set-caret-pos 2 12
+    type-text "../"
+    key-type "M1+s"
+}
 wait-for-discover-window
 //check icon that lib was added
 get-window "Discovering libraries summary" | get-tree | select res1
@@ -117,4 +133,128 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-property itemCount | equals 1 | verify-true
     get-item "res1 - RobotProject\\/libs\\/for_resource" | get-property index | equals 0 | verify-true
 }
+//--------------------------change location of project------------------------------------------------------------------------------
+// clean red.xml
+remove-all-libraries-from-xml
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | close
+// change location of resource library
+get-editor "test_with_resource.robot" | click
+get-view "Project Explorer" | get-tree | select "RobotProject/libs/for_resource" | get-menu "New/Folder" | click
+with [get-window "New Folder"] {
+    get-editbox -after [get-label "Folder name:"] | set-text res
+    get-button Finish | click
+}
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/libs/for_resource/res1.py"
+    get-item "RobotProject/libs/for_resource/res1.py" | drag-start 3 12
+    get-item "RobotProject/libs/for_resource/res" | drag-enter 8 16 -detail move
+    get-item "RobotProject/libs/for_resource/res" | drag-over 10 10 -detail move
+    get-item "RobotProject/libs/for_resource/res" | drag-exit
+    get-item "RobotProject/libs/for_resource/res" | drag-accept 10 10 -detail move
+    drag-set-data
+    get-item "RobotProject/libs/for_resource/res" | drop 10 10 -detail move
+    drag-end -detail mov
+    // change location of project
+    select "RobotProject/tests/test_with_resource.robot" | get-menu "Move..." | click
+}
+with [get-window "Move Resources"] {
+    get-tree | select RobotProject
+    get-button OK | click
+}
+// change location of resource
+get-view "Project Explorer" | get-tree | select "RobotProject/resources" | get-menu "New/Folder" | click
+with [get-window "New Folder"] {
+    get-editbox -after [get-label "Folder name:"] | set-text res
+    get-button Finish | click
+}
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/resources/resource.robot"
+    get-item "RobotProject/resources/resource.robot" | drag-start 10 10
+    get-item "RobotProject/resources/res" | drag-enter 12 13 -detail move
+    get-item "RobotProject/resources/res" | drag-over 12 7 -detail move
+    get-item "RobotProject/resources/res" | drag-exit
+    get-item "RobotProject/resources/res" | drag-accept 12 7 -detail move
+    drag-set-data
+    get-item "RobotProject/resources/res" | drop 12 7 -detail move
+    drag-end -detail move
+    select "RobotProject/test_with_resource.robot" | double-click
+}
+// change path to resources and libraries
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
+    set-caret-pos 3 26
+    type-text "res/"
+    set-caret-pos 4 15
+    key-type BackSpace -times 3
+    set-caret-pos 3 16
+    key-type BackSpace -times 3
+}
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/libs/for_resource/res" | double-click
+    select "RobotProject/libs/for_resource/res/res1.py" | double-click
+}
+get-editor "test_with_resource.robot" | click
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/resources" | double-click
+    select "RobotProject/resources/res" | double-click
+    select "RobotProject/resources/res/resource.robot" | double-click
+}
+with [get-editor "resource.robot" | get-text-viewer] {
+    set-caret-pos 2 15
+    type-text "../"
+    set-caret-pos 2 35
+    type-text "/res"
+    key-type "M1+s"
+}
+get-window "Discovering libraries summary" | get-button OK | click
+with [get-editor "resource.robot" | get-text-viewer] {
+    set-caret-pos 2 47
+    type-text " "
+    key-type "M1+s"
+}
+with [get-editor "test_with_resource.robot"] {
+    key-type "M1+s"
+}
+// varify status of recourse library
+with [get-window "Discovering libraries summary"] {
+    get-tree | get-item "res1/Status: Already existing in project configuration" | click
+    get-button OK | click
+}
+// clean red.xml
+remove-all-libraries-from-xml
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+get-editor "RobotProject/red.xml" | close
+// validate
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
+    set-caret-pos 9 1
+    type-text "  "
+    key-type "M1+s"
+}
+// varify status of discovered libraries
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item multiply | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-item res1 | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+// verify red.xml paths
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" 
+    | get-menu "Open With/Text Editor" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"res1\" path=\"RobotProject/libs/for_resource/res\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"multiply\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>true</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
