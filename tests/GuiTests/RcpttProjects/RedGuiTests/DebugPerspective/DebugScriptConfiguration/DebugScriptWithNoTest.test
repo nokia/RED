@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __tiIYBVQEeeZSZgUeG7ZOA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/25/17 10:25 AM
+Save-Time: 6/5/17 2:22 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -46,7 +46,7 @@ let [val script_name [os-specific "script_win.bat" "script_lin.sh"]]{
 	try -command{
 		get-view Console | get-text-viewer | get-property text 
 		    | equals [format "Command: .*%s .* .*python.* -m robot.run --listener .*TestRunnerAgent.py:43981 --argumentfile .*\.arg .*ScriptProject\n"
-		    + "Suite Executor: Robot Framework .*\n"
+		    + "Suite Executor: <unknown>\n"
 		    + "Hello!" $script_name] | verify-true
 	}-catch{
 		get-view Console | get-text-viewer | get-property text 
