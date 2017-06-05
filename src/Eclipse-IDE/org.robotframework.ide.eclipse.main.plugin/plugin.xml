@@ -1155,7 +1155,7 @@
           name="Delete section">
        <commandParameter
              id="org.robotframework.ide.eclipse.deleteSection.sectionName"
-             name="name"
+             name="Section Name"
              optional="false">
        </commandParameter>
     </command>
@@ -1165,7 +1165,17 @@
           name="Find keyword usages in workspace">
        <commandParameter
              id="org.robotframework.ide.eclipse.findElementUsages.place"
-             name="name"
+             name="place"
+             optional="false">
+       </commandParameter>
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.findElementInTextUsages"
+          name="Find keyword usages in workspace">
+       <commandParameter
+             id="org.robotframework.ide.eclipse.findElementUsages.place"
+             name="place"
              optional="false">
        </commandParameter>
     </command>
@@ -1643,6 +1653,16 @@
                 </and>
              </with>
           </and>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.FindElementUsagesInTextHandler"
+          commandId="org.robotframework.ide.eclipse.findElementInTextUsages">
+   
+       <activeWhen>
+        <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
        </activeWhen>
     </handler>
     <handler
@@ -4436,6 +4456,27 @@
                </with>
             </visibleWhen>
          </menu>
+           <menu
+             label="References">
+          <command
+                commandId="org.robotframework.ide.eclipse.findElementInTextUsages"
+                label="Workspace"
+                style="push">
+             <parameter
+                   name="org.robotframework.ide.eclipse.findElementUsages.place"
+                   value="workspace">
+             </parameter>
+          </command>
+          <command
+                commandId="org.robotframework.ide.eclipse.findElementInTextUsages"
+                label="Project"
+                style="push">
+             <parameter
+                   name="org.robotframework.ide.eclipse.findElementUsages.place"
+                   value="project">
+             </parameter>
+          </command>
+       </menu>
          <menu
                label="Source">
             <command
