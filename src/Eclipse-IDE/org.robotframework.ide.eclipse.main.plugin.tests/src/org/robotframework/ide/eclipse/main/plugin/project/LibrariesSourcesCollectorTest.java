@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.ProjectProvider;
@@ -105,6 +107,29 @@ public class LibrariesSourcesCollectorTest {
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
         assertThat(searchPaths.getClassPaths()).containsOnly(".");
         assertThat(searchPaths.getPythonPaths()).containsOnly(projectProvider.getDir("a").getLocation().toOSString());
+    }
+
+    @Test
+    public void collectedPathsAreExtendedWithPathsFromProjectConfiguration() throws Exception {
+        projectProvider.createDir("python_path");
+        projectProvider.createDir("java_path");
+        projectProvider.createFile("lib.py");
+        projectProvider.createFile("lib.jar");
+
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.addPythonPath(SearchPath.create(projectProvider.getDir("python_path").getLocation().toOSString()));
+        config.addClassPath(SearchPath.create(projectProvider.getDir("java_path").getLocation().toOSString()));
+        projectProvider.configure(config);
+
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector();
+        collector.collectPythonAndJavaLibrariesSources(project);
+
+        final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
+        assertThat(searchPaths.getClassPaths()).containsOnly(".",
+                projectProvider.getFile("lib.jar").getLocation().toOSString(),
+                projectProvider.getDir("java_path").getLocation().toOSString());
+        assertThat(searchPaths.getPythonPaths()).containsOnly(projectProvider.getProject().getLocation().toOSString(),
+                projectProvider.getDir("python_path").getLocation().toOSString());
     }
 
     @Test
