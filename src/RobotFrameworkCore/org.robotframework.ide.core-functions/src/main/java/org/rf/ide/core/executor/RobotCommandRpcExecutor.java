@@ -370,7 +370,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Boolean isVirtualenv() {
+    public boolean isVirtualenv() {
         try {
             return (Boolean) callRpcFunction("isVirtualenv");
         } catch (final XmlRpcException e) {
