@@ -454,10 +454,7 @@ public class RobotRuntimeEnvironment {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            final Boolean result = executor.isVirtualenv();
-            if (result != null) {
-                return result;
-            }
+            return executor.isVirtualenv();
         }
         return false;
     }

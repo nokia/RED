@@ -351,7 +351,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenResourceFileIsImportedViaSysPathFromWorksapce() throws Exception {
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedViaSysPathFromWorkspace() throws Exception {
         final IFolder dir = projectProvider.createDir("dir");
         projectProvider.createFile("dir/res.robot");
 
@@ -394,7 +394,7 @@ public class GeneralSettingsResourcesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenResourceFileIsImportedViaRedXmlPythonPathFromWorksapce()
+    public void noMajorProblemsAreReported_whenResourceFileIsImportedViaRedXmlPythonPathFromWorkspace()
             throws Exception {
         final IFolder dir = projectProvider.createDir("dir");
         projectProvider.createFile("dir/res.robot");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Nokia Solutions and Networks
+ * Copyright 2017 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -63,7 +63,7 @@ public class SourceOpeningSupport {
         if (kwSource.isPresent()) {
             try {
                 final RobotDryRunKeywordSource source = kwSource.get();
-                final IPath location = new Path(source.getFilePath());
+                final IPath location = resolveLocation(project, source);
                 final IFile file = resolveFile(location, project, libSpec);
                 final IEditorPart editor = openInEditor(page, file);
                 final TextEditor textEditor = editor.getAdapter(TextEditor.class);
@@ -76,6 +76,11 @@ public class SourceOpeningSupport {
         } else {
             open(page, model, project, libSpec);
         }
+    }
+
+    private static IPath resolveLocation(final IProject project, final RobotDryRunKeywordSource source) {
+        final Path path = new Path(source.getFilePath());
+        return path.isAbsolute() ? path : project.getLocation().append(path);
     }
 
     private static Optional<RobotDryRunKeywordSource> tryToFindKeywordSource(final RobotModel model,

@@ -301,7 +301,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaSysPathFromWorksapce() throws Exception {
+    public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaSysPathFromWorkspace() throws Exception {
         final IFolder dir = projectProvider.createDir("dir");
         projectProvider.createFile("dir/res.robot");
 
@@ -344,7 +344,7 @@ public class GeneralSettingsVariablesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaRedXmlPythonPathFromWorksapce()
+    public void noMajorProblemsAreReported_whenVariablesFileIsImportedViaRedXmlPythonPathFromWorkspace()
             throws Exception {
         final IFolder dir = projectProvider.createDir("dir");
         projectProvider.createFile("dir/res.robot");

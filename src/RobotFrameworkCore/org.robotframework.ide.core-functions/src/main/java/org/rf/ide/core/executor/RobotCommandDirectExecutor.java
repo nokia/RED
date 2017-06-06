@@ -269,7 +269,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Boolean isVirtualenv() {
+    public boolean isVirtualenv() {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_virtualenv_check.py");
             final List<String> cmdLine = createCommandLine(scriptFile);

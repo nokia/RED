@@ -385,7 +385,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromWorksapce() throws Exception {
+    public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaSysPathFromWorkspace() throws Exception {
         final String libPath = projectProvider.getProject().getName() + "/dir";
 
         final IFolder dir = projectProvider.createDir("dir");
@@ -443,7 +443,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaRedXmlPythonPathFromWorksapce()
+    public void noMajorProblemsAreReported_whenLibraryFileIsImportedViaRedXmlPythonPathFromWorkspace()
             throws Exception {
         final String libPath = projectProvider.getProject().getName() + "/dir";
         final IFolder dir = projectProvider.createDir("dir");
