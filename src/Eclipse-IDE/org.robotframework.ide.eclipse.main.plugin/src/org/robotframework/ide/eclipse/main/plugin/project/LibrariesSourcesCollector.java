@@ -28,15 +28,13 @@ class LibrariesSourcesCollector {
 
     void collectPythonAndJavaLibrariesSources(final RobotProject robotProject) throws CoreException {
         collectPathLocations(robotProject.getProject());
-        pythonpathLocations.addAll(robotProject.getPythonpath());
-        classpathLocations.addAll(robotProject.getClasspath());
+        addPathLocationsFromProject(robotProject);
     }
 
     void collectPythonAndJavaLibrariesSources(final RobotProject robotProject, final int maxDepth)
             throws CoreException {
         collectPathLocations(robotProject.getProject(), 0, maxDepth);
-        pythonpathLocations.addAll(robotProject.getPythonpath());
-        classpathLocations.addAll(robotProject.getClasspath());
+        addPathLocationsFromProject(robotProject);
     }
 
     private void collectPathLocations(final IContainer parent) throws CoreException {
@@ -70,6 +68,11 @@ class LibrariesSourcesCollector {
                 classpathLocations.add(fileLocation.toOSString());
             }
         }
+    }
+
+    private void addPathLocationsFromProject(final RobotProject robotProject) {
+        pythonpathLocations.addAll(robotProject.getPythonpath());
+        classpathLocations.addAll(robotProject.getClasspath());
     }
 
     EnvironmentSearchPaths getEnvironmentSearchPaths() {
