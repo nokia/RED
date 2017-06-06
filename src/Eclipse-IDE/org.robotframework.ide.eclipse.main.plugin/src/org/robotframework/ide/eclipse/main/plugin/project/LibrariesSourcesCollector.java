@@ -5,94 +5,64 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
-import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
-
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**
  * @author mmarzec
  */
-public class LibrariesSourcesCollector {
+class LibrariesSourcesCollector {
 
-    private final RobotProject robotProject;
+    private final Set<String> pythonpathLocations = new LinkedHashSet<>();
 
-    private final Set<String> pythonpathLocations = new HashSet<>();
+    private final Set<String> classpathLocations = new LinkedHashSet<>();
 
-    private final Set<String> classpathLocations = new HashSet<>();
-
-    public LibrariesSourcesCollector(final RobotProject robotProject) {
-        this.robotProject = robotProject;
-    }
-
-    public void collectPythonAndJavaLibrariesSources() throws CoreException {
-        if (shouldCollectLibrariesRecursively()) {
-            collectLocationsWithPythonAndJavaMembersRecursively(robotProject.getProject().members());
-        } else {
-            collectOnlyParentLocationsWithPythonAndJavaMembers(robotProject.getProject().members());
-        }
-
-        final IPath projectLocation = robotProject.getProject().getLocation();
-        if (projectLocation != null) {
-            pythonpathLocations.add(projectLocation.toOSString());
-        }
+    void collectPythonAndJavaLibrariesSources(final RobotProject robotProject) throws CoreException {
+        collectPathLocations(robotProject.getProject());
         pythonpathLocations.addAll(robotProject.getPythonpath());
-
         classpathLocations.addAll(robotProject.getClasspath());
     }
 
-    private boolean shouldCollectLibrariesRecursively() throws CoreException {
-        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-        if (runtimeEnvironment == null) {
-            throw newCoreException(
-                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
-        }
-        return !runtimeEnvironment.isVirtualenv()
-                || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled();
+    void collectPythonAndJavaLibrariesSources(final RobotProject robotProject, final int maxDepth)
+            throws CoreException {
+        collectPathLocations(robotProject.getProject(), 0, maxDepth);
+        pythonpathLocations.addAll(robotProject.getPythonpath());
+        classpathLocations.addAll(robotProject.getClasspath());
     }
 
-    private void collectLocationsWithPythonAndJavaMembersRecursively(final IResource[] members) throws CoreException {
-        if (members != null) {
-            for (int i = 0; i < members.length; i++) {
-                final IResource resource = members[i];
-                if (resource.getType() == IResource.FILE) {
-                    checkFileExtensionAndAddToProperLocations(resource);
-                } else if (resource.getType() == IResource.FOLDER) {
-                    collectLocationsWithPythonAndJavaMembersRecursively(((IFolder) resource).members());
-                }
+    private void collectPathLocations(final IContainer parent) throws CoreException {
+        for (final IResource resource : parent.members()) {
+            if (resource.getType() == IResource.FILE) {
+                checkFileExtensionAndAddToProperLocations((IFile) resource);
+            } else if (resource.getType() == IResource.FOLDER) {
+                collectPathLocations((IFolder) resource);
             }
         }
     }
 
-    private void collectOnlyParentLocationsWithPythonAndJavaMembers(final IResource[] members) throws CoreException {
-        if (members != null) {
-            for (int i = 0; i < members.length; i++) {
-                final IResource resource = members[i];
-                if (resource.getType() == IResource.FOLDER) {
-                    final IResource[] folderMembers = ((IFolder) resource).members();
-                    for (int j = 0; j < folderMembers.length; j++) {
-                        final IResource folderMember = folderMembers[j];
-                        if (folderMember.getType() == IResource.FILE) {
-                            checkFileExtensionAndAddToProperLocations(folderMember);
-                        }
-                    }
-                }
+    private void collectPathLocations(final IContainer parent, final int currentDepth, final int maxDepth)
+            throws CoreException {
+        for (final IResource resource : parent.members()) {
+            if (resource.getType() == IResource.FILE) {
+                checkFileExtensionAndAddToProperLocations((IFile) resource);
+            } else if (resource.getType() == IResource.FOLDER && currentDepth < maxDepth) {
+                collectPathLocations((IFolder) resource, currentDepth + 1, maxDepth);
             }
         }
     }
 
-    public void checkFileExtensionAndAddToProperLocations(final IResource resource) {
-        final String fileExtension = resource.getFileExtension();
-        final IPath fileLocation = resource.getLocation();
+    private void checkFileExtensionAndAddToProperLocations(final IFile file) {
+        final String fileExtension = file.getFileExtension();
+        final IPath fileLocation = file.getLocation();
         if (fileExtension != null && fileLocation != null) {
             if (fileExtension.equals("py")) {
                 pythonpathLocations.add(fileLocation.toFile().getParent());
@@ -102,7 +72,7 @@ public class LibrariesSourcesCollector {
         }
     }
 
-    public EnvironmentSearchPaths getEnvironmentSearchPaths() {
+    EnvironmentSearchPaths getEnvironmentSearchPaths() {
         return new EnvironmentSearchPaths(classpathLocations, pythonpathLocations);
     }
 

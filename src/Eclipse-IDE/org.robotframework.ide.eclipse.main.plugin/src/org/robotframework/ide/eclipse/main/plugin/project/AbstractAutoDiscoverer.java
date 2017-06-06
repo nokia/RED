@@ -37,6 +37,7 @@ import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -46,6 +47,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 public abstract class AbstractAutoDiscoverer {
 
     private static final AtomicBoolean IS_DRY_RUN_RUNNING = new AtomicBoolean(false);
+
+    private static final int VIRTUAL_ENV_SEARCH_DEPTH = 1;
 
     final RobotProject robotProject;
 
@@ -71,7 +74,7 @@ public abstract class AbstractAutoDiscoverer {
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
         this.suiteFiles = new ArrayList<IResource>(suiteFiles);
         this.dryRunTargetsCollector = dryRunTargetsCollector;
-        this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
+        this.librariesSourcesCollector = new LibrariesSourcesCollector();
         this.dryRunHandler = new RobotDryRunHandler();
     }
 
@@ -105,7 +108,13 @@ public abstract class AbstractAutoDiscoverer {
         subMonitor.setWorkRemaining(3);
 
         try {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources();
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            if (runtimeEnvironment == null) {
+                throw newCoreException(
+                        "There is no active runtime environment for project '" + robotProject.getName() + "'");
+            }
+
+            collectLibrarySources(runtimeEnvironment);
             subMonitor.worked(1);
 
             dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, suiteFiles);
@@ -113,7 +122,8 @@ public abstract class AbstractAutoDiscoverer {
 
             subMonitor.subTask("Executing Robot dry run...");
             if (!subMonitor.isCanceled()) {
-                executeDryRun(suiteName -> subMonitor.subTask("Executing Robot dry run on suite: " + suiteName));
+                executeDryRun(runtimeEnvironment,
+                        suiteName -> subMonitor.subTask("Executing Robot dry run on suite: " + suiteName));
             }
             subMonitor.worked(1);
         } catch (final CoreException | IOException e) {
@@ -123,14 +133,17 @@ public abstract class AbstractAutoDiscoverer {
         }
     }
 
-    private void executeDryRun(final Consumer<String> startSuiteHandler)
-            throws CoreException, InterruptedException, IOException {
-        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-        if (runtimeEnvironment == null) {
-            throw newCoreException(
-                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
+    private void collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment) throws CoreException {
+        if (!runtimeEnvironment.isVirtualenv()
+                || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()) {
+            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(robotProject);
+        } else {
+            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(robotProject, VIRTUAL_ENV_SEARCH_DEPTH);
         }
+    }
 
+    private void executeDryRun(final RobotRuntimeEnvironment runtimeEnvironment,
+            final Consumer<String> startSuiteHandler) throws CoreException, InterruptedException, IOException {
         final String host = AgentConnectionServer.DEFAULT_CONNECTION_HOST;
         final int port = AgentConnectionServer.findFreePort();
         final int timeout = AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT;
