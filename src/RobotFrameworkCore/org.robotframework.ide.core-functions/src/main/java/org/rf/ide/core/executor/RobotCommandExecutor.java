@@ -31,7 +31,7 @@ interface RobotCommandExecutor {
 
     String getRobotVersion();
 
-    Boolean isVirtualenv();
+    boolean isVirtualenv();
 
     void createLibdocForStdLibrary(String resultFilePath, String libName, String libPath);
 
