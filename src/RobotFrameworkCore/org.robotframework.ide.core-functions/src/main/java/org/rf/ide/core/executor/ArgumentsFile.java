@@ -71,6 +71,8 @@ public class ArgumentsFile {
 
     File writeToTemporaryOrUseAlreadyExisting() throws IOException {
         final String content = generateContent();
+        // it's deprecated although we don't need security here, so md5 is fine
+        @SuppressWarnings("deprecation")
         final HashFunction md5Hasher = Hashing.md5();
         final HashCode hash = md5Hasher.hashString(content, Charsets.UTF_8);
 
@@ -78,8 +80,8 @@ public class ArgumentsFile {
         final Path dir = RobotRuntimeEnvironment.createTemporaryDirectory();
 
         for (final File existingArgFile : dir.toFile().listFiles((d, name) -> name.equals(fileName))) {
-            final HashCode candidateHash = md5Hasher.hashString(Files.toString(existingArgFile, Charsets.UTF_8),
-                    Charsets.UTF_8);
+            final HashCode candidateHash = md5Hasher
+                    .hashString(Files.asCharSource(existingArgFile, Charsets.UTF_8).read(), Charsets.UTF_8);
             if (hash.equals(candidateHash)) {
                 return existingArgFile;
             }
@@ -94,6 +96,6 @@ public class ArgumentsFile {
         if (!file.exists()) {
             file.createNewFile();
         }
-        Files.write(generateContent(), file, Charsets.UTF_8);
+        Files.asCharSink(file, Charsets.UTF_8).write(generateContent());
     }
 }
