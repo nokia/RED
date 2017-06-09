@@ -5,9 +5,8 @@
  */
 package org.rf.ide.core.executor;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import com.google.common.base.Objects;
@@ -15,16 +14,15 @@ import com.google.common.collect.ImmutableSet;
 
 /**
  * @author Michal Anglart
- *
  */
 public final class EnvironmentSearchPaths {
 
-    private final Set<String> classPaths = new HashSet<>();
+    private final Set<String> classPaths = new LinkedHashSet<>();
 
-    private final Set<String> pythonPaths = new HashSet<>();
+    private final Set<String> pythonPaths = new LinkedHashSet<>();
 
     public EnvironmentSearchPaths() {
-        this(new ArrayList<String>(), new ArrayList<String>());
+        this(new LinkedHashSet<>(), new LinkedHashSet<>());
     }
 
     public EnvironmentSearchPaths(final Collection<String> classPaths, final Collection<String> pythonPaths) {
@@ -65,7 +63,7 @@ public final class EnvironmentSearchPaths {
     }
 
     public Collection<String> getExtendedPythonPaths(final SuiteExecutor interpreter) {
-        final Set<String> extendedPythonPaths = new HashSet<>(pythonPaths);
+        final Set<String> extendedPythonPaths = new LinkedHashSet<>(pythonPaths);
         if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
             // Both Jython and IronPython does not include paths from PYTHONPATH into
             // sys.path list
@@ -81,8 +79,7 @@ public final class EnvironmentSearchPaths {
         }
         if (obj instanceof EnvironmentSearchPaths) {
             final EnvironmentSearchPaths that = (EnvironmentSearchPaths) obj;
-            return this.classPaths.equals(that.classPaths)
-                    && this.pythonPaths.equals(that.pythonPaths);
+            return this.classPaths.equals(that.classPaths) && this.pythonPaths.equals(that.pythonPaths);
         }
         return false;
     }
