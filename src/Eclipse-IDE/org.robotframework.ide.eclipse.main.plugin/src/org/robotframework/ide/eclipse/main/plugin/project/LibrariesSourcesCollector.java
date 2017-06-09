@@ -22,19 +22,22 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
  */
 class LibrariesSourcesCollector {
 
+    private final RobotProject robotProject;
+
     private final Set<String> pythonpathLocations = new LinkedHashSet<>();
 
     private final Set<String> classpathLocations = new LinkedHashSet<>();
 
-    void collectPythonAndJavaLibrariesSources(final RobotProject robotProject) throws CoreException {
-        collectPathLocations(robotProject.getProject());
-        addPathLocationsFromProject(robotProject);
+    LibrariesSourcesCollector(final RobotProject robotProject) {
+        this.robotProject = robotProject;
     }
 
-    void collectPythonAndJavaLibrariesSources(final RobotProject robotProject, final int maxDepth)
-            throws CoreException {
+    void collectPythonAndJavaLibrariesSources() throws CoreException {
+        collectPathLocations(robotProject.getProject());
+    }
+
+    void collectPythonAndJavaLibrariesSources(final int maxDepth) throws CoreException {
         collectPathLocations(robotProject.getProject(), 0, maxDepth);
-        addPathLocationsFromProject(robotProject);
     }
 
     private void collectPathLocations(final IContainer parent) throws CoreException {
@@ -70,13 +73,12 @@ class LibrariesSourcesCollector {
         }
     }
 
-    private void addPathLocationsFromProject(final RobotProject robotProject) {
-        pythonpathLocations.addAll(robotProject.getPythonpath());
-        classpathLocations.addAll(robotProject.getClasspath());
-    }
-
     EnvironmentSearchPaths getEnvironmentSearchPaths() {
-        return new EnvironmentSearchPaths(classpathLocations, pythonpathLocations);
+        final EnvironmentSearchPaths environmentSearchPaths = new RedEclipseProjectConfig(
+                robotProject.getRobotProjectConfig()).createEnvironmentSearchPaths(robotProject.getProject());
+        pythonpathLocations.forEach(environmentSearchPaths::addPythonPath);
+        classpathLocations.forEach(environmentSearchPaths::addClassPath);
+        return environmentSearchPaths;
     }
 
 }

@@ -74,7 +74,7 @@ public abstract class AbstractAutoDiscoverer {
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
         this.suiteFiles = new ArrayList<IResource>(suiteFiles);
         this.dryRunTargetsCollector = dryRunTargetsCollector;
-        this.librariesSourcesCollector = new LibrariesSourcesCollector();
+        this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
         this.dryRunHandler = new RobotDryRunHandler();
     }
 
@@ -136,9 +136,9 @@ public abstract class AbstractAutoDiscoverer {
     private void collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment) throws CoreException {
         if (!runtimeEnvironment.isVirtualenv()
                 || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()) {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(robotProject);
+            librariesSourcesCollector.collectPythonAndJavaLibrariesSources();
         } else {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(robotProject, VIRTUAL_ENV_SEARCH_DEPTH);
+            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(VIRTUAL_ENV_SEARCH_DEPTH);
         }
     }
 
