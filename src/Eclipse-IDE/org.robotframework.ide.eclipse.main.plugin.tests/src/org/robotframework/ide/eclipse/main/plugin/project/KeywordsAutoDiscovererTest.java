@@ -41,6 +41,7 @@ public class KeywordsAutoDiscovererTest {
     public void before() throws Exception {
         final RobotModel model = new RobotModel();
         project = model.createRobotProject(projectProvider.getProject());
+        projectProvider.createDir("libs");
         libraries = new HashMap<>();
     }
 
@@ -52,8 +53,8 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(project).start();
 
-        verifyKwSource("TestLib.Kw X", "TestLib.py", 1, 4, 4);
-        verifyKwSource("TestLib.Kw Abc", "TestLib.py", 3, 6, 6);
+        verifyKwSource("TestLib.Kw X", "libs/TestLib.py", 1, 4, 4);
+        verifyKwSource("TestLib.Kw Abc", "libs/TestLib.py", 3, 6, 6);
     }
 
     @Test
@@ -64,8 +65,8 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(project).start();
 
-        verifyKwSource("First.Kw X", "First.py", 1, 4, 4);
-        verifyKwSource("Second.Kw X", "Second.py", 0, 4, 4);
+        verifyKwSource("First.Kw X", "libs/First.py", 1, 4, 4);
+        verifyKwSource("Second.Kw X", "libs/Second.py", 0, 4, 4);
     }
 
     @Test
@@ -78,8 +79,8 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(project).start();
 
-        verifyKwSource("Decorated.Add ${x:\\d+}", "Decorated.py", 3, 4, 3);
-        verifyKwSource("Decorated.Deco", "Decorated.py", 6, 4, 16);
+        verifyKwSource("Decorated.Add ${x:\\d+}", "libs/Decorated.py", 3, 4, 3);
+        verifyKwSource("Decorated.Deco", "libs/Decorated.py", 6, 4, 16);
     }
 
     @Test
@@ -90,34 +91,34 @@ public class KeywordsAutoDiscovererTest {
 
         new KeywordsAutoDiscoverer(project).start();
 
-        verifyKwSource("DynaLib.Dyna Kw", "DynaLib.py", 3, 6, 11);
-        verifyKwSource("DynaLib.Other Kw", "DynaLib.py", 3, 6, 11);
+        verifyKwSource("DynaLib.Dyna Kw", "libs/DynaLib.py", 3, 6, 11);
+        verifyKwSource("DynaLib.Other Kw", "libs/DynaLib.py", 3, 6, 11);
     }
 
     @Test
     public void testKeywordsFromClassHierarchy() throws Exception {
-        projectProvider.createFile("Parent.py", "class Parent:", "  def parent_kw(self, arg):", "    pass");
+        projectProvider.createFile("libs/Parent.py", "class Parent:", "  def parent_kw(self, arg):", "    pass");
         libraries.putAll(createLibrary("Child", new String[] { "import Parent", "class Child(Parent.Parent):",
                 "  def child_kw(self, arg):", "    pass" }));
         configureProject();
 
         new KeywordsAutoDiscoverer(project).start();
 
-        verifyKwSource("Child.Parent Kw", "Parent.py", 1, 6, 9);
-        verifyKwSource("Child.Child Kw", "Child.py", 2, 6, 8);
+        verifyKwSource("Child.Parent Kw", "libs/Parent.py", 1, 6, 9);
+        verifyKwSource("Child.Child Kw", "libs/Child.py", 2, 6, 8);
     }
 
     @Test
     public void testKeywordsFromImportedLibraries() throws Exception {
-        projectProvider.createFile("External.py", "def ex_kw(args):", "  pass");
+        projectProvider.createFile("libs/External.py", "def ex_kw(args):", "  pass");
         libraries.putAll(createLibrary("Internal",
                 new String[] { "from External import ex_kw", "def int_kw(args):", "  pass" }));
         configureProject();
 
         new KeywordsAutoDiscoverer(project).start();
 
-        verifyKwSource("Internal.Ex Kw", "External.py", 0, 4, 5);
-        verifyKwSource("Internal.Int Kw", "Internal.py", 1, 4, 6);
+        verifyKwSource("Internal.Ex Kw", "libs/External.py", 0, 4, 5);
+        verifyKwSource("Internal.Int Kw", "libs/Internal.py", 1, 4, 6);
     }
 
     private Map<ReferencedLibrary, LibrarySpecification> createLibrary(final String name, final String[] lines)
@@ -128,7 +129,7 @@ public class KeywordsAutoDiscovererTest {
         library.setPath(projectProvider.getProject().getName());
 
         final LibrarySpecification libSpec = new LibrarySpecification();
-        final String filePath = library.getName() + ".py";
+        final String filePath = "libs/" + library.getName() + ".py";
         final IFile libFile = projectProvider.createFile(filePath, lines);
         libSpec.setName(library.getName());
         libSpec.setSourceFile(libFile);
