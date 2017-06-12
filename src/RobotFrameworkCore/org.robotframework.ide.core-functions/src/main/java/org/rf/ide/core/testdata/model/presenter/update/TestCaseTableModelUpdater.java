@@ -1,6 +1,7 @@
 package org.rf.ide.core.testdata.model.presenter.update;
 
-import java.util.Arrays;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -33,7 +34,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<TestCase> {
 
-    private static final List<IExecutablesStepsHolderElementOperation<TestCase>> elementOparations = Arrays.asList(
+    private static final List<IExecutablesStepsHolderElementOperation<TestCase>> ELEMENT_OPERATIONS = newArrayList(
             new TestCaseExecutableRowModelOperation(), new TestCaseDocumentationModelOperation(),
             new TestCaseSetupModelOperation(), new TestCaseTagsModelOperation(), new TestCaseTeardownModelOperation(),
             new TestCaseTemplateModelOperation(), new TestCaseTimeoutModelOperation(),
@@ -121,7 +122,7 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
 
     @VisibleForTesting
     IExecutablesStepsHolderElementOperation<TestCase> getOperationHandler(final ModelType elementModelType) {
-        for (final IExecutablesStepsHolderElementOperation<TestCase> operation : elementOparations) {
+        for (final IExecutablesStepsHolderElementOperation<TestCase> operation : ELEMENT_OPERATIONS) {
             if (operation.isApplicable(elementModelType)) {
                 return operation;
             }
@@ -137,7 +138,7 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
 
     @VisibleForTesting
     IExecutablesStepsHolderElementOperation<TestCase> getOperationHandler(final IRobotTokenType type) {
-        for (final IExecutablesStepsHolderElementOperation<TestCase> operation : elementOparations) {
+        for (final IExecutablesStepsHolderElementOperation<TestCase> operation : ELEMENT_OPERATIONS) {
             if (operation.isApplicable(type)) {
                 return operation;
             }

@@ -49,7 +49,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
     private static OnSaveLibrariesAutodiscoveryTrigger globalBatchSaveResponsibleTrigger = null;
 
-    private static final List<RobotSuiteFile> suitesForDiscover = new ArrayList<>();
+    private final List<RobotSuiteFile> suitesForDiscover = new ArrayList<>();
 
     private final DiscovererFactory discovererFactory;
 
