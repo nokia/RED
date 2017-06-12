@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.model.presenter.update;
 
-import java.util.Arrays;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -32,7 +33,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class SettingTableModelUpdater {
 
-    private static final List<ISettingTableElementOperation> elementOperations = Arrays.asList(
+    private static final List<ISettingTableElementOperation> ELEMENT_OPERATIONS = newArrayList(
             new SuiteSetupModelOperation(), new SuiteTeardownModelOperation(), new TestSetupModelOperation(),
             new TestTeardownModelOperation(), new TestTemplateModelOperation(), new TestTimeoutModelOperation(),
             new ForceTagsModelOperation(), new DefaultTagsModelOperation(), new DocumentationModelOperation(),
@@ -48,7 +49,7 @@ public class SettingTableModelUpdater {
             }
         }
     }
-    
+
     public void updateComment(final AModelElement<?> modelElement, final String value) {
         if (modelElement != null) {
             CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
@@ -66,8 +67,8 @@ public class SettingTableModelUpdater {
         }
         return null;
     }
-    
-    public void insert(final ARobotSectionTable sectionTable, int index, AModelElement<?> modelElement) {
+
+    public void insert(final ARobotSectionTable sectionTable, final int index, final AModelElement<?> modelElement) {
         if (sectionTable != null && sectionTable instanceof SettingTable) {
             final ISettingTableElementOperation operationHandler = getOperationHandler(modelElement);
             if (operationHandler != null) {
@@ -91,29 +92,21 @@ public class SettingTableModelUpdater {
     }
 
     private ISettingTableElementOperation getOperationHandler(final AModelElement<?> elem) {
-        ISettingTableElementOperation oper = null;
-
-        for (final ISettingTableElementOperation cOper : elementOperations) {
-            if (cOper.isApplicable(elem.getModelType())) {
-                oper = cOper;
-                break;
+        for (final ISettingTableElementOperation operation : ELEMENT_OPERATIONS) {
+            if (operation.isApplicable(elem.getModelType())) {
+                return operation;
             }
         }
-
-        return oper;
+        return null;
     }
 
     private ISettingTableElementOperation getOperationHandler(final IRobotTokenType type) {
-        ISettingTableElementOperation oper = null;
-
-        for (final ISettingTableElementOperation cOper : elementOperations) {
-            if (cOper.isApplicable(type)) {
-                oper = cOper;
-                break;
+        for (final ISettingTableElementOperation operation : ELEMENT_OPERATIONS) {
+            if (operation.isApplicable(type)) {
+                return operation;
             }
         }
-
-        return oper;
+        return null;
     }
 
 }
