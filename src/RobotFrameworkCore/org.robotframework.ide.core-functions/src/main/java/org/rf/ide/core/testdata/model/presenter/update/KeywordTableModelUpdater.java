@@ -5,7 +5,8 @@
  */
 package org.rf.ide.core.testdata.model.presenter.update;
 
-import java.util.Arrays;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -41,7 +42,7 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<UserKeyword> {
 
-    private static final List<IExecutablesStepsHolderElementOperation<UserKeyword>> elementOparations = Arrays.asList(
+    private static final List<IExecutablesStepsHolderElementOperation<UserKeyword>> ELEMENT_OPERATIONS = newArrayList(
             new KeywordExecutableRowModelOperation(), new KeywordArgumentsModelOperation(),
             new KeywordDocumentationModelOperation(), new KeywordTagsModelOperation(),
             new KeywordReturnModelOperation(), new KeywordTeardownModelOperation(), new KeywordTimeoutModelOperation(),
@@ -98,12 +99,12 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
         }
         operationHandler.update(modelElement, arguments);
     }
-    
+
     @Override
     public void updateComment(final AModelElement<?> modelElement, final String value) {
         CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
     }
-    
+
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
         final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
@@ -129,7 +130,7 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
 
     @VisibleForTesting
     IExecutablesStepsHolderElementOperation<UserKeyword> getOperationHandler(final ModelType elementModelType) {
-        for (final IExecutablesStepsHolderElementOperation<UserKeyword> operation : elementOparations) {
+        for (final IExecutablesStepsHolderElementOperation<UserKeyword> operation : ELEMENT_OPERATIONS) {
             if (operation.isApplicable(elementModelType)) {
                 return operation;
             }
@@ -145,7 +146,7 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
 
     @VisibleForTesting
     IExecutablesStepsHolderElementOperation<UserKeyword> getOperationHandler(final IRobotTokenType type) {
-        for (final IExecutablesStepsHolderElementOperation<UserKeyword> operation : elementOparations) {
+        for (final IExecutablesStepsHolderElementOperation<UserKeyword> operation : ELEMENT_OPERATIONS) {
             if (operation.isApplicable(type)) {
                 return operation;
             }
