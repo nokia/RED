@@ -378,6 +378,18 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         }
     }
 
+    @Override
+    public int startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
+            final List<String> dataSourcePaths, final EnvironmentSearchPaths additionalPaths) {
+        try {
+            return (Integer) callRpcFunction("startLibraryAutoDiscovering", port, timeout, suiteNames, dataSourcePaths,
+                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+                    newArrayList(additionalPaths.getClassPaths()));
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to start library autodiscovering.", e);
+        }
+    }
+
     private Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
         final Object rpcResult = client.execute(functionName, arguments);
         return resultOrException(rpcResult);
