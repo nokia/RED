@@ -13,8 +13,6 @@ import re
 
 from robot.running.builder import TestSuiteBuilder
 from robot.api import SuiteVisitor
-from robot.run import RobotFramework
-from robot.conf import RobotSettings
 from robot.running import TestLibrary
 from robot.running.testlibraries import _BaseTestLibrary
 from robot.running.model import TestCase, Keyword
@@ -31,12 +29,19 @@ class RedTestSuiteBuilder(TestSuiteBuilder):
 
 
 class SuiteVisitorImportProxy(SuiteVisitor):
-    def __init__(self, lib_import_timeout=60):
+    """ suite names should be passed as arguments """
+
+    def __init__(self, *args, **kwargs):
+        self.__wrap_importer(kwargs["timeout"])
+        self.f_suites = [name for name in args if name]
+
+    def __wrap_importer(self, lib_import_timeout):
+        import robot
         import robot.running.namespace
-        robot.running.namespace.IMPORTER = RedImporter(robot.running.namespace.IMPORTER, lib_import_timeout)
-        self.options, self.arguments = RobotFramework().parse_arguments(sys.argv[1:])
-        self.settings = RobotSettings(**self.options)
-        self.f_suites = self.settings.suite_config['include_suites']
+        import robot.running.importer
+        current = robot.running.namespace.IMPORTER
+        to_wrap = current if isinstance(current, robot.running.importer.Importer) else current.importer
+        robot.running.namespace.IMPORTER = RedImporter(to_wrap, lib_import_timeout)
 
     def start_suite(self, suite):
         if suite:

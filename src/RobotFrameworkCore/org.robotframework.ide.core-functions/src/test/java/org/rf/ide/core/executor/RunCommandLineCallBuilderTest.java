@@ -524,41 +524,6 @@ public class RunCommandLineCallBuilderTest {
                 "--arg", "val1", "-X", "val 2", "--other", "--other2");
     }
 
-    @Test
-    public void testCallForDryrunInArgumentFile_withRuntimeEnvironment_argsFile() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
-                .useArgumentFile(true)
-                .enableDryRun()
-                .build();
-        final String[] commandLine = cmdLine.getCommandLine();
-        assertThat(commandLine).hasSize(7).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                "--argumentfile");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--prerunmodifier");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--runemptysuite");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--dryrun");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--output         NONE");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--report         NONE");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--log            NONE");
-        assertThat(cmdLine.getArgumentFile().get().generateContent()).contains("--console        NONE");
-    }
-
-    @Test
-    public void testCallForDryrunInArgumentFile_withRuntimeEnvironment_argsInline() throws IOException {
-        final RobotRuntimeEnvironment env = prepareEnvironment(SuiteExecutor.Python, "/x/y/z/python");
-
-        final RunCommandLine cmdLine = RunCommandLineCallBuilder.forEnvironment(env, 12345)
-                .useArgumentFile(false)
-                .enableDryRun()
-                .build();
-        final String[] commandLine = cmdLine.getCommandLine();
-        assertThat(cmdLine.getArgumentFile().isPresent()).isFalse();
-        assertThat(commandLine).hasSize(17).containsSubsequence("/x/y/z/python", "-m", "robot.run", "--listener",
-                "--prerunmodifier", "--runemptysuite", "--dryrun", "--output", "NONE", "--report", "NONE", "--log",
-                "NONE", "--console", "NONE");
-    }
-
     private static RobotRuntimeEnvironment prepareEnvironment(final SuiteExecutor executor,
             final String interpreterPath) {
         final RobotRuntimeEnvironment env = mock(RobotRuntimeEnvironment.class);
