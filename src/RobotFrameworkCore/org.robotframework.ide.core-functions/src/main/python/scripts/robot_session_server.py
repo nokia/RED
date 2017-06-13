@@ -170,10 +170,12 @@ def is_virtualenv():
 @logresult
 @encode_result_or_exception
 @logargs
-def start_library_auto_discovering(port, timeout, suite_names, data_source_paths, python_paths, class_paths):
+def start_library_auto_discovering(port, timeout, suite_names, variable_mappings, data_source_paths, python_paths,
+                                   class_paths):
     def to_call():
         import red_library_autodiscover
         return __cleanup_modules(red_library_autodiscover.start_library_auto_discovering)(port, timeout, suite_names,
+                                                                                          variable_mappings,
                                                                                           data_source_paths)
 
     return __extend_paths(to_call, python_paths, class_paths)
