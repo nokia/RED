@@ -39,5 +39,5 @@ interface RobotCommandExecutor {
             EnvironmentSearchPaths additionalPaths);
 
     int startLibraryAutoDiscovering(int port, int timeout, List<String> suiteNames, List<String> dataSourcePaths,
-            EnvironmentSearchPaths additionalPaths);
+            List<String> variableMappings, EnvironmentSearchPaths additionalPaths);
 }

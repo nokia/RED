@@ -5,7 +5,7 @@
 #
 
 
-def start_library_auto_discovering(port, timeout, suite_names, data_source_paths):
+def start_library_auto_discovering(port, timeout, suite_names, variable_mappings, data_source_paths):
     import os
     from robot.run import run
     from TestRunnerAgent import TestRunnerAgent
@@ -21,6 +21,7 @@ def start_library_auto_discovering(port, timeout, suite_names, data_source_paths
                    listener=TestRunnerAgent(port),
                    prerunmodifier=SuiteVisitorImportProxy(*suite_names, timeout=timeout),
                    suite=suite_names,
+                   variable=variable_mappings,
                    runemptysuite=True,
                    dryrun=True,
                    output='NONE',
@@ -34,19 +35,25 @@ def start_library_auto_discovering(port, timeout, suite_names, data_source_paths
 if __name__ == '__main__':
     import sys
 
-    port = sys.argv[1]
-    timeout = sys.argv[2]
+    args = sys.argv[1:]
+
+    port = args[0]
+    timeout = args[1]
+    args = args[2:]
+
     suite_names = []
-    data_source_paths = []
+    variable_mappings = []
 
-    if sys.argv[3] == '-suitenames':
-        suite_names = sys.argv[4].split(';')
-        data_source_paths = sys.argv[5].split(';')
-        if len(sys.argv) > 6:
-            sys.path.extend(sys.argv[6].split(';'))
-    else:
-        data_source_paths = sys.argv[3].split(';')
-        if len(sys.argv) > 4:
-            sys.path.extend(sys.argv[4].split(';'))
+    if args[0] == '-suitenames':
+        suite_names = args[1].split(';')
+        args = args[2:]
 
-    print(start_library_auto_discovering(port, timeout, suite_names, data_source_paths))
+    if args[0] == '-variables':
+        variable_mappings = args[1].split(';')
+        args = args[2:]
+
+    data_source_paths = args[0].split(';')
+    if len(args) > 1:
+        sys.path.extend(args[1].split(';'))
+
+    print(start_library_auto_discovering(port, timeout, suite_names, variable_mappings, data_source_paths))

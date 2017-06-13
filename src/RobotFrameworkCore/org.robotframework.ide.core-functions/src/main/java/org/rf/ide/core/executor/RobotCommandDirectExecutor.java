@@ -285,7 +285,8 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     @Override
     public int startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
-            final List<String> dataSourcePaths, final EnvironmentSearchPaths additionalPaths) {
+            final List<String> variableMappings, final List<String> dataSourcePaths,
+            final EnvironmentSearchPaths additionalPaths) {
         try {
             RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
             RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
@@ -296,6 +297,10 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             if (!suiteNames.isEmpty()) {
                 cmdLine.add("-suitenames");
                 cmdLine.add(String.join(";", suiteNames));
+            }
+            if (!variableMappings.isEmpty()) {
+                cmdLine.add("-variables");
+                cmdLine.add(String.join(";", variableMappings));
             }
             cmdLine.add(String.join(";", dataSourcePaths));
             if (additionalPaths.hasPythonPaths()) {
