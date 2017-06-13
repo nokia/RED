@@ -468,6 +468,8 @@ public class RobotRuntimeEnvironment {
      *            Library import timeout
      * @param suiteNames
      *            Suite names in robot format (no suite filtering if empty)
+     * @param variableMappings
+     *            Variable mappings in <name:value> format (no variable mapping if empty)
      * @param dataSourcePaths
      *            Robot data source paths
      * @param additionalPaths
@@ -479,12 +481,13 @@ public class RobotRuntimeEnvironment {
      * @throws RobotEnvironmentException
      */
     public int startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
-            final List<String> dataSourcePaths, final EnvironmentSearchPaths additionalPaths)
-            throws RobotEnvironmentException {
+            final List<String> variableMappings, final List<String> dataSourcePaths,
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.startLibraryAutoDiscovering(port, timeout, suiteNames, dataSourcePaths, additionalPaths);
+            return executor.startLibraryAutoDiscovering(port, timeout, suiteNames, variableMappings, dataSourcePaths,
+                    additionalPaths);
         }
         return -1;
     }

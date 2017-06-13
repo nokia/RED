@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -33,6 +34,7 @@ import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -66,7 +68,7 @@ public abstract class AbstractAutoDiscoverer {
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
                 robotProject.getStandardLibraries().keySet());
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
-        this.suiteFiles = new ArrayList<IResource>(suiteFiles);
+        this.suiteFiles = new ArrayList<>(suiteFiles);
         this.dryRunTargetsCollector = dryRunTargetsCollector;
         this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
     }
@@ -144,8 +146,7 @@ public abstract class AbstractAutoDiscoverer {
 
         serverJob = startDryRunServer(host, port, timeout, dryRunEventListener);
 
-        runtimeEnvironment.startLibraryAutoDiscovering(port, timeout, dryRunTargetsCollector.getSuiteNames(),
-                getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
+        startDryRunClient(runtimeEnvironment, port, timeout);
 
         serverJob.join();
     }
@@ -166,6 +167,12 @@ public abstract class AbstractAutoDiscoverer {
         return serverJob;
     }
 
+    private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port,
+            final int timeout) {
+        runtimeEnvironment.startLibraryAutoDiscovering(port, timeout, dryRunTargetsCollector.getSuiteNames(),
+                getVariableMappings(), getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
+    }
+
     private List<String> getDataSourcePaths() {
         final List<String> dataSourcePaths = new ArrayList<>();
         final IPath projectLocation = robotProject.getProject().getLocation();
@@ -174,6 +181,15 @@ public abstract class AbstractAutoDiscoverer {
         }
         dryRunTargetsCollector.getAdditionalProjectsLocations().forEach(f -> dataSourcePaths.add(f.getAbsolutePath()));
         return dataSourcePaths;
+    }
+
+    private List<String> getVariableMappings() {
+        return robotProject.getRobotProjectConfig()
+                .getVariableMappings()
+                .stream()
+                .map(v -> VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(v.getName()) + ":"
+                        + v.getValue())
+                .collect(Collectors.toList());
     }
 
     public interface IDryRunTargetsCollector {

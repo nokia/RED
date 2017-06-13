@@ -372,7 +372,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     @Override
     public boolean isVirtualenv() {
         try {
-            return (Boolean) callRpcFunction("isVirtualenv");
+            return (boolean) callRpcFunction("isVirtualenv");
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to check if is virtualenv.", e);
         }
@@ -380,10 +380,11 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
 
     @Override
     public int startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
-            final List<String> dataSourcePaths, final EnvironmentSearchPaths additionalPaths) {
+            final List<String> variableMappings, final List<String> dataSourcePaths,
+            final EnvironmentSearchPaths additionalPaths) {
         try {
-            return (Integer) callRpcFunction("startLibraryAutoDiscovering", port, timeout, suiteNames, dataSourcePaths,
-                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+            return (int) callRpcFunction("startLibraryAutoDiscovering", port, timeout, suiteNames, variableMappings,
+                    dataSourcePaths, newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to start library autodiscovering.", e);
