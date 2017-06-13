@@ -31,7 +31,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
@@ -110,7 +109,7 @@ public class SourceOpeningSupport {
     }
 
     private static IEditorPart openInEditor(final IWorkbenchPage page, final IFile file) throws PartInitException {
-        IEditorDescriptor desc = IDE.getEditorDescriptor(file);
+        IEditorDescriptor desc = IDE.getEditorDescriptor(file, true, true);
         if (!desc.isInternal()) {
             // we don't want to open files with external editors (e.g. running script files etc),
             // so if there is no internal editor, then we will use default text editor
@@ -120,7 +119,7 @@ public class SourceOpeningSupport {
                 throw new EditorOpeningException("No suitable editor for file: " + file.getName());
             }
         }
-        return page.openEditor(new FileEditorInput(file), desc.getId());
+        return IDE.openEditor(page, file, desc.getId());
     }
 
     public static void tryToOpenInEditor(final IWorkbenchPage page, final IFile file) {

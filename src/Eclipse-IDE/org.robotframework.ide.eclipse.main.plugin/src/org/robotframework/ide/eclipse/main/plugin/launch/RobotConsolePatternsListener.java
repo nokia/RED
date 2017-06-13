@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -29,7 +28,6 @@ import org.eclipse.ui.console.IPatternMatchListener;
 import org.eclipse.ui.console.PatternMatchEvent;
 import org.eclipse.ui.console.TextConsole;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
@@ -38,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 /**
  * @author Michal Anglart
- *
  */
 public class RobotConsolePatternsListener implements IPatternMatchListener {
 
@@ -169,7 +166,7 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
                 }
             }
             try {
-                openInEditor(workbenchWindow, wsFile);
+                IDE.openEditor(workbenchWindow.getActivePage(), wsFile);
             } catch (final PartInitException e) {
                 final String message = "Unable to open editor for file: " + wsFile.getName();
                 ErrorDialog.openError(workbenchWindow.getShell(), "Error opening file", message,
@@ -196,11 +193,6 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
             if (!wsFile.isSynchronized(IResource.DEPTH_ZERO)) {
                 wsFile.refreshLocal(IResource.DEPTH_ZERO, null);
             }
-        }
-
-        private void openInEditor(final IWorkbenchWindow workbenchWindow, final IFile wsFile) throws PartInitException {
-            final IEditorDescriptor desc = IDE.getEditorDescriptor(wsFile);
-            workbenchWindow.getActivePage().openEditor(new FileEditorInput(wsFile), desc.getId());
         }
     }
 
