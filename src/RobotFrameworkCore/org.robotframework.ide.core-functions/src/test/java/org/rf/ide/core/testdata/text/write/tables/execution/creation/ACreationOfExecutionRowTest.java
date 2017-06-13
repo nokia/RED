@@ -455,7 +455,7 @@ public abstract class ACreationOfExecutionRowTest {
 
         public void validate() throws InvalidTestStoreException {
             final List<String> errors = new ArrayList<>(0);
-            errors.addAll(collectMistmatchesForNotNullValidation());
+            errors.addAll(collectMismatchesForNotNullValidation());
 
             this.wasValidated.set(true);
             if (!errors.isEmpty()) {
@@ -463,7 +463,7 @@ public abstract class ACreationOfExecutionRowTest {
             }
         }
 
-        protected List<String> collectMistmatchesForNotNullValidation() {
+        protected List<String> collectMismatchesForNotNullValidation() {
             final List<String> errors = new ArrayList<>(0);
             final Class<ValidateNotNull> ano = ValidateNotNull.class;
             final List<Method> publicMethodsAnnotatedWith = getPublicMethodsAnnotatedWith(ano);
