@@ -6,12 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -26,9 +26,11 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
 import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
@@ -58,31 +60,40 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private final Optional<String> libraryNameToDiscover;
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+    private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
+
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
             final IEventBroker eventBroker) {
         this(robotProject, suiteFiles, eventBroker, true, null);
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
             final IEventBroker eventBroker, final String libraryNameToDiscover) {
         this(robotProject, suiteFiles, eventBroker, true, libraryNameToDiscover);
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
             final boolean showSummary) {
         this(robotProject, suiteFiles, null, showSummary, null);
     }
 
-    private LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+    private LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
             final IEventBroker eventBroker, final boolean showSummary, final String libraryNameToDiscover) {
         super(robotProject, suiteFiles, new DryRunTargetsCollector());
         this.eventBroker = eventBroker == null ? PlatformUI.getWorkbench().getService(IEventBroker.class) : eventBroker;
         this.showSummary = showSummary;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
+        this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
+                robotProject.getStandardLibraries().keySet());
     }
 
     @Override
-    public void start(final Shell parent) {
+    RobotDryRunLibraryEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler) {
+        return new RobotDryRunLibraryEventListener(dryRunLibraryImportCollector, startSuiteHandler);
+    }
+
+    @Override
+    void start(final Shell parent) {
         if (lockDryRun()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Discovering libraries") {
 
@@ -98,7 +109,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         if (showSummary) {
                             showSummary(parent, libraryImports);
                         }
-                    } catch (final InvocationTargetException e) {
+                    } catch (final CoreException e) {
                         throw new AutoDiscovererException("Problems occurred during discovering libraries.", e);
                     } catch (final InterruptedException e) {
                         // fine, will simply stop dry run
@@ -171,7 +182,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final List<IResource> suiteFiles) {
+                final List<? extends IResource> suiteFiles) {
             final List<String> resourcesPaths = new ArrayList<>();
             for (final IResource resource : suiteFiles) {
                 RobotSuiteFile suiteFile = null;

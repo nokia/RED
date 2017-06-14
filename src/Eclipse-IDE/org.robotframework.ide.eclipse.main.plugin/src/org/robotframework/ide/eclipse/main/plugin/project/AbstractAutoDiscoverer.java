@@ -8,9 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,9 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.dryrun.RobotDryRunEventListener;
-import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
+import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
@@ -50,11 +46,7 @@ public abstract class AbstractAutoDiscoverer {
 
     final RobotProject robotProject;
 
-    final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
-
-    final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
-
-    private final List<IResource> suiteFiles;
+    private final List<? extends IResource> suiteFiles;
 
     private final IDryRunTargetsCollector dryRunTargetsCollector;
 
@@ -62,13 +54,10 @@ public abstract class AbstractAutoDiscoverer {
 
     private AgentConnectionServerJob serverJob;
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<? extends IResource> suiteFiles,
+    AbstractAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
-        this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
-                robotProject.getStandardLibraries().keySet());
-        this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
-        this.suiteFiles = new ArrayList<>(suiteFiles);
+        this.suiteFiles = suiteFiles;
         this.dryRunTargetsCollector = dryRunTargetsCollector;
         this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
     }
@@ -96,7 +85,7 @@ public abstract class AbstractAutoDiscoverer {
         }
     }
 
-    void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+    void startDiscovering(final IProgressMonitor monitor) throws CoreException, InterruptedException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");
         subMonitor.setWorkRemaining(3);
@@ -120,8 +109,6 @@ public abstract class AbstractAutoDiscoverer {
                         suiteName -> subMonitor.subTask("Executing Robot dry run on suite: " + suiteName));
             }
             subMonitor.worked(1);
-        } catch (final CoreException e) {
-            throw new InvocationTargetException(e);
         } finally {
             subMonitor.done();
         }
@@ -137,14 +124,12 @@ public abstract class AbstractAutoDiscoverer {
     }
 
     private void executeDryRun(final RobotRuntimeEnvironment runtimeEnvironment,
-            final Consumer<String> startSuiteHandler) throws CoreException, InterruptedException {
+            final Consumer<String> startSuiteHandler) throws InterruptedException {
         final String host = AgentConnectionServer.DEFAULT_CONNECTION_HOST;
         final int port = AgentConnectionServer.findFreePort();
         final int timeout = AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT;
-        final RobotDryRunEventListener dryRunEventListener = new RobotDryRunEventListener(dryRunLibraryImportCollector,
-                dryRunLKeywordSourceCollector, startSuiteHandler);
 
-        serverJob = startDryRunServer(host, port, timeout, dryRunEventListener);
+        serverJob = startDryRunServer(host, port, timeout, startSuiteHandler);
 
         startDryRunClient(runtimeEnvironment, port, timeout);
 
@@ -152,12 +137,12 @@ public abstract class AbstractAutoDiscoverer {
     }
 
     private AgentConnectionServerJob startDryRunServer(final String host, final int port, final int timeout,
-            final RobotDryRunEventListener dryRunEventListener) throws InterruptedException {
+            final Consumer<String> startSuiteHandler) throws InterruptedException {
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                 .agentEventsListenedBy(testsStarter)
-                .agentEventsListenedBy(dryRunEventListener)
+                .agentEventsListenedBy(createDryRunEventListener(startSuiteHandler))
                 .agentEventsListenedBy(new AgentServerKeepAlive())
                 .start()
                 .waitForServer();
@@ -166,6 +151,8 @@ public abstract class AbstractAutoDiscoverer {
 
         return serverJob;
     }
+
+    abstract RobotAgentEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler);
 
     private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port,
             final int timeout) {
@@ -194,7 +181,8 @@ public abstract class AbstractAutoDiscoverer {
 
     public interface IDryRunTargetsCollector {
 
-        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject, List<IResource> suiteFiles);
+        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject,
+                List<? extends IResource> suiteFiles);
 
         List<String> getSuiteNames();
 

@@ -9,14 +9,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -111,8 +109,17 @@ class InterpretersComposite extends Composite {
             public void widgetSelected(final SelectionEvent event) {
                 final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
                 try {
-                    new ProgressMonitorDialog(getShell()).run(false, false,
-                            new CheckEnvironmentRunnable(chosenExecutorName));
+                    new ProgressMonitorDialog(getShell()).run(false, false, monitor -> {
+                        final SuiteExecutor executor = SuiteExecutor.fromName(chosenExecutorName);
+                        final String version = RobotRuntimeEnvironment.getVersion(executor);
+                        if (version == null) {
+                            MessageDialog.openError(null, "Interpreter checked",
+                                    "The " + executor.name() + " interpreter has no Robot installed");
+                        } else {
+                            MessageDialog.openInformation(null, "Interpreter checked",
+                                    "The " + executor.name() + " interpreter has " + version + " installed");
+                        }
+                    });
                 } catch (final InterruptedException e) {
                     StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e),
                             StatusManager.BLOCK);
@@ -144,28 +151,6 @@ class InterpretersComposite extends Composite {
 
     SuiteExecutor getChosenSystemExecutor() {
         return SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex()));
-    }
-
-    private static final class CheckEnvironmentRunnable implements IRunnableWithProgress {
-
-        private final String chosenExecutorName;
-
-        private CheckEnvironmentRunnable(final String chosenExecutorName) {
-            this.chosenExecutorName = chosenExecutorName;
-        }
-
-        @Override
-        public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-            final SuiteExecutor executor = SuiteExecutor.fromName(chosenExecutorName);
-            final String version = RobotRuntimeEnvironment.getVersion(executor);
-            if (version == null) {
-                MessageDialog.openError(null, "Interpreter checked",
-                        "The " + executor.name() + " interpreter has no Robot installed");
-            } else {
-                MessageDialog.openInformation(null, "Interpreter checked",
-                        "The " + executor.name() + " interpreter has " + version + " installed");
-            }
-        }
     }
 
     public interface InterpreterListener {

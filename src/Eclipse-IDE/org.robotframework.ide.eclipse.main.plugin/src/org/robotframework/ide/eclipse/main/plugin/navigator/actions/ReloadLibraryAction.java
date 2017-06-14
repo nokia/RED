@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -60,12 +59,7 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
     public void run() {
         final Shell shell = page.getWorkbenchWindow().getShell();
         try {
-            new ProgressMonitorDialog(shell).run(true, true, new IRunnableWithProgress() {
-                @Override
-                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    rebuildLibraries(monitor);
-                }
-            });
+            new ProgressMonitorDialog(shell).run(true, true, monitor -> rebuildLibraries(monitor));
         } catch (InvocationTargetException | InterruptedException e) {
             if (e.getCause() instanceof RobotEnvironmentDetailedException) {
                 final RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
