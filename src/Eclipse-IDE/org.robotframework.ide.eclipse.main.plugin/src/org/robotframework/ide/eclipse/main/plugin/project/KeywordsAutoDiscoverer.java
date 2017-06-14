@@ -34,7 +34,8 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     private final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
 
     public KeywordsAutoDiscoverer(final RobotProject robotProject) {
-        super(robotProject, new ArrayList<>(), new DryRunTargetsCollector());
+        super(robotProject, new ArrayList<>(), new LibrariesSourcesCollector(robotProject),
+                new DryRunTargetsCollector());
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
 

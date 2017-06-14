@@ -76,7 +76,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
             final boolean showSummary, final String libraryNameToDiscover) {
-        super(robotProject, resources, new DryRunTargetsCollector());
+        super(robotProject, resources, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector());
         this.showSummary = showSummary;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(

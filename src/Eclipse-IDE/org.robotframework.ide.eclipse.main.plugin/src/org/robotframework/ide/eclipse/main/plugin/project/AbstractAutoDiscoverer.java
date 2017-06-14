@@ -48,18 +48,19 @@ public abstract class AbstractAutoDiscoverer {
 
     private final List<? extends IResource> resources;
 
-    private final IDryRunTargetsCollector dryRunTargetsCollector;
-
     private final LibrariesSourcesCollector librariesSourcesCollector;
+
+    private final IDryRunTargetsCollector dryRunTargetsCollector;
 
     private AgentConnectionServerJob serverJob;
 
     AbstractAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
+            final LibrariesSourcesCollector librariesSourcesCollector,
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
         this.resources = resources;
+        this.librariesSourcesCollector = librariesSourcesCollector;
         this.dryRunTargetsCollector = dryRunTargetsCollector;
-        this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
     }
 
     public void start() {
