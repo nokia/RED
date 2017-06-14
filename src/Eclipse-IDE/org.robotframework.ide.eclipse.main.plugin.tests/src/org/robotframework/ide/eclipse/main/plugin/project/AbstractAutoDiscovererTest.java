@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -45,13 +45,20 @@ public class AbstractAutoDiscovererTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final AbstractAutoDiscoverer discoverer = createDiscoverer(robotProject);
+        final LibrariesSourcesCollector sourcesCollector = new LibrariesSourcesCollector(robotProject);
+
+        final IDryRunTargetsCollector targetsCollector = mock(IDryRunTargetsCollector.class);
+
+        final AbstractAutoDiscoverer discoverer = createDiscoverer(robotProject, Arrays.asList(), sourcesCollector,
+                targetsCollector);
 
         discoverer.startDiscovering(null);
     }
 
-    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject) {
-        return new AbstractAutoDiscoverer(robotProject, Arrays.asList(), createTargetCollector()) {
+    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject,
+            final List<? extends IResource> resources, final LibrariesSourcesCollector sourcesCollector,
+            final IDryRunTargetsCollector targetsCollector) {
+        return new AbstractAutoDiscoverer(robotProject, resources, sourcesCollector, targetsCollector) {
 
             @Override
             RobotDefaultAgentEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler) {
@@ -64,28 +71,6 @@ public class AbstractAutoDiscovererTest {
             void start(final Shell parent) {
                 // nothing to do
             }
-        };
-    }
-
-    private IDryRunTargetsCollector createTargetCollector() {
-        return new IDryRunTargetsCollector() {
-
-            @Override
-            public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                    final List<? extends IResource> resources) {
-                // nothing to do
-            }
-
-            @Override
-            public List<String> getSuiteNames() {
-                return Arrays.asList();
-            }
-
-            @Override
-            public List<File> getAdditionalProjectsLocations() {
-                return Arrays.asList();
-            }
-
         };
     }
 
