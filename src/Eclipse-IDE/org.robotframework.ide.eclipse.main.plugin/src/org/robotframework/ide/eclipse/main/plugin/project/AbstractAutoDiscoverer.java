@@ -46,7 +46,7 @@ public abstract class AbstractAutoDiscoverer {
 
     final RobotProject robotProject;
 
-    private final List<? extends IResource> suiteFiles;
+    private final List<? extends IResource> resources;
 
     private final IDryRunTargetsCollector dryRunTargetsCollector;
 
@@ -54,10 +54,10 @@ public abstract class AbstractAutoDiscoverer {
 
     private AgentConnectionServerJob serverJob;
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
+    AbstractAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
-        this.suiteFiles = suiteFiles;
+        this.resources = resources;
         this.dryRunTargetsCollector = dryRunTargetsCollector;
         this.librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
     }
@@ -100,7 +100,7 @@ public abstract class AbstractAutoDiscoverer {
             collectLibrarySources(runtimeEnvironment);
             subMonitor.worked(1);
 
-            dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, suiteFiles);
+            dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, resources);
             subMonitor.worked(1);
 
             subMonitor.subTask("Executing Robot dry run...");
@@ -182,7 +182,7 @@ public abstract class AbstractAutoDiscoverer {
     public interface IDryRunTargetsCollector {
 
         void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject,
-                List<? extends IResource> suiteFiles);
+                List<? extends IResource> resources);
 
         List<String> getSuiteNames();
 
