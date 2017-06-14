@@ -8,13 +8,11 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -31,21 +29,18 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
 
     public static class E4LibrariesAutoDiscoverHandler {
 
-        @Inject
-        private IEventBroker eventBroker;
-
         @Execute
         public void addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-            final List<IResource> suitesList = new ArrayList<>();
+            final List<IResource> resources = new ArrayList<>();
             IProject suitesProject = null;
 
             for (final IResource resource : selectedResources) {
                 if (resource.getType() == IResource.PROJECT) {
                     final IProject project = (IProject) resource;
                     final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-                    new LibrariesAutoDiscoverer(robotProject, new ArrayList<>(), eventBroker).start();
+                    new LibrariesAutoDiscoverer(robotProject, new ArrayList<>()).start();
                     return;
 
                 } else if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER) {
@@ -53,14 +48,14 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
                         suitesProject = resource.getProject();
                     }
                     if (resource.getProject().equals(suitesProject)) {
-                        suitesList.add(resource);
+                        resources.add(resource);
                     }
                 }
             }
 
-            if (!suitesList.isEmpty()) {
+            if (!resources.isEmpty()) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(suitesProject);
-                new LibrariesAutoDiscoverer(robotProject, suitesList, eventBroker).start();
+                new LibrariesAutoDiscoverer(robotProject, resources).start();
             }
         }
     }
