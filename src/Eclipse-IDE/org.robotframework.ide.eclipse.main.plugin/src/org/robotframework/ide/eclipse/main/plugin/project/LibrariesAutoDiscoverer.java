@@ -54,33 +54,29 @@ import com.google.common.io.Files;
  */
 public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
-    private final IEventBroker eventBroker;
-
     private final boolean showSummary;
 
     private final Optional<String> libraryNameToDiscover;
 
     private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
-            final IEventBroker eventBroker) {
-        this(robotProject, suiteFiles, eventBroker, true, null);
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources) {
+        this(robotProject, resources, true, null);
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
-            final IEventBroker eventBroker, final String libraryNameToDiscover) {
-        this(robotProject, suiteFiles, eventBroker, true, libraryNameToDiscover);
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
+            final String libraryNameToDiscover) {
+        this(robotProject, resources, true, libraryNameToDiscover);
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
             final boolean showSummary) {
-        this(robotProject, suiteFiles, null, showSummary, null);
+        this(robotProject, resources, showSummary, null);
     }
 
-    private LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> suiteFiles,
-            final IEventBroker eventBroker, final boolean showSummary, final String libraryNameToDiscover) {
-        super(robotProject, suiteFiles, new DryRunTargetsCollector());
-        this.eventBroker = eventBroker == null ? PlatformUI.getWorkbench().getService(IEventBroker.class) : eventBroker;
+    private LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
+            final boolean showSummary, final String libraryNameToDiscover) {
+        super(robotProject, resources, new DryRunTargetsCollector());
         this.showSummary = showSummary;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
@@ -159,6 +155,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             }
 
             subMonitor.subTask("Updating project configuration...");
+            final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
             updater.finalizeLibrariesAdding(eventBroker);
             subMonitor.worked(1);
         }
@@ -182,9 +179,9 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final List<? extends IResource> suiteFiles) {
+                final List<? extends IResource> resources) {
             final List<String> resourcesPaths = new ArrayList<>();
-            for (final IResource resource : suiteFiles) {
+            for (final IResource resource : resources) {
                 RobotSuiteFile suiteFile = null;
                 if (resource.getType() == IResource.FILE) {
                     suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);

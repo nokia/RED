@@ -90,7 +90,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final List<? extends IResource> suiteFiles) {
+                final List<? extends IResource> resources) {
             final List<String> libraryNames = collectLibraryNames(robotProject);
             if (!libraryNames.isEmpty()) {
                 final File tempSuiteFile = RobotDryRunTemporarySuites.createLibraryFile(libraryNames);

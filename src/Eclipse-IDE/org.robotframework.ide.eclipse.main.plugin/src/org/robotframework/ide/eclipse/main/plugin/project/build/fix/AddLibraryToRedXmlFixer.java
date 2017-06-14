@@ -132,9 +132,9 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                     }
                 }
             } catch (final RobotEnvironmentException e) {
-                final List<IResource> suitesList = new ArrayList<>();
-                suitesList.add(suiteFile.getFile());
-                new LibrariesAutoDiscoverer(project, suitesList, eventBroker, pathOrName).start();
+                final List<IResource> suites = new ArrayList<>();
+                suites.add(suiteFile.getFile());
+                new LibrariesAutoDiscoverer(project, suites, pathOrName).start();
 
                 return false;
             }
