@@ -39,8 +39,7 @@ public class KeywordsAutoDiscovererTest {
 
     @Before
     public void before() throws Exception {
-        final RobotModel model = new RobotModel();
-        project = model.createRobotProject(projectProvider.getProject());
+        project = new RobotModel().createRobotProject(projectProvider.getProject());
         projectProvider.createDir("libs");
         libraries = new HashMap<>();
     }

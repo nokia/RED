@@ -27,7 +27,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -405,20 +404,16 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
     private void rebuildWorkspace() {
         try {
-            new ProgressMonitorDialog(getShell()).run(true, true, new IRunnableWithProgress() {
-                @Override
-                public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-                        InterruptedException {
-                    for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
-                        try {
-                            if (project.exists() && project.isOpen()) {
-                                project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-                                project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-                            }
-                        } catch (final CoreException e) {
-                            MessageDialog.openError(getShell(), "Workspace rebuild",
-                                    "Problems occurred during workspace build " + e.getMessage());
+            new ProgressMonitorDialog(getShell()).run(true, true, monitor -> {
+                for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
+                    try {
+                        if (project.exists() && project.isOpen()) {
+                            project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                            project.build(IncrementalProjectBuilder.FULL_BUILD, null);
                         }
+                    } catch (final CoreException e) {
+                        MessageDialog.openError(getShell(), "Workspace rebuild",
+                                "Problems occurred during workspace build " + e.getMessage());
                     }
                 }
             });

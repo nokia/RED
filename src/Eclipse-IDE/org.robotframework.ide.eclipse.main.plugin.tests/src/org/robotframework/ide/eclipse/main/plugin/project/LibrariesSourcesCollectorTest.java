@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,8 +27,7 @@ public class LibrariesSourcesCollectorTest {
 
     @Before
     public void before() throws Exception {
-        final RobotModel model = new RobotModel();
-        project = model.createRobotProject(projectProvider.getProject());
+        project = new RobotModel().createRobotProject(projectProvider.getProject());
         projectProvider.configure(new RobotProjectConfig());
     }
 
@@ -160,5 +160,13 @@ public class LibrariesSourcesCollectorTest {
                 projectProvider.getFile("lib.jar").getLocation().toOSString());
         assertThat(searchPaths.getPythonPaths()).containsExactly(projectProvider.getDir("a").getLocation().toOSString(),
                 projectProvider.getProject().getLocation().toOSString());
+    }
+
+    @Test(expected = CoreException.class)
+    public void coreExceptionIsThrown_whenProjectIsClosed() throws Exception {
+        projectProvider.getProject().close(null);
+
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        collector.collectPythonAndJavaLibrariesSources();
     }
 }

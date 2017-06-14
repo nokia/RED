@@ -9,21 +9,16 @@ import java.util.function.Consumer;
 
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
-import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 
-public class RobotDryRunEventListener extends RobotDefaultAgentEventListener {
-
-    private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
+public class RobotDryRunKeywordEventListener extends RobotDefaultAgentEventListener {
 
     private final RobotDryRunKeywordSourceCollector dryRunKeywordSourceCollector;
 
     private final Consumer<String> startSuiteHandler;
 
-    public RobotDryRunEventListener(final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector,
-            final RobotDryRunKeywordSourceCollector dryRunKeywordSourceCollector,
+    public RobotDryRunKeywordEventListener(final RobotDryRunKeywordSourceCollector dryRunKeywordSourceCollector,
             final Consumer<String> startSuiteHandler) {
-        this.dryRunLibraryImportCollector = dryRunLibraryImportCollector;
         this.dryRunKeywordSourceCollector = dryRunKeywordSourceCollector;
         this.startSuiteHandler = startSuiteHandler;
     }
@@ -34,17 +29,8 @@ public class RobotDryRunEventListener extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleLibraryImport(final LibraryImportEvent event) {
-        dryRunLibraryImportCollector.collectFromLibraryImportEvent(event);
-    }
-
-    @Override
     public void handleMessage(final String msg, final LogLevel level) {
-        if (level == LogLevel.FAIL) {
-            dryRunLibraryImportCollector.collectFromFailMessageEvent(msg);
-        } else if (level == LogLevel.ERROR) {
-            dryRunLibraryImportCollector.collectFromErrorMessageEvent(msg);
-        } else if (level == LogLevel.NONE) {
+        if (level == LogLevel.NONE) {
             dryRunKeywordSourceCollector.collectFromMessageEvent(msg);
         }
     }

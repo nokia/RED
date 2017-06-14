@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -46,7 +45,7 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
                 if (resource.getType() == IResource.PROJECT) {
                     final IProject project = (IProject) resource;
                     final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-                    new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(), eventBroker).start();
+                    new LibrariesAutoDiscoverer(robotProject, new ArrayList<>(), eventBroker).start();
                     return;
 
                 } else if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER) {
