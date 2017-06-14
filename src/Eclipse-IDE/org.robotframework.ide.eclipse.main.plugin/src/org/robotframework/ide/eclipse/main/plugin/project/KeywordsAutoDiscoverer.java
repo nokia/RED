@@ -8,16 +8,18 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
+import org.rf.ide.core.dryrun.RobotDryRunKeywordEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
+import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -29,29 +31,34 @@ import com.google.common.io.Files;
  */
 public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
+    private final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
+
     public KeywordsAutoDiscoverer(final RobotProject robotProject) {
-        super(robotProject, Collections.<IResource> emptyList(), new DryRunTargetsCollector());
+        super(robotProject, new ArrayList<>(), new DryRunTargetsCollector());
+        this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
 
     @Override
-    public void start(final Shell parent) {
+    RobotDryRunKeywordEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler) {
+        return new RobotDryRunKeywordEventListener(dryRunLKeywordSourceCollector, startSuiteHandler);
+    }
+
+    @Override
+    void start(final Shell parent) {
         if (lockDryRun()) {
             try {
-                new ProgressMonitorDialog(parent).run(true, true, new IRunnableWithProgress() {
-
-                    @Override
-                    public void run(final IProgressMonitor monitor)
-                            throws InvocationTargetException, InterruptedException {
-                        try {
-                            startDiscovering(monitor);
-                            if (monitor.isCanceled()) {
-                                return;
-                            }
-                            startAddingKeywordsToProject(monitor, dryRunLKeywordSourceCollector.getKeywordSources());
-                        } finally {
-                            monitor.done();
-                            unlockDryRun();
+                new ProgressMonitorDialog(parent).run(true, true, monitor -> {
+                    try {
+                        startDiscovering(monitor);
+                        if (monitor.isCanceled()) {
+                            return;
                         }
+                        startAddingKeywordsToProject(monitor, dryRunLKeywordSourceCollector.getKeywordSources());
+                    } catch (final CoreException e) {
+                        throw new InvocationTargetException(e);
+                    } finally {
+                        monitor.done();
+                        unlockDryRun();
                     }
                 });
             } catch (final InvocationTargetException e) {
@@ -83,7 +90,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final List<IResource> suiteFiles) {
+                final List<? extends IResource> suiteFiles) {
             final List<String> libraryNames = collectLibraryNames(robotProject);
             if (!libraryNames.isEmpty()) {
                 final File tempSuiteFile = RobotDryRunTemporarySuites.createLibraryFile(libraryNames);

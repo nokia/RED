@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
@@ -249,14 +248,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             rebuildTasksQueue.add(newRebuildTask);
             final Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
             try {
-                new ProgressMonitorDialog(shell).run(true, true, new IRunnableWithProgress() {
-
-                    @Override
-                    public void run(final IProgressMonitor monitor)
-                            throws InvocationTargetException, InterruptedException {
-                        handleRebuildTask(monitor, newRebuildTask);
-                    }
-                });
+                new ProgressMonitorDialog(shell).run(true, true, monitor -> handleRebuildTask(monitor, newRebuildTask));
             } catch (InvocationTargetException | InterruptedException e) {
                 if (e.getCause() instanceof RobotEnvironmentDetailedException) {
                     final RobotEnvironmentDetailedException exc = (RobotEnvironmentDetailedException) e.getCause();
