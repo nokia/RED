@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 /**
  * @author mmarzec
  */
-class LibrariesSourcesCollector {
+public class LibrariesSourcesCollector {
 
     private final RobotProject robotProject;
 
@@ -28,15 +28,15 @@ class LibrariesSourcesCollector {
 
     private final Set<String> classpathLocations = new LinkedHashSet<>();
 
-    LibrariesSourcesCollector(final RobotProject robotProject) {
+    public LibrariesSourcesCollector(final RobotProject robotProject) {
         this.robotProject = robotProject;
     }
 
-    void collectPythonAndJavaLibrariesSources() throws CoreException {
+    public void collectPythonAndJavaLibrariesSources() throws CoreException {
         collectPathLocations(robotProject.getProject());
     }
 
-    void collectPythonAndJavaLibrariesSources(final int maxDepth) throws CoreException {
+    public void collectPythonAndJavaLibrariesSources(final int maxDepth) throws CoreException {
         collectPathLocations(robotProject.getProject(), 0, maxDepth);
     }
 
@@ -73,7 +73,7 @@ class LibrariesSourcesCollector {
         }
     }
 
-    EnvironmentSearchPaths getEnvironmentSearchPaths() {
+    public EnvironmentSearchPaths getEnvironmentSearchPaths() {
         final EnvironmentSearchPaths environmentSearchPaths = new RedEclipseProjectConfig(
                 robotProject.getRobotProjectConfig()).createEnvironmentSearchPaths(robotProject.getProject());
         pythonpathLocations.forEach(environmentSearchPaths::addPythonPath);
