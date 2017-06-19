@@ -50,7 +50,7 @@ public class TestCaseUnkownModelOperation implements IExecutablesStepsHolderElem
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addElement((TestCaseUnknownSettings) modelElement, 0);
+        testCase.addElement((TestCaseUnknownSettings) modelElement, index);
         return modelElement;
     }
 

@@ -46,7 +46,7 @@ public class TestCaseDocumentationModelOperation implements IExecutablesStepsHol
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addDocumentation(0, (TestDocumentation) modelElement);
+        testCase.addDocumentation(index, (TestDocumentation) modelElement);
         return modelElement;
     }
 

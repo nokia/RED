@@ -47,7 +47,7 @@ public class KeywordDocumentationModelOperation implements IExecutablesStepsHold
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addDocumentation(0, (KeywordDocumentation) modelElement);
+        userKeyword.addDocumentation(index, (KeywordDocumentation) modelElement);
         return modelElement;
     }
 

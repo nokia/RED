@@ -45,7 +45,7 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addElement((TestCaseTags) modelElement, 0);
+        testCase.addElement((TestCaseTags) modelElement, index);
         return modelElement;
     }
     

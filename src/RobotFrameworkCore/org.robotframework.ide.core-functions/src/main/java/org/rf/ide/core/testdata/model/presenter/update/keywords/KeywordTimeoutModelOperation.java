@@ -50,7 +50,7 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addElement((KeywordTimeout) modelElement, 0);
+        userKeyword.addElement((KeywordTimeout) modelElement, index);
         return modelElement;
     }
 
