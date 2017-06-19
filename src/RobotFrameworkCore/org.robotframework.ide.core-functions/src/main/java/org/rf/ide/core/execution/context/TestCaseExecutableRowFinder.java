@@ -30,7 +30,7 @@ public class TestCaseExecutableRowFinder implements IRobotExecutableRowFinder {
     @Override
     public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
         if (currentTestCase != null) {
-            final List<RobotExecutableRow<TestCase>> executionRows = currentTestCase.getTestExecutionRows();
+            final List<RobotExecutableRow<TestCase>> executionRows = currentTestCase.getExecutionContext();
             if (testCaseExecutionRowCounter.getCounter() < executionRows.size()) {
                 final RobotExecutableRow<TestCase> executionRow = executionRows.get(testCaseExecutionRowCounter.getCounter());
                 testCaseExecutionRowCounter.increment();

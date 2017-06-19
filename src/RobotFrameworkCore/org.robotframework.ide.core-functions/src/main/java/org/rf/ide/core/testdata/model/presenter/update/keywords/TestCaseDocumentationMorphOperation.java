@@ -26,7 +26,7 @@ public class TestCaseDocumentationMorphOperation extends ExecutablesStepsHolderM
             final AModelElement<?> modelElement) {
         final TestDocumentation caseDocumentation = (TestDocumentation) modelElement;
 
-        final KeywordDocumentation kwDocumentation = keyword.newDocumentation();
+        final KeywordDocumentation kwDocumentation = keyword.newDocumentation(index);
         kwDocumentation.getDeclaration().setText(caseDocumentation.getDeclaration().getText());
         
         for (final RobotToken txt : caseDocumentation.getDocumentationText()) {

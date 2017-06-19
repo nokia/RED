@@ -79,7 +79,6 @@ public class CreateFreshKeywordCallCommandTest {
             final RobotCodeHoldingElement<?> codeHolder, final int index) {
         
         assumeTrue(index >= 0 && index <= codeHolder.getChildren().size());
-        assumeTrue(!codeHolder.hasSettings() || codeHolder.hasSettings() && codeHolder.indexOfLastSetting() < index);
 
         final int oldSize = codeHolder.getChildren().size();
 
@@ -105,40 +104,6 @@ public class CreateFreshKeywordCallCommandTest {
                 .<String, Object> of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
         verifyNoMoreInteractions(eventBroker);
-    }
-
-    @Theory
-    public void whenCommandIsUsedWithIndexUnderWhichSettingIsLocated_newCallIsProperlyAddedAfterLastSetting(
-            final RobotCodeHoldingElement<?> holder, final int index) {
-
-        assumeTrue(index >= 0 && index <= holder.getChildren().size());
-        assumeTrue(holder.hasSettings() && holder.indexOfLastSetting() >= index);
-
-        final int oldSize = holder.getChildren().size();
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-        final CreateFreshKeywordCallCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshKeywordCallCommand(holder, index));
-        command.execute();
-
-        assertThat(holder.getChildren().size()).isEqualTo(oldSize + 1);
-
-        final RobotKeywordCall addedCall = holder.getChildren().get(3);
-        assertThat(addedCall).has(RobotKeywordCallConditions.properlySetParent()).has(name(""));
-        assertThat(addedCall.getArguments()).isEmpty();
-
-        for (final EditorCommand undo : command.getUndoCommands()) {
-            undo.execute();
-        }
-
-        assertThat(holder.getChildren().size()).isEqualTo(oldSize);
-
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
-                .<String, Object> of(IEventBroker.DATA, holder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, holder);
-        verifyNoMoreInteractions(eventBroker);
-
     }
 
     private static RobotCase createTestCase() {

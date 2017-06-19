@@ -71,8 +71,8 @@ public class ReplaceRobotKeywordCallCommandTest {
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
                 .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
         assertThat(result).has(properlySetParent());
-        assertThat(testCase.getLinkedElement().getTestExecutionRows()).doesNotContain(oldLinked);
-        assertThat(testCase.getLinkedElement().getTestExecutionRows().size()).isEqualTo(1);
+        assertThat(testCase.getLinkedElement().getElements()).doesNotContain(oldLinked);
+        assertThat(testCase.getLinkedElement().getElements().size()).isEqualTo(1);
 
         assertThat(anotherTestCase.getChildren().size()).isEqualTo(1);
         assertThat(anotherTestCase.getChildren()).containsExactly(anotherKeywordCall);
@@ -116,8 +116,8 @@ public class ReplaceRobotKeywordCallCommandTest {
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
                 .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
         assertThat(result).has(properlySetParent());
-        assertThat(kwDef.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
-        assertThat(kwDef.getLinkedElement().getKeywordExecutionRows().size()).isEqualTo(1);
+        assertThat(kwDef.getLinkedElement().getElements()).doesNotContain(oldLinked);
+        assertThat(kwDef.getLinkedElement().getElements().size()).isEqualTo(1);
 
         assertThat(anotherKwDef.getChildren().size()).isEqualTo(1);
         assertThat(anotherKwDef.getChildren()).containsExactly(anotherKeywordCall);

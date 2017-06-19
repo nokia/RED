@@ -5,13 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,42 +47,13 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     public void link() {
         final TestCase testCase = getLinkedElement();
 
-        final List<PrioriterizedCaseSettings> settings = newArrayList(EnumSet.allOf(PrioriterizedCaseSettings.class));
-        Collections.sort(settings);
-
-        // settings
-        for (final PrioriterizedCaseSettings setting : settings) {
-            for (final AModelElement<TestCase> element : setting.getModelElements(testCase)) {
-                getChildren().add(new RobotDefinitionSetting(this, element));
+        for (final AModelElement<TestCase> el : testCase.getAllElements()) {
+            if (el instanceof RobotExecutableRow) {
+                getChildren().add(new RobotKeywordCall(this, el));
+            } else {
+                getChildren().add(new RobotDefinitionSetting(this, el));
             }
         }
-
-        // executables
-        for (final RobotExecutableRow<TestCase> execRow : testCase.getTestExecutionRows()) {
-            getChildren().add(new RobotKeywordCall(this, execRow));
-        }
-    }
-
-    @Override
-    public void fixChildrenOrder() {
-        Collections.sort(getChildren(), new Comparator<RobotKeywordCall>() {
-
-            @Override
-            public int compare(final RobotKeywordCall call1, final RobotKeywordCall call2) {
-                if (call1 instanceof RobotDefinitionSetting && call2 instanceof RobotDefinitionSetting) {
-                    final ModelType modelType1 = call1.getLinkedElement().getModelType();
-                    final ModelType modelType2 = call2.getLinkedElement().getModelType();
-                    return PrioriterizedCaseSettings.from(modelType1).compareTo(PrioriterizedCaseSettings.from(modelType2));
-                } else if (call1 instanceof RobotDefinitionSetting && !(call2 instanceof RobotDefinitionSetting)) {
-                    return -1;
-                } else if (!(call1 instanceof RobotDefinitionSetting) && call2 instanceof RobotDefinitionSetting) {
-                    return 1;
-                } else {
-                    // sort is stable so we don't care about those cases
-                    return 0;
-                }
-            }
-        });
     }
 
     @Override
@@ -108,31 +75,27 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     @SuppressWarnings("unchecked")
     @Override
     public void removeUnitSettings(final RobotKeywordCall call) {
-        getLinkedElement().removeUnitSettings((AModelElement<TestCase>) call.getLinkedElement());
+        getLinkedElement().removeElement((AModelElement<TestCase>) call.getLinkedElement());
     }
     
     public Optional<String> getTemplateInUse() {
         return Optional.ofNullable(getLinkedElement().getTemplateKeywordName());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void moveChildDown(final RobotKeywordCall keywordCall) {
         final int index = keywordCall.getIndex();
         Collections.swap(getChildren(), index, index + 1);
-
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<TestCase> linkedCall = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
-        getLinkedElement().moveDownExecutableRow(linkedCall);
+        getLinkedElement().moveElementDown((AModelElement<TestCase>) keywordCall.getLinkedElement());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void moveChildUp(final RobotKeywordCall keywordCall) {
         final int index = keywordCall.getIndex();
         Collections.swap(getChildren(), index, index - 1);
-
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<TestCase> linkedCall = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
-        getLinkedElement().moveUpExecutableRow(linkedCall);
+        getLinkedElement().moveElementUp((AModelElement<TestCase>) keywordCall.getLinkedElement());
     }
 
     @SuppressWarnings("unchecked")

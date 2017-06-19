@@ -29,9 +29,9 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
-            final String comment) {
-        final TestCaseTeardown teardown = testCase.newTeardown();
+    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final TestCaseTeardown teardown = testCase.newTeardown(index);
         teardown.getDeclaration().setText(settingName);
         teardown.getDeclaration().setRaw(settingName);
 
@@ -49,7 +49,7 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addTeardown(0, (TestCaseTeardown) modelElement);
+        testCase.addElement((TestCaseTeardown) modelElement, 0);
         return modelElement;
     }
 
@@ -85,6 +85,6 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+        testCase.removeElement((AModelElement<TestCase>) modelElement);
     }
 }

@@ -36,24 +36,24 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
     }
 
     @Override
-    public RobotToken map(RobotLine currentLine, Stack<ParsingState> processingState, RobotFileOutput robotFileOutput,
-            RobotToken rt, FilePosition fp, String text) {
-        UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput,
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput,
+            final RobotToken rt, final FilePosition fp, final String text) {
+        final UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput,
                 rt, fp);
-        List<IRobotTokenType> types = rt.getTypes();
+        final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_ACTION_ARGUMENT);
 
-        List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp, text);
-        for (RobotToken token : specialTokens) {
+        final List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp, text);
+        for (final RobotToken token : specialTokens) {
             types.addAll(token.getTypes());
         }
 
-        List<RobotExecutableRow<UserKeyword>> keywordExecutionRows = keyword.getKeywordExecutionRows();
-        RobotExecutableRow<UserKeyword> robotExecutableRow = keywordExecutionRows.get(keywordExecutionRows.size() - 1);
+        final List<RobotExecutableRow<UserKeyword>> keywordExecutionRows = keyword.getExecutionContext();
+        final RobotExecutableRow<UserKeyword> robotExecutableRow = keywordExecutionRows.get(keywordExecutionRows.size() - 1);
 
         boolean commentContinue = false;
         if (!robotExecutableRow.getComment().isEmpty()) {
-            int lineNumber = robotExecutableRow.getComment()
+            final int lineNumber = robotExecutableRow.getComment()
                     .get(robotExecutableRow.getComment().size() - 1)
                     .getLineNumber();
             commentContinue = (lineNumber == rt.getLineNumber());
@@ -80,10 +80,10 @@ public class KeywordExecutableRowArgumentMapper implements IParsingMapper {
     }
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput, RobotLine currentLine, RobotToken rt,
-            String text, Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine, final RobotToken rt,
+            final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
         result = (state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT);
 
         return result;

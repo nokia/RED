@@ -26,7 +26,7 @@ public class TestCaseSetupMorphOperation extends ExecutablesStepsHolderMorphOper
             final AModelElement<?> modelElement) {
         final TestCaseSetup setup = (TestCaseSetup) modelElement;
 
-        final KeywordUnknownSettings unknownSetting = keyword.newUnknownSettings();
+        final KeywordUnknownSettings unknownSetting = keyword.newUnknownSettings(index);
         unknownSetting.getDeclaration().setText(setup.getDeclaration().getText());
         unknownSetting.addArgument(setup.getKeywordName());
         for (final RobotToken arg : setup.getArguments()) {

@@ -48,10 +48,9 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
 
     public RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
             final String comment) {
-        final int modelIndex = countRowsOfTypeUpTo(getExecutableRowModelType(), index);
 
         final RobotExecutableRow<?> robotExecutableRow = (RobotExecutableRow<?>) getModelUpdater()
-                .createExecutableRow(getLinkedElement(), modelIndex, name, null, args);
+                .createExecutableRow(getLinkedElement(), index, name, null, args);
 
         CommentServiceHandler.update(robotExecutableRow, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, comment);
         final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
@@ -61,7 +60,8 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
 
     public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
             final String comment) {
-        final AModelElement<?> newModelElement = getModelUpdater().createSetting(getLinkedElement(), settingName, null,
+        final AModelElement<?> newModelElement = getModelUpdater().createSetting(getLinkedElement(), index, settingName,
+                null,
                 args);
 
         CommentServiceHandler.update((ICommentHolder) newModelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE,
@@ -77,13 +77,12 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     public void insertKeywordCall(final int index, final RobotKeywordCall call) {
         call.setParent(this);
 
-        final int modelIndex = countRowsOfTypeUpTo(getExecutableRowModelType(), index);
         if (index == -1) {
             getChildren().add(call);
         } else {
             getChildren().add(index, call);
         }
-        final AModelElement<?> insertedElement = getModelUpdater().insert(getLinkedElement(), modelIndex,
+        final AModelElement<?> insertedElement = getModelUpdater().insert(getLinkedElement(), index,
                 call.getLinkedElement());
         if (insertedElement != call.getLinkedElement()) {
             call.setLinkedElement(insertedElement);
@@ -97,8 +96,6 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         getModelUpdater().remove(getLinkedElement(), child.getLinkedElement());
     }
 
-    public abstract void fixChildrenOrder();
-
     public abstract void moveChildDown(final RobotKeywordCall keywordCall);
 
     public abstract void moveChildUp(final RobotKeywordCall keywordCall);
@@ -106,15 +103,6 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     protected abstract ModelType getExecutableRowModelType();
 
     public abstract RobotTokenType getSettingDeclarationTokenTypeFor(final String name);
-
-    public int indexOfLastSetting() {
-        for (int i = calls.size() - 1; i >= 0; i--) {
-            if (calls.get(i) instanceof RobotDefinitionSetting) {
-                return i;
-            }
-        }
-        return -1;
-    }
 
     @Override
     public String getName() {

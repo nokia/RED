@@ -137,7 +137,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     }
 
     private boolean hasAnythingToExecute(final TestCase testCase) {
-        for (final RobotExecutableRow<?> robotExecutableRow : testCase.getTestExecutionRows()) {
+        for (final RobotExecutableRow<?> robotExecutableRow : testCase.getExecutionContext()) {
             if (robotExecutableRow.isExecutable()) {
                 return true;
             }
@@ -183,7 +183,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
     void reportKeywordUsageProblems(final List<RobotCase> cases) {
         for (final RobotCase testCase : cases) {
             reportKeywordUsageProblemsInTestCaseSettings(testCase);
-            reportKeywordUsageProblems(validationContext, reporter, testCase.getLinkedElement().getTestExecutionRows(),
+            reportKeywordUsageProblems(validationContext, reporter, testCase.getLinkedElement().getExecutionContext(),
                     testCase.getTemplateInUse());
         }
 
@@ -354,7 +354,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
         if (!setups.isEmpty()) {
             exeRows.add(setups.get(0).asExecutableRow());
         }
-        exeRows.addAll(testCase.getTestExecutionRows());
+        exeRows.addAll(testCase.getExecutionContext());
         final List<TestCaseTeardown> teardowns = testCase.getTeardowns();
         if (!teardowns.isEmpty()) {
             exeRows.add(teardowns.get(0).asExecutableRow());

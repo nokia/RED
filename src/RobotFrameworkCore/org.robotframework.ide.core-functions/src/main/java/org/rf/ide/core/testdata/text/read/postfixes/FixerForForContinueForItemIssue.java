@@ -7,10 +7,10 @@ package org.rf.ide.core.testdata.text.read.postfixes;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.ExecutableUnitsFixer;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -54,10 +54,10 @@ public class FixerForForContinueForItemIssue implements IPostProcessFixAction {
         if (testCaseTable.isPresent()) {
             final List<TestCase> testCases = testCaseTable.getTestCases();
             for (final TestCase execUnit : testCases) {
-                List<RobotExecutableRow<TestCase>> fixed = execUnitFixer.applyFix(execUnit);
-                execUnit.removeAllTestExecutionRows();
-                for (RobotExecutableRow<TestCase> tcRowExec : fixed) {
-                    execUnit.addTestExecutionRow(tcRowExec);
+                final List<AModelElement<TestCase>> fixed = execUnitFixer.applyFix(execUnit);
+                execUnit.removeAllElements();
+                for (final AModelElement<TestCase> el : fixed) {
+                    execUnit.addElement(el);
                 }
             }
         }
@@ -65,10 +65,10 @@ public class FixerForForContinueForItemIssue implements IPostProcessFixAction {
         if (keywordTable.isPresent()) {
             final List<UserKeyword> keywords = keywordTable.getKeywords();
             for (final UserKeyword execUnit : keywords) {
-                List<RobotExecutableRow<UserKeyword>> fixed = execUnitFixer.applyFix(execUnit);
-                execUnit.removeAllKeywordExecutionRows();
-                for (RobotExecutableRow<UserKeyword> ukRowExec : fixed) {
-                    execUnit.addKeywordExecutionRow(ukRowExec);
+                final List<AModelElement<UserKeyword>> fixed = execUnitFixer.applyFix(execUnit);
+                execUnit.removeAllElements();
+                for (final AModelElement<UserKeyword> el : fixed) {
+                    execUnit.addElement(el);
                 }
             }
         }

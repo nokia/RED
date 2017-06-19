@@ -28,9 +28,9 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
-            final String comment) {
-        final TestCaseTags tags = testCase.newTags();
+    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final TestCaseTags tags = testCase.newTags(index);
         tags.getDeclaration().setText(settingName);
         tags.getDeclaration().setRaw(settingName);
 
@@ -45,7 +45,7 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addTag(0, (TestCaseTags) modelElement);
+        testCase.addElement((TestCaseTags) modelElement, 0);
         return modelElement;
     }
     
@@ -75,6 +75,6 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+        testCase.removeElement((AModelElement<TestCase>) modelElement);
     }
 }

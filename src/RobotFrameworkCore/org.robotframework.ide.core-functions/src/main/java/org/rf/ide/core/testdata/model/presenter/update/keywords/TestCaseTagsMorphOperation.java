@@ -25,7 +25,7 @@ public class TestCaseTagsMorphOperation extends ExecutablesStepsHolderMorphOpera
     public AModelElement<?> insert(final UserKeyword keyword, final int index, final AModelElement<?> modelElement) {
         final TestCaseTags caseTags = (TestCaseTags) modelElement;
 
-        final KeywordTags kwTags = keyword.newTags();
+        final KeywordTags kwTags = keyword.newTags(index);
         kwTags.getDeclaration().setText(caseTags.getDeclaration().getText());
         
         for (final RobotToken tag : caseTags.getTags()) {

@@ -33,9 +33,9 @@ public class TestCaseUnkownModelOperation implements IExecutablesStepsHolderElem
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
-            final String comment) {
-        final TestCaseUnknownSettings unknown = testCase.newUnknownSettings();
+    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final TestCaseUnknownSettings unknown = testCase.newUnknownSettings(index);
         unknown.getDeclaration().setText(settingName);
         unknown.getDeclaration().setRaw(settingName);
 
@@ -50,7 +50,7 @@ public class TestCaseUnkownModelOperation implements IExecutablesStepsHolderElem
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addUnknownSettings(0, (TestCaseUnknownSettings) modelElement);
+        testCase.addElement((TestCaseUnknownSettings) modelElement, 0);
         return modelElement;
     }
 
@@ -69,7 +69,7 @@ public class TestCaseUnkownModelOperation implements IExecutablesStepsHolderElem
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseUnknownSettings unknown = (TestCaseUnknownSettings) modelElement;
 
-        int elementsToRemove = unknown.getArguments().size();
+        final int elementsToRemove = unknown.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             unknown.removeElementToken(0);
         }
@@ -81,6 +81,6 @@ public class TestCaseUnkownModelOperation implements IExecutablesStepsHolderElem
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+        testCase.removeElement((AModelElement<TestCase>) modelElement);
     }
 }

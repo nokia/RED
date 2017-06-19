@@ -26,7 +26,7 @@ public class TestCaseTeardownMorphOperation extends ExecutablesStepsHolderMorphO
             final AModelElement<?> modelElement) {
         final TestCaseTeardown caseTeardown = (TestCaseTeardown) modelElement;
 
-        final KeywordTeardown kwTeardown = keyword.newTeardown();
+        final KeywordTeardown kwTeardown = keyword.newTeardown(index);
         kwTeardown.getDeclaration().setText(caseTeardown.getDeclaration().getText());
 
         kwTeardown.setKeywordName(caseTeardown.getKeywordName());

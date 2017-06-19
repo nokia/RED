@@ -40,13 +40,13 @@ public abstract class ACreationOfTestCaseTimeoutTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        TestCase test = new TestCase(keyName);
+        final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        test.newTimeout();
+        test.newTimeout(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -72,19 +72,19 @@ public abstract class ACreationOfTestCaseTimeoutTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        TestCase test = new TestCase(keyName);
+        final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        TestCaseTimeout testTimeout = test.newTimeout();
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTimeout.addCommentPart(cmTok1);
@@ -115,15 +115,15 @@ public abstract class ACreationOfTestCaseTimeoutTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        TestCase test = new TestCase(keyName);
+        final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        TestCaseTimeout testTimeout = test.newTimeout();
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         testTimeout.setTimeout(timeout);
 
@@ -151,23 +151,23 @@ public abstract class ACreationOfTestCaseTimeoutTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        TestCase test = new TestCase(keyName);
+        final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        TestCaseTimeout testTimeout = test.newTimeout();
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         testTimeout.setTimeout(timeout);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTimeout.addCommentPart(cmTok1);
@@ -198,23 +198,23 @@ public abstract class ACreationOfTestCaseTimeoutTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        TestCase test = new TestCase(keyName);
+        final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        TestCaseTimeout testTimeout = test.newTimeout();
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         testTimeout.setTimeout(timeout);
 
-        RobotToken msg1 = new RobotToken();
+        final RobotToken msg1 = new RobotToken();
         msg1.setText("msg1");
-        RobotToken msg2 = new RobotToken();
+        final RobotToken msg2 = new RobotToken();
         msg2.setText("msg2");
-        RobotToken msg3 = new RobotToken();
+        final RobotToken msg3 = new RobotToken();
         msg3.setText("msg3");
 
         testTimeout.addMessagePart(msg1);
@@ -247,34 +247,34 @@ public abstract class ACreationOfTestCaseTimeoutTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        TestCase test = new TestCase(keyName);
+        final TestCase test = new TestCase(keyName);
         testCaseTable.addTest(test);
-        TestCaseTimeout testTimeout = test.newTimeout();
+        final TestCaseTimeout testTimeout = test.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         testTimeout.setTimeout(timeout);
 
-        RobotToken msg1 = new RobotToken();
+        final RobotToken msg1 = new RobotToken();
         msg1.setText("msg1");
-        RobotToken msg2 = new RobotToken();
+        final RobotToken msg2 = new RobotToken();
         msg2.setText("msg2");
-        RobotToken msg3 = new RobotToken();
+        final RobotToken msg3 = new RobotToken();
         msg3.setText("msg3");
 
         testTimeout.addMessagePart(msg1);
         testTimeout.addMessagePart(msg2);
         testTimeout.addMessagePart(msg3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTimeout.addCommentPart(cmTok1);

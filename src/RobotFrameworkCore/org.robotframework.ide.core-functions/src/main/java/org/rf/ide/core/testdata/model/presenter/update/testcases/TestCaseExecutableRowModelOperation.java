@@ -25,8 +25,8 @@ public class TestCaseExecutableRowModelOperation implements IExecutablesStepsHol
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String actionName, final List<String> args,
-            final String comment) {
+    public AModelElement<?> create(final TestCase testCase, final int index, final String actionName,
+            final List<String> args, final String comment) {
         final RobotExecutableRow<TestCase> row = new RobotExecutableRow<>();
         row.setParent(testCase);
 
@@ -45,7 +45,7 @@ public class TestCaseExecutableRowModelOperation implements IExecutablesStepsHol
         @SuppressWarnings("unchecked")
         final RobotExecutableRow<TestCase> executableRow = (RobotExecutableRow<TestCase>) modelElement;
 
-        testCase.addTestExecutionRow(executableRow, index);
+        testCase.addElement(executableRow, index);
         return modelElement;
     }
 
@@ -64,7 +64,7 @@ public class TestCaseExecutableRowModelOperation implements IExecutablesStepsHol
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
 
-        int elementsToRemove = row.getArguments().size();
+        final int elementsToRemove = row.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             row.removeElementToken(0);
         }
@@ -76,6 +76,6 @@ public class TestCaseExecutableRowModelOperation implements IExecutablesStepsHol
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeExecutableRow((RobotExecutableRow<TestCase>) modelElement);
+        testCase.removeElement((RobotExecutableRow<TestCase>) modelElement);
     }
 }

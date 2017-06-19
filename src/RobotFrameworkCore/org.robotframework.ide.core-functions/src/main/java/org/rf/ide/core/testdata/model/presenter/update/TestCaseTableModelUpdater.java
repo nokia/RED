@@ -25,7 +25,6 @@ import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTags
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTeardownMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTimeoutMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordUnknownSettingMorphOperation;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -45,14 +44,14 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             new UserKeywordUnknownSettingMorphOperation());
 
     @Override
-    public AModelElement<?> createSetting(final TestCase testCase, final String settingName, final String comment,
-            final List<String> args) {
+    public AModelElement<?> createSetting(final TestCase testCase, final int index, final String settingName,
+            final String comment, final List<String> args) {
         final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(settingName);
         if (operationHandler == null || testCase == null) {
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
         }
-        return operationHandler.create(testCase, settingName, args, comment);
+        return operationHandler.create(testCase, index, settingName, args, comment);
     }
 
     @Override
@@ -65,8 +64,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             throw new IllegalArgumentException(
                     "Unable to create " + action + " executable row. Operation handler is missing");
         }
-        final AModelElement<?> row = operationHandler.create(testCase, action, args, comment);
-        testCase.addTestExecutionRow((RobotExecutableRow<TestCase>) row, index);
+        final AModelElement<?> row = operationHandler.create(testCase, index, action, args, comment);
+        testCase.addElement((AModelElement<TestCase>) row, index);
         return row;
     }
 

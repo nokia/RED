@@ -40,8 +40,8 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
         final UserKeyword userKeyword = keywordTable.createUserKeyword("dbfoo");
         final RobotExecutableRow<UserKeyword> forExec = new RobotExecutableRow<>();
         final RobotExecutableRow<UserKeyword> forContinueOneExec = new RobotExecutableRow<>();
-        userKeyword.addKeywordExecutionRow(forExec);
-        userKeyword.addKeywordExecutionRow(forContinueOneExec);
+        userKeyword.addElement(forExec);
+        userKeyword.addElement(forContinueOneExec);
 
         final RobotToken forAction = RobotToken.create(":FOR");
         forAction.setLineNumber(1);
@@ -76,7 +76,7 @@ public class ForLoopDeclarationRowDescriptorBuilderTest {
         final List<RobotToken> elementTokensLine = line.getElementTokens();
 
         assertThat(elementTokensDesc.size()).isEqualTo(elementTokensLine.size());
-        int size = elementTokensDesc.size();
+        final int size = elementTokensDesc.size();
         for (int i = 0; i < size; i++) {
             assertThat(elementTokensDesc.get(i) != elementTokensLine.get(i)).isTrue();
         }

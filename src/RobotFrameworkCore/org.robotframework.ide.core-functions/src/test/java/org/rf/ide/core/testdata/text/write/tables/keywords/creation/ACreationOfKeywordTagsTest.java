@@ -40,13 +40,13 @@ public abstract class ACreationOfKeywordTagsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        uk.newTags();
+        uk.newTags(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -70,19 +70,19 @@ public abstract class ACreationOfKeywordTagsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTags keyTags = uk.newTags();
+        final KeywordTags keyTags = uk.newTags(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyTags.addCommentPart(cmTok1);
@@ -111,19 +111,19 @@ public abstract class ACreationOfKeywordTagsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTags keyTags = uk.newTags();
+        final KeywordTags keyTags = uk.newTags(0);
 
-        RobotToken tagOne = new RobotToken();
+        final RobotToken tagOne = new RobotToken();
         tagOne.setText("tag1");
-        RobotToken tagTwo = new RobotToken();
+        final RobotToken tagTwo = new RobotToken();
         tagTwo.setText("tag2");
-        RobotToken tagThree = new RobotToken();
+        final RobotToken tagThree = new RobotToken();
         tagThree.setText("tag3");
         keyTags.addTag(tagOne);
         keyTags.addTag(tagTwo);
@@ -153,29 +153,29 @@ public abstract class ACreationOfKeywordTagsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTags keyTags = uk.newTags();
+        final KeywordTags keyTags = uk.newTags(0);
 
-        RobotToken tagOne = new RobotToken();
+        final RobotToken tagOne = new RobotToken();
         tagOne.setText("tag1");
-        RobotToken tagTwo = new RobotToken();
+        final RobotToken tagTwo = new RobotToken();
         tagTwo.setText("tag2");
-        RobotToken tagThree = new RobotToken();
+        final RobotToken tagThree = new RobotToken();
         tagThree.setText("tag3");
         keyTags.addTag(tagOne);
         keyTags.addTag(tagTwo);
         keyTags.addTag(tagThree);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyTags.addCommentPart(cmTok1);

@@ -28,9 +28,9 @@ public class KeywordArgumentsModelOperation implements IExecutablesStepsHolderEl
     }
     
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
-            final String comment) {
-        final KeywordArguments keywordArgs = userKeyword.newArguments();
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final KeywordArguments keywordArgs = userKeyword.newArguments(index);
         keywordArgs.getDeclaration().setText(settingName);
         keywordArgs.getDeclaration().setRaw(settingName);
 
@@ -43,10 +43,11 @@ public class KeywordArgumentsModelOperation implements IExecutablesStepsHolderEl
         return keywordArgs;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addArguments(0, (KeywordArguments) modelElement);
+        userKeyword.addElement((AModelElement<UserKeyword>) modelElement, 0);
         return modelElement;
     }
 
@@ -64,7 +65,7 @@ public class KeywordArgumentsModelOperation implements IExecutablesStepsHolderEl
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordArguments keywordArguments = (KeywordArguments) modelElement;
 
-        int elementsToRemove = keywordArguments.getArguments().size();
+        final int elementsToRemove = keywordArguments.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             keywordArguments.removeElementToken(0);
         }
@@ -76,6 +77,6 @@ public class KeywordArgumentsModelOperation implements IExecutablesStepsHolderEl
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

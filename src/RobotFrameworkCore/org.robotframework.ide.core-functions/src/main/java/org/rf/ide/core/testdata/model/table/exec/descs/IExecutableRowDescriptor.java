@@ -7,8 +7,8 @@ package org.rf.ide.core.testdata.model.table.exec.descs;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -31,10 +31,11 @@ public interface IExecutableRowDescriptor<T> {
 
     IRowType getRowType();
 
-    RobotExecutableRow<T> getRow();
+    AModelElement<T> getRow();
 
     public enum ERowType implements IRowType {
         UNKONWN,
+        SETTING,
         COMMENTED_HASH,
         SIMPLE,
         FOR,

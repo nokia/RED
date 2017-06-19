@@ -23,9 +23,6 @@ public class MoveKeywordCallDownCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (!keywordCall.isExecutable()) {
-            throw new IllegalStateException("Unable to move non-executable rows");
-        }
 
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
 

@@ -40,7 +40,7 @@ public class KeywordTagsMapper extends AKeywordSettingDeclarationMapper {
         final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         final KeywordTags tags = new KeywordTags(rt);
-        keyword.addTag(tags);
+        keyword.addElement(tags);
 
         processingState.push(ParsingState.KEYWORD_SETTING_TAGS);
 

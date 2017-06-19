@@ -262,7 +262,7 @@ public class AssistProposalPredicatesTest {
         final RobotKeywordCall keywordTeardown = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0)
                 .getChildren()
-                .get(1);
+                .get(0);
 
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(keywordTeardown);
@@ -276,14 +276,12 @@ public class AssistProposalPredicatesTest {
         final List<RobotKeywordCall> settings = model.findSection(RobotKeywordsSection.class).get().getChildren()
                 .get(0).getChildren();
 
-        for (int i = 0; i < settings.size(); i++) {
-            // omiting keyword teardown
-            if (i != 1) {
-                final AssistProposalPredicate<String> predicate = AssistProposalPredicates
-                        .globalVariablePredicate(settings.get(i));
-                assertThat(predicate.apply("${KEYWORD_STATUS}")).isFalse();
-                assertThat(predicate.apply("${KEYWORD_MESSAGE}")).isFalse();
-            }
+        // omitting keyword teardown at i = 0
+        for (int i = 1; i < settings.size(); i++) {
+            final AssistProposalPredicate<String> predicate = AssistProposalPredicates
+                    .globalVariablePredicate(settings.get(i));
+            assertThat(predicate.apply("${KEYWORD_STATUS}")).isFalse();
+            assertThat(predicate.apply("${KEYWORD_MESSAGE}")).isFalse();
         }
     }
 

@@ -40,13 +40,13 @@ public abstract class ACreationOfTestCaseTagsTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        test.newTags();
+        test.newTags(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -69,19 +69,19 @@ public abstract class ACreationOfTestCaseTagsTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTags testTags = test.newTags();
+        final TestCaseTags testTags = test.newTags(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTags.addCommentPart(cmTok1);
@@ -110,19 +110,19 @@ public abstract class ACreationOfTestCaseTagsTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTags testTags = test.newTags();
+        final TestCaseTags testTags = test.newTags(0);
 
-        RobotToken tagOne = new RobotToken();
+        final RobotToken tagOne = new RobotToken();
         tagOne.setText("tag1");
-        RobotToken tagTwo = new RobotToken();
+        final RobotToken tagTwo = new RobotToken();
         tagTwo.setText("tag2");
-        RobotToken tagThree = new RobotToken();
+        final RobotToken tagThree = new RobotToken();
         tagThree.setText("tag3");
         testTags.addTag(tagOne);
         testTags.addTag(tagTwo);
@@ -151,29 +151,29 @@ public abstract class ACreationOfTestCaseTagsTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTags testTags = test.newTags();
+        final TestCaseTags testTags = test.newTags(0);
 
-        RobotToken tagOne = new RobotToken();
+        final RobotToken tagOne = new RobotToken();
         tagOne.setText("tag1");
-        RobotToken tagTwo = new RobotToken();
+        final RobotToken tagTwo = new RobotToken();
         tagTwo.setText("tag2");
-        RobotToken tagThree = new RobotToken();
+        final RobotToken tagThree = new RobotToken();
         tagThree.setText("tag3");
         testTags.addTag(tagOne);
         testTags.addTag(tagTwo);
         testTags.addTag(tagThree);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTags.addCommentPart(cmTok1);

@@ -109,9 +109,9 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     private List<RobotExecutableRow<?>> extractAllExecutableRows(final KeywordContext parentKeywordContext) {
         final List<RobotExecutableRow<?>> executableRows = new ArrayList<>();
         if (parentKeywordContext != null && parentKeywordContext.getUserKeyword() != null) {
-            executableRows.addAll(parentKeywordContext.getUserKeyword().getKeywordExecutionRows());
+            executableRows.addAll(parentKeywordContext.getUserKeyword().getExecutionContext());
         } else if (currentTestCase != null) {
-            executableRows.addAll(currentTestCase.getTestExecutionRows());
+            executableRows.addAll(currentTestCase.getExecutionContext());
         }
         return executableRows;
     }

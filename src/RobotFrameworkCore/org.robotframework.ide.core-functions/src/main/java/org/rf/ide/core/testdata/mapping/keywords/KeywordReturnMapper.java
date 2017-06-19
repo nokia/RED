@@ -40,7 +40,7 @@ public class KeywordReturnMapper extends AKeywordSettingDeclarationMapper {
         final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         final KeywordReturn returned = new KeywordReturn(rt);
-        keyword.addReturn(returned);
+        keyword.addElement(returned);
 
         processingState.push(ParsingState.KEYWORD_SETTING_RETURN);
 

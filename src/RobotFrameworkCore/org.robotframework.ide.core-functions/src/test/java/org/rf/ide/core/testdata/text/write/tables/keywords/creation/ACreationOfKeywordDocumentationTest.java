@@ -34,13 +34,13 @@ public abstract class ACreationOfKeywordDocumentationTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText("User Keyword");
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordDocumentation keyDoc = uk.newDocumentation();
+        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
 
         DocumentationServiceHandler.update(keyDoc, "doc me" + "\n" + "textZero" + "\n" + "textTwo");
 
@@ -69,13 +69,13 @@ public abstract class ACreationOfKeywordDocumentationTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        uk.newDocumentation();
+        uk.newDocumentation(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -100,19 +100,19 @@ public abstract class ACreationOfKeywordDocumentationTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordDocumentation keyDoc = uk.newDocumentation();
+        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyDoc.addCommentPart(cmTok1);
@@ -142,18 +142,18 @@ public abstract class ACreationOfKeywordDocumentationTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordDocumentation keyDoc = uk.newDocumentation();
-        RobotToken wr1 = new RobotToken();
+        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
+        final RobotToken wr1 = new RobotToken();
         wr1.setText("w1");
-        RobotToken wr2 = new RobotToken();
+        final RobotToken wr2 = new RobotToken();
         wr2.setText("w2");
-        RobotToken wr3 = new RobotToken();
+        final RobotToken wr3 = new RobotToken();
         wr3.setText("w3");
 
         keyDoc.addDocumentationText(wr1);
@@ -183,29 +183,29 @@ public abstract class ACreationOfKeywordDocumentationTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordDocumentation keyDoc = uk.newDocumentation();
-        RobotToken wr1 = new RobotToken();
+        final KeywordDocumentation keyDoc = uk.newDocumentation(0);
+        final RobotToken wr1 = new RobotToken();
         wr1.setText("w1");
-        RobotToken wr2 = new RobotToken();
+        final RobotToken wr2 = new RobotToken();
         wr2.setText("w2");
-        RobotToken wr3 = new RobotToken();
+        final RobotToken wr3 = new RobotToken();
         wr3.setText("w3");
 
         keyDoc.addDocumentationText(wr1);
         keyDoc.addDocumentationText(wr2);
         keyDoc.addDocumentationText(wr3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyDoc.addCommentPart(cmTok1);

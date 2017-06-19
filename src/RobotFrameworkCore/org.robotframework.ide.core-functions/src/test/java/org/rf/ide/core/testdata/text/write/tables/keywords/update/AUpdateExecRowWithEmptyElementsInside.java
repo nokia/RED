@@ -51,7 +51,7 @@ public abstract class AUpdateExecRowWithEmptyElementsInside {
         final RobotExecutableRow<UserKeyword> newRow = new RobotExecutableRow<>();
         newRow.setAction(RobotToken.create("Log"));
         newRow.addArgument(RobotToken.create("ok"));
-        userKeyword.addKeywordExecutionRow(newRow);
+        userKeyword.addElement(newRow);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
@@ -71,10 +71,10 @@ public abstract class AUpdateExecRowWithEmptyElementsInside {
         final RobotExecutableRow<UserKeyword> newRow = new RobotExecutableRow<>();
         newRow.setAction(RobotToken.create("Log"));
         newRow.addArgument(RobotToken.create("ok"));
-        userKeyword.addKeywordExecutionRow(newRow);
+        userKeyword.addElement(newRow);
 
-        DumpedResult dumpToResultObject = new RobotFileDumper().dumpToResultObject(modelFile.getParent());
-        QuickTokenListenerBaseTwoModelReferencesLinker linker = new QuickTokenListenerBaseTwoModelReferencesLinker();
+        final DumpedResult dumpToResultObject = new RobotFileDumper().dumpToResultObject(modelFile.getParent());
+        final QuickTokenListenerBaseTwoModelReferencesLinker linker = new QuickTokenListenerBaseTwoModelReferencesLinker();
         linker.update(modelFile.getParent(), dumpToResultObject);
 
         // verify
