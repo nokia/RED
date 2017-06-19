@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IlBPkBq5EeexL8zyucnNEq
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/9/17 3:28 PM
+Save-Time: 6/19/17 10:46 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -57,7 +57,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "test\n"
     + "    # [Teardown]    Catenate    4    5\n"
     + "    log  9" | verify-true
-// verify if there in no problems in Problems
+// verify if there is no problems in Problems
 get-view Problems | click
 wait-for-zero-items -times 2 -delay 500
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
