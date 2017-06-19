@@ -49,7 +49,7 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addElement((TestCaseTeardown) modelElement, 0);
+        testCase.addElement((TestCaseTeardown) modelElement, index);
         return modelElement;
     }
 

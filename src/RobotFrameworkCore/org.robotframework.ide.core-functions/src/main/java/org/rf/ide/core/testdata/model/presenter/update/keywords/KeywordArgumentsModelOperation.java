@@ -47,7 +47,7 @@ public class KeywordArgumentsModelOperation implements IExecutablesStepsHolderEl
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addElement((AModelElement<UserKeyword>) modelElement, 0);
+        userKeyword.addElement((AModelElement<UserKeyword>) modelElement, index);
         return modelElement;
     }
 

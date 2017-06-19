@@ -49,7 +49,7 @@ public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderEl
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addElement((TestCaseTemplate) modelElement, 0);
+        testCase.addElement((TestCaseTemplate) modelElement, index);
         return modelElement;
     }
 

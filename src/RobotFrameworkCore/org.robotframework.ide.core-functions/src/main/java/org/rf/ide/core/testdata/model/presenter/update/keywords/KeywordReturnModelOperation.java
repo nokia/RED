@@ -46,7 +46,7 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addElement((KeywordReturn) modelElement, 0);
+        userKeyword.addElement((KeywordReturn) modelElement, index);
         return modelElement;
     }
 

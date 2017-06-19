@@ -49,7 +49,7 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addElement((TestCaseTimeout) modelElement, 0);
+        testCase.addElement((TestCaseTimeout) modelElement, index);
         return modelElement;
     }
 

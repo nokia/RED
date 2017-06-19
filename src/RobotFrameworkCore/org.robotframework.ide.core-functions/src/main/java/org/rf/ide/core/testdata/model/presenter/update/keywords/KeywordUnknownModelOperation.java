@@ -41,7 +41,7 @@ public class KeywordUnknownModelOperation implements IExecutablesStepsHolderElem
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addElement((KeywordUnknownSettings) modelElement, 0);
+        userKeyword.addElement((KeywordUnknownSettings) modelElement, index);
         return modelElement;
     }
 
