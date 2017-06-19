@@ -67,13 +67,13 @@ public class ConvertCallToComment extends EditorCommand {
                 if (parentObject instanceof TestCase) {
                     final RobotExecutableRow<TestCase> tempLinked = new RobotExecutableRow<>();
                     tempLinked.getAction().setType(RobotTokenType.TEST_CASE_ACTION_NAME);
-                    ((TestCase) parentObject).replaceTestExecutionRow(
+                    ((TestCase) parentObject).replaceElement(
                             (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement(), tempLinked);
                     newLinked = tempLinked;
                 } else if (parentObject instanceof UserKeyword) {
                     final RobotExecutableRow<UserKeyword> tempLinked = new RobotExecutableRow<>();
                     tempLinked.getAction().setType(RobotTokenType.KEYWORD_ACTION_NAME);
-                    ((UserKeyword) parentObject).replaceKeywordExecutionRow(
+                    ((UserKeyword) parentObject).replaceElement(
                             (RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement(), tempLinked);
                     newLinked = tempLinked;
                 }

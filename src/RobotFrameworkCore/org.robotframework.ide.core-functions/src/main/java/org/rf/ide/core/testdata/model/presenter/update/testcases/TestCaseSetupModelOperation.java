@@ -29,9 +29,9 @@ public class TestCaseSetupModelOperation implements IExecutablesStepsHolderEleme
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
-            final String comment) {
-        final TestCaseSetup setup = testCase.newSetup();
+    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final TestCaseSetup setup = testCase.newSetup(index);
         setup.getDeclaration().setText(settingName);
         setup.getDeclaration().setRaw(settingName);
 
@@ -49,7 +49,7 @@ public class TestCaseSetupModelOperation implements IExecutablesStepsHolderEleme
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addSetup(0, (TestCaseSetup) modelElement);
+        testCase.addElement((TestCaseSetup) modelElement, 0);
         return modelElement;
     }
 
@@ -72,7 +72,7 @@ public class TestCaseSetupModelOperation implements IExecutablesStepsHolderEleme
         final TestCaseSetup setup = (TestCaseSetup) modelElement;
 
         setup.setKeywordName(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
-        int elementsToRemove = setup.getArguments().size();
+        final int elementsToRemove = setup.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             setup.removeElementToken(0);
         }
@@ -84,6 +84,6 @@ public class TestCaseSetupModelOperation implements IExecutablesStepsHolderEleme
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+        testCase.removeElement((AModelElement<TestCase>) modelElement);
     }
 }

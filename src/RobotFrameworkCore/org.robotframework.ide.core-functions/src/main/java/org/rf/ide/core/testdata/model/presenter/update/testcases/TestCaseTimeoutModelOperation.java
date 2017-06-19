@@ -29,9 +29,9 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
-            final String comment) {
-        final TestCaseTimeout timeout = testCase.newTimeout();
+    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final TestCaseTimeout timeout = testCase.newTimeout(index);
         timeout.getDeclaration().setText(settingName);
         timeout.getDeclaration().setRaw(settingName);
 
@@ -49,7 +49,7 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addTimeout(0, (TestCaseTimeout) modelElement);
+        testCase.addElement((TestCaseTimeout) modelElement, 0);
         return modelElement;
     }
 
@@ -73,7 +73,7 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
         final TestCaseTimeout timeout = (TestCaseTimeout) modelElement;
 
         timeout.setTimeout(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
-        int elementsToRemove = timeout.getMessage().size();
+        final int elementsToRemove = timeout.getMessage().size();
         for (int i = 0; i < elementsToRemove; i++) {
             timeout.removeElementToken(0);
         }
@@ -85,6 +85,6 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+        testCase.removeElement((AModelElement<TestCase>) modelElement);
     }
 }

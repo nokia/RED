@@ -29,9 +29,9 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
-            final String comment) {
-        final KeywordTimeout keywordTimeout = userKeyword.newTimeout();
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final KeywordTimeout keywordTimeout = userKeyword.newTimeout(index);
         keywordTimeout.getDeclaration().setText(settingName);
         keywordTimeout.getDeclaration().setRaw(settingName);
 
@@ -50,7 +50,7 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addTimeout(0, (KeywordTimeout) modelElement);
+        userKeyword.addElement((KeywordTimeout) modelElement, 0);
         return modelElement;
     }
 
@@ -74,7 +74,7 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
         final KeywordTimeout timeout = (KeywordTimeout) modelElement;
 
         timeout.setTimeout(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
-        int elementsToRemove = timeout.getMessage().size();
+        final int elementsToRemove = timeout.getMessage().size();
         for (int i = 0; i < elementsToRemove; i++) {
             timeout.removeElementToken(0);
         }
@@ -86,6 +86,6 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

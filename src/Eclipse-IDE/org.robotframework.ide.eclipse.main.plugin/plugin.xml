@@ -1936,11 +1936,6 @@
               <iterate
                     ifEmpty="false"
                     operator="and">
-                 <not>
-                    <instanceof
-                          value="org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting">
-                    </instanceof>
-                 </not>
               </iterate>
            </with>
           </and>
@@ -1964,11 +1959,6 @@
               <iterate
                     ifEmpty="false"
                     operator="and">
-                 <not>
-                    <instanceof
-                          value="org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting">
-                    </instanceof>
-                 </not>
               </iterate>
            </with>
           </and>
@@ -2200,11 +2190,6 @@
               <iterate
                     ifEmpty="false"
                     operator="and">
-                 <not>
-                    <instanceof
-                          value="org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting">
-                    </instanceof>
-                 </not>
               </iterate>
            </with>
           </and>
@@ -2228,11 +2213,6 @@
               <iterate
                     ifEmpty="false"
                     operator="and">
-                 <not>
-                    <instanceof
-                          value="org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting">
-                    </instanceof>
-                 </not>
               </iterate>
            </with>
           </and>

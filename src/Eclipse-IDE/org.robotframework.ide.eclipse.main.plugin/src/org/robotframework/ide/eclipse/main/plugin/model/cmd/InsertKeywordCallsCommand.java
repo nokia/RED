@@ -43,8 +43,6 @@ public class InsertKeywordCallsCommand extends EditorCommand {
             shift++;
         }
 
-        parentElement.fixChildrenOrder();
-
         RedEventBroker.using(eventBroker)
             .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(callsToInsert)
             .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);

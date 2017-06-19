@@ -108,7 +108,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
 
     private RobotExecutableRow<UserKeyword> findKeywordExecutionRow(final UserKeyword userKeyword,
             final KeywordContext parentKeywordContext) {
-        final List<RobotExecutableRow<UserKeyword>> executableRows = userKeyword.getKeywordExecutionRows();
+        final List<RobotExecutableRow<UserKeyword>> executableRows = userKeyword.getExecutionContext();
         if (parentKeywordContext.getKeywordExecutableRowCounter() < executableRows.size()) {
             final RobotExecutableRow<UserKeyword> executableRow = executableRows
                     .get(parentKeywordContext.getKeywordExecutableRowCounter());

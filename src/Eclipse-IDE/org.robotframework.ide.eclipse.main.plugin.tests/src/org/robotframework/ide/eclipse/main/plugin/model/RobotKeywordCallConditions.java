@@ -12,10 +12,8 @@ public class RobotKeywordCallConditions {
             public boolean matches(final RobotKeywordCall call) {
                 return call.getParent() != null && call.getParent().getChildren().contains(call)
                         && call.getLinkedElement().getParent() != null
-                        && (((IExecutableStepsHolder<?>) call.getLinkedElement().getParent()).getExecutionContext()
+                        && ((IExecutableStepsHolder<?>) call.getLinkedElement().getParent()).getElements()
                                 .contains(call.getLinkedElement())
-                                || ((IExecutableStepsHolder<?>) call.getLinkedElement().getParent())
-                                        .getUnitSettings().contains(call.getLinkedElement()))
                         && call.getParent().getLinkedElement() == call.getLinkedElement().getParent();
             }
         };

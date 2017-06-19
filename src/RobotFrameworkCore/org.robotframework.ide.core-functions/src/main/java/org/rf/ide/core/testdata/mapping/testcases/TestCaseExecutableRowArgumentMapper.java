@@ -36,26 +36,26 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
     }
 
     @Override
-    public RobotToken map(RobotLine currentLine, Stack<ParsingState> processingState, RobotFileOutput robotFileOutput,
-            RobotToken rt, FilePosition fp, String text) {
-        TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput,
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput,
+            final RobotToken rt, final FilePosition fp, final String text) {
+        final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput,
                 rt, fp);
-        List<IRobotTokenType> types = rt.getTypes();
+        final List<IRobotTokenType> types = rt.getTypes();
         types.remove(RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
         types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
 
-        List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp, text);
-        for (RobotToken token : specialTokens) {
+        final List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp, text);
+        for (final RobotToken token : specialTokens) {
             types.addAll(token.getTypes());
         }
 
-        List<RobotExecutableRow<TestCase>> testExecutionRows = testCase.getTestExecutionRows();
-        RobotExecutableRow<TestCase> robotExecutableRow = testExecutionRows.get(testExecutionRows.size() - 1);
+        final List<RobotExecutableRow<TestCase>> testExecutionRows = testCase.getExecutionContext();
+        final RobotExecutableRow<TestCase> robotExecutableRow = testExecutionRows.get(testExecutionRows.size() - 1);
 
         boolean commentContinue = false;
         if (!robotExecutableRow.getComment().isEmpty()) {
-            int lineNumber = robotExecutableRow.getComment()
+            final int lineNumber = robotExecutableRow.getComment()
                     .get(robotExecutableRow.getComment().size() - 1)
                     .getLineNumber();
             commentContinue = (lineNumber == rt.getLineNumber());
@@ -84,10 +84,10 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
     }
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput, RobotLine currentLine, RobotToken rt,
-            String text, Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine, final RobotToken rt,
+            final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
         result = (state == ParsingState.TEST_CASE_INSIDE_ACTION
                 || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT);
 

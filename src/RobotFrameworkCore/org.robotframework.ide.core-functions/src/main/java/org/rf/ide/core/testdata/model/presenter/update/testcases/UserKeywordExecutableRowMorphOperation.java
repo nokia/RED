@@ -34,7 +34,7 @@ public class UserKeywordExecutableRowMorphOperation extends ExecutablesStepsHold
             executableRow.setArgument(i, arg);
         }
 
-        testCase.addTestExecutionRow(executableRow, index);
+        testCase.addElement(executableRow, index);
 
         return executableRow;
     }

@@ -15,6 +15,8 @@ import org.junit.experimental.theories.DataPoints;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -70,11 +72,13 @@ public class DeleteKeywordCallCommandTest {
 
         assertThat(codeHolder.getChildren().size()).isEqualTo(1);
         assertThat(codeHolder.getChildren().get(0).getName()).isEqualTo("Log");
+        // assert that there are no settings
         if (codeHolder instanceof RobotCase) {
-            assertThat(((RobotCase) codeHolder).getLinkedElement().getUnitSettings()).isEmpty();
+            final TestCase testCase = ((RobotCase) codeHolder).getLinkedElement();
+            assertThat(testCase.getAllElements().size()).isEqualTo(testCase.getExecutionContext().size());
         } else {
-            assertThat(((RobotKeywordDefinition) codeHolder).getLinkedElement().getUnitSettings()).isEmpty();
-
+            final UserKeyword userKeyword = ((RobotKeywordDefinition) codeHolder).getLinkedElement();
+            assertThat(userKeyword.getAllElements().size()).isEqualTo(userKeyword.getExecutionContext().size());
         }
 
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
@@ -171,7 +175,7 @@ public class DeleteKeywordCallCommandTest {
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
 
         List<EditorCommand> undoCommands = command.getUndoCommands();
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
 
@@ -184,11 +188,11 @@ public class DeleteKeywordCallCommandTest {
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Timeout");
         assertThat(codeHolder2.getChildren().get(3).getName()).isEqualTo("Log");
 
-        List<EditorCommand> redoCommands = new ArrayList<>();
-        for (EditorCommand undoCommand : undoCommands) {
+        final List<EditorCommand> redoCommands = new ArrayList<>();
+        for (final EditorCommand undoCommand : undoCommands) {
             redoCommands.addAll(0, undoCommand.getUndoCommands());
         }
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             redoCommand.execute();
         }
 
@@ -201,10 +205,10 @@ public class DeleteKeywordCallCommandTest {
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
         
         undoCommands = new ArrayList<>();
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             undoCommands.addAll(0, redoCommand.getUndoCommands());
         }
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
         

@@ -44,7 +44,7 @@ public class SimpleRowDescriptorBuilderTest {
         final RobotToken settedText = RobotToken.create("foobar");
         settedText.setRaw("");
         oneRow.addArgument(settedText);
-        userKeyword.addKeywordExecutionRow(oneRow);
+        userKeyword.addElement(oneRow);
 
         // execute
         final IExecutableRowDescriptor<UserKeyword> lineDesc = oneRow.buildLineDescription();

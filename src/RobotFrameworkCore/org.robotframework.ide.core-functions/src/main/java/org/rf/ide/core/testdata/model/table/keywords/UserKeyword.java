@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -19,7 +20,6 @@ import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -30,21 +30,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
 
     private RobotToken keywordName;
 
-    private final List<KeywordDocumentation> documentation = new ArrayList<>();
-
-    private final List<KeywordTags> tags = new ArrayList<>();
-
-    private final List<KeywordArguments> keywordArguments = new ArrayList<>();
-
-    private final List<KeywordReturn> keywordReturns = new ArrayList<>();
-
-    private final List<KeywordTeardown> teardowns = new ArrayList<>();
-
-    private final List<KeywordTimeout> timeouts = new ArrayList<>();
-
-    private final List<KeywordUnknownSettings> unknownSettings = new ArrayList<>(0);
-
-    private final List<RobotExecutableRow<UserKeyword>> keywordContext = new ArrayList<>();
+    private final List<AModelElement<UserKeyword>> allElements = new ArrayList<>();
 
     public UserKeyword(final RobotToken keywordName) {
         this.keywordName = keywordName;
@@ -60,52 +46,64 @@ public class UserKeyword extends AModelElement<KeywordTable>
         this.keywordName = keywordName;
     }
 
-    public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow) {
-        executionRow.setParent(this);
-        this.keywordContext.add(executionRow);
+    public void addElement(final AModelElement<UserKeyword> element) {
+        element.setParent(this);
+        allElements.add(element);
     }
 
-    public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow, final int position) {
-        executionRow.setParent(this);
-        this.keywordContext.add(position, executionRow);
+    public void addElement(final AModelElement<UserKeyword> element, final int index) {
+        element.setParent(this);
+        allElements.add(index, element);
     }
 
-    public void removeExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
-        this.keywordContext.remove(executionRow);
+    @Override
+    public boolean removeElement(final AModelElement<UserKeyword> element) {
+        if (element != null) {
+            return allElements.remove(element);
+        }
+        return false;
     }
 
-    public boolean moveUpExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
-        return MoveElementHelper.moveUp(keywordContext, executionRow);
+    public void removeElementAt(final int index) {
+        allElements.remove(index);
     }
 
-    public boolean moveDownExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
-        return MoveElementHelper.moveDown(keywordContext, executionRow);
+    public boolean moveElementUp(final AModelElement<UserKeyword> element) {
+        return MoveElementHelper.moveUp(allElements, element);
     }
 
-    public void removeExecutableLineWithIndex(final int rowIndex) {
-        this.keywordContext.remove(rowIndex);
+    public boolean moveElementDown(final AModelElement<UserKeyword> element) {
+        return MoveElementHelper.moveDown(allElements, element);
     }
 
-    public void removeAllKeywordExecutionRows() {
-        keywordContext.clear();
+    public void replaceElement(final AModelElement<UserKeyword> oldElement,
+            final AModelElement<UserKeyword> newElement) {
+        newElement.setParent(this);
+        allElements.set(allElements.indexOf(oldElement), newElement);
     }
 
-    public void replaceKeywordExecutionRow(final RobotExecutableRow<UserKeyword> oldRow,
-            final RobotExecutableRow<UserKeyword> newRow) {
-        newRow.setParent(this);
-        keywordContext.set(keywordContext.indexOf(oldRow), newRow);
+    public void removeAllElements() {
+        allElements.clear();
     }
 
-    public List<RobotExecutableRow<UserKeyword>> getKeywordExecutionRows() {
-        return Collections.unmodifiableList(keywordContext);
+    public List<AModelElement<UserKeyword>> getAllElements() {
+        return Collections.unmodifiableList(allElements);
+    }
+
+    @Override
+    public List<AModelElement<UserKeyword>> getElements() {
+        return getAllElements();
     }
 
     @Override
     public List<RobotExecutableRow<UserKeyword>> getExecutionContext() {
-        return getKeywordExecutionRows();
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW)
+                .map(el -> (RobotExecutableRow<UserKeyword>) el)
+                .collect(Collectors.toList());
     }
 
-    public KeywordDocumentation newDocumentation() {
+    public KeywordDocumentation newDocumentation(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
@@ -114,26 +112,22 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
 
         final KeywordDocumentation keyDoc = new KeywordDocumentation(dec);
-        addDocumentation(0, keyDoc);
+        addDocumentation(index, keyDoc);
 
         return keyDoc;
     }
 
     public void addDocumentation(final KeywordDocumentation doc) {
-        addDocumentation(documentation.size(), doc);
+        addDocumentation(allElements.size(), doc);
     }
 
     public void addDocumentation(final int index, final KeywordDocumentation doc) {
         doc.setParent(this);
-        this.documentation.add(index, doc);
+        allElements.add(index, doc);
         getParent().getParent().getParent().getDocumentationCacher().register(doc);
     }
 
-    public List<KeywordDocumentation> getDocumentation() {
-        return Collections.unmodifiableList(documentation);
-    }
-
-    public KeywordTags newTags() {
+    public KeywordTags newTags(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.KEYWORD_SETTING_TAGS
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
@@ -142,25 +136,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TAGS);
 
         final KeywordTags keyTags = new KeywordTags(dec);
-        addTag(0, keyTags);
+        addElement(keyTags, index);
 
         return keyTags;
     }
 
-    public void addTag(final KeywordTags tag) {
-        addTag(tags.size(), tag);
-    }
-
-    public void addTag(final int index, final KeywordTags tag) {
-        tag.setParent(this);
-        tags.add(index, tag);
-    }
-
-    public List<KeywordTags> getTags() {
-        return Collections.unmodifiableList(tags);
-    }
-
-    public KeywordArguments newArguments() {
+    public KeywordArguments newArguments(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.KEYWORD_SETTING_ARGUMENTS
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
@@ -169,25 +150,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_ARGUMENTS);
 
         final KeywordArguments keyArgs = new KeywordArguments(dec);
-        addArguments(0, keyArgs);
+        addElement(keyArgs, index);
 
         return keyArgs;
     }
 
-    public void addArguments(final KeywordArguments arguments) {
-        addArguments(keywordArguments.size(), arguments);
-    }
-
-    public void addArguments(final int index, final KeywordArguments arguments) {
-        arguments.setParent(this);
-        keywordArguments.add(index, arguments);
-    }
-
-    public List<KeywordArguments> getArguments() {
-        return Collections.unmodifiableList(keywordArguments);
-    }
-
-    public KeywordReturn newReturn() {
+    public KeywordReturn newReturn(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.KEYWORD_SETTING_RETURN
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
@@ -196,25 +164,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_RETURN);
 
         final KeywordReturn keyReturn = new KeywordReturn(dec);
-        addReturn(0, keyReturn);
+        addElement(keyReturn, index);
 
         return keyReturn;
     }
 
-    public void addReturn(final KeywordReturn keywordReturn) {
-        addReturn(keywordReturns.size(), keywordReturn);
-    }
-
-    public void addReturn(final int index, final KeywordReturn keywordReturn) {
-        keywordReturn.setParent(this);
-        keywordReturns.add(index, keywordReturn);
-    }
-
-    public List<KeywordReturn> getReturns() {
-        return Collections.unmodifiableList(keywordReturns);
-    }
-
-    public KeywordTeardown newTeardown() {
+    public KeywordTeardown newTeardown(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.KEYWORD_SETTING_TEARDOWN
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
@@ -223,25 +178,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TEARDOWN);
 
         final KeywordTeardown keyTeardown = new KeywordTeardown(dec);
-        addTeardown(0, keyTeardown);
+        addElement(keyTeardown, index);
 
         return keyTeardown;
     }
 
-    public void addTeardown(final KeywordTeardown teardown) {
-        addTeardown(teardowns.size(), teardown);
-    }
-
-    public void addTeardown(final int index, final KeywordTeardown teardown) {
-        teardown.setParent(this);
-        teardowns.add(index, teardown);
-    }
-
-    public List<KeywordTeardown> getTeardowns() {
-        return Collections.unmodifiableList(teardowns);
-    }
-
-    public KeywordTimeout newTimeout() {
+    public KeywordTimeout newTimeout(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.KEYWORD_SETTING_TIMEOUT
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
@@ -250,45 +192,68 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TIMEOUT);
 
         final KeywordTimeout keyTimeout = new KeywordTimeout(dec);
-        addTimeout(0, keyTimeout);
+        addElement(keyTimeout, index);
 
         return keyTimeout;
     }
 
-    public void addTimeout(final KeywordTimeout timeout) {
-        addTimeout(timeouts.size(), timeout);
-    }
-
-    public void addTimeout(final int index, final KeywordTimeout timeout) {
-        timeout.setParent(this);
-        timeouts.add(index, timeout);
-    }
-
-    public List<KeywordTimeout> getTimeouts() {
-        return Collections.unmodifiableList(timeouts);
-    }
-
-    public KeywordUnknownSettings newUnknownSettings() {
+    public KeywordUnknownSettings newUnknownSettings(final int index) {
         final RobotToken dec = RobotToken.create("[]",
                 newArrayList(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION));
 
         final KeywordUnknownSettings unknown = new KeywordUnknownSettings(dec);
-        addUnknownSettings(unknown);
+        addElement(unknown, index);
 
         return unknown;
     }
 
-    public void addUnknownSettings(final KeywordUnknownSettings unknownSetting) {
-        addUnknownSettings(unknownSettings.size(), unknownSetting);
+    public List<KeywordDocumentation> getDocumentation() {
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION)
+                .map(KeywordDocumentation.class::cast)
+                .collect(Collectors.toList());
     }
 
-    public void addUnknownSettings(final int index, final KeywordUnknownSettings unknownSetting) {
-        unknownSetting.setParent(this);
-        this.unknownSettings.add(index, unknownSetting);
+    public List<KeywordTags> getTags() {
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_TAGS)
+                .map(KeywordTags.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    public List<KeywordArguments> getArguments() {
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_ARGUMENTS)
+                .map(KeywordArguments.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    public List<KeywordReturn> getReturns() {
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_RETURN)
+                .map(KeywordReturn.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    public List<KeywordTeardown> getTeardowns() {
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_TEARDOWN)
+                .map(KeywordTeardown.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    public List<KeywordTimeout> getTimeouts() {
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_TIMEOUT)
+                .map(KeywordTimeout.class::cast)
+                .collect(Collectors.toList());
     }
 
     public List<KeywordUnknownSettings> getUnknownSettings() {
-        return Collections.unmodifiableList(unknownSettings);
+        return getElements().stream()
+                .filter(el -> el.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN)
+                .map(KeywordUnknownSettings.class::cast)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -319,91 +284,16 @@ public class UserKeyword extends AModelElement<KeywordTable>
                 tokens.add(getKeywordName());
             }
 
-            for (final KeywordDocumentation doc : documentation) {
-                tokens.addAll(doc.getElementTokens());
+            for (final AModelElement<UserKeyword> elem : allElements) {
+                tokens.addAll(elem.getElementTokens());
             }
-
-            for (final KeywordArguments arguments : keywordArguments) {
-                tokens.addAll(arguments.getElementTokens());
-            }
-
-            final List<RobotToken> keywordContextInModel = new ArrayList<>(0);
-            for (final RobotExecutableRow<UserKeyword> row : keywordContext) {
-                keywordContextInModel.addAll(row.getElementTokens());
-            }
-            tokens.addAll(keywordContextInModel);
-
-            for (final KeywordReturn returns : keywordReturns) {
-                tokens.addAll(returns.getElementTokens());
-            }
-
-            for (final KeywordTags tag : tags) {
-                tokens.addAll(tag.getElementTokens());
-            }
-
-            for (final KeywordTeardown teardown : teardowns) {
-                tokens.addAll(teardown.getElementTokens());
-            }
-
-            for (final KeywordTimeout timeout : timeouts) {
-                tokens.addAll(timeout.getElementTokens());
-            }
-
-            for (final KeywordUnknownSettings setting : unknownSettings) {
-                tokens.addAll(setting.getElementTokens());
-            }
-
-            Collections.sort(tokens, new RobotTokenPositionComparator());
-            positionRevertToExpectedOrder(tokens, keywordContextInModel);
         }
-
         return tokens;
     }
 
     @Override
     public UserKeyword getHolder() {
         return this;
-    }
-
-    @Override
-    public List<AModelElement<UserKeyword>> getUnitSettings() {
-        final List<AModelElement<UserKeyword>> settings = new ArrayList<>();
-        settings.addAll(getDocumentation());
-        settings.addAll(getTags());
-        settings.addAll(getArguments());
-        settings.addAll(getReturns());
-        settings.addAll(getTeardowns());
-        settings.addAll(getTimeouts());
-        settings.addAll(getUnknownSettings());
-
-        return settings;
-    }
-
-    @Override
-    public boolean removeUnitSettings(final AModelElement<UserKeyword> setting) {
-        if (setting != null) {
-            final ModelType settingType = setting.getModelType();
-            switch (settingType) {
-                case USER_KEYWORD_DOCUMENTATION:
-                    return this.documentation.remove(setting);
-                case USER_KEYWORD_TAGS:
-                    return this.tags.remove(setting);
-                case USER_KEYWORD_ARGUMENTS:
-                    return this.keywordArguments.remove(setting);
-                case USER_KEYWORD_RETURN:
-                    return this.keywordReturns.remove(setting);
-                case USER_KEYWORD_TEARDOWN:
-                    return this.teardowns.remove(setting);
-                case USER_KEYWORD_TIMEOUT:
-                    return this.timeouts.remove(setting);
-                case USER_KEYWORD_SETTING_UNKNOWN:
-                    return this.unknownSettings.remove(setting);
-                default:
-                    return false;
-            }
-        }
-
-        return false;
     }
 
     @Override
@@ -415,33 +305,11 @@ public class UserKeyword extends AModelElement<KeywordTable>
         if (setting.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN) {
             return false;
         } else {
-            return getContainingList(setting).indexOf(setting) > 0;
+            return allElements.stream()
+                    .filter(el -> el.getModelType() == setting.getModelType())
+                    .collect(Collectors.toList())
+                    .indexOf(setting) > 0;
         }
-    }
-
-    public List<? extends AModelElement<UserKeyword>> getContainingList(final AModelElement<?> setting) {
-        if (setting != null) {
-            final ModelType settingType = setting.getModelType();
-            switch (settingType) {
-                case USER_KEYWORD_DOCUMENTATION:
-                    return documentation;
-                case USER_KEYWORD_TAGS:
-                    return tags;
-                case USER_KEYWORD_TEARDOWN:
-                    return teardowns;
-                case USER_KEYWORD_TIMEOUT:
-                    return timeouts;
-                case USER_KEYWORD_ARGUMENTS:
-                    return keywordArguments;
-                case USER_KEYWORD_RETURN:
-                    return keywordReturns;
-                case USER_KEYWORD_SETTING_UNKNOWN:
-                    return unknownSettings;
-                default:
-                    return new ArrayList<>();
-            }
-        }
-        return new ArrayList<>();
     }
 
     @Override

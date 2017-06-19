@@ -26,7 +26,7 @@ public class TestCaseTimeoutMorphOperation extends ExecutablesStepsHolderMorphOp
             final AModelElement<?> modelElement) {
         final TestCaseTimeout caseTimeout = (TestCaseTimeout) modelElement;
 
-        final KeywordTimeout kwTimeout = keyword.newTimeout();
+        final KeywordTimeout kwTimeout = keyword.newTimeout(index);
         kwTimeout.getDeclaration().setText(caseTimeout.getDeclaration().getText());
 
         kwTimeout.setTimeout(caseTimeout.getTimeout().getText());

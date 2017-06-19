@@ -47,7 +47,7 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
         final UserKeyword keyword = keywordTable.getKeywords().get(0);
-        keyword.getKeywordExecutionRows().get(0).addArgument(RobotToken.create("INFO"));
+        keyword.getExecutionContext().get(0).addArgument(RobotToken.create("INFO"));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
@@ -71,7 +71,7 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
         final UserKeyword keyword = keywordTable.getKeywords().get(0);
-        keyword.getKeywordExecutionRows().get(0).addArgument(RobotToken.create("INFO"));
+        keyword.getExecutionContext().get(0).addArgument(RobotToken.create("INFO"));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
@@ -95,7 +95,7 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
         final UserKeyword keyword = keywordTable.getKeywords().get(0);
-        keyword.getKeywordExecutionRows().get(0).addArgument(RobotToken.create("INFO"));
+        keyword.getExecutionContext().get(0).addArgument(RobotToken.create("INFO"));
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
@@ -120,7 +120,7 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log"));
         executionRow.addArgument(RobotToken.create("done EON"));
-        keyword.addKeywordExecutionRow(executionRow);
+        keyword.addElement(executionRow);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);
@@ -147,7 +147,7 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log"));
         executionRow.addArgument(RobotToken.create("done EON"));
-        keyword.addKeywordExecutionRow(executionRow);
+        keyword.addElement(executionRow);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile, ctx);

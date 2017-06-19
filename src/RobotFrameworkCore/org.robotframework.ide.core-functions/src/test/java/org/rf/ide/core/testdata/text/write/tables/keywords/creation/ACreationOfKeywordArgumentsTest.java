@@ -42,13 +42,13 @@ public abstract class ACreationOfKeywordArgumentsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        uk.newArguments();
+        uk.newArguments(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -74,19 +74,19 @@ public abstract class ACreationOfKeywordArgumentsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
+        final KeywordArguments newArguments = uk.newArguments(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         newArguments.addCommentPart(cmTok1);
@@ -117,19 +117,19 @@ public abstract class ACreationOfKeywordArgumentsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
+        final KeywordArguments newArguments = uk.newArguments(0);
 
-        RobotToken argTok1 = new RobotToken();
+        final RobotToken argTok1 = new RobotToken();
         argTok1.setText("${arg1}");
-        RobotToken argTok2 = new RobotToken();
+        final RobotToken argTok2 = new RobotToken();
         argTok2.setText("${arg2}");
-        RobotToken argTok3 = new RobotToken();
+        final RobotToken argTok3 = new RobotToken();
         argTok3.setText("${arg3}");
 
         newArguments.addArgument(argTok1);
@@ -160,30 +160,30 @@ public abstract class ACreationOfKeywordArgumentsTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
+        final KeywordArguments newArguments = uk.newArguments(0);
 
-        RobotToken argTok1 = new RobotToken();
+        final RobotToken argTok1 = new RobotToken();
         argTok1.setText("${arg1}");
-        RobotToken argTok2 = new RobotToken();
+        final RobotToken argTok2 = new RobotToken();
         argTok2.setText("${arg2}");
-        RobotToken argTok3 = new RobotToken();
+        final RobotToken argTok3 = new RobotToken();
         argTok3.setText("${arg3}");
 
         newArguments.addArgument(argTok1);
         newArguments.addArgument(argTok2);
         newArguments.addArgument(argTok3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         newArguments.addCommentPart(cmTok1);

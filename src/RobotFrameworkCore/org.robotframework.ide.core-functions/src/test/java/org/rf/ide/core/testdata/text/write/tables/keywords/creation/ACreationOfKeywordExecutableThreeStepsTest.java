@@ -46,9 +46,9 @@ public abstract class ACreationOfKeywordExecutableThreeStepsTest extends ACreati
 
         final RobotToken keywordName = new RobotToken();
         final UserKeyword execUnit = new UserKeyword(keywordName);
-        execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
-        execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
-        execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
+        execUnit.addElement(new RobotExecutableRow<UserKeyword>());
+        execUnit.addElement(new RobotExecutableRow<UserKeyword>());
+        execUnit.addElement(new RobotExecutableRow<UserKeyword>());
         keywordTable.addKeyword(execUnit);
 
         return execUnit;

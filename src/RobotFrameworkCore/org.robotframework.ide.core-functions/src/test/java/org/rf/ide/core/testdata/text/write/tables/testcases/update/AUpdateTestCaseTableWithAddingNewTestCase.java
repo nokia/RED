@@ -46,7 +46,7 @@ public abstract class AUpdateTestCaseTableWithAddingNewTestCase {
         final RobotExecutableRow<TestCase> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log2"));
         executionRow.addArgument(RobotToken.create("ok2"));
-        newTestT2.addTestExecutionRow(executionRow);
+        newTestT2.addElement(executionRow);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);

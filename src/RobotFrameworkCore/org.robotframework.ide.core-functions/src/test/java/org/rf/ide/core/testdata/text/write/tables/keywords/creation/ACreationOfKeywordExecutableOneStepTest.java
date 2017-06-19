@@ -46,7 +46,7 @@ public abstract class ACreationOfKeywordExecutableOneStepTest extends ACreationO
 
         final RobotToken keywordName = new RobotToken();
         final UserKeyword execUnit = new UserKeyword(keywordName);
-        execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
+        execUnit.addElement(new RobotExecutableRow<UserKeyword>());
         keywordTable.addKeyword(execUnit);
 
         return execUnit;

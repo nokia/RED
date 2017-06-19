@@ -204,7 +204,7 @@ class KeywordTableValidator implements ModelUnitValidator {
     private List<RobotExecutableRow<?>> findExecutableRows(final List<UserKeyword> keywords) {
         final List<RobotExecutableRow<?>> executables = newArrayList();
         for (final UserKeyword keyword : keywords) {
-            executables.addAll(keyword.getKeywordExecutionRows());
+            executables.addAll(keyword.getExecutionContext());
         }
         return executables;
     }
@@ -227,7 +227,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private List<? extends RobotExecutableRow<?>> collectKeywordExeRowsForVariablesChecking(final UserKeyword keyword) {
         final List<RobotExecutableRow<?>> exeRows = newArrayList();
-        exeRows.addAll(keyword.getKeywordExecutionRows());
+        exeRows.addAll(keyword.getExecutionContext());
 
         final List<KeywordTeardown> teardowns = keyword.getTeardowns();
         if (!teardowns.isEmpty()) {

@@ -29,9 +29,9 @@ public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderEl
     }
     
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
-            final String comment) {
-        final TestCaseTemplate template = testCase.newTemplate();
+    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final TestCaseTemplate template = testCase.newTemplate(index);
         template.getDeclaration().setText(settingName);
         template.getDeclaration().setRaw(settingName);
 
@@ -49,7 +49,7 @@ public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderEl
 
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addTemplate(0, (TestCaseTemplate) modelElement);
+        testCase.addElement((TestCaseTemplate) modelElement, 0);
         return modelElement;
     }
 
@@ -72,7 +72,7 @@ public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderEl
         final TestCaseTemplate template = (TestCaseTemplate) modelElement;
 
         template.setKeywordName(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
-        int elementsToRemove = template.getUnexpectedTrashArguments().size();
+        final int elementsToRemove = template.getUnexpectedTrashArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             template.removeElementToken(0);
         }
@@ -84,6 +84,6 @@ public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderEl
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+        testCase.removeElement((AModelElement<TestCase>) modelElement);
     }
 }

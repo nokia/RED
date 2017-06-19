@@ -23,9 +23,9 @@ public class KeywordUnknownModelOperation implements IExecutablesStepsHolderElem
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
-            final String comment) {
-        final KeywordUnknownSettings unknown = userKeyword.newUnknownSettings();
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final KeywordUnknownSettings unknown = userKeyword.newUnknownSettings(index);
         unknown.getDeclaration().setText(settingName);
         unknown.getDeclaration().setRaw(settingName);
 
@@ -41,7 +41,7 @@ public class KeywordUnknownModelOperation implements IExecutablesStepsHolderElem
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addUnknownSettings(0, (KeywordUnknownSettings) modelElement);
+        userKeyword.addElement((KeywordUnknownSettings) modelElement, 0);
         return modelElement;
     }
 
@@ -60,7 +60,7 @@ public class KeywordUnknownModelOperation implements IExecutablesStepsHolderElem
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordUnknownSettings unknown = (KeywordUnknownSettings) modelElement;
 
-        int elementsToRemove = unknown.getArguments().size();
+        final int elementsToRemove = unknown.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             unknown.removeElementToken(0);
         }
@@ -72,6 +72,6 @@ public class KeywordUnknownModelOperation implements IExecutablesStepsHolderElem
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

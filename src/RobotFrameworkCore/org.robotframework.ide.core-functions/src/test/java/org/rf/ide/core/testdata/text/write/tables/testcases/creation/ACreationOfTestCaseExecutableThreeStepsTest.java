@@ -46,9 +46,9 @@ public abstract class ACreationOfTestCaseExecutableThreeStepsTest extends ACreat
 
         final RobotToken testName = new RobotToken();
         final TestCase execUnit = new TestCase(testName);
-        execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
-        execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
-        execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
+        execUnit.addElement(new RobotExecutableRow<TestCase>());
+        execUnit.addElement(new RobotExecutableRow<TestCase>());
+        execUnit.addElement(new RobotExecutableRow<TestCase>());
         testCaseTable.addTest(execUnit);
 
         return execUnit;

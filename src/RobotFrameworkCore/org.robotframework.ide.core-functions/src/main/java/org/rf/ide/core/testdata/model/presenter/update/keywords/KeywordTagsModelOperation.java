@@ -28,9 +28,9 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
-            final String comment) {
-        final KeywordTags keywordTags = userKeyword.newTags();
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final KeywordTags keywordTags = userKeyword.newTags(index);
         keywordTags.getDeclaration().setText(settingName);
         keywordTags.getDeclaration().setRaw(settingName);
 
@@ -46,7 +46,7 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addTag(0, (KeywordTags) modelElement);
+        userKeyword.addElement((KeywordTags) modelElement, 0);
         return modelElement;
     }
     
@@ -64,7 +64,7 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordTags tags = (KeywordTags) modelElement;
 
-        int elementsToRemove = tags.getTags().size();
+        final int elementsToRemove = tags.getTags().size();
         for (int i = 0; i < elementsToRemove; i++) {
             tags.removeElementToken(0);
         }
@@ -76,6 +76,6 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

@@ -46,7 +46,7 @@ public abstract class ACreationOfTestCaseExecutableOneStepTest extends ACreation
 
         final RobotToken testName = new RobotToken();
         final TestCase execUnit = new TestCase(testName);
-        execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
+        execUnit.addElement(new RobotExecutableRow<TestCase>());
         testCaseTable.addTest(execUnit);
 
         return execUnit;

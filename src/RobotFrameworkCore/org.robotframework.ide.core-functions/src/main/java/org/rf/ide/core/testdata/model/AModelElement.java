@@ -183,19 +183,4 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         }
         fixForTheType(token, expectedMainType);
     }
-
-    protected void positionRevertToExpectedOrder(final List<RobotToken> listOfTokens, final List<RobotToken> order) {
-        if (order.isEmpty()) {
-            return;
-        }
-
-        int orderTokIndex = 0;
-        final int size = listOfTokens.size();
-        for (int i = 0; i < size; i++) {
-            if (order.contains(listOfTokens.get(i))) {
-                listOfTokens.set(i, order.get(orderTokIndex));
-                orderTokIndex++;
-            }
-        }
-    }
 }

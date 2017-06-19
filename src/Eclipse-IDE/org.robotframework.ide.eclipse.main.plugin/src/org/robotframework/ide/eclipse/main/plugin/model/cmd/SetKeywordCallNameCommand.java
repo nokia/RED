@@ -113,19 +113,13 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
 
         final int index = keywordCall.getIndex();
-        final int lastSettingIndex = parent.indexOfLastSetting();
-
-        final MoveKeywordCall moveCommand = new MoveKeywordCall(parent, index, lastSettingIndex + 1);
-        moveCommand.execute();
 
         final ConvertCallToSetting convertCommand = new ConvertCallToSetting(eventBroker, keywordCall, settingName);
         convertCommand.execute();
 
-        // when doing undo we also want to firstly move and then convert
         executedCommands.add(convertCommand);
-        executedCommands.add(moveCommand);
 
-        return parent.getChildren().get(lastSettingIndex + 1);
+        return parent.getChildren().get(index);
     }
 
     private RobotKeywordCall changeToCall(final String name) {
@@ -133,19 +127,13 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final RobotDefinitionSetting setting = (RobotDefinitionSetting) keywordCall;
 
         final int index = setting.getIndex();
-        final int lastSettingIndex = parent.indexOfLastSetting();
-
-        final MoveKeywordCall moveCommand = new MoveKeywordCall(parent, index, lastSettingIndex);
-        moveCommand.execute();
 
         final ConvertSettingToCall convertCommand = new ConvertSettingToCall(eventBroker, setting, name);
         convertCommand.execute();
 
-        // when doing undo we also want to firstly move and then convert
         executedCommands.add(convertCommand);
-        executedCommands.add(moveCommand);
 
-        return parent.getChildren().get(lastSettingIndex);
+        return parent.getChildren().get(index);
     }
 
     private void removeFirstArgument(final RobotKeywordCall actualCall) {
@@ -270,35 +258,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         @Override
         public List<EditorCommand> getUndoCommands() {
             return newUndoCommands(new ConvertCallToSetting(eventBroker, newCall, "[" + setting.getName() + "]"));
-        }
-    }
-
-    private static class MoveKeywordCall extends EditorCommand {
-
-        private final RobotCodeHoldingElement<?> parent;
-
-        private final int index;
-
-        private final int targetIndex;
-
-        public MoveKeywordCall(final RobotCodeHoldingElement<?> parent, final int index, final int targetIndex) {
-            this.parent = parent;
-            this.index = index;
-            this.targetIndex = targetIndex;
-        }
-
-        @Override
-        public void execute() throws CommandExecutionException {
-            if (index == targetIndex) {
-                return;
-            }
-            final RobotKeywordCall removed = parent.getChildren().remove(index);
-            parent.getChildren().add(targetIndex, removed);
-        }
-
-        @Override
-        public List<EditorCommand> getUndoCommands() {
-            return newUndoCommands(new MoveKeywordCall(parent, targetIndex, index));
         }
     }
 }

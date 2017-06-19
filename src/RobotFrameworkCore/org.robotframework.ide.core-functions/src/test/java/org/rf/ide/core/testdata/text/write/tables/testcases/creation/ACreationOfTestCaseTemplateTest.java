@@ -40,13 +40,13 @@ public abstract class ACreationOfTestCaseTemplateTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        test.newTemplate();
+        test.newTemplate(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -72,19 +72,19 @@ public abstract class ACreationOfTestCaseTemplateTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTemplate testTemplate = test.newTemplate();
+        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTemplate.addCommentPart(cmTok1);
@@ -115,15 +115,15 @@ public abstract class ACreationOfTestCaseTemplateTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTemplate testTemplate = test.newTemplate();
+        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        RobotToken keyword = new RobotToken();
+        final RobotToken keyword = new RobotToken();
         keyword.setText("execKey");
 
         testTemplate.setKeywordName(keyword);
@@ -152,24 +152,24 @@ public abstract class ACreationOfTestCaseTemplateTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTemplate testTemplate = test.newTemplate();
+        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        RobotToken keyword = new RobotToken();
+        final RobotToken keyword = new RobotToken();
         keyword.setText("execKey");
 
         testTemplate.setKeywordName(keyword);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTemplate.addCommentPart(cmTok1);
@@ -200,24 +200,24 @@ public abstract class ACreationOfTestCaseTemplateTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTemplate testTemplate = test.newTemplate();
+        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        RobotToken keyword = new RobotToken();
+        final RobotToken keyword = new RobotToken();
         keyword.setText("execKey");
 
         testTemplate.setKeywordName(keyword);
 
-        RobotToken argU1 = new RobotToken();
+        final RobotToken argU1 = new RobotToken();
         argU1.setText("argU1");
-        RobotToken argU2 = new RobotToken();
+        final RobotToken argU2 = new RobotToken();
         argU2.setText("argU2");
-        RobotToken argU3 = new RobotToken();
+        final RobotToken argU3 = new RobotToken();
         argU3.setText("argU3");
 
         testTemplate.addUnexpectedTrashArgument(argU1);
@@ -250,35 +250,35 @@ public abstract class ACreationOfTestCaseTemplateTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTemplate testTemplate = test.newTemplate();
+        final TestCaseTemplate testTemplate = test.newTemplate(0);
 
-        RobotToken keyword = new RobotToken();
+        final RobotToken keyword = new RobotToken();
         keyword.setText("execKey");
 
         testTemplate.setKeywordName(keyword);
 
-        RobotToken argU1 = new RobotToken();
+        final RobotToken argU1 = new RobotToken();
         argU1.setText("argU1");
-        RobotToken argU2 = new RobotToken();
+        final RobotToken argU2 = new RobotToken();
         argU2.setText("argU2");
-        RobotToken argU3 = new RobotToken();
+        final RobotToken argU3 = new RobotToken();
         argU3.setText("argU3");
 
         testTemplate.addUnexpectedTrashArgument(argU1);
         testTemplate.addUnexpectedTrashArgument(argU2);
         testTemplate.addUnexpectedTrashArgument(argU3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTemplate.addCommentPart(cmTok1);

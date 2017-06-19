@@ -449,7 +449,7 @@ public class KeywordCallArgumentsValidatorTest {
             final String caseName) {
         final Optional<RobotCasesSection> casesSection = file.findSection(RobotCasesSection.class);
         final RobotCase testCase = (RobotCase) casesSection.get().findChild(caseName);
-        final RobotExecutableRow<TestCase> executable = testCase.getLinkedElement().getTestExecutionRows().get(0);
+        final RobotExecutableRow<TestCase> executable = testCase.getLinkedElement().getExecutionContext().get(0);
         final IExecutableRowDescriptor<?> executableRowDescriptor = executable.buildLineDescription();
         return new DefiningTokenWithArgumentTokens(executableRowDescriptor.getAction().getToken(),
                 executableRowDescriptor.getKeywordArguments());

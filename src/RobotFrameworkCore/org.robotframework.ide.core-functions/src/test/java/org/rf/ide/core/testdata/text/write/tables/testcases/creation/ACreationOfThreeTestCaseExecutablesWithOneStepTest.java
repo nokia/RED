@@ -67,7 +67,7 @@ public abstract class ACreationOfThreeTestCaseExecutablesWithOneStepTest extends
         for (int index = 0; index < 3; index++) {
             final RobotToken testName = new RobotToken();
             final TestCase execUnit = new TestCase(testName);
-            execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
+            execUnit.addElement(new RobotExecutableRow<TestCase>());
             keywordTable.addTest(execUnit);
             execUnits.add(execUnit);
         }

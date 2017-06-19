@@ -24,8 +24,8 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String actionName, final List<String> args,
-            final String comment) {
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String actionName,
+            final List<String> args, final String comment) {
         final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<>();
         row.setParent(userKeyword);
 
@@ -45,7 +45,7 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
         @SuppressWarnings("unchecked")
         final RobotExecutableRow<UserKeyword> executableRow = (RobotExecutableRow<UserKeyword>) modelElement;
         
-        userKeyword.addKeywordExecutionRow(executableRow, index);
+        userKeyword.addElement(executableRow, index);
         return modelElement;
     }
 
@@ -64,7 +64,7 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
 
-        int elementsToRemove = row.getArguments().size();
+        final int elementsToRemove = row.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             row.removeElementToken(0);
         }
@@ -76,6 +76,6 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeExecutableRow((RobotExecutableRow<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

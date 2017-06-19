@@ -20,7 +20,7 @@ public class UserKeywordDocumentationMorphOperation extends ExecutablesStepsHold
     public TestDocumentation insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         final KeywordDocumentation kwDocumentation = (KeywordDocumentation) modelElement;
         
-        final TestDocumentation caseDocumentation = testCase.newDocumentation();
+        final TestDocumentation caseDocumentation = testCase.newDocumentation(index);
         caseDocumentation.getDeclaration().setText(kwDocumentation.getDeclaration().getText());
 
         for (final RobotToken txt : kwDocumentation.getDocumentationText()) {

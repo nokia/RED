@@ -34,13 +34,13 @@ public abstract class ACreationOfTestCaseDocumentationTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testCaseName = new RobotToken();
+        final RobotToken testCaseName = new RobotToken();
         testCaseName.setText("TestCase");
-        TestCase testCase = new TestCase(testCaseName);
+        final TestCase testCase = new TestCase(testCaseName);
         testCaseTable.addTest(testCase);
-        TestDocumentation testDoc = testCase.newDocumentation();
+        final TestDocumentation testDoc = testCase.newDocumentation(0);
 
         DocumentationServiceHandler.update(testDoc, "doc me" + "\n" + "textZero" + "\n" + "textTwo");
 
@@ -68,13 +68,13 @@ public abstract class ACreationOfTestCaseDocumentationTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testCaseName = new RobotToken();
+        final RobotToken testCaseName = new RobotToken();
         testCaseName.setText(userTestCaseName);
-        TestCase testCase = new TestCase(testCaseName);
+        final TestCase testCase = new TestCase(testCaseName);
         testCaseTable.addTest(testCase);
-        testCase.newDocumentation();
+        testCase.newDocumentation(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -99,19 +99,19 @@ public abstract class ACreationOfTestCaseDocumentationTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testCaseName = new RobotToken();
+        final RobotToken testCaseName = new RobotToken();
         testCaseName.setText(userTestCaseName);
-        TestCase test = new TestCase(testCaseName);
+        final TestCase test = new TestCase(testCaseName);
         testCaseTable.addTest(test);
-        TestDocumentation testDoc = test.newDocumentation();
+        final TestDocumentation testDoc = test.newDocumentation(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testDoc.addCommentPart(cmTok1);
@@ -141,18 +141,18 @@ public abstract class ACreationOfTestCaseDocumentationTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testCaseName = new RobotToken();
+        final RobotToken testCaseName = new RobotToken();
         testCaseName.setText(userTestCaseName);
-        TestCase test = new TestCase(testCaseName);
+        final TestCase test = new TestCase(testCaseName);
         testCaseTable.addTest(test);
-        TestDocumentation testDoc = test.newDocumentation();
-        RobotToken wr1 = new RobotToken();
+        final TestDocumentation testDoc = test.newDocumentation(0);
+        final RobotToken wr1 = new RobotToken();
         wr1.setText("w1");
-        RobotToken wr2 = new RobotToken();
+        final RobotToken wr2 = new RobotToken();
         wr2.setText("w2");
-        RobotToken wr3 = new RobotToken();
+        final RobotToken wr3 = new RobotToken();
         wr3.setText("w3");
 
         testDoc.addDocumentationText(wr1);
@@ -182,29 +182,29 @@ public abstract class ACreationOfTestCaseDocumentationTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testCaseName = new RobotToken();
+        final RobotToken testCaseName = new RobotToken();
         testCaseName.setText(userTestCaseName);
-        TestCase test = new TestCase(testCaseName);
+        final TestCase test = new TestCase(testCaseName);
         testCaseTable.addTest(test);
-        TestDocumentation testDoc = test.newDocumentation();
-        RobotToken wr1 = new RobotToken();
+        final TestDocumentation testDoc = test.newDocumentation(0);
+        final RobotToken wr1 = new RobotToken();
         wr1.setText("w1");
-        RobotToken wr2 = new RobotToken();
+        final RobotToken wr2 = new RobotToken();
         wr2.setText("w2");
-        RobotToken wr3 = new RobotToken();
+        final RobotToken wr3 = new RobotToken();
         wr3.setText("w3");
 
         testDoc.addDocumentationText(wr1);
         testDoc.addDocumentationText(wr2);
         testDoc.addDocumentationText(wr3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testDoc.addCommentPart(cmTok1);

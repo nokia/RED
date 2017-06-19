@@ -35,7 +35,7 @@ public class TestCaseTagsMapper extends ATestCaseSettingDeclarationMapper {
         final TestCase testCase = finder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput, rt,
                 fp);
         final TestCaseTags tags = new TestCaseTags(rt);
-        testCase.addTag(tags);
+        testCase.addElement(tags);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TAGS);
 

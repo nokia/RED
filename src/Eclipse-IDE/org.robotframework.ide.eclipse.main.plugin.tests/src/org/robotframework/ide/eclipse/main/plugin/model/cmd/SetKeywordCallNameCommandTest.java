@@ -482,15 +482,15 @@ public class SetKeywordCallNameCommandTest {
     }
 
     @Theory
-    public void settingChangesNameConvertsToCallAndIsMoved_whenThereAreOtherSettingsAfterIt(
+    public void settingChangesNameConvertsToCallAndIsNotMoved_whenThereAreOtherSettingsAfterIt(
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for specific keyword/case
-        assumeTrue(executablesHolder.getName().contains("_moves"));
+        assumeTrue(executablesHolder.getName().contains("_does_not_move"));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 1;
-        final int callIndexAfterCommand = 2;
+        final int callIndexAfterCommand = 1;
 
         final RobotKeywordCall setting = executablesHolder.getChildren().get(callIndex);
         assertThat(setting.getName()).isEqualTo("teardown");
@@ -500,7 +500,7 @@ public class SetKeywordCallNameCommandTest {
                 .isInjectedInto(new SetKeywordCallNameCommand(setting, "call"));
         command.execute();
 
-        assertThat(actionNames(executablesHolder)).containsExactly("tags", "unknown", "call", "call1", "call2",
+        assertThat(actionNames(executablesHolder)).containsExactly("tags", "call", "unknown", "call1", "call2",
                 "call3");
 
         final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
@@ -532,15 +532,15 @@ public class SetKeywordCallNameCommandTest {
     }
 
     @Theory
-    public void callChangesNameConvertsAndIsMoved_whenThereAreOtherCallsBeforeIt(
+    public void callChangesNameConvertsAndIsNotMoved_whenThereAreOtherCallsBeforeIt(
             final RobotCodeHoldingElement<?> executablesHolder) {
         // only perform this test for specific keyword/case
-        assumeTrue(executablesHolder.getName().contains("_moves"));
+        assumeTrue(executablesHolder.getName().contains("_does_not_move"));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final int callIndex = 5;
-        final int callIndexAfterCommand = 3;
+        final int callIndexAfterCommand = 5;
 
         final RobotKeywordCall setting = executablesHolder.getChildren().get(callIndex);
         assertThat(setting.getName()).isEqualTo("call3");
@@ -550,8 +550,8 @@ public class SetKeywordCallNameCommandTest {
                 .isInjectedInto(new SetKeywordCallNameCommand(setting, "[setup]"));
         command.execute();
 
-        assertThat(actionNames(executablesHolder)).containsExactly("tags", "teardown", "unknown", "setup", "call1",
-                "call2");
+        assertThat(actionNames(executablesHolder)).containsExactly("tags", "teardown", "unknown", "call1", "call2",
+                "setup");
 
         final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
         assertThat(constructRow(callAfterNameChange)).containsExactly("setup", "arg1", "arg2", "# comment");
@@ -668,7 +668,7 @@ public class SetKeywordCallNameCommandTest {
                 .appendLine("  [tags]  [tags]  tag1  tag2  # comment")
                 .appendLine("case_with_setting_to_other_setting")
                 .appendLine("  [tags]  [setup]  tag1  tag2  # comment")
-                .appendLine("case_moves")
+                .appendLine("case_does_not_move")
                 .appendLine("  [tags]  arg1  arg2  # comment")
                 .appendLine("  [teardown]  arg1  arg2  # comment")
                 .appendLine("  [unknown]  arg1  arg2  # comment")
@@ -689,7 +689,7 @@ public class SetKeywordCallNameCommandTest {
                 .appendLine("  [tags]  [tags]  tag1  tag2  # comment")
                 .appendLine("keyword_with_setting_to_other_setting")
                 .appendLine("  [tags]  [setup]  tag1  tag2  # comment")
-                .appendLine("keyword_moves")
+                .appendLine("keyword_does_not_move")
                 .appendLine("  [tags]  arg1  arg2  # comment")
                 .appendLine("  [teardown]  arg1  arg2  # comment")
                 .appendLine("  [unknown]  arg1  arg2  # comment")

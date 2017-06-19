@@ -119,7 +119,7 @@ public class InsertKeywordCallsCommandTest {
     }
 
     @Test
-    public void testCaseSettingIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseBody() {
+    public void testCaseSettingIsInsertedToProperPosition_whenInsertingIntoTestCaseBody() {
         final RobotCase testCase = createTestCaseWithSettingsForInsertions();
         final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createTestCaseUnknownSetting("setting") };
 
@@ -127,8 +127,8 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "setup", "teardown", "setting",
-                "call1", "call2", "call3");
+        assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "setup", "teardown", "call1",
+                "setting", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
                 eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
@@ -136,7 +136,7 @@ public class InsertKeywordCallsCommandTest {
     }
 
     @Test
-    public void testCaseExecutableRowIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseSettings() {
+    public void testCaseExecutableRowIsInsertedToProperPosition_whenInsertingIntoTestCaseSettings() {
         final RobotCase testCase = createTestCaseWithSettingsForInsertions();
         final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createTestCaseExecutableRow("action") };
 
@@ -144,7 +144,7 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "setup", "teardown", "action",
+        assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "action", "setup", "teardown",
                 "call1", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
@@ -234,7 +234,7 @@ public class InsertKeywordCallsCommandTest {
     }
 
     @Test
-    public void keywordSettingIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseBody() {
+    public void keywordSettingIsInsertedToProperPosition_whenInsertingIntoTestCaseBody() {
         final RobotKeywordDefinition keyword = createKeywordWithSettingsForInsertions();
         final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createKeywordUnknownSetting("setting") };
 
@@ -243,7 +243,7 @@ public class InsertKeywordCallsCommandTest {
         command.execute();
 
         assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "tags", "return",
-                "setting", "call1", "call2", "call3");
+                "call1", "setting", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
                 eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
@@ -251,7 +251,7 @@ public class InsertKeywordCallsCommandTest {
     }
 
     @Test
-    public void keywordExecutableRowIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseSettings() {
+    public void keywordExecutableRowIsInsertedToProperPosition_whenInsertingIntoTestCaseSettings() {
         final RobotKeywordDefinition keyword = createKeywordWithSettingsForInsertions();
         final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createKeywordExecutableRow("action") };
 
@@ -259,7 +259,7 @@ public class InsertKeywordCallsCommandTest {
         command.setEventBroker(eventBroker);
         command.execute();
 
-        assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "tags", "return", "action",
+        assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "action", "tags", "return",
                 "call1", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),

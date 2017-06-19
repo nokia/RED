@@ -67,8 +67,8 @@ public class ConvertCommentToSettingTest {
         assertThat(result.getArguments()).containsExactly("Catenate", "1", "2");
         assertThat(result.getComment()).isEqualTo("#comment");
         assertThat(result).has(properlySetParent());
-        assertThat(testCase.getLinkedElement().getTestExecutionRows()).doesNotContain(oldLinked);
-        assertThat(testCase.getLinkedElement().getTestExecutionRows()).isEmpty();
+        assertThat(testCase.getLinkedElement().getExecutionContext()).doesNotContain(oldLinked);
+        assertThat(testCase.getLinkedElement().getExecutionContext()).isEmpty();
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
                 .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
@@ -101,8 +101,8 @@ public class ConvertCommentToSettingTest {
         assertThat(result.getArguments()).containsExactly("Catenate", "1", "2");
         assertThat(result.getComment()).isEqualTo("#comment");
         assertThat(result).has(properlySetParent());
-        assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
-        assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).isEmpty();
+        assertThat(keyword.getLinkedElement().getExecutionContext()).doesNotContain(oldLinked);
+        assertThat(keyword.getLinkedElement().getExecutionContext()).isEmpty();
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
                 .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
