@@ -77,7 +77,7 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         final KeywordTable table = modelFile.getKeywordTable();
         final List<UserKeyword> keywords = table.getKeywords();
         final UserKeyword userKeyword = keywords.get(0);
-        userKeyword.getKeywordExecutionRows().get(0).setAction(RobotToken.create("keyAdded"));
+        userKeyword.getExecutionContext().get(0).setAction(RobotToken.create("keyAdded"));
 
         // execute & verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordWithTheFirstCommentLineInTheNameLine"),
@@ -96,7 +96,7 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         final KeywordTable table = modelFile.getKeywordTable();
         final List<UserKeyword> keywords = table.getKeywords();
         final UserKeyword userKeyword = keywords.get(0);
-        userKeyword.getKeywordExecutionRows().get(0).getArguments().get(1).setText("d_new");
+        userKeyword.getExecutionContext().get(0).getArguments().get(1).setText("d_new");
 
         // execute & verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
@@ -117,7 +117,7 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
 
         final KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
 
-        final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getKeywordExecutionRows().get(0);
+        final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getExecutionContext().get(0);
         execOneRow.getAction().setText("${c} =");
         execKeyUpdater.update(execOneRow, 1, "d_new");
 
@@ -141,7 +141,7 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
 
         final KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
 
-        final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getKeywordExecutionRows().get(0);
+        final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getExecutionContext().get(0);
         execOneRow.getAction().setText("${c} =");
         execKeyUpdater.update(execOneRow, 1, "d_new");
 

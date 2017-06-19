@@ -136,7 +136,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             oldArguments = argSetting.getArguments();
 
             keyword.getChildren().remove(argSetting);
-            keyword.getLinkedElement().removeUnitSettings((AModelElement<UserKeyword>) argSetting.getLinkedElement());
+            keyword.getLinkedElement().removeElement((AModelElement<UserKeyword>) argSetting.getLinkedElement());
 
             RedEventBroker.using(eventBroker)
                 .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(argSetting)

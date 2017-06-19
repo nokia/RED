@@ -29,9 +29,9 @@ public class TestCaseDocumentationModelOperation implements IExecutablesStepsHol
     }
     
     @Override
-    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
-            final String comment) {
-        final TestDocumentation testDoc = testCase.newDocumentation();
+    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final TestDocumentation testDoc = testCase.newDocumentation(index);
         testDoc.getDeclaration().setText(settingName);
         testDoc.getDeclaration().setRaw(settingName);
 
@@ -76,6 +76,6 @@ public class TestCaseDocumentationModelOperation implements IExecutablesStepsHol
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+        testCase.removeElement((AModelElement<TestCase>) modelElement);
     }
 }

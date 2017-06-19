@@ -29,9 +29,9 @@ public class KeywordDocumentationModelOperation implements IExecutablesStepsHold
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
-            final String comment) {
-        final KeywordDocumentation keywordDoc = userKeyword.newDocumentation();
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final KeywordDocumentation keywordDoc = userKeyword.newDocumentation(index);
         keywordDoc.getDeclaration().setText(settingName);
         keywordDoc.getDeclaration().setRaw(settingName);
 
@@ -77,6 +77,6 @@ public class KeywordDocumentationModelOperation implements IExecutablesStepsHold
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

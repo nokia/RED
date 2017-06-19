@@ -64,7 +64,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
         } else {
             row.setAction(rt);
         }
-        testCase.addTestExecutionRow(row);
+        testCase.addElement(row);
 
         processingState.push(ParsingState.TEST_CASE_INSIDE_ACTION);
         return rt;

@@ -20,7 +20,7 @@ public class UserKeywordTeardownMorphOperation extends ExecutablesStepsHolderMor
     public TestCaseTeardown insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         final KeywordTeardown kwTeardown = (KeywordTeardown) modelElement;
         
-        final TestCaseTeardown caseTeardown = testCase.newTeardown();
+        final TestCaseTeardown caseTeardown = testCase.newTeardown(index);
         caseTeardown.getDeclaration().setText(kwTeardown.getDeclaration().getText());
 
         caseTeardown.setKeywordName(kwTeardown.getKeywordName());

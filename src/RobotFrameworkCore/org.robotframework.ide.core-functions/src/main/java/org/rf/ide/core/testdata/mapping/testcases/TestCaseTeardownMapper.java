@@ -37,7 +37,7 @@ public class TestCaseTeardownMapper extends ATestCaseSettingDeclarationMapper {
         final TestCase testCase = finder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput, rt,
                 fp);
         final TestCaseTeardown teardown = new TestCaseTeardown(rt);
-        testCase.addTeardown(teardown);
+        testCase.addElement(teardown);
 
         processingState.push(ParsingState.TEST_CASE_SETTING_TEARDOWN);
 

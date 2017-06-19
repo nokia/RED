@@ -26,7 +26,7 @@ public class TestCaseTemplateMorphOperation extends ExecutablesStepsHolderMorphO
             final AModelElement<?> modelElement) {
         final TestCaseTemplate template = (TestCaseTemplate) modelElement;
 
-        final KeywordUnknownSettings unknownSetting = keyword.newUnknownSettings();
+        final KeywordUnknownSettings unknownSetting = keyword.newUnknownSettings(index);
         unknownSetting.getDeclaration().setText(template.getDeclaration().getText());
         unknownSetting.addArgument(template.getKeywordName());
         for (final RobotToken arg : template.getUnexpectedTrashArguments()) {

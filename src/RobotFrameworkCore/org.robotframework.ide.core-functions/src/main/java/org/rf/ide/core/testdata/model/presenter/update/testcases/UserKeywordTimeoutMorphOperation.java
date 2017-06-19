@@ -20,7 +20,7 @@ public class UserKeywordTimeoutMorphOperation extends ExecutablesStepsHolderMorp
     public TestCaseTimeout insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         final KeywordTimeout kwTimeout = (KeywordTimeout) modelElement;
         
-        final TestCaseTimeout caseTimeout = testCase.newTimeout();
+        final TestCaseTimeout caseTimeout = testCase.newTimeout(index);
         caseTimeout.getDeclaration().setText(kwTimeout.getDeclaration().getText());
 
         caseTimeout.setTimeout(kwTimeout.getTimeout().getText());

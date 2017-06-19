@@ -116,7 +116,7 @@ public class KeywordTableModelUpdaterTest {
                     .getOperationHandler(tcModelType);
 
             try {
-                handler.create(keyword, "action", newArrayList("1", "2"), "");
+                handler.create(keyword, 0, "action", newArrayList("1", "2"), "");
                 fail("Expected exception");
             } catch (final UnsupportedOperationException e) {
                 // we expected that
@@ -174,7 +174,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(executable.getArguments(), newArgs, executable.getComment(), newComment);
 
-        checkRemoveMethod(userKeyword.getKeywordExecutionRows(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test
@@ -183,7 +183,7 @@ public class KeywordTableModelUpdaterTest {
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_ARGUMENTS);
@@ -208,7 +208,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getArguments(), newArgs, setting.getComment(), newComment);
 
-        checkRemoveMethod(userKeyword.getArguments(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test
@@ -217,7 +217,7 @@ public class KeywordTableModelUpdaterTest {
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION);
@@ -239,7 +239,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getDocumentationText(), newArrayList("1"), setting.getComment(), newComment);
 
-        checkRemoveMethod(userKeyword.getDocumentation(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test
@@ -248,7 +248,7 @@ public class KeywordTableModelUpdaterTest {
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TAGS);
@@ -273,7 +273,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getTags(), newArgs, setting.getComment(), newComment);
 
-        checkRemoveMethod(userKeyword.getTags(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test
@@ -285,7 +285,7 @@ public class KeywordTableModelUpdaterTest {
         args.addAll(settingArgs);
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
                 args);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TIMEOUT);
@@ -313,7 +313,7 @@ public class KeywordTableModelUpdaterTest {
         checkSetting(setting.getTimeout(), "1", setting.getMessage(), newArrayList("2", "3"), setting.getComment(),
                 newComment);
 
-        checkRemoveMethod(userKeyword.getTimeouts(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test
@@ -325,7 +325,7 @@ public class KeywordTableModelUpdaterTest {
         args.addAll(settingArgs);
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
                 args);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TEARDOWN);
@@ -354,7 +354,7 @@ public class KeywordTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), "1", setting.getArguments(), newArrayList("2", "3"),
                 setting.getComment(), newComment);
 
-        checkRemoveMethod(userKeyword.getTeardowns(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test
@@ -363,7 +363,7 @@ public class KeywordTableModelUpdaterTest {
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_RETURN);
@@ -388,7 +388,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getReturnValues(), newArgs, setting.getComment(), newComment);
 
-        checkRemoveMethod(userKeyword.getReturns(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -398,14 +398,14 @@ public class KeywordTableModelUpdaterTest {
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void outOfBoundsExceptionIsThrown_whenTryingToCreateExecutableRowWithMismatchingIndex() {
-        assertThat(userKeyword.getKeywordExecutionRows()).isEmpty();
+        assertThat(userKeyword.getExecutionContext()).isEmpty();
 
         modelUpdater.createExecutableRow(userKeyword, 2, "some action", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIsThrown_whenCreatingSettingForNullCase() {
-        modelUpdater.createSetting(null, "Setup", "comment", newArrayList("a", "b", "c"));
+        modelUpdater.createSetting(null, 0, "Setup", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test
@@ -414,7 +414,7 @@ public class KeywordTableModelUpdaterTest {
         final String comment = "comment";
         final String keywordSettingName = "[Unknown]";
 
-        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, 0, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN);
@@ -434,7 +434,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
 
-        checkRemoveMethod(userKeyword.getUnknownSettings(), modelElement);
+        checkRemoveMethod(modelElement);
     }
 
     @Test
@@ -471,15 +471,15 @@ public class KeywordTableModelUpdaterTest {
         tcExecutionRow.addArgument(RobotToken.create("b"));
         tcExecutionRow.setComment("comment");
         final TestCase testCase = createCase();
-        testCase.addTestExecutionRow(tcExecutionRow);
+        testCase.addElement(tcExecutionRow);
 
         final UserKeyword keyword = createKeyword();
 
-        assertThat(keyword.getKeywordExecutionRows()).isEmpty();
+        assertThat(keyword.getExecutionContext()).isEmpty();
         modelUpdater.insert(keyword, 0, tcExecutionRow);
 
-        assertThat(keyword.getKeywordExecutionRows()).hasSize(1);
-        final RobotExecutableRow<UserKeyword> row = keyword.getKeywordExecutionRows().get(0);
+        assertThat(keyword.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<UserKeyword> row = keyword.getExecutionContext().get(0);
 
         assertThat(row.getParent()).isSameAs(keyword);
         assertThat(row.getModelType()).isEqualTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW);
@@ -493,7 +493,7 @@ public class KeywordTableModelUpdaterTest {
     @Test
     public void testCaseSetupSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final TestCaseSetup setupSetting = (TestCaseSetup) new TestCaseTableModelUpdater()
-                .createSetting(createCase(), "[Setup]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createCase(), 0, "[Setup]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
 
@@ -517,7 +517,7 @@ public class KeywordTableModelUpdaterTest {
     @Test
     public void testCaseTemplateSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final TestCaseTemplate templateSetting = (TestCaseTemplate) new TestCaseTableModelUpdater()
-                .createSetting(createCase(), "[Template]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createCase(), 0, "[Template]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
 
@@ -541,7 +541,7 @@ public class KeywordTableModelUpdaterTest {
     @Test
     public void testCaseTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
         final TestCaseTags tagsSettingSetting = (TestCaseTags) new TestCaseTableModelUpdater()
-                .createSetting(createCase(), "[Tags]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createCase(), 0, "[Tags]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
 
@@ -565,7 +565,7 @@ public class KeywordTableModelUpdaterTest {
     @Test
     public void testCaseTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
         final TestCaseTeardown teardownSetting = (TestCaseTeardown) new TestCaseTableModelUpdater()
-                .createSetting(createCase(), "[Teardown]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createCase(), 0, "[Teardown]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
 
@@ -589,7 +589,7 @@ public class KeywordTableModelUpdaterTest {
     @Test
     public void testCaseTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
         final TestCaseTimeout timeoutSetting = (TestCaseTimeout) new TestCaseTableModelUpdater()
-                .createSetting(createCase(), "[Timeout]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createCase(), 0, "[Timeout]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
 
@@ -613,7 +613,7 @@ public class KeywordTableModelUpdaterTest {
     @Test
     public void testCaseDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
         final TestDocumentation docSetting = (TestDocumentation) new TestCaseTableModelUpdater()
-                .createSetting(createCase(), "[Documentation]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createCase(), 0, "[Documentation]", "comment", newArrayList("a", "b", "c"));
 
         final UserKeyword keyword = createKeyword();
 
@@ -740,10 +740,10 @@ public class KeywordTableModelUpdaterTest {
         }
     }
 
-    private void checkRemoveMethod(final List<?> keywordSettings, final AModelElement<?> modelElement) {
-        assertFalse(keywordSettings.isEmpty());
+    private void checkRemoveMethod(final AModelElement<?> modelElement) {
+        assertFalse(userKeyword.getElements().isEmpty());
         modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(keywordSettings.isEmpty());
+        assertTrue(userKeyword.getElements().isEmpty());
     }
 
     private static TestCase createCase() {

@@ -42,7 +42,7 @@ public abstract class ACreationOfNewExecutionRowsInTestCase {
         final RobotExecutableRow<TestCase> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("LogMe"));
         executionRow.addArgument(RobotToken.create("arg1"));
-        testCase.addTestExecutionRow(executionRow);
+        testCase.addElement(executionRow);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
@@ -66,7 +66,7 @@ public abstract class ACreationOfNewExecutionRowsInTestCase {
         final RobotExecutableRow<TestCase> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log_new"));
         executionRow.addArgument(RobotToken.create("arg_new"));
-        testCase.addTestExecutionRow(executionRow, 2);
+        testCase.addElement(executionRow, 2);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
@@ -90,7 +90,7 @@ public abstract class ACreationOfNewExecutionRowsInTestCase {
         final RobotExecutableRow<TestCase> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log_new"));
         executionRow.addArgument(RobotToken.create("arg_new"));
-        testCase.addTestExecutionRow(executionRow);
+        testCase.addElement(executionRow);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);

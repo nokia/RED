@@ -10,8 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -64,44 +62,13 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     public void link() {
         final UserKeyword keyword = getLinkedElement();
 
-        final List<PrioriterizedKeywordsSettings> settings = newArrayList(
-                EnumSet.allOf(PrioriterizedKeywordsSettings.class));
-        Collections.sort(settings);
-
-        // settings
-        for (final PrioriterizedKeywordsSettings setting : settings) {
-            for (final AModelElement<UserKeyword> element : setting.getModelElements(keyword)) {
-                getChildren().add(new RobotDefinitionSetting(this, element));
+        for (final AModelElement<UserKeyword> el : keyword.getAllElements()) {
+            if (el instanceof RobotExecutableRow) {
+                getChildren().add(new RobotKeywordCall(this, el));
+            } else {
+                getChildren().add(new RobotDefinitionSetting(this, el));
             }
         }
-
-        // body
-        for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
-            getChildren().add(new RobotKeywordCall(this, execRow));
-        }
-    }
-
-    @Override
-    public void fixChildrenOrder() {
-        Collections.sort(getChildren(), new Comparator<RobotKeywordCall>() {
-
-            @Override
-            public int compare(final RobotKeywordCall call1, final RobotKeywordCall call2) {
-                if (call1 instanceof RobotDefinitionSetting && call2 instanceof RobotDefinitionSetting) {
-                    final ModelType modelType1 = call1.getLinkedElement().getModelType();
-                    final ModelType modelType2 = call2.getLinkedElement().getModelType();
-                    return PrioriterizedKeywordsSettings.from(modelType1)
-                            .compareTo(PrioriterizedKeywordsSettings.from(modelType2));
-                } else if (call1 instanceof RobotDefinitionSetting && !(call2 instanceof RobotDefinitionSetting)) {
-                    return -1;
-                } else if (!(call1 instanceof RobotDefinitionSetting) && call2 instanceof RobotDefinitionSetting) {
-                    return 1;
-                } else {
-                    // sort is stable so we don't care about those cases
-                    return 0;
-                }
-            }
-        });
     }
 
     @Override
@@ -121,7 +88,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     @SuppressWarnings("unchecked")
     @Override
     public void removeUnitSettings(final RobotKeywordCall call) {
-        getLinkedElement().removeUnitSettings((AModelElement<UserKeyword>) call.getLinkedElement());
+        getLinkedElement().removeElement((AModelElement<UserKeyword>) call.getLinkedElement());
     }
 
     public String getDocumentation() {
@@ -195,26 +162,22 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         return keywordSpecification;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void moveChildDown(final RobotKeywordCall keywordCall) {
         final int index = keywordCall.getIndex();
         Collections.swap(getChildren(), index, index + 1);
 
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<UserKeyword> linkedCall = (RobotExecutableRow<UserKeyword>) keywordCall
-                .getLinkedElement();
-        getLinkedElement().moveDownExecutableRow(linkedCall);
+        getLinkedElement().moveElementDown((AModelElement<UserKeyword>) keywordCall.getLinkedElement());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void moveChildUp(final RobotKeywordCall keywordCall) {
         final int index = keywordCall.getIndex();
         Collections.swap(getChildren(), index, index - 1);
 
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<UserKeyword> linkedCall = (RobotExecutableRow<UserKeyword>) keywordCall
-                .getLinkedElement();
-        getLinkedElement().moveUpExecutableRow(linkedCall);
+        getLinkedElement().moveElementUp((AModelElement<UserKeyword>) keywordCall.getLinkedElement());
     }
 
     @SuppressWarnings("unchecked")

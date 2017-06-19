@@ -30,7 +30,6 @@ import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseTeardown
 import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseTemplateMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseTimeoutMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseUnknownSettingMorphOperation;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -53,14 +52,14 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             new TestCaseUnknownSettingMorphOperation());
 
     @Override
-    public AModelElement<?> createSetting(final UserKeyword userKeyword, final String settingName,
+    public AModelElement<?> createSetting(final UserKeyword userKeyword, final int index, final String settingName,
             final String comment, final List<String> args) {
         final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(settingName);
         if (operationHandler == null || userKeyword == null) {
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
         }
-        return operationHandler.create(userKeyword, settingName, args, comment);
+        return operationHandler.create(userKeyword, index, settingName, args, comment);
     }
 
     @SuppressWarnings("unchecked")
@@ -73,8 +72,8 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             throw new IllegalArgumentException(
                     "Unable to create " + action + " executable row. Operation handler is missing");
         }
-        final AModelElement<?> row = operationHandler.create(userKeyword, action, args, comment);
-        userKeyword.addKeywordExecutionRow((RobotExecutableRow<UserKeyword>) row, index);
+        final AModelElement<?> row = operationHandler.create(userKeyword, index, action, args, comment);
+        userKeyword.addElement((AModelElement<UserKeyword>) row, index);
         return row;
     }
 

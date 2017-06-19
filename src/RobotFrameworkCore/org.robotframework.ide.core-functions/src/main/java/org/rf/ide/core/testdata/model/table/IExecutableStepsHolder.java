@@ -12,11 +12,11 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobotSectionTable>> {
 
+    List<AModelElement<T>> getElements();
+
     List<RobotExecutableRow<T>> getExecutionContext();
 
-    List<AModelElement<T>> getUnitSettings();
-
-    boolean removeUnitSettings(final AModelElement<T> setting);
+    boolean removeElement(final AModelElement<T> element);
 
     T getHolder();
 

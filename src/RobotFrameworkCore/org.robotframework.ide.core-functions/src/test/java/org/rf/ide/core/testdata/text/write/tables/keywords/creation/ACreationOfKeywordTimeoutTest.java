@@ -40,13 +40,13 @@ public abstract class ACreationOfKeywordTimeoutTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        uk.newTimeout();
+        uk.newTimeout(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -72,19 +72,19 @@ public abstract class ACreationOfKeywordTimeoutTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTimeout keyTimeout = uk.newTimeout();
+        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyTimeout.addCommentPart(cmTok1);
@@ -114,15 +114,15 @@ public abstract class ACreationOfKeywordTimeoutTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTimeout keyTimeout = uk.newTimeout();
+        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         keyTimeout.setTimeout(timeout);
 
@@ -150,23 +150,23 @@ public abstract class ACreationOfKeywordTimeoutTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTimeout keyTimeout = uk.newTimeout();
+        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         keyTimeout.setTimeout(timeout);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyTimeout.addCommentPart(cmTok1);
@@ -197,23 +197,23 @@ public abstract class ACreationOfKeywordTimeoutTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTimeout keyTimeout = uk.newTimeout();
+        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         keyTimeout.setTimeout(timeout);
 
-        RobotToken msg1 = new RobotToken();
+        final RobotToken msg1 = new RobotToken();
         msg1.setText("msg1");
-        RobotToken msg2 = new RobotToken();
+        final RobotToken msg2 = new RobotToken();
         msg2.setText("msg2");
-        RobotToken msg3 = new RobotToken();
+        final RobotToken msg3 = new RobotToken();
         msg3.setText("msg3");
 
         keyTimeout.addMessagePart(msg1);
@@ -246,34 +246,34 @@ public abstract class ACreationOfKeywordTimeoutTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordTimeout keyTimeout = uk.newTimeout();
+        final KeywordTimeout keyTimeout = uk.newTimeout(0);
 
-        RobotToken timeout = new RobotToken();
+        final RobotToken timeout = new RobotToken();
         timeout.setText("1 hours");
         keyTimeout.setTimeout(timeout);
 
-        RobotToken msg1 = new RobotToken();
+        final RobotToken msg1 = new RobotToken();
         msg1.setText("msg1");
-        RobotToken msg2 = new RobotToken();
+        final RobotToken msg2 = new RobotToken();
         msg2.setText("msg2");
-        RobotToken msg3 = new RobotToken();
+        final RobotToken msg3 = new RobotToken();
         msg3.setText("msg3");
 
         keyTimeout.addMessagePart(msg1);
         keyTimeout.addMessagePart(msg2);
         keyTimeout.addMessagePart(msg3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyTimeout.addCommentPart(cmTok1);

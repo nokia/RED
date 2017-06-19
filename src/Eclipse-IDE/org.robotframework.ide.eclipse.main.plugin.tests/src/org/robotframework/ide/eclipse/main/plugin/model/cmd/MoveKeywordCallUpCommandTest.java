@@ -26,28 +26,70 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveKeywordCallUpCommandTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrown_whenTryingToMoveSettingOfTestCase() {
+    // @Test(expected = IllegalStateException.class)
+    // public void exceptionIsThrown_whenTryingToMoveSettingOfTestCase() {
+    // final List<RobotCase> cases = createTestCasesWithSettings();
+    // final RobotKeywordCall setting = cases.get(0).getChildren().get(0);
+    //
+    // final IEventBroker eventBroker = mock(IEventBroker.class);
+    // ContextInjector.prepareContext()
+    // .inWhich(eventBroker)
+    // .isInjectedInto(new MoveKeywordCallUpCommand(setting))
+    // .execute();
+    // }
+    //
+    // @Test(expected = IllegalStateException.class)
+    // public void exceptionIsThrown_whenTryingToMoveSettingOfKeyword() {
+    // final List<RobotKeywordDefinition> keywords = createKeywordsWithSettings();
+    // final RobotKeywordCall setting = keywords.get(0).getChildren().get(0);
+    //
+    // final IEventBroker eventBroker = mock(IEventBroker.class);
+    // ContextInjector.prepareContext()
+    // .inWhich(eventBroker)
+    // .isInjectedInto(new MoveKeywordCallUpCommand(setting))
+    // .execute();
+    // }
+
+    @Test
+    public void nothingHappens_whenTryingToMoveSettingWhichIsTopmostInTestCase() {
         final List<RobotCase> cases = createTestCasesWithSettings();
-        final RobotKeywordCall setting = cases.get(0).getChildren().get(0);
+        final RobotCase secondCase = cases.get(1);
+        final RobotKeywordCall call = secondCase.getChildren().get(0);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        ContextInjector.prepareContext()
+        final MoveKeywordCallUpCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new MoveKeywordCallUpCommand(setting))
-                .execute();
+                .isInjectedInto(new MoveKeywordCallUpCommand(call));
+        command.execute();
+        assertThat(transform(secondCase.getChildren(), toNames())).containsExactly("Setup", "Log");
+
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(secondCase.getChildren(), toNames())).containsExactly("Setup", "Log");
+
+        verifyZeroInteractions(eventBroker);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrown_whenTryingToMoveSettingOfKeyword() {
+    @Test
+    public void nothingHappens_whenTryingToMoveSettingWhichIsTopmostInKeyword() {
         final List<RobotKeywordDefinition> keywords = createKeywordsWithSettings();
-        final RobotKeywordCall setting = keywords.get(0).getChildren().get(0);
+        final RobotKeywordDefinition secondKeyword = keywords.get(1);
+        final RobotKeywordCall call = secondKeyword.getChildren().get(0);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        ContextInjector.prepareContext()
+        final MoveKeywordCallUpCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new MoveKeywordCallUpCommand(setting))
-                .execute();
+                .isInjectedInto(new MoveKeywordCallUpCommand(call));
+        command.execute();
+        assertThat(transform(secondKeyword.getChildren(), toNames())).containsExactly("Teardown", "Log");
+
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(secondKeyword.getChildren(), toNames())).containsExactly("Teardown", "Log");
+
+        verifyZeroInteractions(eventBroker);
     }
 
     @Test
@@ -93,7 +135,55 @@ public class MoveKeywordCallUpCommandTest {
     }
 
     @Test
-    public void nothingHappens_whenTryingToMoveExecutableWhichIsTopmostExcludingSettingsInCase() {
+    public void rowIsProperlyMovedUp_whenMovingExecutableWhichHasSettingBeforeInCase() {
+        final List<RobotCase> cases = createTestCasesWithSettings();
+        final RobotCase firstCase = cases.get(0);
+        final RobotKeywordCall call = firstCase.getChildren().get(2);
+
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        final MoveKeywordCallUpCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new MoveKeywordCallUpCommand(call));
+        command.execute();
+        assertThat(transform(firstCase.getChildren(), toNames())).containsExactly("Tags", "Log1", "Documentation",
+                "Log2", "Log3");
+
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(firstCase.getChildren(), toNames())).containsExactly("Tags", "Documentation", "Log1",
+                "Log2", "Log3");
+
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstCase);
+        verifyNoMoreInteractions(eventBroker);
+    }
+
+    @Test
+    public void rowIsProperlyMovedUp_whenMovingExecutableWhichHasSettingBeforeInKeyword() {
+        final List<RobotKeywordDefinition> keywords = createKeywordsWithSettings();
+        final RobotKeywordDefinition firstKeyword = keywords.get(0);
+        final RobotKeywordCall call = firstKeyword.getChildren().get(2);
+
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        final MoveKeywordCallUpCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new MoveKeywordCallUpCommand(call));
+        command.execute();
+        assertThat(transform(firstKeyword.getChildren(), toNames())).containsExactly("Tags", "Log1", "Documentation",
+                "Log2", "Log3");
+
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(firstKeyword.getChildren(), toNames())).containsExactly("Tags", "Documentation", "Log1",
+                "Log2", "Log3");
+
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstKeyword);
+        verifyNoMoreInteractions(eventBroker);
+    }
+
+    @Test
+    public void rowIsProperlyMovedUp_whenMovingSettingWhichHasSettingBeforeInCase() {
         final List<RobotCase> cases = createTestCasesWithSettings();
         final RobotCase firstCase = cases.get(0);
         final RobotKeywordCall call = firstCase.getChildren().get(1);
@@ -103,18 +193,21 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstCase.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
+        assertThat(transform(firstCase.getChildren(), toNames())).containsExactly("Documentation", "Tags", "Log1",
+                "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstCase.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
+        assertThat(transform(firstCase.getChildren(), toNames())).containsExactly("Tags", "Documentation", "Log1",
+                "Log2", "Log3");
 
-        verifyZeroInteractions(eventBroker);
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstCase);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
-    public void nothingHappens_whenTryingToMoveExecutableWhichIsTopmostExcludingSettingsInKeyword() {
+    public void rowIsProperlyMovedUp_whenMovingSettingWhichHasSettingBeforeInKeyword() {
         final List<RobotKeywordDefinition> keywords = createKeywordsWithSettings();
         final RobotKeywordDefinition firstKeyword = keywords.get(0);
         final RobotKeywordCall call = firstKeyword.getChildren().get(1);
@@ -124,14 +217,17 @@ public class MoveKeywordCallUpCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveKeywordCallUpCommand(call));
         command.execute();
-        assertThat(transform(firstKeyword.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
+        assertThat(transform(firstKeyword.getChildren(), toNames())).containsExactly("Documentation", "Tags", "Log1",
+                "Log2", "Log3");
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
         }
-        assertThat(transform(firstKeyword.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
+        assertThat(transform(firstKeyword.getChildren(), toNames())).containsExactly("Tags", "Documentation", "Log1",
+                "Log2", "Log3");
 
-        verifyZeroInteractions(eventBroker);
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, firstKeyword);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -228,59 +324,11 @@ public class MoveKeywordCallUpCommandTest {
         verifyZeroInteractions(eventBroker);
     }
 
-    @Test
-    public void rowIsNotMovedToPreviousCase_whenItIsTopmostExcludingSettingsInNonFirstCase() {
-        final List<RobotCase> cases = createTestCasesWithSettings();
-        final RobotCase fstCase = cases.get(0);
-        final RobotCase sndCase = cases.get(1);
-        final RobotKeywordCall callToMove = sndCase.getChildren().get(1);
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-        final MoveKeywordCallUpCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new MoveKeywordCallUpCommand(callToMove));
-        command.execute();
-
-        assertThat(transform(fstCase.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
-        assertThat(transform(sndCase.getChildren(), toNames())).containsExactly("Setup", "Log");
-
-        for (final EditorCommand undo : command.getUndoCommands()) {
-            undo.execute();
-        }
-        assertThat(transform(fstCase.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
-        assertThat(transform(sndCase.getChildren(), toNames())).containsExactly("Setup", "Log");
-
-        verifyZeroInteractions(eventBroker);
-    }
-
-    @Test
-    public void rowIsNotMovedToPreviousKeyword_whenItIsTopmostExcludingSettingsInNonFirstKeyword() {
-        final List<RobotKeywordDefinition> keywords = createKeywordsWithSettings();
-        final RobotKeywordDefinition fstKeyword = keywords.get(0);
-        final RobotKeywordDefinition sndKeyword = keywords.get(1);
-        final RobotKeywordCall callToMove = sndKeyword.getChildren().get(1);
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-        final MoveKeywordCallUpCommand command = ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new MoveKeywordCallUpCommand(callToMove));
-        command.execute();
-
-        assertThat(transform(fstKeyword.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
-        assertThat(transform(sndKeyword.getChildren(), toNames())).containsExactly("Teardown", "Log");
-
-        for (final EditorCommand undo : command.getUndoCommands()) {
-            undo.execute();
-        }
-        assertThat(transform(fstKeyword.getChildren(), toNames())).containsExactly("Tags", "Log1", "Log2", "Log3");
-        assertThat(transform(sndKeyword.getChildren(), toNames())).containsExactly("Teardown", "Log");
-        verifyZeroInteractions(eventBroker);
-    }
-
     private static List<RobotCase> createTestCasesWithSettings() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case 1")
                 .appendLine("  [Tags]  a  b")
+                .appendLine("  [Documentation]  doc")
                 .appendLine("  Log1  10")
                 .appendLine("  Log2  10")
                 .appendLine("  Log3  10")
@@ -313,6 +361,7 @@ public class MoveKeywordCallUpCommandTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword 1")
                 .appendLine("  [Tags]  a  b")
+                .appendLine("  [Documentation]  doc")
                 .appendLine("  Log1  10")
                 .appendLine("  Log2  10")
                 .appendLine("  Log3  10")

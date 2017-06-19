@@ -38,7 +38,7 @@ public class TestCaseExecutableRowMorphOperation extends ExecutablesStepsHolderM
             executableRow.setArgument(i, arg);
         }
 
-        keyword.addKeywordExecutionRow(executableRow, index);
+        keyword.addElement(executableRow, index);
 
         return executableRow;
     }

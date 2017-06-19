@@ -40,13 +40,13 @@ public abstract class ACreationOfKeywordReturnTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        uk.newReturn();
+        uk.newReturn(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -70,19 +70,19 @@ public abstract class ACreationOfKeywordReturnTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordReturn keyReturn = uk.newReturn();
+        final KeywordReturn keyReturn = uk.newReturn(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyReturn.addCommentPart(cmTok1);
@@ -111,19 +111,19 @@ public abstract class ACreationOfKeywordReturnTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordReturn keyReturn = uk.newReturn();
+        final KeywordReturn keyReturn = uk.newReturn(0);
 
-        RobotToken rTok1 = new RobotToken();
+        final RobotToken rTok1 = new RobotToken();
         rTok1.setText("${r1}");
-        RobotToken rTok2 = new RobotToken();
+        final RobotToken rTok2 = new RobotToken();
         rTok2.setText("${r2}");
-        RobotToken rTok3 = new RobotToken();
+        final RobotToken rTok3 = new RobotToken();
         rTok3.setText("${r3}");
 
         keyReturn.addReturnValue(rTok1);
@@ -154,30 +154,30 @@ public abstract class ACreationOfKeywordReturnTest {
 
         // test data prepare
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keyName = new RobotToken();
+        final RobotToken keyName = new RobotToken();
         keyName.setText(userKeywordName);
-        UserKeyword uk = new UserKeyword(keyName);
+        final UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordReturn keyReturn = uk.newReturn();
+        final KeywordReturn keyReturn = uk.newReturn(0);
 
-        RobotToken rTok1 = new RobotToken();
+        final RobotToken rTok1 = new RobotToken();
         rTok1.setText("${r1}");
-        RobotToken rTok2 = new RobotToken();
+        final RobotToken rTok2 = new RobotToken();
         rTok2.setText("${r2}");
-        RobotToken rTok3 = new RobotToken();
+        final RobotToken rTok3 = new RobotToken();
         rTok3.setText("${r3}");
 
         keyReturn.addReturnValue(rTok1);
         keyReturn.addReturnValue(rTok2);
         keyReturn.addReturnValue(rTok3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         keyReturn.addCommentPart(cmTok1);

@@ -40,7 +40,7 @@ public class KeywordArgumentsMapper extends AKeywordSettingDeclarationMapper {
         final UserKeyword keyword = finder.findOrCreateNearestKeyword(currentLine,
                 processingState, robotFileOutput, rt, fp);
         final KeywordArguments arguments = new KeywordArguments(rt);
-        keyword.addArguments(arguments);
+        keyword.addElement(arguments);
 
         processingState.push(ParsingState.KEYWORD_SETTING_ARGUMENTS);
 

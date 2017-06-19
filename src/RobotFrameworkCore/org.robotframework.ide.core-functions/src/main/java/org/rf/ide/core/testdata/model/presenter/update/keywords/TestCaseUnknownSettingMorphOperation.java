@@ -34,7 +34,7 @@ public class TestCaseUnknownSettingMorphOperation extends ExecutablesStepsHolder
 
         if (possibleSettingType == RobotTokenType.KEYWORD_SETTING_ARGUMENTS) {
 
-            final KeywordArguments arguments = keyword.newArguments();
+            final KeywordArguments arguments = keyword.newArguments(index);
             arguments.getDeclaration().setText(tcSetting.getDeclaration().getText());
             for (final RobotToken argument : tcSetting.getArguments()) {
                 arguments.addArgument(argument);
@@ -45,7 +45,7 @@ public class TestCaseUnknownSettingMorphOperation extends ExecutablesStepsHolder
             return arguments;
         } else if (possibleSettingType == RobotTokenType.KEYWORD_SETTING_RETURN) {
 
-            final KeywordReturn returnSetting = keyword.newReturn();
+            final KeywordReturn returnSetting = keyword.newReturn(index);
             returnSetting.getDeclaration().setText(tcSetting.getDeclaration().getText());
             for (final RobotToken argument : tcSetting.getArguments()) {
                 returnSetting.addReturnValue(argument);
@@ -56,7 +56,7 @@ public class TestCaseUnknownSettingMorphOperation extends ExecutablesStepsHolder
             return returnSetting;
         } else {
 
-            final KeywordUnknownSettings unkownSetting = keyword.newUnknownSettings();
+            final KeywordUnknownSettings unkownSetting = keyword.newUnknownSettings(index);
             unkownSetting.getDeclaration().setText(tcSetting.getDeclaration().getText());
             for (final RobotToken arg : tcSetting.getArguments()) {
                 unkownSetting.addArgument(arg.getText());

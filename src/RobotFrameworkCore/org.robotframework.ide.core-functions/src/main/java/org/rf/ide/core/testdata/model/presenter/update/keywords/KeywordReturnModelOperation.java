@@ -28,9 +28,9 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
-            final String comment) {
-        final KeywordReturn keywordReturn = userKeyword.newReturn();
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final KeywordReturn keywordReturn = userKeyword.newReturn(index);
         keywordReturn.getDeclaration().setText(settingName);
         keywordReturn.getDeclaration().setRaw(settingName);
 
@@ -46,7 +46,7 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addReturn(0, (KeywordReturn) modelElement);
+        userKeyword.addElement((KeywordReturn) modelElement, 0);
         return modelElement;
     }
 
@@ -64,7 +64,7 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordReturn keywordReturn = (KeywordReturn) modelElement;
 
-        int elementsToRemove = keywordReturn.getReturnValues().size();
+        final int elementsToRemove = keywordReturn.getReturnValues().size();
         for (int i = 0; i < elementsToRemove; i++) {
             keywordReturn.removeElementToken(0);
         }
@@ -76,6 +76,6 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

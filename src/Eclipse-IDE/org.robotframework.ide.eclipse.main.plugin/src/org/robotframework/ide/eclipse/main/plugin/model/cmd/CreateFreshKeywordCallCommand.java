@@ -50,19 +50,13 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final int lastSettingIndex = parent.indexOfLastSetting();
 
         newKeywordCall = parent.createKeywordCall(index, name, args, comment);
-
-        if (lastSettingIndex >= 0 && index <= lastSettingIndex) {
-            final RobotKeywordCall removed = parent.getChildren().remove(index);
-            parent.getChildren().add(lastSettingIndex + 1, removed);
-        }
         RedEventBroker.using(eventBroker)
             .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newKeywordCall)
             .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new DeleteKeywordCallCommand(newArrayList(newKeywordCall)));

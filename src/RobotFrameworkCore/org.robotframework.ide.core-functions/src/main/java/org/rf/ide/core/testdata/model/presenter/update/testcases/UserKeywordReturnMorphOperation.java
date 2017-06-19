@@ -21,7 +21,7 @@ public class UserKeywordReturnMorphOperation extends ExecutablesStepsHolderMorph
             final AModelElement<?> modelElement) {
         final KeywordReturn returnToken = (KeywordReturn) modelElement;
         
-        final TestCaseUnknownSettings unkownSetting = testCase.newUnknownSettings();
+        final TestCaseUnknownSettings unkownSetting = testCase.newUnknownSettings(index);
         unkownSetting.getDeclaration().setText(returnToken.getDeclaration().getText());
         for (final RobotToken value : returnToken.getReturnValues()) {
             unkownSetting.addArgument(value.getText());

@@ -23,14 +23,11 @@ public class MoveKeywordCallUpCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (!keywordCall.isExecutable()) {
-            throw new IllegalStateException("Unable to move non-executable rows");
-        }
 
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
         final int index = keywordCall.getIndex();
 
-        if (index == 0 || !parent.getChildren().get(index - 1).isExecutable()) {
+        if (index == 0) {
             // no place to move it further up
             return;
         } else {

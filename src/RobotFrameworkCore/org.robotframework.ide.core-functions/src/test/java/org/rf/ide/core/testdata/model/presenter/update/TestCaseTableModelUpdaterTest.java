@@ -84,7 +84,7 @@ public class TestCaseTableModelUpdaterTest {
             final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
             try {
-                handler.create(testCase, "action", newArrayList("1", "2"), "");
+                handler.create(testCase, 0, "action", newArrayList("1", "2"), "");
                 fail("Expected exception");
             } catch (final UnsupportedOperationException e) {
                 // we expected that
@@ -146,13 +146,13 @@ public class TestCaseTableModelUpdaterTest {
     public void executableRowOpreationsTest() {
         final TestCase testCase = createCase();
 
-        assertThat(testCase.getTestExecutionRows()).isEmpty();
+        assertThat(testCase.getExecutionContext()).isEmpty();
 
         final AModelElement<?> row = updater.createExecutableRow(testCase, 0, "some action", "comment",
                 newArrayList("a", "b", "c"));
 
-        assertThat(testCase.getTestExecutionRows()).hasSize(1);
-        final RobotExecutableRow<TestCase> addedRow = testCase.getTestExecutionRows().get(0);
+        assertThat(testCase.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<TestCase> addedRow = testCase.getExecutionContext().get(0);
 
         assertThat(addedRow).isSameAs(row);
         assertThat(addedRow.getParent()).isSameAs(testCase);
@@ -183,11 +183,11 @@ public class TestCaseTableModelUpdaterTest {
                 "#new comment");
 
         updater.remove(testCase, addedRow);
-        assertThat(testCase.getTestExecutionRows()).isEmpty();
+        assertThat(testCase.getExecutionContext()).isEmpty();
 
         updater.insert(testCase, 0, addedRow);
-        assertThat(testCase.getTestExecutionRows()).hasSize(1);
-        assertThat(addedRow).isSameAs(testCase.getTestExecutionRows().get(0));
+        assertThat(testCase.getExecutionContext()).hasSize(1);
+        assertThat(addedRow).isSameAs(testCase.getExecutionContext().get(0));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -198,14 +198,14 @@ public class TestCaseTableModelUpdaterTest {
     @Test(expected = IndexOutOfBoundsException.class)
     public void outOfBoundsExceptionIsThrown_whenTryingToCreateExecutableRowWithMismatchingIndex() {
         final TestCase testCase = createCase();
-        assertThat(testCase.getTestExecutionRows()).isEmpty();
+        assertThat(testCase.getExecutionContext()).isEmpty();
 
         updater.createExecutableRow(testCase, 2, "some action", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIsThrown_whenCreatingSettingForNullCase() {
-        updater.createSetting(null, "Setup", "comment", newArrayList("a", "b", "c"));
+        updater.createSetting(null, 0, "Setup", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test
@@ -214,7 +214,7 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getSetups()).isEmpty();
 
-        final TestCaseSetup setting = (TestCaseSetup) updater.createSetting(testCase, "[Setup]", "comment",
+        final TestCaseSetup setting = (TestCaseSetup) updater.createSetting(testCase, 0, "[Setup]", "comment",
                 newArrayList("a", "b", "c"));
 
         assertThat(testCase.getSetups()).hasSize(1);
@@ -265,7 +265,7 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTags()).isEmpty();
 
-        final TestCaseTags setting = (TestCaseTags) updater.createSetting(testCase, "[Tags]", "comment",
+        final TestCaseTags setting = (TestCaseTags) updater.createSetting(testCase, 0, "[Tags]", "comment",
                 newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTags()).hasSize(1);
@@ -316,7 +316,7 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTimeouts()).isEmpty();
 
-        final TestCaseTimeout setting = (TestCaseTimeout) updater.createSetting(testCase, "[Timeout]", "comment",
+        final TestCaseTimeout setting = (TestCaseTimeout) updater.createSetting(testCase, 0, "[Timeout]", "comment",
                 newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTimeouts()).hasSize(1);
@@ -367,7 +367,7 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final TestCaseTeardown setting = (TestCaseTeardown) updater.createSetting(testCase, "[Teardown]", "comment",
+        final TestCaseTeardown setting = (TestCaseTeardown) updater.createSetting(testCase, 0, "[Teardown]", "comment",
                 newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTeardowns()).hasSize(1);
@@ -418,7 +418,7 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final TestCaseTemplate setting = (TestCaseTemplate) updater.createSetting(testCase, "[Template]", "comment",
+        final TestCaseTemplate setting = (TestCaseTemplate) updater.createSetting(testCase, 0, "[Template]", "comment",
                 newArrayList("a", "b", "c"));
 
         assertThat(testCase.getTemplates()).hasSize(1);
@@ -469,7 +469,8 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getTeardowns()).isEmpty();
 
-        final TestCaseUnknownSettings setting = (TestCaseUnknownSettings) updater.createSetting(testCase, "[unknown]",
+        final TestCaseUnknownSettings setting = (TestCaseUnknownSettings) updater.createSetting(testCase, 0,
+                "[unknown]",
                 "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getUnknownSettings()).hasSize(1);
@@ -520,7 +521,7 @@ public class TestCaseTableModelUpdaterTest {
 
         assertThat(testCase.getDocumentation()).isEmpty();
 
-        final TestDocumentation setting = (TestDocumentation) updater.createSetting(testCase, "[Documentation]",
+        final TestDocumentation setting = (TestDocumentation) updater.createSetting(testCase, 0, "[Documentation]",
                 "comment", newArrayList("a", "b", "c"));
 
         assertThat(testCase.getDocumentation()).hasSize(1);
@@ -573,15 +574,15 @@ public class TestCaseTableModelUpdaterTest {
         kwExecutionRow.addArgument(RobotToken.create("b"));
         kwExecutionRow.setComment("comment");
         final UserKeyword keyword = createKeyword();
-        keyword.addKeywordExecutionRow(kwExecutionRow);
+        keyword.addElement(kwExecutionRow);
 
         final TestCase testCase = createCase();
 
-        assertThat(testCase.getTestExecutionRows()).isEmpty();
+        assertThat(testCase.getExecutionContext()).isEmpty();
         updater.insert(testCase, 0, kwExecutionRow);
 
-        assertThat(testCase.getTestExecutionRows()).hasSize(1);
-        final RobotExecutableRow<TestCase> row = testCase.getTestExecutionRows().get(0);
+        assertThat(testCase.getExecutionContext()).hasSize(1);
+        final RobotExecutableRow<TestCase> row = testCase.getExecutionContext().get(0);
 
         assertThat(row.getParent()).isSameAs(testCase);
         assertThat(row.getModelType()).isEqualTo(ModelType.TEST_CASE_EXECUTABLE_ROW);
@@ -596,7 +597,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordArgumentsSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final KeywordArguments keywordSetting = (KeywordArguments) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), "[Arguments]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, "[Arguments]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -620,7 +621,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordReturnSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final KeywordReturn keywordSetting = (KeywordReturn) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), "[Return]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, "[Return]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -644,6 +645,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
         final KeywordTags keywordSetting = (KeywordTags) new KeywordTableModelUpdater().createSetting(createKeyword(),
+                0,
                 "[Tags]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
@@ -668,7 +670,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
         final KeywordTeardown keywordSetting = (KeywordTeardown) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), "[Teardown]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, "[Teardown]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -692,7 +694,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
         final KeywordTimeout keywordSetting = (KeywordTimeout) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), "[Timeout]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, "[Timeout]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -716,7 +718,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
         final KeywordDocumentation keywordSetting = (KeywordDocumentation) new KeywordTableModelUpdater()
-                .createSetting(createKeyword(), "[Documentation]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), 0, "[Documentation]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 

@@ -40,13 +40,13 @@ public abstract class ACreationOfTestCaseTeardownTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        test.newTeardown();
+        test.newTeardown(0);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
@@ -70,19 +70,19 @@ public abstract class ACreationOfTestCaseTeardownTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTeardown testTeardown = test.newTeardown();
+        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTeardown.addCommentPart(cmTok1);
@@ -110,15 +110,15 @@ public abstract class ACreationOfTestCaseTeardownTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTeardown testTeardown = test.newTeardown();
+        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        RobotToken keywordName = new RobotToken();
+        final RobotToken keywordName = new RobotToken();
         keywordName.setText("execKey");
         testTeardown.setKeywordName(keywordName);
 
@@ -146,23 +146,23 @@ public abstract class ACreationOfTestCaseTeardownTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTeardown testTeardown = test.newTeardown();
+        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        RobotToken keywordName = new RobotToken();
+        final RobotToken keywordName = new RobotToken();
         keywordName.setText("execKey");
         testTeardown.setKeywordName(keywordName);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTeardown.addCommentPart(cmTok1);
@@ -193,23 +193,23 @@ public abstract class ACreationOfTestCaseTeardownTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTeardown testTeardown = test.newTeardown();
+        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        RobotToken keywordName = new RobotToken();
+        final RobotToken keywordName = new RobotToken();
         keywordName.setText("execKey");
         testTeardown.setKeywordName(keywordName);
 
-        RobotToken arg1 = new RobotToken();
+        final RobotToken arg1 = new RobotToken();
         arg1.setText("arg1");
-        RobotToken arg2 = new RobotToken();
+        final RobotToken arg2 = new RobotToken();
         arg2.setText("arg2");
-        RobotToken arg3 = new RobotToken();
+        final RobotToken arg3 = new RobotToken();
         arg3.setText("arg3");
 
         testTeardown.addArgument(arg1);
@@ -240,34 +240,34 @@ public abstract class ACreationOfTestCaseTeardownTest {
 
         // test data prepare
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
+        final RobotToken testName = new RobotToken();
         testName.setText(userTestName);
-        TestCase test = new TestCase(testName);
+        final TestCase test = new TestCase(testName);
         testCaseTable.addTest(test);
-        TestCaseTeardown testTeardown = test.newTeardown();
+        final TestCaseTeardown testTeardown = test.newTeardown(0);
 
-        RobotToken keywordName = new RobotToken();
+        final RobotToken keywordName = new RobotToken();
         keywordName.setText("execKey");
         testTeardown.setKeywordName(keywordName);
 
-        RobotToken arg1 = new RobotToken();
+        final RobotToken arg1 = new RobotToken();
         arg1.setText("arg1");
-        RobotToken arg2 = new RobotToken();
+        final RobotToken arg2 = new RobotToken();
         arg2.setText("arg2");
-        RobotToken arg3 = new RobotToken();
+        final RobotToken arg3 = new RobotToken();
         arg3.setText("arg3");
 
         testTeardown.addArgument(arg1);
         testTeardown.addArgument(arg2);
         testTeardown.addArgument(arg3);
 
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         testTeardown.addCommentPart(cmTok1);

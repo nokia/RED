@@ -29,9 +29,9 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
-            final String comment) {
-        final KeywordTeardown keywordTeardown = userKeyword.newTeardown();
+    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+            final List<String> args, final String comment) {
+        final KeywordTeardown keywordTeardown = userKeyword.newTeardown(index);
         keywordTeardown.getDeclaration().setText(settingName);
         keywordTeardown.getDeclaration().setRaw(settingName);
 
@@ -50,7 +50,7 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addTeardown(0, (KeywordTeardown) modelElement);
+        userKeyword.addElement((KeywordTeardown) modelElement, 0);
         return modelElement;
     }
 
@@ -74,7 +74,7 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
         final KeywordTeardown teardown = (KeywordTeardown) modelElement;
 
         teardown.setKeywordName(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
-        int elementsToRemove = teardown.getArguments().size();
+        final int elementsToRemove = teardown.getArguments().size();
         for (int i = 0; i < elementsToRemove; i++) {
             teardown.removeElementToken(0);
         }
@@ -86,6 +86,6 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+        userKeyword.removeElement((AModelElement<UserKeyword>) modelElement);
     }
 }

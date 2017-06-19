@@ -21,7 +21,7 @@ public class UserKeywordArgumentsMorphOperation extends ExecutablesStepsHolderMo
             final AModelElement<?> modelElement) {
         final KeywordArguments arguments = (KeywordArguments) modelElement;
         
-        final TestCaseUnknownSettings unkownSetting = testCase.newUnknownSettings();
+        final TestCaseUnknownSettings unkownSetting = testCase.newUnknownSettings(index);
         unkownSetting.getDeclaration().setText(arguments.getDeclaration().getText());
         for (final RobotToken arg : arguments.getArguments()) {
             unkownSetting.addArgument(arg.getText());

@@ -6,16 +6,13 @@
 package org.rf.ide.core.testdata.text.write.tables;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TableHeader;
-import org.rf.ide.core.testdata.model.table.UserKeywordTableElementsComparator;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
@@ -66,17 +63,10 @@ public class KeywordsSectionTableDumper extends AExecutableTableDumper {
     public List<AModelElement<? extends IExecutableStepsHolder<?>>> getSortedUnits(
             final IExecutableStepsHolder<?> execHolder) {
         final List<AModelElement<? extends IExecutableStepsHolder<?>>> sorted = new ArrayList<>(0);
-        final List<AModelElement<UserKeyword>> sortedTemp = new ArrayList<>(0);
 
-        for (final RobotExecutableRow<?> execRow : execHolder.getExecutionContext()) {
-            sortedTemp.add((AModelElement<UserKeyword>) execRow);
+        for (final AModelElement<?> el : execHolder.getElements()) {
+            sorted.add((AModelElement<UserKeyword>) el);
         }
-
-        for (final AModelElement<?> setting : execHolder.getUnitSettings()) {
-            sortedTemp.add((AModelElement<UserKeyword>) setting);
-        }
-        Collections.sort(sortedTemp, new UserKeywordTableElementsComparator());
-        sorted.addAll(sortedTemp);
 
         revertExecutableRowToCorrectPlace(sorted, execHolder);
 

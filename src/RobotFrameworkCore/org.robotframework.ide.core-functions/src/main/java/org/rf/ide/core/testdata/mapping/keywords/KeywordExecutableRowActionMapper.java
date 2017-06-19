@@ -41,20 +41,20 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
     }
 
     @Override
-    public RobotToken map(RobotLine currentLine, Stack<ParsingState> processingState, RobotFileOutput robotFileOutput,
-            RobotToken rt, FilePosition fp, String text) {
-        UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput,
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState, final RobotFileOutput robotFileOutput,
+            final RobotToken rt, final FilePosition fp, final String text) {
+        final UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(currentLine, processingState, robotFileOutput,
                 rt, fp);
-        List<IRobotTokenType> types = rt.getTypes();
+        final List<IRobotTokenType> types = rt.getTypes();
         types.add(0, RobotTokenType.KEYWORD_ACTION_NAME);
         types.remove(RobotTokenType.UNKNOWN);
 
-        List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp, text);
-        for (RobotToken token : specialTokens) {
+        final List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp, text);
+        for (final RobotToken token : specialTokens) {
             types.addAll(token.getTypes());
         }
 
-        RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<UserKeyword>();
+        final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<UserKeyword>();
         if (text.startsWith("#") || RobotExecutableRow.isTsvComment(text, robotFileOutput.getFileFormat())) {
             types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
             types.remove(RobotTokenType.KEYWORD_ACTION_ARGUMENT);
@@ -63,17 +63,17 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         } else {
             row.setAction(rt);
         }
-        keyword.addKeywordExecutionRow(row);
+        keyword.addElement(row);
 
         processingState.push(ParsingState.KEYWORD_INSIDE_ACTION);
         return rt;
     }
 
     @Override
-    public boolean checkIfCanBeMapped(RobotFileOutput robotFileOutput, RobotLine currentLine, RobotToken rt,
-            String text, Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine, final RobotToken rt,
+            final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        ParsingState state = stateHelper.getCurrentStatus(processingState);
+        final ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION) {
             if (posResolver.isCorrectPosition(PositionExpected.KEYWORD_EXEC_ROW_ACTION_NAME,
                     robotFileOutput.getFileModel(), currentLine, rt)) {

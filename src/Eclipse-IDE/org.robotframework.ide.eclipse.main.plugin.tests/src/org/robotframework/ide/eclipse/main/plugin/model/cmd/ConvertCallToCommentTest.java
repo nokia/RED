@@ -66,9 +66,9 @@ public class ConvertCallToCommentTest {
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
         assertThat(result).has(properlySetParent());
-        assertThat(testCase.getLinkedElement().getTestExecutionRows())
+        assertThat(testCase.getLinkedElement().getElements())
                 .doesNotContain(oldLinked);
-        assertThat(testCase.getLinkedElement().getTestExecutionRows().size()).isEqualTo(1);
+        assertThat(testCase.getLinkedElement().getElements().size()).isEqualTo(1);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
                 .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
@@ -101,7 +101,7 @@ public class ConvertCallToCommentTest {
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
         assertThat(result).has(properlySetParent());
-        assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
+        assertThat(keyword.getLinkedElement().getElements()).doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
                 .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
@@ -135,7 +135,7 @@ public class ConvertCallToCommentTest {
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
         assertThat(result).has(properlySetParent());
-        assertThat(testCase.getLinkedElement().getTestExecutionRows()).doesNotContain(oldLinked);
+        assertThat(testCase.getLinkedElement().getElements()).doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
                 .of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA, result)));
@@ -170,7 +170,7 @@ public class ConvertCallToCommentTest {
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEqualTo("# call | 1 | 2 | #comment");
         assertThat(result).has(properlySetParent());
-        assertThat(keyword.getLinkedElement().getKeywordExecutionRows()).doesNotContain(oldLinked);
+        assertThat(keyword.getLinkedElement().getElements()).doesNotContain(oldLinked);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE), eq(ImmutableMap
                 .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
