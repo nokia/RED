@@ -50,7 +50,7 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        userKeyword.addElement((KeywordTeardown) modelElement, 0);
+        userKeyword.addElement((KeywordTeardown) modelElement, index);
         return modelElement;
     }
 
