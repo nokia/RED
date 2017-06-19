@@ -62,8 +62,9 @@ public class ConvertCommentToSetting extends EditorCommand {
             }
 
             final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) commentCall.getParent();
+            final int index = commentCall.getIndex();
             parent.removeChild(commentCall);
-            final RobotDefinitionSetting setting = parent.createSetting(0, newName,
+            final RobotDefinitionSetting setting = parent.createSetting(index, newName,
                     newArgs.stream().map(RobotToken::getText).collect(Collectors.toList()),
                     newComments.stream().map(RobotToken::getText).collect(Collectors.joining(" | ")));
 
