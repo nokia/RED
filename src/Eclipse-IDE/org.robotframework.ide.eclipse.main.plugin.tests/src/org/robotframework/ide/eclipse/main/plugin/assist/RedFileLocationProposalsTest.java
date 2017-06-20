@@ -54,7 +54,8 @@ public class RedFileLocationProposalsTest {
 
     @Test
     public void exceptionIsThrown_whenTryingToCreateProposalsProviderForUnsupportedSettingsGroup() {
-        final EnumSet<SettingsGroup> supportedSettingGroups = EnumSet.of(SettingsGroup.RESOURCES, SettingsGroup.VARIABLES);
+        final EnumSet<SettingsGroup> supportedSettingGroups = EnumSet.of(SettingsGroup.RESOURCES,
+                SettingsGroup.VARIABLES, SettingsGroup.LIBRARIES);
 
         for (final SettingsGroup importType : EnumSet.complementOf(supportedSettingGroups)) {
             try {

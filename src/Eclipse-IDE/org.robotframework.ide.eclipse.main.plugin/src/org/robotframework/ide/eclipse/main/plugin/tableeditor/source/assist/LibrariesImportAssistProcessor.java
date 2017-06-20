@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -14,7 +15,9 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedLibraryProposals;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
@@ -55,10 +58,19 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
 
         final String separator = assist.getSeparatorToFollow();
 
+        final List<AssistProposal> libProposals = new ArrayList<>();
+
         final List<? extends AssistProposal> librariesProposals = new RedLibraryProposals(assist.getModel())
                 .getLibrariesProposals(prefix);
+
+        final List<? extends AssistProposal> libFilesProposals = RedFileLocationProposals
+                .create(SettingsGroup.LIBRARIES, assist.getModel()).getFilesLocationsProposals(prefix);
+
+        libProposals.addAll(librariesProposals);
+        libProposals.addAll(libFilesProposals);
+
         final List<ICompletionProposal> proposals = newArrayList();
-        for (final AssistProposal libProposal : librariesProposals) {
+        for (final AssistProposal libProposal : libProposals) {
             final Position positionToReplace = new Position(offset - prefix.length(), cellLength);
 
             final List<String> args = libProposal.getArguments();
