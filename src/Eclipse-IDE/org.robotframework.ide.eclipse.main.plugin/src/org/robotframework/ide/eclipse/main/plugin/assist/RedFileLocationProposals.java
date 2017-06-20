@@ -44,6 +44,8 @@ public abstract class RedFileLocationProposals {
                 return new RedResourceFileLocationsProposals(suiteFile, matcher);
             case VARIABLES:
                 return new RedPythonFileLocationsProposals(suiteFile, matcher);
+            case LIBRARIES:
+                return new RedPythonFileLocationsProposals(suiteFile, matcher);
             default:
                 throw new IllegalStateException("Unknown value: " + importType);
         }
