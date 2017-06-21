@@ -645,8 +645,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
         final KeywordTags keywordSetting = (KeywordTags) new KeywordTableModelUpdater().createSetting(createKeyword(),
-                0,
-                "[Tags]", "comment", newArrayList("a", "b", "c"));
+                0, "[Tags]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
