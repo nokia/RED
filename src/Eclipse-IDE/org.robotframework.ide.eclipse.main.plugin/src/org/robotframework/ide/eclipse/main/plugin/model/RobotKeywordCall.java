@@ -248,15 +248,20 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     @Override
     public DefinitionPosition getDefinitionPosition() {
         RobotToken token;
+        final List<RobotToken> tokens = linkedElement.getElementTokens();
         if (linkedElement instanceof RobotExecutableRow<?>) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
             token = row.buildLineDescription().getAction().getToken();
         } else {
-            token = linkedElement.getElementTokens().get(0);
+            token = tokens.get(0);
         }
 
         if (token.getFilePosition().isNotSet()) {
-            token = linkedElement.getElementTokens().get(0);
+            token = tokens.get(0);
+            // for comment action token would be empty, so the next one should be used
+            if (token.getFilePosition().isNotSet() && tokens.size() > 1) {
+                token = tokens.get(1);
+            }
         }
 
         return new DefinitionPosition(token.getFilePosition(), token.getText().length());
