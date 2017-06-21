@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6dFLQHUGEeaTdNH0nRm1gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/24/17 12:27 PM
+Save-Time: 6/21/17 4:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -88,8 +88,8 @@ check-test_case-row -file "TestFile.robot" -row 2 -tc ""
 check-test_case-row -file "TestFile.robot" -row 3 -tc "..."
 
 check-test_case-row -file "TestFile.robot" -row 4 -tc "t1"
-check-test_case-row -file "TestFile.robot" -row 5 -tc "[tags]" -c1 333
-check-test_case-row -file "TestFile.robot" -row 6 -tc "Log" -c1 "text"
+check-test_case-row -file "TestFile.robot" -row 5 -tc "Log" -c1 "text"
+check-test_case-row -file "TestFile.robot" -row 6 -tc "[tags]" -c1 333
 check-test_case-row -file "TestFile.robot" -row 7 -tc "..."
 
 check-test_case-row -file "TestFile.robot" -row 8 -tc "second test"
