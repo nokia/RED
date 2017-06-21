@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fQHQYJwmEeaF69zyQwob4Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/9/16 2:57 PM
+Save-Time: 6/21/17 9:11 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -90,9 +90,7 @@ check-test_case-row -file "TestFile.robot" -row 10 -tc "new name"
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
 check-test_case-row -file "TestFile.robot" -row 10 -tc "last test"
 
-
 //revert added items
-
 get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1/Convert To Boolean"
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
@@ -131,14 +129,13 @@ check-test_case-row -file "TestFile.robot" -row 8-tc "Convert To Boolean" -c1 8 
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
 check-test_case-row -file "TestFile.robot" -row 8-tc "Convert To Boolean" -c1 8
 
-
 //revert in few points
 get-view Outline | get-tree | select "TestFile.robot/Test Cases/case" | click
 wait 200
 
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
-        key-type Down
+        key-type Down -times 2
         key-type Enter
     }
     //set [doc]-> now is keyword
@@ -150,7 +147,7 @@ with [get-editor "TestFile.robot"] {
     //change keyword name
     get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
-        key-type Down
+        key-type Up
         key-type Left
         key-type Enter
     }
@@ -162,7 +159,7 @@ with [get-editor "TestFile.robot"] {
     
     //remove first arg in [Tag] section
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
-        key-type Down -times 3
+        key-type Down -times 4
         key-type Del
         key-type Right -times 2
         type-text 4
@@ -195,8 +192,8 @@ with [get-editor "TestFile.robot"] {
 }
 
 check-test_case-row -file "TestFile.robot" -row 1 -tc "case" 
-check-test_case-row -file "TestFile.robot" -row 2 -tc "now is keyword" -c1 "doc is here"
-check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be False" -c1 1
+check-test_case-row -file "TestFile.robot" -row 2 -tc "Should Be False" -c1 1
+check-test_case-row -file "TestFile.robot" -row 3 -tc "now is keyword" -c1 "doc is here"
 check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
 
 
@@ -228,8 +225,8 @@ check-test_case-row -file "TestFile.robot" -row 6 -tc "[Tags]" -c1 "nextTag" -c2
 
 //checkpoint
 check-test_case-row -file "TestFile.robot" -row 1 -tc "case"
-check-test_case-row -file "TestFile.robot" -row 2 -tc "now is keyword" -c1 "doc is here"
-check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be False" -c1 1
+check-test_case-row -file "TestFile.robot" -row 2 -tc "Should Be False" -c1 1
+check-test_case-row -file "TestFile.robot" -row 3 -tc "now is keyword" -c1 "doc is here"
 check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
 
 
@@ -251,8 +248,8 @@ check-test_case-row -file "TestFile.robot" -row 6 -tc "[Tags]" -c1 "newTag1" -c2
 
 //revert changing kw name
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
-check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be True" -c1 1
-check-test_case-row -file "TestFile.robot" -row 2 -tc "now is keyword" -c1 "doc is here"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "Should Be True" -c1 1
+check-test_case-row -file "TestFile.robot" -row 3 -tc "now is keyword" -c1 "doc is here"
 
 
 //revert changing [doc]
@@ -260,8 +257,8 @@ get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 
 
 //checkpoint
 check-test_case-row -file "TestFile.robot" -row 1 -tc "case"
-check-test_case-row -file "TestFile.robot" -row 2 -tc "[Documentation]" -c1 "doc is here"
-check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be True" -c1 1
+check-test_case-row -file "TestFile.robot" -row 2 -tc "Should Be True" -c1 1
+check-test_case-row -file "TestFile.robot" -row 3 -tc "[Documentation]" -c1 "doc is here"
 check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
 
 
