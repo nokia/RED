@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _CsOaUHBOEeas5uogJbgGYA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/16/16 10:59 AM
+Save-Time: 6/21/17 11:10 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,8 +68,8 @@ check-keyword-row -file "TestFile.robot" -row 7 -kw "Import Library" -c1 "m lib"
 check-keyword-row -file "TestFile.robot" -row 8 -kw "..."
 
 check-keyword-row -file "TestFile.robot" -row 9 -kw "last kw"
-check-keyword-row -file "TestFile.robot" -row 10 -kw "[Return]" -c1 45
-check-keyword-row -file "TestFile.robot" -row 11 -kw "${x}=" -c1 "Should Not Be Equal As Integers" -c2 44 -c3 555
+check-keyword-row -file "TestFile.robot" -row 10 -kw "${x}=" -c1 "Should Not Be Equal As Integers" -c2 44 -c3 555
+check-keyword-row -file "TestFile.robot" -row 11 -kw "[Return]" -c1 45
 check-keyword-row -file "TestFile.robot" -row 12 -kw "..."
 
 is-row-fully-selected -row 5 -table "User Keywords"
