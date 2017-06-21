@@ -26,30 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveKeywordCallUpCommandTest {
 
-    // @Test(expected = IllegalStateException.class)
-    // public void exceptionIsThrown_whenTryingToMoveSettingOfTestCase() {
-    // final List<RobotCase> cases = createTestCasesWithSettings();
-    // final RobotKeywordCall setting = cases.get(0).getChildren().get(0);
-    //
-    // final IEventBroker eventBroker = mock(IEventBroker.class);
-    // ContextInjector.prepareContext()
-    // .inWhich(eventBroker)
-    // .isInjectedInto(new MoveKeywordCallUpCommand(setting))
-    // .execute();
-    // }
-    //
-    // @Test(expected = IllegalStateException.class)
-    // public void exceptionIsThrown_whenTryingToMoveSettingOfKeyword() {
-    // final List<RobotKeywordDefinition> keywords = createKeywordsWithSettings();
-    // final RobotKeywordCall setting = keywords.get(0).getChildren().get(0);
-    //
-    // final IEventBroker eventBroker = mock(IEventBroker.class);
-    // ContextInjector.prepareContext()
-    // .inWhich(eventBroker)
-    // .isInjectedInto(new MoveKeywordCallUpCommand(setting))
-    // .execute();
-    // }
-
     @Test
     public void nothingHappens_whenTryingToMoveSettingWhichIsTopmostInTestCase() {
         final List<RobotCase> cases = createTestCasesWithSettings();
