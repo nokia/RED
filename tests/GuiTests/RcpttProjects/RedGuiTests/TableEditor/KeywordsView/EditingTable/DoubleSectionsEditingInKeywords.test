@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _GWpiMGRcEeayWasF5RXANg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/27/17 10:08 AM
+Save-Time: 6/21/17 4:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,7 +34,7 @@ wait 300
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Right -times 4
-        key-type Up
+        key-type Down
         key-type Enter
     }
     //change value 
@@ -77,7 +77,7 @@ wait 300
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Right -times 5
-        key-type Up
+        key-type Down
         key-type Enter
     }
     //add new value
@@ -97,7 +97,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    [Documentation]    my doc\n"
     + "    Convert To Binary    42442\n"
     + "    [Teardown]    a    b    c    fff    new item\n"
-    + "    [Teardown]" | verify-true    
+    + "    [Teardown]\n"
+    + "    \\" | verify-true  
         
 
         
@@ -179,7 +180,7 @@ wait 200
 //change 999-> 55
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down -times 2
+        key-type Down -times 3
         key-type Right -times 2
         key-type Enter
     }
@@ -221,7 +222,7 @@ wait 200
 
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down -times 2
+        key-type Down -times 3
         key-type Right -times 5
         key-type Enter
     }
@@ -239,7 +240,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    [Documentation]  44 aa\n"
     + "    log  6\n"
     + "    [Teardown]    Log   999    Convert To Binary    66    new item\n"
-    + "    [Teardown]" | verify-true
+    + "    [Teardown]\n"
+    + "    \\" | verify-true
 
 //----------------------------------------------- arguments --------------------------------------------
 
