@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tPtekGhvEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/14/16 11:08 AM
+Save-Time: 6/21/17 11:43 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -98,7 +98,7 @@ wait 200
 //go to doc argument
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
-        key-type Down
+        key-type Down -times 2
         key-type Right
         key-type Enter
     }
@@ -108,6 +108,10 @@ with [get-editor "TestFile.robot"] {
         key-type Enter
     }
     //change Teardown to normal KW
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Up -times 2
+        key-type Enter
+    }
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         type-text "not section"
         key-type Enter
@@ -125,8 +129,8 @@ check-test_case-row -file "TestFile.robot" -row 7 -tc "\\" -c1 "new"
 check-test_case-row -file "TestFile.robot" -row 8 -tc "..."
 
 check-test_case-row -file "TestFile.robot" -row 9 -tc "case"
-check-test_case-row -file "TestFile.robot" -row 10 -tc "[Documentation]" -c1 "i changed doc"
-check-test_case-row -file "TestFile.robot" -row 11 -tc "not section" -c1 "No Operation"
+check-test_case-row -file "TestFile.robot" -row 10 -tc "not section" -c1 "No Operation"
+check-test_case-row -file "TestFile.robot" -row 11 -tc "[Documentation]" -c1 "i changed doc"
 check-test_case-row -file "TestFile.robot" -row 12 -tc "Log" -c1 "67"
 check-test_case-row -file "TestFile.robot" -row 13 -tc "..."
 check-test_case-row -file "TestFile.robot" -row 14 -tc "...add new case"
