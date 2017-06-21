@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xe9eMMbZEeaVRsIP7EWHyA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/27/17 2:46 PM
+Save-Time: 6/21/17 11:40 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -44,7 +44,22 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[15].getText()" | equals "BuiltIn (already imported)" | verify-true
     get-property "getItems().TableItem[16].getText()" | equals "Easter (already imported)" | verify-true
     get-property "getItems().TableItem[17].getText()" | equals "Reserved (already imported)" | verify-true
-    get-property "getItems().TableItem[18].getText()" | equals "${/}" | verify-true
+    
+    //libs
+    get-property "getItems().TableItem[18].getText()" | equals "multiply.py" | verify-true
+    get-property "getItems().TableItem[19].getText()" | equals "Tests_wit_lib/discover.py" | verify-true
+    get-property "getItems().TableItem[20].getText()" | equals "Tests_wit_lib/discover_lib.py" | verify-true
+    get-property "getItems().TableItem[21].getText()" | equals "libs/add.py" | verify-true
+    get-property "getItems().TableItem[22].getText()" | equals "libs/error.py" | verify-true
+    get-property "getItems().TableItem[23].getText()" | equals "libs/lib with space.py" | verify-true
+    get-property "getItems().TableItem[24].getText()" | equals "libs/lib_with_args.py" | verify-true
+    get-property "getItems().TableItem[25].getText()" | equals "libs/for_resource/res1.py" | verify-true
+    get-property "getItems().TableItem[26].getText()" | equals "libs/subfolder/many_classes.py" | verify-true
+    get-property "getItems().TableItem[27].getText()" | equals "libs/t/divide.py" | verify-true
+    get-property "getItems().TableItem[28].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[29].getText()" | equals "${:}" | verify-true
+    get-property "getItems().TableItem[30].getText()" | equals "${\\n}" | verify-true
+    get-property "getItems().TableItem[31].getText()" | equals "${CURDIR}" | verify-true
 }
 
 //select Add
