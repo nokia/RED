@@ -200,7 +200,15 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     @Override
     public FilePosition getBeginPosition() {
-        return getAction().getFilePosition();
+        FilePosition position = getAction().getFilePosition();
+        if (position.isNotSet()) {
+            // this may be comment row
+            final List<RobotToken> tokens = getElementTokens();
+            if (tokens.size() > 1) {
+                position = tokens.get(1).getFilePosition();
+            }
+        }
+        return position;
     }
 
     @Override
@@ -215,13 +223,13 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     private List<RobotToken> compact(final List<RobotToken> elementsSingleType) {
-        int size = elementsSingleType.size();
+        final int size = elementsSingleType.size();
         for (int i = size - 1; i >= 0; i--) {
             if (elementsSingleType.size() == 0) {
                 break;
             }
 
-            RobotToken t = elementsSingleType.get(i);
+            final RobotToken t = elementsSingleType.get(i);
             if (t.getText() == null || t.getText().isEmpty()) {
                 elementsSingleType.remove(i);
             } else {
@@ -283,7 +291,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public <P> RobotExecutableRow<P> copy() {
-        RobotExecutableRow<P> execRow = new RobotExecutableRow<>();
+        final RobotExecutableRow<P> execRow = new RobotExecutableRow<>();
         execRow.setAction(getAction().copyWithoutPosition());
         for (final RobotToken arg : getArguments()) {
             execRow.addArgument(arg.copyWithoutPosition());
