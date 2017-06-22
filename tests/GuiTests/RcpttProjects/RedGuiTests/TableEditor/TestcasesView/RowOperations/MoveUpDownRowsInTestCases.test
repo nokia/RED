@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pEYlwG6SEeaFMpJxhF5ZTQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 2:53 PM
+Save-Time: 6/22/17 2:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -55,17 +55,17 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
 }
 
 //set focus on teardown
-get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 3
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 5
 
-//check tah it cannot be moved
+//check [Teradown] cann be moved
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-    get-menu "Row/Move up" | get-property enablement | equals false | verify-true
-    get-menu "Row/Move down" | get-property enablement | equals false | verify-true
+    get-menu "Row/Move up" | get-property enablement | equals true | verify-true
+    get-menu "Row/Move down" | get-property enablement | equals true | verify-true
 }
 //go down to Catenate
 get-eclipse-window | key-type Down
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-    key-type Down
+    key-type Up -times 2
     key-type Right
     //move catenate down
     get-menu "Row/Move down" | click
@@ -112,9 +112,9 @@ check-test_case-row -file  "TestFile.robot" -row 3 -tc "my kw"
 check-test_case-row -file  "TestFile.robot" -row 4 -tc "..." 
 
 check-test_case-row -file  "TestFile.robot" -row 5 -tc "test 1" 
-check-test_case-row -file  "TestFile.robot" -row 6 -tc "[Teardown]" -c1 "Convert To Hex" -c2 555
-check-test_case-row -file  "TestFile.robot" -row 7 -tc "Should Be True" -c1 "${True}"
-check-test_case-row -file  "TestFile.robot" -row 8 -tc "Catenate" -c1 1 -c2 2 -c3 3 -c4 4 -c5 5
+check-test_case-row -file  "TestFile.robot" -row 6 -tc "Should Be True" -c1 "${True}"
+check-test_case-row -file  "TestFile.robot" -row 7 -tc "Catenate" -c1 1 -c2 2 -c3 3 -c4 4 -c5 5
+check-test_case-row -file  "TestFile.robot" -row 8 -tc "[Teardown]" -c1 "Convert To Hex" -c2 555
 check-test_case-row -file  "TestFile.robot" -row 9 -tc "..."
 
 check-test_case-row -file  "TestFile.robot" -row 10 -tc "test 3"
