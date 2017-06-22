@@ -27,26 +27,17 @@ public class PathEntryDialogTest {
     public void entryDialogProperlyGeneratesSearchPaths_whenPathsAreProvidedInTextBox() throws Exception {
         final AtomicBoolean finished = new AtomicBoolean(false);
         final AtomicReference<PathEntryDialog> dialog = new AtomicReference<>(null);
-        
-        final Thread guiChangesRequestingThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SwtThread.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.set(new PathEntryDialog(shell.getShell()));
-                        dialog.get().open();
-                        finished.set(true);
-                    }
-                });
-                SwtThread.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.get().getSearchPathsText().setText("path1\n\n  \t  \npath\t2\n");
-                        dialog.get().getOkButton().notifyListeners(SWT.Selection, new Event());
-                    }
-                });
-            }
+
+        final Thread guiChangesRequestingThread = new Thread(() -> {
+            SwtThread.asyncExec(() -> {
+                dialog.set(new PathEntryDialog(shell.getShell()));
+                dialog.get().open();
+                finished.set(true);
+            });
+            SwtThread.asyncExec(() -> {
+                dialog.get().getSearchPathsText().setText("path1\n\n  \t  \npath\t2\n");
+                dialog.get().getOkButton().notifyListeners(SWT.Selection, new Event());
+            });
         });
         guiChangesRequestingThread.start();
         guiChangesRequestingThread.join();

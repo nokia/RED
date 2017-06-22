@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -63,14 +64,14 @@ public abstract class AbstractAutoDiscoverer {
         this.dryRunTargetsCollector = dryRunTargetsCollector;
     }
 
-    public void start() {
+    public Job start() {
         final IWorkbench workbench = PlatformUI.getWorkbench();
         final IWorkbenchWindow workbenchWindow = workbench.getActiveWorkbenchWindow();
         final Shell parent = workbenchWindow != null ? workbenchWindow.getShell() : null;
-        start(parent);
+        return start(parent);
     }
 
-    abstract void start(final Shell parent);
+    abstract Job start(Shell parent);
 
     final boolean lockDryRun() {
         return IS_DRY_RUN_RUNNING.compareAndSet(false, true);
