@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -46,6 +47,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarSt
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
@@ -74,7 +76,8 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         this(robotProject, resources, showSummary, null);
     }
 
-    private LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
+    @VisibleForTesting
+    LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
             final boolean showSummary, final String libraryNameToDiscover) {
         super(robotProject, resources, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector());
         this.showSummary = showSummary;
@@ -89,7 +92,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    void start(final Shell parent) {
+    Job start(final Shell parent) {
         if (lockDryRun()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Discovering libraries") {
 
@@ -124,7 +127,9 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             };
             wsJob.setUser(true);
             wsJob.schedule();
+            return wsJob;
         }
+        return null;
     }
 
     private List<RobotDryRunLibraryImport> getLibraryImportsToProcess() {
@@ -162,13 +167,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     private void showSummary(final Shell parent, final List<RobotDryRunLibraryImport> libraryImports) {
-        SwtThread.syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                new LibrariesAutoDiscovererWindow(parent, libraryImports).open();
-            }
-        });
+        SwtThread.syncExec(() -> new LibrariesAutoDiscovererWindow(parent, libraryImports).open());
     }
 
     private static class DryRunTargetsCollector implements IDryRunTargetsCollector {
