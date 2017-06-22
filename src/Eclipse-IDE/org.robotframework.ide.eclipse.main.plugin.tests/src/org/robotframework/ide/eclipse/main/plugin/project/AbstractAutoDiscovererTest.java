@@ -14,7 +14,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,19 +50,17 @@ public class AbstractAutoDiscovererTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
+        final List<IResource> resources = Arrays.asList();
+
         final LibrariesSourcesCollector sourcesCollector = new LibrariesSourcesCollector(robotProject);
 
         final IDryRunTargetsCollector targetsCollector = mock(IDryRunTargetsCollector.class);
 
-        final AbstractAutoDiscoverer discoverer = createDiscoverer(robotProject, Arrays.asList(), sourcesCollector,
-                targetsCollector);
-
-        discoverer.startDiscovering(null);
+        createDiscoverer(robotProject, resources, sourcesCollector, targetsCollector).startDiscovering(null);
     }
 
-    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject,
-            final List<? extends IResource> resources, final LibrariesSourcesCollector sourcesCollector,
-            final IDryRunTargetsCollector targetsCollector) {
+    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject, final List<IResource> resources,
+            final LibrariesSourcesCollector sourcesCollector, final IDryRunTargetsCollector targetsCollector) {
         return new AbstractAutoDiscoverer(robotProject, resources, sourcesCollector, targetsCollector) {
 
             @Override
@@ -68,8 +71,14 @@ public class AbstractAutoDiscovererTest {
             }
 
             @Override
-            void start(final Shell parent) {
-                // nothing to do
+            Job start(final Shell parent) {
+                return new WorkspaceJob("Discovering") {
+
+                    @Override
+                    public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+                        return Status.OK_STATUS;
+                    }
+                };
             }
         };
     }

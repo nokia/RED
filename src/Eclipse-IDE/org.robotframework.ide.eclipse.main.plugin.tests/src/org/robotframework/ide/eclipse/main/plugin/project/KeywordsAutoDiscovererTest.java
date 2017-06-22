@@ -122,16 +122,16 @@ public class KeywordsAutoDiscovererTest {
 
     private Map<ReferencedLibrary, LibrarySpecification> createLibrary(final String name, final String[] lines)
             throws IOException, CoreException {
+        final IFile sourceFile = projectProvider.createFile("libs/" + name + ".py", lines);
+
         final ReferencedLibrary library = new ReferencedLibrary();
         library.setType(LibraryType.PYTHON.toString());
         library.setName(name);
-        library.setPath(projectProvider.getProject().getName());
+        library.setPath(sourceFile.getFullPath().makeRelative().removeLastSegments(1).toPortableString());
 
         final LibrarySpecification libSpec = new LibrarySpecification();
-        final String filePath = "libs/" + library.getName() + ".py";
-        final IFile libFile = projectProvider.createFile(filePath, lines);
-        libSpec.setName(library.getName());
-        libSpec.setSourceFile(libFile);
+        libSpec.setName(name);
+        libSpec.setSourceFile(sourceFile);
 
         return ImmutableMap.of(library, libSpec);
     }
