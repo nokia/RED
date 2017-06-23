@@ -1,0 +1,94 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Element-Name: AutoDiscoverWithVariableMapping
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _P5zfcFf8EeeREoIbiWoJ5g
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 6/23/17 1:50 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/lib_with_variable.robot" | double-click
+}
+
+//remove old path
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 3 40
+    key-type BackSpace -times 12
+    type-text "libs/add.py"
+    set-caret-pos 3 22
+    
+    //add var to var mapping
+    hover-text 3 19
+    key-type "M1+1"
+}
+wait 300
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Define '${not_existing}' variable" | click -default
+    
+//set path to project    
+with [get-window "Add variable mapping"] {
+    get-editbox -after [get-label Value] | set-text [concat $RED_workspace_path_unix_style "/RobotProject"]
+    get-button OK | click
+}
+
+wait-for-loading-red-xml -editor_name "RobotProject/red.xml"
+wait 500
+get-button "Save (M1+S)" | click
+get-editor "lib_with_variable.robot" | click
+get-button "Save (M1+S)" | click
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item add | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-item multiply | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-item "lib1.py" | get-property "image.path" 
+        | equals ".*/error_fatal.png" | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+
+//open resource
+get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" 
+    | select "RobotProject/resources/resource.robot" | double-click
+    
+//remove old path and add new with variable    
+with [get-editor "resource.robot" | get-text-viewer] {
+    set-caret-pos 3 1
+    select-range 2 37 2 12
+    hover-text 2 24 -with Left
+    type-text "${a}/libs/t"
+    set-caret-pos 2 23
+    type-text "/divide.py"
+    set-caret-pos 2 15
+    hover-text 2 14
+    key-type "M1+1"
+}
+
+//add relative path
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Define '${a}' variable" 
+    | click -default
+with [get-window "Add variable mapping"] {
+    get-editbox -after [get-label Value] | set-text "../"
+    get-button OK | click
+}
+get-button "Save (M1+S)" | click
+
+//save resource
+get-editor "resource.robot" | click
+get-button "Save (M1+S)" | click
+
+//check if lib was found
+get-window "Discovering libraries summary" | get-tree | get-item divide | get-property "image.path" 
+    | equals ".*/success_big.png" | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
