@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4TCM4GB-EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/11/16 10:00 PM
+Save-Time: 6/23/17 9:40 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -79,7 +79,7 @@ get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESC
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type Up
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Right
-        key-type Up -times 7
+        key-type Up -times 8
         key-type Enter
     }
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
@@ -97,10 +97,10 @@ get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESC
         key-type "M1+v"
         key-type Enter
     }
-    // go up and copy "6"
+    // go down to Return and copy "6"
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Up
+        key-type Down -times 2
         key-type Enter
     }
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
@@ -110,7 +110,7 @@ get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESC
     //paste "6" as kw name
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Left
-        key-type Up
+        key-type Up -times 3
         key-type Enter
     }
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
