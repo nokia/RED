@@ -21,7 +21,7 @@ public class ModelConditions {
             @Override
             public boolean matches(final RobotFileInternalElement element) {
                 final List<RobotToken> tokens = ((AModelElement<?>) element.getLinkedElement()).getElementTokens();
-                return all(tokens, not(havePositionsSet()));
+                return all(tokens, not(havePositionsSet(false)));
             }
         };
     }
@@ -32,18 +32,18 @@ public class ModelConditions {
             @Override
             public boolean matches(final RobotFileInternalElement element) {
                 final List<RobotToken> tokens = ((AModelElement<?>) element.getLinkedElement()).getElementTokens();
-                return all(tokens, havePositionsSet());
+                return all(tokens, havePositionsSet(true));
             }
         };
     }
 
-    private static Predicate<RobotToken> havePositionsSet() {
+    private static Predicate<RobotToken> havePositionsSet(final boolean expected) {
         return new Predicate<RobotToken>() {
 
             @Override
             public boolean apply(final RobotToken token) {
                 final FilePosition tokenPosition = token.getFilePosition();
-                return tokenPosition.isNotSet();
+                return "".equals(token.getText()) ? expected : tokenPosition.isNotSet();
             }
         };
     }

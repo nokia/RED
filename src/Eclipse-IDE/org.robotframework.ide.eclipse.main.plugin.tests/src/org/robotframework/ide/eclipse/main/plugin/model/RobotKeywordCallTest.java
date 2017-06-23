@@ -128,8 +128,12 @@ public class RobotKeywordCallTest {
     private static void assertLabel(final List<RobotKeywordCall> calls) {
         int i = 0;
         for (final RobotKeywordCall call : calls) {
-            assertThat(call.getLabel()).isEqualTo("kw" + i);
-            i++;
+            if (i != 14) {
+                assertThat(call.getLabel()).isEqualTo("kw" + i);
+                i++;
+            } else {// comment case
+                assertThat(call.getLabel()).isEqualTo("");
+            }
         }
     }
 
@@ -165,6 +169,7 @@ public class RobotKeywordCallTest {
                 .appendLine("  ${x}  ${y}  kw11  1  2  # comment    rest")
                 .appendLine("  ${x}  ${y}=  kw12  1  2")
                 .appendLine("  ${x}  ${y}=  kw13  1  2  # comment    rest")
+                .appendLine("  # whole line commented")
                 .build();
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
         return section.getChildren().get(0).getChildren();
@@ -187,6 +192,7 @@ public class RobotKeywordCallTest {
                 .appendLine("  ${x}  ${y}  kw11  1  2  # comment  rest")
                 .appendLine("  ${x}  ${y}=  kw12  1  2")
                 .appendLine("  ${x}  ${y}=  kw13  1  2  # comment  rest")
+                .appendLine("  # whole line commented")
                 .build();
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
         return section.getChildren().get(0).getChildren();
