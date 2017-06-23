@@ -196,6 +196,7 @@ def create_libdoc(libname, python_paths, class_paths):
 # during decorated call
 def __cleanup_modules(to_call):
     import sys
+
     def inner(*args, **kwargs):
         old_modules = set(sys.modules.keys())
         try:
@@ -204,7 +205,11 @@ def __cleanup_modules(to_call):
             raise
         finally:
             current_modules = set(sys.modules.keys())
-            to_remove = current_modules - old_modules
+            builtin_modules = set(sys.builtin_module_names)
+
+            # some modules should not be removed because it causes rpc server problems
+            to_remove = [m for m in current_modules - old_modules - builtin_modules if
+                         not m.startswith('robot.') and not m.startswith('encodings.')]
             for m in to_remove:
                 del (sys.modules[m])
                 del (m)
