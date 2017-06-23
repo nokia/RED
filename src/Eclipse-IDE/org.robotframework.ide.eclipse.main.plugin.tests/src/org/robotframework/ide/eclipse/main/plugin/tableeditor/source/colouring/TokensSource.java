@@ -121,38 +121,38 @@ public class TokensSource {
 
     static class LineElement implements IRobotLineElement {
 
-        private final FilePosition filePostion;
+        private final FilePosition filePosition;
 
         private final String text;
 
         public LineElement(final int line, final int column, final int offset, final String content) {
-            this.filePostion = new FilePosition(line, column, offset);
+            this.filePosition = new FilePosition(line, column, offset);
             this.text = content;
         }
 
         @Override
         public int getLineNumber() {
-            return filePostion.getLine();
+            return filePosition.getLine();
         }
 
         @Override
         public int getStartColumn() {
-            return filePostion.getColumn();
+            return filePosition.getColumn();
         }
 
         @Override
         public int getEndColumn() {
-            return filePostion.getColumn() + text.length();
+            return filePosition.getColumn() + text.length();
         }
 
         @Override
         public int getStartOffset() {
-            return filePostion.getOffset();
+            return filePosition.getOffset();
         }
 
         @Override
         public FilePosition getFilePosition() {
-            return filePostion;
+            return filePosition;
         }
 
         @Override

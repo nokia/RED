@@ -164,11 +164,11 @@ public class SuiteSourceEditor extends TextEditor {
         });
     }
 
-    private void updateLineLocationStatusBar(final int caretPostion) {
+    private void updateLineLocationStatusBar(final int caretPosition) {
         try {
             final IDocument document = getDocument();
-            int lineNumber = document.getLineOfOffset(caretPostion);
-            final int columnNumber = caretPostion - document.getLineOffset(lineNumber) + 1;
+            int lineNumber = document.getLineOfOffset(caretPosition);
+            final int columnNumber = caretPosition - document.getLineOffset(lineNumber) + 1;
             lineNumber++;
 
             final StatusLineContributionItem find = (StatusLineContributionItem) getEditorSite().getActionBars()
@@ -350,11 +350,11 @@ public class SuiteSourceEditor extends TextEditor {
             sourceDocSelectionChangedListener.positionChanged(getDocument(), getFileModel(), region, isEditing);
         }
     }
-    
+
     public void setSourceDocSelectionChangedListener(final SourceDocumentationSelectionChangedListener listener) {
         this.sourceDocSelectionChangedListener = listener;
     }
-    
+
     public void removeSourceDocSelectionChangedListener() {
         this.sourceDocSelectionChangedListener = null;
     }
