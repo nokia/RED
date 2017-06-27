@@ -7,24 +7,24 @@ Element-Version: 3.0
 External-Reference: 
 Id: _45cFcFsMEeedsKq3x9SlkA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/27/17 2:46 PM
+Save-Time: 6/27/17 3:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-// verify default File Associations preference for unassociated extensions (it should be 'System Editor; if none: Text Editor')
+// verify default File Associations preference for unassociated extensions (it should be 'Text Editor')
 get-view "Project Explorer" | get-tree | select SecondRobotProject | double-click
-//get-preferences-menu | click
-//with [get-window Preferences | get-tree] {
-//    select General | double-click
-//    select "General/Editors" | double-click
-//    select "General/Editors/File Associations" | double-click
-//}
-//get-window Preferences | get-combo -after [get-label "Open unassociated files with:"] | get-property selection 
-//    | equals "System Editor; if none: Text Editor" | verify-true
-//get-window Preferences | get-button OK | click
+get-preferences-menu | click
+with [get-window Preferences | get-tree] {
+    select General | double-click
+    select "General/Editors" | double-click
+    select "General/Editors/File Associations" | double-click
+}
+get-window Preferences | get-combo -after [get-label "Open unassociated files with:"] | get-property selection 
+    | equals "Text Editor" | verify-true
+get-window Preferences | get-button OK | click
 // open first file, enter text and save
 get-view "Project Explorer" | get-tree | select "SecondRobotProject/file_1.xyz" | double-click
 with [get-editor "file_1.xyz" | get-text-viewer] {
