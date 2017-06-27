@@ -168,7 +168,9 @@ public abstract class AbstractAutoDiscoverer {
         if (projectLocation != null) {
             dataSourcePaths.add(projectLocation.toFile().getAbsolutePath());
         }
-        dryRunTargetsCollector.getAdditionalProjectsLocations().forEach(f -> dataSourcePaths.add(f.getAbsolutePath()));
+        for (final File additionalProjectsLocation : dryRunTargetsCollector.getAdditionalProjectsLocations()) {
+            dataSourcePaths.add(additionalProjectsLocation.getAbsolutePath());
+        }
         return dataSourcePaths;
     }
 

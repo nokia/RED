@@ -7,12 +7,16 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -37,7 +41,7 @@ public class LibrariesSourcesCollectorTest {
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
-        assertThat(searchPaths.getClassPaths()).isEmpty();
+        assertThat(searchPaths.getClassPaths()).containsExactly(".");
         assertThat(searchPaths.getPythonPaths()).isEmpty();
     }
 
@@ -55,7 +59,7 @@ public class LibrariesSourcesCollectorTest {
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
-        assertThat(searchPaths.getClassPaths()).isEmpty();
+        assertThat(searchPaths.getClassPaths()).containsExactly(".");
         assertThat(searchPaths.getPythonPaths()).containsExactly(
                 projectProvider.getDir("a/b/c").getLocation().toOSString(),
                 projectProvider.getDir("a/b").getLocation().toOSString(),
@@ -72,7 +76,7 @@ public class LibrariesSourcesCollectorTest {
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
-        assertThat(searchPaths.getClassPaths()).isEmpty();
+        assertThat(searchPaths.getClassPaths()).containsExactly(".");
         assertThat(searchPaths.getPythonPaths())
                 .containsExactly(projectProvider.getProject().getLocation().toOSString());
     }
@@ -89,7 +93,7 @@ public class LibrariesSourcesCollectorTest {
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
-        assertThat(searchPaths.getClassPaths()).containsExactly(
+        assertThat(searchPaths.getClassPaths()).containsExactly(".",
                 projectProvider.getFile("a/lib3.jar").getLocation().toOSString(),
                 projectProvider.getFile("lib2.jar").getLocation().toOSString());
         assertThat(searchPaths.getPythonPaths()).containsExactly(projectProvider.getDir("a").getLocation().toOSString(),
@@ -108,19 +112,23 @@ public class LibrariesSourcesCollectorTest {
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
-        assertThat(searchPaths.getClassPaths()).isEmpty();
+        assertThat(searchPaths.getClassPaths()).containsExactly(".");
         assertThat(searchPaths.getPythonPaths())
                 .containsExactly(projectProvider.getDir("a").getLocation().toOSString());
     }
 
     @Test
-    public void collectedPathsAreExtendedWithPathsFromProjectConfiguration() throws Exception {
+    public void referenceLibAndAdditionalPathsFromProjectConfigurationAreAddedToCollectedPaths() throws Exception {
+        projectProvider.createDir("python_libs");
+        projectProvider.createDir("java_libs");
         projectProvider.createDir("python_path");
         projectProvider.createDir("java_path");
         projectProvider.createFile("lib.py");
         projectProvider.createFile("lib.jar");
 
         final RobotProjectConfig config = new RobotProjectConfig();
+        config.addReferencedLibrary(createLibrary(LibraryType.PYTHON, "pythonLib", "python_libs/pythonLib.py"));
+        config.addReferencedLibrary(createLibrary(LibraryType.JAVA, "javaLib", "java_libs/javaLib.jar"));
         config.addPythonPath(SearchPath.create(projectProvider.getDir("python_path").getLocation().toOSString()));
         config.addClassPath(SearchPath.create(projectProvider.getDir("java_path").getLocation().toOSString()));
         projectProvider.configure(config);
@@ -129,12 +137,28 @@ public class LibrariesSourcesCollectorTest {
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
-        assertThat(searchPaths.getClassPaths()).containsExactly(
+        assertThat(searchPaths.getClassPaths()).containsExactly(".",
+                projectProvider.getDir("java_libs").getLocation().toOSString(),
                 projectProvider.getDir("java_path").getLocation().toOSString(),
                 projectProvider.getFile("lib.jar").getLocation().toOSString());
         assertThat(searchPaths.getPythonPaths()).containsExactly(
+                projectProvider.getDir("python_libs").getLocation().toOSString(),
                 projectProvider.getDir("python_path").getLocation().toOSString(),
                 projectProvider.getProject().getLocation().toOSString());
+    }
+
+    private ReferencedLibrary createLibrary(final LibraryType libType, final String name, final String filePath)
+            throws IOException, CoreException {
+        final ReferencedLibrary library = new ReferencedLibrary();
+        library.setType(libType.toString());
+        library.setName(name);
+        library.setPath(projectProvider.getFile(filePath)
+                .getFullPath()
+                .makeRelative()
+                .removeLastSegments(1)
+                .toPortableString());
+
+        return library;
     }
 
     @Test
@@ -155,7 +179,7 @@ public class LibrariesSourcesCollectorTest {
         collector.collectPythonAndJavaLibrariesSources(1);
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
-        assertThat(searchPaths.getClassPaths()).containsExactly(
+        assertThat(searchPaths.getClassPaths()).containsExactly(".",
                 projectProvider.getFile("a/libA.jar").getLocation().toOSString(),
                 projectProvider.getFile("lib.jar").getLocation().toOSString());
         assertThat(searchPaths.getPythonPaths()).containsExactly(projectProvider.getDir("a").getLocation().toOSString(),
