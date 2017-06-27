@@ -66,7 +66,9 @@ public class RobotProject extends RobotContainer {
     private RobotProjectHolder projectHolder;
 
     private Map<String, LibrarySpecification> stdLibsSpecs;
+
     private Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs;
+
     private List<ReferencedVariableFile> referencedVariableFiles;
 
     private RobotProjectConfig configuration;
@@ -166,7 +168,7 @@ public class RobotProject extends RobotContainer {
         for (final ReferencedLibrary library : configuration.getLibraries()) {
             final LibrarySpecification spec = reflibToSpec(getProject()).apply(library);
             librariesWatchHandler.registerLibrary(library, spec);
-            if(librariesWatchHandler.isLibSpecDirty(spec)) {
+            if (librariesWatchHandler.isLibSpecDirty(spec)) {
                 spec.setIsModified(true);
             }
             refLibsSpecs.put(library, spec);
@@ -274,6 +276,7 @@ public class RobotProject extends RobotContainer {
 
     private RedProjectEditorInput findEditorInputIfAlreadyOpened() {
         return SwtThread.syncEval(new Evaluation<RedProjectEditorInput>() {
+
             @Override
             public RedProjectEditorInput runCalculation() {
                 final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -347,53 +350,47 @@ public class RobotProject extends RobotContainer {
 
     public synchronized List<String> getPythonpath() {
         readProjectConfigurationIfNeeded();
+        final Set<String> pp = newLinkedHashSet();
         if (configuration != null) {
-            final Set<String> pp = newLinkedHashSet();
-            for (final ReferencedLibrary lib : configuration.getLibraries()) {
-                if (lib.provideType() == LibraryType.PYTHON) {
-                    final String path = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(
-                            new Path(lib.getPath())).toOSString();
-                    pp.add(path);
-                }
-            }
-            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
-            for (final SearchPath searchPath : configuration.getPythonPath()) {
-                try {
-                    final String path = redConfig.toAbsolutePath(searchPath, getProject()).getPath();
-                    pp.add(path);
-                } catch (final PathResolvingException e) {
-                    // we don't want to add syntax-problematic paths
-                }
-            }
-            return newArrayList(pp);
+            pp.addAll(getReferenceLibPaths(LibraryType.PYTHON));
+            pp.addAll(getAdditionalPaths(configuration.getPythonPath()));
         }
-        return newArrayList();
+        return newArrayList(pp);
     }
 
     public synchronized List<String> getClasspath() {
         readProjectConfigurationIfNeeded();
+        final Set<String> cp = newLinkedHashSet();
+        cp.add(".");
         if (configuration != null) {
-            final Set<String> cp = newLinkedHashSet();
-            cp.add(".");
-            for (final ReferencedLibrary lib : configuration.getLibraries()) {
-                if (lib.provideType() == LibraryType.JAVA) {
-                    final IPath absPath = RedWorkspace.Paths
-                            .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()));
-                    cp.add(absPath.toOSString());
-                }
-            }
-            for (final SearchPath searchPath : configuration.getClassPath()) {
-                try {
-                    final String path = new RedEclipseProjectConfig(configuration)
-                            .toAbsolutePath(searchPath, getProject()).getPath();
-                    cp.add(path);
-                } catch (final PathResolvingException e) {
-                    // we don't want to add syntax-problematic paths
-                }
-            }
-            return newArrayList(cp);
+            cp.addAll(getReferenceLibPaths(LibraryType.JAVA));
+            cp.addAll(getAdditionalPaths(configuration.getClassPath()));
         }
-        return newArrayList(".");
+        return newArrayList(cp);
+    }
+
+    private synchronized List<String> getReferenceLibPaths(final LibraryType libType) {
+        final List<String> paths = newArrayList();
+        for (final ReferencedLibrary lib : configuration.getLibraries()) {
+            if (lib.provideType() == libType) {
+                paths.add(RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()))
+                        .toOSString());
+            }
+        }
+        return paths;
+    }
+
+    private synchronized List<String> getAdditionalPaths(final List<SearchPath> searchPaths) {
+        final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
+        final List<String> paths = newArrayList();
+        for (final SearchPath searchPath : searchPaths) {
+            try {
+                paths.add(redConfig.toAbsolutePath(searchPath, getProject()).getPath());
+            } catch (final PathResolvingException e) {
+                // we don't want to add syntax-problematic paths
+            }
+        }
+        return paths;
     }
 
     public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
@@ -453,7 +450,7 @@ public class RobotProject extends RobotContainer {
     }
 
     public synchronized List<ReferencedVariableFile> getVariablesFromReferencedFiles() {
-        if(referencedVariableFiles != null) {
+        if (referencedVariableFiles != null) {
             return referencedVariableFiles;
         }
         readProjectConfigurationIfNeeded();
@@ -485,9 +482,9 @@ public class RobotProject extends RobotContainer {
     }
 
     private void removeUnusedLibspecFiles(final Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs) {
-        if(!librariesWatchHandler.getRemovedSpecs().isEmpty()) {
+        if (!librariesWatchHandler.getRemovedSpecs().isEmpty()) {
             for (final LibrarySpecification removedSpec : librariesWatchHandler.getRemovedSpecs()) {
-                if(!refLibsSpecs.containsValue(removedSpec)) {
+                if (!refLibsSpecs.containsValue(removedSpec)) {
                     final IFile libspecFile = removedSpec.getSourceFile();
                     if (libspecFile != null) {
                         final IPath libspecFileLocation = libspecFile.getLocation();

@@ -74,8 +74,8 @@ class LibrariesSourcesCollector {
     }
 
     EnvironmentSearchPaths getEnvironmentSearchPaths() {
-        final EnvironmentSearchPaths environmentSearchPaths = new RedEclipseProjectConfig(
-                robotProject.getRobotProjectConfig()).createEnvironmentSearchPaths(robotProject.getProject());
+        final EnvironmentSearchPaths environmentSearchPaths = new EnvironmentSearchPaths(robotProject.getClasspath(),
+                robotProject.getPythonpath());
         pythonpathLocations.forEach(environmentSearchPaths::addPythonPath);
         classpathLocations.forEach(environmentSearchPaths::addClassPath);
         return environmentSearchPaths;
