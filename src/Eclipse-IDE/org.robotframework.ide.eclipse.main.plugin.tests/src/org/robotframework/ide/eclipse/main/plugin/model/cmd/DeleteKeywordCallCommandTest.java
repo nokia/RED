@@ -52,7 +52,7 @@ public class DeleteKeywordCallCommandTest {
                 .isInjectedInto(new DeleteKeywordCallCommand(callsToRemove))
                 .execute();
 
-        assertThat(section.getChildren().size()).isEqualTo(2);
+        assertThat(section.getChildren()).hasSize(2);
 
         verifyZeroInteractions(eventBroker);
     }
@@ -70,15 +70,15 @@ public class DeleteKeywordCallCommandTest {
                 .isInjectedInto(new DeleteKeywordCallCommand(callsToRemove));
         command.execute();
 
-        assertThat(codeHolder.getChildren().size()).isEqualTo(1);
+        assertThat(codeHolder.getChildren()).hasSize(1);
         assertThat(codeHolder.getChildren().get(0).getName()).isEqualTo("Log");
         // assert that there are no settings
         if (codeHolder instanceof RobotCase) {
             final TestCase testCase = ((RobotCase) codeHolder).getLinkedElement();
-            assertThat(testCase.getAllElements().size()).isEqualTo(testCase.getExecutionContext().size());
+            assertThat(testCase.getAllElements()).hasSameSizeAs(testCase.getExecutionContext());
         } else {
             final UserKeyword userKeyword = ((RobotKeywordDefinition) codeHolder).getLinkedElement();
-            assertThat(userKeyword.getAllElements().size()).isEqualTo(userKeyword.getExecutionContext().size());
+            assertThat(userKeyword.getAllElements()).hasSameSizeAs(userKeyword.getExecutionContext());
         }
 
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
@@ -97,7 +97,7 @@ public class DeleteKeywordCallCommandTest {
                 .isInjectedInto(new DeleteKeywordCallCommand(callsToRemove));
         command.execute();
 
-        assertThat(codeHolder.getChildren().size()).isEqualTo(3);
+        assertThat(codeHolder.getChildren()).hasSize(3);
         assertThat(codeHolder.getChildren().get(0).getName()).isEqualTo("Documentation");
         assertThat(codeHolder.getChildren().get(1).getName()).isEqualTo("Tags");
         assertThat(codeHolder.getChildren().get(2).getName()).isEqualTo("Teardown");
@@ -124,7 +124,7 @@ public class DeleteKeywordCallCommandTest {
                 .isInjectedInto(new DeleteKeywordCallCommand(callsToRemove));
         command.execute();
 
-        assertThat(codeHolder1.getChildren().size()).isEqualTo(3);
+        assertThat(codeHolder1.getChildren()).hasSize(3);
         assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
         assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Teardown");
         assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Log");
@@ -136,7 +136,7 @@ public class DeleteKeywordCallCommandTest {
             assertThat(((RobotKeywordDefinition) codeHolder1).getLinkedElement().getTags()).isEmpty();
         }
 
-        assertThat(codeHolder2.getChildren().size()).isEqualTo(2);
+        assertThat(codeHolder2.getChildren()).hasSize(2);
         assertThat(codeHolder2.getChildren().get(0).getName()).isEqualTo("Timeout");
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
         if (codeHolder2 instanceof RobotCase) {
@@ -166,11 +166,11 @@ public class DeleteKeywordCallCommandTest {
                 .isInjectedInto(new DeleteKeywordCallCommand(callsToRemove));
         command.execute();
 
-        assertThat(codeHolder1.getChildren().size()).isEqualTo(3);
+        assertThat(codeHolder1.getChildren()).hasSize(3);
         assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
         assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Teardown");
         assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Log");
-        assertThat(codeHolder2.getChildren().size()).isEqualTo(2);
+        assertThat(codeHolder2.getChildren()).hasSize(2);
         assertThat(codeHolder2.getChildren().get(0).getName()).isEqualTo("Timeout");
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
 
@@ -179,12 +179,12 @@ public class DeleteKeywordCallCommandTest {
             undoCommand.execute();
         }
 
-        assertThat(codeHolder1.getChildren().size()).isEqualTo(5);
+        assertThat(codeHolder1.getChildren()).hasSize(5);
         assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
         assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Tags");
         assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Teardown");
         assertThat(codeHolder1.getChildren().get(3).getName()).isEqualTo("Log");
-        assertThat(codeHolder2.getChildren().size()).isEqualTo(4);
+        assertThat(codeHolder2.getChildren()).hasSize(4);
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Timeout");
         assertThat(codeHolder2.getChildren().get(3).getName()).isEqualTo("Log");
 
@@ -196,11 +196,11 @@ public class DeleteKeywordCallCommandTest {
             redoCommand.execute();
         }
 
-        assertThat(codeHolder1.getChildren().size()).isEqualTo(3);
+        assertThat(codeHolder1.getChildren()).hasSize(3);
         assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
         assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Teardown");
         assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Log");
-        assertThat(codeHolder2.getChildren().size()).isEqualTo(2);
+        assertThat(codeHolder2.getChildren()).hasSize(2);
         assertThat(codeHolder2.getChildren().get(0).getName()).isEqualTo("Timeout");
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
         
@@ -212,12 +212,12 @@ public class DeleteKeywordCallCommandTest {
             undoCommand.execute();
         }
         
-        assertThat(codeHolder1.getChildren().size()).isEqualTo(5);
+        assertThat(codeHolder1.getChildren()).hasSize(5);
         assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
         assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Tags");
         assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Teardown");
         assertThat(codeHolder1.getChildren().get(3).getName()).isEqualTo("Log");
-        assertThat(codeHolder2.getChildren().size()).isEqualTo(4);
+        assertThat(codeHolder2.getChildren()).hasSize(4);
         assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Timeout");
         assertThat(codeHolder2.getChildren().get(3).getName()).isEqualTo("Log");
     }
