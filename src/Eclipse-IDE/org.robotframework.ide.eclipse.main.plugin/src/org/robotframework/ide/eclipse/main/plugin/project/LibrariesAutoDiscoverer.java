@@ -181,20 +181,14 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 final List<? extends IResource> resources) {
             final List<String> resourcesPaths = new ArrayList<>();
             for (final IResource resource : resources) {
-                RobotSuiteFile suiteFile = null;
-                if (resource.getType() == IResource.FILE) {
-                    suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
-                }
-                if (suiteFile != null && suiteFile.isResourceFile()) {
+                if (isResourceFile(resource)) {
                     final IPath resourceFilePath = RedWorkspace.Paths
                             .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
                     resourcesPaths.add(resourceFilePath.toString());
+                } else if (resource.isLinked()) {
+                    collectLinkedSuiteNamesAndProjectsLocations(resource);
                 } else {
-                    if (resource.isLinked()) {
-                        collectLinkedSuiteNamesAndProjectsLocations(resource);
-                    } else {
-                        suiteNames.add(RobotPathsNaming.createSuiteName(resource));
-                    }
+                    suiteNames.add(RobotPathsNaming.createSuiteName(resource));
                 }
             }
             if (!resourcesPaths.isEmpty()) {
@@ -204,6 +198,14 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     additionalProjectsLocations.add(tempSuiteFile.getParentFile());
                 }
             }
+        }
+
+        private boolean isResourceFile(final IResource resource) {
+            RobotSuiteFile suiteFile = null;
+            if (resource.getType() == IResource.FILE) {
+                suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
+            }
+            return suiteFile != null && suiteFile.isResourceFile();
         }
 
         private void collectLinkedSuiteNamesAndProjectsLocations(final IResource resource) {
