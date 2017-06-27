@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ObjectStreamException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -194,58 +193,5 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     public String toString() {
         // for debugging purposes only
         return getName();
-    }
-
-    static enum PrioriterizedKeywordsSettings {
-        // the order is defined by enums definitions order (see Enum.compareTo() method javadoc)
-        ARGUMENTS,
-        DOCUMENTATION,
-        TAGS,
-        TIMEOUT,
-        TEARDOWN,
-        RETURN,
-        UNKNOWN;
-
-        public List<? extends AModelElement<UserKeyword>> getModelElements(final UserKeyword keyword) {
-            switch (this) {
-                case ARGUMENTS:
-                    return keyword.getArguments();
-                case DOCUMENTATION:
-                    return keyword.getDocumentation();
-                case TAGS:
-                    return keyword.getTags();
-                case TIMEOUT:
-                    return keyword.getTimeouts();
-                case TEARDOWN:
-                    return keyword.getTeardowns();
-                case RETURN:
-                    return keyword.getReturns();
-                case UNKNOWN:
-                    return keyword.getUnknownSettings();
-                default:
-                    return new ArrayList<>();
-            }
-        }
-
-        public static PrioriterizedKeywordsSettings from(final ModelType modelType) {
-            switch (modelType) {
-                case USER_KEYWORD_ARGUMENTS:
-                    return ARGUMENTS;
-                case USER_KEYWORD_DOCUMENTATION:
-                    return DOCUMENTATION;
-                case USER_KEYWORD_TAGS:
-                    return TAGS;
-                case USER_KEYWORD_TIMEOUT:
-                    return TIMEOUT;
-                case USER_KEYWORD_TEARDOWN:
-                    return TEARDOWN;
-                case USER_KEYWORD_RETURN:
-                    return RETURN;
-                case USER_KEYWORD_SETTING_UNKNOWN:
-                    return UNKNOWN;
-                default:
-                    throw new IllegalArgumentException("No setting defined for " + modelType.name());
-            }
-        }
     }
 }

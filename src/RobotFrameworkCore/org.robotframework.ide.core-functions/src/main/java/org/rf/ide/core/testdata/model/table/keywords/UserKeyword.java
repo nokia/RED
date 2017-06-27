@@ -58,10 +58,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
 
     @Override
     public boolean removeElement(final AModelElement<UserKeyword> element) {
-        if (element != null) {
-            return allElements.remove(element);
-        }
-        return false;
+        return allElements.remove(element);
     }
 
     public void removeElementAt(final int index) {

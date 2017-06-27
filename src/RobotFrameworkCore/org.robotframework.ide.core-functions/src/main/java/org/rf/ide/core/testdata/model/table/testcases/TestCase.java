@@ -65,10 +65,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     @Override
     public boolean removeElement(final AModelElement<TestCase> element) {
-        if (element != null) {
-            return allElements.remove(element);
-        }
-        return false;
+        return allElements.remove(element);
     }
 
     public void removeElementAt(final int index) {

@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.io.ObjectStreamException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -112,43 +111,5 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     public String toString() {
         // for debugging purposes only
         return getName();
-    }
-
-    static enum PrioriterizedCaseSettings {
-        // the order is defined by enums definitions order (see Enum.compareTo() method javadoc)
-        DOCUMENTATION,
-        TAGS,
-        SETUP,
-        TEARDOWN,
-        TEMPLATE,
-        TIMEOUT,
-        UNKNOWN;
-
-        public List<? extends AModelElement<TestCase>> getModelElements(final TestCase testCase) {
-            switch (this) {
-                case DOCUMENTATION: return testCase.getDocumentation();
-                case TAGS: return testCase.getTags();
-                case SETUP: return testCase.getSetups();
-                case TEARDOWN: return testCase.getTeardowns();
-                case TEMPLATE: return testCase.getTemplates();
-                case TIMEOUT: return testCase.getTimeouts();
-                case UNKNOWN: return testCase.getUnknownSettings();
-                default: return new ArrayList<>();
-            }
-        }
-
-        public static PrioriterizedCaseSettings from(final ModelType modelType) {
-            switch (modelType) {
-                case TEST_CASE_DOCUMENTATION: return DOCUMENTATION;
-                case TEST_CASE_TAGS: return TAGS;
-                case TEST_CASE_SETUP: return SETUP;
-                case TEST_CASE_TEARDOWN: return TEARDOWN;
-                case TEST_CASE_TEMPLATE: return TEMPLATE;
-                case TEST_CASE_TIMEOUT: return TIMEOUT;
-                case TEST_CASE_SETTING_UNKNOWN: return UNKNOWN;
-                default:
-                    throw new IllegalArgumentException("No setting defined for " + modelType.name());
-            }
-        }
     }
 }
