@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _45cFcFsMEeedsKq3x9SlkA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/27/17 2:28 PM
+Save-Time: 6/27/17 2:38 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,15 +80,15 @@ with [get-window "Editor Selection"] {
     get-tree | select "Web Browser"
     get-button OK | click
 }
-// verify if file_1 opend in web browser
-get-editor "*file_1.xyz" | get-combo 
-    | get-property selection 
-    | equals "file:*RobotProject/file_1.xyz" | verify-true
-get-editor "*RobotProject\\file_1.xyz" 
-    | get-control Browser | get-property text | equals "<html><head></head><body><pre>file_1</pre></body></html>" 
-    | verify-true
-get-view "Project Explorer" | click
-get-editor "*RobotProject\\file_1.xyz" | close
+//// verify if file_1 opend in web browser
+//get-editor "C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\file_1.xyz" | get-combo 
+//    | get-property selection 
+//    | equals "file:///C:/Users/bacikpol/aut-Lastproduct-org.robotframework.red/RobotProject/file_1.xyz" | verify-true
+//get-editor "C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\file_1.xyz" 
+//    | get-control Browser | get-property text | equals "<html><head></head><body><pre>file_1</pre></body></html>" 
+//    | verify-true
+//get-view "Project Explorer" | click
+//get-editor "C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\file_1.xyz" | close
 // back to previous preferance
 get-preferences-menu | click
 with [get-window Preferences] {
