@@ -7,14 +7,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _45cFcFsMEeedsKq3x9SlkA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/27/17 2:38 PM
+Save-Time: 6/27/17 2:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-// verify default File Associations preferance for unassociated extensions (it should be 'System Editor; if none: Text Editor')
+// verify default File Associations preference for unassociated extensions (it should be 'System Editor; if none: Text Editor')
 get-view "Project Explorer" | get-tree | select SecondRobotProject | double-click
 //get-preferences-menu | click
 //with [get-window Preferences | get-tree] {
@@ -63,7 +63,7 @@ with [get-window Import] {
     get-table | get-item "file_1.xyz" | check
     get-button Finish | click
 }
-// change preferance: use 'Ask via pop-up'
+// change preference: use 'Ask via pop-up'
 get-preferences-menu | click
 with [get-window Preferences] {
     with [get-tree] {
@@ -80,16 +80,8 @@ with [get-window "Editor Selection"] {
     get-tree | select "Web Browser"
     get-button OK | click
 }
-//// verify if file_1 opend in web browser
-//get-editor "C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\file_1.xyz" | get-combo 
-//    | get-property selection 
-//    | equals "file:///C:/Users/bacikpol/aut-Lastproduct-org.robotframework.red/RobotProject/file_1.xyz" | verify-true
-//get-editor "C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\file_1.xyz" 
-//    | get-control Browser | get-property text | equals "<html><head></head><body><pre>file_1</pre></body></html>" 
-//    | verify-true
-//get-view "Project Explorer" | click
-//get-editor "C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\file_1.xyz" | close
-// back to previous preferance
+
+// back to previous prefeance
 get-preferences-menu | click
 with [get-window Preferences] {
     get-combo -after [get-label "Open unassociated files with:"] | select "System Editor; if none: Text Editor"
@@ -125,7 +117,7 @@ get-editor "new_py.py" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/new_py.py" | double-click
 // verify it Text Editor with python file is not open (file_2 is opened)
 get-editor "file_2.xyz" | get-text-viewer | get-property text | equals "file_2" | verify-true
-// change preferances: use Text Editor
+// change preferences: use Text Editor
 get-preferences-menu | click
 with [get-window Preferences] {
     get-combo -after [get-label "Open unassociated files with:"] | select "Text Editor"
@@ -148,7 +140,7 @@ get-editor "new_py2.py" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/new_py2.py" | double-click
 // verify if Text Editor wyth second python file is open
 get-editor "new_py2.py" | get-text-viewer | get-property text | equals "new python file 2" | verify-true
-// back to default preferance
+// back to default preference
 get-preferences-menu | click
 with [get-window Preferences] {
     get-combo -after [get-label "Open unassociated files with:"] | select "System Editor; if none: Text Editor"
