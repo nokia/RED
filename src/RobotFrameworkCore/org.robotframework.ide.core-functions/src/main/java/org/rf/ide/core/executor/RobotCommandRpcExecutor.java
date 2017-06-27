@@ -237,9 +237,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return variables;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException(
-                    "Unable to communicate with XML-RPC server. File " + filePath + " with arguments " + fileArguments,
-                    e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -315,7 +313,9 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                 Files.write(bytes, libdocFile);
             }
 
-        } catch (final XmlRpcException | IOException e) {
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+        } catch (final IOException e) {
             final String additional = libPath.isEmpty() ? ""
                     : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
             throw new RobotEnvironmentException(
@@ -335,7 +335,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to obtain modules search path", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -347,7 +347,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     newArrayList(additionalPaths.getClassPaths()));
             return Optional.of(new File(path));
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -364,8 +364,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             }
             return classes;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to find classes in module " + moduleLocation.getAbsolutePath(),
-                    e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -374,7 +373,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         try {
             return (boolean) callRpcFunction("isVirtualenv");
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to check if is virtualenv.", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -387,7 +386,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     dataSourcePaths, newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to start library autodiscovering.", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
