@@ -64,7 +64,7 @@ public class ReplaceRobotKeywordCallCommandTest {
                 .isInjectedInto(new ReplaceRobotKeywordCallCommand(eventBroker, keywordCall, anotherKeywordCall))
                 .execute();
 
-        assertThat(testCase.getChildren().size()).isEqualTo(1);
+        assertThat(testCase.getChildren()).hasSize(1);
         final RobotKeywordCall result = testCase.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
         assertThat(result).isEqualTo(anotherKeywordCall);
@@ -72,9 +72,9 @@ public class ReplaceRobotKeywordCallCommandTest {
                 .containsExactly(RobotTokenType.TEST_CASE_ACTION_NAME);
         assertThat(result).has(properlySetParent());
         assertThat(testCase.getLinkedElement().getElements()).doesNotContain(oldLinked);
-        assertThat(testCase.getLinkedElement().getElements().size()).isEqualTo(1);
+        assertThat(testCase.getLinkedElement().getElements()).hasSize(1);
 
-        assertThat(anotherTestCase.getChildren().size()).isEqualTo(1);
+        assertThat(anotherTestCase.getChildren()).hasSize(1);
         assertThat(anotherTestCase.getChildren()).containsExactly(anotherKeywordCall);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(ImmutableMap
@@ -109,7 +109,7 @@ public class ReplaceRobotKeywordCallCommandTest {
                 .isInjectedInto(new ReplaceRobotKeywordCallCommand(eventBroker, keywordCall, anotherKeywordCall))
                 .execute();
 
-        assertThat(kwDef.getChildren().size()).isEqualTo(1);
+        assertThat(kwDef.getChildren()).hasSize(1);
         final RobotKeywordCall result = kwDef.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotKeywordCall.class);
         assertThat(result).isEqualTo(anotherKeywordCall);
@@ -117,9 +117,9 @@ public class ReplaceRobotKeywordCallCommandTest {
                 .containsExactly(RobotTokenType.KEYWORD_ACTION_NAME);
         assertThat(result).has(properlySetParent());
         assertThat(kwDef.getLinkedElement().getElements()).doesNotContain(oldLinked);
-        assertThat(kwDef.getLinkedElement().getElements().size()).isEqualTo(1);
+        assertThat(kwDef.getLinkedElement().getElements()).hasSize(1);
 
-        assertThat(anotherKwDef.getChildren().size()).isEqualTo(1);
+        assertThat(anotherKwDef.getChildren()).hasSize(1);
         assertThat(anotherKwDef.getChildren()).containsExactly(anotherKeywordCall);
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED), eq(

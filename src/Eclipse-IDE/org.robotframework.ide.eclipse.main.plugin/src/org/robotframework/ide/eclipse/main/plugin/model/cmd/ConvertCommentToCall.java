@@ -56,15 +56,14 @@ public class ConvertCommentToCall extends EditorCommand {
             } else if (parentObject instanceof UserKeyword) {
                 final RobotExecutableRow<UserKeyword> tempLinked = new RobotExecutableRow<>();
                 ((UserKeyword) parentObject)
-                        .replaceElement(
-                        (RobotExecutableRow<UserKeyword>) commentCall.getLinkedElement(), tempLinked);
+                        .replaceElement((RobotExecutableRow<UserKeyword>) commentCall.getLinkedElement(), tempLinked);
                 typeToUse = RobotTokenType.KEYWORD_ACTION_ARGUMENT;
                 firstToken.setType(RobotTokenType.KEYWORD_ACTION_NAME);
                 newLinked = tempLinked;
             }
 
             newLinked.setAction(firstToken);
-            newLinked.getAction().setText(newName);
+            firstToken.setText(newName);
 
             boolean foundComment = false;
             for (int i = 1; i < comments.size(); i++) {
