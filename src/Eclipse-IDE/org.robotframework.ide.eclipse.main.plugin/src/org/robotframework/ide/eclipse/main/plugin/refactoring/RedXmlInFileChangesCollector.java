@@ -18,7 +18,6 @@ import org.eclipse.text.edits.TextEditGroup;
 
 /**
  * @author Michal Anglart
- *
  */
 class RedXmlInFileChangesCollector {
 
@@ -39,8 +38,7 @@ class RedXmlInFileChangesCollector {
         final RedXmlEditsCollector redXmlEdits = new RedXmlEditsCollector(pathBeforeRefactoring, pathAfterRefactoring);
         final List<TextEdit> validationExcluded = redXmlEdits
                 .collectEditsInExcludedPaths(redXmlFile.getProject().getName(), redXmlFile);
-        final List<TextEdit> libraryMoved = redXmlEdits.collectEditsInMovedLibraries(
-                redXmlFile.getProject().getName(),
+        final List<TextEdit> libraryMoved = redXmlEdits.collectEditsInMovedLibraries(redXmlFile.getProject().getName(),
                 redXmlFile);
 
         final MultiTextEdit multiTextEdit = new MultiTextEdit();
@@ -50,7 +48,7 @@ class RedXmlInFileChangesCollector {
         for (final TextEdit edit : libraryMoved) {
             multiTextEdit.addChild(edit);
         }
-        
+
         if (multiTextEdit.hasChildren()) {
             final TextFileChange fileChange = new TextFileChange(
                     "'" + redXmlFile.getFullPath() + "': paths mentioned in red.xml", redXmlFile);
@@ -59,7 +57,7 @@ class RedXmlInFileChangesCollector {
                     validationExcluded.toArray(new TextEdit[0])));
             fileChange.addTextEditGroup(
                     new TextEditGroup("Change paths in referenced libraries", libraryMoved.toArray(new TextEdit[0])));
-            return Optional.<Change> of(fileChange);
+            return Optional.of(fileChange);
         } else {
             return Optional.empty();
         }

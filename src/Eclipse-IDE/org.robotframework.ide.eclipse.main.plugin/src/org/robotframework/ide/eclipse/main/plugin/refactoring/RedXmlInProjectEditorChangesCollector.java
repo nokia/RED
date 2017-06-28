@@ -88,10 +88,10 @@ class RedXmlInProjectEditorChangesCollector {
 
             final IPath potentiallyAffectedPath = Path.fromPortableString(excluded.getPath());
             final IPath adjustedPathBeforeRefactoring = Changes
-                    .excapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
+                    .escapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
             if (pathAfterRefactoring.isPresent()) {
                 final IPath adjustedPathAfterRefactoring = Changes
-                        .excapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
+                        .escapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
 
                 final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
                         adjustedPathAfterRefactoring, potentiallyAffectedPath);
@@ -113,10 +113,10 @@ class RedXmlInProjectEditorChangesCollector {
 
             final IPath potentiallyAffectedPath = Path.fromPortableString(lib.getPath());
             final IPath adjustedPathBeforeRefactoring = Changes
-                    .excapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
+                    .escapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
             if (pathAfterRefactoring.isPresent()) {
                 final IPath adjustedPathAfterRefactoring = Changes
-                        .excapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
+                        .escapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
 
                 final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
                         adjustedPathAfterRefactoring, potentiallyAffectedPath);
