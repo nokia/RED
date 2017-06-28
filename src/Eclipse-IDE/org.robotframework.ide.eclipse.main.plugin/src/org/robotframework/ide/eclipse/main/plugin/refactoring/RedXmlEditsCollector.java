@@ -30,7 +30,6 @@ import com.google.common.io.CharStreams;
 
 /**
  * @author Michal Anglart
- *
  */
 class RedXmlEditsCollector {
 
@@ -58,20 +57,20 @@ class RedXmlEditsCollector {
     }
 
     List<TextEdit> collectEditsInMovedLibraries(final String projectName, final IDocument redXmlDocument) {
-        return collectEditsInMovedLibriaries(projectName, new MatchesInDocumentEngine(redXmlDocument));
+        return collectEditsInMovedLibraries(projectName, new MatchesInDocumentEngine(redXmlDocument));
     }
 
     List<TextEdit> collectEditsInMovedLibraries(final String projectName, final IFile redXmlFile) {
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(redXmlFile.getContents()))) {
 
             final IDocument document = new Document(CharStreams.toString(fileReader));
-            return collectEditsInMovedLibriaries(projectName, new MatchesInDocumentEngine(document));
+            return collectEditsInMovedLibraries(projectName, new MatchesInDocumentEngine(document));
         } catch (IOException | CoreException e) {
             return new ArrayList<>();
         }
     }
 
-    private List<TextEdit> collectEditsInMovedLibriaries(String projectName, final MatchingEngine engine) {
+    private List<TextEdit> collectEditsInMovedLibraries(final String projectName, final MatchingEngine engine) {
         if (!projectName.equals(pathBeforeRefactoring.segment(0))) {
             return new ArrayList<>();
         }
@@ -79,14 +78,14 @@ class RedXmlEditsCollector {
         if (pathBeforeRefactoring.lastSegment().contains(".py")
                 || pathBeforeRefactoring.lastSegment().contains(".java")) {
             tryk = pathBeforeRefactoring.lastSegment().substring(0,
-                pathBeforeRefactoring.lastSegment().lastIndexOf("."));
+                    pathBeforeRefactoring.lastSegment().lastIndexOf("."));
         } else {
             tryk = "^\"";
         }
 
         final String toMatch = "\\s*(<referencedLibrary\\s*type=\"([^\"]*)\"\\s*name=\"([" + tryk
                 + "]*)\"\\s*path=\"([^\"]*)\"/>)\\s*";
-       final Pattern toMatchPattern = Pattern.compile(toMatch);
+        final Pattern toMatchPattern = Pattern.compile(toMatch);
 
         final LibraryMovedMatchesAccess matchesAccess = new LibraryMovedMatchesAccess(toMatchPattern);
         engine.searchForMatches(toMatch, matchesAccess);
@@ -131,10 +130,10 @@ class RedXmlEditsCollector {
 
             final IPath potentiallyAffectedPath = Path.fromPortableString(matcher.group(2));
             final IPath adjustedPathBeforeRefactoring = Changes
-                    .excapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
+                    .escapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
             if (pathAfterRefactoring.isPresent()) {
                 final IPath adjustedPathAfterRefactoring = Changes
-                        .excapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
+                        .escapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
 
                 final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
                         adjustedPathAfterRefactoring, potentiallyAffectedPath);
@@ -174,22 +173,16 @@ class RedXmlEditsCollector {
             final String type = matcher.group(2);
             final String name = matcher.group(3);
 
-
-            
             final IPath potentiallyAffectedPath = Path.fromPortableString(matcher.group(4));
-            final IPath adjustedPathBeforeRefactoring = Changes
-                    .excapeXmlCharacters(pathBeforeRefactoring);
+            final IPath adjustedPathBeforeRefactoring = Changes.escapeXmlCharacters(pathBeforeRefactoring);
             if (pathAfterRefactoring.isPresent()) {
-                final IPath adjustedPathAfterRefactoring = Changes
-                        .excapeXmlCharacters(pathAfterRefactoring.get());
+                final IPath adjustedPathAfterRefactoring = Changes.escapeXmlCharacters(pathAfterRefactoring.get());
 
-
-
-                Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
+                final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
                         adjustedPathAfterRefactoring, potentiallyAffectedPath);
                 String toInsert;
                 if (transformedPath.isPresent()) {
-                    String finalPath = transformedPath.get().toPortableString();
+                    final String finalPath = transformedPath.get().toPortableString();
 
                     toInsert = "<referencedLibrary type=\"" + type + "\"" + " name=\""
                             + name
@@ -197,8 +190,7 @@ class RedXmlEditsCollector {
                             + finalPath.substring(1);
 
                 } else {
-
-                    String finalPath = adjustedPathAfterRefactoring.removeLastSegments(1).toPortableString();
+                    final String finalPath = adjustedPathAfterRefactoring.removeLastSegments(1).toPortableString();
 
                     toInsert = "<referencedLibrary type=\"" + type + "\"" + " name=\""
                             + adjustedPathAfterRefactoring.lastSegment().substring(0,
@@ -208,17 +200,14 @@ class RedXmlEditsCollector {
                             + finalPath.substring(1, finalPath.length());
                 }
 
-
-
-                    final int startShift = matcher.start(1);
+                final int startShift = matcher.start(1);
                 final int endShift = matchingContent.length() - matcher.end(4) + startShift;
-                    edits.add(new ReplaceEdit(matchPosition.getOffset() + startShift,
-                            matchPosition.getLength() - endShift, toInsert));
+                edits.add(new ReplaceEdit(matchPosition.getOffset() + startShift, matchPosition.getLength() - endShift,
+                        toInsert));
 
             } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
                 edits.add(new DeleteEdit(matchPosition.getOffset(), matchPosition.getLength()));
             }
-
 
         }
     }
