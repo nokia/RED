@@ -24,7 +24,7 @@ class Changes {
     /**
      * Returns the composite change itself if it contains children changes, or
      * null change otherwise
-     * 
+     *
      * @param change
      * @return
      */
@@ -37,7 +37,7 @@ class Changes {
         return change.getChildren().length > 0 ? change : new NullChange();
     }
 
-    static IPath excapeXmlCharacters(final IPath path) {
+    static IPath escapeXmlCharacters(final IPath path) {
         return Path.fromPortableString(XmlEscapers.xmlContentEscaper().escape(path.toPortableString()));
     }
 
@@ -45,7 +45,7 @@ class Changes {
      * Creates a path to which {@code affectedPath} should be transformed given the fact that
      * the {@code sourcePath} changed into {@code destinationPath}. Assumption: ALL the paths
      * are relative to common location.
-     * 
+     *
      * @param sourcePath
      * @param destinationPath
      * @param affectedPath

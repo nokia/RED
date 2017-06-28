@@ -29,9 +29,9 @@ public class ChangesTest {
         compositeChange.add(new NullChange());
         compositeChange.add(actualChange2);
         compositeChange.add(new NullChange());
-        
+
         final Change result = Changes.normalizeCompositeChange(compositeChange);
-        
+
         assertThat(result).isSameAs(compositeChange);
         final Change[] children = ((CompositeChange) result).getChildren();
         assertThat(children).hasSize(2);
@@ -42,21 +42,21 @@ public class ChangesTest {
     @Test
     public void compositeChangeIsNormalizedToNullChange_ifItContainsOnlyNullChanges() {
         final CompositeChange compositeChange1 = new CompositeChange("Change");
-        
+
         final CompositeChange compositeChange2 = new CompositeChange("Change");
         compositeChange2.add(new NullChange());
         compositeChange2.add(new NullChange());
         compositeChange2.add(new NullChange());
-        
+
         assertThat(Changes.normalizeCompositeChange(compositeChange1)).isInstanceOf(NullChange.class);
         assertThat(Changes.normalizeCompositeChange(compositeChange2)).isInstanceOf(NullChange.class);
     }
 
     @Test
     public void xmlCharactersAreEscapedInGivenPath() {
-        assertThat(Changes.excapeXmlCharacters(path("/a/b/c"))).isEqualTo(path("/a/b/c"));
-        assertThat(Changes.excapeXmlCharacters(path("/a/b/c/file.txt"))).isEqualTo(path("/a/b/c/file.txt"));
-        assertThat(Changes.excapeXmlCharacters(path("/path<&>/dir"))).isEqualTo(path("/path&lt;&amp;&gt;/dir"));
+        assertThat(Changes.escapeXmlCharacters(path("/a/b/c"))).isEqualTo(path("/a/b/c"));
+        assertThat(Changes.escapeXmlCharacters(path("/a/b/c/file.txt"))).isEqualTo(path("/a/b/c/file.txt"));
+        assertThat(Changes.escapeXmlCharacters(path("/path<&>/dir"))).isEqualTo(path("/path&lt;&amp;&gt;/dir"));
     }
 
     @Test

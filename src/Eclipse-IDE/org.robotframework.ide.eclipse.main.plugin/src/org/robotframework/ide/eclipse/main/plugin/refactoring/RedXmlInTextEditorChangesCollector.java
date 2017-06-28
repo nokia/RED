@@ -29,7 +29,6 @@ import org.robotframework.red.swt.SwtThread.Evaluation;
 
 /**
  * @author Michal Anglart
- *
  */
 class RedXmlInTextEditorChangesCollector {
 
@@ -56,6 +55,7 @@ class RedXmlInTextEditorChangesCollector {
 
     private IDocument getDocumentUnderEdit(final IFile redXmlFile) {
         return SwtThread.syncEval(new Evaluation<IDocument>() {
+
             @Override
             public IDocument runCalculation() {
                 final FileEditorInput input = new FileEditorInput(redXmlFile);
@@ -81,17 +81,16 @@ class RedXmlInTextEditorChangesCollector {
 
     private Optional<Change> collectChanges(final IDocument document) {
         final RedXmlEditsCollector redXmlEdits = new RedXmlEditsCollector(pathBeforeRefactoring, pathAfterRefactoring);
-
         final List<TextEdit> validationExcluded = redXmlEdits
                 .collectEditsInExcludedPaths(redXmlFile.getProject().getName(), document);
-        final List<TextEdit> movedLibriaries = redXmlEdits
-                .collectEditsInMovedLibraries(redXmlFile.getProject().getName(), document);
+        final List<TextEdit> libraryMoved = redXmlEdits.collectEditsInMovedLibraries(redXmlFile.getProject().getName(),
+                document);
 
         final MultiTextEdit multiTextEdit = new MultiTextEdit();
         for (final TextEdit edit : validationExcluded) {
             multiTextEdit.addChild(edit);
         }
-        for (final TextEdit edit : movedLibriaries) {
+        for (final TextEdit edit : libraryMoved) {
             multiTextEdit.addChild(edit);
         }
 
@@ -102,9 +101,8 @@ class RedXmlInTextEditorChangesCollector {
             docChange.addTextEditGroup(new TextEditGroup("Change paths excluded from validation",
                     validationExcluded.toArray(new TextEdit[0])));
             docChange.addTextEditGroup(
-                    new TextEditGroup("Change paths of referenced libriaries",
-                            movedLibriaries.toArray(new TextEdit[0])));
-            return Optional.<Change> of(docChange);
+                    new TextEditGroup("Change paths of referenced libraries", libraryMoved.toArray(new TextEdit[0])));
+            return Optional.of(docChange);
         } else {
             return Optional.empty();
         }
