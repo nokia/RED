@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _uuVDgK_-EeaOOtfbYFWVRw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/27/17 12:04 PM
+Save-Time: 6/28/17 11:46 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -156,6 +156,7 @@ with [get-editor "ProjectForAnalysis/red.xml" | get-section "Referenced librarie
     key-type "M1+s"
 }
 
+
 //uncoment line with KW from file in next project
 get-view "Project Explorer" | get-tree | select "NextProject/kw/radio.tsv" | double-click
 with [get-editor "radio.tsv" | get-text-viewer] {
@@ -163,8 +164,10 @@ with [get-editor "radio.tsv" | get-text-viewer] {
     key-type "M1+/"
     set-caret-pos 6 8
     key-type "M1+/"
-    key-type "M1+s"
 }
+
+wait-for-errors -amount 5 -times 4 -delay 1000
+get-editor "radio.tsv" | get-text-viewer |  key-type "M1+s"
 
 wait-for-discover-window
 get-window "Discovering libraries summary" | get-button OK | click
