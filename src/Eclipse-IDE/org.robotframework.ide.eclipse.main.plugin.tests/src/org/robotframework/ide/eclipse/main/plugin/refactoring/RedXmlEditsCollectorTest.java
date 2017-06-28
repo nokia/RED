@@ -26,7 +26,7 @@ import org.robotframework.red.junit.ProjectProvider;
 public class RedXmlEditsCollectorTest {
 
     private static final String PROJECT_NAME = RedXmlEditsCollectorTest.class.getSimpleName();
-    
+
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 

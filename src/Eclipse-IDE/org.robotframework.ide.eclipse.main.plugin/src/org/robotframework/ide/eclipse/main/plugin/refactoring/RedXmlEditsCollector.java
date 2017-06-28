@@ -74,21 +74,23 @@ class RedXmlEditsCollector {
         if (!projectName.equals(pathBeforeRefactoring.segment(0))) {
             return new ArrayList<>();
         }
-        String tryk;
+
+        String namePattern;
         if (pathBeforeRefactoring.lastSegment().contains(".py")
                 || pathBeforeRefactoring.lastSegment().contains(".java")) {
-            tryk = pathBeforeRefactoring.lastSegment().substring(0,
+            namePattern = pathBeforeRefactoring.lastSegment().substring(0,
                     pathBeforeRefactoring.lastSegment().lastIndexOf("."));
         } else {
-            tryk = "^\"";
+            namePattern = "^\"";
         }
-
-        final String toMatch = "\\s*(<referencedLibrary\\s*type=\"([^\"]*)\"\\s*name=\"([" + tryk
+        final String toMatch = "\\s*(<referencedLibrary\\s*type=\"([^\"]*)\"\\s*name=\"([" + namePattern
                 + "]*)\"\\s*path=\"([^\"]*)\"/>)\\s*";
+
         final Pattern toMatchPattern = Pattern.compile(toMatch);
 
         final LibraryMovedMatchesAccess matchesAccess = new LibraryMovedMatchesAccess(toMatchPattern);
-        engine.searchForMatches(toMatch, matchesAccess);
+        // FIXME: Search for matches temporary disabled in RED-871 because of RED-860 & RED-864 bugs
+        // engine.searchForMatches(toMatch, matchesAccess);
         return matchesAccess.getEdits();
     }
 
@@ -177,27 +179,21 @@ class RedXmlEditsCollector {
             final IPath adjustedPathBeforeRefactoring = Changes.escapeXmlCharacters(pathBeforeRefactoring);
             if (pathAfterRefactoring.isPresent()) {
                 final IPath adjustedPathAfterRefactoring = Changes.escapeXmlCharacters(pathAfterRefactoring.get());
-
                 final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
                         adjustedPathAfterRefactoring, potentiallyAffectedPath);
+
                 String toInsert;
                 if (transformedPath.isPresent()) {
                     final String finalPath = transformedPath.get().toPortableString();
-
-                    toInsert = "<referencedLibrary type=\"" + type + "\"" + " name=\""
-                            + name
-                            + "\"" + " path=\""
+                    toInsert = "<referencedLibrary type=\"" + type + "\" name=\"" + name + "\" path=\""
                             + finalPath.substring(1);
 
                 } else {
                     final String finalPath = adjustedPathAfterRefactoring.removeLastSegments(1).toPortableString();
-
-                    toInsert = "<referencedLibrary type=\"" + type + "\"" + " name=\""
+                    toInsert = "<referencedLibrary type=\"" + type + "\" name=\""
                             + adjustedPathAfterRefactoring.lastSegment().substring(0,
                                     adjustedPathAfterRefactoring.lastSegment().lastIndexOf('.'))
-                            + "\""
-                            + " path=\""
-                            + finalPath.substring(1, finalPath.length());
+                            + "\" path=\"" + finalPath.substring(1, finalPath.length());
                 }
 
                 final int startShift = matcher.start(1);
