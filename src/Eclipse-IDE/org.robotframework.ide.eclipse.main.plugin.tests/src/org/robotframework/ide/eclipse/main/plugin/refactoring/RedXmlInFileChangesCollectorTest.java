@@ -49,7 +49,7 @@ public class RedXmlInFileChangesCollectorTest {
     @Test
     public void noChangeIsCollected_whenRemovedResourceDoesNotAffectExcludedFolders() {
         final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
-        
+
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
                 new Path(PROJECT_NAME + "/x"), Optional.<IPath> empty());
 
