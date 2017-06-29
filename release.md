@@ -1,3 +1,29 @@
+# RED - Robot Editor v0.7.9
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+
+## Updates
+
+- #112 - revert/remove Project Rename from src for release 0.7.9 - this feature will be reimplemented
+- RED can open .py files in editor instead of interpreter for the first time
+- Autodiscovery takes Variable Mapping into account for discovering libs, now parametrized paths to python libs should be discovered correctly 
+- Autodiscovery now discovers libs  inside resources
+- Autodiscovery now uses Remote Session Server if defined
+
+    
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
+
+
 # RED - Robot Editor v0.7.8
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
