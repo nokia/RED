@@ -1,3 +1,22 @@
+RED 0.7.9 - 2017/06/29
+** Bug
+    [RED-496] - Order is changed in source after converting setting in table view
+    [RED-800] - User cannot go to Source/table view using F4 for commented line
+    [RED-809] - Autodiscovery is not working in included resource
+    [RED-844] - Variable mapping in red.xml is not taken in to account during autodiscovery
+    [RED-868] - Order in source should be the same in table view
+    [RED-872] - Autodiscover does not work from resource
+
+**  Enhancement
+    [RED-652] - Adding python libraries to content assist
+    [RED-780] - Autodiscovering should use remote session server
+    [RED-823] - Different order of settings in Source after comment and uncomment in Test Case
+    [RED-878] - Enable link to debug file for robot console log - found while #117
+
+** Task
+    [RED-664] - Investigate if RED can open .py files in editor instead of interpreter for the first time
+    [RED-871] - revert/remove Project Rename from src for release 0.7.9 - fix for #112
+
 RED 0.7.8 - 2017/06/01
 
 ** Bug
