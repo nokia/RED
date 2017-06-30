@@ -20,8 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Function;
-
 class Settings {
 
     private final List<LibrarySpecification> toImport;
@@ -35,12 +33,7 @@ class Settings {
         final List<LibrarySpecification> imported = newArrayList(fileModel.getImportedLibraries().keySet());
         final List<LibrarySpecification> toImport = newArrayList(fileModel.getProject().getLibrariesSpecifications());
         toImport.removeAll(imported);
-        final List<IPath> importedResources = transform(fileModel.getResourcesPaths(), new Function<String, IPath>() {
-            @Override
-            public IPath apply(final String path) {
-                return new Path(path);
-            }
-        });
+        final List<IPath> importedResources = transform(fileModel.getResourcesPaths(), Path::new);
         final List<ImportArguments> importedVariables = getImportedVariables(fileModel);
         return new Settings(toImport, imported, importedResources, importedVariables);
     }

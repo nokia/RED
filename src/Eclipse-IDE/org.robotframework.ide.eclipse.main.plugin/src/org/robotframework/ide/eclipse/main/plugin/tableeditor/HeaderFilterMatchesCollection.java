@@ -31,7 +31,6 @@ public class HeaderFilterMatchesCollection {
         this.sourceCollectors = sourceCollectors;
     }
 
-    @SuppressWarnings("unused")
     public void collect(final RobotElement element, final String filter) {
         // nothing to collect here, override this method
     }

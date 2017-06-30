@@ -117,7 +117,7 @@ public abstract class InputLoadingFormComposite extends Composite {
         form.setImage(ImagesManager.getImage(image));
     }
 
-    protected Control createHeadClient(@SuppressWarnings("unused") final Composite head) {
+    protected Control createHeadClient(final Composite head) {
         // nothing to do, override if needed
         return null;
     }
