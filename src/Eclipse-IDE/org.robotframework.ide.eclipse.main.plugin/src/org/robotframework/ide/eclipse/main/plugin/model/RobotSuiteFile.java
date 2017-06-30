@@ -385,7 +385,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     /**
      * Gets model element for given offset in file
-     * 
+     *
      * @param offset
      * @return
      */
@@ -401,6 +401,14 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public SetMultimap<LibrarySpecification, String> getImportedLibraries() {
+        return getAvailableLibraries(false);
+    }
+
+    public SetMultimap<LibrarySpecification, String> getAllLibraries() {
+        return getAvailableLibraries(true);
+    }
+
+    private SetMultimap<LibrarySpecification, String> getAvailableLibraries(final boolean includeNotImported) {
         final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
         final SetMultimap<String, String> toImport = HashMultimap.create();
         if (section.isPresent()) {
@@ -412,7 +420,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             if (toImport.containsKey(spec.getName())) {
                 imported.putAll(spec, toImport.get(spec.getName()));
                 toImport.removeAll(spec.getName());
-            } else if (spec.isAccessibleWithoutImport()) {
+            } else if (includeNotImported || spec.isAccessibleWithoutImport()) {
                 imported.put(spec, "");
             }
         }

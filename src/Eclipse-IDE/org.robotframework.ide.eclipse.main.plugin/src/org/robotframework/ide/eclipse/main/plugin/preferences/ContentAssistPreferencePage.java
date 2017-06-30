@@ -18,6 +18,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -25,10 +26,10 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
-
 public class ContentAssistPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private Text charsTextControl;
+
     private Text delayTextControl;
 
     public ContentAssistPreferencePage() {
@@ -48,6 +49,7 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 
         createAutoActivationEditors(parent);
         createKeywordPrefixAutoAdditionEditor(parent);
+        createLibraryImportAutoAdditionEditor(parent);
     }
 
     protected void createAutoActivationEditors(final Composite parent) {
@@ -71,7 +73,7 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         delayTextControl = autoActivationDelay.getTextControl(autoActivationGroup);
         delayTextControl.setEnabled(isAutoActivationEnabled);
         GridDataFactory.fillDefaults().indent(25, 2).applyTo(autoActivationDelay.getLabelControl(autoActivationGroup));
-        
+
         final StringFieldEditor autoActivationChars = new StringFieldEditor(
                 RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "Auto activation triggers", autoActivationGroup);
         addField(autoActivationChars);
@@ -80,6 +82,7 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         GridDataFactory.fillDefaults().indent(25, 2).applyTo(autoActivationChars.getLabelControl(autoActivationGroup));
 
         button.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 delayTextControl.setEnabled(button.getSelection());
@@ -92,7 +95,7 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
     private void createKeywordPrefixAutoAdditionEditor(final Composite parent) {
         final Group keywordsGroup = new Group(parent, SWT.NONE);
         keywordsGroup.setText("Keywords");
-        GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(keywordsGroup);
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(keywordsGroup);
         GridLayoutFactory.fillDefaults().applyTo(keywordsGroup);
         final BooleanFieldEditor automaticKeywordPrefixingEditor = new BooleanFieldEditor(
                 RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED,
@@ -100,6 +103,28 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         addField(automaticKeywordPrefixingEditor);
         final Button button = (Button) automaticKeywordPrefixingEditor.getDescriptionControl(keywordsGroup);
         GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
+    }
+
+    private void createLibraryImportAutoAdditionEditor(final Composite parent) {
+        final Group librariesGroup = new Group(parent, SWT.NONE);
+        librariesGroup.setText("Libraries");
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(librariesGroup);
+        GridLayoutFactory.fillDefaults().applyTo(librariesGroup);
+        final BooleanFieldEditor keywordLibraryImportEditor = new BooleanFieldEditor(
+                RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED,
+                "Include keywords from not imported libraries", librariesGroup);
+        addField(keywordLibraryImportEditor);
+        final Button button = (Button) keywordLibraryImportEditor.getDescriptionControl(librariesGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
+
+        final Label notImportedLibrariesDescription = new Label(librariesGroup, SWT.WRAP);
+        notImportedLibrariesDescription.setText("When libraries are added to red.xml but not imported in robot file, "
+                + "keywords from such libraries will be included in propositions.");
+        GridDataFactory.fillDefaults()
+                .hint(150, SWT.DEFAULT)
+                .indent(5, 2)
+                .grab(true, false)
+                .applyTo(notImportedLibrariesDescription);
     }
 
     @Override
