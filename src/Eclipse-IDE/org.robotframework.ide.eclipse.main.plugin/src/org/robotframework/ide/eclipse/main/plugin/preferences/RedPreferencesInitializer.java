@@ -26,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 
 public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
@@ -55,21 +54,9 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
             final String activeExec = interpreterPaths.get(0).getInterpreter().name();
 
             final String allPaths = Joiner.on(';')
-                    .join(transform(interpreterPaths, new Function<PythonInstallationDirectory, String>() {
-
-                        @Override
-                        public String apply(final PythonInstallationDirectory dir) {
-                            return dir.getAbsolutePath();
-                        }
-                    }));
+                    .join(transform(interpreterPaths, PythonInstallationDirectory::getAbsolutePath));
             final String allExecs = Joiner.on(';')
-                    .join(transform(interpreterPaths, new Function<PythonInstallationDirectory, String>() {
-
-                        @Override
-                        public String apply(final PythonInstallationDirectory dir) {
-                            return dir.getInterpreter().name();
-                        }
-                    }));
+                    .join(transform(interpreterPaths, dir -> dir.getInterpreter().name()));
 
             preferences.put(RedPreferences.ACTIVE_RUNTIME, activePath);
             preferences.put(RedPreferences.ACTIVE_RUNTIME_EXEC, activeExec);
@@ -100,6 +87,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
         preferences.put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");
         preferences.putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
+        preferences.putBoolean(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, false);
     }
 
     private void initializeSyntaxColoringPreferences(final IEclipsePreferences preferences) {
