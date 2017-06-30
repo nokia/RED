@@ -89,4 +89,17 @@ public class RedPreferencesInitializerTest {
         verify(preferences).putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, 43_981);
         verify(preferences).putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT, 30);
     }
+
+    @Test
+    public void byDefaultAllContentAssistPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).putBoolean(RedPreferences.ASSISTANT_AUTO_ACTIVATION_ENABLED, true);
+        verify(preferences).putInt(RedPreferences.ASSISTANT_AUTO_ACTIVATION_DELAY, 100);
+        verify(preferences).put(RedPreferences.ASSISTANT_AUTO_ACTIVATION_CHARS, "");
+        verify(preferences).putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
+        verify(preferences).putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
+    }
 }

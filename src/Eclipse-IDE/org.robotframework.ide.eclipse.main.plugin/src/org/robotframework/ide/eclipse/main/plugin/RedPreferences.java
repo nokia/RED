@@ -52,6 +52,7 @@ public class RedPreferences {
     public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "assistantAutoActivationDelay";
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
     public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
+    public static final String ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED = "red.editor.assistant.keywordFromNotImportedLibrary";
 
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
 
@@ -164,13 +165,17 @@ public class RedPreferences {
         return store.getBoolean(ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
     }
 
+    public boolean isAssistantKeywordFromNotImportedLibraryEnabled() {
+        return store.getBoolean(ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED);
+    }
+
     public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
         return store.getBoolean(PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
     }
 
     public EnumSet<FoldableElements> getFoldableElements() {
         final EnumSet<FoldableElements> elements = EnumSet.noneOf(FoldableElements.class);
-        if(store.getBoolean(FOLDABLE_SECTIONS)) {
+        if (store.getBoolean(FOLDABLE_SECTIONS)) {
             elements.add(FoldableElements.SECTIONS);
         }
         if (store.getBoolean(FOLDABLE_CASES)) {
