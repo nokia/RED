@@ -90,8 +90,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return proposals;
     }
 
-    protected List<String> getArguments(final AssistProposal proposal,
-            @SuppressWarnings("unused") final String lineContent) {
+    protected List<String> getArguments(final AssistProposal proposal, final String lineContent) {
         return proposal.getArguments();
     }
 

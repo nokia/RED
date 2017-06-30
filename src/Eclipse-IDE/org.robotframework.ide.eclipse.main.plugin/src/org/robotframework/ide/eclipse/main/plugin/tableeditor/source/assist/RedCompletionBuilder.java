@@ -78,7 +78,7 @@ public class RedCompletionBuilder {
 
         private boolean additionalInfoAsHtml;
 
-        private boolean activateAssitant;
+        private boolean activateAssistant;
 
         private final Collection<Runnable> operationsAfterAccept = new ArrayList<>();
 
@@ -115,7 +115,7 @@ public class RedCompletionBuilder {
 
         @Override
         public OptionalSettingsStep activateAssistantAfterAccepting(final boolean activate) {
-            this.activateAssitant = activate;
+            this.activateAssistant = activate;
             return this;
         }
 
@@ -163,7 +163,7 @@ public class RedCompletionBuilder {
         public RedCompletionProposal create() {
             final int cursorPos = cursorPosition == -1 ? (contentToInsert.length() - cursorBackShift) : cursorPosition;
             return new RedCompletionProposal(contentToInsert, offset, length, 0, cursorPos, selectionLength, image,
-                    false, labelToDisplay, activateAssitant, operationsAfterAccept, additionalInfo,
+                    false, labelToDisplay, activateAssistant, operationsAfterAccept, additionalInfo,
                     additionalInfoAsHtml);
         }
     }
