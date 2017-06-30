@@ -35,7 +35,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
 /**
@@ -50,13 +49,7 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
         new KeywordDefinitionLocator(file, new RobotModel()).locateKeywordDefinitionInLibraries(project,
                 createKeywordsDetector(keywordName, libs));
 
-        return newArrayList(Iterables.transform(libs, new Function<String, IMarkerResolution>() {
-
-            @Override
-            public IMarkerResolution apply(final String libName) {
-                return new ImportLibraryFixer(libName);
-            }
-        }));
+        return newArrayList(Iterables.transform(libs, libName -> new ImportLibraryFixer(libName)));
     }
 
     private static KeywordDetector createKeywordsDetector(final String keywordName, final Set<String> libs) {
