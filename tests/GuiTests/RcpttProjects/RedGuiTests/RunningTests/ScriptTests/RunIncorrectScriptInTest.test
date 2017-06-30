@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _wd55QBiBEee93KAG-tW51Q
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/25/17 10:24 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/30/17 10:56 AM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -147,10 +147,19 @@ exec-with-options {
     get-window "Run Configurations" | get-button Run | click
 }
 // verify if script was runned
-get-view Console | get-text-viewer | get-property text 
-    | equals "Hello world!\n"
-    + "Command: .* -m robot.run --listener .* --argumentfile .* .*\n"
-    + "Suite Executor: <unknown>" | verify-true
+try{
+	get-view Console | get-text-viewer | get-property text 
+	    | equals "Hello world!\n"
+	    + "Command: .* -m robot.run --listener .* --argumentfile .* .*\n"
+	    + "Suite Executor: <unknown>" | verify-true
+}-catch{
+	get-view Console | get-text-viewer | get-property text 
+	    | equals  "Command: .* -m robot.run --listener .* --argumentfile .* .*\n"
+	    + "Suite Executor: <unknown>" 
+	    + "Hello world!" | verify-true
+
+}    
+    
 // verify if no test was runned
 get-view "Message Log" | get-editbox | get-property text | equals "" | verify-true
 
