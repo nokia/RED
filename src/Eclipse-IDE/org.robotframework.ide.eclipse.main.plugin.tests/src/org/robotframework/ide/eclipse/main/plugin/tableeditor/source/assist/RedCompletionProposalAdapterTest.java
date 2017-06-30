@@ -59,7 +59,7 @@ public class RedCompletionProposalAdapterTest {
 
         final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, modification1);
         assertThat(adapter1.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(10);
-        
+
         final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, modification2);
         assertThat(adapter2.getPrefixCompletionStart(mock(IDocument.class), 0)).isEqualTo(20);
 
@@ -107,7 +107,7 @@ public class RedCompletionProposalAdapterTest {
     }
 
     @Test
-    public void operationsToPerformAfterAcceptAreTakendFromModification() {
+    public void operationsToPerformAfterAcceptAreTakenFromModification() {
         final Runnable r1 = new Runnable() {
 
             @Override
@@ -133,11 +133,11 @@ public class RedCompletionProposalAdapterTest {
     public void assistantShouldBeActivateAfterAccept_whenItIsSpecifiedInModification() {
         final DocumentationModification modification1 = new DocumentationModification("", new Position(0), true);
         final RedCompletionProposalAdapter adapter1 = new RedCompletionProposalAdapter(null, modification1);
-        assertThat(adapter1.shouldActivateAssitantAfterAccepting()).isTrue();
+        assertThat(adapter1.shouldActivateAssistantAfterAccepting()).isTrue();
 
         final DocumentationModification modification2 = new DocumentationModification("", new Position(0), false);
         final RedCompletionProposalAdapter adapter2 = new RedCompletionProposalAdapter(null, modification2);
-        assertThat(adapter2.shouldActivateAssitantAfterAccepting()).isFalse();
+        assertThat(adapter2.shouldActivateAssistantAfterAccepting()).isFalse();
     }
 
     @Test

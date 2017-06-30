@@ -190,7 +190,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         return styledString;
     }
 
-    public boolean shouldActivateAssitantAfterAccepting() {
+    public boolean shouldActivateAssistantAfterAccepting() {
         return activateAssistant;
     }
 
