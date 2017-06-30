@@ -84,12 +84,12 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
      *            the additional information visible as styled label part
      * @param prefixLength
      * @param decoratePrefix
-     * @param activateAssitant
+     * @param activateAssistant
      * @param additionalInfoAsHtml
      */
-    RedCompletionProposal(final String replacementString, final int replacementOffset,
-            final int replacementLength, final int prefixLength, final int cursorPosition, final int selectionLength,
-            final Image image, final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
+    RedCompletionProposal(final String replacementString, final int replacementOffset, final int replacementLength,
+            final int prefixLength, final int cursorPosition, final int selectionLength, final Image image,
+            final boolean decoratePrefix, final String displayString, final boolean activateAssistant,
             final Collection<Runnable> operationsAfterAccepting, final String additionalProposalInfo,
             final boolean additionalInfoAsHtml) {
         Preconditions.checkNotNull(replacementString);
@@ -106,7 +106,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         this.selectionLength = selectionLength;
         this.image = image;
         this.displayString = displayString;
-        this.activateAssistant = activateAssitant;
+        this.activateAssistant = activateAssistant;
         this.operationsAfterAccepting = operationsAfterAccepting;
         this.additionalProposalInfo = additionalProposalInfo;
         this.additionalInfoAsHtml = additionalInfoAsHtml;
