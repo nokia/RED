@@ -1013,7 +1013,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             tooltips.put("Test Template", "The keyword %s is used as default template keyword in this suite");
             tooltips.put("Test Timeout",
                     "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
-                            + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+                            + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
             tooltips.put("Force Tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
             tooltips.put("Default Tags",
                     "Sets tags to all tests cases in this suite, unless test case specifies own tags");

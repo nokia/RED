@@ -205,7 +205,7 @@ public class AssistProposalsTest {
     }
 
     @Test
-    public void verifyLibraryProposalProperites() {
+    public void verifyLibraryProposalProperties() {
         final RobotSuiteFile suiteFile = new RobotModel().createSuiteFile(file);
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setName("library");
@@ -365,7 +365,7 @@ public class AssistProposalsTest {
                 proposal("ZZZ"), proposal("ABC"), proposal("abc1"));
 
         Collections.sort(proposals, AssistProposals.sortedByLabels());
-        
+
         assertThat(transform(proposals, toLabel())).containsExactly("ABC", "abc1", "xyz", "Xyz1", "ZZZ", "zzz1");
     }
 
