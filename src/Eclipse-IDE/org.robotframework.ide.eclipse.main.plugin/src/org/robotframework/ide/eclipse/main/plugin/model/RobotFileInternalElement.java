@@ -127,7 +127,6 @@ public interface RobotFileInternalElement extends RobotElement {
             run(page, Optional.of(openMode), labelWhichShouldBeInSelectedCell);
         }
 
-        @SuppressWarnings("unused")
         protected void run(final IWorkbenchPage page, final Optional<ElementOpenMode> openMode,
                 final String labelWhichShouldBeInSelectedCell) {
             // nothing to do in thi null-object

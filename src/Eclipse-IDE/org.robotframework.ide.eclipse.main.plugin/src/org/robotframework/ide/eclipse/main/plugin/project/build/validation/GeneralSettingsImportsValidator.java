@@ -108,10 +108,10 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     private void validateSpecifiedImport(final AImported imported, final String pathOrName,
-            final RobotToken pathOrNameToken, final boolean isParametrized)
+            final RobotToken pathOrNameToken, final boolean isParameterized)
                     throws CoreException {
         if (isPathImport(pathOrName)) {
-            validatePathImport(pathOrName, pathOrNameToken, isParametrized, imported.getArguments());
+            validatePathImport(pathOrName, pathOrNameToken, isParameterized, imported.getArguments());
         } else {
             validateNameImport(pathOrName, pathOrNameToken, imported.getArguments());
         }
@@ -119,7 +119,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     protected abstract boolean isPathImport(String pathOrName);
 
-    protected void validatePathImport(final String path, final RobotToken pathToken, final boolean isParametrized,
+    protected void validatePathImport(final String path, final RobotToken pathToken, final boolean isParameterized,
             final List<RobotToken> arguments) throws CoreException {
 
         if (hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
@@ -128,10 +128,10 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         }
 
         final IPath importPath = new Path(path);
-        if (!isParametrized && importPath.isAbsolute()) {
+        if (!isParameterized && importPath.isAbsolute()) {
             reportAbsolutePathImport(pathToken, path);
         }
-        
+
         final Optional<MarkedUri> absoluteMarkedPath = calculateAbsoluteUri(path);
         if (!absoluteMarkedPath.isPresent()) {
             reportMissingImportPath(path, pathToken, importPath);
@@ -239,19 +239,16 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         reporter.handleProblem(problem, validationContext.getFile(), pathToken);
     }
 
-    @SuppressWarnings("unused")
     protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
             throws CoreException {
         // nothing to do; override if needed
     }
 
-    @SuppressWarnings("unused")
     protected void validateResource(final IResource resource, final String path, final RobotToken pathToken,
             final List<RobotToken> arguments) {
         // nothing to do; override if needed
     }
 
-    @SuppressWarnings("unused")
     protected void validateFile(final File file, final String path, final RobotToken pathToken,
             final List<RobotToken> arguments) {
         // nothing to do; override if needed
