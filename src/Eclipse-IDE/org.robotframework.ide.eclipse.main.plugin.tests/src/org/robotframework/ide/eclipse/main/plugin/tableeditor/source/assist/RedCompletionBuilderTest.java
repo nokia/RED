@@ -64,7 +64,7 @@ public class RedCompletionBuilderTest {
                 .activateAssistantAfterAccepting(true)
                 .thenCursorWillStopAt(10)
                 .create();
-        assertThat(proposal.shouldActivateAssitantAfterAccepting()).isTrue();
+        assertThat(proposal.shouldActivateAssistantAfterAccepting()).isTrue();
     }
 
     @Test
@@ -80,13 +80,9 @@ public class RedCompletionBuilderTest {
 
     @Test
     public void operationsToPerformAreProperlySet() {
-        final Runnable op1 = new Runnable() {
-            @Override
-            public void run() { }
+        final Runnable op1 = () -> {
         };
-        final Runnable op2 = new Runnable() {
-            @Override
-            public void run() { }
+        final Runnable op2 = () -> {
         };
         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                 .willPut("def")

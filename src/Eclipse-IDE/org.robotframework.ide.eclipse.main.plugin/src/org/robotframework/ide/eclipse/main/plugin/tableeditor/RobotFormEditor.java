@@ -243,9 +243,9 @@ public class RobotFormEditor extends FormEditor {
         final IEclipseContext eclipseContext = parentContext.getActiveLeaf();
         ContextInjectionFactory.inject(editorPart, eclipseContext);
 
-        final int newVariablesPart = addPage(editorPart, getEditorInput());
-        setPageImage(newVariablesPart, image);
-        setPageText(newVariablesPart, partName);
+        final int newEditorPart = addPage(editorPart, getEditorInput());
+        setPageImage(newEditorPart, image);
+        setPageText(newEditorPart, partName);
     }
 
     private void prepareCommandsContext() {

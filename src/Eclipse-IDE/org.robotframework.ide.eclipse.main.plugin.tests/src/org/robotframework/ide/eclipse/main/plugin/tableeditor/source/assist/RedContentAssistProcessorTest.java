@@ -91,7 +91,7 @@ public class RedContentAssistProcessorTest {
     }
 
     @Test
-    public void trueIsReturnedForLocationQuery_whenLocatedAtTheEndOfDocumentInDefualtCTNeighboringApplicableCT()
+    public void trueIsReturnedForLocationQuery_whenLocatedAtTheEndOfDocumentInDefaultCTNeighboringApplicableCT()
             throws Exception {
         final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 10;
@@ -103,7 +103,7 @@ public class RedContentAssistProcessorTest {
     }
 
     @Test
-    public void falseIsReturnedForLocationQuery_whenLocatedAtTheEndOfDocumentInDefualtCTNeighboringNonApplicableCT()
+    public void falseIsReturnedForLocationQuery_whenLocatedAtTheEndOfDocumentInDefaultCTNeighboringNonApplicableCT()
             throws Exception {
         final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 10;
@@ -115,7 +115,7 @@ public class RedContentAssistProcessorTest {
     }
 
     @Test
-    public void falseIsReturnedForLocationQuery_whenLocatedAtTheEndOfEmptyDocumentInDefualtCT()
+    public void falseIsReturnedForLocationQuery_whenLocatedAtTheEndOfEmptyDocumentInDefaultCT()
             throws Exception {
         final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 0;

@@ -33,26 +33,26 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private final SuiteSourceAssistantContext assistContext;
 
-    private final AssitantCallbacks assistant;
+    private final AssistantCallbacks assistant;
 
     private final List<RedContentAssistProcessor> processors;
 
     private int currentPage;
 
-    private boolean canReopenAssitantProgramatically;
+    private boolean canReopenAssistantProgramatically;
 
     public CycledContentAssistProcessor(final SuiteSourceAssistantContext assistContext,
-            final AssitantCallbacks assistant) {
+            final AssistantCallbacks assistant) {
         this.assistContext = assistContext;
         this.assistant = assistant;
         this.processors = newArrayList();
         this.currentPage = 0;
-        this.canReopenAssitantProgramatically = false;
+        this.canReopenAssistantProgramatically = false;
     }
 
     @VisibleForTesting
-    void setCanReopenAssitantProgramatically(final boolean canReopenAssitantProgramatically) {
-        this.canReopenAssitantProgramatically = canReopenAssitantProgramatically;
+    void setCanReopenAssistantProgramatically(final boolean canReopenAssistantProgramatically) {
+        this.canReopenAssistantProgramatically = canReopenAssistantProgramatically;
     }
 
     public void addProcessor(final RedContentAssistProcessor processor) {
@@ -100,23 +100,23 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     public void assistSessionStarted(final ContentAssistEvent event) {
         if (event.processor == this) {
             assistContext.refreshPreferences();
-            canReopenAssitantProgramatically = true;
+            canReopenAssistantProgramatically = true;
             currentPage = 0;
         } else {
-            canReopenAssitantProgramatically = false;
+            canReopenAssistantProgramatically = false;
         }
     }
 
     @Override
     public void assistSessionRestarted(final ContentAssistEvent event) {
         if (event.processor == this) {
-            canReopenAssitantProgramatically = true;
+            canReopenAssistantProgramatically = true;
             currentPage--;
             if (currentPage < 0) {
                 currentPage = processors.size() - 1;
             }
         } else {
-            canReopenAssitantProgramatically = false;
+            canReopenAssistantProgramatically = false;
         }
 
     }
@@ -133,11 +133,11 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         // this method is called also for processors from which the proposal was not chosen
         // hence canReopenAssistantProgramatically is holding information which proccessor
         // is able to open proposals after accepting
-        if (!canReopenAssitantProgramatically) {
+        if (!canReopenAssistantProgramatically) {
             return;
         }
         if (shouldActivateAssist(proposal)) {
-            canReopenAssitantProgramatically = false;
+            canReopenAssistantProgramatically = false;
             Display.getCurrent().asyncExec(new Runnable() {
 
                 @Override
@@ -154,9 +154,9 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
 
     private boolean shouldActivateAssist(final ICompletionProposal proposal) {
         return proposal instanceof RedCompletionProposal
-                    && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()
+                && ((RedCompletionProposal) proposal).shouldActivateAssistantAfterAccepting()
                 || proposal instanceof RedCompletionProposalAdapter
-                    && ((RedCompletionProposalAdapter) proposal).shouldActivateAssitantAfterAccepting();
+                        && ((RedCompletionProposalAdapter) proposal).shouldActivateAssistantAfterAccepting();
     }
 
     private Collection<Runnable> getOperationsAfterAccept(final ICompletionProposal proposal) {
@@ -178,7 +178,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         return assistContext.getAssistantAutoActivationChars();
     }
 
-    public interface AssitantCallbacks {
+    public interface AssistantCallbacks {
 
         void setStatus(String title);
 
