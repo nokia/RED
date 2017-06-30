@@ -177,9 +177,9 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
 
     private boolean shouldActivateAssist(final ICompletionProposal proposal) {
         return proposal instanceof RedCompletionProposal
-                    && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()
+                && ((RedCompletionProposal) proposal).shouldActivateAssistantAfterAccepting()
                 || proposal instanceof RedCompletionProposalAdapter
-                    && ((RedCompletionProposalAdapter) proposal).shouldActivateAssitantAfterAccepting();
+                        && ((RedCompletionProposalAdapter) proposal).shouldActivateAssistantAfterAccepting();
     }
 
     @Override

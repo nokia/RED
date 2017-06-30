@@ -24,7 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescr
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Range;
 
@@ -78,13 +77,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
             return new ArrayList<>();
         } else {
             final List<String> arguments = newArrayList(
-                    transform(getArgumentsDescriptor().getRequiredArguments(), new Function<Argument, String>() {
-
-                        @Override
-                        public String apply(final Argument arg) {
-                            return arg.getName();
-                        }
-                    }));
+                    transform(getArgumentsDescriptor().getRequiredArguments(), Argument::getName));
 
             final Range<Integer> noOfArgs = getArgumentsDescriptor().getPossibleNumberOfArguments();
             final boolean mayHaveMoreArguments = !noOfArgs.hasUpperBound()

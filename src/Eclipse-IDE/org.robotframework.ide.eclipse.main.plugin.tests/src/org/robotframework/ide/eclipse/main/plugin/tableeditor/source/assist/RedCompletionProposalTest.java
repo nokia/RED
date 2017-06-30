@@ -59,19 +59,15 @@ public class RedCompletionProposalTest {
         final RedCompletionProposal proposal2 = new RedCompletionProposal("", 0, 0, 0, 0, 0, null, false, null, false,
                 new ArrayList<Runnable>(), null, false);
 
-        assertThat(proposal1.shouldActivateAssitantAfterAccepting()).isTrue();
-        assertThat(proposal2.shouldActivateAssitantAfterAccepting()).isFalse();
+        assertThat(proposal1.shouldActivateAssistantAfterAccepting()).isTrue();
+        assertThat(proposal2.shouldActivateAssistantAfterAccepting()).isFalse();
     }
 
     @Test
     public void operationsToPerformAreProperlyReturned() {
-        final Runnable op1 = new Runnable() {
-            @Override
-            public void run() { }
+        final Runnable op1 = () -> {
         };
-        final Runnable op2 = new Runnable() {
-            @Override
-            public void run() { }
+        final Runnable op2 = () -> {
         };
         final RedCompletionProposal proposal1 = new RedCompletionProposal("", 0, 0, 0, 0, 0, null, false, null, false,
                 new ArrayList<Runnable>(), null, false);
@@ -154,7 +150,7 @@ public class RedCompletionProposalTest {
     }
 
     @Test
-    public void styledLabelHavePrefixHihglighted_whenMatchingPrefixHasPositiveLengthAndItShouldBeDecorated() {
+    public void styledLabelHavePrefixHighlighted_whenMatchingPrefixHasPositiveLengthAndItShouldBeDecorated() {
         final RedCompletionProposal proposal = new RedCompletionProposal("", 0, 0, 3, 0, 0, null, true, "label", false,
                 new ArrayList<Runnable>(), null, false);
 
@@ -206,7 +202,7 @@ public class RedCompletionProposalTest {
     public void completionProposalsAreComparedUsingLabel() {
         final RedCompletionProposal proposal1 = new RedCompletionProposal("", 34, 0, 0, 56, 20, null, false,
                 "abc", false, new ArrayList<Runnable>(), null, false);
-        
+
         final RedCompletionProposal proposal2 = new RedCompletionProposal("", 34, 0, 0, 56, 20, null, false, "xyz",
                 false, new ArrayList<Runnable>(), null, false);
 

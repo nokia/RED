@@ -58,7 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlighting
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CodeReservedWordsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.GeneralSettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInCodeAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInSettingsAssistProcessor;
@@ -174,7 +174,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void setupAssistantProcessors(final ContentAssistant contentAssistant) {
-        final AssitantCallbacks assistantAccessor = new AssitantCallbacks() {
+        final AssistantCallbacks assistantAccessor = new AssistantCallbacks() {
 
             @Override
             public void setStatus(final String title) {
@@ -211,7 +211,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createSettingsAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
@@ -239,7 +239,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createVariablesAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
@@ -259,7 +259,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createTestCasesAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
@@ -284,7 +284,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createKeywordsAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
@@ -309,7 +309,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createDefaultAssist(final ContentAssistant contentAssistant,
-            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+            final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
         // we are adding all the assistants for default content type. Most of them (excluding
         // section headers assistant) are working in default content type only at the very last
         // position in file (this position always has default content type, but it can be actually

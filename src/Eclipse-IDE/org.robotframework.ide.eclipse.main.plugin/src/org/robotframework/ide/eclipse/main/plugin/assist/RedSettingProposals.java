@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableTable;
@@ -56,7 +55,7 @@ public class RedSettingProposals {
                 + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
         builder.put(SettingTarget.KEYWORD, "[return]",
                 "Specify the return value for this keyword. Multiple values can be used.");
-        
+
         builder.put(SettingTarget.GENERAL, "library", "");
         builder.put(SettingTarget.GENERAL, "resource", "");
         builder.put(SettingTarget.GENERAL, "variables", "");
@@ -121,13 +120,7 @@ public class RedSettingProposals {
         switch (target) {
             case GENERAL:
                 final Iterable<String> upperCased = transform(Splitter.on(' ').split(settingName),
-                        new Function<String, String>() {
-
-                            @Override
-                            public String apply(final String elem) {
-                                return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, elem);
-                            }
-                        });
+                        elem -> CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, elem));
                 return Joiner.on(' ').join(upperCased);
             case TEST_CASE:
             case KEYWORD:

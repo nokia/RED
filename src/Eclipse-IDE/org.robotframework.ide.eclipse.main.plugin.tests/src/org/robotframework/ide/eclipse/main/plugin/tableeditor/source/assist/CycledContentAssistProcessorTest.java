@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Display;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssistantCallbacks;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.swt.SwtThread;
 
@@ -41,7 +41,7 @@ public class CycledContentAssistProcessorTest {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
-        final AssitantCallbacks callback = mock(AssitantCallbacks.class);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final IDocument document = spy(new Document());
         when(document.getContentType(0)).thenReturn("__ct");
@@ -84,7 +84,7 @@ public class CycledContentAssistProcessorTest {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
-        final AssitantCallbacks callback = mock(AssitantCallbacks.class);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final IDocument document = spy(new Document());
         when(document.getContentType(0)).thenReturn("__ct");
@@ -119,12 +119,12 @@ public class CycledContentAssistProcessorTest {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
-        final AssitantCallbacks callback = mock(AssitantCallbacks.class);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final ICompletionProposal proposal = mock(ICompletionProposal.class);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, callback);
-        cycledProcessor.setCanReopenAssitantProgramatically(true);
+        cycledProcessor.setCanReopenAssistantProgramatically(true);
         cycledProcessor.applied(proposal);
 
         verifyZeroInteractions(proposal);
@@ -153,13 +153,13 @@ public class CycledContentAssistProcessorTest {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
-        final AssitantCallbacks callback = mock(AssitantCallbacks.class);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposal proposal = mock(RedCompletionProposal.class);
         when(proposal.operationsToPerformAfterAccepting()).thenReturn(newArrayList(r1, r2));
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, callback);
-        cycledProcessor.setCanReopenAssitantProgramatically(true);
+        cycledProcessor.setCanReopenAssistantProgramatically(true);
         cycledProcessor.applied(proposal);
 
         assertThat(runnedOperations.get()).isEqualTo(2);
@@ -189,13 +189,13 @@ public class CycledContentAssistProcessorTest {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
-        final AssitantCallbacks callback = mock(AssitantCallbacks.class);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposalAdapter proposal = mock(RedCompletionProposalAdapter.class);
         when(proposal.operationsToPerformAfterAccepting()).thenReturn(newArrayList(r1, r2));
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, callback);
-        cycledProcessor.setCanReopenAssitantProgramatically(true);
+        cycledProcessor.setCanReopenAssistantProgramatically(true);
         cycledProcessor.applied(proposal);
 
         assertThat(runnedOperations.get()).isEqualTo(2);
@@ -209,13 +209,13 @@ public class CycledContentAssistProcessorTest {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
-        final AssitantCallbacks callback = mock(AssitantCallbacks.class);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposal proposal = mock(RedCompletionProposal.class);
-        when(proposal.shouldActivateAssitantAfterAccepting()).thenReturn(true);
+        when(proposal.shouldActivateAssistantAfterAccepting()).thenReturn(true);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, callback);
-        cycledProcessor.setCanReopenAssitantProgramatically(true);
+        cycledProcessor.setCanReopenAssistantProgramatically(true);
         cycledProcessor.applied(proposal);
 
         execAllAwaitingMessages();
@@ -229,13 +229,13 @@ public class CycledContentAssistProcessorTest {
         final AssistPreferences assistPreferences = new AssistPreferences(
                 new MockRedPreferences(true, "  ", new char[] { 'a', 'b', 'c' }));
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(null, assistPreferences);
-        final AssitantCallbacks callback = mock(AssitantCallbacks.class);
+        final AssistantCallbacks callback = mock(AssistantCallbacks.class);
 
         final RedCompletionProposalAdapter proposal = mock(RedCompletionProposalAdapter.class);
-        when(proposal.shouldActivateAssitantAfterAccepting()).thenReturn(true);
+        when(proposal.shouldActivateAssistantAfterAccepting()).thenReturn(true);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext, callback);
-        cycledProcessor.setCanReopenAssitantProgramatically(true);
+        cycledProcessor.setCanReopenAssistantProgramatically(true);
         cycledProcessor.applied(proposal);
 
         execAllAwaitingMessages();
