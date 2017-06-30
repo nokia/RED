@@ -10,8 +10,8 @@ public class CellEditorCloser {
     public static void closeForcibly(final NatTable table) {
         final ICellEditor cellEditor = table.getActiveCellEditor();
         if (cellEditor != null && !cellEditor.isClosed()) {
-            final boolean commited = cellEditor.commit(MoveDirectionEnum.NONE);
-            if (!commited) {
+            final boolean committed = cellEditor.commit(MoveDirectionEnum.NONE);
+            if (!committed) {
                 cellEditor.close();
             }
             SwtThread.asyncExec(new Runnable() {

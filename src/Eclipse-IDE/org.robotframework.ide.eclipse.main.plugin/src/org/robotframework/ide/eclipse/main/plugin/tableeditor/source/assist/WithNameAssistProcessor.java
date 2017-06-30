@@ -79,8 +79,8 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
     }
 
 
-    private AssistProposalPredicate<String> createPredicate(final String lineContentTillOfsset) {
-        final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOfsset, assist.isTsvFile());
+    private AssistProposalPredicate<String> createPredicate(final String lineContentTillOffset) {
+        final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOffset, assist.isTsvFile());
         return AssistProposalPredicates.withNamePredicate(separators);
     }
 }

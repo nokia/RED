@@ -53,7 +53,7 @@ public class KeywordCallsAssistProcessorTest {
     @BeforeClass
     public static void beforeSuite() throws Exception {
         robotModel = new RobotModel();
-        
+
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2");
 
         projectProvider.createFile("suite.robot",
