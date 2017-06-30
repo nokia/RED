@@ -86,14 +86,14 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         }
     }
 
-    private AssistProposalPredicate<String> createPredicate(final String lineContentTillOfsset, final int line) {
-        final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOfsset, assist.isTsvFile());
+    private AssistProposalPredicate<String> createPredicate(final String lineContentTillOffset, final int line) {
+        final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOffset, assist.isTsvFile());
         final RobotLine lineModel = assist.getModel().getLinkedElement().getFileContent().get(line);
         final List<RobotToken> lineTokens = lineModel.getLineTokens();
         final Optional<RobotToken> firstToken = lineTokens.isEmpty() ?
                 Optional.<RobotToken> empty() :
                 Optional.of(lineTokens.get(0));
-        
+
         return AssistProposalPredicates.codeReservedWordsPredicate(separators, firstToken);
     }
 }
