@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 5/30/17 12:39 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 6/30/17 4:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -29,7 +29,7 @@ proc "restore-interpreters"{
 				    get-table | get-item "Robot Framework .*\(Python .*\)" | check
 				}
 				    get-button OK | click
-				    get-window "Rebuild required" | get-button OK | click
+				    get-window "Rebuild required" | get-button "(OK)|(Applay and Close)" | click
 			}
 		}-else{
 			get-window Preferences | get-button OK | click
