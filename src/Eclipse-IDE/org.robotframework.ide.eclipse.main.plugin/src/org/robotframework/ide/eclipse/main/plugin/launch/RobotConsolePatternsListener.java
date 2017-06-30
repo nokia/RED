@@ -85,6 +85,10 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
             final String path = matchedLine.substring("Output:".length()).trim();
             final int offset = matchedLine.length() - path.length();
             return new PathWithOffset(path, offset);
+        } else if (matchedLine.startsWith("XUnit:")) {
+            final String path = matchedLine.substring("XUnit:".length()).trim();
+            final int offset = matchedLine.length() - path.length();
+            return new PathWithOffset(path, offset);
         } else if (matchedLine.startsWith("Log:")) {
             final String path = matchedLine.substring("Log:".length()).trim();
             final int offset = matchedLine.length() - path.length();
@@ -104,7 +108,7 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
 
     @Override
     public String getPattern() {
-        return "(Debug|Output|Log|Report|Command):\\s*(.*)";
+        return "(Debug|Output|XUnit|Log|Report|Command):\\s*(.*)";
     }
 
     @Override
@@ -114,7 +118,7 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
 
     @Override
     public String getLineQualifier() {
-        return "(Debug|Output|Log|Report|Command): ";
+        return "(Debug|Output|XUnit|Log|Report|Command): ";
     }
 
     private static final class ExecutionArtifactsHyperlink implements IHyperlink {
