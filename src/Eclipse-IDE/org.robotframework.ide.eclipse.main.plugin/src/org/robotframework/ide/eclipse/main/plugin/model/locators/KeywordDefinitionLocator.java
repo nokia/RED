@@ -37,13 +37,21 @@ public class KeywordDefinitionLocator {
 
     private final RobotModel model;
 
+    private final boolean includeNotImportedLibraries;
+
     public KeywordDefinitionLocator(final IFile file) {
         this(file, RedPlugin.getModelManager().getModel());
     }
 
     public KeywordDefinitionLocator(final IFile file, final RobotModel model) {
+        this(file, model, false);
+    }
+
+    public KeywordDefinitionLocator(final IFile file, final RobotModel model,
+            final boolean includeNotImportedLibraries) {
         this.file = file;
         this.model = model;
+        this.includeNotImportedLibraries = includeNotImportedLibraries;
     }
 
     public void locateKeywordDefinitionInLibraries(final RobotProject project, final KeywordDetector detector) {
@@ -126,7 +134,8 @@ public class KeywordDefinitionLocator {
     }
 
     private ContinueDecision locateInLibraries(final RobotSuiteFile file, final KeywordDetector detector) {
-        final SetMultimap<LibrarySpecification, String> librariesMap = file.getImportedLibraries();
+        final SetMultimap<LibrarySpecification, String> librariesMap = includeNotImportedLibraries
+                ? file.getAllLibraries() : file.getImportedLibraries();
         for (final LibrarySpecification libSpec : librariesMap.keySet()) {
             final List<KeywordSpecification> keywords = libSpec.getKeywords();
             for (final KeywordSpecification kwSpec : keywords) {
@@ -144,7 +153,7 @@ public class KeywordDefinitionLocator {
 
         /**
          * Called when keyword definition was detected inside file.
-         * 
+         *
          * @param file
          *            File in which definition was detected
          * @param keyword
@@ -156,7 +165,7 @@ public class KeywordDefinitionLocator {
         /**
          * Called when keyword of given specification was found within given library which was
          * exposed by given file
-         * 
+         *
          * @param libSpec
          *            Specification of library where keyword was detected
          * @param kwSpec

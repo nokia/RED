@@ -99,9 +99,10 @@ public class RedKeywordProposals {
         return null;
     }
 
-    private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite, final String userContent) {
+    private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite,
+            final String userContent) {
         final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(shouldUseQualifiedName(),
-                userContent);
+                shouldIncludeKeywordsFromNotImportedLibraries(), userContent);
         return new AccessibleKeywordsEntities(suite.getFile().getFullPath(), collector);
     }
 
@@ -142,16 +143,23 @@ public class RedKeywordProposals {
         return false;
     }
 
+    private boolean shouldIncludeKeywordsFromNotImportedLibraries() {
+        return RedPlugin.getDefault().getPreferences().isAssistantKeywordFromNotImportedLibraryEnabled();
+    }
+
     private final class ProposalsKeywordCollector implements AccessibleKeywordsCollector {
 
         private final Predicate<RedKeywordProposal> shouldUseQualifiedName;
 
+        private final boolean includeNotImportedLibraries;
+
         private final String userContent;
 
         private ProposalsKeywordCollector(final Predicate<RedKeywordProposal> shouldUseQualifiedName,
-                final String userContent) {
-            this.userContent = userContent;
+                final boolean includeNotImportedLibraries, final String userContent) {
             this.shouldUseQualifiedName = shouldUseQualifiedName;
+            this.includeNotImportedLibraries = includeNotImportedLibraries;
+            this.userContent = userContent;
         }
 
         @Override
@@ -161,7 +169,8 @@ public class RedKeywordProposals {
 
         private Map<String, Collection<KeywordEntity>> collectAccessibleKeywords() {
             final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
-            new KeywordDefinitionLocator(suiteFile.getFile(), model).locateKeywordDefinition(new KeywordDetector() {
+            new KeywordDefinitionLocator(suiteFile.getFile(), model, includeNotImportedLibraries)
+                    .locateKeywordDefinition(new KeywordDetector() {
 
                 @Override
                 public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
@@ -239,7 +248,7 @@ public class RedKeywordProposals {
                             final ProposalMatch match = qualifiedKeywordMatch.getMatch().get();
                             final Optional<ProposalMatch> inLabelMatch = match.mapAndShiftToFragment(alias.length() + 1,
                                     keywordName.length());
-                            
+
                             if (inLabelMatch.isPresent()) {
                                 final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(keyword,
                                         qualifiedKeywordMatch.getBddPrefix(), scope, alias,
