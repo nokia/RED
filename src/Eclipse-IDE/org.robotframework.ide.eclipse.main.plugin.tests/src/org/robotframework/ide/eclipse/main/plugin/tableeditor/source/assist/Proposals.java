@@ -27,7 +27,7 @@ class Proposals {
 
             @Override
             public boolean matches(final ICompletionProposal proposal) {
-                return ((RedCompletionProposalAdapter) proposal).shouldActivateAssitantAfterAccepting();
+                return ((RedCompletionProposalAdapter) proposal).shouldActivateAssistantAfterAccepting();
             }
         };
     }

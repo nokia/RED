@@ -70,6 +70,7 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
                         + "Robot __init__ files will not be used then.");
         GridDataFactory.fillDefaults()
                 .hint(150, SWT.DEFAULT)
+                .indent(5, 2)
                 .grab(true, false)
                 .applyTo(singleFileDataSourceDescription);
     }

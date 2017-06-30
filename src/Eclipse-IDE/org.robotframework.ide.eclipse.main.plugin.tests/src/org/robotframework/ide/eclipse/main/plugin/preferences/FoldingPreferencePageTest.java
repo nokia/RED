@@ -50,8 +50,7 @@ public class FoldingPreferencePageTest {
             if (editor instanceof BooleanFieldEditor) {
                 booleanPrefNames.remove(editor.getPreferenceName());
             } else if (editor instanceof IntegerFieldEditor) {
-                final IntegerFieldEditor lineLimitEditor = (IntegerFieldEditor) editor;
-                assertThat(lineLimitEditor.getPreferenceName()).isEqualTo(RedPreferences.FOLDING_LINE_LIMIT);
+                assertThat(editor.getPreferenceName()).isEqualTo(RedPreferences.FOLDING_LINE_LIMIT);
             }
         }
         assertThat(booleanPrefNames).isEmpty();

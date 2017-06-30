@@ -119,7 +119,7 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
         return this.getDisplayString().compareTo(that.getDisplayString());
     }
 
-    public boolean shouldActivateAssitantAfterAccepting() {
+    public boolean shouldActivateAssistantAfterAccepting() {
         return modification.activateAssistant;
     }
 
