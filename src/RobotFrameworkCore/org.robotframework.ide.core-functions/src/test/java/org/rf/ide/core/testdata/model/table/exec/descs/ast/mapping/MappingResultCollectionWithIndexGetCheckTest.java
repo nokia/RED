@@ -30,7 +30,7 @@ public class MappingResultCollectionWithIndexGetCheckTest {
     @Parameters(name = "${0}")
     public static Iterable<Object[]> data() throws Exception {
         final List<String> lines = Files.readAllLines(Paths.get(
-                VariableComputationHelperExtractionParametrizedTest.class.getResource("VAR_INDEX_CHECK.cvs").toURI()),
+                VariableComputationHelperExtractionParameterizedTest.class.getResource("VAR_INDEX_CHECK.cvs").toURI()),
                 Charset.forName("UTF-8"));
 
         final List<Object[]> o = new ArrayList<>(0);

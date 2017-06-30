@@ -28,7 +28,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 @RunWith(Parameterized.class)
-public class VariableComputationHelperExtractionParametrizedTest {
+public class VariableComputationHelperExtractionParameterizedTest {
 
     private final static Pattern SPLIT_CSV_PATTERN = Pattern.compile("(?<!\\\\),");
 
@@ -36,7 +36,7 @@ public class VariableComputationHelperExtractionParametrizedTest {
 
     @Parameters(name = "${0}")
     public static Iterable<Object[]> data() throws Exception {
-        final List<String> lines = Files.readAllLines(Paths.get(VariableComputationHelperExtractionParametrizedTest.class
+        final List<String> lines = Files.readAllLines(Paths.get(VariableComputationHelperExtractionParameterizedTest.class
                 .getResource("VAR_WITH_MATH_OPERATIONS.cvs").toURI()), Charset.forName("UTF-8"));
 
         final List<Object[]> o = new ArrayList<>(0);
@@ -100,7 +100,7 @@ public class VariableComputationHelperExtractionParametrizedTest {
 
     private final boolean shouldExtract;
 
-    public VariableComputationHelperExtractionParametrizedTest(final String testName, final String text,
+    public VariableComputationHelperExtractionParameterizedTest(final String testName, final String text,
             final int variableNameStart, final String variableName, final boolean shouldExtract) {
         this.testName = testName;
         this.text = text;
