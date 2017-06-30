@@ -146,12 +146,12 @@ public class RedTextCellEditor extends TextCellEditor {
             final boolean skipValidation) {
         if (validationJobScheduler.canCloseCellEditor()) {
             removeEditorControlListeners();
-            final boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
+            final boolean committed = super.commit(direction, closeAfterCommit, skipValidation);
             if (direction == MoveDirectionEnum.NONE) {
                 layerCell.getLayer().doCommand(new SelectCellCommand(layerCell.getLayer(),
                         layerCell.getColumnPosition(), layerCell.getRowPosition(), false, false));
             }
-            return commited;
+            return committed;
         } else {
             return false;
         }
@@ -187,8 +187,8 @@ public class RedTextCellEditor extends TextCellEditor {
             if (commitOnEnter && (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR)) {
                 final boolean commit = event.stateMask != SWT.ALT;
                 if (commit) {
-                    final boolean commited = commit(getMoveDirection(event));
-                    if (!commited && wrapCellContent) {
+                    final boolean committed = commit(getMoveDirection(event));
+                    if (!committed && wrapCellContent) {
                         // when there is multiline Text control we don't want to
                         // have new lines there, so cannot deliver this event to
                         // control

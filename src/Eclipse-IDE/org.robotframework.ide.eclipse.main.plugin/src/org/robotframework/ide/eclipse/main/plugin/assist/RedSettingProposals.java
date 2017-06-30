@@ -37,7 +37,7 @@ public class RedSettingProposals {
         builder.put(SettingTarget.TEST_CASE, "[timeout]",
                 "Specifies maximum time this test case is allowed to execute before being aborted.\n"
                 + "This setting overrides Test Timeout setting set on suite level\n"
-                + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+                        + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
         builder.put(SettingTarget.TEST_CASE, "[teardown]",
                 "The keyword %s is executed after every other keyword inside the definition");
 
@@ -52,7 +52,7 @@ public class RedSettingProposals {
         builder.put(SettingTarget.KEYWORD, "[timeout]",
                 "Specifies maximum time this keyword is allowed to execute before being aborted.\n"
                 + "This setting overrides Test Timeout setting set on suite level\n"
-                + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+                        + "Numerical values are interpreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
         builder.put(SettingTarget.KEYWORD, "[return]",
                 "Specify the return value for this keyword. Multiple values can be used.");
 
