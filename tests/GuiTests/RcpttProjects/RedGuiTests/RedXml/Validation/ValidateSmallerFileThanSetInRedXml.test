@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Zk1_YNFyEeWl7fLmvSqX3Q
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 2/12/16 11:27 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 11:21 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,7 +17,7 @@ Entry-Name: .content
 
 // clean rpoject to run validation
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 // check number of errors
 get-tab-folder -index 3 | get-tab-item Problems | click
@@ -35,7 +35,7 @@ with [get-editor "ScriptWithResource/red.xml"] {
 }
 // clean and validate project, there should be less errors
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 // check errors - there should be only 1
 get-view Problems | get-label "1 error, 0 warnings, 0 others" | get-property caption 
@@ -50,9 +50,10 @@ with [get-editor "ScriptWithResource/red.xml" | get-section "Excluded project pa
 }
 // clean and validate
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 // errors should be 3 as in init state
 get-view Problems | get-label "3 errors, 0 warnings, 0 others" | get-property caption 
     | equals "3 errors, 0 warnings, 0 others" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
