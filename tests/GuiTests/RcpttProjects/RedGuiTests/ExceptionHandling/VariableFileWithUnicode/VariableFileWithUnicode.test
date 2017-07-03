@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _HWVnoKS8EeWCSZzk3osblg
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/7/16 5:10 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 11:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,7 +33,7 @@ with [get-editor "txt_test.robot" | get-text-viewer] {
 }
 
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 get-tab-folder -index 4 | get-tab-item Problems | click
 get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 
