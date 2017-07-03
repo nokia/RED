@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _T93gENGDEeWl7fLmvSqX3Q
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 2/12/16 1:33 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:26 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,7 +16,8 @@ Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "VariableModule/TestVariable.robot" | double-click
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
+
 get-tab-folder -index 4 | get-tab-item Problems | click
 with [get-editor "TestVariable.robot" | get-text-viewer] {
     set-caret-pos 6 21

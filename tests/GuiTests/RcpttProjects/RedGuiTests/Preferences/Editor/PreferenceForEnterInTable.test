@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _qKIwwE3AEeaiR4l81oXgMw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/2/16 4:14 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:25 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -39,7 +39,7 @@ with [get-window Preferences] {
     get-tree | select "Robot Framework/Editor"
     get-group Tables | get-combo -after [get-label "After pressing Enter in cell under edit"] 
         | select "stay in the same cell"
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
 //set focus on $a2

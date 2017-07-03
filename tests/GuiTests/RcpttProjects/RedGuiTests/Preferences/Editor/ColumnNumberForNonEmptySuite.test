@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _2DXt4Em1EeaRB_Xz0tiYpg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/9/16 11:18 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -139,7 +139,7 @@ with [get-window Preferences] {
     get-group Tables | get-editbox -after [get-label "Default number of columns for arguments in table editors"] 
         | set-text 2
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
 //restart view
@@ -160,7 +160,7 @@ with [get-window Preferences] {
     get-group Tables | get-editbox -after [get-label "Default number of columns for arguments in table editors"] 
         | set-text 14
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 get-view "Project Explorer" | click
 get-editor "TestFile.robot" | close

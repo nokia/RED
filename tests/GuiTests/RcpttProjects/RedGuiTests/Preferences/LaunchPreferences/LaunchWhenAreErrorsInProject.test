@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Nm22AO38EeaEfJH5Ahap2w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/9/17 2:12 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -150,7 +150,7 @@ get-preferences-menu | click
 with [get-window Preferences] {
     get-tree | select "Run\\/Debug/Launching"
     get-group "Continue launch if project contains errors" | get-button Prompt | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 //run test one more time
 exec-with-options -disableJobWaiting -command {
