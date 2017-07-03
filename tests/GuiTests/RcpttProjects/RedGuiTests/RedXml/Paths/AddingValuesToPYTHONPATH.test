@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/1/17 2:56 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:27 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -139,7 +139,7 @@ wait 500
 
 //this is added because test: AddLibraryToRedXmlByQuickFix was affecing this test
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
  
 //expand erorrs
 get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | expand-all
