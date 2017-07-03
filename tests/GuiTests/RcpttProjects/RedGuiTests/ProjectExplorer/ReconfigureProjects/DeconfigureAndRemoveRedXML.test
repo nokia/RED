@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _59DNAEd3EeaRB_Xz0tiYpg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/25/17 10:22 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 11:19 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -31,8 +31,8 @@ with [get-window "New Project"] {
 
 //select preference to set .project and non-red projects
 get-button "View Menu" | click
-get-view "Project Explorer" | get-menu "Customize View..." | click
-with [get-window "Available Customizations"] {
+get-view "Project Explorer" |  get-menu "(Customize View...)|(Filters and Customization...)" | click
+with [get-window  "(Available Customizations)|(Filters and Customization)" ] {
     get-tab-folder | get-tab-item Filters | click
     with [get-table] {
         get-item ".\\* resources" | uncheck
@@ -179,8 +179,8 @@ get-editor ".project" | get-text-viewer | get-property text | equals "<?xml vers
     
 //reset prefernce
 get-button "View Menu" | click
-get-view "Project Explorer" | get-menu "Customize View..." | click
-with [get-window "Available Customizations"] {
+get-view "Project Explorer" | get-menu "(Customize View...)|(Filters and Customization...)"  | click
+with [get-window  "(Available Customizations)|(Filters and Customization)"] {
     get-tab-folder | get-tab-item Filters | click
     with [get-table] {
         get-item ".\\* resources" | check
