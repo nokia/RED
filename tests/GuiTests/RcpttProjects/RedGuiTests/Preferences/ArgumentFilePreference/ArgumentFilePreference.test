@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _LISQcBCbEeeG6d5optx6Vw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/30/17 9:59 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:53 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,7 +22,7 @@ with [get-window Preferences | get-group Robot | get-button "Pass Robot argument
     get-property enablement | equals true | verify-true
     get-property caption | equals "Pass Robot arguments using arguments file" | verify-true
 }
-get-window Preferences | get-button OK | click
+get-window Preferences | get-button $Apply_and_OK_in_preference | click
 get-view "Project Explorer" | get-tree | select "RunRobotScriptInDebugPerspective/SimpleLoggingTestCase.robot" 
     | get-menu "Run As/1 Robot Test" | click
 // console Command should have --argumentfile part
@@ -54,7 +54,7 @@ get-preferences-menu | click
 with [get-window Preferences] {
     get-group Robot | get-button "Pass Robot arguments using arguments file" | uncheck
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference| click
 }
 get-eclipse-window | key-type F11  
 wait-for-console
@@ -88,7 +88,7 @@ get-preferences-menu | click
 with [get-window Preferences] {
     get-group Robot | get-button "Pass Robot arguments using arguments file" | check
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 get-eclipse-window | key-type F11
 wait 500

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ErbYMPglEea7hL0QdGOb6w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/10/17 3:23 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:23 AM
 Testcase-Type: ecl
 Verifications: _kIYBEPhCEea7hL0QdGOb6w
 
@@ -53,7 +53,7 @@ get-button "Save (M1+S)" | click
 
 //clean must be after editing red.xml
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 wait-for-errors -amount 4 -times 3 -delay 1000
 
@@ -113,7 +113,7 @@ get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-t
 get-button "Save (M1+S)" | click
 
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 wait-for-errors -amount 7 -times 3 -delay 1000
 
@@ -154,7 +154,7 @@ get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-t
 get-button "Save (M1+S)" | click
 
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 //check warnings
 with [get-view Problems | get-tree] {
