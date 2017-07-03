@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _6SFBkKdNEeazyPh6f3_hNQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/14/16 5:40 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 11:18 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -40,7 +40,7 @@ with [get-window Preferences] {
     //change to jython
     get-tree | select "Robot Framework/Installed frameworks"
     get-table | get-item "Robot Framework .*\(Jython .*\)" | check
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
     get-window "Rebuild required" | get-button OK | click
 }
 
