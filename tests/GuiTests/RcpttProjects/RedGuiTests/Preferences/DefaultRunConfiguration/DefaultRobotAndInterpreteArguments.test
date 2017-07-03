@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VFqkwP0BEeaFC_dPBuoMWQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/30/17 12:18 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/3/17 10:50 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -38,7 +38,7 @@ get-window Preferences | get-tree | select "Robot Framework/Launching/Default La
 with [get-window Preferences] {
     get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "--version"
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 get-view "Project Explorer" | get-tree | select "RobotProject/test_for_run_config.robot" | get-menu "Run As/1 Robot Test" | click
 wait-for-console
@@ -83,7 +83,7 @@ with [get-window Preferences] {
     get-editbox -after [get-label "Additional interpreter arguments:"] | set-text ""
     get-editbox -after [get-label "Additional Robot Framework arguments:"] 
         | set-text "-i \"test 1\" -o None -d None -l None -r None"
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference  | click
 }
 
 
@@ -184,7 +184,7 @@ get-window "Run Configurations" | get-button Close | click
 get-preferences-menu | click
 with [get-window Preferences] {
     get-editbox -after [get-label "Additional Robot Framework arguments:"] | set-text "-o None -d None -l None -r None"
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference  | click
 }
 
 ///add new tsv file
