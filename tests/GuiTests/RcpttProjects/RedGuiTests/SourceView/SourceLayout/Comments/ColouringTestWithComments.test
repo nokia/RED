@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _LssiYIPXEeWImNPXuPy_LQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/28/17 2:43 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/4/17 11:16 AM
 Testcase-Type: ecl
 Verifications: _Z93QAIPZEeWImNPXuPy_LQ,_YOOasI7XEeWetPU-dn-gxQ,_lf2sEPncEea7hL0QdGOb6w
 
@@ -164,7 +164,7 @@ get-editor "new.robot" | get-left-ruler | get-ruler-column AnnotationColumn | do
 get-button "Open Perspective" | click
 with [get-window "Open Perspective"] {
     get-table | select Debug
-    get-button OK | click
+    get-button "(OK)|(Open)" | click
 }
 
 get-view Breakpoints | click
