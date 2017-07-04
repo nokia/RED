@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _rfqskLkQEeWsFpIoyr2saw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/9/17 2:10 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/4/17 11:14 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,7 +27,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/a" | get-menu "Rob
 
 // revalidate
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 wait 2000
 
 // 2 problems should be not visible - total 6
@@ -60,7 +60,7 @@ get-editor "RobotProject/red.xml" | get-section "Excluded project parts" | get-t
     | select "RobotProject/TestFile.robot" | key-type "M1+s"
     
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 
 // check caption in red.xml and project explorer
@@ -84,7 +84,7 @@ with [get-view "Project Explorer" | get-tree] {
     
 }
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 // there should be 6 errors and 1 warning for exclude in exclude folder
 get-view Problems | get-label "6 errors, 1 warning, 0 others" | get-property caption 
     | equals "6 errors, 1 warning, 0 others" | verify-true
@@ -102,7 +102,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestSuiteFolder/with_init.tsv" | get-menu "Robot Framework/Exclude from validation" | click
 }
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 // check file name with exclude label
 get-view "Project Explorer" | get-tree | get-item "RobotProject/TestSuiteFolder/with_init.tsv \\[excluded\\]" 
@@ -116,7 +116,7 @@ get-view Problems | get-label "5 errors, 1 warning, 0 others" | get-property cap
 get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder/with_init.tsv [excluded]" 
     | get-menu "Robot Framework/Include for validation" | click
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 // check if file name does not have [excluded]
 get-view "Project Explorer" | get-tree | get-item "RobotProject/TestSuiteFolder/with_init.tsv" | get-property caption 
