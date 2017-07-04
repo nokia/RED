@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Z-lo8BRiEeeZSZgUeG7ZOA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/30/17 6:12 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/4/17 11:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -23,7 +23,7 @@ proc "check-if-no-error-is-shown"{
 proc "check-buttons-enablement" [val apply_button] [val ok_button]{
 	with [get-window Preferences] {
 	    get-button Apply | get-property enablement | equals $apply_button | verify-true
-	    get-button OK | get-property enablement | equals $ok_button | verify-true
+	    get-button $Apply_and_OK_in_preference | get-property enablement | equals $ok_button | verify-true
 	}	    
 }   
 
@@ -141,7 +141,7 @@ check-buttons-enablement -apply_button true -ok_button true
 //apply and run test
 with [get-window Preferences] {
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 get-view "Project Explorer" | get-tree | select "ExecutorTab/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
 compare-console 
@@ -172,7 +172,7 @@ with [get-window Preferences] {
         get-editbox -after [get-label "Additional executable file arguments:"] | set-text "new 1 new2 new3"
   }
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
 //run the same test again
