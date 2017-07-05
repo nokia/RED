@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-UsioKUBEeazyPh6f3_hNQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:48 AM
+Save-Time: 7/5/17 9:31 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,7 +68,7 @@ with [get-window Preferences] {
 
 //clean to update
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 //check if one warning was moved to errors
 with [get-view Problems | get-tree] {
@@ -85,12 +85,12 @@ with [get-window Preferences] {
     get-section "Name shadowing and conflicts" | get-combo -after [get-label "Duplicated test case name"] | select Info
     get-section "Unnecessary code" | get-combo -after [get-label "Empty settings definition"] | select Ignore
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
 //clean to update
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 
 with [get-view Problems | get-tree] {
@@ -141,12 +141,12 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
 get-preferences-menu | click
 with [get-window Preferences] {
     get-button "Restore Defaults" | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
 //clean to update
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 
 check-default-errors
@@ -159,7 +159,7 @@ with [get-window Preferences] {
         get-combo -after [get-label "Variable given as keyword name"] | select Error
     }
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 with [get-editor "tsv_file.tsv" | get-text-viewer] {
     set-caret-pos 12 1
