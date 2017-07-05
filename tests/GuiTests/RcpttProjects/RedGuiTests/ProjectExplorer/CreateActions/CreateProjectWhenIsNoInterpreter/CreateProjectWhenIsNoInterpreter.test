@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _A9XVMAiaEea9m_qlhlPmsQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/17 11:13 AM
+Save-Time: 7/5/17 9:32 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -75,7 +75,7 @@ get-window "Runtime Environment Error" | get-window Preferences | get-table | ge
     | verify-true
 //    
 //close window    
-get-window "Runtime Environment Error" | get-window Preferences | get-button OK | click
+get-window "Runtime Environment Error" | get-window Preferences | get-button $Apply_and_OK_in_preference | click
 
 //run test
 get-view "Project Explorer" | get-tree | select "new/test.robot"

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _i2nE4CT9EeesE7mkFuId1w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/19/17 3:47 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/5/17 9:33 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -63,7 +63,7 @@ get-button "Save \((Ctrl|M1)\+S\)" | click
 
 //clean
 get-menu "Project/Clean..." | click
-get-window Clean | get-button OK | click
+get-window Clean | get-button $OK_Clean_button | click
 
 //check errors
 with [get-view Problems | get-tree] {
