@@ -6,16 +6,15 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OPRvEF18EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/10/17 2:16 PM
-Tags: notTestable
+Save-Time: 7/6/17 1:35 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
 Content-Type: text/plain
 Entry-Name: .description
 
-newst bug: RED-536 
 corrected bugs:
+RED-536
 RED-458
 RED-459
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
@@ -205,6 +204,36 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw5\n"
     + "    \\" | verify-true
     
-//to-do wklejanie 2x tego samego, wklejanie [set] do isniejacej i innego kw
+// one more verification of [Documentation] setting location
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | double-click
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type "M1+M2+x"
+        key-type Down -times 2
+        key-type "M1+M2+v"
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "kw1\n"
+    + "    log  1\n"
+    + "    [return]  9\n"
+    + "kw3\n"
+    + "    a1\n"
+    + "    a2\n"
+    + "    a3\n"
+    + "kw4\n"
+    + "    Set Log Level    5\n"
+    + "    this was empty line\n"
+    + "    [Documentation]    doc\n"
+    + "kw-2\n"
+    + "    Should Be Empty    item\n"
+    + "kw5\n"
+    + "    \\" | verify-true
     
+//to-do wklejanie 2x tego samego, wklejanie [set] do isniejacej i innego kw
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
