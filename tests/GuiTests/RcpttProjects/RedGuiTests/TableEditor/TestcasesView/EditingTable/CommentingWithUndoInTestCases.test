@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IlBPkBq5EeexL8zyucnNEq
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/19/17 10:46 AM
+Save-Time: 7/6/17 2:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -60,4 +60,43 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 // verify if there is no problems in Problems
 get-view Problems | click
 wait-for-zero-items -times 2 -delay 500
+
+// commemt and uncomment [Teardown] few times
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item "Test Cases" | click
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+/"
+        key-type "M1+/"
+        key-type "M1+/"
+        key-type "M1+/"
+    }
+}
+// verify if comment
+check-test_case-row -file "TestFile.robot" -row 1 -tc "test"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "# [Teardown]" -c1 "Catenate" -c2 4 -c3 5
+check-test_case-row -file "TestFile.robot" -row 3 -tc "log" -c1 "9"
+// press ctrl+z
+get-eclipse-window | key-type "M1+z"
+// verify if uncomment
+check-test_case-row -file "TestFile.robot" -row 1 -tc "test"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "[Teardown]" -c1 "Catenate" -c2 4 -c3 5
+check-test_case-row -file "TestFile.robot" -row 3 -tc "log" -c1 "9"
+// press ctrl+z
+get-eclipse-window | key-type "M1+z"
+// verify if comment
+check-test_case-row -file "TestFile.robot" -row 1 -tc "test"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "# [Teardown]" -c1 "Catenate" -c2 4 -c3 5
+check-test_case-row -file "TestFile.robot" -row 3 -tc "log" -c1 "9"
+// press ctrl+z
+get-eclipse-window | key-type "M1+z"
+// verify if uncomment
+check-test_case-row -file "TestFile.robot" -row 1 -tc "test"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "[Teardown]" -c1 "Catenate" -c2 4 -c3 5
+check-test_case-row -file "TestFile.robot" -row 3 -tc "log" -c1 "9"
+// verify Source tab
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    [Teardown]    Catenate    4    5\n"
+    + "    log  9" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
