@@ -8,11 +8,20 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 
 import javax.inject.Named;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.SourceViewer;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.FindElementUsagesInTextHandler.E4FindUsagesInTextHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 
@@ -30,18 +39,33 @@ public class FindElementUsagesInTextHandler extends DIParameterizedHandler<E4Fin
 
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
 
+            final IEditorInput input = editor.getEditorInput();
+            final FileEditorInput editorfile = (FileEditorInput) input;
+            final IPath path = editorfile.getPath();
+            final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+            boolean isTSV = file.getFileExtension().equals("tsv");
+
             final ITextSelection selection = (ITextSelection) viewer.getSelection();
 
-            final String selectedText = selection.getText();
+            String selectedText = selection.getText();
 
             if (selectedText.isEmpty()) {
-                // nothing is selected so we won't search
-                return;
+                try {
+                    IDocument doc = viewer.getDocument();
+                    int offset = selection.getOffset();
+                    IRegion token;
+                    token = doc.getLineInformation(doc.getLineOfOffset(offset));
+                    selectedText = DocumentUtilities.getFirstTokenInLine(doc, isTSV, token.getOffset());
+                } catch (BadLocationException e1) {
+                    return;
+                }
             }
-
-            FindUsagesHandler.findElements(place, editor, selectedText);
+            if (!selectedText.isEmpty()) {
+                FindUsagesHandler.findElements(place, file, selectedText);
+            }
 
         }
 
     }
+
 }

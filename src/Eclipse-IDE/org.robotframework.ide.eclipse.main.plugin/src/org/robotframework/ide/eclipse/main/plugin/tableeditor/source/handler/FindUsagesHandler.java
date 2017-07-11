@@ -10,24 +10,15 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 public class FindUsagesHandler {
 
-    public static void findElements(final String place, RobotFormEditor editor, final String selectedText) {
-
-        IEditorInput input = editor.getEditorInput();
-        FileEditorInput editorfile = (FileEditorInput) input;
-        IPath path = editorfile.getPath();
-        IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+    public static void findElements(final String place, IFile file, final String selectedText) {
 
         try {
             final List<IResource> resourcesToLookInto;

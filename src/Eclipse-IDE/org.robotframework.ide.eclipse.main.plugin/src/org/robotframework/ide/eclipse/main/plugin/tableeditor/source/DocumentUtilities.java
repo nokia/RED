@@ -26,7 +26,6 @@ import com.google.common.collect.Range;
 
 /**
  * @author Michal Anglart
- *
  */
 public class DocumentUtilities {
 
@@ -76,6 +75,30 @@ public class DocumentUtilities {
         return Optional.empty();
     }
 
+    public static String getFirstTokenInLine(IDocument document, boolean isTSV, final int offset)
+            throws BadLocationException {
+        int begin = offset;
+
+        while (Character.isWhitespace(document.get(begin, 1).charAt(0)) && document.get(begin, 1).charAt(0) != '\n') {
+            begin++;
+        }
+
+        int end = begin;
+        if (!isTSV) {
+            while (!(Character.isWhitespace(document.get(end, 1).charAt(0))
+                    && Character.isWhitespace(document.get(end + 1, 1).charAt(0))
+                    || document.get(end, 1).charAt(0) == '\t')) {
+                end++;
+            }
+        } else {
+            while (!(document.get(end, 1).charAt(0) == '\t' || document.get(end, 1).charAt(0) == '\n')) {
+                end++;
+            }
+        }
+
+        return document.get(begin, end - begin);
+    }
+
     private static boolean varStartDetected(final String cellContent, final int i) {
         if (i + 1 < cellContent.length()) {
             return newHashSet("${", "@{", "%{", "&{").contains(cellContent.substring(i, i + 2));
@@ -123,9 +146,10 @@ public class DocumentUtilities {
      *            Document in which cell should be find
      * @param offset
      *            Current offset at which search should start
-     * @return The region describing whole cell or absent if offset is inside cell separator. If returned region
-     * is present then it is always true that:
-     *     region.getOffset() <= offset <= region.getOffset() + region.getLength()
+     * @return The region describing whole cell or absent if offset is inside cell separator. If
+     *         returned region
+     *         is present then it is always true that:
+     *         region.getOffset() <= offset <= region.getOffset() + region.getLength()
      * @throws BadLocationException
      */
     public static Optional<IRegion> findCellRegion(final IDocument document, final boolean isTsv, final int offset)
@@ -168,7 +192,7 @@ public class DocumentUtilities {
                 : findCellRegion(document, isTsv, offset - 1);
         if (region.isPresent()) {
             final int length = Math.max(offset - region.get().getOffset(), region.get().getLength());
-            return Optional.<IRegion>of(new Region(region.get().getOffset(), length));
+            return Optional.<IRegion> of(new Region(region.get().getOffset(), length));
         }
         return region;
     }
@@ -335,7 +359,8 @@ public class DocumentUtilities {
         }
     }
 
-    public static Optional<IRegion> getSnippet(final IDocument document, final int offset, final int noOfLinesBeforeAndAfter) {
+    public static Optional<IRegion> getSnippet(final IDocument document, final int offset,
+            final int noOfLinesBeforeAndAfter) {
         if (noOfLinesBeforeAndAfter < 0) {
             return Optional.empty();
         }
@@ -349,7 +374,7 @@ public class DocumentUtilities {
 
             return Optional.<IRegion> of(new Region(firstLineRegion.getOffset(),
                     lastLineRegion.getOffset() + lastLineRegion.getLength() - firstLineRegion.getOffset()));
-            
+
         } catch (final BadLocationException e) {
             return Optional.empty();
         }
