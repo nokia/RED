@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedLibraryKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedNotAccessibleLibraryKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedUserKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableOrigin;
@@ -59,8 +60,8 @@ public class AssistProposals {
         return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1).toString();
     }
 
-    static RedLibraryProposal createLibraryProposal(final RobotSuiteFile suiteFile,
-            final LibrarySpecification libSpec, final ProposalMatch match) {
+    static RedLibraryProposal createLibraryProposal(final RobotSuiteFile suiteFile, final LibrarySpecification libSpec,
+            final ProposalMatch match) {
 
         final String libraryName = libSpec.getName();
         final List<String> arguments = new ArrayList<>();
@@ -69,6 +70,17 @@ public class AssistProposals {
         }
         final boolean isImported = suiteFile.getImportedLibraries().containsKey(libSpec);
         return new RedLibraryProposal(libraryName, arguments, isImported, libSpec.getDocumentation(), match);
+    }
+
+    static RedKeywordProposal createNotAccessibleLibraryKeywordProposal(final LibrarySpecification spec,
+            final KeywordSpecification keyword, final String bddPrefix, final KeywordScope scope,
+            final String sourcePrefix, final IPath exposingFilepath,
+            final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
+
+        final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
+        return new RedNotAccessibleLibraryKeywordProposal(spec.getName(), sourcePrefix, scope, bddPrefix,
+                keyword.getName(), argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
+                shouldUseQualified, match);
     }
 
     static RedKeywordProposal createLibraryKeywordProposal(final LibrarySpecification spec,
@@ -116,7 +128,7 @@ public class AssistProposals {
         return new RedSettingProposal(settingName, target, match);
     }
 
-    static AssistProposal createNewVariableProposal(final VariableType type) {
+    static RedNewVariableProposal createNewVariableProposal(final VariableType type) {
         switch (type) {
             case SCALAR:
                 return new RedNewVariableProposal("${newScalar}", type, new ArrayList<String>(),
@@ -177,17 +189,17 @@ public class AssistProposals {
             public int compare(final RedVariableProposal proposal1, final RedVariableProposal proposal2) {
                 final char type1 = proposal1.getContent().charAt(0);
                 final char type2 = proposal2.getContent().charAt(0);
-                
+
                 if (type1 == type2) {
                     final boolean isBuiltIn1 = proposal1.getOrigin() == VariableOrigin.BUILTIN;
                     final boolean isBuiltIn2 = proposal2.getOrigin() == VariableOrigin.BUILTIN;
-                    
+
                     if (isBuiltIn1 == isBuiltIn2) {
                         return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
                     } else {
                         return isBuiltIn1 ? 1 : -1;
                     }
-                    
+
                 } else {
                     return Integer.compare(typesOrder.indexOf(type1), typesOrder.indexOf(type2));
                 }

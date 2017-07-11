@@ -146,7 +146,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
         @Override
         public Map<String, Collection<KeywordEntity>> collect() {
-            return context.collectAccessibleKeywordNames(file);
+            return context.collectAccessibleKeywords(file);
         }
     }
 
