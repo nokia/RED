@@ -10,13 +10,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContextInformation;
@@ -27,6 +27,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
@@ -71,20 +72,24 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                 .getKeywordProposals(prefix);
 
         final String separator = assist.getSeparatorToFollow();
-        final List<ICompletionProposal> proposals = newArrayList();
+        final List<ICompletionProposal> proposals = new ArrayList<>();
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-        for (final AssistProposal kwProposal : kwProposals) {
-            final List<String> args = atTheEndOfLine ? getArguments(kwProposal, lineContent) : new ArrayList<String>();
+        for (final RedKeywordProposal kwProposal : kwProposals) {
+            final List<String> args = atTheEndOfLine ? getArguments(kwProposal, lineContent) : new ArrayList<>();
             final String contentSuffix = args.isEmpty() ? "" : (separator + Joiner.on(separator).join(args));
 
-            final Position positionToReplace = new Position(offset - prefix.length(), cellLength);
-            final Collection<Runnable> operations = atTheEndOfLine ? createOperationsToPerformAfterAccepting(viewer,
-                    (KeywordEntity) kwProposal, positionToReplace.getOffset(), lineContent) : new ArrayList<Runnable>();
-            final DocumentationModification modification = new DocumentationModification(contentSuffix,
-                    positionToReplace, operations);
+            final Position toReplace = new Position(offset - prefix.length(), cellLength);
+
+            final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine
+                    ? calculateRegionsForLinkedMode(kwProposal, toReplace.getOffset(), lineContent)
+                    : new ArrayList<>();
+            final Collection<Runnable> operations = createOperationsToPerformAfterAccepting(regionsToLinkedEdit,
+                    kwProposal);
+            final DocumentationModification modification = new DocumentationModification(contentSuffix, toReplace,
+                    operations);
             final IContextInformation contextInfo = new ContextInformation(null,
-                    ((KeywordEntity) kwProposal).getArgumentsDescriptor().getDescription());
+                    kwProposal.getArgumentsDescriptor().getDescription());
             proposals.add(new RedCompletionProposalAdapter(kwProposal, modification, contextInfo));
         }
         return proposals;
@@ -92,28 +97,6 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     protected List<String> getArguments(final AssistProposal proposal, final String lineContent) {
         return proposal.getArguments();
-    }
-
-    private Collection<Runnable> createOperationsToPerformAfterAccepting(final ITextViewer viewer,
-            final KeywordEntity entity, final int startOffset, final String lineContent) {
-        final Runnable operation = new Runnable() {
-
-            @Override
-            public void run() {
-                final Collection<IRegion> regionsToLinkedEdit = calculateRegionsForLinkedMode(entity, startOffset,
-                        lineContent);
-                if (!regionsToLinkedEdit.isEmpty()) {
-                    SwtThread.asyncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
-                        }
-                    });
-                }
-            }
-        };
-        return newArrayList(operation);
     }
 
     @VisibleForTesting
@@ -153,5 +136,49 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             offset += requiredArg.length() + separatorLength;
         }
         return regions;
+    }
+
+    private Collection<Runnable> createOperationsToPerformAfterAccepting(final Collection<IRegion> regionsToLinkedEdit,
+            final RedKeywordProposal proposal) {
+        final Collection<Runnable> operations = new ArrayList<>();
+
+        if (!regionsToLinkedEdit.isEmpty()) {
+            operations.add(new Runnable() {
+
+                @Override
+                public void run() {
+                    SwtThread.asyncExec(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
+                        }
+                    });
+                }
+            });
+        }
+
+        if (!proposal.isAccessible()) {
+            operations.add(new Runnable() {
+
+                @Override
+                public void run() {
+                    SwtThread.asyncExec(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            final ImportLibraryFixer fixer = new ImportLibraryFixer(proposal.getSourceName());
+                            final Optional<ICompletionProposal> proposal = fixer.asContentProposal(null,
+                                    viewer.getDocument(), assist.getModel());
+                            if (proposal.isPresent()) {
+                                proposal.get().apply(viewer.getDocument());
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        return operations;
     }
 }
