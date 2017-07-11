@@ -177,7 +177,7 @@ public class RedKeywordProposals {
                 @Override
                 public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                         final KeywordSpecification kwSpec, final Set<String> libraryAliases,
-                        final RobotSuiteFile exposingFile) {
+                        final RobotSuiteFile exposingFile, final boolean isAccessible) {
                     final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                             : KeywordScope.STD_LIBRARY;
 
@@ -197,10 +197,15 @@ public class RedKeywordProposals {
                                 keywordName);
 
                         if (keywordMatch.getMatch().isPresent()) {
-                            final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(libSpec,
-                                    kwSpec, keywordMatch.getBddPrefix(), scope, aliasToUse,
-                                    exposingFile.getFile().getFullPath(), shouldUseQualifiedName,
-                                    keywordMatch.getMatch().get());
+                            final RedKeywordProposal proposal = isAccessible
+                                    ? AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec,
+                                            keywordMatch.getBddPrefix(), scope, aliasToUse,
+                                            exposingFile.getFile().getFullPath(), shouldUseQualifiedName,
+                                            keywordMatch.getMatch().get())
+                                    : AssistProposals.createNotAccessibleLibraryKeywordProposal(libSpec, kwSpec,
+                                            keywordMatch.getBddPrefix(), scope, aliasToUse,
+                                            exposingFile.getFile().getFullPath(), shouldUseQualifiedName,
+                                            keywordMatch.getMatch().get());
                             addAccessibleKeyword(keywordName, proposal);
                         } else {
                             final String qualifiedName = aliasToUse + "." + keywordName;
@@ -212,11 +217,15 @@ public class RedKeywordProposals {
                                         .mapAndShiftToFragment(aliasToUse.length() + 1, keywordName.length());
 
                                 if (inLabelMatch.isPresent()) {
-                                    final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(
-                                            libSpec, kwSpec, qualifiedKeywordMatch.getBddPrefix(), scope, aliasToUse,
-                                            exposingFile.getFile().getFullPath(),
-                                            AssistProposalPredicates.<RedKeywordProposal> alwaysTrue(),
-                                            inLabelMatch.get());
+                                    final RedKeywordProposal proposal = isAccessible
+                                            ? AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec,
+                                                    qualifiedKeywordMatch.getBddPrefix(), scope, aliasToUse,
+                                                    exposingFile.getFile().getFullPath(),
+                                                    AssistProposalPredicates.alwaysTrue(), inLabelMatch.get())
+                                            : AssistProposals.createNotAccessibleLibraryKeywordProposal(libSpec, kwSpec,
+                                                    qualifiedKeywordMatch.getBddPrefix(), scope, aliasToUse,
+                                                    exposingFile.getFile().getFullPath(),
+                                                    AssistProposalPredicates.alwaysTrue(), inLabelMatch.get());
                                     addAccessibleKeyword(keywordName, proposal);
                                 }
                             }
@@ -254,7 +263,7 @@ public class RedKeywordProposals {
                             if (inLabelMatch.isPresent()) {
                                 final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(keyword,
                                         qualifiedKeywordMatch.getBddPrefix(), scope, alias,
-                                        AssistProposalPredicates.<RedKeywordProposal> alwaysTrue(), inLabelMatch.get());
+                                        AssistProposalPredicates.alwaysTrue(), inLabelMatch.get());
                                 addAccessibleKeyword(keywordName, proposal);
                             }
                         }
@@ -266,7 +275,7 @@ public class RedKeywordProposals {
                     final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
 
                     if (!accessibleKeywords.containsKey(unifiedName)) {
-                        accessibleKeywords.put(unifiedName, new LinkedHashSet<KeywordEntity>());
+                        accessibleKeywords.put(unifiedName, new LinkedHashSet<>());
                     }
                     accessibleKeywords.get(unifiedName).add(keyword);
                 }

@@ -162,17 +162,17 @@ abstract class HyperlinksToKeywordsDetector {
 
         @Override
         public Map<String, Collection<KeywordEntity>> collect() {
-            return collectAccessibleKeywordNames(file);
+            return collectAccessibleKeywords(file);
         }
 
-        private Map<String, Collection<KeywordEntity>> collectAccessibleKeywordNames(final IFile file) {
+        private Map<String, Collection<KeywordEntity>> collectAccessibleKeywords(final IFile file) {
             final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
             new KeywordDefinitionLocator(file, model).locateKeywordDefinition(new KeywordDetector() {
 
                 @Override
                 public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                         final KeywordSpecification kwSpec, final Set<String> libraryAliases,
-                        final RobotSuiteFile exposingFile) {
+                        final RobotSuiteFile exposingFile, final boolean isAccessible) {
 
                     final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                             : KeywordScope.STD_LIBRARY;
