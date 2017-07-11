@@ -5,10 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newLinkedHashSet;
+import static java.util.stream.Collectors.toCollection;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -35,47 +35,45 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.collect.Iterables;
-
 /**
  * @author Michal Anglart
  */
 public class ImportLibraryFixer extends RedSuiteMarkerResolution {
 
     public static Collection<IMarkerResolution> createFixers(final IFile file, final String keywordName) {
-        final RobotProject project = RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
-
-        final Set<String> libs = newLinkedHashSet();
-        new KeywordDefinitionLocator(file, new RobotModel()).locateKeywordDefinitionInLibraries(project,
-                createKeywordsDetector(keywordName, libs));
-
-        return newArrayList(Iterables.transform(libs, libName -> new ImportLibraryFixer(libName)));
+        final Collection<String> libNames = collectNotImportedLibraryNames(file, keywordName);
+        return libNames.stream().map(libName -> new ImportLibraryFixer(libName)).collect(toCollection(ArrayList::new));
     }
 
-    private static KeywordDetector createKeywordsDetector(final String keywordName, final Set<String> libs) {
-        return new KeywordDetector() {
+    private static Collection<String> collectNotImportedLibraryNames(final IFile file, final String keywordName) {
+        final RobotModel model = RedPlugin.getModelManager().getModel();
+        final Set<String> libs = new LinkedHashSet<>();
+        new KeywordDefinitionLocator(file, model)
+                .locateKeywordDefinitionInLibraries(model.createRobotProject(file.getProject()), new KeywordDetector() {
 
-            @Override
-            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                    final RobotSuiteFile exposingFile) {
-                if (QualifiedKeywordName.fromOccurrence(keywordName).matchesIgnoringCase(QualifiedKeywordName
-                        .create(QualifiedKeywordName.unifyDefinition(kwSpec.getName()), libSpec.getName()))) {
-                    libs.add(libSpec.getName());
-                }
-                return ContinueDecision.CONTINUE;
-            }
+                    @Override
+                    public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+                            final KeywordSpecification kwSpec, final Set<String> libraryAlias,
+                            final RobotSuiteFile exposingFile, final boolean isAccessible) {
+                        if (QualifiedKeywordName.fromOccurrence(keywordName).matchesIgnoringCase(QualifiedKeywordName
+                                .create(QualifiedKeywordName.unifyDefinition(kwSpec.getName()), libSpec.getName()))) {
+                            libs.add(libSpec.getName());
+                        }
+                        return ContinueDecision.CONTINUE;
+                    }
 
-            @Override
-            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
-                return ContinueDecision.CONTINUE;
-            }
-        };
+                    @Override
+                    public ContinueDecision keywordDetected(final RobotSuiteFile file,
+                            final RobotKeywordDefinition keyword) {
+                        return ContinueDecision.CONTINUE;
+                    }
+                });
+        return libs;
     }
 
     private final String libName;
 
-    private ImportLibraryFixer(final String libName) {
+    public ImportLibraryFixer(final String libName) {
         this.libName = libName;
     }
 
@@ -96,16 +94,15 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
             try {
                 final IRegion lineInformation = document.getLineInformation(line - 1);
                 final int offset = lineInformation.getOffset() + lineInformation.getLength();
-                return Optional
-                        .<ICompletionProposal> of(new CompletionProposal(lineToInsert, offset, 0, lineToInsert.length(),
-                                ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null));
+                return Optional.of(new CompletionProposal(lineToInsert, offset, 0, lineToInsert.length(),
+                        ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null));
             } catch (final BadLocationException e) {
                 return Optional.empty();
             }
 
         } else {
             final String toInsert = "*** Settings ***" + lineToInsert + lineDelimiter + lineDelimiter;
-            return Optional.<ICompletionProposal> of(new CompletionProposal(toInsert, 0, 0, toInsert.length(),
+            return Optional.of(new CompletionProposal(toInsert, 0, 0, toInsert.length(),
                     ImagesManager.getImage(RedImages.getBookImage()), getLabel(), null, null));
         }
     }

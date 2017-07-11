@@ -52,9 +52,9 @@ public class SourceHyperlinksToFilesDetector extends HyperlinksToFilesDetector i
             }
             final IRegion fromRegion = hyperlinkRegion.get();
             final String pathAsString = document.get(fromRegion.getOffset(), fromRegion.getLength());
-            final boolean isLibraryImprort = lineContent.trim().toLowerCase().startsWith("library");
+            final boolean isLibraryImport = lineContent.trim().toLowerCase().startsWith("library");
 
-            final List<IHyperlink> hyperlinks = detectHyperlinks(suiteFile, fromRegion, pathAsString, isLibraryImprort);
+            final List<IHyperlink> hyperlinks = detectHyperlinks(suiteFile, fromRegion, pathAsString, isLibraryImport);
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
         } catch (final BadLocationException e) {
             return null;

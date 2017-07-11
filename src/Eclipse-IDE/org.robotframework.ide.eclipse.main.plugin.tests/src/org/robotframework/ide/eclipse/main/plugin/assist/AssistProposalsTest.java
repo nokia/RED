@@ -75,7 +75,7 @@ public class AssistProposalsTest {
         final RobotKeywordDefinition kw1 = fileModel.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
 
         final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(kw1, "Given ", KeywordScope.LOCAL,
-                "suite", AssistProposalPredicates.<RedKeywordProposal> alwaysFalse(), ProposalMatch.EMPTY);
+                "suite", AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Given kw1");
         assertThat(proposal.getSourceName()).isEqualTo("suite");
@@ -85,6 +85,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("kw1 - suite.robot");
         assertThat(proposal.hasDescription()).isTrue();
         assertThat(proposal.getDescription()).contains("myDocumentation");
+        assertThat(proposal.isAccessible()).isTrue();
     }
 
     @Test
@@ -98,8 +99,8 @@ public class AssistProposalsTest {
         kwSpec.setDocumentation("myDocumentation");
 
         final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "Given ",
-                KeywordScope.STD_LIBRARY, "myLibrary", new Path("lib.py"),
-                AssistProposalPredicates.<RedKeywordProposal> alwaysFalse(), ProposalMatch.EMPTY);
+                KeywordScope.STD_LIBRARY, "myLibrary", new Path("test.robot"), AssistProposalPredicates.alwaysFalse(),
+                ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Given libKw");
         assertThat(proposal.getSourceName()).isEqualTo("myLibrary");
@@ -109,6 +110,32 @@ public class AssistProposalsTest {
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("libKw - myLibrary");
         assertThat(proposal.hasDescription()).isTrue();
         assertThat(proposal.getDescription()).contains("myDocumentation");
+        assertThat(proposal.isAccessible()).isTrue();
+    }
+
+    @Test
+    public void verifyKeywordProposalPropertiesMadeFromNotImportedLibraryKeyword() throws Exception, CoreException {
+        final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setName("myNotImportedLibrary");
+        final KeywordSpecification kwSpec = new KeywordSpecification();
+        kwSpec.setFormat("ROBOT");
+        kwSpec.setName("libKw");
+        kwSpec.setArguments(newArrayList("x", "*list"));
+        kwSpec.setDocumentation("myDocumentation");
+
+        final RedKeywordProposal proposal = AssistProposals.createNotAccessibleLibraryKeywordProposal(libSpec, kwSpec,
+                "Given ", KeywordScope.STD_LIBRARY, "myNotImportedLibrary", new Path("test.robot"),
+                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+
+        assertThat(proposal.getContent()).isEqualTo("Given libKw");
+        assertThat(proposal.getSourceName()).isEqualTo("myNotImportedLibrary");
+        assertThat(proposal.getArguments()).containsExactly("x", "");
+        assertThat(proposal.getArgumentsDescriptor()).isEqualTo(ArgumentsDescriptor.createDescriptor("x", "*list"));
+        assertThat(proposal.getImage()).isEqualTo(RedImages.getKeywordImage());
+        assertThat(proposal.getStyledLabel().getString()).isEqualTo("libKw - myNotImportedLibrary");
+        assertThat(proposal.hasDescription()).isTrue();
+        assertThat(proposal.getDescription()).contains("myDocumentation");
+        assertThat(proposal.isAccessible()).isFalse();
     }
 
     @Test
@@ -313,7 +340,7 @@ public class AssistProposalsTest {
 
     @Test
     public void verifyNewScalarProposalProperties() {
-        final AssistProposal proposal = AssistProposals.createNewVariableProposal(VariableType.SCALAR);
+        final RedNewVariableProposal proposal = AssistProposals.createNewVariableProposal(VariableType.SCALAR);
         assertThat(proposal.getContent()).isEqualTo("${newScalar}");
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
@@ -324,7 +351,7 @@ public class AssistProposalsTest {
 
     @Test
     public void verifyNewListProposalProperties() {
-        final AssistProposal proposal = AssistProposals.createNewVariableProposal(VariableType.LIST);
+        final RedNewVariableProposal proposal = AssistProposals.createNewVariableProposal(VariableType.LIST);
         assertThat(proposal.getContent()).isEqualTo("@{newList}");
         assertThat(proposal.getArguments()).containsExactly("item");
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotListVariableImage());
@@ -335,7 +362,7 @@ public class AssistProposalsTest {
 
     @Test
     public void verifyNewDictionaryProposalProperties() {
-        final AssistProposal proposal = AssistProposals.createNewVariableProposal(VariableType.DICTIONARY);
+        final RedNewVariableProposal proposal = AssistProposals.createNewVariableProposal(VariableType.DICTIONARY);
         assertThat(proposal.getContent()).isEqualTo("&{newDict}");
         assertThat(proposal.getArguments()).containsExactly("key=value");
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotDictionaryVariableImage());

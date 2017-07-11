@@ -14,8 +14,8 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 public class RedNewVariableProposals {
 
-    public List<? extends AssistProposal> getNewVariableProposals() {
-        final List<AssistProposal> proposals = new ArrayList<>();
+    public List<RedNewVariableProposal> getNewVariableProposals() {
+        final List<RedNewVariableProposal> proposals = new ArrayList<>();
 
         for (final VariableType type : newArrayList(VariableType.SCALAR, VariableType.LIST, VariableType.DICTIONARY)) {
             proposals.add(AssistProposals.createNewVariableProposal(type));

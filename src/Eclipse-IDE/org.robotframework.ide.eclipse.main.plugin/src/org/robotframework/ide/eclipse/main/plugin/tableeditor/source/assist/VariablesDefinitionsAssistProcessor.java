@@ -15,11 +15,9 @@ import java.util.Optional;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -28,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
 import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
 import org.robotframework.red.swt.SwtThread;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
 /**
@@ -72,31 +69,36 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
 
+        final List<RedNewVariableProposal> newVariableProposals = new RedNewVariableProposals()
+                .getNewVariableProposals();
+
         final String separator = assist.getSeparatorToFollow();
-        final List<ICompletionProposal> proposals = newArrayList();
+        final List<ICompletionProposal> proposals = new ArrayList<>();
 
-        for (final AssistProposal newVarProposal : new RedNewVariableProposals().getNewVariableProposals()) {
+        final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+        for (final RedNewVariableProposal newVarProposal : newVariableProposals) {
             final List<String> args = newVarProposal.getArguments();
-            final String additionalContent = atTheEndOfLine
-                    ? separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args) + separator) : "";
+            final String contentSuffix = atTheEndOfLine
+                    ? separator + (args.isEmpty() ? "" : String.join(separator, args) + separator)
+                    : "";
 
+            final Position toReplace = new Position(offset - prefix.length(), cellLength);
             final Position toSelect = new Position(offset - prefix.length() + 2,
                     newVarProposal.getContent().length() - 3);
 
-            final IRegion lineInfo = document.getLineInformationOfOffset(offset);
-            final Collection<IRegion> regions = atTheEndOfLine
-                    ? getLinkedModeRegions(lineInfo, (RedNewVariableProposal) newVarProposal)
-                    : new ArrayList<IRegion>();
-            final Collection<Runnable> operations = createOperationsToPerformAfterAccepting(viewer, regions);
-            final DocumentationModification modification = new DocumentationModification(additionalContent,
-                    new Position(offset - prefix.length(), cellLength), toSelect, operations);
+            final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine
+                    ? calculateRegionsForLinkedMode(newVarProposal, lineInfo)
+                    : new ArrayList<>();
+            final Collection<Runnable> operations = createOperationsToPerformAfterAccepting(regionsToLinkedEdit);
+            final DocumentationModification modification = new DocumentationModification(contentSuffix, toReplace,
+                    toSelect, operations);
             proposals.add(new RedCompletionProposalAdapter(newVarProposal, modification));
         }
         return proposals;
     }
 
-    private Collection<IRegion> getLinkedModeRegions(final IRegion lineInformation,
-            final RedNewVariableProposal proposal) {
+    private Collection<IRegion> calculateRegionsForLinkedMode(final RedNewVariableProposal proposal,
+            final IRegion lineInformation) {
         final int startingOffset = lineInformation.getOffset();
         final int separatorLength = assist.getSeparatorToFollow().length();
         int offset = startingOffset + proposal.getContent().length() + separatorLength;
@@ -130,7 +132,7 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
         return linkedModeRegions;
     }
 
-    private Collection<Runnable> createOperationsToPerformAfterAccepting(final ITextViewer viewer,
+    private Collection<Runnable> createOperationsToPerformAfterAccepting(
             final Collection<IRegion> regionsToLinkedEdit) {
         if (regionsToLinkedEdit.isEmpty()) {
             return new ArrayList<>();

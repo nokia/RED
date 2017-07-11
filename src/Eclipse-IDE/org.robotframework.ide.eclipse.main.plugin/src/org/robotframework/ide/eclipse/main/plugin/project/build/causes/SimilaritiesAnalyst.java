@@ -72,18 +72,18 @@ class SimilaritiesAnalyst {
     }
 
     Collection<String> provideSimilarAccessibleKeywords(final IFile suiteFile, final String keywordName) {
-        final Collection<String> allNames = getAccessibleKeywords(suiteFile);
+        final Collection<String> allNames = collectAccessibleKeywordNames(suiteFile);
         return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allNames, keywordName, maximumDistance));
     }
 
-    private Collection<String> getAccessibleKeywords(final IFile suiteFile) {
+    private Collection<String> collectAccessibleKeywordNames(final IFile suiteFile) {
         final Set<String> names = new LinkedHashSet<>();
         new KeywordDefinitionLocator(suiteFile).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                    final RobotSuiteFile exposingFile) {
+                    final RobotSuiteFile exposingFile, final boolean isAccessible) {
                 names.add(kwSpec.getName());
                 return ContinueDecision.CONTINUE;
             }
@@ -99,11 +99,11 @@ class SimilaritiesAnalyst {
 
     Collection<String> provideSimilarAccessibleVariables(final IFile suiteFile, final int offset,
             final String varName) {
-        final Collection<String> allNames = getAccessibleVariables(suiteFile, offset);
+        final Collection<String> allNames = collectAccessibleVariableNames(suiteFile, offset);
         return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allNames, varName, maximumDistance));
     }
 
-    private Collection<String> getAccessibleVariables(final IFile suiteFile, final int offset) {
+    private Collection<String> collectAccessibleVariableNames(final IFile suiteFile, final int offset) {
         final Set<String> names = new LinkedHashSet<>();
         new VariableDefinitionLocator(suiteFile).locateVariableDefinitionWithLocalScope(new VariableDetector() {
 
