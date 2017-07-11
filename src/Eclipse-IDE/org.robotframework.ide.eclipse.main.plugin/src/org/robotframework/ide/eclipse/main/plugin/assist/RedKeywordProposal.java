@@ -5,11 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -76,8 +74,10 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
         if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(getNameFromDefinition())) {
             return new ArrayList<>();
         } else {
-            final List<String> arguments = newArrayList(
-                    transform(getArgumentsDescriptor().getRequiredArguments(), Argument::getName));
+            final List<String> arguments = getArgumentsDescriptor().getRequiredArguments()
+                    .stream()
+                    .map(Argument::getName)
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             final Range<Integer> noOfArgs = getArgumentsDescriptor().getPossibleNumberOfArguments();
             final boolean mayHaveMoreArguments = !noOfArgs.hasUpperBound()
@@ -118,6 +118,10 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
         builder.append(documentation);
 
         return builder.toString();
+    }
+
+    public boolean isAccessible() {
+        return true;
     }
 
     protected abstract String getSourceDescription();
@@ -186,6 +190,23 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
             } else {
                 return "Library (" + getAlias() + " - alias for " + getSourceName() + ")";
             }
+        }
+    }
+
+    static class RedNotAccessibleLibraryKeywordProposal extends RedLibraryKeywordProposal {
+
+        RedNotAccessibleLibraryKeywordProposal(final String sourceName, final String sourceAlias,
+                final KeywordScope scope, final String bddPrefix, final String name,
+                final ArgumentsDescriptor argumentsDescriptor, final String documentation, final boolean isDeprecated,
+                final IPath exposingFilePath, final Predicate<RedKeywordProposal> shouldUseQualifiedName,
+                final ProposalMatch match) {
+            super(sourceName, sourceAlias, scope, bddPrefix, name, argumentsDescriptor, documentation, isDeprecated,
+                    exposingFilePath, shouldUseQualifiedName, match);
+        }
+
+        @Override
+        public boolean isAccessible() {
+            return false;
         }
     }
 }
