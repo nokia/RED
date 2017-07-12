@@ -9,9 +9,12 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
+import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.FindElementUsagesHandler.E4FindUsagesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.FindUsagesHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -32,9 +35,22 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
 
             final RobotFileInternalElement element = Selections.getSingleElement(selection,
                     RobotFileInternalElement.class);
-            final String name = element.getName();
 
-            FindUsagesHandler.findElements(place, editor, name);
+            int row = 0, column = 0;
+
+            final SelectionLayerAccessor accessor = editor.getSelectionLayerAccessor();
+            final IDataProvider dataProvider = accessor.getDataProvider();
+            final PositionCoordinate[] positions = accessor.getSelectedPositions();
+
+            if (positions.length == 1) {
+                row = positions[0].getRowPosition();
+                column = positions[0].getColumnPosition();
+                FindUsagesHandler.findElements(place, editor, (String) dataProvider.getDataValue(column, row));
+            } else {
+                final String name = element.getName();
+                FindUsagesHandler.findElements(place, editor, name);
+            }
+
         }
 
     }
