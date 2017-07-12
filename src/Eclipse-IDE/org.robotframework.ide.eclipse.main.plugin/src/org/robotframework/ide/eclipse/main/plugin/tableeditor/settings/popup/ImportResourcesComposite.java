@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -231,7 +230,7 @@ public class ImportResourcesComposite {
         for (final String newPathString : paths) {
             final IPath newPath = new Path(newPathString);
             if (!currentPaths.contains(newPath) && !newPathString.isEmpty()) {
-                final ArrayList<String> args = newArrayList(newPathString);
+                final List<String> args = newArrayList(newPathString);
                 commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Resource", args));
                 currentPaths.add(newPath);
             }
@@ -292,16 +291,16 @@ public class ImportResourcesComposite {
     }
     
     private static class ResourcesLabelProvider extends StyledCellLabelProvider {
-        
+
         @Override
         public void update(final ViewerCell cell) {
-            
+
             final StyledString label = getStyledText(cell.getElement());
             cell.setText(label.getString());
             cell.setStyleRanges(label.getStyleRanges());
-            
+
             cell.setImage(getImage(cell.getElement()));
-            
+
             super.update(cell);
         }
 

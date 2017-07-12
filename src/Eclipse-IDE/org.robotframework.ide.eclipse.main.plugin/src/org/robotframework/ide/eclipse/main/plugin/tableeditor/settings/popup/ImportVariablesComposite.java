@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -103,7 +102,7 @@ public class ImportVariablesComposite {
         variablesViewer.setContentProvider(new ImportVariablesContentProvider());
         variablesViewer.setLabelProvider(new VariablesLabelProvider());
         GridDataFactory.fillDefaults().grab(true, true).hint(220, 250).applyTo(variablesViewer.getControl());
-        
+
         final Composite addVariablesButtons = formToolkit.createComposite(variablesComposite);
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(addVariablesButtons);
         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(addVariablesButtons);
@@ -270,7 +269,7 @@ public class ImportVariablesComposite {
                 .getImportedVariablesArguments();
         for (final String newPathString : paths) {
             if (!newPathString.isEmpty()) {
-                final ArrayList<String> args = newArrayList(newPathString);
+                final List<String> args = newArrayList(newPathString);
                 commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Variables", args));
                 currentVariables.add(new ImportArguments(args));
             }
@@ -353,16 +352,16 @@ public class ImportVariablesComposite {
     }
 
     private static class VariablesLabelProvider extends StyledCellLabelProvider {
-        
+
         @Override
         public void update(final ViewerCell cell) {
-            
+
             final StyledString label = getStyledText(cell.getElement());
             cell.setText(label.getString());
             cell.setStyleRanges(label.getStyleRanges());
 
             cell.setImage(getImage(cell.getElement()));
-            
+
             super.update(cell);
         }
 
