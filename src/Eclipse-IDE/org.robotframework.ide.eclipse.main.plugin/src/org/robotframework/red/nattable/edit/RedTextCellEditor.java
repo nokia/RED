@@ -116,7 +116,7 @@ public class RedTextCellEditor extends TextCellEditor {
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
         // workaround: switching off the focus listener during activation; this was causing
-        // some incosistent state where newly created cell editor was not responsive
+        // some inconsistent state where newly created cell editor was not responsive
         ((InlineFocusListener) focusListener).handleFocusChanges = false;
 
         final Text text = (Text) super.activateCell(parent, originalCanonicalValue);

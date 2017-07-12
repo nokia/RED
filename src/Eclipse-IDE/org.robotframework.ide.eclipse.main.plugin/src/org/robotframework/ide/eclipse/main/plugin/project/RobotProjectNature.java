@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -35,7 +35,7 @@ public class RobotProjectNature implements IProjectNature {
     public static void addRobotNature(final IProject project, final IProgressMonitor monitor) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
-        final ArrayList<String> natures = newArrayList(desc.getNatureIds());
+        final List<String> natures = newArrayList(desc.getNatureIds());
         natures.add(ROBOT_NATURE);
         desc.setNatureIds(natures.toArray(new String[0]));
 
@@ -46,7 +46,7 @@ public class RobotProjectNature implements IProjectNature {
             final boolean removeRedXml) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
-        final ArrayList<String> natures = newArrayList(desc.getNatureIds());
+        final List<String> natures = newArrayList(desc.getNatureIds());
         natures.remove(ROBOT_NATURE);
         desc.setNatureIds(natures.toArray(new String[0]));
 
