@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -448,7 +447,7 @@ public class ImportLibraryComposite {
 
         final Optional<RobotSettingsSection> section = fileModel.findSection(RobotSettingsSection.class);
         for (final LibrarySpecification spec : specs) {
-            final ArrayList<String> args = newArrayList(spec.getName());
+            final List<String> args = newArrayList(spec.getName());
             if (spec.isRemote()) {
                 String host = spec.getSecondaryKey();
                 if (!host.startsWith("http://")) {

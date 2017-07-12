@@ -28,11 +28,9 @@ public abstract class EditorCommand {
     public abstract void execute() throws CommandExecutionException;
 
     public List<EditorCommand> getUndoCommands() {
-        final List<EditorCommand> commands = newArrayList();
-        commands.add(new EmptyCommand());
-        return commands;
+        return newArrayList(new EmptyCommand());
     }
-    
+
     public EditorCommand getParent() {
         return parent;
     }

@@ -15,7 +15,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -145,7 +144,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testExecutableRowCRUD() {
-        final ArrayList<String> execArgs = newArrayList("arg1", "arg2");
+        final List<String> execArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
         final String keywordName = "call";
 
@@ -169,7 +168,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(executable.getArguments(), execArgs, executable.getComment(), newComment);
 
-        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        final List<String> newArgs = newArrayList("1", "2", "3");
         modelUpdater.setArguments(executable, newArgs);
 
         checkSetting(executable.getArguments(), newArgs, executable.getComment(), newComment);
@@ -203,7 +202,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
 
-        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        final List<String> newArgs = newArrayList("1", "2", "3");
         modelUpdater.setArguments(setting, newArgs);
 
         checkSetting(setting.getArguments(), newArgs, setting.getComment(), newComment);
@@ -268,7 +267,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getTags(), settingArgs, setting.getComment(), newComment);
 
-        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        final List<String> newArgs = newArrayList("1", "2", "3");
         modelUpdater.setArguments(setting, newArgs);
 
         checkSetting(setting.getTags(), newArgs, setting.getComment(), newComment);
@@ -383,7 +382,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getReturnValues(), settingArgs, setting.getComment(), newComment);
 
-        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        final List<String> newArgs = newArrayList("1", "2", "3");
         modelUpdater.setArguments(setting, newArgs);
 
         checkSetting(setting.getReturnValues(), newArgs, setting.getComment(), newComment);
@@ -410,7 +409,7 @@ public class KeywordTableModelUpdaterTest {
 
     @Test
     public void testUnknownCRUD() {
-        final ArrayList<String> settingArgs = newArrayList("arg1", "arg2");
+        final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
         final String keywordSettingName = "[Unknown]";
 
