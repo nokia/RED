@@ -50,9 +50,7 @@ public class FindElementUsagesInTextHandler extends DIParameterizedHandler<E4Fin
                         offset);
 
                 selectedText = doc.get(token.get().getOffset(), token.get().getLength());
-                // token = doc.getLineInformation(doc.getLineOfOffset(offset));
-                // selectedText = DocumentUtilities.getFirstTokenInLine(doc, isTSV,
-                // token.getOffset());
+
             }
             if (!selectedText.isEmpty()) {
                 FindUsagesHandler.findElements(place, editor, selectedText);
