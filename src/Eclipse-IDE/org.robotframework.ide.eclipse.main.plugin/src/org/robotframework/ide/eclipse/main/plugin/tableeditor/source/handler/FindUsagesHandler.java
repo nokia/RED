@@ -10,16 +10,20 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.search.ui.ISearchQuery;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.TextSearchQueryProvider;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 public class FindUsagesHandler {
 
-    public static void findElements(final String place, IFile file, final String selectedText) {
-
+    public static void findElements(final String place, RobotFormEditor editor, final String selectedText) {
+        IFile file = getUnderlayingfile(editor);
         try {
             final List<IResource> resourcesToLookInto;
             if ("workspace".equals(place)) {
@@ -64,4 +68,15 @@ public class FindUsagesHandler {
         return resources;
     }
 
+    public static boolean isTSV(RobotFormEditor editor) {
+        IFile file = getUnderlayingfile(editor);
+        return file.getFileExtension().equals("tsv");
+    }
+
+    private static IFile getUnderlayingfile(RobotFormEditor editor) {
+        final IEditorInput input = editor.getEditorInput();
+        final FileEditorInput editorfile = (FileEditorInput) input;
+        final IPath path = editorfile.getPath();
+        return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+    }
 }
