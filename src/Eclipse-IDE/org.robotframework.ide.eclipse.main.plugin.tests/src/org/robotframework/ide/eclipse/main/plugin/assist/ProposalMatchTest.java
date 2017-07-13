@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.red.junit.Conditions.absent;
-import static org.robotframework.red.junit.Conditions.containing;
 
 import org.junit.Test;
 
@@ -42,7 +40,7 @@ public class ProposalMatchTest {
     public void matchesHashCodeIsBuildFromRanges() {
         final int hashcode1 = new ProposalMatch(Range.closedOpen(2, 5), Range.closedOpen(7, 10)).hashCode();
         final int hashcode2 = newArrayList(Range.closedOpen(2, 5), Range.closedOpen(7, 10)).hashCode();
-        
+
         assertThat(hashcode1).isEqualTo(hashcode2);
     }
 
@@ -50,23 +48,23 @@ public class ProposalMatchTest {
     public void emptyMatchMappingAlwaysResultsInEmptyMatch() {
         final ProposalMatch match = new ProposalMatch();
 
-        assertThat(match.mapAndShiftToFragment(0, 10)).is(absent());
-        assertThat(match.mapAndShiftToFragment(100, 30)).is(absent());
-        assertThat(match.mapAndShiftToFragment(1, 5)).is(absent());
+        assertThat(match.mapAndShiftToFragment(0, 10)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(100, 30)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(1, 5)).isNotPresent();
     }
 
     @Test
     public void singleRangeMatchMappingProperly() {
         final ProposalMatch match = new ProposalMatch(Range.closedOpen(5, 10));
-        
-        assertThat(match.mapAndShiftToFragment(0, 3)).is(absent());
-        assertThat(match.mapAndShiftToFragment(0, 4)).is(absent());
-        assertThat(match.mapAndShiftToFragment(0, 5)).is(containing(new ProposalMatch(Range.closedOpen(5, 5))));
-        assertThat(match.mapAndShiftToFragment(2, 5)).is(containing(new ProposalMatch(Range.closedOpen(3, 5))));
-        assertThat(match.mapAndShiftToFragment(4, 8)).is(containing(new ProposalMatch(Range.closedOpen(1, 6))));
-        assertThat(match.mapAndShiftToFragment(6, 3)).is(containing(new ProposalMatch(Range.closedOpen(0, 3))));
-        assertThat(match.mapAndShiftToFragment(6, 8)).is(containing(new ProposalMatch(Range.closedOpen(0, 4))));
-        assertThat(match.mapAndShiftToFragment(10, 5)).is(containing(new ProposalMatch(Range.closedOpen(0, 0))));
-        assertThat(match.mapAndShiftToFragment(15, 5)).is(absent());
+
+        assertThat(match.mapAndShiftToFragment(0, 3)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(0, 4)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(0, 5)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(5, 5)));
+        assertThat(match.mapAndShiftToFragment(2, 5)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(3, 5)));
+        assertThat(match.mapAndShiftToFragment(4, 8)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(1, 6)));
+        assertThat(match.mapAndShiftToFragment(6, 3)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 3)));
+        assertThat(match.mapAndShiftToFragment(6, 8)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
+        assertThat(match.mapAndShiftToFragment(10, 5)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
+        assertThat(match.mapAndShiftToFragment(15, 5)).isNotPresent();
     }
 }
