@@ -1,0 +1,210 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _IB9MYEqpEeeaDot5BUIDGA
+Element-Name: ReferancesFromContextMenuInTables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _sEs4MGcAEeeb6u3hKfecxQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/13/17 9:40 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open test file from first project
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+// add second test
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 16 32
+    key-type Enter
+    key-type BackSpace -times 4
+    type-text "secondTest 1"
+    key-type Enter
+    type-text "TestKW word"
+    key-type Enter
+    type-text "TestKW2"
+}
+// save it
+get-eclipse-window | key-type "M1+s"
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+// go to workspace referances of Collections.Sort List
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/testcase/Collections.Sort List" | double-click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Right
+    get-menu "References/Workspace" | click
+}
+// expand tree in Search tab
+get-view Search | get-button "Expand All" | click
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getTopItem().getText()" | equals RobotProject | verify-true
+    get-property "getTopItem().getItems().TreeItem[0].getText()" | equals "TestFile.robot (2 matches)" | verify-true
+    get-property "getTopItem().getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "15: Collections.Sort List    ${list}" | verify-true
+    get-property "getTopItem().getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+    get-property "getTopItem().getItems().TreeItem[1].getText()" | equals "TestFile2.robot (2 matches)" | verify-true
+    get-property "getTopItem().getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "14: Collections.Sort List    ${list}" | verify-true
+    get-property "getTopItem().getItems().TreeItem[1].getItems().TreeItem[1].getText()" | equals "15: Log    ${list}" 
+        | verify-true
+}
+// go to workspace referances of TestKW word in Test Cases
+with [get-view Outline | get-tree] {
+    select "TestFile.robot/Test Cases/secondTest 1" | double-click
+    select "TestFile.robot/Test Cases/secondTest 1/TestKW word" | double-click
+}
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Right
+    key-type Left
+    get-menu "References/Workspace" | click
+}
+// expand tree in Search tab
+get-view Search | get-button "Expand All" | click
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "8: TestKW word" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "18: TestKW word" | verify-true
+}
+// comment one line
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type "M1+/"
+    key-type "M1+s"
+}
+// go to workspace referances of TestKW word in Test Cases
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/testcase/Log" | double-click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Right -times 2
+    get-menu "References/Workspace" | click
+}
+// expand tree in Search tab
+get-view Search | get-button "Expand All" | click
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getTopItem().getText()" | equals RobotProject | verify-true
+    get-property "getTopItem().getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" | verify-true
+    get-property "getTopItem().getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "8: TestKW word" 
+        | verify-true
+    get-property "getTopItem().getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+    get-property "getTopItem().getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "18: # TestKW word" 
+        | verify-true
+}
+// go to workspace referances of TestKW word in Keywords
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "TestFile.robot/Keywords/TestKW word" | double-click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Left
+    get-menu "References/Workspace" | click
+}
+// expand tree in Search tabS
+get-view Search | get-button "Expand All" | click
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "8: TestKW word" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "18: # TestKW word" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals RobotProject2 | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "TestFile.robot (2 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "8: TestKW word" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+}
+// go to workspace referances of [Create List, 1, 3, 2] word in Variable
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+get-view Outline | get-tree | select "TestFile.robot/Variables/list" | double-click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
+    key-type Right
+    get-menu "References/Workspace" | click
+}
+// verify 0 matches in Search tab
+get-view Search | get-link "'[Create List, 1, 3, 2]' - 0 matches in '.project', 'TestFile.robot', ..." 
+    | get-property caption | equals "'[Create List, 1, 3, 2]' - 0 matches in '.project', 'TestFile.robot', ..." 
+    | verify-true
+get-view Outline | get-tree | select "TestFile.robot/Variables/x" | double-click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
+    key-type Right
+    get-menu "References/Project" | click
+}
+// expand tree in Search tab
+get-view Search | get-button "Expand All" | click
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "6: ${x}=  \"python lib\".sum" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "TestFile2.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "6: ${x}=  \"python lib\".sum" | verify-true
+}
+// go to workspace referances of @{list} word in Variable
+get-view Outline | get-tree | select "TestFile.robot/Variables/list" | double-click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
+    key-type Right
+    key-type Left
+    get-menu "References/Project" | click
+}
+// expand tree in Search tab
+get-view Search | get-button "Expand All" | click
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "TestFile2.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+}
+// go to location one of the Search results
+with [get-view Search | get-tree] {
+    select "RobotProject/TestFile2.robot/5: @{list}=    Create List    1    3    2  " | double-click
+    select "RobotProject/TestFile2.robot/5: @{list}=    Create List    1    3    2  "
+}
+// verify content of Source tab
+with [get-editor "TestFile2.robot" | get-text-viewer] {
+    get-property text | equals "*** Settings ***\n"
+        + "Library    Collections\n"
+        + "Library    lib.py    WITH NAME  \"python lib\"\n"
+        + "*** Variables ***\n"
+        + "@{list}=    Create List    1    3    2\n"
+        + "${x}=  \"python lib\".sum\n"
+        + "*** Keywords ***\n"
+        + "TestKW\n"
+        + "    log  9\n"
+        + "TestKW2\n"
+        + "    log  11\n"
+        + "*** Test Cases ***\n"
+        + "testcase\n"
+        + "    Collections.Sort List    ${list}\n"
+        + "    Log    ${list}" | verify-true
+    // verify style in Source
+    get-property "styles[10].text" | equals "@{list}" | verify-true
+    get-property "styles[10].backgroundColor" | equals "#EBEBEB" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

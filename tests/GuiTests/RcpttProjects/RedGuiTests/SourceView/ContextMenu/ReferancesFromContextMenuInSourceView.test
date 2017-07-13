@@ -1,0 +1,204 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _IB9MYEqpEeeaDot5BUIDGA
+Element-Name: ReferancesFromContextMenuInSourceView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _srGiIEm6EeeIatagbul8lQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/12/17 2:35 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open test file from first project
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+// add second test
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 16 32
+    key-type Enter
+    key-type BackSpace -times 4
+    type-text "secondTest 1"
+    key-type Enter
+    type-text "TestKW word"
+    key-type Enter
+    type-text "TestKW2"
+}
+// save it
+get-eclipse-window | key-type "M1+s"
+// go to workspace referances of @{list}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 5
+    get-menu "References/Workspace" | click
+}
+// expand tree in Search tab
+with [get-view Search] {
+    get-button "Expand All" | click
+}
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "TestFile2.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals RobotProject2 | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "TestFile.robot" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" | equals "TestFile2.robot" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+}
+// go to workspace referances of {list}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 5 2
+    set-caret-pos 5 3
+    select-range 5 2 5 8
+    get-menu "References/Workspace" | click
+}
+// expand tree in Search tab
+with [get-view Search] {
+    get-button "Expand All" | click
+}
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "15: Collections.Sort List    ${list}" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "TestFile2.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[1].getText()" 
+        | equals "14: Collections.Sort List    ${list}" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[2].getText()" 
+        | equals "15: Log    ${list}" | verify-true
+    get-property "getItems().TreeItem[1].getText()" | equals RobotProject2 | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "15: Collections.Sort List    ${list}" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" | equals "TestFile2.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "5: @{list}=    Create List    1    3    2" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[1].getItems().TreeItem[1].getText()" 
+        | equals "14: Collections.Sort List    ${list}" | verify-true
+    get-property "getItems().TreeItem[1].getItems().TreeItem[1].getItems().TreeItem[2].getText()" 
+        | equals "15: Log    ${list}" | verify-true
+}
+// go to project referances of TestKW word
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 8 4
+    hover-text 8 6
+    get-menu "References/Project" | click
+}
+// expand tree in Search tab
+with [get-view Search] {
+    get-button "Expand All" | click
+}
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "8: TestKW word" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "16: Log    ${list}  TestKW word" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "18: TestKW word" | verify-true
+}
+// add Suite Teardown setting
+// go to project referances of TestKW2 without comment
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 3 45
+    key-type Enter
+    type-text "Suite Teardown  TestKW2"
+    key-type "M1+s"
+    hover-text 20 8
+    set-caret-pos 20 9
+    get-menu "References/Project" | click
+}
+// expand tree in Search tab
+with [get-view Search] {
+    get-button "Expand All" | click
+}
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "4: Suite Teardown  TestKW2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "12: TestKW2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "20: TestKW2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "TestFile2.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "10: TestKW2" | verify-true
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 1
+    key-type "M1+/"
+    key-type "M1+s"
+    hover-text 12 4
+}
+// go to project referances of TestKW2 with comment
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile2.robot" | double-click
+with [get-editor "TestFile2.robot" | get-text-viewer] {
+    set-caret-pos 10 6
+    hover-text 10 4
+    get-menu "References/Project" | click
+}
+// expand tree in Search tab
+with [get-view Search] {
+    get-button "Expand All" | click
+}
+// verify content of Search tab
+with [get-view Search | get-tree] {
+    get-property "getItems().TreeItem[0].getText()" | equals RobotProject | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "TestFile.robot (3 matches)" 
+        | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals "4: # Suite Teardown  TestKW2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals "12: TestKW2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+        | equals "20: TestKW2" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "TestFile2.robot" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "10: TestKW2" | verify-true
+}
+// verify style of selected search results in Source tab
+get-editor "TestFile.robot" | click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "styles[8].text" | equals "# Suite Teardown" | verify-true
+    get-property "styles[10].text" | equals TestKW2 | verify-true
+    get-property "styles[10].backgroundColor" | equals "#CECCF7" | verify-true
+    get-property "styles[26].text" | equals TestKW2 | verify-true
+    get-property "styles[26].backgroundColor" | equals "#CECCF7" | verify-true
+    get-property "styles[46].text" | equals TestKW2 | verify-true
+    get-property "styles[46].backgroundColor" | equals "#CECCF7" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
