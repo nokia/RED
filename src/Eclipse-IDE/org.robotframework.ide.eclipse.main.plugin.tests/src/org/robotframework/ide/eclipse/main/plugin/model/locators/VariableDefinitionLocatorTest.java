@@ -353,7 +353,7 @@ public class VariableDefinitionLocatorTest {
         final RobotProject robotProject = model.createRobotProject(sourceFile.getProject());
 
         final ReferencedVariableFile varsImportRef = new ReferencedVariableFile();
-        varsImportRef.setVariables(ImmutableMap.<String, Object> of("var_a", 42, "var_b", 1729));
+        varsImportRef.setVariables(ImmutableMap.of("var_a", 42, "var_b", 1729));
 
         robotProject.setReferencedVariablesFiles(newArrayList(varsImportRef));
 
@@ -372,7 +372,7 @@ public class VariableDefinitionLocatorTest {
         final RobotProject robotProject = model.createRobotProject(sourceFile.getProject());
 
         final ReferencedVariableFile varsImportRef = new ReferencedVariableFile();
-        varsImportRef.setVariables(ImmutableMap.<String, Object> of("var_a", 42, "var_b", 1729));
+        varsImportRef.setVariables(ImmutableMap.of("var_a", 42, "var_b", 1729));
 
         robotProject.setReferencedVariablesFiles(newArrayList(varsImportRef));
 

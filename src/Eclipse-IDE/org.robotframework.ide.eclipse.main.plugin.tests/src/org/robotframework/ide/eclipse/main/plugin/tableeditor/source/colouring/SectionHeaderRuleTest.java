@@ -5,8 +5,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.robotframework.red.junit.Conditions.absent;
-import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,13 +42,13 @@ public class SectionHeaderRuleTest {
             if (token.getText().contains("*")) {
                 thereWasName = true;
 
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition())
                         .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
 
             } else {
-                assertThat(evaluatedToken).is(absent());
+                assertThat(evaluatedToken).isNotPresent();
             }
         }
         assertThat(thereWasName).isTrue();
@@ -66,18 +64,18 @@ public class SectionHeaderRuleTest {
             if (token.getText().contains("*")) {
                 thereWasName = true;
 
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition())
                         .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
 
             } else {
-                assertThat(evaluatedToken).is(absent());
+                assertThat(evaluatedToken).isNotPresent();
             }
         }
         assertThat(thereWasName).isTrue();
     }
-    
+
     @Test
     public void sectionHeadersAreRecognized_EvenWhenFollowedBySingleSpace() {
         final List<RobotToken> headers = headersWithSpaces();
@@ -87,7 +85,7 @@ public class SectionHeaderRuleTest {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
             final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken);
 
-            assertThat(evaluatedToken).is(present());
+            assertThat(evaluatedToken).isPresent();
             assertThat(evaluatedToken.get().getPosition())
                     .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
             assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
