@@ -2,8 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.robotframework.red.junit.Conditions.absent;
-import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +40,13 @@ public class ExecutableRowCallRuleTest {
                     || token.getText().equals("given call") || token.getText().equals("when then call")) {
                 thereWasName = true;
 
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition())
                         .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
 
             } else {
-                assertThat(evaluatedToken).is(absent());
+                assertThat(evaluatedToken).isNotPresent();
             }
             previousTokens.add(token);
         }
@@ -69,13 +67,13 @@ public class ExecutableRowCallRuleTest {
                     || token.getText().equals("given call") || token.getText().equals("when then call")) {
                 thereWasName = true;
 
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(new Position(
                         token.getStartOffset() + positionInsideToken, token.getText().length() - positionInsideToken));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
 
             } else {
-                assertThat(evaluatedToken).is(absent());
+                assertThat(evaluatedToken).isNotPresent();
             }
             previousTokens.add(token);
         }

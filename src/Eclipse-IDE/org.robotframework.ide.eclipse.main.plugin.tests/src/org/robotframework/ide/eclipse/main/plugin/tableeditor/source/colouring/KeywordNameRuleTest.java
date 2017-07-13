@@ -3,8 +3,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.robotframework.red.junit.Conditions.absent;
-import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,13 +38,13 @@ public class KeywordNameRuleTest {
             if (token.getText().contains("userkw")) {
                 thereWasName = true;
 
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition())
                         .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("name_token");
 
             } else {
-                assertThat(evaluatedToken).is(absent());
+                assertThat(evaluatedToken).isNotPresent();
             }
         }
         assertThat(thereWasName).isTrue();
@@ -62,13 +60,13 @@ public class KeywordNameRuleTest {
             if (token.getText().contains("userkw")) {
                 thereWasName = true;
 
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition())
                         .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("name_token");
 
             } else {
-                assertThat(evaluatedToken).is(absent());
+                assertThat(evaluatedToken).isNotPresent();
             }
         }
         assertThat(thereWasName).isTrue();
@@ -93,7 +91,7 @@ public class KeywordNameRuleTest {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
                 final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
                         new ArrayList<IRobotLineElement>());
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("var_token");
             }
@@ -120,7 +118,7 @@ public class KeywordNameRuleTest {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
                 final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
                         new ArrayList<IRobotLineElement>());
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("name_token");
             }
