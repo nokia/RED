@@ -3,8 +3,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.robotframework.red.junit.Conditions.absent;
-import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +35,7 @@ public class VariableUsageRuleTest {
 
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0,
                 new ArrayList<IRobotLineElement>());
-        assertThat(evaluatedToken).is(absent());
+        assertThat(evaluatedToken).isNotPresent();
     }
 
     @Test
@@ -46,7 +44,7 @@ public class VariableUsageRuleTest {
 
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0, new ArrayList<IRobotLineElement>());
 
-        assertThat(evaluatedToken).is(present());
+        assertThat(evaluatedToken).isPresent();
         assertThat(evaluatedToken.get().getPosition())
                 .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
         assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
@@ -71,7 +69,7 @@ public class VariableUsageRuleTest {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
                 final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
                         new ArrayList<IRobotLineElement>());
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
             }
@@ -85,20 +83,20 @@ public class VariableUsageRuleTest {
         final String def3 = "ghi";
         final String def4 = "[0]jkl";
         final String content = def1 + "${var}" + def2 + "@{list}" + def3 + "&{dir}" + def4;
-        
+
         final Collection<Position> varPositions = newArrayList();
         varPositions.add(new Position(content.indexOf(def1), def1.length()));
         varPositions.add(new Position(content.indexOf(def2), def2.length()));
         varPositions.add(new Position(content.indexOf(def3), def3.length()));
         varPositions.add(new Position(content.indexOf(def4), def4.length()));
-        
+
         final RobotToken token = createToken(content);
 
         for (final Position position : varPositions) {
             for (int i = position.getOffset(); i < position.getLength(); i++) {
                 final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, i,
                         new ArrayList<IRobotLineElement>());
-                assertThat(evaluatedToken).is(present());
+                assertThat(evaluatedToken).isPresent();
                 assertThat(evaluatedToken.get().getPosition()).isEqualTo(position);
                 assertThat(evaluatedToken.get().getToken()).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
             }

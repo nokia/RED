@@ -149,7 +149,7 @@ public class KeywordsAutoDiscovererTest {
     private void verifyKwSource(final String qualifiedKwName, final String expectedFilePath, final int expectedLine,
             final int expectedOffset, final int expectedLength) {
         final Optional<RobotDryRunKeywordSource> kwSource = project.getKeywordSource(qualifiedKwName);
-        assertThat(kwSource.isPresent()).isTrue();
+        assertThat(kwSource).isPresent();
         assertThat(kwSource.get().getFilePath())
                 .isEqualTo(projectProvider.getFile(expectedFilePath).getLocation().toOSString());
         assertThat(kwSource.get().getLine()).isEqualTo(expectedLine);
