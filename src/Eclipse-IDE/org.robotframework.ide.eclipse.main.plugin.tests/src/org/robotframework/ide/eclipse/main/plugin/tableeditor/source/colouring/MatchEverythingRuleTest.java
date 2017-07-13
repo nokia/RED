@@ -2,7 +2,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class MatchEverythingRuleTest {
         for (final RobotToken token : TokensSource.createTokens()) {
             final Optional<PositionedTextToken> evaluatedToken = evaluate(token);
 
-            assertThat(evaluatedToken).is(present());
+            assertThat(evaluatedToken).isPresent();
             assertThat(evaluatedToken.get().getPosition())
                     .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
             assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
@@ -45,7 +44,7 @@ public class MatchEverythingRuleTest {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
             final Optional<PositionedTextToken> evaluatedToken = evaluate(token, positionInsideToken);
 
-            assertThat(evaluatedToken).is(present());
+            assertThat(evaluatedToken).isPresent();
             assertThat(evaluatedToken.get().getPosition())
                     .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
             assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");

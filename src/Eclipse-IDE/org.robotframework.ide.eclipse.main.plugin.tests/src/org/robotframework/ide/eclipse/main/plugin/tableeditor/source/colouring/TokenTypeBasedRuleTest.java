@@ -3,8 +3,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-import static org.robotframework.red.junit.Conditions.absent;
-import static org.robotframework.red.junit.Conditions.present;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +28,7 @@ public class TokenTypeBasedRuleTest {
 
     private final TokenTypeBasedRule testedRule = new TokenTypeBasedRule(new Token("token"),
             newArrayList(recognizedType1, recognizedType2));
-    
+
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
         assertThat(testedRule.isApplicable(new RobotToken())).isTrue();
@@ -44,7 +42,7 @@ public class TokenTypeBasedRuleTest {
         token.setStartOffset(42);
 
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0, new ArrayList<IRobotLineElement>());
-        assertThat(evaluatedToken).is(present());
+        assertThat(evaluatedToken).isPresent();
         assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
         assertThat(evaluatedToken.get().getPosition())
                 .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
@@ -57,26 +55,26 @@ public class TokenTypeBasedRuleTest {
 
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0,
                 new ArrayList<IRobotLineElement>());
-        assertThat(evaluatedToken).is(present());
+        assertThat(evaluatedToken).isPresent();
         assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
         assertThat(evaluatedToken.get().getPosition())
                 .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
     }
 
     @Test
-    public void tokenIsRecognized_whenItHasExpectedTypeAtFirstPositionRegardlesGivenOffsetInside() {
+    public void tokenIsRecognized_whenItHasExpectedTypeAtFirstPositionRegardlessGivenOffsetInside() {
         final RobotToken token = RobotToken.create("text", newArrayList(recognizedType2, recognizedType1));
         token.setStartOffset(42);
 
         final int offsetInside = new Random().nextInt(token.getText().length());
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, offsetInside,
                 new ArrayList<IRobotLineElement>());
-        assertThat(evaluatedToken).is(present());
+        assertThat(evaluatedToken).isPresent();
         assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
         assertThat(evaluatedToken.get().getPosition())
                 .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
     }
-    
+
     @Test
     public void tokenIsNotRecognized_whenItHasUnrecognizedType() {
         final RobotToken token = RobotToken.create("text", newArrayList(unrecognizedType));
@@ -84,7 +82,7 @@ public class TokenTypeBasedRuleTest {
 
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0,
                 new ArrayList<IRobotLineElement>());
-        assertThat(evaluatedToken).is(absent());
+        assertThat(evaluatedToken).isNotPresent();
     }
 
     @Test
@@ -95,18 +93,18 @@ public class TokenTypeBasedRuleTest {
 
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0,
                 new ArrayList<IRobotLineElement>());
-        assertThat(evaluatedToken).is(absent());
+        assertThat(evaluatedToken).isNotPresent();
     }
 
     @Test
-    public void tokenIsNotRecognized_whenItHasUnrecognizedTypeRegardlesGivenOffsetInside() {
+    public void tokenIsNotRecognized_whenItHasUnrecognizedTypeRegardlessGivenOffsetInside() {
         final RobotToken token = RobotToken.create("text", newArrayList(unrecognizedType));
         token.setStartOffset(42);
 
         final int offsetInside = new Random().nextInt(token.getText().length());
         final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, offsetInside,
                 new ArrayList<IRobotLineElement>());
-        assertThat(evaluatedToken).is(absent());
+        assertThat(evaluatedToken).isNotPresent();
     }
 
     private class RecognizedTokenTypeMock1 implements IRobotTokenType {
