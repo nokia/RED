@@ -12,8 +12,10 @@ import java.util.function.Supplier;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportLibraryTableFixer;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
@@ -39,8 +41,23 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
 
         final List<IContentProposal> proposals = newArrayList();
         for (final AssistProposal proposedKeyword : keywordsEntities) {
-            proposals.add(new AssistProposalAdapter(proposedKeyword));
+            proposals.add(new AssistProposalAdapter(proposedKeyword,
+                    createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
         }
         return proposals.toArray(new RedContentProposal[0]);
+    }
+
+    private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword) {
+        final List<Runnable> operations = newArrayList();
+        if (!proposedKeyword.isAccessible()) {
+            operations.add(new Runnable() {
+
+                @Override
+                public void run() {
+                    new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile.get());
+                }
+            });
+        }
+        return operations;
     }
 }
