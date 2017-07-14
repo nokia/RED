@@ -22,7 +22,6 @@ import java.util.Set;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -51,28 +50,24 @@ public class RedKeywordProposals {
 
     private final AssistProposalPredicate<LibrarySpecification> libraryPredicate;
 
-    private final RedPreferences preferences;
-
     public RedKeywordProposals(final RobotSuiteFile suiteFile) {
         this(RedPlugin.getModelManager().getModel(), suiteFile, ProposalMatchers.embeddedKeywordsMatcher(),
-                AssistProposalPredicates.reservedLibraryPredicate(), RedPlugin.getDefault().getPreferences());
+                AssistProposalPredicates.reservedLibraryPredicate());
     }
 
     @VisibleForTesting
-    public RedKeywordProposals(final RobotModel model, final RobotSuiteFile suiteFile,
-            final RedPreferences preferences) {
+    public RedKeywordProposals(final RobotModel model, final RobotSuiteFile suiteFile) {
         this(model, suiteFile, ProposalMatchers.embeddedKeywordsMatcher(),
-                AssistProposalPredicates.reservedLibraryPredicate(), preferences);
+                AssistProposalPredicates.reservedLibraryPredicate());
     }
 
     @VisibleForTesting
     RedKeywordProposals(final RobotModel model, final RobotSuiteFile suiteFile, final ProposalMatcher matcher,
-            final AssistProposalPredicate<LibrarySpecification> libraryPredicate, final RedPreferences preferences) {
+            final AssistProposalPredicate<LibrarySpecification> libraryPredicate) {
         this.model = model;
         this.suiteFile = suiteFile;
         this.matcher = matcher;
         this.libraryPredicate = libraryPredicate;
-        this.preferences = preferences;
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent) {
@@ -108,7 +103,7 @@ public class RedKeywordProposals {
     private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite,
             final String userContent) {
         final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(shouldUseQualifiedName(),
-                preferences.isAssistantKeywordFromNotImportedLibraryEnabled(), userContent);
+                shouldIncludeNotImportedLibraries(), userContent);
         return new AccessibleKeywordsEntities(suite.getFile().getFullPath(), collector);
     }
 
@@ -117,11 +112,17 @@ public class RedKeywordProposals {
 
             @Override
             public boolean apply(final RedKeywordProposal proposal) {
-                final boolean isAutoPrefixEnabled = preferences.isAssistantKeywordPrefixAutoAdditionEnabled();
+                final boolean isAutoPrefixEnabled = RedPlugin.getDefault()
+                        .getPreferences()
+                        .isAssistantKeywordPrefixAutoAdditionEnabled();
                 return keywordIsNotInLocalScope(proposal)
                         && (isAutoPrefixEnabled || keywordProposalIsConflicting(proposal));
             }
         };
+    }
+
+    private boolean shouldIncludeNotImportedLibraries() {
+        return RedPlugin.getDefault().getPreferences().isAssistantKeywordFromNotImportedLibraryEnabled();
     }
 
     private boolean keywordIsNotInLocalScope(final RedKeywordProposal keywordProposal) {
