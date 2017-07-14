@@ -48,10 +48,8 @@ public class SourceOpeningSupportTest {
 
     @Before
     public void before() throws Exception {
-        final ReferencedLibrary lib = new ReferencedLibrary();
-        lib.setType(LibraryType.PYTHON.toString());
-        lib.setName("testlib");
-        lib.setPath(projectProvider.getProject().getName());
+        final ReferencedLibrary lib = ReferencedLibrary.create(LibraryType.PYTHON, "testlib",
+                projectProvider.getProject().getName());
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(lib);

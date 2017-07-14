@@ -8,8 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates.alwaysTrue;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
@@ -22,6 +20,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -31,12 +30,16 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class RedKeywordProposalsTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RedKeywordProposalsTest.class);
+
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     private RobotModel robotModel;
 
@@ -62,7 +65,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         assertThat(provider.getKeywordProposals("kw")).isEmpty();
     }
@@ -77,7 +80,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
 
         assertThat(transform(proposals, toLabels())).containsExactly("b_kw2 - file.robot");
@@ -95,7 +98,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
-                alwaysTrue(), mock(RedPreferences.class));
+                alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
 
         assertThat(transform(proposals, toLabels())).containsExactly("c_kw3 - file.robot");
@@ -111,7 +114,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
         assertThat(transform(proposals, toLabels())).containsExactly("a_kw1 - file.robot", "b_kw2 - file.robot",
@@ -129,7 +132,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
@@ -146,7 +149,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         assertThat(provider.getKeywordProposals("kw")).isEmpty();
     }
@@ -159,7 +162,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
 
         assertThat(transform(proposals, toLabels())).containsExactly("b_res_kw2 - res.robot");
@@ -174,7 +177,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.alwaysTrue(), mock(RedPreferences.class));
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
 
         assertThat(transform(proposals, toLabels())).containsExactly("c_res_kw3 - res.robot");
@@ -188,7 +191,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
         assertThat(transform(proposals, toLabels())).containsExactly("a_res_kw1 - res.robot", "b_res_kw2 - res.robot",
@@ -204,7 +207,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
@@ -234,7 +237,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         assertThat(provider.getKeywordProposals("kw")).isEmpty();
     }
@@ -260,7 +263,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
 
         assertThat(transform(proposals, toLabels())).containsExactly("b_rlib_kw2 - refLib", "b_slib_kw2 - stdLib");
@@ -288,7 +291,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.alwaysTrue(), mock(RedPreferences.class));
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
 
         assertThat(transform(proposals, toLabels())).containsExactly("c_rlib_kw3 - refLib", "c_slib_kw3 - stdLib");
@@ -315,7 +318,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
         assertThat(transform(proposals, toLabels())).containsExactly("a_rlib_kw1 - refLib", "a_slib_kw1 - stdLib",
@@ -339,7 +342,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
         final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
@@ -362,7 +365,7 @@ public class RedKeywordProposalsTest {
 
         final AssistProposalPredicate<LibrarySpecification> predicate = libSpec -> !libSpec.getName().equals("refLib");
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
-                predicate, mock(RedPreferences.class));
+                predicate);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
         assertThat(transform(proposals, toLabels())).containsExactly("a_slib_kw1 - stdLib");
@@ -385,7 +388,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         for (final String bddPrefix : newArrayList("Given", "When", "And", "But", "Then")) {
             final List<? extends AssistProposal> proposals = provider.getKeywordProposals(bddPrefix + " a");
@@ -410,7 +413,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("stdLib.");
 
@@ -432,7 +435,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         assertThat(provider.getKeywordProposals("stdLib.")).isEmpty();
 
@@ -457,7 +460,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("res.");
 
@@ -480,7 +483,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("file.");
 
@@ -496,7 +499,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("kw with something");
 
@@ -506,6 +509,8 @@ public class RedKeywordProposalsTest {
     @Test
     public void qualifiedNameIsAddedToContentForProposals_whenKeywordPrefixAutoAdditionPreferenceIsEnabled()
             throws Exception {
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, true);
+
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_lib_kw1")));
         robotProject.setReferencedLibraries(createReferencedLibraries());
@@ -516,9 +521,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedPreferences preferences = mock(RedPreferences.class);
-        when(preferences.isAssistantKeywordPrefixAutoAdditionEnabled()).thenReturn(true);
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, preferences);
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
 
@@ -541,7 +544,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
 
@@ -581,7 +584,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
 
@@ -591,6 +594,8 @@ public class RedKeywordProposalsTest {
     @Test
     public void allKeywordsFromProjectLibrariesAreProvided_whenKeywordFromNotImportedLibraryPreferenceIsEnabled()
             throws Exception {
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
+
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(
                 createStandardLibraries(
@@ -605,9 +610,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedPreferences preferences = mock(RedPreferences.class);
-        when(preferences.isAssistantKeywordFromNotImportedLibraryEnabled()).thenReturn(true);
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, preferences);
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("a_");
 
@@ -630,7 +633,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
         assertThat(bestMatch.getAlias()).isEqualTo("file");
@@ -650,7 +653,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
         assertThat(bestMatch.getAlias()).isEqualTo("res");
@@ -669,7 +672,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
         assertThat(bestMatch.getAlias()).isEqualTo("refLib");
@@ -688,7 +691,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
         assertThat(bestMatch.getAlias()).isEqualTo("stdLib");
@@ -710,7 +713,7 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, mock(RedPreferences.class));
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("unknown");
         assertThat(bestMatch).isNull();
