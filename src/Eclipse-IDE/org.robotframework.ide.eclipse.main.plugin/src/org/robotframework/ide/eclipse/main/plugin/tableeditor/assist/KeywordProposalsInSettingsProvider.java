@@ -15,8 +15,10 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportLibraryTableFixer;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
@@ -45,17 +47,32 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
                     .getKeywordProposals(prefix);
 
             for (final AssistProposal proposedKeyword : keywordsEntities) {
-                proposals.add(new AssistProposalAdapter(proposedKeyword));
+                proposals.add(new AssistProposalAdapter(proposedKeyword,
+                        createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
             }
         }
         return proposals.toArray(new RedContentProposal[0]);
+    }
+
+    private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword) {
+        final List<Runnable> operations = newArrayList();
+        if (!proposedKeyword.isAccessible()) {
+            operations.add(new Runnable() {
+
+                @Override
+                public void run() {
+                    new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile);
+                }
+            });
+        }
+        return operations;
     }
 
     static boolean isKeywordBasedSetting(final IRowDataProvider<?> dataProvider, final int row) {
         final Entry<?, ?> entry = (Entry<?, ?>) dataProvider.getRowObject(row);
         final String settingName = (String) entry.getKey();
         final RobotTokenType actualType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
-        
+
         return EnumSet.of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
                 RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
                 RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)
