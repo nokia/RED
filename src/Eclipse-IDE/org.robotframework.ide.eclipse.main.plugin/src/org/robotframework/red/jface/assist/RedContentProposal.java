@@ -5,6 +5,8 @@
  */
 package org.robotframework.red.jface.assist;
 
+import java.util.Collection;
+
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
@@ -20,6 +22,8 @@ public interface RedContentProposal extends IContentProposal {
     boolean hasDescription();
 
     ModificationStrategy getModificationStrategy();
+
+    Collection<Runnable> getOperationsToPerformAfterAccepting();
 
     public static interface ModificationStrategy {
 

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -21,24 +23,32 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     private final String additionalSuffix;
 
+    private final Collection<Runnable> operationsToPerformAfterAccepting;
+
     public AssistProposalAdapter(final AssistProposal wrappedProposal) {
-        this(wrappedProposal, null, "");
+        this(wrappedProposal, null, "", new ArrayList<>());
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal,
             final ModificationStrategy modificationStrategy) {
-        this(wrappedProposal, modificationStrategy, "");
+        this(wrappedProposal, modificationStrategy, "", new ArrayList<>());
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal, final String additionalSuffix) {
-        this(wrappedProposal, null, additionalSuffix);
+        this(wrappedProposal, null, additionalSuffix, new ArrayList<>());
     }
 
-    private AssistProposalAdapter(final AssistProposal wrappedProposal,
-            final ModificationStrategy modificationStrategy, final String additionalSuffix) {
+    public AssistProposalAdapter(final AssistProposal wrappedProposal,
+            final Collection<Runnable> operationsToPerformAfterAccepting) {
+        this(wrappedProposal, null, "", operationsToPerformAfterAccepting);
+    }
+
+    private AssistProposalAdapter(final AssistProposal wrappedProposal, final ModificationStrategy modificationStrategy,
+            final String additionalSuffix, final Collection<Runnable> operationsToPerformAfterAccepting) {
         this.wrappedProposal = wrappedProposal;
         this.modificationStrategy = Optional.ofNullable(modificationStrategy);
         this.additionalSuffix = additionalSuffix;
+        this.operationsToPerformAfterAccepting = operationsToPerformAfterAccepting;
     }
 
     @Override
@@ -79,5 +89,10 @@ public class AssistProposalAdapter implements RedContentProposal {
     @Override
     public ModificationStrategy getModificationStrategy() {
         return modificationStrategy.orElse(new SubstituteTextModificationStrategy());
+    }
+
+    @Override
+    public Collection<Runnable> getOperationsToPerformAfterAccepting() {
+        return operationsToPerformAfterAccepting;
     }
 }

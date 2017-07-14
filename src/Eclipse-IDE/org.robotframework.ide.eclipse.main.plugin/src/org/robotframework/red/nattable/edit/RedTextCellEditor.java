@@ -274,7 +274,9 @@ public class RedTextCellEditor extends TextCellEditor {
 
         @Override
         public void proposalAccepted(final RedContentProposal proposal) {
-            // nothing to do
+            for (final Runnable operation : proposal.getOperationsToPerformAfterAccepting()) {
+                operation.run();
+            }
         }
     }
 }
