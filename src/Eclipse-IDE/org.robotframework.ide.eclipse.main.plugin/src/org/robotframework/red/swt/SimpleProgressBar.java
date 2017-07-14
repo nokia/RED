@@ -67,7 +67,7 @@ public class SimpleProgressBar extends Canvas {
     }
 
     public double getProgress() {
-        return (double) currentWork / (double) totalWork;
+        return currentWork == 0 ? 0.0 : (double) currentWork / (double) totalWork;
     }
 
     public void setBarColor(final Color progressBarColor) {
