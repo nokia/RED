@@ -149,16 +149,12 @@ public class LibrariesSourcesCollectorTest {
 
     private ReferencedLibrary createLibrary(final LibraryType libType, final String name, final String filePath)
             throws IOException, CoreException {
-        final ReferencedLibrary library = new ReferencedLibrary();
-        library.setType(libType.toString());
-        library.setName(name);
-        library.setPath(projectProvider.getFile(filePath)
-                .getFullPath()
-                .makeRelative()
-                .removeLastSegments(1)
-                .toPortableString());
-
-        return library;
+        return ReferencedLibrary.create(libType, name,
+                projectProvider.getFile(filePath)
+                        .getFullPath()
+                        .makeRelative()
+                        .removeLastSegments(1)
+                        .toPortableString());
     }
 
     @Test
