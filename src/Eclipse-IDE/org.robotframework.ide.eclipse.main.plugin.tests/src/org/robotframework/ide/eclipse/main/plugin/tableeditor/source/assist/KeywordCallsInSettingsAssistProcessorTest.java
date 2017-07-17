@@ -10,9 +10,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithOperationsToPerformAfterAccepting;
 
 import java.util.List;
 
@@ -22,13 +24,18 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Splitter;
@@ -39,12 +46,15 @@ public class KeywordCallsInSettingsAssistProcessorTest {
     public static ProjectProvider projectProvider = new ProjectProvider(
             KeywordCallsInSettingsAssistProcessorTest.class);
 
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
+
     private static RobotModel robotModel;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        robotModel = new RobotModel();
-        
+        robotModel = RedPlugin.getModelManager().getModel();
+
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw");
 
         projectProvider.createFile("suite.robot",
@@ -454,6 +464,34 @@ public class KeywordCallsInSettingsAssistProcessorTest {
                 "Test Teardown   abc  def  ghi", "Test Template   abc  def  ghi", "Force Tags      abc  def  ghi",
                 "Default Tags    abc  def  ghi", "Documentation   abc  def  ghi", "Metadata        abc  def  ghi",
                 "*** Keywords ***", "akeyword", "keyword"));
+    }
+
+    @Test
+    public void thereAreOperationsToPerformAfterAccepting_onlyForNotAccessibleKeywordProposals() throws Exception {
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
+
+        final RobotProject project = robotModel.createRobotProject(projectProvider.getProject());
+        project.setReferencedLibraries(createRefLib("LibNotImported", "kw1", "kw2"));
+
+        final int offset = 53;
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        final IDocument document = spy(documentFromSuiteFile());
+
+        when(viewer.getDocument()).thenReturn(document);
+        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+
+        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final KeywordCallsInSettingsAssistProcessor processor = new KeywordCallsInSettingsAssistProcessor(
+                createAssistant(model));
+
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+
+        assertThat(proposals).hasSize(5)
+                .haveExactly(3, proposalWithImage(ImagesManager.getImage(RedImages.getUserKeywordImage())))
+                .haveExactly(2, proposalWithImage(ImagesManager.getImage(RedImages.getKeywordImage())))
+                .haveExactly(3, proposalWithOperationsToPerformAfterAccepting(0))
+                .haveExactly(2, proposalWithOperationsToPerformAfterAccepting(1));
     }
 
     private static IDocument documentFromSuiteFile() throws Exception {
