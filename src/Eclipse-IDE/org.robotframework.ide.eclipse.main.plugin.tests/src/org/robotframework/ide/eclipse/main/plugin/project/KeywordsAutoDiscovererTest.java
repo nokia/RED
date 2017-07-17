@@ -124,10 +124,8 @@ public class KeywordsAutoDiscovererTest {
             throws IOException, CoreException {
         final IFile sourceFile = projectProvider.createFile("libs/" + name + ".py", lines);
 
-        final ReferencedLibrary library = new ReferencedLibrary();
-        library.setType(LibraryType.PYTHON.toString());
-        library.setName(name);
-        library.setPath(sourceFile.getFullPath().makeRelative().removeLastSegments(1).toPortableString());
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, name,
+                sourceFile.getFullPath().makeRelative().removeLastSegments(1).toPortableString());
 
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setName(name);
