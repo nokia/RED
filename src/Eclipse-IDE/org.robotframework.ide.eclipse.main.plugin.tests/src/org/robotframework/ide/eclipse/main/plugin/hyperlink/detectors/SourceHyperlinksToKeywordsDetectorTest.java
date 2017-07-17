@@ -63,10 +63,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
                 "res_kw",
                 "  log  10");
 
-        lib = new ReferencedLibrary();
-        lib.setType(LibraryType.PYTHON.toString());
-        lib.setName("testlib");
-        lib.setPath(projectProvider.getProject().getName());
+        lib = ReferencedLibrary.create(LibraryType.PYTHON, "testlib", projectProvider.getProject().getName());
 
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addReferencedLibrary(lib);
@@ -162,7 +159,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         final int begin = 26;
         assertThat(document.get(begin, 3)).isEqualTo("kw1");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true)).isNull();
     }
@@ -184,7 +181,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         final int begin = 26;
         assertThat(document.get(begin, 3)).isEqualTo("kw1");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true)).isNull();
     }
@@ -200,7 +197,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(getContent(file));
-        
+
         final RobotProject project = suiteFile.getProject();
         project.setStandardLibraries(ImmutableMap.<String, LibrarySpecification> of());
         project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
@@ -210,7 +207,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         final int begin = 26;
         assertThat(document.get(begin, 7)).isEqualTo("some_kw");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
         assertThat(detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true)).isNull();
     }
@@ -233,7 +230,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         final int begin = 26;
         assertThat(document.get(begin, 3)).isEqualTo("kw1");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
@@ -264,7 +261,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         final int begin = 26;
         assertThat(document.get(begin, 6)).isEqualTo("res_kw");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
@@ -288,7 +285,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         final RobotModel model = new RobotModel();
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
         final Document document = new Document(getContent(file));
-        
+
         final RobotProject project = suiteFile.getProject();
         project.setStandardLibraries(ImmutableMap.<String, LibrarySpecification> of());
         project.setReferencedLibraries(ImmutableMap.of(lib, libSpec));
@@ -298,7 +295,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         final int begin = 26;
         assertThat(document.get(begin, 6)).isEqualTo("lib_kw");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
@@ -338,7 +335,7 @@ public class SourceHyperlinksToKeywordsDetectorTest {
         assertThat(document.get(begins[2], 6)).isEqualTo("but kw");
         assertThat(document.get(begins[3], 7)).isEqualTo("when kw");
         assertThat(document.get(begins[4], 7)).isEqualTo("then kw");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
 
         for (int i = 0; i < begins.length; i++) {
@@ -369,17 +366,17 @@ public class SourceHyperlinksToKeywordsDetectorTest {
 
         final int begin = 26;
         assertThat(document.get(begin, 6)).isEqualTo("res_kw");
-        
+
         final SourceHyperlinksToKeywordsDetector detector = new SourceHyperlinksToKeywordsDetector(model, suiteFile);
         final IHyperlink[] hyperlinks = detector.detectHyperlinks(textViewer, new Region(begin + 1, 1), true);
 
         assertThat(hyperlinks).hasSize(4);
         assertThat(hyperlinks[0]).isInstanceOf(RegionsHyperlink.class);
         assertThat(((RegionsHyperlink) hyperlinks[0]).getDestinationRegion()).isEqualTo(new Region(56, 6));
-        
+
         assertThat(hyperlinks[1]).isInstanceOf(UserKeywordDocumentationHyperlink.class);
         assertThat(((UserKeywordDocumentationHyperlink) hyperlinks[1]).getDestinationKeyword()).isSameAs(kw);
-        
+
         assertThat(hyperlinks[2]).isInstanceOf(CompoundHyperlink.class);
         assertThat(((CompoundHyperlink) hyperlinks[2]).getHyperlinks()).hasSize(2);
         assertThat(((CompoundHyperlink) hyperlinks[2]).getHyperlinks().get(0)).isInstanceOf(RegionsHyperlink.class);

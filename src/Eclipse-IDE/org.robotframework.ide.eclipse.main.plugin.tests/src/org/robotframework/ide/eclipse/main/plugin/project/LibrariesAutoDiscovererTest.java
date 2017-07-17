@@ -161,15 +161,11 @@ public class LibrariesAutoDiscovererTest {
 
     private ReferencedLibrary createLibrary(final String name, final String filePath)
             throws IOException, CoreException {
-        final ReferencedLibrary library = new ReferencedLibrary();
-        library.setType(LibraryType.PYTHON.toString());
-        library.setName(name);
-        library.setPath(projectProvider.getFile(filePath)
-                .getFullPath()
-                .makeRelative()
-                .removeLastSegments(1)
-                .toPortableString());
-
-        return library;
+        return ReferencedLibrary.create(LibraryType.PYTHON, name,
+                projectProvider.getFile(filePath)
+                        .getFullPath()
+                        .makeRelative()
+                        .removeLastSegments(1)
+                        .toPortableString());
     }
 }
