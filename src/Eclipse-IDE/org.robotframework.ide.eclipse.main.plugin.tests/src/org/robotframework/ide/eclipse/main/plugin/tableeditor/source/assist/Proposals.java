@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-
 import java.util.Objects;
 
 import org.assertj.core.api.Condition;
@@ -18,7 +17,6 @@ import com.google.common.base.Function;
 
 /**
  * @author Michal Anglart
- *
  */
 class Proposals {
 
@@ -34,6 +32,7 @@ class Proposals {
 
     static Condition<? super ICompletionProposal> proposalWithImage(final Image image) {
         return new Condition<ICompletionProposal>() {
+
             @Override
             public boolean matches(final ICompletionProposal proposal) {
                 return Objects.equals(proposal.getImage(), image);
@@ -41,8 +40,19 @@ class Proposals {
         };
     }
 
+    static Condition<? super ICompletionProposal> proposalWithOperationsToPerformAfterAccepting(final int size) {
+        return new Condition<ICompletionProposal>() {
+
+            @Override
+            public boolean matches(final ICompletionProposal proposal) {
+                return ((RedCompletionProposalAdapter) proposal).operationsToPerformAfterAccepting().size() == size;
+            }
+        };
+    }
+
     static Function<ICompletionProposal, IDocument> byApplyingToDocument(final IDocument document) {
         return new Function<ICompletionProposal, IDocument>() {
+
             @Override
             public IDocument apply(final ICompletionProposal proposal) {
                 final Document docCopy = new Document(document);
