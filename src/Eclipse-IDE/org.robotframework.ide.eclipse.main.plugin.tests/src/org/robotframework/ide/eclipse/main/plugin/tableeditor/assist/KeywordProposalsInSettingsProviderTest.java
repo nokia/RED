@@ -8,12 +8,15 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
@@ -21,13 +24,18 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
+import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
@@ -40,6 +48,9 @@ public class KeywordProposalsInSettingsProviderTest {
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
+
+    @Rule
+    public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
@@ -155,6 +166,48 @@ public class KeywordProposalsInSettingsProviderTest {
 
             proposals[0].getModificationStrategy().insert(text, proposals[0]);
             assertThat(text.getText()).isEqualTo("keyword");
+        }
+    }
+
+    @Test
+    public void thereAreOperationsToPerformAfterAccepting_onlyForNotAccessibleKeywordProposals() throws Exception {
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
+
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new LinkedHashMap<>();
+        refLibs.putAll(createRefLib("LibImported", "kw1", "kw2"));
+        refLibs.putAll(createRefLib("LibNotImported", "kw3", "kw4"));
+
+        final RobotProject project = RedPlugin.getModelManager().createProject(projectProvider.getProject());
+        project.setReferencedLibraries(refLibs);
+
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Settings ***",
+                "Suite Setup",
+                "Suite Teardown",
+                "Test Setup",
+                "Test Teardown",
+                "Test Template",
+                "Library  LibImported");
+        final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
+        final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
+
+        final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
+        final KeywordProposalsInSettingsProvider provider = new KeywordProposalsInSettingsProvider(suiteFile,
+                dataProvider);
+
+        for (int row = 0; row < settings.size(); row++) {
+            final AssistantContext context = new NatTableAssistantContext(1, row);
+            final RedContentProposal[] proposals = provider.getProposals("k", 1, context);
+            assertThat(proposals).hasSize(4);
+
+            assertThat(proposals[0].getLabel()).isEqualTo("kw1 - LibImported");
+            assertThat(proposals[0].getOperationsToPerformAfterAccepting()).isEmpty();
+            assertThat(proposals[1].getLabel()).isEqualTo("kw2 - LibImported");
+            assertThat(proposals[1].getOperationsToPerformAfterAccepting()).isEmpty();
+            assertThat(proposals[2].getLabel()).isEqualTo("kw3 - LibNotImported");
+            assertThat(proposals[2].getOperationsToPerformAfterAccepting()).hasSize(1);
+            assertThat(proposals[3].getLabel()).isEqualTo("kw4 - LibNotImported");
+            assertThat(proposals[3].getOperationsToPerformAfterAccepting()).hasSize(1);
         }
     }
 
