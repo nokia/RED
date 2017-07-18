@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/28/17 10:59 AM
+Save-Time: 7/18/17 2:26 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -15,6 +15,9 @@ Entry-Name: .ecl.context
 proc "wait-for-thread" [val file]{
 	try -times 8 -delay 1000 -command{
 		get-view Debug | get-tree |get-item [format "%s \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" $file ] | get-property childCount -raw | gt 0 | verify-true
+//		get-view Debug | get-tree | get-item 
+//		    -path [format "%s \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" $file]  | get-property childCount -raw | gt 0 | verify-true
+
 	}
 }
 
@@ -22,6 +25,10 @@ proc "wait-for-thread-in-remote" [val child_count 1]{
 	get-view Debug | get-tree 
 	    | get-item "RemoteProject \\[Robot Remote\\]/Remote Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
 	    	| get-property childCount | equals $child_count | verify-true
+
+//	get-view Debug | get-tree | get-item 
+//	    -path "RemoteProject \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+//	    | get-property childCount | equals $child_count | verify-true
 }    
     
 proc "wait-for-remote-connection"{
@@ -38,8 +45,11 @@ proc "check-debug-marker-on-ruler" [val line] [val script_name]{
  	loop [val index 0]{
 	 	try -times 1 -command{
 			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].text" $line $index] -raw
+//			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].Type" $line $index] -raw
+			
 			| let [val marker -input]{
 				if [ $marker | not-eq "Debug Current Instruction Pointer" ] {  
+//				if [ $marker | not-eq "org.eclipse.debug.ui.currentIP" ] {  
 					recur [$index | plus 1]
 				}
 	
