@@ -5,15 +5,15 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ROyUcGBVEeW-9bGOK0urnw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/4/17 12:12 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/18/17 10:59 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-proc "check-execution-view" [val pass 0] [val fail 0] [val items 0] [val pb NaN]{
+proc "check-execution-view" [val pass 0] [val fail 0] [val items 0] [val pb "0.0"]{
 	with [get-view "Execution View"] {
 	    get-tree | get-property itemCount | equals $items | verify-true
 	    get-label "Tests: .*" | get-property caption | equals [format "Tests: %s/%s" $pass $pass] | verify-true
