@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RBRS8DlIEeaMk_UgyvYHpA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:01 AM
+Save-Time: 7/18/17 11:04 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,16 +18,17 @@ Entry-Name: .content
 //open file
 get-view "Project Explorer" | get-tree | select "SettingsProject/Script.robot" | double-click
 get-editor "Script.robot" | get-tab-folder | get-tab-item Settings | click
-//get-editor "Script.robot" | get-section General | get-editbox -index 1 | get-property text 
-//    | equals "${a} @{b} &{c} - special characters !@#$%^&*()_+<>?:{}[]\n"
-//    + "\tNew line\n"
-//    + "Escaped tab: '\\t'with tab. Here: '\t'" | verify-true
-
-get-editor "Script.robot" | get-section General | get-editbox 
-    -after [get-label "Provide test suite documentation and general settings"] | get-property text 
+get-editor "Script.robot" | get-section General | get-editbox -index 1 | get-property text 
     | equals "${a} @{b} &{c} - special characters !@#$%^&*()_+<>?:{}[]\n"
     + "\tNew line\n"
     + "Escaped tab: '\\t'with tab. Here: '\t'" | verify-true
+
+//this is for Oxygen    
+//get-editor "Script.robot" | get-section General | get-editbox 
+//    -after [get-label "Provide test suite documentation and general settings"] | get-property text 
+//    | equals "${a} @{b} &{c} - special characters !@#$%^&*()_+<>?:{}[]\n"
+//    + "\tNew line\n"
+//    + "Escaped tab: '\\t'with tab. Here: '\t'" | verify-true
     
 //make full screen
 with [get-editor "Script.robot"] {
