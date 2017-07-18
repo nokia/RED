@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Nu4IgJQdEeWNpL9oeriwCw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/22/16 10:39 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/18/17 10:57 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -22,43 +22,45 @@ Entry-Name: .content
 //check how window looks like
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Editor/Content Assist"
-with [get-window Preferences | get-control Any -after [get-label "Content Assist"] -index 9] {
-    get-property "getChildren().length" | equals 3 | verify-true
-    get-property "getChildren().Control[0].getText()" 
-        | equals "Configure preferences for content asisstant in Red Source Editor" | verify-true
-        
-    get-property "getChildren().Control[1].getChildren().length" | equals 2 | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals "Auto activation" | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().length" | equals 5 | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getSelection()" 
-        | equals true | verify-true       
-        
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getText()" 
-        | equals "Auto activation enabled" | verify-true     
-        
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getText()" 
-        | equals "Auto activation delay (ms)" | verify-true
-        
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getEditable()" 
-        | equals true | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getText()" | equals 100 
-        | verify-true
-         
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getText()" 
-        | equals "Auto activation triggers" | verify-true
-        
-        
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[4].getEditable()" 
-        | equals true | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[4].getText()" | equals "" 
-        | verify-true
-        
-    get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals Keywords | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[1].getChildren().length" | equals 1 | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[1].getChildren().Control[0].getSelection()" 
-        | equals false | verify-true
-    get-property "getChildren().Control[1].getChildren().Control[1].getChildren().Control[0].getText()" 
-        | equals "Automatically add library or resource name to keyword proposal insertion" | verify-true
+with [get-window Preferences] {
+    with [get-control Any -after [get-label "Content Assist"] -index 9] {
+        get-property "getChildren().length" | equals 3 | verify-true
+        get-property "getChildren().Control[0].getText()" 
+            | equals "Configure preferences for content asisstant in Red Source Editor" | verify-true
+        get-property "getChildren().Control[1].getChildren().length" | equals 3 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getText()" | equals "Auto activation" 
+            | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().length" | equals 5 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getText()" 
+            | equals "Auto activation enabled" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getText()" 
+            | equals "Auto activation delay (ms)" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getEditable()" 
+            | equals true | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getText()" 
+            | equals 100 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getText()" 
+            | equals "Auto activation triggers" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[4].getEditable()" 
+            | equals true | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[4].getText()" | equals "" 
+            | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getText()" | equals Keywords | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getChildren().length" | equals 1 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getChildren().Control[0].getText()" 
+            | equals "Automatically add library or resource name to keyword proposal insertion" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[1].getChildren().Control[0].getSelection()" 
+            | equals false | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[2].getText()" | equals Libraries | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[2].getChildren().length" | equals 2 | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[2].getChildren().Control[0].getText()" 
+            | equals "Include keywords from not imported libraries" | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[2].getChildren().Control[0].getSelection()" 
+            | equals false | verify-true
+        get-property "getChildren().Control[1].getChildren().Control[2].getChildren().Control[1].getText()" 
+            | equals "When libraries are added to red.xml but not imported in robot file, keywords from such libraries will be included in propositions." 
+            | verify-true
+    }
 }
 get-window Preferences | get-button Cancel | click
 
