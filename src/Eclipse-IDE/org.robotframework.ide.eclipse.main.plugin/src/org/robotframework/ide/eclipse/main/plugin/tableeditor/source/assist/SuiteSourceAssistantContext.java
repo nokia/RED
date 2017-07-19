@@ -5,13 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
+import java.util.function.Supplier;
+
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.bindings.keys.KeySequence;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Supplier;
 
 /**
  * @author Michal Anglart
@@ -21,16 +23,20 @@ public class SuiteSourceAssistantContext {
 
     private final Supplier<RobotSuiteFile> modelSupplier;
 
+    private final KeySequence activationTrigger;
+
     private final AssistPreferences assistPreferences;
 
-    public SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier) {
-        this(modelSupplier, new AssistPreferences(RedPlugin.getDefault().getPreferences()));
+    public SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier,
+            final KeySequence activationTrigger) {
+        this(modelSupplier, activationTrigger, new AssistPreferences(RedPlugin.getDefault().getPreferences()));
     }
 
     @VisibleForTesting
-    public SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier,
+    SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier, final KeySequence activationTrigger,
             final AssistPreferences assistPreferences) {
         this.modelSupplier = modelSupplier;
+        this.activationTrigger = activationTrigger;
         this.assistPreferences = assistPreferences;
     }
 
@@ -48,6 +54,10 @@ public class SuiteSourceAssistantContext {
 
     public boolean isTsvFile() {
         return getModel().isTsvFile();
+    }
+
+    public KeySequence getActivationTrigger() {
+        return activationTrigger;
     }
 
     public String getSeparatorToFollow() {

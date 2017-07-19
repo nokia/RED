@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import java.util.Optional;
-
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -21,7 +19,6 @@ import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.jface.assist.AssistantContext;
-import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator;
@@ -33,7 +30,6 @@ import com.google.common.base.Strings;
 
 /**
  * @author Michal Anglart
- *
  */
 class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken> {
 
@@ -44,7 +40,6 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
     private String indexText;
 
     private Text textEdit;
-
 
     ListVariableDetailCellEditorEntry(final Composite parent, final int column, final int row,
             final AssistanceSupport assistSupport, final Color hoverColor, final Color selectionColor) {
@@ -68,6 +63,7 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
         textEdit.setText(text);
         textEdit.setSelection(text.length());
         textEdit.addFocusListener(new FocusAdapter() {
+
             @Override
             public void focusLost(final FocusEvent e) {
                 commitEdit();
@@ -89,7 +85,7 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
         });
         validationJobScheduler.armRevalidationOn(textEdit);
         final AssistantContext context = new NatTableAssistantContext(column, row);
-        assistSupport.install(textEdit, context, Optional.<RedContentProposalListener> empty());
+        assistSupport.install(textEdit, context);
         GridDataFactory.fillDefaults().grab(true, false).indent(calculateControlIndent(), 2).applyTo(textEdit);
         layout();
 
