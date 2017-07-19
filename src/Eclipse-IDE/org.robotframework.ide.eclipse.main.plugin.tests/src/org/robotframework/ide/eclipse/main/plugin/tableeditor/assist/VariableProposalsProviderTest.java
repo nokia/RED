@@ -55,7 +55,7 @@ public class VariableProposalsProviderTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void exceptionIsThrownWhenDataProviderReturnsOrddinaryObject() {
+    public void exceptionIsThrownWhenDataProviderReturnsOrdinaryObject() {
         final RobotSuiteFile suite = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         @SuppressWarnings("unchecked")

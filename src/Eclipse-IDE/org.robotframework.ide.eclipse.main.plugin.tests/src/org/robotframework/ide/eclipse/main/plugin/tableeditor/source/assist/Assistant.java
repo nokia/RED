@@ -6,11 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.SWT;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
-
-import com.google.common.base.Supplier;
 
 class Assistant {
 
@@ -19,13 +20,10 @@ class Assistant {
     }
 
     static SuiteSourceAssistantContext createAssistant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-
-            @Override
-            public RobotSuiteFile get() {
-                model.parse();
-                return model;
-            }
-        }, new AssistPreferences(new MockRedPreferences(false, "  ")));
+        return new SuiteSourceAssistantContext(() -> {
+            model.parse();
+            return model;
+        }, KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)),
+                new AssistPreferences(new MockRedPreferences(false, "  ")));
     }
 }
