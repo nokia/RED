@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import java.util.Optional;
-
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -22,7 +20,6 @@ import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.Diction
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.assist.AssistantContext;
-import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator;
@@ -32,13 +29,13 @@ import org.robotframework.red.swt.LabelsMeasurer;
 
 /**
  * @author Michal Anglart
- *
  */
 class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<DictionaryKeyValuePair> {
 
     private final AssistanceSupport assistSupport;
 
     private String keyText;
+
     private String valueText;
 
     private Text textEdit;
@@ -66,6 +63,7 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
         textEdit.setText(toEdit);
         textEdit.setSelection(textEdit.getText().length());
         textEdit.addFocusListener(new FocusAdapter() {
+
             @Override
             public void focusLost(final FocusEvent e) {
                 commitEdit();
@@ -87,7 +85,7 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
         });
         validationJobScheduler.armRevalidationOn(textEdit);
         final AssistantContext context = new NatTableAssistantContext(column, row);
-        assistSupport.install(textEdit, context, Optional.<RedContentProposalListener> empty());
+        assistSupport.install(textEdit, context);
         GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).applyTo(textEdit);
         layout();
 
@@ -138,9 +136,11 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
             }
 
             if (isHovered()) {
-                bufferGC.drawImage(ImagesManager.getImage(RedImages.getDictionaryMappingImage()), mid - spacingAroundImage, 4);
+                bufferGC.drawImage(ImagesManager.getImage(RedImages.getDictionaryMappingImage()),
+                        mid - spacingAroundImage, 4);
             } else {
-                bufferGC.drawImage(ImagesManager.getImage(RedImages.getGrayedImage(RedImages.getDictionaryMappingImage())),
+                bufferGC.drawImage(
+                        ImagesManager.getImage(RedImages.getGrayedImage(RedImages.getDictionaryMappingImage())),
                         mid - spacingAroundImage, 4);
             }
 

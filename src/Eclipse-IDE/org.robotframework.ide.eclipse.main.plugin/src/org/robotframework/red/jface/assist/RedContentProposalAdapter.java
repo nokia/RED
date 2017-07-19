@@ -6,10 +6,10 @@
 package org.robotframework.red.jface.assist;
 
 import java.util.ArrayList;
-import java.util.Optional;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
@@ -83,6 +83,8 @@ public class RedContentProposalAdapter {
     private final RedControlContentAdapter controlContentAdapter;
 
     private ContentProposalPopup popup;
+    
+    private final KeySequence activationTrigger;
 
     private final KeyStroke triggerKeyStroke;
 
@@ -105,42 +107,41 @@ public class RedContentProposalAdapter {
     private boolean watchModify = false;
 
     public static RedContentProposalAdapter install(final Text text, final AssistantContext context,
-            final RedContentProposalProvider proposalsProvider) {
-        return install(text, context, proposalsProvider, Optional.<RedContentProposalListener> empty());
+            final RedContentProposalProvider proposalsProvider, final KeySequence activationTrigger,
+            final RedContentProposalListener listener) {
+
+        final RedContentProposalAdapter adapter = install(text, context, proposalsProvider, activationTrigger);
+        adapter.addContentProposalListener(listener);
+        return adapter;
     }
 
     public static RedContentProposalAdapter install(final Text text, final AssistantContext context,
-            final RedContentProposalProvider proposalsProvider, final Optional<RedContentProposalListener> listener) {
+            final RedContentProposalProvider proposalsProvider, final KeySequence activationTrigger) {
 
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
 
         final RedControlContentAdapter controlAdapter = new RedTextContentAdapter();
-        final KeyStroke activationStroke = KeyStroke.getInstance(SWT.CTRL, ' ');
         final char[] activationChars = preferences.getAssistantAutoActivationChars();
         final int autoActivationDelay = preferences.getAssistantAutoActivationDelay();
 
         final RedContentProposalAdapter adapter = new RedContentProposalAdapter(text, context, controlAdapter,
-                proposalsProvider, activationStroke, activationChars, autoActivationDelay,
+                proposalsProvider, activationTrigger, activationChars, autoActivationDelay,
                 RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
-        if (listener.isPresent()) {
-            adapter.addContentProposalListener(listener.get());
-        }
         adapter.install();
         return adapter;
     }
 
     public static RedContentProposalAdapter install(final Combo combo,
-            final RedContentProposalProvider proposalsProvider) {
+            final RedContentProposalProvider proposalsProvider, final KeySequence activationTrigger) {
 
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
 
         final RedControlContentAdapter controlAdapter = new RedComboContentAdapter();
-        final KeyStroke activationStroke = KeyStroke.getInstance(SWT.CTRL, ' ');
         final char[] activationChars = preferences.getAssistantAutoActivationChars();
         final int autoActivationDelay = preferences.getAssistantAutoActivationDelay();
 
         final RedContentProposalAdapter adapter = new RedContentProposalAdapter(combo, null, controlAdapter,
-                proposalsProvider, activationStroke, activationChars, autoActivationDelay,
+                proposalsProvider, activationTrigger, activationChars, autoActivationDelay,
                 RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         adapter.install();
         return adapter;
@@ -149,22 +150,16 @@ public class RedContentProposalAdapter {
     public static void markControlWithDecoration(final RedContentProposalAdapter adapter) {
         final Control control = adapter.control;
         final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP);
-        decoration.setDescriptionText("Press Ctrl+Space for content assist");
+        decoration.setDescriptionText(String.format("Press %s for content assist", adapter.activationTrigger.format()));
         decoration.setImage(FieldDecorationRegistry.getDefault()
                 .getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL)
                 .getImage());
-        control.addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                decoration.dispose();
-            }
-        });
+        control.addDisposeListener(e -> decoration.dispose());
     }
 
     private RedContentProposalAdapter(final Control control, final AssistantContext context,
             final RedControlContentAdapter controlContentAdapter, final RedContentProposalProvider proposalProvider,
-            final KeyStroke keyStroke, final char[] autoActivationCharacters, final int autoActivationDelay,
+            final KeySequence activationTrigger, final char[] autoActivationCharacters, final int autoActivationDelay,
             final int acceptanceStyle) {
         this.control = Preconditions.checkNotNull(control);
         this.context = context;
@@ -172,7 +167,8 @@ public class RedContentProposalAdapter {
         this.labelProvider = new TooltipsEnablingDelegatingStyledCellLabelProvider(new ProposalsLabelProvider());
 
         this.proposalProvider = proposalProvider;
-        this.triggerKeyStroke = keyStroke;
+        this.activationTrigger = activationTrigger;
+        this.triggerKeyStroke = activationTrigger.getKeyStrokes().length > 0 ? activationTrigger.getKeyStrokes()[0] : null;
         this.autoActivateString = new String(autoActivationCharacters).intern();
         this.autoActivationDelay = autoActivationDelay;
         this.proposalAcceptanceStyle = acceptanceStyle;
@@ -1125,7 +1121,7 @@ public class RedContentProposalAdapter {
             GridDataFactory.fillDefaults().applyTo(separator);
 
             final Label lbl = new Label(parent, SWT.NONE);
-            lbl.setText("Press Ctrl+Space to show Keywords proposals");
+            lbl.setText(String.format("Press %s to show Keywords proposals", activationTrigger.format()));
             GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(lbl);
 
             return proposalTableViewer.getTable();

@@ -6,7 +6,6 @@
 package org.robotframework.red.nattable.edit;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
@@ -28,14 +27,13 @@ import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.red.jface.assist.AssistantContext;
-import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
 /**
  * Cell editor which shows list of detailed entries which can be edited
  * <D> type of detail model elements to edit
- * 
+ *
  * @author Michal Anglart
  */
 public class DetailCellEditor<D> extends AbstractCellEditor {
@@ -78,7 +76,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         composite.setInput(column, row);
 
         final AssistantContext context = new NatTableAssistantContext(column, row);
-        assistSupport.install(composite.getText(), context, Optional.<RedContentProposalListener> empty());
+        assistSupport.install(composite.getText(), context);
         parent.redraw();
 
         final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
@@ -105,6 +103,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
 
         composite.getText().setFocus();
         composite.getText().addTraverseListener(new TraverseListener() {
+
             @Override
             public void keyTraversed(final TraverseEvent event) {
                 if (assistSupport.areContentProposalsShown()) {

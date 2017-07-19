@@ -10,13 +10,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-
-import com.google.common.base.Supplier;
 
 public abstract class RedFileLocationProposals {
 
@@ -90,25 +89,14 @@ public abstract class RedFileLocationProposals {
     private static class RedPythonFileLocationsProposals extends RedFileLocationProposals {
 
         private RedPythonFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
-            super(suiteFile, new Supplier<List<IFile>>() {
-                @Override
-                public List<IFile> get() {
-                    return ImportedFiles.getPythonFiles();
-                }
-            }, matcher);
+            super(suiteFile, () -> ImportedFiles.getPythonFiles(), matcher);
         }
     }
 
     private static class RedResourceFileLocationsProposals extends RedFileLocationProposals {
 
         private RedResourceFileLocationsProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
-            super(suiteFile, new Supplier<List<IFile>>() {
-
-                @Override
-                public List<IFile> get() {
-                    return ImportedFiles.getResourceFiles(suiteFile.getFile());
-                }
-            }, matcher);
+            super(suiteFile, () -> ImportedFiles.getResourceFiles(suiteFile.getFile()), matcher);
         }
     }
 }

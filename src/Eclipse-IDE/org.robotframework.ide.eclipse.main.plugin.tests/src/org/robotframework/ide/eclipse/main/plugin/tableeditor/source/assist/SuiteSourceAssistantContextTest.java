@@ -13,13 +13,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.bindings.keys.KeySequence;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.swt.SWT;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
-
-import com.google.common.base.Supplier;
 
 public class SuiteSourceAssistantContextTest {
 
@@ -136,21 +137,21 @@ public class SuiteSourceAssistantContextTest {
         verify(preferences, times(2)).getAssistantAutoActivationChars();
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void contextReturnsActivationTrigger() {
+        final KeySequence trigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, '9'));
+        assertThat(new SuiteSourceAssistantContext(null, trigger).getActivationTrigger()).isSameAs(trigger);
+    }
+
     private SuiteSourceAssistantContext createContext(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        });
+        return new SuiteSourceAssistantContext(() -> model,
+                KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)));
     }
 
     private SuiteSourceAssistantContext createContext(final RobotSuiteFile model, final RedPreferences redPreferences) {
-        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
-            @Override
-            public RobotSuiteFile get() {
-                return model;
-            }
-        }, new AssistPreferences(redPreferences));
+        return new SuiteSourceAssistantContext(() -> model,
+                KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)),
+                new AssistPreferences(redPreferences));
     }
 }

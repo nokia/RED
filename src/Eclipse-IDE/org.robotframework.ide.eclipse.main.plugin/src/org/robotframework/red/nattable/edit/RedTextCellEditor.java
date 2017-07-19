@@ -6,7 +6,6 @@
 package org.robotframework.red.nattable.edit;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
@@ -125,7 +124,7 @@ public class RedTextCellEditor extends TextCellEditor {
                 (InlineFocusListener) focusListener);
 
         final AssistantContext context = new NatTableAssistantContext(getColumnIndex(), getRowIndex());
-        support.install(text, context, Optional.of(assistListener));
+        support.install(text, context, assistListener);
         parent.redraw();
 
         if ((selectionStartShift > 0 || selectionEndShift > 0) && !text.isDisposed()) {

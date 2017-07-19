@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +24,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
- *
  */
 public class CycledContentAssistProcessor extends DefaultContentAssistProcessor implements IContentAssistProcessor,
         ICompletionListener, ICompletionListenerExtension, ICompletionListenerExtension2 {
@@ -45,7 +42,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
             final AssistantCallbacks assistant) {
         this.assistContext = assistContext;
         this.assistant = assistant;
-        this.processors = newArrayList();
+        this.processors = new ArrayList<>();
         this.currentPage = 0;
         this.canReopenAssistantProgramatically = false;
     }
@@ -68,7 +65,8 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         final RedContentAssistProcessor nextApplicableProcessor = getNextApplicableProcessor(viewer.getDocument(),
                 offset);
         assistant.setStatus(nextApplicableProcessor == getCurrentProcessor() ? ""
-                : String.format("Press Ctrl+Space to show %s proposals", nextApplicableProcessor.getProposalsTitle()));
+                : String.format("Press %s to show %s proposals", assistContext.getActivationTrigger().format(),
+                        nextApplicableProcessor.getProposalsTitle()));
 
         final ICompletionProposal[] proposals = getCurrentProcessor().computeCompletionProposals(viewer, offset);
 
