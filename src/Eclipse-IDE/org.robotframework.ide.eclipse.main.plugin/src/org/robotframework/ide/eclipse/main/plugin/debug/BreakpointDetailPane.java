@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.IDetailPane3;
+import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -35,6 +36,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -63,7 +67,7 @@ public class BreakpointDetailPane implements IDetailPane3 {
     private Text hitCountTxt;
     private Button conditionBtn;
     private Combo conditionCombo;
-    
+
     private final List<String> previousConditions = new ArrayList<>();
 
     private boolean isInitializingValues = false;
@@ -164,9 +168,8 @@ public class BreakpointDetailPane implements IDetailPane3 {
         }
 
         isInitializingValues = true;
-        if (proposalsAdapter != null) {
-            proposalsAdapter.uninstall();
-        }
+
+        deactivateContentAssistant();
 
         if (selection != null && Selections.getElements(selection, RobotLineBreakpoint.class).size() == 1) {
             currentBreakpoint = Selections.getSingleElement(selection, RobotLineBreakpoint.class);
@@ -185,12 +188,8 @@ public class BreakpointDetailPane implements IDetailPane3 {
             final String condition = currentBreakpoint.getCondition();
             conditionCombo.setText(condition);
             conditionCombo.setSelection(new Point(condition.length(), condition.length()));
-            
-            final RobotSuiteFile currentModel = RedPlugin.getModelManager()
-                    .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
-            final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel);
-            proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider);
 
+            activateContentAssistant();
         } else {
             currentBreakpoint = null;
             for (final Control control : newArrayList(hitCountBtn, hitCountTxt, conditionBtn, conditionCombo)) {
@@ -202,6 +201,28 @@ public class BreakpointDetailPane implements IDetailPane3 {
             conditionCombo.setText("");
         }
         isInitializingValues = false;
+    }
+
+    private void deactivateContentAssistant() {
+        if (proposalsAdapter != null) {
+            proposalsAdapter.uninstall();
+        }
+    }
+
+    private void activateContentAssistant() {
+        final KeySequence contentAssistActivationTrigger = getContentAssistActivationTrigger();
+        if (contentAssistActivationTrigger != null) {
+            final RobotSuiteFile currentModel = RedPlugin.getModelManager()
+                    .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
+            final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel);
+            proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider,
+                    contentAssistActivationTrigger);
+        }
+    }
+
+    private KeySequence getContentAssistActivationTrigger() {
+        final IBindingService service = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+        return (KeySequence) service.getBestActiveBindingFor(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
     }
 
     @Override

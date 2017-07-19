@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.text.AbstractReusableInformationControlCreator;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IAutoEditStrategy;
@@ -40,7 +39,6 @@ import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
@@ -102,10 +100,14 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private final SuiteSourceEditor editor;
 
+    private final KeySequence contentAssistActivationTrigger;
+
     private IReconciler reconciler;
 
-    public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor) {
+    public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor,
+            final KeySequence contentAssistActivationTrigger) {
         this.editor = editor;
+        this.contentAssistActivationTrigger = contentAssistActivationTrigger;
     }
 
     @Override
@@ -157,8 +159,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         contentAssistant.setShowEmptyList(true);
         contentAssistant.setStatusLineVisible(true);
         contentAssistant.setRepeatedInvocationMode(true);
-        contentAssistant
-                .setRepeatedInvocationTrigger(KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE)));
+        contentAssistant.setRepeatedInvocationTrigger(contentAssistActivationTrigger);
 
         setupAssistantProcessors(contentAssistant);
 
@@ -212,7 +213,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createSettingsAssist(final ContentAssistant contentAssistant,
             final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
+                contentAssistActivationTrigger);
 
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
@@ -240,7 +242,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createVariablesAssist(final ContentAssistant contentAssistant,
             final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
+                contentAssistActivationTrigger);
 
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
@@ -260,7 +263,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createTestCasesAssist(final ContentAssistant contentAssistant,
             final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
+                contentAssistActivationTrigger);
 
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
@@ -285,8 +289,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private void createKeywordsAssist(final ContentAssistant contentAssistant,
             final Supplier<RobotSuiteFile> modelSupplier, final AssistantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
-
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
+                contentAssistActivationTrigger);
         final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
@@ -315,7 +319,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         // position in file (this position always has default content type, but it can be actually
         // prepended with some valid meaningful content type
 
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier,
+                contentAssistActivationTrigger);
 
         final GeneralSettingsAssistProcessor generalSettingProcessor = new GeneralSettingsAssistProcessor(
                 assistContext);
@@ -440,8 +445,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new VariableDefinitionRule(variable), new CommentRule(comment), new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, store,
-                variablesRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, store, variablesRules);
 
         return reconciler;
     }
