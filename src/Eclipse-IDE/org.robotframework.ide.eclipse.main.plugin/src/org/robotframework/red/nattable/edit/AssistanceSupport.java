@@ -5,9 +5,11 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import java.util.Optional;
-
+import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
@@ -27,13 +29,28 @@ public class AssistanceSupport {
         this.proposalsProvider = proposalsProvider;
     }
 
-    public void install(final Text textControl, final AssistantContext context,
-            final Optional<RedContentProposalListener> listener) {
-        if (proposalsProvider == null || textControl.isDisposed()) {
+    public void install(final Text text, final AssistantContext context) {
+        install(text, context, getContentAssistActivationTrigger(), null);
+    }
+
+    public void install(final Text text, final AssistantContext context, final RedContentProposalListener listener) {
+        install(text, context, getContentAssistActivationTrigger(), listener);
+    }
+
+    private void install(final Text text, final AssistantContext context, final KeySequence activationTrigger,
+            final RedContentProposalListener listener) {
+        if (proposalsProvider == null || text.isDisposed() || activationTrigger == null) {
             return;
         }
-        adapter = RedContentProposalAdapter.install(textControl, context, proposalsProvider, listener);
+        adapter = listener == null
+                ? RedContentProposalAdapter.install(text, context, proposalsProvider, activationTrigger)
+                : RedContentProposalAdapter.install(text, context, proposalsProvider, activationTrigger, listener);
         RedContentProposalAdapter.markControlWithDecoration(adapter);
+    }
+
+    private KeySequence getContentAssistActivationTrigger() {
+        final IBindingService service = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+        return (KeySequence) service.getBestActiveBindingFor(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
     }
 
     public boolean areContentProposalsShown() {

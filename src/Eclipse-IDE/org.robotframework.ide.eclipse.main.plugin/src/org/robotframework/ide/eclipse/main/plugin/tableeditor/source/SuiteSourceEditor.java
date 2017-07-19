@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -42,8 +43,10 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.keys.IBindingService;
 import org.eclipse.ui.texteditor.GotoLineAction;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
@@ -54,8 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorAct
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.SourceDocumentationSelectionChangedListener;
 import org.robotframework.red.swt.StyledTextWrapper;
-
-import com.google.common.base.Supplier;
 
 public class SuiteSourceEditor extends TextEditor {
 
@@ -77,14 +78,13 @@ public class SuiteSourceEditor extends TextEditor {
     protected void initializeEditor() {
         super.initializeEditor();
 
-        setSourceViewerConfiguration(new SuiteSourceEditorConfiguration(this));
-        setDocumentProvider(new SuiteSourceDocumentProvider(new Supplier<RobotSuiteFile>() {
+        setSourceViewerConfiguration(new SuiteSourceEditorConfiguration(this, getContentAssistActivationTrigger()));
+        setDocumentProvider(new SuiteSourceDocumentProvider(() -> fileModel));
+    }
 
-            @Override
-            public RobotSuiteFile get() {
-                return fileModel;
-            }
-        }));
+    private KeySequence getContentAssistActivationTrigger() {
+        final IBindingService service = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+        return (KeySequence) service.getBestActiveBindingFor(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
     }
 
     @Override
