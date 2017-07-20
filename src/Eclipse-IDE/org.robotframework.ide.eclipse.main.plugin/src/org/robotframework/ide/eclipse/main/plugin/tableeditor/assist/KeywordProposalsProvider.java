@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -39,7 +38,7 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<? extends AssistProposal> keywordsEntities = new RedKeywordProposals(suiteFile.get())
                 .getKeywordProposals(prefix);
 
-        final List<IContentProposal> proposals = newArrayList();
+        final List<IContentProposal> proposals = new ArrayList<>();
         for (final AssistProposal proposedKeyword : keywordsEntities) {
             proposals.add(new AssistProposalAdapter(proposedKeyword,
                     createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
@@ -48,15 +47,9 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
     }
 
     private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword) {
-        final List<Runnable> operations = newArrayList();
+        final List<Runnable> operations = new ArrayList<>();
         if (!proposedKeyword.isAccessible()) {
-            operations.add(new Runnable() {
-
-                @Override
-                public void run() {
-                    new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile.get());
-                }
-            });
+            operations.add(() -> new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile.get()));
         }
         return operations;
     }

@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import com.google.common.base.Predicate;
-
+import java.util.function.Predicate;
 
 public interface AssistProposalPredicate<T> extends Predicate<T> {
     // just a marker interface for easier code navigation

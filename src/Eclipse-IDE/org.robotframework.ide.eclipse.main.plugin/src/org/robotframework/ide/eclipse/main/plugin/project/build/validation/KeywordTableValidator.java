@@ -198,7 +198,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private void reportKeywordUsageProblems(final List<UserKeyword> keywords) {
         TestCaseTableValidator.reportKeywordUsageProblems(validationContext, reporter, findExecutableRows(keywords),
-                Optional.<String> empty());
+                Optional.empty());
     }
 
     private List<RobotExecutableRow<?>> findExecutableRows(final List<UserKeyword> keywords) {

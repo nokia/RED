@@ -36,7 +36,7 @@ public class RedWithNameProposals {
 
         final List<RedWithNameProposal> proposals = new ArrayList<>();
 
-        if (predicateWordHasToSatisfy.apply(WITH_NAME)) {
+        if (predicateWordHasToSatisfy.test(WITH_NAME)) {
             final Optional<ProposalMatch> withNameMatch = matcher.matches(userContent, WITH_NAME);
             if (withNameMatch.isPresent()) {
                 proposals.add(AssistProposals.createWithNameProposal(WITH_NAME, withNameMatch.get()));

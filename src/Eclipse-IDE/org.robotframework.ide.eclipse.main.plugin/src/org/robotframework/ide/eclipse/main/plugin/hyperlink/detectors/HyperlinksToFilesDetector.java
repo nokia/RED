@@ -72,13 +72,12 @@ abstract class HyperlinksToFilesDetector {
     private Optional<IHyperlink> createLink(final RobotSuiteFile suiteFile, final IRegion fromRegion, final URI path) {
         final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
         final IResource resource = new RedWorkspace(wsRoot).forUri(path);
-        return resource != null ? createHyperlink(fromRegion, resource) : Optional.<IHyperlink> empty();
+        return resource != null ? createHyperlink(fromRegion, resource) : Optional.empty();
     }
 
     private Optional<IHyperlink> createHyperlink(final IRegion fromRegion, final IResource destination) {
         if (destination != null && destination.exists() && destination.getType() == IResource.FILE) {
-            return Optional.<IHyperlink> of(
-                    new FileHyperlink(fromRegion, (IFile) destination, "Open File", performAfterOpening()));
+            return Optional.of(new FileHyperlink(fromRegion, (IFile) destination, "Open File", performAfterOpening()));
         }
         return Optional.empty();
     }

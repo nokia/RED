@@ -40,7 +40,6 @@ import org.eclipse.ui.texteditor.MarkerAnnotation;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -113,13 +112,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
                 if (isKeyword(suiteFile, hoverRegion)) {
                     final Optional<String> info = GherkinStyleSupport.firstNameTransformationResult(hoveredText,
-                            new NameTransformation<String>() {
-
-                                @Override
-                                public Optional<String> transform(final String gherkinNameVariant) {
-                                    return Optional.ofNullable(getKeywordHoverInfo(gherkinNameVariant));
-                                }
-                            });
+                            gherkinNameVariant -> Optional.ofNullable(getKeywordHoverInfo(gherkinNameVariant)));
                     return info.orElse(null);
                 }
             }

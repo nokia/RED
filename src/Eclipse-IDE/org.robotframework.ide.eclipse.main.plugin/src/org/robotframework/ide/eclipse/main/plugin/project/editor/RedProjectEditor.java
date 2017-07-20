@@ -89,7 +89,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
                 try (InputStream stream = storage.getContents()) {
-                    editorInput = new RedProjectEditorInput(Optional.<IFile> empty(), !storage.isReadOnly(),
+                    editorInput = new RedProjectEditorInput(Optional.empty(), !storage.isReadOnly(),
                             new RobotProjectConfigReader().readConfigurationWithLines(stream));
                 } catch (final CoreException | IOException e) {
                     throw new IllegalProjectConfigurationEditorInputException(

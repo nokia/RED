@@ -619,6 +619,29 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
+    public void allKeywordsFromProjectLibrariesAreProvided_whenQualifiedNameIsUsedAndKeywordFromNotImportedLibraryPreferenceIsEnabled()
+            throws Exception {
+        preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
+
+        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        robotProject.setStandardLibraries(
+                createStandardLibraries(
+                        libKeyword("otherLib", "a_other_kw1"),
+                        libKeyword("otherLib", "a_other_kw2")));
+        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_rlib_kw1")));
+
+        final IFile file = projectProvider.createFile("file.robot");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("otherLib.");
+
+        assertThat(transform(proposals, toLabels())).containsExactly("a_other_kw1 - otherLib",
+                "a_other_kw2 - otherLib");
+    }
+
+    @Test
     public void bestMatchingKeywordIsLocalWhenAllExist() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_res_kw1")));

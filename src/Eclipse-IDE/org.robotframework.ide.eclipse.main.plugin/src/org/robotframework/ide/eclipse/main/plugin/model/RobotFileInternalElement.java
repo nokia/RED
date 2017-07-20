@@ -23,28 +23,28 @@ public interface RobotFileInternalElement extends RobotElement {
     /**
      * Gets the suite file in which this element is contained or null if it is
      * not inside the suite file.
-     * 
+     *
      * @return Model object representing containg file.
      */
     RobotSuiteFile getSuiteFile();
 
     /**
      * Gets position of the whole element inside the file
-     * 
+     *
      * @return position
      */
     Position getPosition();
 
     /**
      * Gets position of the defining token (usually name of the element)
-     * 
+     *
      * @return position
      */
     DefinitionPosition getDefinitionPosition();
 
     /**
      * Gets model element for given offset in file
-     * 
+     *
      * @param offset
      * @return
      */
@@ -52,7 +52,7 @@ public interface RobotFileInternalElement extends RobotElement {
 
     /**
      * Gets the comment of the element
-     * 
+     *
      * @return Comment of the element
      */
     String getComment();
@@ -62,7 +62,7 @@ public interface RobotFileInternalElement extends RobotElement {
     /**
      * Returns open strategy capable of opening and selecting this element in
      * editor.
-     * 
+     *
      * @return
      */
     OpenStrategy getOpenRobotEditorStrategy();
@@ -88,7 +88,7 @@ public interface RobotFileInternalElement extends RobotElement {
          *            should be selected.
          */
         public final void run(final IWorkbenchPage page) {
-            run(page, Optional.<ElementOpenMode> empty(), null);
+            run(page, Optional.empty(), null);
         }
 
         /**
@@ -98,7 +98,7 @@ public interface RobotFileInternalElement extends RobotElement {
          * @param page
          */
         public final void run(final IWorkbenchPage page, final String labelWhichShouldBeInSelectedCell) {
-            run(page, Optional.<ElementOpenMode> empty(), labelWhichShouldBeInSelectedCell);
+            run(page, Optional.empty(), labelWhichShouldBeInSelectedCell);
         }
 
         /**

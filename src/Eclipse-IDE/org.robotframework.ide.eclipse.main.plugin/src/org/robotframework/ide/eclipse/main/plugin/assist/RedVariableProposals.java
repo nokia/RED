@@ -29,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinit
 import com.google.common.annotations.VisibleForTesting;
 
 public class RedVariableProposals {
-    
+
     private final RobotModel model;
     private final RobotSuiteFile suiteFile;
     private final ProposalMatcher matcher;
@@ -125,7 +125,7 @@ public class RedVariableProposals {
 
             @Override
             public ContinueDecision globalVariableDetected(final String variableName, final Object value) {
-                if (globalVarPredicate.apply(variableName)) {
+                if (globalVarPredicate.test(variableName)) {
                     final Optional<ProposalMatch> match = matcher.matches(userContent, variableName);
                     if (match.isPresent()) {
                         proposals.add(AssistProposals.createBuiltInVariableProposal(variableName, value.toString(),
