@@ -95,13 +95,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                new AssistProposalPredicate<String>() {
-
-                    @Override
-                    public boolean apply(final String globalVarName) {
-                        return globalVarName.contains("2");
-                    }
-                });
+                globalVarName -> globalVarName.contains("2"));
 
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
@@ -638,7 +632,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
         final RobotFileInternalElement logCall = suiteFile.findSection(RobotKeywordsSection.class).get()
                 .getChildren().get(0).getChildren().get(3);
-        
+
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", logCall);

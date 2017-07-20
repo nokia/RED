@@ -30,7 +30,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
@@ -264,14 +263,9 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 .findPossibleKeywords(keywordName.getText());
 
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName.getText(),
-                new NameTransformation<String>() {
-
-                    @Override
-                    public Optional<String> transform(final String gherkinNameVariant) {
-                        return validationContext.isKeywordAccessible(keywordProposal, gherkinNameVariant)
-                                ? Optional.of(gherkinNameVariant) : Optional.<String> empty();
-                    }
-                });
+                gherkinNameVariant -> validationContext.isKeywordAccessible(keywordProposal, gherkinNameVariant)
+                        ? Optional.of(gherkinNameVariant)
+                        : Optional.empty());
         final String name = !nameToUse.isPresent() || nameToUse.get().isEmpty() ? keywordName.getText()
                 : nameToUse.get();
         final int offset = keywordName.getStartOffset() + (keywordName.getText().length() - name.length());
@@ -376,7 +370,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final ProblemsReportingStrategy reporter, final Set<String> variables, final RobotToken timeoutToken) {
         final String timeout = timeoutToken.getText();
         if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
-            
+
             if (containsVariables(validationContext, timeoutToken)) {
                 final UnknownVariables unknownVarsValidator = new UnknownVariables(validationContext, reporter);
                 unknownVarsValidator.reportUnknownVars(newArrayList(timeoutToken), variables);

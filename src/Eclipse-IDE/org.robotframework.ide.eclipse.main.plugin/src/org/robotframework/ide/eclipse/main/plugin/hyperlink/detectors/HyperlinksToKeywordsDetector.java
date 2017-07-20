@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
-import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +25,6 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.CompoundHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordDocumentationHyperlink;
@@ -65,14 +63,9 @@ abstract class HyperlinksToKeywordsDetector {
         final AccessibleKeywordsEntities context = createEntities(suiteFile);
         final ListMultimap<String, KeywordEntity> keywordProposal = context.findPossibleKeywords(keywordName, false);
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName,
-                new NameTransformation<String>() {
-
-                    @Override
-                    public Optional<String> transform(final String gherkinNameVariant) {
-                        return context.isKeywordAccessible(keywordProposal, gherkinNameVariant)
-                                ? Optional.of(gherkinNameVariant) : Optional.<String> empty();
-                    }
-                });
+                gherkinNameVariant -> context.isKeywordAccessible(keywordProposal, gherkinNameVariant)
+                        ? Optional.of(gherkinNameVariant)
+                        : Optional.empty());
 
         if (!nameToUse.isPresent()) {
             return hyperlinks;
@@ -170,9 +163,15 @@ abstract class HyperlinksToKeywordsDetector {
             new KeywordDefinitionLocator(file, model).locateKeywordDefinition(new KeywordDetector() {
 
                 @Override
-                public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+                public ContinueDecision nonAccessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                        final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
+                    return ContinueDecision.CONTINUE;
+                }
+
+                @Override
+                public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
                         final KeywordSpecification kwSpec, final Set<String> libraryAliases,
-                        final RobotSuiteFile exposingFile, final boolean isAccessible) {
+                        final RobotSuiteFile exposingFile) {
 
                     final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                             : KeywordScope.STD_LIBRARY;
@@ -202,13 +201,10 @@ abstract class HyperlinksToKeywordsDetector {
 
                 private void addAccessibleKeyword(final String keywordName, final KeywordHyperlinkEntity keyword) {
                     final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
-                    if (accessibleKeywords.containsKey(unifiedName)) {
-                        accessibleKeywords.get(unifiedName).add(keyword);
-                    } else {
-                        final LinkedHashSet<KeywordEntity> setOfKeywords = newLinkedHashSet();
-                        setOfKeywords.add(keyword);
-                        accessibleKeywords.put(unifiedName, setOfKeywords);
+                    if (!accessibleKeywords.containsKey(unifiedName)) {
+                        accessibleKeywords.put(unifiedName, new LinkedHashSet<>());
                     }
+                    accessibleKeywords.get(unifiedName).add(keyword);
                 }
             });
             return accessibleKeywords;

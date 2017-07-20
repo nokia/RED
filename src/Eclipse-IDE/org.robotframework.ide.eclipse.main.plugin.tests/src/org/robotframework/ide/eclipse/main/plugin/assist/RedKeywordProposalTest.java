@@ -12,6 +12,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.function.Predicate;
+
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
@@ -24,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedN
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedUserKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Range;
 
 public class RedKeywordProposalTest {
@@ -55,7 +56,7 @@ public class RedKeywordProposalTest {
 
         @SuppressWarnings("unchecked")
         final Predicate<RedKeywordProposal> shouldBeQualified = mock(Predicate.class);
-        when(shouldBeQualified.apply(any(RedKeywordProposal.class))).thenReturn(false);
+        when(shouldBeQualified.test(any(RedKeywordProposal.class))).thenReturn(false);
 
         final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
                 "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
@@ -66,7 +67,7 @@ public class RedKeywordProposalTest {
         }
 
         // verify it was called only once
-        verify(shouldBeQualified).apply(any(RedKeywordProposal.class));
+        verify(shouldBeQualified).test(any(RedKeywordProposal.class));
         verifyNoMoreInteractions(shouldBeQualified);
     }
 
@@ -297,8 +298,8 @@ public class RedKeywordProposalTest {
 
     @Test
     public void keywordIsAccessible_forUserKeyword() {
-        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", "alias", KeywordScope.LOCAL, 
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation", false, 
+        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", "alias", KeywordScope.LOCAL,
+                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation", false,
                 new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.isAccessible()).isTrue();
@@ -315,8 +316,8 @@ public class RedKeywordProposalTest {
 
     @Test
     public void keywordIsNotAccessible_forNotAccessibleLibraryKeyword() {
-        final RedKeywordProposal proposal = new RedNotAccessibleLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY, 
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation", false, 
+        final RedKeywordProposal proposal = new RedNotAccessibleLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
+                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation", false,
                 new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.isAccessible()).isFalse();

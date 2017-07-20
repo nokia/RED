@@ -31,7 +31,7 @@ public class DocumentUtilities {
 
     /**
      * Returns region around offset which constitutes a single robot variable.
-     * 
+     *
      * @param document
      *            Document in which variable should be find
      * @param offset
@@ -68,14 +68,14 @@ public class DocumentUtilities {
             if (varEndDetected(cellContent, i) && !positions.isEmpty()) {
                 lastIndex = positions.pop();
                 if (stackLevel == positions.size() && i >= offset) {
-                    return Optional.<IRegion> of(new Region(lastIndex, i - lastIndex + 1));
+                    return Optional.of(new Region(lastIndex, i - lastIndex + 1));
                 }
             }
         }
         return Optional.empty();
     }
 
-    public static String getFirstTokenInLine(IDocument document, boolean isTSV, final int offset)
+    public static String getFirstTokenInLine(final IDocument document, final boolean isTSV, final int offset)
             throws BadLocationException {
         int begin = offset;
 
@@ -130,7 +130,7 @@ public class DocumentUtilities {
             final int closingBracketIndex = cellContent.indexOf('}', start + 1);
             final int end = closingBracketIndex == -1 ? matcher.end() : Math.min(matcher.end(), closingBracketIndex);
             if (Range.closed(start, end).contains(offset)) {
-                return Optional.<IRegion> of(new Region(start, end - start));
+                return Optional.of(new Region(start, end - start));
             }
         }
         return Optional.empty();
@@ -141,7 +141,7 @@ public class DocumentUtilities {
      * is surrounded with file begin or cells separator on the left and by the file end or another
      * cells separator on right.
      * Cell separator is at least 2 spaces, tabulator or newline character
-     * 
+     *
      * @param document
      *            Document in which cell should be find
      * @param offset
@@ -157,7 +157,7 @@ public class DocumentUtilities {
         final String prev = offset > 0 ? document.get(offset - 1, 1) : "";
         final String next = offset < document.getLength() ? document.get(offset, 1) : "";
         if (prev.equals("\n") && next.equals("\n")) {
-            return Optional.<IRegion> of(new Region(offset, 0));
+            return Optional.of(new Region(offset, 0));
         }
         if (isInsideSeparator(prev, next, isTsv)) {
             return Optional.empty();
@@ -165,14 +165,14 @@ public class DocumentUtilities {
 
         final int beginOffset = offset - calculateCellRegionBegin(document, isTsv, offset);
         final int endOffset = offset + calculateCellRegionEnd(document, isTsv, offset);
-        return Optional.<IRegion> of(new Region(beginOffset, endOffset - beginOffset));
+        return Optional.of(new Region(beginOffset, endOffset - beginOffset));
     }
 
     /**
      * Returns region around offset which consitutues a cell during live editing. This is very
      * similar to {@link #findCellRegion(IDocument, int)} method with a single exception that
      * there can be a single space just before offset prefixed with whole cell content.
-     * 
+     *
      * @param document
      * @param offset
      * @return
@@ -186,13 +186,13 @@ public class DocumentUtilities {
         }
 
         if (!firstCandidate.isPresent() && offset > 0 && document.getChar(offset - 1) == '\n') {
-            return Optional.<IRegion> of(new Region(offset, 0));
+            return Optional.of(new Region(offset, 0));
         }
         final Optional<IRegion> region = firstCandidate.isPresent() ? firstCandidate
                 : findCellRegion(document, isTsv, offset - 1);
         if (region.isPresent()) {
             final int length = Math.max(offset - region.get().getOffset(), region.get().getLength());
-            return Optional.<IRegion> of(new Region(region.get().getOffset(), length));
+            return Optional.of(new Region(region.get().getOffset(), length));
         }
         return region;
     }
@@ -372,7 +372,7 @@ public class DocumentUtilities {
             final IRegion firstLineRegion = document.getLineInformation(firstLine);
             final IRegion lastLineRegion = document.getLineInformation(lastLine);
 
-            return Optional.<IRegion> of(new Region(firstLineRegion.getOffset(),
+            return Optional.of(new Region(firstLineRegion.getOffset(),
                     lastLineRegion.getOffset() + lastLineRegion.getLength() - firstLineRegion.getOffset()));
 
         } catch (final BadLocationException e) {

@@ -56,8 +56,8 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
         final Object tableElement = dataProvider.getRowObject(context.getRow());
         if (tableElement instanceof RobotKeywordCall) {
             final List<RobotToken> tokens = ((RobotKeywordCall) tableElement).getLinkedElement().getElementTokens();
-            
-            final Optional<RobotToken> firstTokenInLine = tokens.isEmpty() ? Optional.<RobotToken> empty()
+
+            final Optional<RobotToken> firstTokenInLine = tokens.isEmpty() ? Optional.empty()
                     : Optional.of(tokens.get(0));
             return AssistProposalPredicates.codeReservedWordsPredicate(cellIndex + 1, firstTokenInLine);
         } else {

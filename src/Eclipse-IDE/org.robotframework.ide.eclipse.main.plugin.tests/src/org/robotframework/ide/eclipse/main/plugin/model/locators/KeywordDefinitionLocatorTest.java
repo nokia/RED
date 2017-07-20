@@ -43,7 +43,7 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
-        locator.locateKeywordDefinitionInLibraries(robotProject, libraryDetector(visitedLibs));
+        locator.locateKeywordDefinitionInLibraries(robotProject, nonAccessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).containsOnly("kw1 - StdLib", "kw2 - StdLib", "kw3 - RefLib", "kw4 - RefLib");
     }
 
@@ -57,7 +57,7 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
-        locator.locateKeywordDefinitionInLibraries(robotProject, limitedLibraryDetector(visitedLibs));
+        locator.locateKeywordDefinitionInLibraries(robotProject, limitedNonAccessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).containsOnly("kw1 - StdLib", "kw2 - StdLib");
     }
 
@@ -106,7 +106,7 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
-        locator.locateKeywordDefinition(libraryDetector(visitedLibs));
+        locator.locateKeywordDefinition(accessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).containsOnly("kw1 - StdLib", "kw2 - StdLib", "kw3 - RefLib", "kw4 - RefLib");
     }
 
@@ -120,7 +120,7 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
-        locator.locateKeywordDefinition(libraryDetector(visitedLibs));
+        locator.locateKeywordDefinition(accessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).containsOnly("Log - BuiltIn", "Log Many - BuiltIn");
     }
 
@@ -136,7 +136,7 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
-        locator.locateKeywordDefinition(libraryDetector(visitedLibs));
+        locator.locateKeywordDefinition(accessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).containsOnly("kw1 - StdLib", "kw2 - StdLib", "kw3 - RefLib", "kw4 - RefLib");
     }
 
@@ -151,7 +151,7 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
-        locator.locateKeywordDefinition(limitedLibraryDetector(visitedLibs));
+        locator.locateKeywordDefinition(limitedAccessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).containsOnly("kw1 - StdLib", "kw2 - StdLib");
     }
 
@@ -165,7 +165,7 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file);
-        locator.locateKeywordDefinition(libraryDetector(visitedLibs));
+        locator.locateKeywordDefinition(nonAccessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).isEmpty();
     }
 
@@ -179,30 +179,54 @@ public class KeywordDefinitionLocatorTest {
 
         final Set<String> visitedLibs = new HashSet<>();
         final KeywordDefinitionLocator locator = new KeywordDefinitionLocator(file, robotModel, true);
-        locator.locateKeywordDefinition(libraryDetector(visitedLibs));
+        locator.locateKeywordDefinition(nonAccessibleLibraryDetector(visitedLibs));
         assertThat(visitedLibs).containsOnly("kw1 - RefLib", "kw2 - RefLib");
     }
 
-    private KeywordDetector libraryDetector(final Set<String> visitedLibs) {
+    private KeywordDetector nonAccessibleLibraryDetector(final Set<String> visitedLibs) {
         return new TestKeywordDetector() {
 
             @Override
-            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                    final RobotSuiteFile exposingFile, final boolean isAccessible) {
+            public ContinueDecision nonAccessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
                 visitedLibs.add(kwSpec.getName() + " - " + libSpec.getName());
                 return ContinueDecision.CONTINUE;
             }
         };
     }
 
-    private KeywordDetector limitedLibraryDetector(final Set<String> visitedLibs) {
+    private KeywordDetector limitedNonAccessibleLibraryDetector(final Set<String> visitedLibs) {
         return new TestKeywordDetector() {
 
             @Override
-            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+            public ContinueDecision nonAccessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
+                visitedLibs.add(kwSpec.getName() + " - " + libSpec.getName());
+                return visitedLibs.size() < 2 ? ContinueDecision.CONTINUE : ContinueDecision.STOP;
+            }
+        };
+    }
+
+    private KeywordDetector accessibleLibraryDetector(final Set<String> visitedLibs) {
+        return new TestKeywordDetector() {
+
+            @Override
+            public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                    final RobotSuiteFile exposingFile, final boolean isAccessible) {
+                    final RobotSuiteFile exposingFile) {
+                visitedLibs.add(kwSpec.getName() + " - " + libSpec.getName());
+                return ContinueDecision.CONTINUE;
+            }
+        };
+    }
+
+    private KeywordDetector limitedAccessibleLibraryDetector(final Set<String> visitedLibs) {
+        return new TestKeywordDetector() {
+
+            @Override
+            public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
+                    final RobotSuiteFile exposingFile) {
                 visitedLibs.add(kwSpec.getName() + " - " + libSpec.getName());
                 return visitedLibs.size() < 2 ? ContinueDecision.CONTINUE : ContinueDecision.STOP;
             }
@@ -239,9 +263,14 @@ public class KeywordDefinitionLocatorTest {
         }
 
         @Override
-        public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                final KeywordSpecification kwSpec, final Set<String> libraryAlias, final RobotSuiteFile exposingFile,
-                final boolean isAccessible) {
+        public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                final KeywordSpecification kwSpec, final Set<String> libraryAlias, final RobotSuiteFile exposingFile) {
+            return ContinueDecision.CONTINUE;
+        }
+
+        @Override
+        public ContinueDecision nonAccessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
             return ContinueDecision.CONTINUE;
         }
     }

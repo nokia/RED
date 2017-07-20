@@ -57,7 +57,7 @@ public final class ProposalMatch implements Iterable<Range<Integer>> {
         for (final Range<Integer> match : rangesInDomain) {
             newMatches.add(Range.closedOpen(match.lowerEndpoint() - startIndex, match.upperEndpoint() - startIndex));
         }
-        return newMatches.isEmpty() ? Optional.<ProposalMatch> empty() : Optional.of(new ProposalMatch(newMatches));
+        return newMatches.isEmpty() ? Optional.empty() : Optional.of(new ProposalMatch(newMatches));
     }
 
     @Override

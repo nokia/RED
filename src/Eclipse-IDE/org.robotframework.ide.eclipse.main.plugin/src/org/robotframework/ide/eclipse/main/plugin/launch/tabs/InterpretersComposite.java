@@ -65,7 +65,7 @@ class InterpretersComposite extends Composite {
             public void widgetSelected(final SelectionEvent e) {
                 checkEnvironmentBtn.setEnabled(false);
                 comboExecutorName.setEnabled(false);
-                listener.interpreterChanged(Optional.<SuiteExecutor> empty());
+                listener.interpreterChanged(Optional.empty());
             }
         });
     }

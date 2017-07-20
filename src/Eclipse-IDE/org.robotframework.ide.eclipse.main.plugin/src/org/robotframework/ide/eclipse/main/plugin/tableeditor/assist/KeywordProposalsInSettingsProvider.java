@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -39,7 +38,7 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
             final AssistantContext context) {
         final String prefix = contents.substring(0, position);
 
-        final List<IContentProposal> proposals = newArrayList();
+        final List<IContentProposal> proposals = new ArrayList<>();
 
         final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
         if (tableContext.getColumn() == 1 && isKeywordBasedSetting(dataProvider, tableContext.getRow())) {
@@ -55,15 +54,9 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
     }
 
     private List<Runnable> createOperationsToPerformAfterAccepting(final RedKeywordProposal proposedKeyword) {
-        final List<Runnable> operations = newArrayList();
+        final List<Runnable> operations = new ArrayList<>();
         if (!proposedKeyword.isAccessible()) {
-            operations.add(new Runnable() {
-
-                @Override
-                public void run() {
-                    new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile);
-                }
-            });
+            operations.add(() -> new ImportLibraryTableFixer(proposedKeyword.getSourceName()).apply(suiteFile));
         }
         return operations;
     }

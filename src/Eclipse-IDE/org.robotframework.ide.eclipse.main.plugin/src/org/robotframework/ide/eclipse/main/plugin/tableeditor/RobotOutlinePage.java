@@ -109,7 +109,7 @@ class RobotOutlinePage extends ContentOutlinePage {
                 new LinkWithEditorAction(editorSelectionProvider, editorSourceWidget));
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
         getSite().getActionBars().getToolBarManager().add(new ExpandAllAction(getTreeViewer()));
-        
+
         final MenuManager menuManager = new MenuManager("Outline popup", "RobotOutlinePage.popup");
         final Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
         getTreeViewer().getControl().setMenu(menu);
@@ -141,9 +141,7 @@ class RobotOutlinePage extends ContentOutlinePage {
                         @Override
                         public void run() {
                             shouldUpdateEditorSelection.set(false);
-                            setSelectionInOutline(
-                                    element.isPresent() && element.get() == suiteModel
-                                            ? Optional.<RobotElement> empty() : element);
+                            setSelectionInOutline(element.filter(e -> e != suiteModel));
                         }
                     });
                 }
