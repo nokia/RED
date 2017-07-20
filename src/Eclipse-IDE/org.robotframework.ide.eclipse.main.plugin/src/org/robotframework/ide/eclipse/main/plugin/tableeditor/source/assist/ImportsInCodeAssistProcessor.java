@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedImportProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
 public class ImportsInCodeAssistProcessor extends RedContentAssistProcessor {
 
@@ -51,7 +51,7 @@ public class ImportsInCodeAssistProcessor extends RedContentAssistProcessor {
                 .getImportsProposals(prefix);
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : importsProposals) {
-            final DocumentationModification modification = new DocumentationModification("",
+            final DocumentModification modification = new DocumentModification("",
                     new Position(offset - prefix.length(), cellLength), true);
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));

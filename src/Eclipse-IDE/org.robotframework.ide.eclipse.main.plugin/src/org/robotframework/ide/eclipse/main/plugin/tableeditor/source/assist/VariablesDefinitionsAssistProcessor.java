@@ -22,7 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedNewVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
 import org.robotframework.red.swt.SwtThread;
 
@@ -30,7 +30,6 @@ import com.google.common.base.Splitter;
 
 /**
  * @author Michal Anglart
- *
  */
 public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcessor {
 
@@ -86,12 +85,13 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
             final Position toSelect = new Position(offset - prefix.length() + 2,
                     newVarProposal.getContent().length() - 3);
 
-            final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine
-                    ? calculateRegionsForLinkedMode(newVarProposal, lineInfo)
-                    : new ArrayList<>();
-            final Collection<Runnable> operations = createOperationsToPerformAfterAccepting(regionsToLinkedEdit);
-            final DocumentationModification modification = new DocumentationModification(contentSuffix, toReplace,
-                    toSelect, operations);
+            final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, toSelect,
+                    () -> {
+                        final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine
+                                ? calculateRegionsForLinkedMode(newVarProposal, lineInfo)
+                                : new ArrayList<>();
+                        return createOperationsToPerformAfterAccepting(regionsToLinkedEdit);
+                    });
             proposals.add(new RedCompletionProposalAdapter(newVarProposal, modification));
         }
         return proposals;
@@ -134,20 +134,13 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
 
     private Collection<Runnable> createOperationsToPerformAfterAccepting(
             final Collection<IRegion> regionsToLinkedEdit) {
-        if (regionsToLinkedEdit.isEmpty()) {
-            return new ArrayList<>();
+        final Collection<Runnable> operations = new ArrayList<>();
+
+        if (!regionsToLinkedEdit.isEmpty()) {
+            operations.add(() -> SwtThread
+                    .asyncExec(() -> RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit)));
         }
-        final Runnable operation = new Runnable() {
-            @Override
-            public void run() {
-                SwtThread.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
-                    }
-                });
-            }
-        };
-        return newArrayList(operation);
+
+        return operations;
     }
 }

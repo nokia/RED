@@ -30,7 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
 import org.robotframework.red.swt.SwtThread;
 
@@ -80,13 +80,12 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
             final Position toReplace = new Position(offset - prefix.length(), cellLength);
 
-            final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine
-                    ? calculateRegionsForLinkedMode(kwProposal, toReplace.getOffset(), lineContent)
-                    : new ArrayList<>();
-            final Collection<Runnable> operations = createOperationsToPerformAfterAccepting(regionsToLinkedEdit,
-                    kwProposal);
-            final DocumentationModification modification = new DocumentationModification(contentSuffix, toReplace,
-                    operations);
+            final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, () -> {
+                final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine
+                        ? calculateRegionsForLinkedMode(kwProposal, toReplace.getOffset(), lineContent)
+                        : new ArrayList<>();
+                return createOperationsToPerformAfterAccepting(regionsToLinkedEdit, kwProposal);
+            });
             final IContextInformation contextInfo = new ContextInformation(null,
                     kwProposal.getArgumentsDescriptor().getDescription());
             proposals.add(new RedCompletionProposalAdapter(kwProposal, modification, contextInfo));
