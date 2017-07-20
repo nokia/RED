@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
@@ -23,32 +24,35 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     private final String additionalSuffix;
 
-    private final Collection<Runnable> operationsToPerformAfterAccepting;
+    // calculating operations to perform after accepting may be time consuming, so instead of
+    // precomputing this information for each proposal we're pushing the calculation into this
+    // lambda, which is calculated only when proposal is chosen
+    private final Supplier<Collection<Runnable>> operationsAfterAccepting;
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal) {
-        this(wrappedProposal, null, "", new ArrayList<>());
+        this(wrappedProposal, null, "", () -> new ArrayList<>());
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal,
             final ModificationStrategy modificationStrategy) {
-        this(wrappedProposal, modificationStrategy, "", new ArrayList<>());
+        this(wrappedProposal, modificationStrategy, "", () -> new ArrayList<>());
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal, final String additionalSuffix) {
-        this(wrappedProposal, null, additionalSuffix, new ArrayList<>());
+        this(wrappedProposal, null, additionalSuffix, () -> new ArrayList<>());
     }
 
     public AssistProposalAdapter(final AssistProposal wrappedProposal,
-            final Collection<Runnable> operationsToPerformAfterAccepting) {
-        this(wrappedProposal, null, "", operationsToPerformAfterAccepting);
+            final Supplier<Collection<Runnable>> operationsAfterAccepting) {
+        this(wrappedProposal, null, "", operationsAfterAccepting);
     }
 
     private AssistProposalAdapter(final AssistProposal wrappedProposal, final ModificationStrategy modificationStrategy,
-            final String additionalSuffix, final Collection<Runnable> operationsToPerformAfterAccepting) {
+            final String additionalSuffix, final Supplier<Collection<Runnable>> operationsAfterAccepting) {
         this.wrappedProposal = wrappedProposal;
         this.modificationStrategy = Optional.ofNullable(modificationStrategy);
         this.additionalSuffix = additionalSuffix;
-        this.operationsToPerformAfterAccepting = operationsToPerformAfterAccepting;
+        this.operationsAfterAccepting = operationsAfterAccepting;
     }
 
     @Override
@@ -93,6 +97,6 @@ public class AssistProposalAdapter implements RedContentProposal {
 
     @Override
     public Collection<Runnable> getOperationsToPerformAfterAccepting() {
-        return operationsToPerformAfterAccepting;
+        return operationsAfterAccepting.get();
     }
 }
