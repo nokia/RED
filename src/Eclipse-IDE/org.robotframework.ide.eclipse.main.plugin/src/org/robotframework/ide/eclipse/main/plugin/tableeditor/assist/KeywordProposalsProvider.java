@@ -41,7 +41,7 @@ public class KeywordProposalsProvider implements RedContentProposalProvider {
         final List<IContentProposal> proposals = new ArrayList<>();
         for (final AssistProposal proposedKeyword : keywordsEntities) {
             proposals.add(new AssistProposalAdapter(proposedKeyword,
-                    createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
+                    () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
         }
         return proposals.toArray(new RedContentProposal[0]);
     }

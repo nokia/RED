@@ -18,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
 
 /**
@@ -60,7 +60,7 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal settingProposal : settingsProposals) {
-            final DocumentationModification modification = new DocumentationModification(additionalContent,
+            final DocumentModification modification = new DocumentModification(additionalContent,
                     new Position(offset - prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));
