@@ -42,6 +42,6 @@ public class MarkersLabelAccumulator implements IConfigLabelAccumulator {
     protected Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
         final Object rowObject = dataProvider.getRowObject(rowPosition);
         return rowObject instanceof RobotFileInternalElement ? Optional.of((RobotFileInternalElement) rowObject)
-                : Optional.<RobotFileInternalElement> empty();
+                : Optional.empty();
     }
 }

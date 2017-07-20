@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newHashSet;
-import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -188,9 +187,15 @@ public class ValidationContext {
         new KeywordDefinitionLocator(file, model).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
-            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+            public ContinueDecision nonAccessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final Set<String> libraryAliases,
-                    final RobotSuiteFile exposingFile, final boolean isAccessible) {
+                    final RobotSuiteFile exposingFile) {
 
                 final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
                 for (final String libraryAlias : libraryAliases) {
@@ -217,13 +222,10 @@ public class ValidationContext {
 
             private void addAccessibleKeyword(final String keywordName, final ValidationKeywordEntity keyword) {
                 final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
-                if (accessibleKeywords.containsKey(unifiedName)) {
-                    accessibleKeywords.get(unifiedName).add(keyword);
-                } else {
-                    final LinkedHashSet<KeywordEntity> setOfKeywords = newLinkedHashSet();
-                    setOfKeywords.add(keyword);
-                    accessibleKeywords.put(unifiedName, setOfKeywords);
+                if (!accessibleKeywords.containsKey(unifiedName)) {
+                    accessibleKeywords.put(unifiedName, new LinkedHashSet<>());
                 }
+                accessibleKeywords.get(unifiedName).add(keyword);
             }
         });
         return accessibleKeywords;

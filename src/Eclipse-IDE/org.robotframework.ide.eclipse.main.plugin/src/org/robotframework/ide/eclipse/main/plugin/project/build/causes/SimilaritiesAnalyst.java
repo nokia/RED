@@ -81,9 +81,15 @@ class SimilaritiesAnalyst {
         new KeywordDefinitionLocator(suiteFile).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
-            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+            public ContinueDecision nonAccessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                    final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
+                return ContinueDecision.CONTINUE;
+            }
+
+            @Override
+            public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                    final RobotSuiteFile exposingFile, final boolean isAccessible) {
+                    final RobotSuiteFile exposingFile) {
                 names.add(kwSpec.getName());
                 return ContinueDecision.CONTINUE;
             }

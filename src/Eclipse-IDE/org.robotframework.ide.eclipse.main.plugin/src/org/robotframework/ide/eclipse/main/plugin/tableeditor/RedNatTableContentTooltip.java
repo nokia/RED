@@ -54,7 +54,7 @@ public class RedNatTableContentTooltip extends NatTableContentTooltip {
     protected Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
         final Object rowObject = dataProvider.getRowObject(rowPosition);
         return rowObject instanceof RobotFileInternalElement ? Optional.of((RobotFileInternalElement) rowObject)
-                : Optional.<RobotFileInternalElement> empty();
+                : Optional.empty();
     }
 
     private String createMessage(final List<String> markerDescriptions) {

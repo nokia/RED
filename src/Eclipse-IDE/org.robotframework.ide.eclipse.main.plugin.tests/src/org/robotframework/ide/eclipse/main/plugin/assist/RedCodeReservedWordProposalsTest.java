@@ -41,13 +41,7 @@ public class RedCodeReservedWordProposalsTest {
 
     @Test
     public void onlyProposalsMatchingPredicateAreProvided_whenPredicateSelectsThem() {
-        final AssistProposalPredicate<String> predicateWordHasToSatisfy = new AssistProposalPredicate<String>() {
-
-            @Override
-            public boolean apply(final String word) {
-                return word.length() < 4;
-            }
-        };
+        final AssistProposalPredicate<String> predicateWordHasToSatisfy = word -> word.length() < 4;
         final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
                 predicateWordHasToSatisfy);
 

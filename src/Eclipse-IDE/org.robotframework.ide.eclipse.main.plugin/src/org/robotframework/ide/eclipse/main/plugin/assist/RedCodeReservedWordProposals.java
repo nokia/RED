@@ -46,14 +46,14 @@ public class RedCodeReservedWordProposals {
 
         proposals.addAll(generateProposalsFrom(GHERKIN_ELEMENTS, userContent));
         // match against both variants, but add only one proposal
-        if (predicateWordHasToSatisfy.apply(FOR_LOOP_1)) {
-            
+        if (predicateWordHasToSatisfy.test(FOR_LOOP_1)) {
+
             final Optional<ProposalMatch> forLoopMatch = newArrayList(FOR_LOOP_1, FOR_LOOP_2).stream()
                     .map(variant -> matcher.matches(userContent, variant))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst();
-            
+
             if (forLoopMatch.isPresent()) {
                 proposals.add(AssistProposals.createCodeReservedWordProposal(FOR_LOOP_1, forLoopMatch.get()));
             }
@@ -69,7 +69,7 @@ public class RedCodeReservedWordProposals {
 
         final List<RedCodeReservedWordProposal> proposals = new ArrayList<>();
         for (final String word : words) {
-            if (predicateWordHasToSatisfy.apply(word)) {
+            if (predicateWordHasToSatisfy.test(word)) {
                 final Optional<ProposalMatch> match = matcher.matches(userContent, word);
                 if (match.isPresent()) {
                     proposals.add(AssistProposals.createCodeReservedWordProposal(word, match.get()));

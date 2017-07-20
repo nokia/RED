@@ -36,13 +36,7 @@ public class RedWithNameProposalsTest {
 
     @Test
     public void onlyProposalsMatchingPredicateAreProvided_whenPredicateSelectsThem() {
-        final AssistProposalPredicate<String> predicateWordHasToSatisfy = new AssistProposalPredicate<String>() {
-
-            @Override
-            public boolean apply(final String word) {
-                return word.length() < 4;
-            }
-        };
+        final AssistProposalPredicate<String> predicateWordHasToSatisfy = word -> word.length() < 4;
         final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");
@@ -51,13 +45,7 @@ public class RedWithNameProposalsTest {
 
     @Test
     public void onlyProposalsMatchingPredicateAreProvided_whenPredicateCannotSelectThem() {
-        final AssistProposalPredicate<String> predicateWordHasToSatisfy = new AssistProposalPredicate<String>() {
-
-            @Override
-            public boolean apply(final String word) {
-                return word.length() > 4;
-            }
-        };
+        final AssistProposalPredicate<String> predicateWordHasToSatisfy = word -> word.length() > 4;
         final RedWithNameProposals proposalsProvider = new RedWithNameProposals(predicateWordHasToSatisfy);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("");

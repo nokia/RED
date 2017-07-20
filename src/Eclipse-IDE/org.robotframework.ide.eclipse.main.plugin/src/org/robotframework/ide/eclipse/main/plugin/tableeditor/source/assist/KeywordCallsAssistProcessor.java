@@ -35,7 +35,6 @@ import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 
 /**
  * @author Michal Anglart
@@ -77,7 +76,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         for (final RedKeywordProposal kwProposal : kwProposals) {
             final List<String> args = atTheEndOfLine ? getArguments(kwProposal, lineContent) : new ArrayList<>();
-            final String contentSuffix = args.isEmpty() ? "" : (separator + Joiner.on(separator).join(args));
+            final String contentSuffix = args.isEmpty() ? "" : (separator + String.join(separator, args));
 
             final Position toReplace = new Position(offset - prefix.length(), cellLength);
 
@@ -143,40 +142,19 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         final Collection<Runnable> operations = new ArrayList<>();
 
         if (!regionsToLinkedEdit.isEmpty()) {
-            operations.add(new Runnable() {
-
-                @Override
-                public void run() {
-                    SwtThread.asyncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
-                        }
-                    });
-                }
-            });
+            operations.add(() -> SwtThread
+                    .asyncExec(() -> RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit)));
         }
 
         if (!proposal.isAccessible()) {
-            operations.add(new Runnable() {
-
-                @Override
-                public void run() {
-                    SwtThread.asyncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            final ImportLibraryFixer fixer = new ImportLibraryFixer(proposal.getSourceName());
-                            final Optional<ICompletionProposal> proposal = fixer.asContentProposal(null,
-                                    viewer.getDocument(), assist.getModel());
-                            if (proposal.isPresent()) {
-                                proposal.get().apply(viewer.getDocument());
-                            }
-                        }
-                    });
+            operations.add(() -> SwtThread.asyncExec(() -> {
+                final ImportLibraryFixer fixer = new ImportLibraryFixer(proposal.getSourceName());
+                final Optional<ICompletionProposal> completionProposal = fixer.asContentProposal(null,
+                        viewer.getDocument(), assist.getModel());
+                if (completionProposal.isPresent()) {
+                    completionProposal.get().apply(viewer.getDocument());
                 }
-            });
+            }));
         }
 
         return operations;

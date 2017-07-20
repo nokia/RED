@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
@@ -32,8 +33,6 @@ import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
-
-import com.google.common.base.Predicate;
 
 public class WithNameElementsProposalsProviderTest {
 
@@ -62,13 +61,9 @@ public class WithNameElementsProposalsProviderTest {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("suite.robot"));
 
-        final Iterable<RobotElement> elements = filter(getAllElements(suiteFile), new Predicate<RobotElement>() {
-
-            @Override
-            public boolean apply(final RobotElement element) {
-                return !(element instanceof RobotSetting);
-            }
-        });
+        final Iterable<RobotElement> elements = getAllElements(suiteFile).stream()
+                .filter(element -> !(element instanceof RobotSetting))
+                .collect(Collectors.toList());
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
         final WithNameElementsProposalsProvider provider = new WithNameElementsProposalsProvider(dataProvider);
 

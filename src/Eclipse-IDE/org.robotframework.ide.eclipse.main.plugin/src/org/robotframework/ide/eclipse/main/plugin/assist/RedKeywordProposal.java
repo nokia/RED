@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IPath;
@@ -22,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescr
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Range;
 
 public abstract class RedKeywordProposal extends KeywordEntity implements AssistProposal {
@@ -60,7 +60,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
     @Override
     public String getContent() {
         if (content == null) {
-            if (shouldUseQualifiedName.apply(this)) {
+            if (shouldUseQualifiedName.test(this)) {
                 content = bddPrefix + getAlias() + "." + getNameFromDefinition();
             } else {
                 content = bddPrefix + getNameFromDefinition();

@@ -34,22 +34,22 @@ public class AssistProposalPredicatesTest {
     public void alwaysTruePredicate_isAlwaysSatisfied() {
         final AssistProposalPredicate<Object> predicate = AssistProposalPredicates.alwaysTrue();
 
-        assertThat(predicate.apply(null)).isTrue();
-        assertThat(predicate.apply(new Object())).isTrue();
-        assertThat(predicate.apply("abc")).isTrue();
-        assertThat(predicate.apply(newArrayList())).isTrue();
-        assertThat(predicate.apply(newArrayList(1, 2, 3))).isTrue();
+        assertThat(predicate.test(null)).isTrue();
+        assertThat(predicate.test(new Object())).isTrue();
+        assertThat(predicate.test("abc")).isTrue();
+        assertThat(predicate.test(newArrayList())).isTrue();
+        assertThat(predicate.test(newArrayList(1, 2, 3))).isTrue();
     }
 
     @Test
     public void alwaysFalsePredicate_isAlwaysNotSatisfied() {
         final AssistProposalPredicate<Object> predicate = AssistProposalPredicates.alwaysFalse();
 
-        assertThat(predicate.apply(null)).isFalse();
-        assertThat(predicate.apply(new Object())).isFalse();
-        assertThat(predicate.apply("abc")).isFalse();
-        assertThat(predicate.apply(newArrayList())).isFalse();
-        assertThat(predicate.apply(newArrayList(1, 2, 3))).isFalse();
+        assertThat(predicate.test(null)).isFalse();
+        assertThat(predicate.test(new Object())).isFalse();
+        assertThat(predicate.test("abc")).isFalse();
+        assertThat(predicate.test(newArrayList())).isFalse();
+        assertThat(predicate.test(newArrayList(1, 2, 3))).isFalse();
     }
 
     @Test
@@ -65,8 +65,8 @@ public class AssistProposalPredicatesTest {
         final AssistProposalPredicate<LibrarySpecification> predicate = AssistProposalPredicates
                 .reservedLibraryPredicate();
 
-        assertThat(predicate.apply(spec1)).isTrue();
-        assertThat(predicate.apply(spec2)).isTrue();
+        assertThat(predicate.test(spec1)).isTrue();
+        assertThat(predicate.test(spec2)).isTrue();
     }
 
     @Test
@@ -77,7 +77,7 @@ public class AssistProposalPredicatesTest {
         final AssistProposalPredicate<LibrarySpecification> predicate = AssistProposalPredicates
                 .reservedLibraryPredicate();
 
-        assertThat(predicate.apply(spec)).isTrue();
+        assertThat(predicate.test(spec)).isTrue();
     }
 
     @Test
@@ -88,52 +88,52 @@ public class AssistProposalPredicatesTest {
         final AssistProposalPredicate<LibrarySpecification> predicate = AssistProposalPredicates
                 .reservedLibraryPredicate();
 
-        assertThat(predicate.apply(spec)).isFalse();
+        assertThat(predicate.test(spec)).isFalse();
     }
 
     @Test
     public void whenInSecondCellAndForOrGherkinWordIsGiven_theReservedWordPredicateIsSatisfied() {
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates.codeReservedWordsPredicate(1,
-                Optional.<RobotToken> empty());
+                Optional.empty());
 
-        assertThat(predicate.apply(":FOR")).isTrue();
-        assertThat(predicate.apply("Given")).isTrue();
-        assertThat(predicate.apply("When")).isTrue();
-        assertThat(predicate.apply("And")).isTrue();
-        assertThat(predicate.apply("But")).isTrue();
-        assertThat(predicate.apply("Then")).isTrue();
+        assertThat(predicate.test(":FOR")).isTrue();
+        assertThat(predicate.test("Given")).isTrue();
+        assertThat(predicate.test("When")).isTrue();
+        assertThat(predicate.test("And")).isTrue();
+        assertThat(predicate.test("But")).isTrue();
+        assertThat(predicate.test("Then")).isTrue();
     }
 
     @Test
     public void whenInNonSecondCellAndForOrGherkinWordIsGiven_theReservedWordPredicateIsNotSatisfied() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
-                Optional.<RobotToken> empty());
+                Optional.empty());
         final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(3,
-                Optional.<RobotToken> empty());
+                Optional.empty());
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2)) {
-            assertThat(predicate.apply(":FOR")).isFalse();
-            assertThat(predicate.apply("Given")).isFalse();
-            assertThat(predicate.apply("When")).isFalse();
-            assertThat(predicate.apply("And")).isFalse();
-            assertThat(predicate.apply("But")).isFalse();
-            assertThat(predicate.apply("Then")).isFalse();
+            assertThat(predicate.test(":FOR")).isFalse();
+            assertThat(predicate.test("Given")).isFalse();
+            assertThat(predicate.test("When")).isFalse();
+            assertThat(predicate.test("And")).isFalse();
+            assertThat(predicate.test("But")).isFalse();
+            assertThat(predicate.test("Then")).isFalse();
         }
     }
 
     @Test
     public void whenThereIsNoTokenGiven_theReservedWordPredicateIsNotSatisfiedForArbitraryWords() {
         final AssistProposalPredicate<String> predicate1 = AssistProposalPredicates.codeReservedWordsPredicate(0,
-                Optional.<RobotToken> empty());
+                Optional.empty());
         final AssistProposalPredicate<String> predicate2 = AssistProposalPredicates.codeReservedWordsPredicate(1,
-                Optional.<RobotToken> empty());
+                Optional.empty());
         final AssistProposalPredicate<String> predicate3 = AssistProposalPredicates.codeReservedWordsPredicate(5,
-                Optional.<RobotToken> empty());
+                Optional.empty());
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
-            assertThat(predicate.apply(null)).isFalse();
-            assertThat(predicate.apply("")).isFalse();
-            assertThat(predicate.apply("word")).isFalse();
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
         }
     }
 
@@ -147,9 +147,9 @@ public class AssistProposalPredicatesTest {
                 Optional.of(RobotToken.create("foo")));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
-            assertThat(predicate.apply(null)).isFalse();
-            assertThat(predicate.apply("")).isFalse();
-            assertThat(predicate.apply("word")).isFalse();
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
         }
     }
 
@@ -163,9 +163,9 @@ public class AssistProposalPredicatesTest {
                 Optional.of(RobotToken.create(": FOR")));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
-            assertThat(predicate.apply(null)).isFalse();
-            assertThat(predicate.apply("")).isFalse();
-            assertThat(predicate.apply("word")).isFalse();
+            assertThat(predicate.test(null)).isFalse();
+            assertThat(predicate.test("")).isFalse();
+            assertThat(predicate.test("word")).isFalse();
         }
     }
 
@@ -179,9 +179,9 @@ public class AssistProposalPredicatesTest {
                 Optional.of(RobotToken.create(": FOR")));
 
         for (final AssistProposalPredicate<String> predicate : newArrayList(predicate1, predicate2, predicate3)) {
-            assertThat(predicate.apply(null)).isTrue();
-            assertThat(predicate.apply("")).isTrue();
-            assertThat(predicate.apply("word")).isTrue();
+            assertThat(predicate.test(null)).isTrue();
+            assertThat(predicate.test("")).isTrue();
+            assertThat(predicate.test("word")).isTrue();
         }
     }
 
@@ -191,10 +191,10 @@ public class AssistProposalPredicatesTest {
 
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates.globalVariablePredicate(element);
 
-        assertThat(predicate.apply(null)).isTrue();
-        assertThat(predicate.apply("")).isTrue();
-        assertThat(predicate.apply("foo")).isTrue();
-        assertThat(predicate.apply("${var}")).isTrue();
+        assertThat(predicate.test(null)).isTrue();
+        assertThat(predicate.test("")).isTrue();
+        assertThat(predicate.test("foo")).isTrue();
+        assertThat(predicate.test("${var}")).isTrue();
 
         verifyZeroInteractions(element);
     }
@@ -206,9 +206,9 @@ public class AssistProposalPredicatesTest {
 
         for (final RobotElement element : Iterables.concat(newArrayList(testCase), testCase.getChildren())) {
             final AssistProposalPredicate<String> predicate = AssistProposalPredicates.globalVariablePredicate(element);
-            assertThat(predicate.apply("${TEST_NAME}")).isTrue();
-            assertThat(predicate.apply("@{TEST_TAGS}")).isTrue();
-            assertThat(predicate.apply("${TEST_DOCUMENTATION")).isTrue();
+            assertThat(predicate.test("${TEST_NAME}")).isTrue();
+            assertThat(predicate.test("@{TEST_TAGS}")).isTrue();
+            assertThat(predicate.test("${TEST_DOCUMENTATION")).isTrue();
         }
     }
 
@@ -218,9 +218,9 @@ public class AssistProposalPredicatesTest {
 
         final AssistProposalPredicate<String> anyElementPredicate = AssistProposalPredicates
                 .globalVariablePredicate(anyElement);
-        assertThat(anyElementPredicate.apply("${TEST_NAME}")).isFalse();
-        assertThat(anyElementPredicate.apply("@{TEST_TAGS}")).isFalse();
-        assertThat(anyElementPredicate.apply("${TEST_DOCUMENTATION}")).isFalse();
+        assertThat(anyElementPredicate.test("${TEST_NAME}")).isFalse();
+        assertThat(anyElementPredicate.test("@{TEST_TAGS}")).isFalse();
+        assertThat(anyElementPredicate.test("${TEST_DOCUMENTATION}")).isFalse();
     }
 
     @Test
@@ -230,8 +230,8 @@ public class AssistProposalPredicatesTest {
 
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(suiteTeardown);
-        assertThat(predicate.apply("${SUITE_STATUS}")).isTrue();
-        assertThat(predicate.apply("${SUITE_MESSAGE}")).isTrue();
+        assertThat(predicate.test("${SUITE_STATUS}")).isTrue();
+        assertThat(predicate.test("${SUITE_MESSAGE}")).isTrue();
     }
 
     @Test
@@ -243,8 +243,8 @@ public class AssistProposalPredicatesTest {
         for (int i = 1; i < settings.size(); i++) {
             final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                     .globalVariablePredicate(settings.get(i));
-            assertThat(predicate.apply("${SUITE_STATUS}")).isFalse();
-            assertThat(predicate.apply("${SUITE_MESSAGE}")).isFalse();
+            assertThat(predicate.test("${SUITE_STATUS}")).isFalse();
+            assertThat(predicate.test("${SUITE_MESSAGE}")).isFalse();
         }
     }
 
@@ -252,8 +252,8 @@ public class AssistProposalPredicatesTest {
     public void whenSuiteTeardownVariableIsTested_theGlobalVarsPredicateIsNotSatisfiedForAnyElement() {
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(mock(RobotElement.class));
-        assertThat(predicate.apply("${SUITE_STATUS}")).isFalse();
-        assertThat(predicate.apply("${SUITE_MESSAGE}")).isFalse();
+        assertThat(predicate.test("${SUITE_STATUS}")).isFalse();
+        assertThat(predicate.test("${SUITE_MESSAGE}")).isFalse();
     }
 
     @Test
@@ -266,8 +266,8 @@ public class AssistProposalPredicatesTest {
 
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(keywordTeardown);
-        assertThat(predicate.apply("${KEYWORD_STATUS}")).isTrue();
-        assertThat(predicate.apply("${KEYWORD_MESSAGE}")).isTrue();
+        assertThat(predicate.test("${KEYWORD_STATUS}")).isTrue();
+        assertThat(predicate.test("${KEYWORD_MESSAGE}")).isTrue();
     }
 
     @Test
@@ -280,8 +280,8 @@ public class AssistProposalPredicatesTest {
         for (int i = 1; i < settings.size(); i++) {
             final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                     .globalVariablePredicate(settings.get(i));
-            assertThat(predicate.apply("${KEYWORD_STATUS}")).isFalse();
-            assertThat(predicate.apply("${KEYWORD_MESSAGE}")).isFalse();
+            assertThat(predicate.test("${KEYWORD_STATUS}")).isFalse();
+            assertThat(predicate.test("${KEYWORD_MESSAGE}")).isFalse();
         }
     }
 
@@ -289,8 +289,8 @@ public class AssistProposalPredicatesTest {
     public void whenKeywordTeardownVariableIsTested_theGlobalVarsPredicateIsNotSatisfiedForAnyElement() {
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(mock(RobotElement.class));
-        assertThat(predicate.apply("${KEYWORD_STATUS}")).isFalse();
-        assertThat(predicate.apply("${KEYWORD_MESSAGE}")).isFalse();
+        assertThat(predicate.test("${KEYWORD_STATUS}")).isFalse();
+        assertThat(predicate.test("${KEYWORD_MESSAGE}")).isFalse();
     }
 
     @Test
@@ -301,8 +301,8 @@ public class AssistProposalPredicatesTest {
 
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(generalTestTeardown);
-        assertThat(predicate.apply("${TEST_STATUS}")).isTrue();
-        assertThat(predicate.apply("${TEST_MESSAGE}")).isTrue();
+        assertThat(predicate.test("${TEST_STATUS}")).isTrue();
+        assertThat(predicate.test("${TEST_MESSAGE}")).isTrue();
     }
 
     @Test
@@ -313,8 +313,8 @@ public class AssistProposalPredicatesTest {
 
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(testTeardown);
-        assertThat(predicate.apply("${TEST_STATUS}")).isTrue();
-        assertThat(predicate.apply("${TEST_MESSAGE}")).isTrue();
+        assertThat(predicate.test("${TEST_STATUS}")).isTrue();
+        assertThat(predicate.test("${TEST_MESSAGE}")).isTrue();
     }
 
     @Test
@@ -328,8 +328,8 @@ public class AssistProposalPredicatesTest {
             if (i != 1) {
                 final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                         .globalVariablePredicate(settings.get(i));
-                assertThat(predicate.apply("${TEST_STATUS}")).isFalse();
-                assertThat(predicate.apply("${TEST_MESSAGE}")).isFalse();
+                assertThat(predicate.test("${TEST_STATUS}")).isFalse();
+                assertThat(predicate.test("${TEST_MESSAGE}")).isFalse();
             }
         }
     }
@@ -338,8 +338,8 @@ public class AssistProposalPredicatesTest {
     public void whenTestTeardownVariableIsTested_theGlobalVarsPredicateIsNotSatisfiedForAnyElement() {
         final AssistProposalPredicate<String> predicate = AssistProposalPredicates
                 .globalVariablePredicate(mock(RobotElement.class));
-        assertThat(predicate.apply("${TEST_STATUS}")).isFalse();
-        assertThat(predicate.apply("${TEST_MESSAGE}")).isFalse();
+        assertThat(predicate.test("${TEST_STATUS}")).isFalse();
+        assertThat(predicate.test("${TEST_MESSAGE}")).isFalse();
     }
 
     private static RobotSuiteFile createModel() {

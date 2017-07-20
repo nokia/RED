@@ -28,7 +28,7 @@ public final class ResolvedImportPath {
             if (RobotExpressions.isParameterized(path)) {
                 final String resolvedPath = RobotExpressions.resolve(parameters, path);
                 if (RobotExpressions.isParameterized(resolvedPath)) {
-                    return Optional.<ResolvedImportPath> empty();
+                    return Optional.empty();
                 } else {
                     return Optional.of(create(resolvedPath));
                 }
