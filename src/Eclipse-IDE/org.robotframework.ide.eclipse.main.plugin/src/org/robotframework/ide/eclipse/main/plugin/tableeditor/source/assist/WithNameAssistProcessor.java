@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate
 import org.robotframework.ide.eclipse.main.plugin.assist.RedWithNameProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
 import com.google.common.base.Joiner;
 
@@ -70,7 +70,7 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
                     : new Position(offset - prefix.length() + proposal.getContent().length() + separator.length(),
                             proposal.getArguments().get(0).length());
 
-            final DocumentationModification modification = new DocumentationModification(contentSuffix,
+            final DocumentModification modification = new DocumentModification(contentSuffix,
                     new Position(offset - prefix.length(), cellLength), toHighlight);
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));

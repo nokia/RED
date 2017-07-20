@@ -18,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposal
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
 
 /**
@@ -57,7 +57,7 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : varFilesProposals) {
-            final DocumentationModification modification = new DocumentationModification("",
+            final DocumentModification modification = new DocumentModification("",
                     new Position(offset - prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));

@@ -401,26 +401,14 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public SetMultimap<LibrarySpecification, String> getImportedLibraries() {
-        return getAvailableLibraries(false);
-    }
-
-    public SetMultimap<LibrarySpecification, String> getAllLibraries() {
-        return getAvailableLibraries(true);
-    }
-
-    private SetMultimap<LibrarySpecification, String> getAvailableLibraries(final boolean includeNotImported) {
-        final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
-        final SetMultimap<String, String> toImport = HashMultimap.create();
-        if (section.isPresent()) {
-            toImport.putAll(section.get().getLibrariesPathsOrNamesWithAliases());
-        }
+        final SetMultimap<String, String> toImport = getLibrariesPathsOrNamesWithAliases();
 
         final SetMultimap<LibrarySpecification, String> imported = HashMultimap.create();
         for (final LibrarySpecification spec : getProject().getLibrariesSpecifications()) {
             if (toImport.containsKey(spec.getName())) {
                 imported.putAll(spec, toImport.get(spec.getName()));
                 toImport.removeAll(spec.getName());
-            } else if (includeNotImported || spec.isAccessibleWithoutImport()) {
+            } else if (spec.isAccessibleWithoutImport()) {
                 imported.put(spec, "");
             }
         }
@@ -435,6 +423,26 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             }
         }
         return imported;
+    }
+
+    public SetMultimap<LibrarySpecification, String> getNotImportedLibraries() {
+        final SetMultimap<String, String> toImport = getLibrariesPathsOrNamesWithAliases();
+
+        final SetMultimap<LibrarySpecification, String> imported = HashMultimap.create();
+        for (final LibrarySpecification spec : getProject().getLibrariesSpecifications()) {
+            if (!toImport.containsKey(spec.getName()) && !spec.isAccessibleWithoutImport()) {
+                imported.put(spec, "");
+            }
+        }
+        return imported;
+    }
+
+    private SetMultimap<String, String> getLibrariesPathsOrNamesWithAliases() {
+        final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
+        if (section.isPresent()) {
+            return section.get().getLibrariesPathsOrNamesWithAliases();
+        }
+        return HashMultimap.create();
     }
 
     private LibrarySpecification findSpecForPath(final String pathOrName) {
