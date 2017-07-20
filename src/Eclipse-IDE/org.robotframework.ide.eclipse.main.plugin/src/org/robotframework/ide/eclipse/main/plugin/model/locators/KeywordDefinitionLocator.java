@@ -65,8 +65,8 @@ public class KeywordDefinitionLocator {
             final KeywordDetector detector) {
         for (final LibrarySpecification libSpec : filter(libSpecs, Predicates.notNull())) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, newHashSet(""),
-                        null, false);
+                final ContinueDecision shouldContinue = detector.nonAccessibleLibraryKeywordDetected(libSpec, kwSpec,
+                        null);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
@@ -141,8 +141,9 @@ public class KeywordDefinitionLocator {
         for (final LibrarySpecification libSpec : libsToSearch.keySet()) {
             final boolean isAccessible = importedLibs.containsKey(libSpec);
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
-                        libsToSearch.get(libSpec), file, isAccessible);
+                final ContinueDecision shouldContinue = isAccessible
+                        ? detector.accessibleLibraryKeywordDetected(libSpec, kwSpec, libsToSearch.get(libSpec), file)
+                        : detector.nonAccessibleLibraryKeywordDetected(libSpec, kwSpec, file);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
@@ -176,12 +177,25 @@ public class KeywordDefinitionLocator {
          *            Library alias (may be empty)
          * @param exposingFile
          *            The file which imported given library
-         * @param isAccessible
-         *            Whether library is imported or accessible without import
          * @return A decision whether detection should proceed
          */
-        ContinueDecision libraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
-                Set<String> libraryAlias, RobotSuiteFile exposingFile, boolean isAccessible);
+        ContinueDecision accessibleLibraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
+                Set<String> libraryAlias, RobotSuiteFile exposingFile);
+
+        /**
+         * Called when keyword of given specification was found within given library which is about
+         * to be exposed by given file
+         *
+         * @param libSpec
+         *            Specification of library where keyword was detected
+         * @param kwSpec
+         *            Specification of detected keyword
+         * @param exposingFile
+         *            The file which is about to import given library
+         * @return A decision whether detection should proceed
+         */
+        ContinueDecision nonAccessibleLibraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
+                RobotSuiteFile exposingFile);
 
     }
 }

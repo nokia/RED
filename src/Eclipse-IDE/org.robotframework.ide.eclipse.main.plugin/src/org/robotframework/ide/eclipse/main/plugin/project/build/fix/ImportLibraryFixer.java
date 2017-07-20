@@ -52,13 +52,19 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
                 .locateKeywordDefinitionInLibraries(model.createRobotProject(file.getProject()), new KeywordDetector() {
 
                     @Override
-                    public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                            final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                            final RobotSuiteFile exposingFile, final boolean isAccessible) {
+                    public ContinueDecision nonAccessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                            final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
                         if (QualifiedKeywordName.fromOccurrence(keywordName).matchesIgnoringCase(QualifiedKeywordName
                                 .create(QualifiedKeywordName.unifyDefinition(kwSpec.getName()), libSpec.getName()))) {
                             libs.add(libSpec.getName());
                         }
+                        return ContinueDecision.CONTINUE;
+                    }
+
+                    @Override
+                    public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
+                            final KeywordSpecification kwSpec, final Set<String> libraryAlias,
+                            final RobotSuiteFile exposingFile) {
                         return ContinueDecision.CONTINUE;
                     }
 

@@ -21,7 +21,7 @@ class BddMatchesHelper {
 
     BddAwareProposalMatch findBddAwareMatch(final String userContent, final String proposalContent) {
         final StringBuilder gherkinPrefix = new StringBuilder();
-        final AtomicReference<Optional<ProposalMatch>> match = new AtomicReference<>(Optional.<ProposalMatch> empty());
+        final AtomicReference<Optional<ProposalMatch>> match = new AtomicReference<>(Optional.empty());
         GherkinStyleSupport.forEachPossibleGherkinName(userContent, new NameOperation() {
 
             @Override
