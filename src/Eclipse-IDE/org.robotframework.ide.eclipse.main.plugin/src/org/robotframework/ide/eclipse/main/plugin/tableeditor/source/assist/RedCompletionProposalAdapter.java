@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
@@ -30,15 +31,15 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
     private final AssistProposal adaptedProposal;
 
-    private final DocumentationModification modification;
+    private final DocumentModification modification;
 
     private final IContextInformation contextInformation;
 
-    public RedCompletionProposalAdapter(final AssistProposal proposal, final DocumentationModification modification) {
+    public RedCompletionProposalAdapter(final AssistProposal proposal, final DocumentModification modification) {
         this(proposal, modification, null);
     }
 
-    public RedCompletionProposalAdapter(final AssistProposal proposal, final DocumentationModification modification,
+    public RedCompletionProposalAdapter(final AssistProposal proposal, final DocumentModification modification,
             final IContextInformation contextInformation) {
         this.adaptedProposal = proposal;
         this.modification = modification;
@@ -124,10 +125,10 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
     }
 
     public Collection<Runnable> operationsToPerformAfterAccepting() {
-        return modification.operationsAfterAccepting;
+        return modification.operationsAfterAccepting.get();
     }
 
-    static class DocumentationModification {
+    static class DocumentModification {
 
         private final String contentSuffix;
 
@@ -137,34 +138,36 @@ public class RedCompletionProposalAdapter implements Comparable<RedCompletionPro
 
         private final Position toSelect;
 
-        public Collection<Runnable> operationsAfterAccepting;
+        // calculating operations to perform after accepting may be time consuming, so instead of
+        // precomputing this information for each proposal we're pushing the calculation into this
+        // lambda, which is calculated only when proposal is chosen
+        public Supplier<Collection<Runnable>> operationsAfterAccepting;
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace) {
-            this(contentSuffix, toReplace, null, false, new ArrayList<Runnable>());
+        public DocumentModification(final String contentSuffix, final Position toReplace) {
+            this(contentSuffix, toReplace, null, false, () -> new ArrayList<Runnable>());
         }
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace,
+        public DocumentModification(final String contentSuffix, final Position toReplace,
                 final boolean shouldActivate) {
-            this(contentSuffix, toReplace, null, shouldActivate, new ArrayList<Runnable>());
+            this(contentSuffix, toReplace, null, shouldActivate, () -> new ArrayList<Runnable>());
         }
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace,
-                final Position toSelect) {
-            this(contentSuffix, toReplace, toSelect, false, new ArrayList<Runnable>());
+        public DocumentModification(final String contentSuffix, final Position toReplace, final Position toSelect) {
+            this(contentSuffix, toReplace, toSelect, false, () -> new ArrayList<Runnable>());
         }
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace, final Position toSelect,
-                final Collection<Runnable> operationsAfterAccepting) {
+        public DocumentModification(final String contentSuffix, final Position toReplace, final Position toSelect,
+                final Supplier<Collection<Runnable>> operationsAfterAccepting) {
             this(contentSuffix, toReplace, toSelect, false, operationsAfterAccepting);
         }
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace,
-                final Collection<Runnable> operationsAfterAccepting) {
+        public DocumentModification(final String contentSuffix, final Position toReplace,
+                final Supplier<Collection<Runnable>> operationsAfterAccepting) {
             this(contentSuffix, toReplace, null, false, operationsAfterAccepting);
         }
 
-        public DocumentationModification(final String contentSuffix, final Position toReplace, final Position toSelect,
-                final boolean activateAssistant, final Collection<Runnable> operationsAfterAccepting) {
+        public DocumentModification(final String contentSuffix, final Position toReplace, final Position toSelect,
+                final boolean activateAssistant, final Supplier<Collection<Runnable>> operationsAfterAccepting) {
             this.contentSuffix = contentSuffix;
             this.toReplace = toReplace;
             this.toSelect = toSelect;

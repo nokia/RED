@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedLibraryProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
 import com.google.common.base.Joiner;
 
@@ -71,13 +71,12 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal libProposal : libProposals) {
-            final Position positionToReplace = new Position(offset - prefix.length(), cellLength);
-
             final List<String> args = libProposal.getArguments();
             final String additionalContent = atTheEndOfLine
-                    ? separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args)) : "";
-            final DocumentationModification modification = new DocumentationModification(additionalContent,
-                    positionToReplace);
+                    ? separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args))
+                    : "";
+            final DocumentModification modification = new DocumentModification(additionalContent,
+                    new Position(offset - prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(libProposal, modification));
         }

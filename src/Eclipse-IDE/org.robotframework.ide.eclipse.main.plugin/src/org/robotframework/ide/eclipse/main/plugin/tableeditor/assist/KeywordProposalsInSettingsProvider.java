@@ -26,6 +26,7 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 public class KeywordProposalsInSettingsProvider implements RedContentProposalProvider {
 
     private final RobotSuiteFile suiteFile;
+
     private final IRowDataProvider<?> dataProvider;
 
     public KeywordProposalsInSettingsProvider(final RobotSuiteFile suiteFile, final IRowDataProvider<?> dataProvider) {
@@ -47,7 +48,7 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
 
             for (final AssistProposal proposedKeyword : keywordsEntities) {
                 proposals.add(new AssistProposalAdapter(proposedKeyword,
-                        createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
+                        () -> createOperationsToPerformAfterAccepting((RedKeywordProposal) proposedKeyword)));
             }
         }
         return proposals.toArray(new RedContentProposal[0]);
@@ -66,9 +67,10 @@ public class KeywordProposalsInSettingsProvider implements RedContentProposalPro
         final String settingName = (String) entry.getKey();
         final RobotTokenType actualType = RobotTokenType.findTypeOfDeclarationForSettingTable(settingName);
 
-        return EnumSet.of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION,
-                RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_SETUP_DECLARATION,
-                RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)
+        return EnumSet
+                .of(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION, RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION,
+                        RobotTokenType.SETTING_TEST_SETUP_DECLARATION, RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION,
+                        RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)
                 .contains(actualType);
     }
 }

@@ -22,7 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate
 import org.robotframework.ide.eclipse.main.plugin.assist.RedCodeReservedWordProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
 
 /**
@@ -68,7 +68,7 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         for (final AssistProposal proposal : wordsProposals) {
             final String additional = getAdditionalContent(atTheEndOfLine, proposal);
 
-            final DocumentationModification modification = new DocumentationModification(additional,
+            final DocumentModification modification = new DocumentModification(additional,
                     new Position(offset - prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
