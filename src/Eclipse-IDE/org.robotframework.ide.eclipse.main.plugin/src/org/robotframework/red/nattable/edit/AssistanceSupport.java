@@ -5,11 +5,7 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.keys.IBindingService;
-import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
@@ -17,7 +13,6 @@ import org.robotframework.red.jface.assist.RedContentProposalProvider;
 
 /**
  * @author Michal Anglart
- *
  */
 public class AssistanceSupport {
 
@@ -30,27 +25,18 @@ public class AssistanceSupport {
     }
 
     public void install(final Text text, final AssistantContext context) {
-        install(text, context, getContentAssistActivationTrigger(), null);
+        install(text, context, null);
     }
 
     public void install(final Text text, final AssistantContext context, final RedContentProposalListener listener) {
-        install(text, context, getContentAssistActivationTrigger(), listener);
-    }
-
-    private void install(final Text text, final AssistantContext context, final KeySequence activationTrigger,
-            final RedContentProposalListener listener) {
-        if (proposalsProvider == null || text.isDisposed() || activationTrigger == null) {
+        if (proposalsProvider == null || text.isDisposed()) {
             return;
         }
-        adapter = listener == null
-                ? RedContentProposalAdapter.install(text, context, proposalsProvider, activationTrigger)
-                : RedContentProposalAdapter.install(text, context, proposalsProvider, activationTrigger, listener);
-        RedContentProposalAdapter.markControlWithDecoration(adapter);
-    }
-
-    private KeySequence getContentAssistActivationTrigger() {
-        final IBindingService service = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-        return (KeySequence) service.getBestActiveBindingFor(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
+        adapter = listener == null ? RedContentProposalAdapter.install(text, context, proposalsProvider)
+                : RedContentProposalAdapter.install(text, context, proposalsProvider, listener);
+        if (adapter != null) {
+            RedContentProposalAdapter.markControlWithDecoration(adapter);
+        }
     }
 
     public boolean areContentProposalsShown() {
