@@ -10,13 +10,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ImportLibraryTableFixer;
 import org.robotframework.red.junit.Editors;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -25,9 +27,17 @@ public class ImportLibraryTableFixerTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(ImportLibraryTableFixerTest.class);
 
+    private final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+
+    private final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
+
+    @After
+    public void after() {
+        page.closeAllEditors(false);
+    }
+
     @Test
     public void libraryImportIsAdded_whenSettingsSectionDoesNotExist() throws Exception {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final IFile suiteFile = projectProvider.createFile("suite.robot");
         Editors.openInRobotEditor(suiteFile);
 
@@ -43,7 +53,6 @@ public class ImportLibraryTableFixerTest {
 
     @Test
     public void libraryImportIsAdded_whenEmptySettingsSectionExists() throws Exception {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***");
         Editors.openInRobotEditor(suiteFile);
 
@@ -59,7 +68,6 @@ public class ImportLibraryTableFixerTest {
 
     @Test
     public void libraryImportIsAdded_whenNotEmptySettingsSectionExists() throws Exception {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  SomeLib");
         Editors.openInRobotEditor(suiteFile);
 
@@ -75,7 +83,6 @@ public class ImportLibraryTableFixerTest {
 
     @Test
     public void libraryImportIsAdded_whenSeveralSettingsSectionsExist() throws Exception {
-        final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  FirstLib",
                 "*** Settings ***", "Library  SecondLib");
         Editors.openInRobotEditor(suiteFile);
