@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ public class RedSectionProposalsTest {
     public void allProposalsAreProvided_whenPrefixIsEmpty() {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("");
         
-        assertThat(transform(proposals, toLabels())).containsExactly("*** Keywords ***", "*** Settings ***",
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Keywords ***", "*** Settings ***",
                 "*** Test Cases ***", "*** Variables ***");
     }
 
@@ -36,7 +35,7 @@ public class RedSectionProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSectionProposals().getSectionsProposals("*",
                 reverseComparator(AssistProposals.sortedByLabels()));
 
-        assertThat(transform(proposals, toLabels())).containsExactly("*** Variables ***", "*** Test Cases ***",
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Variables ***", "*** Test Cases ***",
                 "*** Settings ***", "*** Keywords ***");
     }
 
@@ -45,6 +44,6 @@ public class RedSectionProposalsTest {
         final List<? extends AssistProposal> proposals = new RedSectionProposals(substringMatcher())
                 .getSectionsProposals("es");
 
-        assertThat(transform(proposals, toLabels())).containsExactly("*** Test Cases ***", "*** Variables ***");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("*** Test Cases ***", "*** Variables ***");
     }
 }
