@@ -1,0 +1,235 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_d8aMACuvEeW667Afdo4DcA
+Element-Name: EditingVariableNew
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: __AGDkGyEEeeps9cepQRw2Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/21/17 5:21 PM
+Tags: notTestable
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "change-var-value" [val val_name] [val new_val]{
+	with [get-view Variables | get-tree] {
+	    select $val_name | activate-cell-edit -column 1
+	    with [get-editbox] {
+	        set-text $new_val
+	        key-type Enter
+	    }
+	    apply-cell-edit -deactivate
+	}    
+}
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+
+get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
+    + "Library    Collections    \n"
+    + "*** Variables ***\n"
+    + "${a}    45\n"
+    + "@{c}   x  y  z\n"
+    + "@{list}    66  77  888  ${a}\n"
+    + "&{dict}    key=value    fruit= apple  last=${a}\n\n"
+    + "# assigning\n"
+    + "${b}    ${a}\n"
+    + "@{assigned}  ${c}   a1  a2  a3\n"
+    + "*** Test Cases ***\n"
+    + "ada\n"
+    + "    log  7\n"
+    + "    Log Many    @{assigned}\n"
+    + "    Log Many    &{dict}\n"
+    + "    Remove From Dictionary  ${dict}   fruit\n"
+    + "    Remove From List    ${list}    2"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+//set BP
+get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 14
+
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
+	wait-for-thread -file "TestFile.robot"
+	
+	get-view Variables | maximize
+	//change value for variable
+	change-var-value "${a}"  999
+	
+	//change value in list @{c}
+	change-var-value  "@{c}/\\[1\\]" middle
+
+	//check i values are changed in list that contains list @{c}
+	wait 1000
+//	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
+	wait 1000
+	with [get-view Variables | get-tree] {
+		get-item "@{assigned}" | expand
+		wait 1000
+	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Value']" | equals x | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[1\\]" | get-property "values['Value']" | equals y | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[2\\]" | get-property "values['Value']" | equals z | verify-true
+	}
+	with [get-view Variables | get-tree] {
+	    get-item "@{assigned}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{assigned}/\\[1\\]" | get-property "values['Value']" | equals a1 | verify-true
+	    get-item "@{assigned}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{assigned}/\\[2\\]" | get-property "values['Value']" | equals a2 | verify-true
+	    get-item "@{assigned}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
+	    get-item "@{assigned}/\\[3\\]" | get-property "values['Value']" | equals a3 | verify-true
+	}
+	//change first item in nested list in @assigned
+	change-var-value "@{assigned}/\\[0\\]/\\[0\\]" 1111
+	
+	//change last value in list
+	change-var-value "@{assigned}/\\[3\\]"   t1
+	with [get-button "Step Over (F6)"] {
+	    click
+	    wait 500
+	    click
+	}
+	//check values
+	with [get-view Variables | get-tree] {
+	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Value']" | equals 1111 | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[1\\]" | get-property "values['Value']" | equals y | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{assigned}/\\[0\\]/\\[2\\]" | get-property "values['Value']" | equals z | verify-true
+	    get-item "@{assigned}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{assigned}/\\[1\\]" | get-property "values['Value']" | equals a1 | verify-true
+	    get-item "@{assigned}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{assigned}/\\[2\\]" | get-property "values['Value']" | equals a2 | verify-true
+	    get-item "@{assigned}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
+	    get-item "@{assigned}/\\[3\\]" | get-property "values['Value']" | equals t1 | verify-true
+	    
+	    get-item "@{c}" | expand
+	    get-item "@{c}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{c}/\\[0\\]" | get-property "values['Value']" | equals x | verify-true
+	    get-item "@{c}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{c}/\\[1\\]" | get-property "values['Value']" | equals middle | verify-true
+	    get-item "@{c}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{c}/\\[2\\]" | get-property "values['Value']" | equals z | verify-true
+	}
+	
+	//check variables after step over
+	with [get-view Variables | get-tree] {
+	    get-item "${a}" | get-property "values['Name']" | equals "${a}" | verify-true
+	    get-item "${a}" | get-property "values['Value']" | equals 999 | verify-true
+	    get-item "${b}" | get-property "values['Name']" | equals "${b}" | verify-true
+	    get-item "${b}" | get-property "values['Value']" | equals 45 | verify-true
+	}
+	//check dict
+	with [get-view Variables | get-tree] {
+	    get-item "&{dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
+	    get-item "&{dict}/fruit" | get-property "values['Value']" | equals " apple" | verify-true
+	    get-item "&{dict}/key" | get-property "values['Name']" | equals key | verify-true
+	    get-item "&{dict}/key" | get-property "values['Value']" | equals "value" | verify-true
+	    get-item "&{dict}/last" | get-property "values['Name']" | equals last | verify-true
+	    get-item "&{dict}/last" | get-property "values['Value']" | equals "45" | verify-true
+	}
+	with [get-view Variables | get-tree] {
+	    get-item "@{list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{list}/\\[0\\]" | get-property "values['Value']" | equals 66 | verify-true
+	    get-item "@{list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{list}/\\[1\\]" | get-property "values['Value']" | equals 77 | verify-true
+	    get-item "@{list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{list}/\\[2\\]" | get-property "values['Value']" | equals 888 | verify-true
+	}
+	
+	//assigne to a b again
+	change-var-value "${b}" "${a}"
+	//check if value was updated
+	with [get-view Variables | get-tree] {
+	    get-item "${b}" | get-property "values['Name']" | equals "${b}" | verify-true
+	    get-item "${b}" | get-property "values['Value']" | equals 999 | verify-true
+	}
+	
+	// ---------------------------------------------------- wrong values ----------------------------------------------------
+	
+	//assigne non-existing param
+	change-var-value "${b}" "${new}"
+	get-window "Debugger Error" 
+	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Variable '${new}' not found." 
+	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
+	    + "Setting variables error: Variable '${new}' not found." | verify-true
+	get-window "Debugger Error" | get-button OK | click
+	
+	//check if old value was restored
+	get-view Variables | get-tree | get-item "${b}" | get-property "values['Value']" | equals 999 | verify-true
+	
+	//add value with double spaces
+	change-var-value "${b}" "  text"
+	get-window "Debugger Error" 
+	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
+	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
+	    + "Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
+	    | verify-true
+	get-window "Debugger Error" | get-button OK | click
+	
+	
+	//assigne non-existing list to variable
+	change-var-value "${b}" "@{abc}"
+	get-window "Debugger Error" 
+	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
+	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
+	    + "Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
+	    | verify-true
+	get-window "Debugger Error" | get-button OK | click
+	
+	
+	//------------------------------------------ different type ----------------------------------------------------------
+	//add empty text
+	change-var-value "${b}" ""
+	get-view Variables | get-tree | get-item "${b}" | get-property "values['Value']" | equals "" | verify-true
+	
+	//change param to list
+	change-var-value "${b}" "${c}"
+	with [get-view Variables | get-tree] {
+	    get-item "${b}" | get-property "values['Value']" | equals "" | verify-true
+	    get-item "@{a}" | get-property "values['Name']" | equals "@{a}" | verify-true
+	    get-item "@{a}" | get-property "values['Value']" | equals "list[3]" | verify-true
+	    get-item "@{a}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{a}/\\[0\\]" | get-property "values['Value']" | equals x | verify-true
+	    get-item "@{a}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{a}/\\[1\\]" | get-property "values['Value']" | equals middle | verify-true
+	    get-item "@{a}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{a}/\\[2\\]" | get-property "values['Value']" | equals z | verify-true
+	}
+	
+	//change value to non-existing param 
+	change-var-value "@{c}/\\[2\\]"   "${ghi}"
+	
+	get-window "Debugger Error" 
+	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Variable '${ghi}' not found." 
+	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
+	    + "Setting variables error: Variable '${ghi}' not found." | verify-true
+	get-window "Debugger Error" | get-button OK | click
+	
+	//change value for key in dict
+	change-var-value "&{dict}/key"   "${z}"
+	get-window "Debugger Error" 
+	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Variable '${z}' not found." 
+	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
+	    + "Setting variables error: Variable '${z}' not found." | verify-true
+	get-window "Debugger Error" | get-button OK | click
+
+	
+}
+
+
+//   Append To List    ${list}    omamo    
+//    Insert Into List    ${list}     1   bede na 1
+//    Set To Dictionary  ${dict}   nowiuski_klucz=na koniec
+//    log many  ${dict} 
+//    Log Many    ${list}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
