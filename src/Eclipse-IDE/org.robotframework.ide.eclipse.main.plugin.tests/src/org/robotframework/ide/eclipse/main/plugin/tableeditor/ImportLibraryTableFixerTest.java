@@ -3,18 +3,21 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
+import org.eclipse.core.resources.IFile;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ImportLibraryTableFixer;
+import org.robotframework.red.junit.Editors;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class ImportLibraryTableFixerTest {
@@ -25,7 +28,10 @@ public class ImportLibraryTableFixerTest {
     @Test
     public void libraryImportIsAdded_whenSettingsSectionDoesNotExist() throws Exception {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, projectProvider.createFile("suite.robot"));
+        final IFile suiteFile = projectProvider.createFile("suite.robot");
+        Editors.openInRobotEditor(suiteFile);
+
+        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, suiteFile);
 
         final ImportLibraryTableFixer fixer = new ImportLibraryTableFixer("LibToFix");
         fixer.apply(robotFile);
@@ -38,8 +44,10 @@ public class ImportLibraryTableFixerTest {
     @Test
     public void libraryImportIsAdded_whenEmptySettingsSectionExists() throws Exception {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject,
-                projectProvider.createFile("suite.robot", "*** Settings ***"));
+        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***");
+        Editors.openInRobotEditor(suiteFile);
+
+        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, suiteFile);
 
         final ImportLibraryTableFixer fixer = new ImportLibraryTableFixer("LibToFix");
         fixer.apply(robotFile);
@@ -52,8 +60,10 @@ public class ImportLibraryTableFixerTest {
     @Test
     public void libraryImportIsAdded_whenNotEmptySettingsSectionExists() throws Exception {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject,
-                projectProvider.createFile("suite.robot", "*** Settings ***", "Library  SomeLib"));
+        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  SomeLib");
+        Editors.openInRobotEditor(suiteFile);
+
+        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, suiteFile);
 
         final ImportLibraryTableFixer fixer = new ImportLibraryTableFixer("LibToFix");
         fixer.apply(robotFile);
@@ -66,8 +76,11 @@ public class ImportLibraryTableFixerTest {
     @Test
     public void libraryImportIsAdded_whenSeveralSettingsSectionsExist() throws Exception {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
-        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, projectProvider.createFile("suite.robot",
-                "*** Settings ***", "Library  FirstLib", "*** Settings ***", "Library  SecondLib"));
+        final IFile suiteFile = projectProvider.createFile("suite.robot", "*** Settings ***", "Library  FirstLib",
+                "*** Settings ***", "Library  SecondLib");
+        Editors.openInRobotEditor(suiteFile);
+
+        final RobotSuiteFile robotFile = new RobotSuiteFile(robotProject, suiteFile);
 
         final ImportLibraryTableFixer fixer = new ImportLibraryTableFixer("LibToFix");
         fixer.apply(robotFile);
