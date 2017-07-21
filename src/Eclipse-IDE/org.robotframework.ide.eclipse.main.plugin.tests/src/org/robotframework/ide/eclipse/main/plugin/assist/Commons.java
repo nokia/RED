@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import java.util.Comparator;
 import java.util.Optional;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Range;
 
 class Commons {
@@ -33,16 +32,6 @@ class Commons {
             @Override
             public int compare(final T o1, final T o2) {
                 return comparator.compare(o2, o1);
-            }
-        };
-    }
-
-    static Function<AssistProposal, String> toLabels() {
-        return new Function<AssistProposal, String>() {
-
-            @Override
-            public String apply(final AssistProposal proposal) {
-                return proposal.getLabel();
             }
         };
     }

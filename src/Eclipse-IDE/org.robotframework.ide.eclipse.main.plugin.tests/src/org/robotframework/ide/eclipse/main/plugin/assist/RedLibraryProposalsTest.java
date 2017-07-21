@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -62,7 +61,7 @@ public class RedLibraryProposalsTest {
         refLibs.put(refTestLib, testLib);
         return refLibs;
     }
-    
+
     @AfterClass
     public static void afterSuite() {
         model.dispose();
@@ -81,7 +80,7 @@ public class RedLibraryProposalsTest {
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("Std");
-        assertThat(transform(proposals, toLabels())).containsExactly("StdLib");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib");
     }
 
     @Test
@@ -89,7 +88,7 @@ public class RedLibraryProposalsTest {
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(model, substringMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("dl");
-        assertThat(transform(proposals, toLabels())).containsExactly("StdLib");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib");
     }
 
     @Test
@@ -97,7 +96,7 @@ public class RedLibraryProposalsTest {
         final RedLibraryProposals proposalsProvider = new RedLibraryProposals(model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("");
-        assertThat(transform(proposals, toLabels())).containsExactly("StdLib", "TestLib");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib", "TestLib");
     }
 
     @Test
@@ -118,7 +117,7 @@ public class RedLibraryProposalsTest {
             }
         };
         final List<? extends AssistProposal> proposals = proposalsProvider.getLibrariesProposals("", comparator);
-        assertThat(transform(proposals, toLabels())).containsExactly("TestLib", "StdLib");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("TestLib", "StdLib");
     }
 
 }

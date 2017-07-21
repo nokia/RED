@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
@@ -21,8 +22,6 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Function;
 
 public class HyperlinksToFilesDetectorTest {
 
