@@ -44,6 +44,9 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
+import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.red.graphics.ImagesManager;
@@ -81,7 +84,7 @@ public class RedContentProposalAdapter {
     private final RedControlContentAdapter controlContentAdapter;
 
     private ContentProposalPopup popup;
-    
+
     private final KeySequence activationTrigger;
 
     private final KeyStroke triggerKeyStroke;
@@ -105,16 +108,17 @@ public class RedContentProposalAdapter {
     private boolean watchModify = false;
 
     public static RedContentProposalAdapter install(final Text text, final AssistantContext context,
-            final RedContentProposalProvider proposalsProvider, final KeySequence activationTrigger,
-            final RedContentProposalListener listener) {
+            final RedContentProposalProvider proposalsProvider, final RedContentProposalListener listener) {
 
-        final RedContentProposalAdapter adapter = install(text, context, proposalsProvider, activationTrigger);
-        adapter.addContentProposalListener(listener);
+        final RedContentProposalAdapter adapter = install(text, context, proposalsProvider);
+        if (adapter != null) {
+            adapter.addContentProposalListener(listener);
+        }
         return adapter;
     }
 
     public static RedContentProposalAdapter install(final Text text, final AssistantContext context,
-            final RedContentProposalProvider proposalsProvider, final KeySequence activationTrigger) {
+            final RedContentProposalProvider proposalsProvider) {
 
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
 
@@ -122,15 +126,19 @@ public class RedContentProposalAdapter {
         final char[] activationChars = preferences.getAssistantAutoActivationChars();
         final int autoActivationDelay = preferences.getAssistantAutoActivationDelay();
 
-        final RedContentProposalAdapter adapter = new RedContentProposalAdapter(text, context, controlAdapter,
-                proposalsProvider, activationTrigger, activationChars, autoActivationDelay,
-                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
-        adapter.install();
-        return adapter;
+        final KeySequence activationTrigger = getContentAssistActivationTrigger();
+        if (activationTrigger != null) {
+            final RedContentProposalAdapter adapter = new RedContentProposalAdapter(text, context, controlAdapter,
+                    proposalsProvider, activationTrigger, activationChars, autoActivationDelay,
+                    RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+            adapter.install();
+            return adapter;
+        }
+        return null;
     }
 
     public static RedContentProposalAdapter install(final Combo combo,
-            final RedContentProposalProvider proposalsProvider, final KeySequence activationTrigger) {
+            final RedContentProposalProvider proposalsProvider) {
 
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
 
@@ -138,11 +146,20 @@ public class RedContentProposalAdapter {
         final char[] activationChars = preferences.getAssistantAutoActivationChars();
         final int autoActivationDelay = preferences.getAssistantAutoActivationDelay();
 
-        final RedContentProposalAdapter adapter = new RedContentProposalAdapter(combo, null, controlAdapter,
-                proposalsProvider, activationTrigger, activationChars, autoActivationDelay,
-                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
-        adapter.install();
-        return adapter;
+        final KeySequence activationTrigger = getContentAssistActivationTrigger();
+        if (activationTrigger != null) {
+            final RedContentProposalAdapter adapter = new RedContentProposalAdapter(combo, null, controlAdapter,
+                    proposalsProvider, activationTrigger, activationChars, autoActivationDelay,
+                    RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+            adapter.install();
+            return adapter;
+        }
+        return null;
+    }
+
+    private static KeySequence getContentAssistActivationTrigger() {
+        final IBindingService service = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
+        return (KeySequence) service.getBestActiveBindingFor(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
     }
 
     public static void markControlWithDecoration(final RedContentProposalAdapter adapter) {
@@ -210,7 +227,7 @@ public class RedContentProposalAdapter {
                             } else {
                                 popup.getTargetControlListener().handleEvent(e);
                             }
-                            
+
                             // See
                             // https://bugs.eclipse.org/bugs/show_bug.cgi?id=192633
                             // If the popup is open and this is a valid character,
@@ -352,7 +369,7 @@ public class RedContentProposalAdapter {
      * proposal provider. If there are no proposals to be shown, do not show the
      * popup. This method returns immediately. That is, it does not wait for the
      * popup to open or a proposal to be selected.
-     * 
+     *
      * @param autoActivated
      *            a boolean indicating whether the popup was autoactivated. If
      *            false, a beep will sound when no proposals can be shown.
@@ -579,7 +596,7 @@ public class RedContentProposalAdapter {
 
     /**
      * Answers a boolean indicating whether the main proposal popup is open.
-     * 
+     *
      * @return <code>true</code> if the proposal popup is open, and
      *         <code>false</code> if it is not.
      * @since 3.6
@@ -1045,7 +1062,7 @@ public class RedContentProposalAdapter {
          * Constructs a new instance of this popup, specifying the control for
          * which this popup is showing content, and how the proposals should be
          * obtained and displayed.
-         * 
+         *
          * @param infoText
          *            Text to be shown in a lower info area, or
          *            <code>null</code> if there is no info area.
@@ -1076,7 +1093,7 @@ public class RedContentProposalAdapter {
          * Creates the content area for the proposal popup. This creates a table
          * and places it inside the composite. The table will contain a list of
          * all the proposals.
-         * 
+         *
          * @param parent The parent composite to contain the dialog area; must
          * not be <code>null</code>.
          */
@@ -1293,9 +1310,9 @@ public class RedContentProposalAdapter {
          * Opens this ContentProposalPopup. This method is extended in order to
          * add the control listener when the popup is opened and to invoke the
          * secondary popup if applicable.
-         * 
+         *
          * @return the return code
-         * 
+         *
          * @see org.eclipse.jface.window.Window#open()
          */
         @Override
@@ -1315,7 +1332,7 @@ public class RedContentProposalAdapter {
         /**
          * Closes this popup. This method is extended to remove the control
          * listener.
-         * 
+         *
          * @return <code>true</code> if the window is (or was already) closed,
          *         and <code>false</code> if it is still open
          */
