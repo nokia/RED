@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.ui.IDetailPane3;
-import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -36,9 +35,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.keys.IBindingService;
-import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -210,19 +206,10 @@ public class BreakpointDetailPane implements IDetailPane3 {
     }
 
     private void activateContentAssistant() {
-        final KeySequence contentAssistActivationTrigger = getContentAssistActivationTrigger();
-        if (contentAssistActivationTrigger != null) {
-            final RobotSuiteFile currentModel = RedPlugin.getModelManager()
-                    .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
-            final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel);
-            proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider,
-                    contentAssistActivationTrigger);
-        }
-    }
-
-    private KeySequence getContentAssistActivationTrigger() {
-        final IBindingService service = PlatformUI.getWorkbench().getAdapter(IBindingService.class);
-        return (KeySequence) service.getBestActiveBindingFor(ITextEditorActionDefinitionIds.CONTENT_ASSIST_PROPOSALS);
+        final RobotSuiteFile currentModel = RedPlugin.getModelManager()
+                .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
+        final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel);
+        proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider);
     }
 
     @Override
