@@ -1,0 +1,225 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9YYmUGu9Eeeps9cepQRw2Q,_OCxtEBRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA,_MyJrwGxlEeeps9cepQRw2Q
+Element-Name: ScopeOfVariables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _UAxzsGu3Eeeps9cepQRw2Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/21/17 5:21 PM
+Tags: notTestable
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add BP
+get-view "Project Explorer" | get-tree | select "ScopeProject/tests/test1.robot" | double-click
+with [get-editor "test1.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+    double-click-ruler 19
+    double-click-ruler 27
+}
+
+//run test
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "ScopeProject/tests/test1.robot" | get-menu "Debug As/1 Robot Test" 
+	    | click
+	    
+    wait-for-thread -file "test1.robot"
+	get-view Variables | maximize
+
+	//check variables for test
+	with [get-view Variables | get-tree] {
+	    get-property "getItemCount()" | equals 12 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${b1}" | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${res var}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "&{main dict}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "@{b2_list}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "@{list from res}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "@{main list}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "${this is test var}" | verify-true
+	    get-property "getItems().TreeItem[10].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[11].getText()" | equals "Automatic Variables" | verify-true
+	}
+	check-list-and-dicts
+	//expand automatic variables and check them
+	get-view Variables | get-tree | select "Automatic Variables/${\\/}" | expand-all
+	check-automatic-var-values -project "ScopeProject" -suite_name "ScopeProject.Tests.Test1" -test_name "this is main test" -suite_source [concat $sys_sep2 "test1.robot"]
+
+	get-view Variables |  restore
+	
+	//--------------------- click on test name--------------------------------------------------------------------------------
+	get-view Debug | get-tree
+    	| select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/this is main test"
+    	
+    //check if my kw was highlighted	
+	get-editor "test1.robot" | get-text-viewer | get-property "markers['17'][0].Type" 
+	    | equals "org.eclipse.debug.ui.secondaryIP" | verify-true
+	
+	//check varaibles on test level
+	get-view Variables |  maximize
+	with [get-view Variables | get-tree] {
+	    get-property "getItems().length" | equals 13 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${b1}" | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${res var}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "&{main dict}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "@{b2_list}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "@{list from res}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "@{main list}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "${this is test var}" | verify-true
+	    get-property "getItems().TreeItem[10].getText()" | equals "${normal_var}" | verify-true
+	    get-property "getItems().TreeItem[11].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[12].getText()" | equals "Automatic Variables" | verify-true
+	}
+	check-list-and-dicts
+	check_automatic_variable_order
+	check-automatic-var-values -project "ScopeProject" -suite_name "ScopeProject.Tests.Test1" -test_name "this is main test"  -suite_source [concat $sys_sep2 "test1.robot"]
+
+	get-view Variables |  restore
+	
+	//--------------  go to  file level --------------------------------------------------------------------------------
+	get-view Debug | get-tree 
+    	| select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Test1"
+
+	get-view Variables | maximize
+	with [get-view Variables | get-tree] {
+	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${b1}" | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${res var}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "&{main dict}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "@{b2_list}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "@{list from res}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "@{main list}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[10].getText()" | equals "Automatic Variables" | verify-true
+	}
+
+	check-list-and-dicts
+	check_automatic_variable_order -is_test_level False
+	check-automatic-var-values -project "ScopeProject" -suite_name "ScopeProject.Tests.Test1" -test_name "this is main test"  -is_test_level False -suite_source [concat $sys_sep2 "test1.robot"]
+	
+	get-view Variables | restore
+	
+	//------------------ go to level of dir --------------------------------------------------------------------------------
+	
+	get-view Debug | get-tree 
+	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Tests <directory>"
+	with [get-view Variables | get-tree] {
+	    get-property "getItems().length" | equals 5 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${this var is from init}" | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "Automatic Variables" | verify-true
+	}
+	
+	check_automatic_variable_order  -is_test_level False
+	check-automatic-var-values -project "ScopeProject" -suite_name "ScopeProject.Tests" -is_test_level False 
+	
+	//-------------------------go to level of project --------------------------------------------------------------------------------
+	get-view Debug | get-tree 
+	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/ScopeProject <directory>"
+	with [get-view Variables | get-tree] {
+	    get-property itemCount | equals 3 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "Automatic Variables" | verify-true
+	}
+	
+	check_automatic_variable_order -is_test_level False
+	
+	//resume to second test
+	get-button "Resume (F8)" | click
+	
+	get-view Debug | get-tree 
+	    | get-item "test1.robot \\[Robot\\]/<suspended>Robot Test at .*/Tests execution thread/test 2" 
+	    | get-property selected | equals true | verify-true
+	    
+//	check-debug-marker-on-ruler -line 19 -script_name "test1.robot"
+	
+	//change value
+	with [get-view Variables] {
+	    with [get-tree] {
+	        select "${a}" | activate-cell-edit -column 1
+	        with [get-editbox] {
+	            set-text 2121
+	            key-type Enter
+	        }
+	        apply-cell-edit -deactivate
+	    }
+	}
+	
+	//check value on different levels
+	//test
+	get-view Debug | get-tree 
+    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Test1"
+	get-view Variables | get-tree | get-item "${a}" | get-property "values['Value']" | equals 2121 | verify-true
+	
+	//folder
+	get-view Debug | get-tree 
+	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Tests <directory>"
+	get-view Variables | get-tree | get-item "${a}" | get-property "values['Value']" | equals "a from init" | verify-true
+	get-view Debug | get-tree 
+	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/test 2"
+
+	//check variables
+	get-view Variables | maximize
+	with [get-view Variables | get-tree] {
+	    get-property "getItems().length" | equals 12 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${b1}" | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "${res var}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "${suite var}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "&{main dict}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "@{b2_list}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "@{list from res}" | verify-true
+	    get-property "getItems().TreeItem[10].getText()" | equals "@{main list}" | verify-true
+	    get-property "getItems().TreeItem[11].getText()" | equals "Automatic Variables" | verify-true
+	}
+	
+	check-list-and-dicts
+	check_automatic_variable_order
+	check-automatic-var-values -project "ScopeProject" -suite_name "ScopeProject.Tests.Test1" 
+	 -prev_test_name "this is main test" -prev_test_status "PASS" -test_name "test 2" -is_test_level False -suite_source  [concat $sys_sep2 "test1.robot"]
+	get-view Variables | restore
+	
+	// change value in box below variables
+	with [get-view Variables] {
+	    get-tree | select "@{main list}/[2]"
+	    with [get-text-viewer] {
+	        set-caret-pos 1 4
+	        key-type BackSpace -times 3
+	        type-text 555
+	        key-type "M1+s"
+	        set-caret-pos 1 1
+	    }
+	}
+	with [get-view Variables | get-tree] {
+	    get-item "@{main list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{main list}/\\[2\\]" | get-property "values['Value']" | equals 555 | verify-true
+	}
+	get-button "Step Into (F5)" | click
+	with [get-view Variables | get-tree] {
+	    get-item "@{main list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{main list}/\\[2\\]" | get-property "values['Value']" | equals 555 | verify-true
+	}
+	get-view Debug | get-tree 
+	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Test1"
+	get-button "Resume (F8)" | click
+}
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
