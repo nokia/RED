@@ -14,6 +14,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 
 /**
  * @author Michal Anglart
@@ -27,6 +28,10 @@ public class Editors {
 
     public static RedProjectEditor openInProjectEditor(final IFile file) throws PartInitException {
         return (RedProjectEditor) openInEditor(file, RedProjectEditor.ID);
+    }
+
+    public static RobotFormEditor openInRobotEditor(final IFile file) throws PartInitException {
+        return (RobotFormEditor) openInEditor(file, RobotFormEditor.ID);
     }
 
     private static IEditorPart openInEditor(final IFile file, final String editorId) throws PartInitException {

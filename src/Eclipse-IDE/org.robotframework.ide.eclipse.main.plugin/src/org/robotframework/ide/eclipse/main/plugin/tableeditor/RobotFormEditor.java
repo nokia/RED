@@ -521,18 +521,23 @@ public class RobotFormEditor extends FormEditor {
     }
 
     public ISectionEditorPart activatePage(final RobotSuiteFileSection section) {
-        int index = -1;
-
         for (int i = 0; i < getPageCount(); i++) {
             final IEditorPart part = (IEditorPart) pages.get(i);
             if (part instanceof ISectionEditorPart && ((ISectionEditorPart) part).isPartFor(section)) {
-                index = i;
-                break;
+                setActivePage(i);
+                return (ISectionEditorPart) part;
             }
         }
-        if (index >= 0) {
-            setActivePage(index);
-            return (ISectionEditorPart) pages.get(index);
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getPage(final Class<T> pageClass) {
+        for (int i = 0; i < getPageCount(); i++) {
+            final IEditorPart part = (IEditorPart) pages.get(i);
+            if (part.getClass().equals(pageClass)) {
+                return (T) part;
+            }
         }
         return null;
     }
