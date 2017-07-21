@@ -9,7 +9,6 @@ import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -84,7 +83,7 @@ public class RedFileLocationProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider
                 .getFilesLocationsProposals("dir1");
-        assertThat(transform(proposals, toLabels()))
+        assertThat(transform(proposals, AssistProposal::getLabel))
                 .containsExactly("dir1/res1.robot");
     }
 
@@ -95,7 +94,7 @@ public class RedFileLocationProposalsTest {
                 model, substringMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("1");
-        assertThat(transform(proposals, toLabels()))
+        assertThat(transform(proposals, AssistProposal::getLabel))
                 .containsExactly("dir1/res1.robot");
     }
 
@@ -106,7 +105,7 @@ public class RedFileLocationProposalsTest {
                 model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, toLabels())).containsExactly(
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(
                 "dir1/res1.robot", "dir2/res2.robot");
     }
 
@@ -130,7 +129,8 @@ public class RedFileLocationProposalsTest {
             }
         };
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
-        assertThat(transform(proposals, toLabels())).containsExactly("dir2/res2.robot", "dir1/res1.robot");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir2/res2.robot",
+                "dir1/res1.robot");
     }
 
     @Test
@@ -150,7 +150,7 @@ public class RedFileLocationProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider
                 .getFilesLocationsProposals("dir1_1/l");
-        assertThat(transform(proposals, toLabels()))
+        assertThat(transform(proposals, AssistProposal::getLabel))
                 .containsExactly("dir1_1/lib.py");
     }
 
@@ -161,7 +161,7 @@ public class RedFileLocationProposalsTest {
                 model, substringMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
-        assertThat(transform(proposals, toLabels()))
+        assertThat(transform(proposals, AssistProposal::getLabel))
                 .containsExactly("dir1_1/vars.py");
     }
 
@@ -172,7 +172,7 @@ public class RedFileLocationProposalsTest {
                 model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, toLabels())).containsExactly(
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(
                 "dir1_1/lib.py", "dir1_1/vars.py");
     }
 
@@ -196,7 +196,7 @@ public class RedFileLocationProposalsTest {
             }
         };
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
-        assertThat(transform(proposals, toLabels())).containsExactly(
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(
                 "dir1_1/vars.py", "dir1_1/lib.py");
     }
 
@@ -216,7 +216,7 @@ public class RedFileLocationProposalsTest {
                 model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir1_1/l");
-        assertThat(transform(proposals, toLabels())).containsExactly("dir1_1/lib.py");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/lib.py");
     }
 
     @Test
@@ -226,7 +226,7 @@ public class RedFileLocationProposalsTest {
                 model, substringMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
-        assertThat(transform(proposals, toLabels())).containsExactly("dir1_1/vars.py");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/vars.py");
     }
 
     @Test
@@ -236,7 +236,7 @@ public class RedFileLocationProposalsTest {
                 model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, toLabels())).containsExactly("dir1_1/lib.py", "dir1_1/vars.py");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/lib.py", "dir1_1/vars.py");
     }
 
     @Test
@@ -259,6 +259,6 @@ public class RedFileLocationProposalsTest {
             }
         };
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
-        assertThat(transform(proposals, toLabels())).containsExactly("dir1_1/vars.py", "dir1_1/lib.py");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/vars.py", "dir1_1/lib.py");
     }
 }

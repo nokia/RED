@@ -40,8 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Function;
-
 public class AssistProposalsTest {
 
     private static final String PROJECT_NAME = AssistProposalsTest.class.getSimpleName();
@@ -393,7 +391,7 @@ public class AssistProposalsTest {
 
         Collections.sort(proposals, AssistProposals.sortedByLabels());
 
-        assertThat(transform(proposals, toLabel())).containsExactly("ABC", "abc1", "xyz", "Xyz1", "ZZZ", "zzz1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("ABC", "abc1", "xyz", "Xyz1", "ZZZ", "zzz1");
     }
 
     @Test
@@ -419,7 +417,7 @@ public class AssistProposalsTest {
                 varProposal("@{klm1}", VariableOrigin.LOCAL));
         Collections.sort(proposals, AssistProposals.sortedByTypesAndOrigin());
 
-        assertThat(transform(proposals, toLabel())).containsExactly("${abc1}", "${abc2}", "${klm1}", "${klm2}",
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${abc1}", "${abc2}", "${klm1}", "${klm2}",
                 "${Xyz1}", "${Xyz2}", "${abc3}", "${klm3}", "${Xyz3}", "@{abc1}", "@{abc2}", "@{klm1}", "@{klm2}",
                 "@{Xyz1}", "@{Xyz2}", "@{abc3}", "@{klm3}", "@{Xyz3}");
     }
@@ -435,7 +433,7 @@ public class AssistProposalsTest {
                 libProposal("klm1", false));
         Collections.sort(proposals, AssistProposals.sortedByLabelsNotImportedFirst());
 
-        assertThat(transform(proposals, toLabel())).containsExactly("abc1", "klm1", "Xyz1", "abc2", "klm2", "Xyz2");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("abc1", "klm1", "Xyz1", "abc2", "klm2", "Xyz2");
     }
 
     private AssistProposal proposal(final String content) {
@@ -449,16 +447,6 @@ public class AssistProposalsTest {
 
     private RedLibraryProposal libProposal(final String name, final boolean isImported) {
         return new RedLibraryProposal(name, new ArrayList<String>(), isImported, "", ProposalMatch.EMPTY);
-    }
-
-    private Function<AssistProposal, String> toLabel() {
-        return new Function<AssistProposal, String>() {
-
-            @Override
-            public String apply(final AssistProposal proposal) {
-                return proposal.getLabel();
-            }
-        };
     }
 
     private static RobotVariable createVariable() {

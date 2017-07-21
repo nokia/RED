@@ -10,6 +10,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.function.Function;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IFileEditorInput;
@@ -20,8 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.base.Function;
 
 public class FileHyperlinkTest {
 

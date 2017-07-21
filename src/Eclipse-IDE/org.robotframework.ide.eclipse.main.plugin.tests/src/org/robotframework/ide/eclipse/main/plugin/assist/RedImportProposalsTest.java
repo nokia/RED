@@ -9,7 +9,6 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -110,7 +109,7 @@ public class RedImportProposalsTest {
         final RedImportProposals proposalsProvider = new RedImportProposals(model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("std");
-        assertThat(transform(proposals, toLabels())).containsExactly("StdLib1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib1");
 
         file.delete(true, null);
     }
@@ -128,7 +127,7 @@ public class RedImportProposalsTest {
         final RedImportProposals proposalsProvider = new RedImportProposals(model, substringMatcher());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("1");
-        assertThat(transform(proposals, toLabels())).containsExactly("StdLib1", "res1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib1", "res1");
 
         file.delete(true, null);
     }
@@ -146,7 +145,7 @@ public class RedImportProposalsTest {
         final RedImportProposals proposalsProvider = new RedImportProposals(model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("");
-        assertThat(transform(proposals, toLabels())).containsExactly("StdLib1", "other", "res1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib1", "other", "res1");
 
         file.delete(true, null);
     }
@@ -165,7 +164,7 @@ public class RedImportProposalsTest {
 
         for (final String bddPrefix : newArrayList("Given", "When", "And", "But", "Then")) {
             final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals(bddPrefix + " ");
-            assertThat(transform(proposals, toLabels())).containsExactly("StdLib1", "other", "res1");
+            assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib1", "other", "res1");
         }
 
         file.delete(true, null);
@@ -198,8 +197,8 @@ public class RedImportProposalsTest {
             }
         };
         final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("e", comparator);
-        assertThat(transform(proposals, toLabels())).containsExactly("res1", "other");
-        
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("res1", "other");
+
         file.delete(true, null);
     }
 
@@ -214,8 +213,8 @@ public class RedImportProposalsTest {
         final RedImportProposals proposalsProvider = new RedImportProposals(model);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("");
-        assertThat(transform(proposals, toLabels())).containsExactly("lib_x", "lib_y");
-        
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("lib_x", "lib_y");
+
         file.delete(true, null);
     }
 }

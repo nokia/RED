@@ -19,8 +19,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Function;
-
 public class ImportedFilesTest {
 
     @ClassRule
@@ -43,25 +41,25 @@ public class ImportedFilesTest {
     @Test
     public void pythonFilesAreProperlyProvided() {
         final List<IFile> pythonFiles = ImportedFiles.getPythonFiles();
-        assertThat(transform(pythonFiles, toNames())).containsOnly("lib.py", "vars.py");
+        assertThat(transform(pythonFiles, IFile::getName)).containsOnly("lib.py", "vars.py");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_1() {
         final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("res.robot"));
-        assertThat(transform(resourceFiles, toNames())).containsOnly("res1.robot", "res2.robot");
+        assertThat(transform(resourceFiles, IFile::getName)).containsOnly("res1.robot", "res2.robot");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_2() {
         final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir1/res1.robot"));
-        assertThat(transform(resourceFiles, toNames())).containsOnly("res.robot", "res2.robot");
+        assertThat(transform(resourceFiles, IFile::getName)).containsOnly("res.robot", "res2.robot");
     }
 
     @Test
     public void resourceFilesAreProperlyProvided_3() {
         final List<IFile> resourceFiles = ImportedFiles.getResourceFiles(projectProvider.getFile("dir2/res2.robot"));
-        assertThat(transform(resourceFiles, toNames())).containsOnly("res.robot", "res1.robot");
+        assertThat(transform(resourceFiles, IFile::getName)).containsOnly("res.robot", "res1.robot");
     }
 
     @Test
@@ -99,15 +97,5 @@ public class ImportedFilesTest {
 
     private static int compare(final Comparator<IPath> comparator, final String p1, final String p2) {
         return comparator.compare(new Path(p1), new Path(p2));
-    }
-
-    private static Function<IFile, String> toNames() {
-        return new Function<IFile, String>() {
-
-            @Override
-            public String apply(final IFile file) {
-                return file.getName();
-            }
-        };
     }
 }
