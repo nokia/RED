@@ -135,15 +135,25 @@ public class KeywordDefinitionLocator {
 
     private ContinueDecision locateInLibraries(final RobotSuiteFile file, final KeywordDetector detector) {
         final SetMultimap<LibrarySpecification, String> importedLibs = file.getImportedLibraries();
-        final SetMultimap<LibrarySpecification, String> libsToSearch = includeNotImportedLibraries
-                ? file.getAllLibraries()
-                : importedLibs;
-        for (final LibrarySpecification libSpec : libsToSearch.keySet()) {
-            final boolean isAccessible = importedLibs.containsKey(libSpec);
+        for (final LibrarySpecification libSpec : importedLibs.keySet()) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = isAccessible
-                        ? detector.accessibleLibraryKeywordDetected(libSpec, kwSpec, libsToSearch.get(libSpec), file)
-                        : detector.nonAccessibleLibraryKeywordDetected(libSpec, kwSpec, file);
+                final ContinueDecision shouldContinue = detector.accessibleLibraryKeywordDetected(libSpec, kwSpec,
+                        importedLibs.get(libSpec), file);
+                if (shouldContinue == ContinueDecision.STOP) {
+                    return ContinueDecision.STOP;
+                }
+            }
+        }
+
+        if (!includeNotImportedLibraries) {
+            return ContinueDecision.CONTINUE;
+        }
+
+        final SetMultimap<LibrarySpecification, String> notImportedLibs = file.getNotImportedLibraries();
+        for (final LibrarySpecification libSpec : notImportedLibs.keySet()) {
+            for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
+                final ContinueDecision shouldContinue = detector.nonAccessibleLibraryKeywordDetected(libSpec, kwSpec,
+                        file);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
