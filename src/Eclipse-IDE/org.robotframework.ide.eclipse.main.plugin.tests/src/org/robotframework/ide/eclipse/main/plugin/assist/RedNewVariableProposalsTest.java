@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class RedNewVariableProposalsTest {
     public void allProposalsAreProvided_noMatterWhatUserWouldProvideAsInput() {
         final List<? extends AssistProposal> proposals = new RedNewVariableProposals().getNewVariableProposals();
 
-        assertThat(transform(proposals, toLabels())).containsExactly("Fresh scalar", "Fresh list",
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Fresh scalar", "Fresh list",
                 "Fresh dictionary");
     }
 }
