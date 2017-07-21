@@ -1,0 +1,211 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: CheckingVariablesProcedures
+Element-Type: context
+Element-Version: 2.0
+Id: _MyJrwGxlEeeps9cepQRw2Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/19/17 2:21 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+global [val sys_sep2 [get-by-os -win "\\\\" -linux "/"]]
+global [val project_path [concat [  replace $RED_workspace_path -old "\\" -new "\\\\"] $sys_sep2 "ScopeProject"]]
+global [val temp_dir [replace [get-java-property "java.io.tmpdir" | invoke toLowerCase | invoke replaceAll "\\\$" "" ] -old "\\" -new "\\\\"]] 
+
+proc "check_automatic_variable_order" [val is_test_level True]{
+	with [get-view Variables | get-tree] {
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[0].getText()" | equals "${/}" | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[1].getText()" | equals "${:}" | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[2].getText()" | equals "${DEBUG_FILE}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[3].getText()" | equals "${EXECDIR}" | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[4].getText()" | equals "${False}" | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[5].getText()" | equals "${LOG_FILE}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[6].getText()" | equals "${LOG_LEVEL}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[7].getText()" | equals "${None}" | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[8].getText()" | equals "${OUTPUT_DIR}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[9].getText()" | equals "${OUTPUT_FILE}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[10].getText()" | equals "${PREV_TEST_MESSAGE}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[11].getText()" | equals "${PREV_TEST_NAME}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[12].getText()" | equals "${PREV_TEST_STATUS}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[13].getText()" | equals "${REPORT_FILE}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[14].getText()" | equals "${SPACE}" | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[15].getText()" | equals "${SUITE_DOCUMENTATION}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[16].getText()" | equals "${SUITE_NAME}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[17].getText()" | equals "${SUITE_SOURCE}" 
+	        | verify-true
+	    get-item "Automatic Variables" | get-property "getItems().TreeItem[18].getText()" | equals "${TEMPDIR}" 
+	        | verify-true
+	        
+	    if [$is_test_level | eq True]{    
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[19].getText()" | equals "${TEST_DOCUMENTATION}" 
+		        | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[20].getText()" | equals "${TEST_NAME}" 
+		        | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[21].getText()" | equals "${True}" | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[22].getText()" | equals "${\\n"
+		        + "}" | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[23].getText()" | equals "${null}" | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[24].getText()" | equals "&{SUITE_METADATA}" 
+		        | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[25].getText()" | equals "@{TEST_TAGS}" 
+		        | verify-true
+		   get-item "Automatic Variables" | get-property childCount | equals 26 | verify-true
+		        
+		}-else{
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[19].getText()" | equals "${True}" | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[20].getText()" | equals "${\\n}" | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[21].getText()" | equals "${null}" | verify-true
+		    get-item "Automatic Variables" | get-property "getItems().TreeItem[22].getText()" | equals "&{SUITE_METADATA}" 
+		        | verify-true
+		
+			get-item "Automatic Variables" | get-property childCount | equals 23 | verify-true
+		}	        
+	}
+	
+	
+}
+
+proc "check-automatic-var-values" [val project] [val prev_test_msg ""] [val prev_test_name ""]  [val prev_test_status ""]
+		[val suite_name ""] [val test_name ""] [val suite_source "" ] [val is_test_level True]{
+	with [get-view Variables | get-tree] {
+		
+	    get-item "Automatic Variables/${\\/}" | get-property "values['Value']" | equals "\\\\\\\\" | verify-true
+	    get-item "Automatic Variables/${:}" | get-property "values['Value']" | equals ";" | verify-true
+	    get-item "Automatic Variables/${DEBUG_FILE}" | get-property "values['Value']" | equals NONE | verify-true
+	    
+		//execdir
+	    get-item "Automatic Variables/${EXECDIR}" | get-property "values['Value']" 
+	        | equals $project_path  | verify-true    
+	        
+	    get-item "Automatic Variables/${False}" | get-property "values['Value']" | equals False | verify-true
+	    //log file
+	    get-item "Automatic Variables/${LOG_FILE}" | get-property "values['Value']" 
+	        | equals [concat $project_path $sys_sep2 "log.html"] | verify-true
+	        
+	    get-item "Automatic Variables/${LOG_LEVEL}" | get-property "values['Value']" | equals INFO | verify-true
+	    get-item "Automatic Variables/${None}" | get-property "values['Value']" | equals None | verify-true
+	    
+	    //output dir and file
+	    get-item "Automatic Variables/${OUTPUT_DIR}" | get-property "values['Value']" 
+	        | equals $project_path | verify-true
+	    get-item "Automatic Variables/${OUTPUT_FILE}" | get-property "values['Value']" 
+	        | equals [concat $project_path  $sys_sep2 "output.xml"] | verify-true
+	 
+	 	//prev test values
+	    get-item "Automatic Variables/${PREV_TEST_MESSAGE}" | get-property "values['Value']" | equals $prev_test_msg | verify-true
+	    get-item "Automatic Variables/${PREV_TEST_NAME}" | get-property "values['Value']" | equals $prev_test_name | verify-true
+	    get-item "Automatic Variables/${PREV_TEST_STATUS}" | get-property "values['Value']" | equals $prev_test_status | verify-true  
+	    
+	    //report file
+	    get-item "Automatic Variables/${REPORT_FILE}" | get-property "values['Value']" 
+	        | equals  [concat $project_path $sys_sep2 "report.html"] | verify-true
+	 
+	    get-item "Automatic Variables/${SPACE}" | get-property "values['Value']" | equals " " | verify-true
+	    get-item "Automatic Variables/${SUITE_DOCUMENTATION}" | get-property "values['Value']" | equals "" | verify-true
+	
+		//suite name
+	    get-item "Automatic Variables/${SUITE_NAME}" | get-property "values['Value']" | equals $suite_name
+	        | verify-true
+	  
+	  	//suite source
+	    get-item "Automatic Variables/${SUITE_SOURCE}" | get-property "values['Value']" 
+	        | equals [concat $project_path $sys_sep2 "tests"  $suite_source] | verify-true
+	
+	    get-item "Automatic Variables/${TEMPDIR}" | get-property "values['Value']" 
+	        | equals $temp_dir| verify-true
+	
+
+	    get-item "Automatic Variables/${True}" | get-property "values['Value']" | equals True | verify-true
+	    get-item "Automatic Variables/${\\n}" | get-property "values['Value']" | equals [get-by-os -win "\\\\r\\\\n" -linux "\\n"] | verify-true
+	    get-item "Automatic Variables/${null}" | get-property "values['Value']" | equals None | verify-true
+	    get-item "Automatic Variables/&{SUITE_METADATA}" | get-property "values['Value']" | equals "NormalizedDict[0]" 
+	        | verify-true
+	    
+	}
+	
+	if [$is_test_level | eq True]{    
+		with [get-view Variables | get-tree] {
+			get-item "Automatic Variables/${TEST_DOCUMENTATION}" | get-property "values['Value']" | equals "" | verify-true
+			
+			//test name
+		    get-item "Automatic Variables/${TEST_NAME}" | get-property "values['Value']" | equals $test_name
+		        | verify-true
+		   get-item "Automatic Variables/@{TEST_TAGS}" | get-property "values['Value']" | equals "list[0]" | verify-true     	
+		}	
+	}
+
+}
+
+
+proc "check-list-and-dicts"{
+
+	//{main dict} - dictinary
+	with [get-view Variables | get-tree] {
+	    get-item "&{main dict}" | get-property childCount | equals 2 | verify-true
+	    get-item "&{main dict}" | get-property "values['Name']" | equals "&{main dict}" | verify-true
+	    get-item "&{main dict}" | get-property "values['Value']" | equals "DotDict[2]" | verify-true
+	    
+	    //values
+	    get-item "&{main dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
+	    get-item "&{main dict}/fruit" | get-property "values['Value']" | equals " apple" | verify-true
+	    get-item "&{main dict}/key" | get-property "values['Name']" | equals key | verify-true
+	    get-item "&{main dict}/key" | get-property "values['Value']" | equals value | verify-true
+	}
+	//@{b2_list}
+	with [get-view Variables | get-tree] {
+	    get-item "@{b2_list}" | get-property "values['Name']" | equals "@{b2_list}" | verify-true
+	    get-item "@{b2_list}" | get-property "values['Value']" | equals "list[3]" | verify-true
+	    
+	    //values
+	    get-item "@{b2_list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{b2_list}/\\[0\\]" | get-property "values['Value']" | equals k1 | verify-true
+	    get-item "@{b2_list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{b2_list}/\\[1\\]" | get-property "values['Value']" | equals k2 | verify-true
+	    get-item "@{b2_list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{b2_list}/\\[2\\]" | get-property "values['Value']" | equals k3 | verify-true
+	}
+	
+	with [get-view Variables | get-tree] {
+	    get-item "@{list from res}" | get-property "values['Name']" | equals "@{list from res}" | verify-true
+	    get-item "@{list from res}" | get-property "values['Value']" | equals "list[4]" | verify-true
+	    
+	    get-item "@{list from res}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{list from res}/\\[0\\]" | get-property "values['Value']" | equals ab1 | verify-true
+	    get-item "@{list from res}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{list from res}/\\[1\\]" | get-property "values['Value']" | equals ab2 | verify-true
+	    get-item "@{list from res}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{list from res}/\\[2\\]" | get-property "values['Value']" | equals ab3 | verify-true
+	    get-item "@{list from res}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
+	    get-item "@{list from res}/\\[3\\]" | get-property "values['Value']" | equals ab4 | verify-true
+	}
+	
+	with [get-view Variables | get-tree] {
+	    get-item "@{main list}" | get-property "values['Name']" | equals "@{main list}" | verify-true
+	    get-item "@{main list}" | get-property "values['Value']" | equals "list[4]" | verify-true
+	
+	    get-item "@{main list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{main list}/\\[0\\]" | get-property "values['Value']" | equals 66 | verify-true
+	    get-item "@{main list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{main list}/\\[1\\]" | get-property "values['Value']" | equals 77 | verify-true
+	    get-item "@{main list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{main list}/\\[2\\]" | get-property "values['Value']" | equals 888 | verify-true
+	    get-item "@{main list}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
+	    get-item "@{main list}/\\[3\\]" | get-property "values['Value']" | equals 99 | verify-true
+	}
+}	
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
