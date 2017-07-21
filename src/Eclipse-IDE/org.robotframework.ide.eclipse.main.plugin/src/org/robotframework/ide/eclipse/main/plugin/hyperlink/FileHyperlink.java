@@ -5,14 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
+import java.util.function.Function;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
-
-import com.google.common.base.Function;
 
 /**
  * @author Michal Anglart

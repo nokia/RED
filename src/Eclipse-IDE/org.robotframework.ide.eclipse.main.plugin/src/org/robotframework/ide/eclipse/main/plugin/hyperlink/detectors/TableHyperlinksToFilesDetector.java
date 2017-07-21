@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.Region;
@@ -19,8 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-
-import com.google.common.base.Function;
 
 
 public class TableHyperlinksToFilesDetector extends HyperlinksToFilesDetector implements ITableHyperlinksDetector {

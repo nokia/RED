@@ -9,7 +9,6 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.toLabels;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -99,7 +98,7 @@ public class RedVariableProposalsTest {
 
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("glb_var_2");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_2");
     }
 
     @Test
@@ -115,7 +114,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("glb_var_1", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("glb_var_1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_1");
     }
 
     @Test
@@ -131,7 +130,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("2", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("glb_var_2");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_2");
     }
 
     @Test
@@ -147,7 +146,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("glb_var_1", "glb_var_2");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_1", "glb_var_2");
     }
 
     @Test
@@ -165,7 +164,7 @@ public class RedVariableProposalsTest {
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("glb_var_2", "glb_var_1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_2", "glb_var_1");
     }
 
     @Test
@@ -197,7 +196,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${glb_var_file_1", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${glb_var_file_1}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_1}");
     }
 
     @Test
@@ -214,7 +213,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("2", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${glb_var_file_2}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_2}");
     }
 
     @Test
@@ -231,7 +230,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${glb_var_file_1}", "${glb_var_file_2}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_1}", "${glb_var_file_2}");
     }
 
     @Test
@@ -249,7 +248,7 @@ public class RedVariableProposalsTest {
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${glb_var_file_2}", "${glb_var_file_1}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_2}", "${glb_var_file_1}");
     }
 
     @Test
@@ -289,7 +288,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_v", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_vf}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vf}");
     }
 
     @Test
@@ -310,7 +309,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${c_vf}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_vf}");
     }
 
     @Test
@@ -331,7 +330,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_vf}", "${b_vf}", "${c_vf}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_vf}", "${b_vf}", "${c_vf}");
     }
 
     @Test
@@ -353,7 +352,7 @@ public class RedVariableProposalsTest {
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_vf}", "${a_vf}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vf}", "${a_vf}");
     }
 
     @Test
@@ -397,7 +396,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_v", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_vt}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vt}");
     }
 
     @Test
@@ -420,7 +419,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${c_vt}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_vt}");
     }
 
     @Test
@@ -443,7 +442,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_vt}", "${b_vt}", "${c_vt}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_vt}", "${b_vt}", "${c_vt}");
     }
 
     @Test
@@ -466,7 +465,7 @@ public class RedVariableProposalsTest {
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_vt}", "${a_vt}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vt}", "${a_vt}");
     }
 
     @Test
@@ -504,7 +503,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_res_var}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_res_var}");
     }
 
     @Test
@@ -524,7 +523,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${c_res_var}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_res_var}");
     }
 
     @Test
@@ -543,7 +542,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_res_var}", "${b_res_var}", "${c_res_var}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_res_var}", "${b_res_var}", "${c_res_var}");
     }
 
     @Test
@@ -564,7 +563,7 @@ public class RedVariableProposalsTest {
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_res_var}", "${a_res_var}", "${c_res_var}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_res_var}", "${a_res_var}", "${c_res_var}");
     }
 
     @Test
@@ -611,7 +610,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", 100);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_arg}", "${b_local}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
     }
 
     @Test
@@ -637,7 +636,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", logCall);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_arg}", "${b_local}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
     }
 
     @Test
@@ -661,7 +660,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", 100);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_arg}", "${b_local}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
     }
 
     @Test
@@ -687,7 +686,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", logCall);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_arg}", "${b_local}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
     }
 
     @Test
@@ -710,7 +709,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 100);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_arg}", "${a_local}", "${b_arg}", "${b_local}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}", "${b_local}");
     }
 
     @Test
@@ -735,7 +734,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", logCall);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_arg}", "${a_local}", "${b_arg}", "${b_local}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}", "${b_local}");
     }
 
     @Test
@@ -758,7 +757,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 90);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_arg}", "${a_local}", "${b_arg}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}");
     }
 
     @Test
@@ -783,7 +782,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", call2Call);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_arg}", "${a_local}", "${b_arg}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}");
     }
 
     @Test
@@ -806,7 +805,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 70);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_arg}", "${b_arg}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${b_arg}");
     }
 
     @Test
@@ -831,7 +830,7 @@ public class RedVariableProposalsTest {
                 AssistProposalPredicates.<String> alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", call1Call);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${a_arg}", "${b_arg}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${b_arg}");
     }
 
     @Test
@@ -856,7 +855,7 @@ public class RedVariableProposalsTest {
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 100);
 
-        assertThat(transform(proposals, toLabels())).containsExactly("${b_local}", "${b_arg}", "${a_arg}",
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_local}", "${b_arg}", "${a_arg}",
                 "${a_local}");
     }
 
