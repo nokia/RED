@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.junit.Before;
@@ -668,8 +669,9 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch.getAlias()).isEqualTo("file");
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
+        assertThat(bestMatch).isPresent()
+                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("file"));
     }
 
     @Test
@@ -688,8 +690,9 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch.getAlias()).isEqualTo("res");
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
+        assertThat(bestMatch).isPresent()
+                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("res"));
     }
 
     @Test
@@ -707,8 +710,9 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch.getAlias()).isEqualTo("refLib");
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
+        assertThat(bestMatch).isPresent()
+                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("refLib"));
     }
 
     @Test
@@ -726,8 +730,9 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch.getAlias()).isEqualTo("stdLib");
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
+        assertThat(bestMatch).isPresent()
+                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("stdLib"));
     }
 
     @Test
@@ -748,8 +753,8 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        final RedKeywordProposal bestMatch = provider.getBestMatchingKeywordProposal("unknown");
-        assertThat(bestMatch).isNull();
+        final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("unknown");
+        assertThat(bestMatch).isNotPresent();
     }
 
     private static Map<String, LibrarySpecification> createStandardLibraries(final LibKeyword... keywords) {
