@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeSet;
 import com.google.common.collect.TreeRangeSet;
@@ -128,17 +127,17 @@ public class EmbeddedKeywordNamesSupport {
     @VisibleForTesting
     static RangeSet<Integer> findEmbeddedArgumentsRanges(final String definitionName) {
         final RangeSet<Integer> varRanges = TreeRangeSet.create();
-        
+
         if (definitionName.isEmpty()) {
             return varRanges;
         }
         int varStart = -1;
         int currentIndex = 0;
-        int currentState = 0;
+        KeywordDfaState currentState = KeywordDfaState.START_STATE;
 
         while (currentIndex < definitionName.length()) {
             final char character = definitionName.charAt(currentIndex);
-            
+
             if (currentState == KeywordDfaState.START_STATE) {
                 currentState = character == '$' ? KeywordDfaState.VAR_DOLLAR_DETECTED : KeywordDfaState.START_STATE;
 
@@ -176,26 +175,15 @@ public class EmbeddedKeywordNamesSupport {
         return varRanges;
     }
 
-    public static Function<String, String> removeRegexFunction() {
-        return new Function<String, String>() {
-
-            @Override
-            public String apply(final String variable) {
-                return removeRegex(variable);
-            }
-        };
-    }
-
     public static String removeRegex(final String variable) {
         return variable.indexOf(':') != -1 ? variable.substring(0, variable.indexOf(':')) + "}" : variable;
     }
 
-    private interface KeywordDfaState {
-
-        static final int START_STATE = 0;
-        static final int VAR_DOLLAR_DETECTED = 1;
-        static final int VAR_START_DETECTED = 2;
-        static final int IN_VAR_ESCAPING = 3;
-        static final int IN_VAR_NO_ESCAPE_CURRENTLY = 4;
+    private enum KeywordDfaState {
+        START_STATE,
+        VAR_DOLLAR_DETECTED,
+        VAR_START_DETECTED,
+        IN_VAR_ESCAPING,
+        IN_VAR_NO_ESCAPE_CURRENTLY;
     }
 }

@@ -92,17 +92,17 @@ public class RedKeywordProposals {
         return entities;
     }
 
-    public RedKeywordProposal getBestMatchingKeywordProposal(final String keywordName) {
+    public Optional<RedKeywordProposal> getBestMatchingKeywordProposal(final String keywordName) {
         final AccessibleKeywordsEntities accessibleKeywordsEntities = getAccessibleKeywordsEntities(suiteFile, "");
         final ListMultimap<KeywordScope, KeywordEntity> keywords = accessibleKeywordsEntities
                 .getPossibleKeywords(keywordName, false);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
             for (final KeywordEntity keyword : keywords.get(scope)) {
-                return (RedKeywordProposal) keyword;
+                return Optional.of((RedKeywordProposal) keyword);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite,

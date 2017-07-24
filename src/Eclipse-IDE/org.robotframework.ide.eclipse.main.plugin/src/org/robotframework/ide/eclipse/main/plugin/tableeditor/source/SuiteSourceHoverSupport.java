@@ -112,7 +112,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
                 if (isKeyword(suiteFile, hoverRegion)) {
                     final Optional<String> info = GherkinStyleSupport.firstNameTransformationResult(hoveredText,
-                            gherkinNameVariant -> Optional.ofNullable(getKeywordHoverInfo(gherkinNameVariant)));
+                            this::getKeywordHoverInfo);
                     return info.orElse(null);
                 }
             }
@@ -216,13 +216,10 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         return spec == null ? null : spec.getDocumentation();
     }
 
-    private String getKeywordHoverInfo(final String keywordName) {
-        final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
-        final RedKeywordProposal best = proposals.getBestMatchingKeywordProposal(keywordName);
-        if (best != null) {
-            return best.getDescription();
-        }
-        return null;
+    private Optional<String> getKeywordHoverInfo(final String keywordName) {
+        final Optional<RedKeywordProposal> bestMatch = new RedKeywordProposals(suiteFile)
+                .getBestMatchingKeywordProposal(keywordName);
+        return bestMatch.map(RedKeywordProposal::getDescription);
     }
 
     private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {

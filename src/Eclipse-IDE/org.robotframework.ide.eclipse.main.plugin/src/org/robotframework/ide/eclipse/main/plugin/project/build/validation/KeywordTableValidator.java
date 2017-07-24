@@ -249,7 +249,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         arguments.addAll(newArrayList(transform(
                 VariableNamesSupport
                         .extractUnifiedVariables(newArrayList(keyword.getKeywordName()), extractor, fileName).keySet(),
-                EmbeddedKeywordNamesSupport.removeRegexFunction())));
+                EmbeddedKeywordNamesSupport::removeRegex)));
         for (final KeywordArguments argument : keyword.getArguments()) {
             arguments.addAll(VariableNamesSupport.extractUnifiedVariables(argument.getArguments(), extractor, fileName)
                     .keySet());
