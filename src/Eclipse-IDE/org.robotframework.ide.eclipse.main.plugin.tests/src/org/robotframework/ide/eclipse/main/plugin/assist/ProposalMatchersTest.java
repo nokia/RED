@@ -49,31 +49,6 @@ public class ProposalMatchersTest {
     }
 
     @Test
-    public void caseSensitivePrefixesMatcherReturnsMatches_whenProposalContentStartsFromUserContentWithCaseTakenIntoAccount() {
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("abc", "")).isNotPresent();
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("abc", "d")).isNotPresent();
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("abc", "de")).isNotPresent();
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("abc", "def")).isNotPresent();
-
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("A", "abcdef")).isNotPresent();
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("AB", "abcdef")).isNotPresent();
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("AbC", "abcdef")).isNotPresent();
-
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("a", "AbcDef")).isNotPresent();
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("ab", "AbCDeF")).isNotPresent();
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("abc", "ABCDEF")).isNotPresent();
-
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("", "abcdef")).isPresent()
-                .hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("a", "abcdef")).isPresent()
-                .hasValue(new ProposalMatch(Range.closedOpen(0, 1)));
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("ab", "abcdef")).isPresent()
-                .hasValue(new ProposalMatch(Range.closedOpen(0, 2)));
-        assertThat(ProposalMatchers.caseSensitivePrefixesMatcher().matches("abc", "abcdef")).isPresent()
-                .hasValue(new ProposalMatch(Range.closedOpen(0, 3)));
-    }
-
-    @Test
     public void embeddedNamesAwareMatcherReturnsMatches_whenDefinitionStartsTakingRegexIntoAccount() {
         assertThat(ProposalMatchers.embeddedKeywordsMatcher().matches("abc", "")).isNotPresent();
         assertThat(ProposalMatchers.embeddedKeywordsMatcher().matches("abc", "d")).isNotPresent();
@@ -119,5 +94,42 @@ public class ProposalMatchersTest {
                 .hasValue(new ProposalMatch(Range.closedOpen(0, 6)));
         assertThat(ProposalMatchers.embeddedKeywordsMatcher().matches("axyzcd", "a${b}c")).isPresent()
                 .hasValue(new ProposalMatch(Range.closedOpen(0, 5)));
+    }
+
+    @Test
+    public void pathsMatcherReturnsMatches_whenProposalContentStartsFromUserContent() {
+        assertThat(ProposalMatchers.pathsMatcher().matches("x", "")).isNotPresent();
+        assertThat(ProposalMatchers.pathsMatcher().matches("x", "/path")).isNotPresent();
+
+        assertThat(ProposalMatchers.pathsMatcher().matches("", "/path")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("/", "/path")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 1)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("/P", "/path")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 2)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("/Pa", "/path")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 3)));
+
+        assertThat(ProposalMatchers.pathsMatcher().matches("", "/PaTh")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("/", "/PATh")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 1)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("/p", "/PaTH")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 2)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("/pa", "/PATH")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 3)));
+
+        assertThat(ProposalMatchers.pathsMatcher().matches("p", "/path/to/something")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(1, 2)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("pa", "/path/to/something")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(1, 3)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("pat", "/path/to/something")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(1, 4)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("s", "/path/to/something")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(9, 10)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("some", "/path/to/something")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(9, 13)));
+        assertThat(ProposalMatchers.pathsMatcher().matches("something", "/path/to/something")).isPresent()
+                .hasValue(new ProposalMatch(Range.closedOpen(9, 18)));
     }
 }

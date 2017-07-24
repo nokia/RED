@@ -19,7 +19,17 @@ import com.google.common.collect.RangeSet;
 public class EmbeddedKeywordNamesSupportTest {
 
     @Test
+    public void hasEmbeddedArgumentsTest() {
+        assertThat(EmbeddedKeywordNamesSupport.hasEmbeddedArguments("abc")).isFalse();
+
+        assertThat(EmbeddedKeywordNamesSupport.hasEmbeddedArguments("abc${x}")).isTrue();
+    }
+
+    @Test
     public void prefixMatchesTest() {
+        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc", "")).isEqualTo(0);
+        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc", "x")).isEqualTo(-1);
+
         assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "")).isEqualTo(0);
         assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "a")).isEqualTo(1);
         assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "ab")).isEqualTo(2);
@@ -44,6 +54,9 @@ public class EmbeddedKeywordNamesSupportTest {
 
     @Test
     public void nameMatchesTest() {
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("abc", "")).isFalse();
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("abc", "x")).isFalse();
+
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("abc", "abc")).isTrue();
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("ABC", "abc")).isTrue();
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("abc", "ABC")).isTrue();
@@ -61,7 +74,7 @@ public class EmbeddedKeywordNamesSupportTest {
 
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${x:\\D+}c", "ABXYZC")).isTrue();
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("a${x:\\D+}c", "A1C")).isFalse();
-        
+
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("today is ${date:\\d{4\\}-\\d{2\\}-\\d{2\\}}",
                 "today is 2016-12-20")).isTrue();
     }
@@ -73,7 +86,7 @@ public class EmbeddedKeywordNamesSupportTest {
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("ab$c")).is(empty());
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("ab${c")).is(empty());
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("ab${}c")).is(empty());
-        
+
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("${x}"))
                 .is(containingExactly(Range.closed(0, 3)));
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("ab${x}cd"))
@@ -83,12 +96,19 @@ public class EmbeddedKeywordNamesSupportTest {
                 .is(containingExactly(Range.closed(0, 3), Range.closed(4, 7)));
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("ab${x}c${y}d"))
                 .is(containingExactly(Range.closed(2, 5), Range.closed(7, 10)));
-        
+
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("a${x:\\d+}b"))
                 .is(containingExactly(Range.closed(1, 8)));
 
         assertThat(EmbeddedKeywordNamesSupport.findEmbeddedArgumentsRanges("a${x:\\d{3\\}}b"))
                 .is(containingExactly(Range.closed(1, 11)));
+    }
+
+    @Test
+    public void regexRemoveTest() {
+        assertThat(EmbeddedKeywordNamesSupport.removeRegex("${x}")).isEqualTo("${x}");
+
+        assertThat(EmbeddedKeywordNamesSupport.removeRegex("${x:\\\\d+}")).isEqualTo("${x}");
     }
 
     private static Condition<? super RangeSet<Integer>> empty() {
