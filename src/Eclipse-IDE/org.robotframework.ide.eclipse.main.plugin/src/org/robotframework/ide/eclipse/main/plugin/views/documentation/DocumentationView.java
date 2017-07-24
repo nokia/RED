@@ -161,11 +161,9 @@ public class DocumentationView {
     }
 
     private void showLibdocText(final String elementName, final RobotSuiteFile suiteFile) {
-        final RedKeywordProposal proposal = new RedKeywordProposals(suiteFile)
+        final Optional<RedKeywordProposal> bestMatch = new RedKeywordProposals(suiteFile)
                 .getBestMatchingKeywordProposal(elementName);
-        if (proposal != null) {
-            SwtThread.asyncExec(new DocTextSetter(proposal.getDescription(), "", ""));
-        }
+        bestMatch.ifPresent(proposal -> SwtThread.asyncExec(new DocTextSetter(proposal.getDescription(), "", "")));
     }
 
     @Inject
