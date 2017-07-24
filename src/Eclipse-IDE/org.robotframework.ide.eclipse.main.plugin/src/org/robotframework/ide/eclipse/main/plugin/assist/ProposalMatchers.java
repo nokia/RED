@@ -27,20 +27,6 @@ public class ProposalMatchers {
         };
     }
 
-    public static ProposalMatcher caseSensitivePrefixesMatcher() {
-        return new ProposalMatcher() {
-
-            @Override
-            public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
-                if (proposalContent.startsWith(userContent)) {
-                    return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
-                } else {
-                    return Optional.empty();
-                }
-            }
-        };
-    }
-
     public static ProposalMatcher embeddedKeywordsMatcher() {
         return new ProposalMatcher() {
 
