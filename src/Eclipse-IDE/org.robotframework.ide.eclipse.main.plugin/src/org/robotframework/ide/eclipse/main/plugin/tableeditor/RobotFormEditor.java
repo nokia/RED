@@ -531,12 +531,11 @@ public class RobotFormEditor extends FormEditor {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T getPage(final Class<T> pageClass) {
         for (int i = 0; i < getPageCount(); i++) {
             final IEditorPart part = (IEditorPart) pages.get(i);
             if (part.getClass().equals(pageClass)) {
-                return (T) part;
+                return pageClass.cast(part);
             }
         }
         return null;
