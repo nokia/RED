@@ -61,7 +61,7 @@ public class CodeReservedElementsProposalsProvider implements RedContentProposal
                     : Optional.of(tokens.get(0));
             return AssistProposalPredicates.codeReservedWordsPredicate(cellIndex + 1, firstTokenInLine);
         } else {
-            return AssistProposalPredicates.<String> alwaysFalse();
+            return AssistProposalPredicates.alwaysFalse();
         }
     }
 }

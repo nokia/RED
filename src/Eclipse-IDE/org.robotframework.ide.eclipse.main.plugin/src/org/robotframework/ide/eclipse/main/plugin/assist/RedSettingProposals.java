@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -24,7 +25,7 @@ public class RedSettingProposals {
 
     private static final Table<SettingTarget, String, String> DESCRIBED_SETTINGS;
     static {
-        final Builder<SettingTarget, String, String> builder = ImmutableTable.<SettingTarget, String, String> builder();
+        final Builder<SettingTarget, String, String> builder = ImmutableTable.builder();
 
         builder.put(SettingTarget.TEST_CASE, "[tags]",
                 "These tags are set to this test case and they possibly override Default Tags");
@@ -90,7 +91,8 @@ public class RedSettingProposals {
         this(target, ProposalMatchers.prefixesMatcher());
     }
 
-    public RedSettingProposals(final SettingTarget target, final ProposalMatcher matcher) {
+    @VisibleForTesting
+    RedSettingProposals(final SettingTarget target, final ProposalMatcher matcher) {
         this.target = target;
         this.matcher = matcher;
     }

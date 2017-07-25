@@ -13,6 +13,8 @@ import java.util.Optional;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RedLibraryProposals {
 
     private final RobotSuiteFile suiteFile;
@@ -23,7 +25,8 @@ public class RedLibraryProposals {
         this(suiteFile, ProposalMatchers.prefixesMatcher());
     }
 
-    public RedLibraryProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
+    @VisibleForTesting
+    RedLibraryProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
         this.suiteFile = suiteFile;
         this.matcher = matcher;
     }
