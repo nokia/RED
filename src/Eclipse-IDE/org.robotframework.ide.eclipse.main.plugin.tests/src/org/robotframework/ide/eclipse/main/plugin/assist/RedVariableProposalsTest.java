@@ -62,7 +62,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysFalse());
+                AssistProposalPredicates.alwaysFalse());
 
         assertThat(provider.getVariableProposals("", 0)).isEmpty();
     }
@@ -78,7 +78,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         assertThat(provider.getVariableProposals("var", 0)).isEmpty();
     }
@@ -111,7 +111,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("glb_var_1", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_1");
@@ -127,7 +127,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("2", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_2");
@@ -143,7 +143,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_1", "glb_var_2");
@@ -160,7 +160,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
@@ -178,7 +178,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         assertThat(provider.getVariableProposals("var", 0)).isEmpty();
     }
@@ -193,7 +193,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${glb_var_file_1", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_1}");
@@ -210,7 +210,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("2", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_2}");
@@ -227,7 +227,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_1}", "${glb_var_file_2}");
@@ -244,7 +244,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
@@ -266,7 +266,7 @@ public class RedVariableProposalsTest {
         addLocalVarFileVariables(suiteFile, "a_vf", "b_vf", "c_vf");
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         assertThat(provider.getVariableProposals("var", 0)).isEmpty();
     }
@@ -285,7 +285,7 @@ public class RedVariableProposalsTest {
         addLocalVarFileVariables(suiteFile, "a_vf", "b_vf", "c_vf");
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_v", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vf}");
@@ -306,7 +306,7 @@ public class RedVariableProposalsTest {
         addLocalVarFileVariables(suiteFile, "a_vf", "b_vf", "c_vf");
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_vf}");
@@ -327,7 +327,7 @@ public class RedVariableProposalsTest {
         addLocalVarFileVariables(suiteFile, "a_vf", "b_vf", "c_vf");
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_vf}", "${b_vf}", "${c_vf}");
@@ -348,7 +348,7 @@ public class RedVariableProposalsTest {
         addLocalVarFileVariables(suiteFile, "a_vf", "b_vf");
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
@@ -372,7 +372,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         assertThat(provider.getVariableProposals("var", 0)).isEmpty();
     }
@@ -393,7 +393,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_v", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vt}");
@@ -416,7 +416,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_vt}");
@@ -439,7 +439,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_vt}", "${b_vt}", "${c_vt}");
@@ -461,7 +461,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
@@ -482,7 +482,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         assertThat(provider.getVariableProposals("var", 0)).isEmpty();
     }
@@ -500,7 +500,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_res_var}");
@@ -520,7 +520,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_res_var}");
@@ -539,7 +539,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_res_var}", "${b_res_var}", "${c_res_var}");
@@ -559,7 +559,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 0);
 
@@ -584,7 +584,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         assertThat(provider.getVariableProposals("var", 100)).isEmpty();
     }
@@ -607,7 +607,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", 100);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
@@ -633,7 +633,7 @@ public class RedVariableProposalsTest {
                 .getChildren().get(0).getChildren().get(3);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", logCall);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
@@ -657,7 +657,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", 100);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
@@ -683,7 +683,7 @@ public class RedVariableProposalsTest {
                 .getChildren().get(0).getChildren().get(3);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", logCall);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
@@ -706,7 +706,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 100);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}", "${b_local}");
@@ -731,7 +731,7 @@ public class RedVariableProposalsTest {
                 .getChildren().get(0).getChildren().get(3);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", logCall);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}", "${b_local}");
@@ -754,7 +754,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 90);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}");
@@ -779,7 +779,7 @@ public class RedVariableProposalsTest {
                 .getChildren().get(0).getChildren().get(2);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", call2Call);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${a_local}", "${b_arg}");
@@ -802,7 +802,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", 70);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${b_arg}");
@@ -827,7 +827,7 @@ public class RedVariableProposalsTest {
                 .getChildren().get(0).getChildren().get(1);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", call1Call);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${a_arg}", "${b_arg}");
@@ -851,7 +851,7 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 100);
 
