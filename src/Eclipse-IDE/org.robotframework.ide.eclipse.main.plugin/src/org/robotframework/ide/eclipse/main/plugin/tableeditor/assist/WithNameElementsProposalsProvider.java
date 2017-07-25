@@ -55,7 +55,7 @@ public class WithNameElementsProposalsProvider implements RedContentProposalProv
                 && RobotSetting.SettingsGroup.LIBRARIES.equals(((RobotSetting) tableElement).getGroup())) {
             return AssistProposalPredicates.withNamePredicate(cellIndex);
         } else {
-            return AssistProposalPredicates.<String> alwaysFalse();
+            return AssistProposalPredicates.alwaysFalse();
         }
     }
 }

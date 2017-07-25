@@ -17,6 +17,8 @@ import org.rf.ide.core.executor.RedSystemProperties;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public abstract class RedFileLocationProposals {
 
     private final RobotSuiteFile suiteFile;
@@ -25,7 +27,8 @@ public abstract class RedFileLocationProposals {
 
     private final ProposalMatcher matcher;
 
-    protected RedFileLocationProposals(final RobotSuiteFile suiteFile, final Supplier<List<IFile>> filesSupplier,
+    @VisibleForTesting
+    RedFileLocationProposals(final RobotSuiteFile suiteFile, final Supplier<List<IFile>> filesSupplier,
             final ProposalMatcher matcher) {
         this.suiteFile = suiteFile;
         this.filesSupplier = filesSupplier;
@@ -36,13 +39,13 @@ public abstract class RedFileLocationProposals {
         return create(importType, suiteFile, ProposalMatchers.pathsMatcher());
     }
 
-    public static RedFileLocationProposals create(final SettingsGroup importType, final RobotSuiteFile suiteFile,
+    @VisibleForTesting
+    static RedFileLocationProposals create(final SettingsGroup importType, final RobotSuiteFile suiteFile,
             final ProposalMatcher matcher) {
         switch (importType) {
             case RESOURCES:
                 return new RedResourceFileLocationsProposals(suiteFile, matcher);
             case VARIABLES:
-                return new RedPythonFileLocationsProposals(suiteFile, matcher);
             case LIBRARIES:
                 return new RedPythonFileLocationsProposals(suiteFile, matcher);
             default:
@@ -63,20 +66,20 @@ public abstract class RedFileLocationProposals {
         final List<IFile> files = filesSupplier.get();
         Collections.sort(files, comparator);
 
-        for (final IFile varFile : files) {
+        for (final IFile toFile : files) {
 
             final IFile fromFile = suiteFile.getFile();
             final String content;
             if (RedSystemProperties.isWindowsPlatform()
-                    && !fromFile.getLocation().getDevice().equals(varFile.getLocation().getDevice())) {
-                content = varFile.getLocation().toString();
+                    && !fromFile.getLocation().getDevice().equals(toFile.getLocation().getDevice())) {
+                content = toFile.getLocation().toString();
             } else {
-                content = createCurrentFileRelativePath(fromFile, varFile);
+                content = createCurrentFileRelativePath(fromFile, toFile);
             }
             final Optional<ProposalMatch> match = matcher.matches(userContent, content);
 
             if (match.isPresent()) {
-                proposals.add(AssistProposals.createFileLocationProposal(content, varFile, match.get()));
+                proposals.add(AssistProposals.createFileLocationProposal(content, toFile, match.get()));
             }
         }
         return proposals;

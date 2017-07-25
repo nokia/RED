@@ -97,7 +97,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             final RobotSuiteFile model) {
         final Optional<? extends RobotElement> element = model.findElement(lastTokenOffset);
         return element.isPresent() ? AssistProposalPredicates.globalVariablePredicate(element.get())
-                : AssistProposalPredicates.<String> alwaysTrue();
+                : AssistProposalPredicates.alwaysTrue();
     }
 
     private int lastTokenOffset(final int offset, final int line, final RobotSuiteFile model) {

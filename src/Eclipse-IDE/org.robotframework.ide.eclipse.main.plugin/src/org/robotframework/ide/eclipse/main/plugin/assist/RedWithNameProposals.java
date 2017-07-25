@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RedWithNameProposals {
 
     static final String LIBRARY = "library";
@@ -21,6 +23,7 @@ public class RedWithNameProposals {
         this(ProposalMatchers.prefixesMatcher(), predicateWordHasToSatisfy);
     }
 
+    @VisibleForTesting
     RedWithNameProposals(final ProposalMatcher matcher,
             final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
         this.matcher = matcher;
