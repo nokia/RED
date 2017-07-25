@@ -51,7 +51,7 @@ public class RedCodeReservedWordProposalsTest {
     @Test
     public void onlyProposalsMatchingPrefixAreProvided_whenPrefixIsGivenAndDefaultMatcherIsUsed() {
         final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
-                AssistProposalPredicates.<String>alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("iN");
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("IN", "IN ENUMERATE", "IN RANGE",
@@ -61,7 +61,7 @@ public class RedCodeReservedWordProposalsTest {
     @Test
     public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
         final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
-                substringMatcher(), AssistProposalPredicates.<String> alwaysTrue());
+                substringMatcher(), AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("an");
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("And", "IN RANGE");

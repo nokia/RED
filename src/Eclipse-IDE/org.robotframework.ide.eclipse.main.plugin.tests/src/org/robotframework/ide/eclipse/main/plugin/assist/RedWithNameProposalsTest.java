@@ -54,7 +54,7 @@ public class RedWithNameProposalsTest {
     @Test
     public void onlyProposalsMatchingPrefixAreProvided_whenPrefixIsGivenAndDefaultMatcherIsUsed() {
         final RedWithNameProposals proposalsProvider = new RedWithNameProposals(
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("with");
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");
@@ -63,7 +63,7 @@ public class RedWithNameProposalsTest {
     @Test
     public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
         final RedWithNameProposals proposalsProvider = new RedWithNameProposals(substringMatcher(),
-                AssistProposalPredicates.<String> alwaysTrue());
+                AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("am");
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");

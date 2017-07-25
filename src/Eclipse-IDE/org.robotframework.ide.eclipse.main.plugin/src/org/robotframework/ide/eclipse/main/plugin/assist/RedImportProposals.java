@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwa
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.Files;
 
 public class RedImportProposals {
@@ -28,7 +29,8 @@ public class RedImportProposals {
         this(suiteFile, ProposalMatchers.prefixesMatcher());
     }
 
-    public RedImportProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
+    @VisibleForTesting
+    RedImportProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher) {
         this.suiteFile = suiteFile;
         this.matcher = matcher;
     }
