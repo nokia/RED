@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RedCodeReservedWordProposals {
 
     static final String FOR_LOOP_1 = ":FOR";
@@ -29,6 +31,7 @@ public class RedCodeReservedWordProposals {
         this(ProposalMatchers.prefixesMatcher(), predicateWordHasToSatisfy);
     }
 
+    @VisibleForTesting
     RedCodeReservedWordProposals(final ProposalMatcher matcher,
             final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
         this.matcher = matcher;

@@ -18,6 +18,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RedSectionProposals {
 
     private static final List<String> SECTION_NAMES = newArrayList(RobotKeywordsSection.SECTION_NAME,
@@ -29,7 +31,8 @@ public class RedSectionProposals {
         this(ProposalMatchers.prefixesMatcher());
     }
 
-    public RedSectionProposals(final ProposalMatcher matcher) {
+    @VisibleForTesting
+    RedSectionProposals(final ProposalMatcher matcher) {
         this.matcher = matcher;
     }
 

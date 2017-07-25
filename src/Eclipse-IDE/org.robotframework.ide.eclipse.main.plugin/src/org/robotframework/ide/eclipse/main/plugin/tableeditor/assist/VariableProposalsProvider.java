@@ -64,7 +64,7 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
     private AssistProposalPredicate<String> createGlobalVarPredicate(final Object rowElement) {
         return rowElement instanceof RobotElement
                 ? AssistProposalPredicates.globalVariablePredicate((RobotElement) rowElement)
-                : AssistProposalPredicates.<String> alwaysTrue();
+                : AssistProposalPredicates.alwaysTrue();
     }
 
     private RobotFileInternalElement getModelElement(final Object rowElement) {
