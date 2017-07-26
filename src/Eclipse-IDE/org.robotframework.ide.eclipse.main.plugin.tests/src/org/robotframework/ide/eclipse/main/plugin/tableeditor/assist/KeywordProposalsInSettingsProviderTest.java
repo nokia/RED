@@ -197,7 +197,7 @@ public class KeywordProposalsInSettingsProviderTest {
 
         for (int row = 0; row < settings.size(); row++) {
             final AssistantContext context = new NatTableAssistantContext(1, row);
-            final RedContentProposal[] proposals = provider.getProposals("k", 1, context);
+            final RedContentProposal[] proposals = provider.getProposals("kw", 2, context);
             assertThat(proposals).hasSize(4);
 
             assertThat(proposals[0].getLabel()).isEqualTo("kw1 - LibImported");
