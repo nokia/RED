@@ -28,7 +28,7 @@ public class RedSectionProposals {
     private final ProposalMatcher matcher;
 
     public RedSectionProposals() {
-        this(ProposalMatchers.prefixesMatcher());
+        this(ProposalMatchers.substringMatcher());
     }
 
     @VisibleForTesting

@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,6 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposal;
@@ -126,7 +126,7 @@ public class KeywordProposalsInSettingsProviderTest {
     }
 
     @Test
-    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix() throws Exception {
+    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
@@ -143,7 +143,7 @@ public class KeywordProposalsInSettingsProviderTest {
     }
 
     @Test
-    public void thereAreProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted() throws Exception {
+    public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("kw");
 
@@ -174,8 +174,8 @@ public class KeywordProposalsInSettingsProviderTest {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
         final Map<ReferencedLibrary, LibrarySpecification> refLibs = new LinkedHashMap<>();
-        refLibs.putAll(createRefLib("LibImported", "kw1", "kw2"));
-        refLibs.putAll(createRefLib("LibNotImported", "kw3", "kw4"));
+        refLibs.putAll(Libraries.createRefLib("LibImported", "kw1", "kw2"));
+        refLibs.putAll(Libraries.createRefLib("LibNotImported", "kw3", "kw4"));
 
         final RobotProject project = RedPlugin.getModelManager().createProject(projectProvider.getProject());
         project.setReferencedLibraries(refLibs);
