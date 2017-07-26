@@ -119,7 +119,6 @@ public class CycledContentAssistProcessorTest {
         assertThat(cycledProcessor.computeCompletionProposals(viewer, 0)).containsExactly(p1, p2, p3);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void nextProposalStatusesWithCorrectActivationTriggerAreSet_forNestedProcessors() throws Exception {
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, '9'));
@@ -163,7 +162,6 @@ public class CycledContentAssistProcessorTest {
         verifyNoMoreInteractions(callback);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void emptyNextProposalStatusIsSet_forSingleProcessor() throws Exception {
         final KeySequence activationTrigger = KeySequence.getInstance(KeyStroke.getInstance(SWT.CTRL, SWT.SPACE));

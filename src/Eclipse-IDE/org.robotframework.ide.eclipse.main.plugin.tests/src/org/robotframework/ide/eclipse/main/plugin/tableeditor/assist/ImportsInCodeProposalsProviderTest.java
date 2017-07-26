@@ -28,7 +28,7 @@ public class ImportsInCodeProposalsProviderTest {
     public ShellProvider shellProvider = new ShellProvider();
 
     @Test
-    public void thereAreNoProposalsProvided_whenThereIsNoImportMatchingCurrentPrefix() throws Exception {
+    public void thereAreNoProposalsProvided_whenThereIsNoImportMatchingCurrentInput() throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
                 "Resource  ares.robot",
@@ -41,7 +41,7 @@ public class ImportsInCodeProposalsProviderTest {
     }
 
     @Test
-    public void thereAreProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted() throws Exception {
+    public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("abc");
 

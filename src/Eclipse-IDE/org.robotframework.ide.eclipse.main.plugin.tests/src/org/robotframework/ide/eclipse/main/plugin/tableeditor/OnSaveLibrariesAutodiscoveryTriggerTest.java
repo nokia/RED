@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,12 +25,12 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.OnSaveLibrariesAutodiscoveryTrigger.DiscovererFactory;
 import org.robotframework.red.junit.ProjectProvider;
@@ -57,42 +56,32 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         projectProvider.createFile("suite_with_unknown_library_2.robot",
                 "*** Settings ***",
                 "Library  unknown_2");
-        projectProvider.createFile("suite_with_unknown_library_in_resource.robot", 
+        projectProvider.createFile("suite_with_unknown_library_in_resource.robot",
                 "*** Settings ***",
                 "Resource  resource.robot");
-        projectProvider.createFile("resource.robot", 
-                "*** Settings ***", 
+        projectProvider.createFile("resource.robot",
+                "*** Settings ***",
                 "Library  unknown");
-        projectProvider.createFile("suite_with_unknown_library_in_resources_with_cycle.robot", 
+        projectProvider.createFile("suite_with_unknown_library_in_resources_with_cycle.robot",
                 "*** Settings ***",
                 "Resource  resource_with_cycle_1.robot");
-        projectProvider.createFile("resource_with_cycle_1.robot", 
+        projectProvider.createFile("resource_with_cycle_1.robot",
                 "*** Settings ***",
                 "Resource  resource_with_cycle_2.robot");
-        projectProvider.createFile("resource_with_cycle_2.robot", 
+        projectProvider.createFile("resource_with_cycle_2.robot",
                 "*** Settings ***",
-                "Resource  resource_with_cycle_1.robot", 
+                "Resource  resource_with_cycle_1.robot",
                 "Library  unknown");
 
-        final ReferencedLibrary knownLib1 = ReferencedLibrary.create(LibraryType.PYTHON, "known1", "");
-        final LibrarySpecification knownLib1spec = new LibrarySpecification();
-        knownLib1spec.setName("known1");
-        final ReferencedLibrary knownLib2 = ReferencedLibrary.create(LibraryType.PYTHON, "known2", "");
-        final LibrarySpecification knownLib2spec = new LibrarySpecification();
-        knownLib2spec.setName("known2");
-        final Map<ReferencedLibrary, LibrarySpecification> libs = new HashMap<>();
-        libs.put(knownLib1, knownLib1spec);
-        libs.put(knownLib2, knownLib2spec);
+        final Map<ReferencedLibrary, LibrarySpecification> libs = Libraries.createRefLibs("known1", "known2");
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addReferencedLibrary(knownLib1);
-        config.addReferencedLibrary(knownLib2);
+        libs.keySet().forEach(config::addReferencedLibrary);
         projectProvider.configure(config);
         projectProvider.addRobotNature();
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setReferencedLibraries(libs);
-        robotProject.setStandardLibraries(new HashMap<String, LibrarySpecification>());
     }
 
     @AfterClass

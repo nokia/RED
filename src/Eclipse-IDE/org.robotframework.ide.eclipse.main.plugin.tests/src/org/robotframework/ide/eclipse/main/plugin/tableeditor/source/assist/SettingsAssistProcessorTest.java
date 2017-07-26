@@ -73,7 +73,7 @@ public class SettingsAssistProcessorTest {
     public void noProposalsAreProvided_whenInTheFirstCell() throws Exception {
         final int offset = 25;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  keyword  argument");
-        
+
         final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
@@ -93,7 +93,7 @@ public class SettingsAssistProcessorTest {
     public void keywordSettingsProposalsAreProvided_whenInFirstCellOfKeywordSection() throws Exception {
         final int offset = 27;
         final List<String> lines = newArrayList("*** Keywords ***", "keyword", "  ");
-        
+
         final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
@@ -120,7 +120,7 @@ public class SettingsAssistProcessorTest {
     }
 
     @Test
-    public void onlyKeywordSettingsProposalsMatchingPrefixAreProvided_whenInFirstCellOfSetting() throws Exception {
+    public void onlyKeywordSettingsProposalsMatchingInputAreProvided_whenInFirstCellOfSetting() throws Exception {
         final int offset = 29;
         final List<String> lines = newArrayList("*** Keywords ***", "keyword", "  [T");
 
@@ -150,7 +150,7 @@ public class SettingsAssistProcessorTest {
     public void testCaseSettingsProposalsAreProvided_whenInFirstCellOfTestCasesSection() throws Exception {
         final int offset = 26;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  ");
-        
+
         final IFile file = projectProvider.createFile(new Path("1.robot"), lines.toArray(new String[0]));
 
         final ITextViewer viewer = mock(ITextViewer.class);
@@ -177,7 +177,7 @@ public class SettingsAssistProcessorTest {
     }
 
     @Test
-    public void onlyTestCaseSettingsProposalsMatchingPrefixAreProvided_whenInFirstCellOfSetting() throws Exception {
+    public void onlyTestCaseSettingsProposalsMatchingInputAreProvided_whenInFirstCellOfSetting() throws Exception {
         final int offset = 29;
         final List<String> lines = newArrayList("*** Test Cases ***", "case", "  [Te");
 

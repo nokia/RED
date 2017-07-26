@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -16,9 +15,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -32,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
@@ -51,14 +48,14 @@ public class ImportsInCodeAssistProcessorTest {
         robotModel = new RobotModel();
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLibs("Lib1", "Lib2", "Lib3"));
 
         projectProvider.createFile("suite.robot",
                 "*** Settings ***",
                 "Library  Lib1",
                 "Library  Lib3",
                 "Resource  res1.robot",
-                "Resource  other.robot",
+                "Resource  abcde.robot",
                 "*** Keywords ***",
                 "keyword",
                 "  ",
@@ -146,13 +143,13 @@ public class ImportsInCodeAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  Lib1.", "  rst", "  acb  lkj"),
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  Lib1.", "  rst", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  Lib3.", "  rst", "  acb  lkj"),
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  Lib3.", "  rst", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  res1.", "  rst", "  acb  lkj"),
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  res1.", "  rst", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  other.", "  rst", "  acb  lkj"));
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  abcde.", "  rst", "  acb  lkj"));
     }
 
     @Test
@@ -178,13 +175,13 @@ public class ImportsInCodeAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  ", "  Lib1.", "  acb  lkj"),
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  Lib1.", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  ", "  Lib3.", "  acb  lkj"),
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  Lib3.", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj"),
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj"),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  ", "  other.", "  acb  lkj"));
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  abcde.", "  acb  lkj"));
     }
 
     @Test
@@ -209,7 +206,7 @@ public class ImportsInCodeAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj"));
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  res1.", "  acb  lkj"));
     }
 
     @Test
@@ -234,20 +231,9 @@ public class ImportsInCodeAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib1."),
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib1."),
                 new Document("*** Settings ***", "Library  Lib1", "Library  Lib3", "Resource  res1.robot",
-                        "Resource  other.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib3."));
-    }
-
-    private static Map<String, LibrarySpecification> createStandardLibraries() {
-        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
-        for (final String libName : newArrayList("Lib1", "Lib2", "Lib3")) {
-            final LibrarySpecification stdLib = new LibrarySpecification();
-            stdLib.setName(libName);
-
-            stdLibs.put(stdLib.getName(), stdLib);
-        }
-        return stdLibs;
+                        "Resource  abcde.robot", "*** Keywords ***", "keyword", "  ", "  rst", "  acb  Lib3."));
     }
 
     private static IDocument documentFromSuiteFile() throws Exception {

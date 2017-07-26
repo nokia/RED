@@ -14,9 +14,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -25,13 +23,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
@@ -42,6 +39,7 @@ public class LibrariesImportAssistProcessorTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(LibrariesImportAssistProcessorTest.class);
+
     private static RobotModel robotModel;
 
     @BeforeClass
@@ -49,8 +47,8 @@ public class LibrariesImportAssistProcessorTest {
         robotModel = new RobotModel();
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries());
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLibs("StdLib1", "StdLib2"));
+        robotProject.setReferencedLibraries(Libraries.createRefLibs("cRefLib"));
 
         projectProvider.createFile("suite.robot",
                 "*** Settings ***",
@@ -204,27 +202,6 @@ public class LibrariesImportAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Settings ***", "Resources  cell", "Library  ", "Library  cRefLib  cell2"));
-    }
-
-    private static Map<String, LibrarySpecification> createStandardLibraries() {
-        final LibrarySpecification stdLib1 = new LibrarySpecification();
-        stdLib1.setName("StdLib1");
-        final LibrarySpecification stdLib2 = new LibrarySpecification();
-        stdLib2.setName("StdLib2");
-        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
-        stdLibs.put(stdLib1.getName(), stdLib1);
-        stdLibs.put(stdLib2.getName(), stdLib2);
-        return stdLibs;
-    }
-
-    private static Map<ReferencedLibrary, LibrarySpecification> createReferencedLibraries() {
-        final ReferencedLibrary refTestLib = new ReferencedLibrary();
-        refTestLib.setName("cRefLib");
-        final LibrarySpecification testLib = new LibrarySpecification();
-        testLib.setName("cRefLib");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(refTestLib, testLib);
-        return refLibs;
     }
 
     private static IDocument documentFromSuiteFile() throws Exception {

@@ -88,7 +88,7 @@ public class RedSettingProposals {
     private final ProposalMatcher matcher;
 
     public RedSettingProposals(final SettingTarget target) {
-        this(target, ProposalMatchers.prefixesMatcher());
+        this(target, ProposalMatchers.substringMatcher());
     }
 
     @VisibleForTesting

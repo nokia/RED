@@ -9,26 +9,25 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates.alwaysTrue;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 
 import java.util.Comparator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.PreferenceUpdater;
 import org.robotframework.red.junit.ProjectProvider;
@@ -43,10 +42,8 @@ public class RedKeywordProposalsTest {
 
     private RobotModel robotModel;
 
-    @Before
-    public void beforeTest() throws Exception {
-        robotModel = new RobotModel();
-
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
         projectProvider.createFile("res.robot",
                 "*** Keywords ***",
                 "a_res_kw1",
@@ -54,8 +51,13 @@ public class RedKeywordProposalsTest {
                 "c_res_kw3");
     }
 
+    @Before
+    public void beforeTest() throws Exception {
+        robotModel = new RobotModel();
+    }
+
     @Test
-    public void noLocalKeywordsAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
+    public void noLocalKeywordsAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Keywords ***",
@@ -67,11 +69,11 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        assertThat(provider.getKeywordProposals("kw")).isEmpty();
+        assertThat(provider.getKeywordProposals("other")).isEmpty();
     }
 
     @Test
-    public void onlyLocalKeywordsMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyLocalKeywordsMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Keywords ***",
                 "a_kw1",
@@ -81,7 +83,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw2 - file.robot");
     }
@@ -97,9 +99,9 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, prefixesMatcher(),
                 alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("c_");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_kw3 - file.robot");
     }
@@ -143,7 +145,7 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void noResourceKeywordsAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
+    public void noResourceKeywordsAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -153,11 +155,11 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        assertThat(provider.getKeywordProposals("kw")).isEmpty();
+        assertThat(provider.getKeywordProposals("other")).isEmpty();
     }
 
     @Test
-    public void onlyResourceKeywordsMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyResourceKeywordsMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
                 "Resource  res.robot",
@@ -165,9 +167,9 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_res_kw2 - res.robot");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_res_kw3 - res.robot");
     }
 
     @Test
@@ -178,11 +180,11 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_res_kw3 - res.robot");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_res_kw2 - res.robot");
     }
 
     @Test
@@ -220,19 +222,11 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void noLibraryKeywordsAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
+    public void noLibraryKeywordsAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("stdLib", "a_slib_kw1"),
-                        libKeyword("stdLib", "b_slib_kw2"),
-                        libKeyword("stdLib", "c_slib_kw3")));
-        robotProject.setReferencedLibraries(
-                createReferencedLibraries(
-                        libKeyword("refLib", "a_rlib_kw1"),
-                        libKeyword("refLib", "b_rlib_kw2"),
-                        libKeyword("refLib", "c_rlib_kw3")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1", "b_slib_kw2", "c_slib_kw3"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1", "b_rlib_kw2", "c_rlib_kw3"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -243,22 +237,14 @@ public class RedKeywordProposalsTest {
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
-        assertThat(provider.getKeywordProposals("kw")).isEmpty();
+        assertThat(provider.getKeywordProposals("other")).isEmpty();
     }
 
     @Test
-    public void onlyLibraryKeywordsMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyLibraryKeywordsMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("stdLib", "a_slib_kw1"),
-                        libKeyword("stdLib", "b_slib_kw2"),
-                        libKeyword("stdLib", "c_slib_kw3")));
-        robotProject.setReferencedLibraries(
-                createReferencedLibraries(
-                        libKeyword("refLib", "a_rlib_kw1"),
-                        libKeyword("refLib", "b_rlib_kw2"),
-                        libKeyword("refLib", "c_rlib_kw3")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1", "b_slib_kw2", "c_slib_kw3"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1", "b_rlib_kw2", "c_rlib_kw3"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -268,7 +254,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("b_");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_rlib_kw2 - refLib",
                 "b_slib_kw2 - stdLib");
@@ -277,16 +263,8 @@ public class RedKeywordProposalsTest {
     @Test
     public void onlyLibraryKeywordsMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("stdLib", "a_slib_kw1"),
-                        libKeyword("stdLib", "b_slib_kw2"),
-                        libKeyword("stdLib", "c_slib_kw3")));
-        robotProject.setReferencedLibraries(
-                createReferencedLibraries(
-                        libKeyword("refLib", "a_rlib_kw1"),
-                        libKeyword("refLib", "b_rlib_kw2"),
-                        libKeyword("refLib", "c_rlib_kw3")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1", "b_slib_kw2", "c_slib_kw3"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1", "b_rlib_kw2", "c_rlib_kw3"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -295,9 +273,9 @@ public class RedKeywordProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("c_");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_rlib_kw3 - refLib",
                 "c_slib_kw3 - stdLib");
@@ -306,16 +284,8 @@ public class RedKeywordProposalsTest {
     @Test
     public void allLibraryKeywordsAreProvided_whenTheyAreMatched() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("stdLib", "a_slib_kw1"),
-                        libKeyword("stdLib", "b_slib_kw2"),
-                        libKeyword("stdLib", "c_slib_kw3")));
-        robotProject.setReferencedLibraries(
-                createReferencedLibraries(
-                        libKeyword("refLib", "a_rlib_kw1"),
-                        libKeyword("refLib", "b_rlib_kw2"),
-                        libKeyword("refLib", "c_rlib_kw3")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1", "b_slib_kw2", "c_slib_kw3"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1", "b_rlib_kw2", "c_rlib_kw3"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -336,11 +306,7 @@ public class RedKeywordProposalsTest {
     public void allLibraryKeywordsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("stdLib", "a_kw"),
-                        libKeyword("stdLib", "b_kw")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_kw", "b_kw"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -360,8 +326,8 @@ public class RedKeywordProposalsTest {
     public void onlyLibraryKeywordsFromLibrariesSatisfyingPredicateAreProvided_whenPredicateFiltersLibraries()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_slib_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_rlib_kw1")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -371,7 +337,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final AssistProposalPredicate<LibrarySpecification> predicate = libSpec -> !libSpec.getName().equals("refLib");
-        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, substringMatcher(),
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile, prefixesMatcher(),
                 predicate);
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("");
 
@@ -381,10 +347,7 @@ public class RedKeywordProposalsTest {
     @Test
     public void allKeywordProposalsAreProvided_whenTheyArePrefixedWithBddSyntax() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("stdLib", "a_slib_kw")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -408,8 +371,7 @@ public class RedKeywordProposalsTest {
     @Test
     public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_1() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_slib_kw")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -430,8 +392,7 @@ public class RedKeywordProposalsTest {
     @Test
     public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_withAlias() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_slib_kw")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -453,10 +414,7 @@ public class RedKeywordProposalsTest {
     @Test
     public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_2() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("stdLib", "a_slib_kw")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -479,8 +437,7 @@ public class RedKeywordProposalsTest {
     @Test
     public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_3() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_slib_kw")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -516,13 +473,12 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void qualifiedNameIsAddedToContentForProposals_whenKeywordPrefixAutoAdditionPreferenceIsEnabled()
+    public void qualifiedNameIsAddedToInputForProposals_whenKeywordPrefixAutoAdditionPreferenceIsEnabled()
             throws Exception {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, true);
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_lib_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_lib_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -539,10 +495,9 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void qualifiedNameIsAddedToContentForProposals_whenProposalIsConflicting() throws Exception {
+    public void qualifiedNameIsAddedToInputForProposals_whenProposalIsConflicting() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_res_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_res_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -580,12 +535,12 @@ public class RedKeywordProposalsTest {
     public void onlyKeywordsFromImportedLibrariesOrAccessibleWithoutImportAreProvided_whenKeywordFromNotImportedLibraryPreferenceIsDisabled()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("BuiltIn", "a_kw1"),
-                        libKeyword("stdLib", "a_lib_kw1"),
-                        libKeyword("otherLib", "a_other_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_rlib_kw1")));
+        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
+        stdLibs.putAll(Libraries.createStdLib("BuiltIn", "a_kw1"));
+        stdLibs.putAll(Libraries.createStdLib("stdLib", "a_lib_kw1"));
+        stdLibs.putAll(Libraries.createStdLib("otherLib", "a_other_kw1"));
+        robotProject.setStandardLibraries(stdLibs);
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -607,12 +562,12 @@ public class RedKeywordProposalsTest {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("BuiltIn", "a_kw1"),
-                        libKeyword("stdLib", "a_lib_kw1"),
-                        libKeyword("otherLib", "a_other_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_rlib_kw1")));
+        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
+        stdLibs.putAll(Libraries.createStdLib("BuiltIn", "a_kw1"));
+        stdLibs.putAll(Libraries.createStdLib("stdLib", "a_lib_kw1"));
+        stdLibs.putAll(Libraries.createStdLib("otherLib", "a_other_kw1"));
+        robotProject.setStandardLibraries(stdLibs);
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -635,11 +590,8 @@ public class RedKeywordProposalsTest {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(
-                createStandardLibraries(
-                        libKeyword("otherLib", "a_other_kw1"),
-                        libKeyword("otherLib", "a_other_kw2")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_rlib_kw1")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("otherLib", "a_other_kw1", "a_other_kw2"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
@@ -655,8 +607,8 @@ public class RedKeywordProposalsTest {
     @Test
     public void bestMatchingKeywordIsLocalWhenAllExist() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_res_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_res_kw1")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_res_kw1"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_res_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -670,15 +622,14 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).isPresent()
-                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("file"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("file"));
     }
 
     @Test
     public void bestMatchingKeywordIsResourceKeywordIfThereIsNoLocal() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_res_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_res_kw1")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_res_kw1"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_res_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -691,15 +642,14 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).isPresent()
-                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("res"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("res"));
     }
 
     @Test
     public void bestMatchingKeywordIsUserLibKeywordIfThereIsNoLocalAndResource() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_res_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_res_kw1")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_res_kw1"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_res_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -711,15 +661,13 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).isPresent()
-                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("refLib"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("refLib"));
     }
 
     @Test
     public void bestMatchingKeywordIsStdLibKeywordIfThereAreNoOther() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_res_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_res_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -731,15 +679,14 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).isPresent()
-                .hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("stdLib"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("stdLib"));
     }
 
     @Test
     public void bestMatchingKeywordIsNullForUnknownName() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(createStandardLibraries(libKeyword("stdLib", "a_res_kw1")));
-        robotProject.setReferencedLibraries(createReferencedLibraries(libKeyword("refLib", "a_res_kw1")));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_res_kw1"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_res_kw1"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -757,44 +704,6 @@ public class RedKeywordProposalsTest {
         assertThat(bestMatch).isNotPresent();
     }
 
-    private static Map<String, LibrarySpecification> createStandardLibraries(final LibKeyword... keywords) {
-        final Map<String, LibrarySpecification> stdLibs = new LinkedHashMap<>();
-        for (final LibKeyword keyword : keywords) {
-            if (!stdLibs.containsKey(keyword.library)) {
-                final LibrarySpecification stdLib = new LibrarySpecification();
-                stdLib.setName(keyword.library);
-                stdLibs.put(keyword.library, stdLib);
-            }
-            final KeywordSpecification keywordSpecification = new KeywordSpecification();
-            keywordSpecification.setName(keyword.keyword);
-
-            final LibrarySpecification libSpec = stdLibs.get(keyword.library);
-            libSpec.getKeywords().add(keywordSpecification);
-        }
-        return stdLibs;
-    }
-
-    private static Map<ReferencedLibrary, LibrarySpecification> createReferencedLibraries(
-            final LibKeyword... keywords) {
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new LinkedHashMap<>();
-        for (final LibKeyword keyword : keywords) {
-            final ReferencedLibrary refLibrary = ReferencedLibrary.create(LibraryType.PYTHON, keyword.library, "");
-            if (!refLibs.containsKey(refLibrary)) {
-
-                final LibrarySpecification refLibSpec = new LibrarySpecification();
-                refLibSpec.setName(keyword.library);
-                refLibSpec.setReferenced(refLibrary);
-                refLibs.put(refLibrary, refLibSpec);
-            }
-            final KeywordSpecification keywordSpecification = new KeywordSpecification();
-            keywordSpecification.setName(keyword.keyword);
-
-            final LibrarySpecification libSpec = refLibs.get(refLibrary);
-            libSpec.getKeywords().add(keywordSpecification);
-        }
-        return refLibs;
-    }
-
     private static Comparator<? super RedKeywordProposal> firstProposalContaining(final String toContain) {
         return new Comparator<RedKeywordProposal>() {
 
@@ -809,21 +718,5 @@ public class RedKeywordProposalsTest {
                 }
             }
         };
-    }
-
-    private static LibKeyword libKeyword(final String libName, final String kwName) {
-        return new LibKeyword(libName, kwName);
-    }
-
-    private static class LibKeyword {
-
-        private final String library;
-
-        private final String keyword;
-
-        public LibKeyword(final String libName, final String kwName) {
-            this.library = libName;
-            this.keyword = kwName;
-        }
     }
 }

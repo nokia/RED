@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
@@ -33,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.PreferenceUpdater;
@@ -471,7 +471,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
         final RobotProject project = robotModel.createRobotProject(projectProvider.getProject());
-        project.setReferencedLibraries(createRefLib("LibNotImported", "kw1", "kw2"));
+        project.setReferencedLibraries(Libraries.createRefLib("LibNotImported", "kw1", "kw2"));
 
         final int offset = 53;
 

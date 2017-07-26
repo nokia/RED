@@ -109,7 +109,7 @@ public class GeneralSettingsAssistProcessorTest {
     }
 
     @Test
-    public void onlyProposalsMatchingPrefixAreProvided_whenInsideFirstCell() throws Exception {
+    public void onlyProposalsMatchingInputAreProvided_whenInsideFirstCell() throws Exception {
         final List<String> lines = newArrayList("*** Settings ***", "Test cell");
 
         final ITextViewer viewer = mock(ITextViewer.class);

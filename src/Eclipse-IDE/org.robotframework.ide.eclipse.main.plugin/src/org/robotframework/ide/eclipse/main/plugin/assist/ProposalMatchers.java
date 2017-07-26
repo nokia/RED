@@ -13,16 +13,16 @@ import com.google.common.collect.Range;
 
 public class ProposalMatchers {
 
-    public static ProposalMatcher prefixesMatcher() {
+    public static ProposalMatcher substringMatcher() {
         return new ProposalMatcher() {
 
             @Override
             public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
-                if (proposalContent.toLowerCase().startsWith(userContent.toLowerCase())) {
-                    return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
-                } else {
-                    return Optional.empty();
+                if (proposalContent.toLowerCase().contains(userContent.toLowerCase())) {
+                    final int index = proposalContent.toLowerCase().indexOf(userContent.toLowerCase());
+                    return Optional.of(new ProposalMatch(Range.closedOpen(index, index + userContent.length())));
                 }
+                return Optional.empty();
             }
         };
     }
@@ -32,30 +32,8 @@ public class ProposalMatchers {
 
             @Override
             public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
-                final int index = EmbeddedKeywordNamesSupport.startsWithIgnoreCase(proposalContent, userContent);
-                if (index >= 0) {
-                    return Optional.of(new ProposalMatch(Range.closedOpen(0, index)));
-                } else {
-                    return Optional.empty();
-                }
-            }
-        };
-    }
-
-    public static ProposalMatcher pathsMatcher() {
-        return new ProposalMatcher() {
-
-            @Override
-            public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
-                if (proposalContent.toLowerCase().startsWith(userContent.toLowerCase())) {
-                    return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
-                }
-                final int index = proposalContent.toLowerCase().indexOf("/" + userContent.toLowerCase());
-                if (index >= 0) {
-                    return Optional
-                            .of(new ProposalMatch(Range.closedOpen(index + 1, index + 1 + userContent.length())));
-                }
-                return Optional.empty();
+                return EmbeddedKeywordNamesSupport.containsIgnoreCase(proposalContent, userContent)
+                        .map(ProposalMatch::new);
             }
         };
     }

@@ -36,7 +36,7 @@ public abstract class RedFileLocationProposals {
     }
 
     public static RedFileLocationProposals create(final SettingsGroup importType, final RobotSuiteFile suiteFile) {
-        return create(importType, suiteFile, ProposalMatchers.pathsMatcher());
+        return create(importType, suiteFile, ProposalMatchers.substringMatcher());
     }
 
     @VisibleForTesting

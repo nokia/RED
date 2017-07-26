@@ -59,12 +59,12 @@ public class ProposalMatchTest {
 
         assertThat(match.mapAndShiftToFragment(0, 3)).isNotPresent();
         assertThat(match.mapAndShiftToFragment(0, 4)).isNotPresent();
-        assertThat(match.mapAndShiftToFragment(0, 5)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(5, 5)));
-        assertThat(match.mapAndShiftToFragment(2, 5)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(3, 5)));
-        assertThat(match.mapAndShiftToFragment(4, 8)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(1, 6)));
-        assertThat(match.mapAndShiftToFragment(6, 3)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 3)));
-        assertThat(match.mapAndShiftToFragment(6, 8)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
-        assertThat(match.mapAndShiftToFragment(10, 5)).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
+        assertThat(match.mapAndShiftToFragment(0, 5)).hasValue(new ProposalMatch(Range.closedOpen(5, 5)));
+        assertThat(match.mapAndShiftToFragment(2, 5)).hasValue(new ProposalMatch(Range.closedOpen(3, 5)));
+        assertThat(match.mapAndShiftToFragment(4, 8)).hasValue(new ProposalMatch(Range.closedOpen(1, 6)));
+        assertThat(match.mapAndShiftToFragment(6, 3)).hasValue(new ProposalMatch(Range.closedOpen(0, 3)));
+        assertThat(match.mapAndShiftToFragment(6, 8)).hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
+        assertThat(match.mapAndShiftToFragment(10, 5)).hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
         assertThat(match.mapAndShiftToFragment(15, 5)).isNotPresent();
     }
 }

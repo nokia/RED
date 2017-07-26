@@ -69,7 +69,7 @@ public class VariableProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoVariablesProposalsProvided_whenThereIsNoVariableMatchingCurrentPrefix() {
+    public void thereAreNoVariablesProposalsProvided_whenThereIsNoVariableMatchingCurrentInput() {
         final RobotSuiteFile suite = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotKeywordCall callElement = suite.findSection(RobotCasesSection.class)
                 .get().getChildren().get(0).getChildren().get(0);

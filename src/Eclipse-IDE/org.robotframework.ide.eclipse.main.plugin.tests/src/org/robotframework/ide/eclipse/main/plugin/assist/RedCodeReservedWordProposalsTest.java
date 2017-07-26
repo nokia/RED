@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
 
 import java.util.Comparator;
 import java.util.List;
@@ -49,8 +49,18 @@ public class RedCodeReservedWordProposalsTest {
     }
 
     @Test
-    public void onlyProposalsMatchingPrefixAreProvided_whenPrefixIsGivenAndDefaultMatcherIsUsed() {
+    public void onlyProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
         final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
+                AssistProposalPredicates.alwaysTrue());
+
+        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("En");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Given", "IN ENUMERATE", "Then",
+                "When");
+    }
+
+    @Test
+    public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
+        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("iN");
@@ -59,19 +69,9 @@ public class RedCodeReservedWordProposalsTest {
     }
 
     @Test
-    public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
+    public void proposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
-                substringMatcher(), AssistProposalPredicates.alwaysTrue());
-
-        final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("an");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("And", "IN RANGE");
-    }
-
-    @Test
-    public void proposalsAreProvided_inOrderInducedByGivenComparator() {
-        final AssistProposalPredicate<String> predicateWordHasToSatisfy = AssistProposalPredicates.alwaysTrue();
-        final RedCodeReservedWordProposals proposalsProvider = new RedCodeReservedWordProposals(
-                predicateWordHasToSatisfy);
+                AssistProposalPredicates.alwaysTrue());
 
         final Comparator<AssistProposal> comparator = reverseComparator(AssistProposals.sortedByLabels());
         final List<? extends AssistProposal> proposals = proposalsProvider.getReservedWordProposals("", comparator);

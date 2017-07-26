@@ -124,7 +124,7 @@ public class CodeReservedWordsAssistProcessorTest {
     }
 
     @Test
-    public void gherkinAndForProposalsAreProvided_whenInsideTheCellAndProposalIsMatchingToPrefix() throws Exception {
+    public void gherkinAndForProposalsAreProvided_whenInsideTheCellAndProposalIsMatchingToInput() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(documentFromFile("suite.robot"));
 
