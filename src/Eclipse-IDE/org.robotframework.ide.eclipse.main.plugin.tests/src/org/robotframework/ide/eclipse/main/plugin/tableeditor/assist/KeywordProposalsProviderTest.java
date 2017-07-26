@@ -87,7 +87,7 @@ public class KeywordProposalsProviderTest {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile);
 
-        final RedContentProposal[] proposals = provider.getProposals("k", 0, null);
+        final RedContentProposal[] proposals = provider.getProposals("kw", 2, null);
         assertThat(proposals).hasSize(4);
 
         assertThat(proposals[0].getLabel()).isEqualTo("kw1 - LibImported");
