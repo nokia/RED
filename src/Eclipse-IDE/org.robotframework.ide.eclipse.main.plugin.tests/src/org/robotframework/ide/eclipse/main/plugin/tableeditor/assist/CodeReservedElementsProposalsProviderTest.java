@@ -109,7 +109,7 @@ public class CodeReservedElementsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoProposalsProvided_whenElementIsKeywordCallAndColumnIsFirstOneButPrefixDoesNotMatch() {
+    public void thereAreNoProposalsProvided_whenElementIsKeywordCallAndColumnIsFirstOneButInputDoesNotMatch() {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("suite.robot"));
 
@@ -121,7 +121,7 @@ public class CodeReservedElementsProposalsProviderTest {
         for (@SuppressWarnings("unused")
         final RobotElement element : elements) {
             final AssistantContext context = new NatTableAssistantContext(0, row);
-            final RedContentProposal[] proposals = provider.getProposals("foo", 2, context);
+            final RedContentProposal[] proposals = provider.getProposals("other", 2, context);
             assertThat(proposals).isEmpty();
 
             row++;
@@ -129,7 +129,7 @@ public class CodeReservedElementsProposalsProviderTest {
     }
 
     @Test
-    public void thereIsForProposalProvided_whenInFirstColumnAndCurrentPrefixMatchesToForWord() {
+    public void thereIsForProposalProvided_whenInFirstColumnAndCurrentInputMatchesToForWord() {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("suite.robot"));
 
@@ -155,7 +155,7 @@ public class CodeReservedElementsProposalsProviderTest {
     }
 
     @Test
-    public void thereIsBddKeywordProposalProvided_whenInFirstColumnAndCurrentPrefixMatchesToGivenWord() {
+    public void thereIsBddKeywordProposalProvided_whenInFirstColumnAndCurrentInputMatchesToGivenWord() {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("suite.robot"));
 

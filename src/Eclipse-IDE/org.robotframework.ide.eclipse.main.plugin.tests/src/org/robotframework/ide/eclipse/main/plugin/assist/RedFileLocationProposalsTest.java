@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -30,25 +30,29 @@ public class RedFileLocationProposalsTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(RedFileLocationProposalsTest.class);
 
-    private static IFile importingFile;
+    private static RobotSuiteFile suiteFile;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
         projectProvider.createDir("dir1");
-        projectProvider.createDir("dir1_1");
         projectProvider.createDir("dir2");
 
-        importingFile = projectProvider.createFile("importing_file.robot", "*** Test Cases ***");
         projectProvider.createFile("dir1/res1.robot", "*** Variables ***");
-        projectProvider.createFile("dir1_1/lib.py");
-        projectProvider.createFile("dir1_1/vars.py");
+        projectProvider.createFile("dir1/lib1.py");
+        projectProvider.createFile("dir1/vars1.py");
+        projectProvider.createFile("dir2/lib2.py");
+        projectProvider.createFile("dir2/vars2.py");
         projectProvider.createFile("dir2/res2.robot", "*** Variables ***");
         projectProvider.createFile("dir2/tests.robot", "*** Test Cases ***");
+
+        final IFile file = projectProvider.createFile("importing_file.robot", "*** Test Cases ***");
+        suiteFile = new RobotModel().createSuiteFile(file);
     }
 
     @AfterClass
     public static void afterSuite() {
-        importingFile = null;
+        suiteFile.dispose();
+        suiteFile = null;
     }
 
     @Test
@@ -67,198 +71,157 @@ public class RedFileLocationProposalsTest {
     }
 
     @Test
-    public void noResourcesProposalsProvided_whenNoResourceIsMatchingToGivenPrefix() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void noResourcesProposalsProvided_whenNoResourceIsMatchingToGivenInput() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.RESOURCES,
-                model);
+                suiteFile);
 
         assertThat(proposalsProvider.getFilesLocationsProposals("unknown")).isEmpty();
     }
 
     @Test
-    public void onlyResourcesProposalsMatchingPrefixAreProvided_whenPrefixIsGivenAndDefaultMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void onlyResourcesProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.RESOURCES,
-                model);
+                suiteFile);
 
-        final List<? extends AssistProposal> proposals = proposalsProvider
-                .getFilesLocationsProposals("dir1");
-        assertThat(transform(proposals, AssistProposal::getLabel))
-                .containsExactly("dir1/res1.robot");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/res1.robot");
     }
 
     @Test
     public void onlyResourcesProposalsMatchingInputAreProvided_whenCustomMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.RESOURCES,
-                model, substringMatcher());
+                suiteFile, prefixesMatcher());
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("1");
-        assertThat(transform(proposals, AssistProposal::getLabel))
-                .containsExactly("dir1/res1.robot");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/res1.robot");
     }
 
     @Test
-    public void allResourcesProposalsAreProvided_whenPrefixIsEmptyAndDefaultMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void allResourcesProposalsAreProvided_whenInputIsEmpty() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.RESOURCES,
-                model);
+                suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(
-                "dir1/res1.robot", "dir2/res2.robot");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/res1.robot",
+                "dir2/res2.robot");
     }
 
     @Test
-    public void allResourcesProposalsAreProvidedInOrderInducedByComparator_whenCustomComparatorIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void allResourcesProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.RESOURCES,
-                model);
+                suiteFile);
 
-        final Comparator<IFile> comparator = new Comparator<IFile>() {
-
-            @Override
-            public int compare(final IFile o1, final IFile o2) {
-                if (o1.equals(o2)) {
-                    return 0;
-                } else if (o1.getName().contains("2")) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            }
-        };
+        final Comparator<IFile> comparator = firstFileNameContaining("2");
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir2/res2.robot",
                 "dir1/res1.robot");
     }
 
     @Test
-    public void noVariablesFilesProposalsProvided_whenNoResourceIsMatchingToGivenPrefix() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void noVariablesFilesProposalsProvided_whenNoResourceIsMatchingToGivenInput() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.VARIABLES,
-                model);
+                suiteFile);
 
         assertThat(proposalsProvider.getFilesLocationsProposals("unknown")).isEmpty();
     }
 
     @Test
-    public void onlyVariablesFilesProposalsMatchingPrefixAreProvided_whenPrefixIsGivenAndDefaultMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void onlyVariablesFilesProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.VARIABLES,
-                model);
+                suiteFile);
 
-        final List<? extends AssistProposal> proposals = proposalsProvider
-                .getFilesLocationsProposals("dir1_1/l");
-        assertThat(transform(proposals, AssistProposal::getLabel))
-                .containsExactly("dir1_1/lib.py");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/vars1.py", "dir2/vars2.py");
     }
 
     @Test
     public void onlyVariablesFilesProposalsMatchingInputAreProvided_whenCustomMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.VARIABLES,
-                model, substringMatcher());
+                suiteFile, prefixesMatcher());
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
-        assertThat(transform(proposals, AssistProposal::getLabel))
-                .containsExactly("dir1_1/vars.py");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir1/");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir1/vars1.py");
     }
 
     @Test
-    public void allVariablesFilesProposalsAreProvided_whenPrefixIsEmptyAndDefaultMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void allVariablesFilesProposalsAreProvided_whenInputIsEmpty() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.VARIABLES,
-                model);
+                suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(
-                "dir1_1/lib.py", "dir1_1/vars.py");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir1/vars1.py",
+                "dir2/lib2.py", "dir2/vars2.py");
     }
 
     @Test
-    public void allVariablesFilesProposalsAreProvidedInOrderInducedByComparator_whenCustomComparatorIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void allVariablesFilesProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.VARIABLES,
-                model);
+                suiteFile);
 
-        final Comparator<IFile> comparator = new Comparator<IFile>() {
-
-            @Override
-            public int compare(final IFile o1, final IFile o2) {
-                if (o1.equals(o2)) {
-                    return 0;
-                } else if (o1.getName().contains("vars")) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            }
-        };
-        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(
-                "dir1_1/vars.py", "dir1_1/lib.py");
+        final Comparator<IFile> comparator = firstFileNameContaining("vars");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("2", comparator);
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir2/vars2.py", "dir2/lib2.py");
     }
 
     @Test
-    public void noLibrariesFilesProposalsProvided_whenNoResourceIsMatchingToGivenPrefix() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void noLibrariesFilesProposalsProvided_whenNoResourceIsMatchingToInput() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.LIBRARIES,
-                model);
+                suiteFile);
 
         assertThat(proposalsProvider.getFilesLocationsProposals("unknown")).isEmpty();
     }
 
     @Test
-    public void onlyLibrariesFilesProposalsMatchingPrefixAreProvided_whenPrefixIsGivenAndDefaultMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void onlyLibrariesFilesProposalsMatchingInputAreProvided_whenDefaultMatcherIsUsed() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.LIBRARIES,
-                model);
+                suiteFile);
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir1_1/l");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/lib.py");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("lib");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir2/lib2.py");
     }
 
     @Test
     public void onlyLibrariesFilesProposalsMatchingInputAreProvided_whenCustomMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.LIBRARIES,
-                model, substringMatcher());
+                suiteFile, prefixesMatcher());
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("vars");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/vars.py");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("dir2/");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir2/lib2.py", "dir2/vars2.py");
     }
 
     @Test
-    public void allLibrariesFilesProposalsAreProvided_whenPrefixIsEmptyAndDefaultMatcherIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void allLibrariesFilesProposalsAreProvided_whenInputIsEmpty() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.LIBRARIES,
-                model);
+                suiteFile);
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("");
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/lib.py", "dir1_1/vars.py");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/lib1.py", "dir1/vars1.py",
+                "dir2/lib2.py", "dir2/vars2.py");
     }
 
     @Test
-    public void allLibrariesFilesProposalsAreProvidedInOrderInducedByComparator_whenCustomComparatorIsUsed() {
-        final RobotSuiteFile model = new RobotModel().createSuiteFile(importingFile);
+    public void allLibrariesFilesProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final RedFileLocationProposals proposalsProvider = RedFileLocationProposals.create(SettingsGroup.LIBRARIES,
-                model);
+                suiteFile);
 
-        final Comparator<IFile> comparator = new Comparator<IFile>() {
+        final Comparator<IFile> comparator = firstFileNameContaining("vars");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("1", comparator);
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1/vars1.py", "dir1/lib1.py");
+    }
+
+    private static Comparator<IFile> firstFileNameContaining(final String toContain) {
+        return new Comparator<IFile>() {
 
             @Override
             public int compare(final IFile o1, final IFile o2) {
                 if (o1.equals(o2)) {
                     return 0;
-                } else if (o1.getName().contains("vars")) {
+                } else if (o1.getName().contains(toContain)) {
                     return -1;
                 } else {
                     return 1;
                 }
             }
         };
-        final List<? extends AssistProposal> proposals = proposalsProvider.getFilesLocationsProposals("", comparator);
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("dir1_1/vars.py", "dir1_1/lib.py");
     }
 }

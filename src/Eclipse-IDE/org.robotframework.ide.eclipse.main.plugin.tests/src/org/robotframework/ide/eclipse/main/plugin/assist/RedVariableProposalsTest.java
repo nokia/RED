@@ -8,7 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.firstProposalContaining;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
@@ -41,15 +43,18 @@ public class RedVariableProposalsTest {
 
     private RobotModel robotModel;
 
-    @Before
-    public void beforeTest() throws Exception {
-        robotModel = new RobotModel();
-
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
         projectProvider.createFile("res.robot",
                 "*** Variables ***",
                 "${a_res_var}  1",
                 "${b_res_var}  2",
                 "${c_res_var}  3");
+    }
+
+    @Before
+    public void beforeTest() throws Exception {
+        robotModel = new RobotModel();
     }
 
     @Test
@@ -68,8 +73,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void noGlobalVariablesAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
-            throws Exception {
+    public void noGlobalVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
@@ -80,7 +84,7 @@ public class RedVariableProposalsTest {
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
 
-        assertThat(provider.getVariableProposals("var", 0)).isEmpty();
+        assertThat(provider.getVariableProposals("other", 0)).isEmpty();
     }
 
     @Test
@@ -102,7 +106,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void onlyGlobalVariablesMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyGlobalVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
         createGlobalVarFilesVariables(robotProject);
@@ -112,7 +116,7 @@ public class RedVariableProposalsTest {
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("glb_var_1", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("var_1", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_1");
     }
@@ -120,17 +124,17 @@ public class RedVariableProposalsTest {
     @Test
     public void onlyGlobalVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        createGlobalVariables(robotProject, "glb_var_1", "glb_var_2");
+        createGlobalVariables(robotProject, "glb_var_1", "other_glb_var_2");
         createGlobalVarFilesVariables(robotProject);
 
         final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("2", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("oth", 0);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("glb_var_2");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("other_glb_var_2");
     }
 
     @Test
@@ -168,7 +172,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void noGlobalVarFileVariablesAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
+    public void noGlobalVarFileVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
@@ -180,11 +184,11 @@ public class RedVariableProposalsTest {
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
 
-        assertThat(provider.getVariableProposals("var", 0)).isEmpty();
+        assertThat(provider.getVariableProposals("other", 0)).isEmpty();
     }
 
     @Test
-    public void onlyGlobalVarFileVariablesMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyGlobalVarFileVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "glb_var_file_2");
@@ -194,7 +198,7 @@ public class RedVariableProposalsTest {
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${glb_var_file_1", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("file_1", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_1}");
     }
@@ -204,16 +208,16 @@ public class RedVariableProposalsTest {
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
-        createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "glb_var_file_2");
+        createGlobalVarFilesVariables(robotProject, "glb_var_file_1", "other_glb_var_file_2");
 
         final IFile file = projectProvider.createFile("file.robot", "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("2", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${oth", 0);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${glb_var_file_2}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${other_glb_var_file_2}");
     }
 
     @Test
@@ -252,7 +256,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void noLocalVarFileVariablesAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
+    public void noLocalVarFileVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
@@ -272,7 +276,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void onlyLocalVarFileVariablesMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyLocalVarFileVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
@@ -282,13 +286,13 @@ public class RedVariableProposalsTest {
                 "Variables  vars.py",
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
-        addLocalVarFileVariables(suiteFile, "a_vf", "b_vf", "c_vf");
+        addLocalVarFileVariables(suiteFile, "a_vf", "b_vf", "c_vf", "other_b_vf");
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_v", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", 0);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vf}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vf}", "${other_b_vf}");
     }
 
     @Test
@@ -305,16 +309,15 @@ public class RedVariableProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
         addLocalVarFileVariables(suiteFile, "a_vf", "b_vf", "c_vf");
 
-        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${c", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_vf}");
     }
 
     @Test
-    public void allLocalVarFileVariablesAreProvided_whenTheyAreMatched()
-            throws Exception {
+    public void allLocalVarFileVariablesAreProvided_whenTheyAreMatched() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
@@ -356,7 +359,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void noLocalVarTableVariablesAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
+    public void noLocalVarTableVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
@@ -378,7 +381,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void onlyLocalVarTableVariablesMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyLocalVarTableVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
@@ -389,14 +392,15 @@ public class RedVariableProposalsTest {
                 "${a_vt}  1",
                 "${b_vt}  2",
                 "${c_vt}  3",
+                "${other_b_vt}  4",
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_v", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", 0);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vt}");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_vt}", "${other_b_vt}");
     }
 
     @Test
@@ -415,16 +419,15 @@ public class RedVariableProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${c", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_vt}");
     }
 
     @Test
-    public void allLocalVarTableVariablesAreProvided_whenTheyAreMatched()
-            throws Exception {
+    public void allLocalVarTableVariablesAreProvided_whenTheyAreMatched() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
@@ -469,7 +472,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void noResourceVariablesAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
+    public void noResourceVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
@@ -484,11 +487,11 @@ public class RedVariableProposalsTest {
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
 
-        assertThat(provider.getVariableProposals("var", 0)).isEmpty();
+        assertThat(provider.getVariableProposals("other", 0)).isEmpty();
     }
 
     @Test
-    public void onlyResourceVariablesMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyResourceVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
@@ -501,14 +504,13 @@ public class RedVariableProposalsTest {
 
         final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile,
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b_", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_res_var}");
     }
 
     @Test
-    public void onlyResourceVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher()
-            throws Exception {
+    public void onlyResourceVariablesMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
@@ -519,9 +521,9 @@ public class RedVariableProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("c", 0);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${c", 0);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${c_res_var}");
     }
@@ -567,8 +569,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void noLocalVariablesAreProvided_whenTheyDoNotMatchToGivenContentAndDefaultMatcherIsUsed()
-            throws Exception {
+    public void noLocalVariablesAreProvided_whenTheyDoNotMatchToGivenInputAndDefaultMatcherIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
         createGlobalVarFilesVariables(robotProject);
@@ -590,7 +591,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void onlyLocalVariablesMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed_usingOffset()
+    public void onlyLocalVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed_usingOffset()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
@@ -614,7 +615,7 @@ public class RedVariableProposalsTest {
     }
 
     @Test
-    public void onlyLocalVariablesMatchingGivenPrefixAreProvided_whenDefaultMatcherIsUsed_usingElement()
+    public void onlyLocalVariablesMatchingGivenInputAreProvided_whenDefaultMatcherIsUsed_usingElement()
             throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         createGlobalVariables(robotProject);
@@ -656,9 +657,9 @@ public class RedVariableProposalsTest {
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
-        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", 100);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b", 100);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
     }
@@ -682,9 +683,9 @@ public class RedVariableProposalsTest {
         final RobotFileInternalElement logCall = suiteFile.findSection(RobotKeywordsSection.class).get()
                 .getChildren().get(0).getChildren().get(3);
 
-        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, substringMatcher(),
+        final RedVariableProposals provider = new RedVariableProposals(robotModel, suiteFile, prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
-        final List<? extends AssistProposal> proposals = provider.getVariableProposals("b", logCall);
+        final List<? extends AssistProposal> proposals = provider.getVariableProposals("${b", logCall);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}");
     }
@@ -892,21 +893,5 @@ public class RedVariableProposalsTest {
         varsImportRef.map(variables);
         final RobotFileOutput output = suiteFile.getLinkedElement().getParent();
         output.setVariablesImportReferences(newArrayList(varsImportRef));
-    }
-
-    private static Comparator<? super RedVariableProposal> firstProposalContaining(final String toContain) {
-        return new Comparator<RedVariableProposal>() {
-
-            @Override
-            public int compare(final RedVariableProposal p1, final RedVariableProposal p2) {
-                if (p1.equals(p2)) {
-                    return 0;
-                } else if (p1.getLabel().contains(toContain)) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            }
-        };
     }
 }

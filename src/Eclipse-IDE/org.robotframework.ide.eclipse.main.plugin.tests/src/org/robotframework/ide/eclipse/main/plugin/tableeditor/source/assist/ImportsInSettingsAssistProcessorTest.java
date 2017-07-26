@@ -14,9 +14,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -25,13 +23,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
@@ -50,7 +47,8 @@ public class ImportsInSettingsAssistProcessorTest {
     public static void beforeSuite() throws Exception {
         robotModel = new RobotModel();
 
-        robotModel.createRobotProject(projectProvider.getProject()).setReferencedLibraries(createReferencedLibraries());
+        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        robotProject.setReferencedLibraries(Libraries.createRefLibs("lib", "lib2"));
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw");
 
         projectProvider.createFile("suite.robot",
@@ -67,24 +65,6 @@ public class ImportsInSettingsAssistProcessorTest {
                 "Metadata        abc  def  ghi",
                 "Library  lib",
                 "Library  lib2  WITH NAME  alias");
-    }
-
-    private static Map<ReferencedLibrary, LibrarySpecification> createReferencedLibraries() {
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new LinkedHashMap<>();
-
-        final ReferencedLibrary ref1 = ReferencedLibrary.create(LibraryType.PYTHON, "lib", "");
-        final LibrarySpecification ref1LibSpec = new LibrarySpecification();
-        ref1LibSpec.setName("lib");
-        ref1LibSpec.setReferenced(ref1);
-        refLibs.put(ref1, ref1LibSpec);
-
-        final ReferencedLibrary ref2 = ReferencedLibrary.create(LibraryType.PYTHON, "lib2", "");
-        final LibrarySpecification ref2LibSpec = new LibrarySpecification();
-        ref2LibSpec.setName("lib2");
-        ref2LibSpec.setReferenced(ref2);
-        refLibs.put(ref2, ref2LibSpec);
-
-        return refLibs;
     }
 
     @AfterClass

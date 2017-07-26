@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -22,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.junit.PreferenceUpdater;
@@ -40,7 +40,7 @@ public class KeywordProposalsProviderTest {
     public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
     @Test
-    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix() throws Exception {
+    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Keywords ***",
                 "kw1",
@@ -53,7 +53,7 @@ public class KeywordProposalsProviderTest {
     }
 
     @Test
-    public void thereAreProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted() throws Exception {
+    public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("foo");
 
@@ -75,8 +75,8 @@ public class KeywordProposalsProviderTest {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
         final Map<ReferencedLibrary, LibrarySpecification> refLibs = new LinkedHashMap<>();
-        refLibs.putAll(createRefLib("LibImported", "kw1", "kw2"));
-        refLibs.putAll(createRefLib("LibNotImported", "kw3", "kw4"));
+        refLibs.putAll(Libraries.createRefLib("LibImported", "kw1", "kw2"));
+        refLibs.putAll(Libraries.createRefLib("LibNotImported", "kw3", "kw4"));
 
         final RobotProject project = RedPlugin.getModelManager().createProject(projectProvider.getProject());
         project.setReferencedLibraries(refLibs);

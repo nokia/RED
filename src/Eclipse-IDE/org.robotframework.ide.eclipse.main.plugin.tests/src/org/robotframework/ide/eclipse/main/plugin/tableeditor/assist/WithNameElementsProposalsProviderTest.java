@@ -104,7 +104,7 @@ public class WithNameElementsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButPrefixDoesNotMatch() {
+    public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButInputDoesNotMatch() {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("suite.robot"));
 
@@ -148,7 +148,7 @@ public class WithNameElementsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted() throws Exception {
+    public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("suite.robot"));
 

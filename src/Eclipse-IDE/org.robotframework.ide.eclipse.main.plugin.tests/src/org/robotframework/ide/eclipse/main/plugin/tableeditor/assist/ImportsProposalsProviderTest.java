@@ -5,13 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
@@ -29,7 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProposalsProvider.LibrariesProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProposalsProvider.ResourceFileLocationsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProposalsProvider.VariableFileLocationsProposalsProvider;
@@ -58,7 +54,7 @@ public class ImportsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoResourcesProposalsProvided_whenNothingMatchesToCurrentPrefix() {
+    public void thereAreNoResourcesProposalsProvided_whenNothingMatchesToCurrentInput() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
@@ -146,7 +142,7 @@ public class ImportsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoVariablesProposalsProvided_whenNothingMatchesToCurrentPrefix() {
+    public void thereAreNoVariablesProposalsProvided_whenNothingMatchesToCurrentInput() {
         final RobotSuiteFile model = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.VARIABLES,
@@ -235,12 +231,12 @@ public class ImportsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoLibrariesProposalsProvided_whenNothingMatchesCurrentPrefix() {
+    public void thereAreNoLibrariesProposalsProvided_whenNothingMatchesCurrentInput() {
         final RobotModel robotModel = new RobotModel();
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
 
-        robotProject.setStandardLibraries(createStandardLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
@@ -262,7 +258,7 @@ public class ImportsProposalsProviderTest {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
 
-        robotProject.setStandardLibraries(createStandardLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.RESOURCES,
                 new ResourceImport(RobotToken.create("Resource")));
@@ -284,7 +280,7 @@ public class ImportsProposalsProviderTest {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
 
-        robotProject.setStandardLibraries(createStandardLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
@@ -314,7 +310,7 @@ public class ImportsProposalsProviderTest {
         final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
 
-        robotProject.setStandardLibraries(createStandardLibraries());
+        robotProject.setStandardLibraries(Libraries.createStdLibs("aLib", "bLib"));
 
         final RobotSetting setting = new RobotSetting(null, SettingsGroup.LIBRARIES,
                 new LibraryImport(RobotToken.create("Library")));
@@ -332,16 +328,5 @@ public class ImportsProposalsProviderTest {
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
         assertThat(text.getText()).isEqualTo("aLib");
-    }
-
-    private static Map<String, LibrarySpecification> createStandardLibraries() {
-        final Map<String, LibrarySpecification> stdLibs = new HashMap<>();
-        for (final String libName : newArrayList("aLib", "bLib")) {
-            final LibrarySpecification stdLib = new LibrarySpecification();
-            stdLib.setName(libName);
-
-            stdLibs.put(stdLib.getName(), stdLib);
-        }
-        return stdLibs;
     }
 }

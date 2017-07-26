@@ -60,7 +60,7 @@ public class SectionsAssistProcessorTest {
     @Test
     public void allSectionsProposalsAreProvided_whenInFirstColumnOfSuiteFile() {
         final List<String> lines = newArrayList("*** Test Cases ***", "");
-        
+
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = new Document(lines);
         when(viewer.getDocument()).thenReturn(document);
@@ -69,10 +69,10 @@ public class SectionsAssistProcessorTest {
         final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 19);
-        
+
         assertThat(proposals).hasSize(4)
             .haveExactly(4, proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
-        
+
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Test Cases ***", "*** Keywords ***", ""),
@@ -84,7 +84,7 @@ public class SectionsAssistProcessorTest {
     @Test
     public void allSectionsProposalsButTestCasesAreProvided_whenInFirstColumnOfResourceFile() {
         final List<String> lines = newArrayList("");
-        
+
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = new Document(lines);
         when(viewer.getDocument()).thenReturn(document);
@@ -93,10 +93,10 @@ public class SectionsAssistProcessorTest {
         final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 0);
-        
+
         assertThat(proposals).hasSize(4).haveExactly(4,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
-        
+
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Keywords ***", ""),
@@ -106,7 +106,7 @@ public class SectionsAssistProcessorTest {
     }
 
     @Test
-    public void onlyProposalsMatchingPrefixAreProvided_whenInsideFirstCell() {
+    public void onlyProposalsMatchingInputAreProvided_whenInsideFirstCell() {
         final List<String> lines = newArrayList("*** Test Cases ***", "*** Sett");
 
         final ITextViewer viewer = mock(ITextViewer.class);

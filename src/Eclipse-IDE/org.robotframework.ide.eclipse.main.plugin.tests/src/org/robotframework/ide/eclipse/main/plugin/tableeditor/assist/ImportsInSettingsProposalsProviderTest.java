@@ -114,7 +114,7 @@ public class ImportsInSettingsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix() throws Exception {
+    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
                 .createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
@@ -131,7 +131,7 @@ public class ImportsInSettingsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted() throws Exception {
+    public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("rrr");
 

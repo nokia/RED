@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.keywords.names;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -23,36 +24,36 @@ public class EmbeddedKeywordNamesSupport {
     }
 
     /**
-     * @return number of characters in definition which matches with given prefix
+     * @return optional first range in definition which matches with given occurrence
      */
-    public static int startsWithIgnoreCase(final String definitionName, final String occurrenceNamePrefix) {
-        return startsWith(definitionName.toLowerCase(), occurrenceNamePrefix.toLowerCase());
-    }
+    public static Optional<Range<Integer>> containsIgnoreCase(final String definitionName,
+            final String occurrenceName) {
+        final int occurrenceIndex = definitionName.toLowerCase().indexOf(occurrenceName.toLowerCase());
+        if (occurrenceIndex >= 0) {
+            return Optional.of(Range.closedOpen(occurrenceIndex, occurrenceIndex + occurrenceName.length()));
+        } else if (definitionName.contains("$")) {
+            final RangeSet<Integer> varRanges = findEmbeddedArgumentsRanges(definitionName);
 
-    private static int startsWith(final String definitionName, final String occurrenceNamePrefix) {
-        if (definitionName.startsWith(occurrenceNamePrefix)) {
-            return occurrenceNamePrefix.length();
-        } else if (definitionName.indexOf('$') == -1) {
-            return -1;
+            int lowerIndex = 0;
+            while (lowerIndex < definitionName.length()) {
+                int upperIndex = definitionName.length();
+                while (lowerIndex <= upperIndex) {
+                    final String shortenedDefinition = definitionName.substring(lowerIndex, upperIndex);
+                    if (matchesIgnoreCase(shortenedDefinition, occurrenceName)) {
+                        return Optional.of(Range.closedOpen(lowerIndex, upperIndex));
+                    }
+
+                    upperIndex--;
+                    if (varRanges.contains(upperIndex)) {
+                        final Range<Integer> range = varRanges.rangeContaining(upperIndex);
+                        upperIndex = range.lowerEndpoint();
+                    }
+                }
+                lowerIndex++;
+            }
         }
 
-        final RangeSet<Integer> varRanges = findEmbeddedArgumentsRanges(definitionName);
-
-        int i = definitionName.length();
-        while (i >= 0) {
-            final String shortenedDefinition = definitionName.substring(0, i);
-            final boolean matches = matchesIgnoreCase(shortenedDefinition, occurrenceNamePrefix);
-            if (matches) {
-                return i;
-            }
-
-            i--;
-            if (varRanges.contains(i)) {
-                final Range<Integer> range = varRanges.rangeContaining(i);
-                i = range.lowerEndpoint();
-            }
-        }
-        return -1;
+        return Optional.empty();
     }
 
     public static boolean matchesIgnoreCase(final String definitionName, final String occurrenceName) {
@@ -62,15 +63,15 @@ public class EmbeddedKeywordNamesSupport {
             return false;
         }
 
-        final String regex = "^" + substituteVariablesWithRegex(definitionName, true) + "$";
+        final String regex = "(?i)^" + substituteVariablesWithRegex(definitionName) + "$";
         try {
-            return Pattern.matches(regex, occurrenceName.toLowerCase());
+            return Pattern.matches(regex, occurrenceName);
         } catch (final PatternSyntaxException e) {
             return false;
         }
     }
 
-    private static String substituteVariablesWithRegex(final String definitionName, final boolean ignoreCase) {
+    private static String substituteVariablesWithRegex(final String definitionName) {
         final StringBuilder wholeRegex = new StringBuilder();
 
         final RangeSet<Integer> varRanges = findEmbeddedArgumentsRanges(definitionName);
@@ -80,8 +81,7 @@ public class EmbeddedKeywordNamesSupport {
         while (i < definitionName.length()) {
             if (varRanges.contains(i)) {
                 if (exactWordPatternRegex.length() > 0) {
-                    final String exactWordPattern = exactWordPatternRegex.toString();
-                    wholeRegex.append(Pattern.quote(ignoreCase ? exactWordPattern.toLowerCase() : exactWordPattern));
+                    wholeRegex.append(Pattern.quote(exactWordPatternRegex.toString()));
                     exactWordPatternRegex = new StringBuilder();
                 }
 
@@ -95,8 +95,7 @@ public class EmbeddedKeywordNamesSupport {
             }
         }
         if (exactWordPatternRegex.length() > 0) {
-            final String exactWordPattern = exactWordPatternRegex.toString();
-            wholeRegex.append(Pattern.quote(ignoreCase ? exactWordPattern.toLowerCase() : exactWordPattern));
+            wholeRegex.append(Pattern.quote(exactWordPatternRegex.toString()));
         }
         return wholeRegex.toString();
     }

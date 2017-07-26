@@ -20,7 +20,7 @@ public class RedWithNameProposals {
     private final AssistProposalPredicate<String> predicateWordHasToSatisfy;
 
     public RedWithNameProposals(final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
-        this(ProposalMatchers.prefixesMatcher(), predicateWordHasToSatisfy);
+        this(ProposalMatchers.substringMatcher(), predicateWordHasToSatisfy);
     }
 
     @VisibleForTesting

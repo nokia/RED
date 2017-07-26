@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.ide.eclipse.main.plugin.assist.ProposalMatchers.substringMatcher;
 
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
@@ -14,7 +15,7 @@ import com.google.common.collect.Range;
 
 public class BddMatchesHelperTest {
 
-    private final BddMatchesHelper bddMatcher = new BddMatchesHelper(ProposalMatchers.prefixesMatcher());
+    private final BddMatchesHelper bddMatcher = new BddMatchesHelper(substringMatcher());
 
     @Test
     public void thereIsNoMatch_whenNoBddPrefixIsUsedAndProposalDoesNotMatchPrefix() {
@@ -26,7 +27,7 @@ public class BddMatchesHelperTest {
     @Test
     public void thereIsAMatch_whenNoBddPrefixIsUsedAndProposalDoesMatchPrefix() {
         final BddAwareProposalMatch match = bddMatcher.findBddAwareMatch("keyw", "keyword");
-        assertThat(match.getMatch()).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
+        assertThat(match.getMatch()).hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
         assertThat(match.getBddPrefix()).isEmpty();
     }
 
@@ -40,28 +41,28 @@ public class BddMatchesHelperTest {
     @Test
     public void thereIsAMatch_whenBddPrefixIsUsedAndProposalMatchesContent() {
         final BddAwareProposalMatch match = bddMatcher.findBddAwareMatch("Given keyw", "keyword");
-        assertThat(match.getMatch()).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
+        assertThat(match.getMatch()).hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
         assertThat(match.getBddPrefix()).isEqualTo("Given ");
     }
 
     @Test
     public void thereIsAMatch_whenBddPrefixIsDuplicatedUsedAndProposalMatchesContent() {
         final BddAwareProposalMatch match = bddMatcher.findBddAwareMatch("Given And keyw", "keyword");
-        assertThat(match.getMatch()).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
+        assertThat(match.getMatch()).hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
         assertThat(match.getBddPrefix()).isEqualTo("Given And ");
     }
 
     @Test
     public void thereIsAMatch_whenGivenKeywordHasANameWhichIsAlsoBddWord_1() {
         final BddAwareProposalMatch match = bddMatcher.findBddAwareMatch("Given key", "Given keyword");
-        assertThat(match.getMatch()).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 9)));
+        assertThat(match.getMatch()).hasValue(new ProposalMatch(Range.closedOpen(0, 9)));
         assertThat(match.getBddPrefix()).isEmpty();
     }
 
     @Test
     public void thereIsAMatch_whenGivenKeywordHasANameWhichIsAlsoBddWord_2() {
         final BddAwareProposalMatch match = bddMatcher.findBddAwareMatch("Given Given key", "Given keyword");
-        assertThat(match.getMatch()).isPresent().hasValue(new ProposalMatch(Range.closedOpen(0, 9)));
+        assertThat(match.getMatch()).hasValue(new ProposalMatch(Range.closedOpen(0, 9)));
         assertThat(match.getBddPrefix()).isEqualTo("Given ");
     }
 }

@@ -37,8 +37,7 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoTestCaseSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix()
-            throws Exception {
+    public void thereAreNoTestCaseSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.TEST_CASE);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
@@ -47,7 +46,7 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreTestCaseProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted() throws Exception {
+    public void thereAreTestCaseProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("[dx");
 
@@ -76,7 +75,7 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoKeywordSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix() throws Exception {
+    public void thereAreNoKeywordSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.KEYWORD);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
@@ -85,10 +84,10 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreKeywordSettingsProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted()
+    public void thereAreKeywordSettingsProposalsProvided_whenInputIsMatchingAndProperContentIsInserted()
             throws Exception {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
-        text.setText("[dx");
+        text.setText("cut");
 
         final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.KEYWORD);
 
@@ -115,8 +114,7 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreNoGeneralSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentPrefix()
-            throws Exception {
+    public void thereAreNoGeneralSettingProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
         final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.GENERAL);
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
@@ -125,10 +123,10 @@ public class SettingProposalsProviderTest {
     }
 
     @Test
-    public void thereAreGeneralSettingsProposalsProvided_whenPrefixIsMatchingAndProperContentIsInserted()
+    public void thereAreGeneralSettingsProposalsProvided_whenInputIsMatchingAndProperContentIsInserted()
             throws Exception {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
-        text.setText("dox");
+        text.setText("cut");
 
         final SettingProposalsProvider provider = new SettingProposalsProvider(SettingTarget.GENERAL);
 
