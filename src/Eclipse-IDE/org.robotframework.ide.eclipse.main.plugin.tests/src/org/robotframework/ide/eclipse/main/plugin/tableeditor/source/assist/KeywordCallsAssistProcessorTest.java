@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
-import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Assistant.createAssistant;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.byApplyingToDocument;
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Proposals.proposalWithImage;
@@ -43,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.PreferenceUpdater;
@@ -73,7 +73,7 @@ public class KeywordCallsAssistProcessorTest {
                 "  rst",
                 "  acb  kjm",
                 "*** Keywords ***",
-                "akeyword",
+                "abcdefgh",
                 "keyword",
                 "*** Settings ***",
                 "Resource  res.robot");
@@ -156,17 +156,17 @@ public class KeywordCallsAssistProcessorTest {
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
-                new Document("*** Test Cases ***", "case", "  akeyword", "  rst", "  acb  kjm", "*** Keywords ***",
-                        "akeyword",
+                new Document("*** Test Cases ***", "case", "  abcdefgh", "  rst", "  acb  kjm", "*** Keywords ***",
+                        "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"),
                 new Document("*** Test Cases ***", "case", "  keyword", "  rst", "  acb  kjm", "*** Keywords ***",
-                        "akeyword",
+                        "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"),
                 new Document("*** Test Cases ***", "case", "  kw1", "  rst", "  acb  kjm", "*** Keywords ***",
-                        "akeyword",
+                        "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"),
                 new Document("*** Test Cases ***", "case", "  kw2", "  rst", "  acb  kjm", "*** Keywords ***",
-                        "akeyword",
+                        "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"));
     }
 
@@ -190,13 +190,13 @@ public class KeywordCallsAssistProcessorTest {
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
-                new Document("*** Test Cases ***", "case", "  ", "  akeyword", "  acb  kjm", "*** Keywords ***",
-                        "akeyword", "keyword", "*** Settings ***", "Resource  res.robot"),
+                new Document("*** Test Cases ***", "case", "  ", "  abcdefgh", "  acb  kjm", "*** Keywords ***",
+                        "abcdefgh", "keyword", "*** Settings ***", "Resource  res.robot"),
                 new Document("*** Test Cases ***", "case", "  ", "  keyword", "  acb  kjm", "*** Keywords ***",
-                        "akeyword", "keyword", "*** Settings ***", "Resource  res.robot"),
-                new Document("*** Test Cases ***", "case", "  ", "  kw1", "  acb  kjm", "*** Keywords ***", "akeyword",
+                        "abcdefgh", "keyword", "*** Settings ***", "Resource  res.robot"),
+                new Document("*** Test Cases ***", "case", "  ", "  kw1", "  acb  kjm", "*** Keywords ***", "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"),
-                new Document("*** Test Cases ***", "case", "  ", "  kw2", "  acb  kjm", "*** Keywords ***", "akeyword",
+                new Document("*** Test Cases ***", "case", "  ", "  kw2", "  acb  kjm", "*** Keywords ***", "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"));
     }
 
@@ -220,8 +220,8 @@ public class KeywordCallsAssistProcessorTest {
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments)
-                .containsOnly(new Document("*** Test Cases ***", "case", "  ", "  rst", "  akeyword  kjm",
-                        "*** Keywords ***", "akeyword", "keyword", "*** Settings ***", "Resource  res.robot"));
+                .containsOnly(new Document("*** Test Cases ***", "case", "  ", "  rst", "  abcdefgh  kjm",
+                        "*** Keywords ***", "abcdefgh", "keyword", "*** Settings ***", "Resource  res.robot"));
     }
 
     @Test
@@ -245,10 +245,10 @@ public class KeywordCallsAssistProcessorTest {
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Test Cases ***", "case", "  ", "  rst", "  acb  keyword", "*** Keywords ***",
-                        "akeyword", "keyword", "*** Settings ***", "Resource  res.robot"),
-                new Document("*** Test Cases ***", "case", "  ", "  rst", "  acb  kw1", "*** Keywords ***", "akeyword",
+                        "abcdefgh", "keyword", "*** Settings ***", "Resource  res.robot"),
+                new Document("*** Test Cases ***", "case", "  ", "  rst", "  acb  kw1", "*** Keywords ***", "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"),
-                new Document("*** Test Cases ***", "case", "  ", "  rst", "  acb  kw2", "*** Keywords ***", "akeyword",
+                new Document("*** Test Cases ***", "case", "  ", "  rst", "  acb  kw2", "*** Keywords ***", "abcdefgh",
                         "keyword", "*** Settings ***", "Resource  res.robot"));
     }
 
@@ -301,7 +301,7 @@ public class KeywordCallsAssistProcessorTest {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
 
         final RobotProject project = robotModel.createRobotProject(projectProvider.getProject());
-        project.setReferencedLibraries(createRefLib("LibNotImported", "kw1", "kw2"));
+        project.setReferencedLibraries(Libraries.createRefLib("LibNotImported", "kw1", "kw2"));
 
         final int offset = 29;
 

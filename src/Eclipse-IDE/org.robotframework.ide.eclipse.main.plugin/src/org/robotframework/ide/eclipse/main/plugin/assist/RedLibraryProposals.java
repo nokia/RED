@@ -22,7 +22,7 @@ public class RedLibraryProposals {
     private final ProposalMatcher matcher;
 
     public RedLibraryProposals(final RobotSuiteFile suiteFile) {
-        this(suiteFile, ProposalMatchers.prefixesMatcher());
+        this(suiteFile, ProposalMatchers.substringMatcher());
     }
 
     @VisibleForTesting

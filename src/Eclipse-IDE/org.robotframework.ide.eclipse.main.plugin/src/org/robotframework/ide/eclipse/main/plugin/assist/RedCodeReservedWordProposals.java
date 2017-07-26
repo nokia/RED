@@ -28,7 +28,7 @@ public class RedCodeReservedWordProposals {
     private final AssistProposalPredicate<String> predicateWordHasToSatisfy;
 
     public RedCodeReservedWordProposals(final AssistProposalPredicate<String> predicateWordHasToSatisfy) {
-        this(ProposalMatchers.prefixesMatcher(), predicateWordHasToSatisfy);
+        this(ProposalMatchers.substringMatcher(), predicateWordHasToSatisfy);
     }
 
     @VisibleForTesting

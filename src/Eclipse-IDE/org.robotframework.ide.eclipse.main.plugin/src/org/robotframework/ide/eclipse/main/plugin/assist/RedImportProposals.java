@@ -26,7 +26,7 @@ public class RedImportProposals {
     private final ProposalMatcher matcher;
 
     public RedImportProposals(final RobotSuiteFile suiteFile) {
-        this(suiteFile, ProposalMatchers.prefixesMatcher());
+        this(suiteFile, ProposalMatchers.substringMatcher());
     }
 
     @VisibleForTesting
