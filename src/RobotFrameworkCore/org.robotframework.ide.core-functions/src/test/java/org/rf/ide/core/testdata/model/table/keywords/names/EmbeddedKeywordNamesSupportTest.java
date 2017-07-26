@@ -26,30 +26,58 @@ public class EmbeddedKeywordNamesSupportTest {
     }
 
     @Test
-    public void prefixMatchesTest() {
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc", "")).isEqualTo(0);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc", "x")).isEqualTo(-1);
+    public void containsMatchesTest() {
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abcAbC", "")).hasValue(Range.closedOpen(0, 0));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abcabc", "A")).hasValue(Range.closedOpen(0, 1));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abcabc", "ab")).hasValue(Range.closedOpen(0, 2));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("ABCabc", "Bc")).hasValue(Range.closedOpen(1, 3));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("AbCaBc", "bC")).hasValue(Range.closedOpen(1, 3));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abcAbC", "x")).isNotPresent();
 
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "")).isEqualTo(0);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "a")).isEqualTo(1);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "ab")).isEqualTo(2);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "abc")).isEqualTo(3);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "abcd")).isEqualTo(7);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "abcde")).isEqualTo(7);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "abcdef")).isEqualTo(7);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "abcdefg")).isEqualTo(7);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}xyz", "abcdefgh")).isEqualTo(7);
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "")).hasValue(Range.closedOpen(0, 0));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "b")).hasValue(Range.closedOpen(1, 2));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "bc")).hasValue(Range.closedOpen(1, 3));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "bcd"))
+                .hasValue(Range.closedOpen(1, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "bcde"))
+                .hasValue(Range.closedOpen(1, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "bcdef"))
+                .hasValue(Range.closedOpen(1, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "bcdefg"))
+                .hasValue(Range.closedOpen(1, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "bcdefgh"))
+                .hasValue(Range.closedOpen(1, 7));
 
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "")).isEqualTo(0);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "a")).isEqualTo(1);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "ab")).isEqualTo(2);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "abc")).isEqualTo(3);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "abcd")).isEqualTo(7);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "abcde")).isEqualTo(7);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "abcdef")).isEqualTo(7);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "abcdefg")).isEqualTo(8);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "abcdefgh")).isEqualTo(12);
-        assertThat(EmbeddedKeywordNamesSupport.startsWithIgnoreCase("abc${x}g${y}hi${z}", "abcdefghi")).isEqualTo(12);
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", ""))
+                .hasValue(Range.closedOpen(0, 0));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "b"))
+                .hasValue(Range.closedOpen(1, 2));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "bc"))
+                .hasValue(Range.closedOpen(1, 3));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "bcd"))
+                .hasValue(Range.closedOpen(1, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "bcde"))
+                .hasValue(Range.closedOpen(1, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "bcdef"))
+                .hasValue(Range.closedOpen(1, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "bcdefg"))
+                .hasValue(Range.closedOpen(1, 8));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "bcdefgh"))
+                .hasValue(Range.closedOpen(1, 12));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}g${y}hi${z}", "bcdefghi"))
+                .hasValue(Range.closedOpen(1, 12));
+
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "vwxyz"))
+                .hasValue(Range.closedOpen(3, 10));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "wxyz"))
+                .hasValue(Range.closedOpen(3, 10));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "xyz"))
+                .hasValue(Range.closedOpen(7, 10));
+
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "def"))
+                .hasValue(Range.closedOpen(3, 7));
+
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x:[}xyz", "def")).isNotPresent();
     }
 
     @Test
@@ -77,6 +105,8 @@ public class EmbeddedKeywordNamesSupportTest {
 
         assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("today is ${date:\\d{4\\}-\\d{2\\}-\\d{2\\}}",
                 "today is 2016-12-20")).isTrue();
+
+        assertThat(EmbeddedKeywordNamesSupport.matchesIgnoreCase("incorrect regex ${date:[}", "word")).isFalse();
     }
 
     @Test

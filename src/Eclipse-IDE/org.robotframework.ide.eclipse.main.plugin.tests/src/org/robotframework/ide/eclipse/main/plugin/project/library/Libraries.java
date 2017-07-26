@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.library;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -13,6 +14,14 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import com.google.common.collect.ImmutableMap;
 
 public class Libraries {
+
+    public static Map<String, LibrarySpecification> createStdLibs(final String... libNames) {
+        final Map<String, LibrarySpecification> libs = new HashMap<>();
+        for (final String libName : libNames) {
+            libs.putAll(createStdLib(libName));
+        }
+        return libs;
+    }
 
     public static Map<String, LibrarySpecification> createStdLib(final String libName, final String... kwNames) {
         final LibrarySpecification libSpec = new LibrarySpecification();
@@ -23,6 +32,14 @@ public class Libraries {
             libSpec.getKeywords().add(kwSpec);
         }
         return ImmutableMap.of(libName, libSpec);
+    }
+
+    public static Map<ReferencedLibrary, LibrarySpecification> createRefLibs(final String... libNames) {
+        final Map<ReferencedLibrary, LibrarySpecification> libs = new HashMap<>();
+        for (final String libName : libNames) {
+            libs.putAll(createRefLib(libName));
+        }
+        return libs;
     }
 
     public static Map<ReferencedLibrary, LibrarySpecification> createRefLib(final String libName,

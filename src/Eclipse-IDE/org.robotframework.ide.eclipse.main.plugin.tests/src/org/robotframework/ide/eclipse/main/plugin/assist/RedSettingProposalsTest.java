@@ -7,8 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.reverseComparator;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
 
 import java.util.List;
 
@@ -62,62 +62,66 @@ public class RedSettingProposalsTest {
     }
 
     @Test
-    public void allGeneralSettingsProposalsAreProvided_whenPrefixIsEmpty() {
+    public void allGeneralSettingsProposalsAreProvided_whenInputIsEmpty() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
                 .getSettingsProposals("");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Default Tags", "Documentation",
-                "Force Tags",
-                "Library", "Metadata", "Resource", "Suite Setup", "Suite Teardown", "Test Setup", "Test Teardown",
-                "Test Template", "Test Timeout", "Variables");
+                "Force Tags", "Library", "Metadata", "Resource", "Suite Setup", "Suite Teardown", "Test Setup",
+                "Test Teardown", "Test Template", "Test Timeout", "Variables");
     }
 
     @Test
-    public void noGeneralSettingsProposalsAreProvided_whenNothingMatchesToGivenPrefix() {
+    public void noGeneralSettingsProposalsAreProvided_whenNothingMatchesToGivenInput() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
                 .getSettingsProposals("Xyz");
         assertThat(proposals).isEmpty();
     }
 
     @Test
-    public void generalSettingsProposalsAreProvidedInOrderInducedByGivenComparator() {
+    public void generalSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
-                .getSettingsProposals("T", reverseComparator(AssistProposals.sortedByLabels()));
+                .getSettingsProposals("Test", reverseComparator(AssistProposals.sortedByLabels()));
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Test Timeout", "Test Template",
-                "Test Teardown",
-                "Test Setup");
+                "Test Teardown", "Test Setup");
+    }
+
+    @Test
+    public void onlyGeneralSettingsProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
+                .getSettingsProposals("es");
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Resource", "Test Setup",
+                "Test Teardown", "Test Template", "Test Timeout", "Variables");
     }
 
     @Test
     public void onlyGeneralSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL,
-                substringMatcher()).getSettingsProposals("es");
+                prefixesMatcher()).getSettingsProposals("D");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Resource", "Test Setup",
-                "Test Teardown",
-                "Test Template", "Test Timeout", "Variables");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Default Tags", "Documentation");
     }
 
     @Test
-    public void allKeywordSettingsProposalsAreProvided_whenPrefixIsEmpty() {
+    public void allKeywordSettingsProposalsAreProvided_whenInputIsEmpty() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
                 .getSettingsProposals("");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Arguments]", "[Documentation]",
-                "[Return]",
-                "[Tags]", "[Teardown]", "[Timeout]");
+                "[Return]", "[Tags]", "[Teardown]", "[Timeout]");
     }
 
     @Test
-    public void noKeywordSettingsProposalsAreProvided_whenNothingMatchesToGivenPrefix() {
+    public void noKeywordSettingsProposalsAreProvided_whenNothingMatchesToGivenInput() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
-                .getSettingsProposals("docu");
+                .getSettingsProposals("res");
         assertThat(proposals).isEmpty();
     }
 
     @Test
-    public void keywordSettingsProposalsAreProvidedInOrderInducedByGivenComparator() {
+    public void keywordSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
                 .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabels()));
 
@@ -125,33 +129,40 @@ public class RedSettingProposalsTest {
     }
 
     @Test
-    public void onlyKeywordSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD,
-                substringMatcher()).getSettingsProposals("me");
+    public void onlyKeywordSettingsProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
+                .getSettingsProposals("me");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Arguments]", "[Documentation]",
                 "[Timeout]");
     }
 
     @Test
-    public void allTestCaseSettingsProposalsAreProvided_whenPrefixIsEmpty() {
+    public void onlyKeywordSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD,
+                prefixesMatcher()).getSettingsProposals("[T");
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Tags]", "[Teardown]", "[Timeout]");
+    }
+
+    @Test
+    public void allTestCaseSettingsProposalsAreProvided_whenInputIsEmpty() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
                 .getSettingsProposals("");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Documentation]", "[Setup]",
-                "[Tags]",
-                "[Teardown]", "[Template]", "[Timeout]");
+                "[Tags]", "[Teardown]", "[Template]", "[Timeout]");
     }
 
     @Test
-    public void noTestCaseSettingsProposalsAreProvided_whenNothingMatchesToGivenPrefix() {
+    public void noTestCaseSettingsProposalsAreProvided_whenNothingMatchesToGivenInput() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
-                .getSettingsProposals("docu");
+                .getSettingsProposals("res");
         assertThat(proposals).isEmpty();
     }
 
     @Test
-    public void testCaseSettingsProposalsAreProvidedInOrderInducedByGivenComparator() {
+    public void testCaseSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
                 .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabels()));
 
@@ -160,10 +171,18 @@ public class RedSettingProposalsTest {
     }
 
     @Test
-    public void onlyTestCaseSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
-        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE,
-                substringMatcher()).getSettingsProposals("me");
+    public void onlyTestCaseSettingsProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
+                .getSettingsProposals("me");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Documentation]", "[Timeout]");
+    }
+
+    @Test
+    public void onlyTestCaseSettingsProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE,
+                prefixesMatcher()).getSettingsProposals("[D");
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Documentation]");
     }
 }

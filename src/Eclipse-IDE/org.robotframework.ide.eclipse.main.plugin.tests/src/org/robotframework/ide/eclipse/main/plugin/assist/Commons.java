@@ -12,16 +12,16 @@ import com.google.common.collect.Range;
 
 class Commons {
 
-    static ProposalMatcher substringMatcher() {
+    static ProposalMatcher prefixesMatcher() {
         return new ProposalMatcher() {
 
             @Override
             public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
-                if (proposalContent.toLowerCase().contains(userContent.toLowerCase())) {
-                    final int index = proposalContent.toLowerCase().indexOf(userContent.toLowerCase());
-                    return Optional.of(new ProposalMatch(Range.closedOpen(index, index + userContent.length())));
+                if (proposalContent.toLowerCase().startsWith(userContent.toLowerCase())) {
+                    return Optional.of(new ProposalMatch(Range.closedOpen(0, userContent.length())));
+                } else {
+                    return Optional.empty();
                 }
-                return Optional.empty();
             }
         };
     }
@@ -32,6 +32,22 @@ class Commons {
             @Override
             public int compare(final T o1, final T o2) {
                 return comparator.compare(o2, o1);
+            }
+        };
+    }
+
+    static Comparator<AssistProposal> firstProposalContaining(final String toContain) {
+        return new Comparator<AssistProposal>() {
+
+            @Override
+            public int compare(final AssistProposal p1, final AssistProposal p2) {
+                if (p1.equals(p2)) {
+                    return 0;
+                } else if (p1.getLabel().contains(toContain)) {
+                    return -1;
+                } else {
+                    return 1;
+                }
             }
         };
     }

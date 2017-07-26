@@ -105,7 +105,7 @@ public class WithNameAssistProcessorTest {
     }
 
     @Test
-    public void withNameProposalIsProvided_whenInApplicableContentTypeAndMatchesPrefix() throws Exception {
+    public void withNameProposalIsProvided_whenInApplicableContentTypeAndMatchesInput() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(documentFromFile("suite.robot"));
 
@@ -139,7 +139,7 @@ public class WithNameAssistProcessorTest {
     }
 
     @Test
-    public void noProposalsAreProvided_whenInApplicableContentTypeButDoesntMatchPrefix() throws Exception {
+    public void noProposalsAreProvided_whenInApplicableContentTypeButDoesNotMatchInput() throws Exception {
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(documentFromFile("suite.robot"));
 

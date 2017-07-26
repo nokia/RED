@@ -7,7 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.substringMatcher;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 
 import java.util.List;
 
@@ -52,20 +52,19 @@ public class RedWithNameProposalsTest {
     }
 
     @Test
-    public void onlyProposalsMatchingPrefixAreProvided_whenPrefixIsGivenAndDefaultMatcherIsUsed() {
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(
-                AssistProposalPredicates.alwaysTrue());
+    public void onlyProposalsContainingInputAreProvided_whenDefaultMatcherIsUsed() {
+        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(AssistProposalPredicates.alwaysTrue());
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("with");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("am");
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");
     }
 
     @Test
     public void onlyProposalsMatchingGivenMatcherAreProvided_whenMatcherIsGiven() {
-        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(substringMatcher(),
+        final RedWithNameProposals proposalsProvider = new RedWithNameProposals(prefixesMatcher(),
                 AssistProposalPredicates.alwaysTrue());
 
-        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("am");
+        final List<? extends AssistProposal> proposals = proposalsProvider.getWithNameProposals("with");
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("WITH NAME");
     }
 }
