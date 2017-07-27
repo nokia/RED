@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.TextStyle;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -23,11 +23,11 @@ import com.google.common.collect.Range;
 
 public class RedFileLocationProposalTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(RedFileLocationProposalTest.class);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(RedFileLocationProposalTest.class);
 
-    @Before
-    public void before() throws IOException, CoreException {
+    @BeforeClass
+    public static void beforeSuite() throws IOException, CoreException {
         projectProvider.createFile("file.txt");
     }
 
