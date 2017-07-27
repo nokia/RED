@@ -14,7 +14,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -71,7 +70,6 @@ public class KeywordProposalsProviderTest {
         assertThat(text.getText()).isEqualTo("kw1");
     }
 
-    @Ignore("TODO: check why test fails on regression")
     @Test
     public void thereAreOperationsToPerformAfterAccepting_onlyForNotAccessibleKeywordProposals() throws Exception {
         preferenceUpdater.setValue(RedPreferences.ASSISTANT_KEYWORD_FROM_NOT_IMPORTED_LIBRARY_ENABLED, true);
