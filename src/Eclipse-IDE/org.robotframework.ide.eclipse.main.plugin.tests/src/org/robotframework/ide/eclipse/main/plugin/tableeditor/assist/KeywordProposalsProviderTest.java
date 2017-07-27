@@ -13,7 +13,6 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -30,8 +29,8 @@ import org.robotframework.red.junit.ShellProvider;
 
 public class KeywordProposalsProviderTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsProviderTest.class);
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsProviderTest.class);
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
@@ -59,7 +58,8 @@ public class KeywordProposalsProviderTest {
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Keywords ***",
-                "kw1", "kw2");
+                "kw1",
+                "kw2");
         final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile);
 
