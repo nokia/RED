@@ -24,7 +24,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordInLibrarySourceHyperlinkTest;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.red.junit.Editors;
@@ -37,7 +36,7 @@ public class LibrariesConfigUpdaterTest {
     private static final ReferencedLibrary LIB_2 = ReferencedLibrary.create(LibraryType.JAVA, "a", "b");
 
     @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(KeywordInLibrarySourceHyperlinkTest.class);
+    public ProjectProvider projectProvider = new ProjectProvider(LibrariesConfigUpdaterTest.class);
 
     private RobotProject robotProject;
 
@@ -45,9 +44,8 @@ public class LibrariesConfigUpdaterTest {
 
     @Before
     public void before() throws Exception {
-        final RobotModel model = new RobotModel();
         projectProvider.configure();
-        robotProject = model.createRobotProject(projectProvider.getProject());
+        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         eventBroker = mock(IEventBroker.class);
     }
 

@@ -19,7 +19,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -33,8 +33,8 @@ import com.google.common.collect.ImmutableMap;
 
 public class SourceOpeningSupportTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(SourceOpeningSupportTest.class);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(SourceOpeningSupportTest.class);
 
     private final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 

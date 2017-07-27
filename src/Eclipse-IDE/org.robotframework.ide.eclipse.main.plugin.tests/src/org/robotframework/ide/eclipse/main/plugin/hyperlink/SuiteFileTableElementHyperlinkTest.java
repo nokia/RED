@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotContainer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
@@ -32,10 +33,15 @@ import org.robotframework.red.junit.ProjectProvider;
 public class SuiteFileTableElementHyperlinkTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(FileHyperlinkTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(SuiteFileTableElementHyperlinkTest.class);
+
+    private static RobotModel robotModel;
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
+        // FIXME : this shouldn't use global model; there should be a way to inject own model
+        robotModel = RedPlugin.getModelManager().getModel();
+
         projectProvider.createFile("f.robot",
                 "*** Test Cases ***",
                 "tc1",
@@ -46,6 +52,7 @@ public class SuiteFileTableElementHyperlinkTest {
     @AfterClass
     public static void afterSuite() {
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
+        RedPlugin.getModelManager().dispose();
     }
 
     @Test
@@ -72,10 +79,7 @@ public class SuiteFileTableElementHyperlinkTest {
 
         assertThat(page.getEditorReferences()).isEmpty();
 
-        // FIXME : this shouldn't use global model; there should be a way to inject own model
-        final RobotSuiteFile sourceModel = RedPlugin.getModelManager()
-                .getModel()
-                .createSuiteFile(projectProvider.getFile("f.robot"));
+        final RobotSuiteFile sourceModel = robotModel.createSuiteFile(projectProvider.getFile("f.robot"));
         final RobotCase testCase = sourceModel.findSection(RobotCasesSection.class).get().getChildren().get(1);
 
         final SuiteFileTableElementHyperlink link = new SuiteFileTableElementHyperlink(new Region(20, 10), sourceModel,
@@ -87,7 +91,7 @@ public class SuiteFileTableElementHyperlinkTest {
         final IEditorPart editor = page.getEditorReferences()[0].getEditor(true);
         assertThat(editor).isInstanceOf(RobotFormEditor.class);
         final RobotFormEditor redEditor = (RobotFormEditor) editor;
-        
+
         final IEditorPart activePart = redEditor.getActiveEditor();
         assertThat(activePart).isInstanceOf(CasesEditorPart.class);
         final CasesEditorPart casesSectionPart = (CasesEditorPart) activePart;

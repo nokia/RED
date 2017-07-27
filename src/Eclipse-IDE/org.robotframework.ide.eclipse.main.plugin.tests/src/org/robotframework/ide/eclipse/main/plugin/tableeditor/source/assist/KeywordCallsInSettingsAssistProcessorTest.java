@@ -77,6 +77,7 @@ public class KeywordCallsInSettingsAssistProcessorTest {
     @AfterClass
     public static void afterSuite() {
         robotModel = null;
+        RedPlugin.getModelManager().dispose();
     }
 
     @Test

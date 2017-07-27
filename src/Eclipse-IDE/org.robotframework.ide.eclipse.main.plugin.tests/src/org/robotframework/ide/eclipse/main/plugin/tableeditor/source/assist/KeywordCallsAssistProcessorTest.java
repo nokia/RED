@@ -82,6 +82,7 @@ public class KeywordCallsAssistProcessorTest {
     @AfterClass
     public static void afterSuite() {
         robotModel = null;
+        RedPlugin.getModelManager().dispose();
     }
 
     @Test
