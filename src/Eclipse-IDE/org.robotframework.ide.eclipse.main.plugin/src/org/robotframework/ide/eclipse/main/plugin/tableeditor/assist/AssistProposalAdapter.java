@@ -99,9 +99,4 @@ public class AssistProposalAdapter implements RedContentProposal {
     public Collection<Runnable> getOperationsToPerformAfterAccepting() {
         return operationsAfterAccepting.get();
     }
-
-    @Override
-    public String toString() {
-        return wrappedProposal.toString();
-    }
 }
