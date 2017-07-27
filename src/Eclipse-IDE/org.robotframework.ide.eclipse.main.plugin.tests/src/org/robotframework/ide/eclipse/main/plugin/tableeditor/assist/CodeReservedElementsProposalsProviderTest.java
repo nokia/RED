@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -26,6 +27,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.red.jface.assist.AssistantContext;
@@ -43,8 +45,12 @@ public class CodeReservedElementsProposalsProviderTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
+    private static RobotModel robotModel;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
+        robotModel = RedPlugin.getModelManager().getModel();
+
         projectProvider.createFile("suite.robot",
                 "*** Test Cases ***",
                 "case",
@@ -58,10 +64,14 @@ public class CodeReservedElementsProposalsProviderTest {
                 "  log");
     }
 
+    @AfterClass
+    public static void afterSuite() {
+        RedPlugin.getModelManager().dispose();
+    }
+
     @Test
     public void thereAreNoProposalsProvided_whenElementIsNotKeywordCall() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> !(element instanceof RobotKeywordCall))
@@ -84,8 +94,7 @@ public class CodeReservedElementsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsKeywordCallButColumnIsDifferentThanFirst() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
@@ -110,8 +119,7 @@ public class CodeReservedElementsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsKeywordCallAndColumnIsFirstOneButInputDoesNotMatch() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
@@ -130,8 +138,7 @@ public class CodeReservedElementsProposalsProviderTest {
 
     @Test
     public void thereIsForProposalProvided_whenInFirstColumnAndCurrentInputMatchesToForWord() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
@@ -156,8 +163,7 @@ public class CodeReservedElementsProposalsProviderTest {
 
     @Test
     public void thereIsBddKeywordProposalProvided_whenInFirstColumnAndCurrentInputMatchesToGivenWord() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotKeywordCall> elements = filter(getAllElements(suiteFile), RobotKeywordCall.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
