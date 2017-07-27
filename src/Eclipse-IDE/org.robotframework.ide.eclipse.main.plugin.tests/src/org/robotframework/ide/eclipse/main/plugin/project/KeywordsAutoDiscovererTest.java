@@ -14,8 +14,8 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -30,27 +30,26 @@ import com.google.common.collect.ImmutableMap;
 
 public class KeywordsAutoDiscovererTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(KeywordsAutoDiscovererTest.class);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(KeywordsAutoDiscovererTest.class);
 
-    private RobotProject project;
+    private static RobotProject robotProject;
 
-    private Map<ReferencedLibrary, LibrarySpecification> libraries;
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
+        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
-    @Before
-    public void before() throws Exception {
-        project = new RobotModel().createRobotProject(projectProvider.getProject());
         projectProvider.createDir("libs");
-        libraries = new HashMap<>();
     }
 
     @Test
     public void testDifferentKeywordsFromSameLibrary() throws Exception {
+        final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("TestLib",
                 new String[] { "#comment", "def kw_x():", "  return 0", "def   kw_abc ():", "  pass" }));
-        configureProject();
+        configureProject(libraries);
 
-        new KeywordsAutoDiscoverer(project).start();
+        new KeywordsAutoDiscoverer(robotProject).start();
 
         verifyKwSource("TestLib.Kw X", "libs/TestLib.py", 1, 4, 4);
         verifyKwSource("TestLib.Kw Abc", "libs/TestLib.py", 3, 6, 6);
@@ -58,11 +57,12 @@ public class KeywordsAutoDiscovererTest {
 
     @Test
     public void testSameKeywordsFromDifferentLibraries() throws Exception {
+        final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("First", new String[] { "#comment", "def kw_x():", "  pass" }));
         libraries.putAll(createLibrary("Second", new String[] { "def kw_x():", "  pass" }));
-        configureProject();
+        configureProject(libraries);
 
-        new KeywordsAutoDiscoverer(project).start();
+        new KeywordsAutoDiscoverer(robotProject).start();
 
         verifyKwSource("First.Kw X", "libs/First.py", 1, 4, 4);
         verifyKwSource("Second.Kw X", "libs/Second.py", 0, 4, 4);
@@ -70,13 +70,14 @@ public class KeywordsAutoDiscovererTest {
 
     @Test
     public void testKeywordsDefinedWithDecorator() throws Exception {
+        final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("Decorated",
                 new String[] { "import robot.api.deco", "from robot.api.deco import keyword",
                         "@robot.api.deco.keyword('Add ${x:\\d+}')", "def add(x):", "  pass", "@keyword(name='Deco')",
                         "def decorated_method():", "  pass" }));
-        configureProject();
+        configureProject(libraries);
 
-        new KeywordsAutoDiscoverer(project).start();
+        new KeywordsAutoDiscoverer(robotProject).start();
 
         verifyKwSource("Decorated.Add ${x:\\d+}", "libs/Decorated.py", 3, 4, 3);
         verifyKwSource("Decorated.Deco", "libs/Decorated.py", 6, 4, 16);
@@ -84,11 +85,12 @@ public class KeywordsAutoDiscovererTest {
 
     @Test
     public void testKeywordsFromDynamicLibrary() throws Exception {
+        final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("DynaLib", new String[] { "class DynaLib:", "  def get_keyword_names(self):",
                 "    return ['Dyna Kw', 'Other Kw']", "  def run_keyword(self, name, args):", "    pass" }));
-        configureProject();
+        configureProject(libraries);
 
-        new KeywordsAutoDiscoverer(project).start();
+        new KeywordsAutoDiscoverer(robotProject).start();
 
         verifyKwSource("DynaLib.Dyna Kw", "libs/DynaLib.py", 3, 6, 11);
         verifyKwSource("DynaLib.Other Kw", "libs/DynaLib.py", 3, 6, 11);
@@ -97,11 +99,12 @@ public class KeywordsAutoDiscovererTest {
     @Test
     public void testKeywordsFromClassHierarchy() throws Exception {
         projectProvider.createFile("libs/Parent.py", "class Parent:", "  def parent_kw(self, arg):", "    pass");
+        final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("Child", new String[] { "import Parent", "class Child(Parent.Parent):",
                 "  def child_kw(self, arg):", "    pass" }));
-        configureProject();
+        configureProject(libraries);
 
-        new KeywordsAutoDiscoverer(project).start();
+        new KeywordsAutoDiscoverer(robotProject).start();
 
         verifyKwSource("Child.Parent Kw", "libs/Parent.py", 1, 6, 9);
         verifyKwSource("Child.Child Kw", "libs/Child.py", 2, 6, 8);
@@ -110,11 +113,12 @@ public class KeywordsAutoDiscovererTest {
     @Test
     public void testKeywordsFromImportedLibraries() throws Exception {
         projectProvider.createFile("libs/External.py", "def ex_kw(args):", "  pass");
+        final Map<ReferencedLibrary, LibrarySpecification> libraries = new HashMap<>();
         libraries.putAll(createLibrary("Internal",
                 new String[] { "from External import ex_kw", "def int_kw(args):", "  pass" }));
-        configureProject();
+        configureProject(libraries);
 
-        new KeywordsAutoDiscoverer(project).start();
+        new KeywordsAutoDiscoverer(robotProject).start();
 
         verifyKwSource("Internal.Ex Kw", "libs/External.py", 0, 4, 5);
         verifyKwSource("Internal.Int Kw", "libs/Internal.py", 1, 4, 6);
@@ -134,19 +138,19 @@ public class KeywordsAutoDiscovererTest {
         return ImmutableMap.of(library, libSpec);
     }
 
-    private void configureProject() throws IOException, CoreException {
+    private void configureProject(final Map<ReferencedLibrary, LibrarySpecification> libraries)
+            throws IOException, CoreException {
         final RobotProjectConfig config = new RobotProjectConfig();
         for (final ReferencedLibrary referencedLibrary : libraries.keySet()) {
             config.addReferencedLibrary(referencedLibrary);
         }
         projectProvider.configure(config);
-        project.setStandardLibraries(new HashMap<String, LibrarySpecification>());
-        project.setReferencedLibraries(libraries);
+        robotProject.setReferencedLibraries(libraries);
     }
 
     private void verifyKwSource(final String qualifiedKwName, final String expectedFilePath, final int expectedLine,
             final int expectedOffset, final int expectedLength) {
-        final Optional<RobotDryRunKeywordSource> kwSource = project.getKeywordSource(qualifiedKwName);
+        final Optional<RobotDryRunKeywordSource> kwSource = robotProject.getKeywordSource(qualifiedKwName);
         assertThat(kwSource).isPresent();
         assertThat(kwSource.get().getFilePath())
                 .isEqualTo(projectProvider.getFile(expectedFilePath).getLocation().toOSString());

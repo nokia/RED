@@ -16,7 +16,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -32,8 +32,8 @@ import com.google.common.collect.ImmutableMap;
 
 public class KeywordInLibrarySourceHyperlinkTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(KeywordInLibrarySourceHyperlinkTest.class);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(KeywordInLibrarySourceHyperlinkTest.class);
 
     private final RobotModel model = new RobotModel();
 

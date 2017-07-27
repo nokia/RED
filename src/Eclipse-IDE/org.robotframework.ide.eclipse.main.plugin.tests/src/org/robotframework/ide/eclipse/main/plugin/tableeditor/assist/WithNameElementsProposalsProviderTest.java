@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -25,6 +26,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -43,8 +45,12 @@ public class WithNameElementsProposalsProviderTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
+    private static RobotModel robotModel;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
+        robotModel = RedPlugin.getModelManager().getModel();
+
         projectProvider.createFile("suite.robot",
                 "*** Settings ***",
                 "Library  DateTime",
@@ -56,10 +62,14 @@ public class WithNameElementsProposalsProviderTest {
                 "  log");
     }
 
+    @AfterClass
+    public static void afterSuite() {
+        RedPlugin.getModelManager().dispose();
+    }
+
     @Test
     public void thereAreNoProposalsProvided_whenElementIsNotInSettings() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotElement> elements = getAllElements(suiteFile).stream()
                 .filter(element -> !(element instanceof RobotSetting))
@@ -82,8 +92,7 @@ public class WithNameElementsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsInSettingsButColumnIsBeforeThird() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
@@ -105,8 +114,7 @@ public class WithNameElementsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButInputDoesNotMatch() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
@@ -125,8 +133,7 @@ public class WithNameElementsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenElementIsInSettingsAndColumnIsThirdOneButNotLibrarySetting() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);
@@ -149,8 +156,7 @@ public class WithNameElementsProposalsProviderTest {
 
     @Test
     public void thereAreProposalsProvided_whenInputIsMatchingAndProperContentIsInserted() throws Exception {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("suite.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
 
         final Iterable<RobotSetting> elements = filter(getAllElements(suiteFile), RobotSetting.class);
         final IRowDataProvider<Object> dataProvider = prepareElementsProvider(elements);

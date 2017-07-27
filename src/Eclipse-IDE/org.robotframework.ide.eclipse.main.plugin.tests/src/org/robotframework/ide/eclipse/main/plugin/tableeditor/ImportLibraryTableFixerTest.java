@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.ClassRule;
@@ -27,13 +26,11 @@ public class ImportLibraryTableFixerTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(ImportLibraryTableFixerTest.class);
 
-    private final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
     private final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
     @After
     public void after() {
-        page.closeAllEditors(false);
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
     }
 
     @Test
