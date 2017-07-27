@@ -43,8 +43,7 @@ import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantC
 public class KeywordProposalsInSettingsProviderTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(
-            KeywordProposalsInSettingsProviderTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsInSettingsProviderTest.class);
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
@@ -180,7 +179,7 @@ public class KeywordProposalsInSettingsProviderTest {
         final RobotProject project = RedPlugin.getModelManager().createProject(projectProvider.getProject());
         project.setReferencedLibraries(refLibs);
 
-        final IFile file = projectProvider.createFile("file.robot",
+        final IFile file = projectProvider.createFile("kw_based_settings_with_lib_import.robot",
                 "*** Settings ***",
                 "Suite Setup",
                 "Suite Teardown",

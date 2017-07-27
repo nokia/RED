@@ -9,6 +9,7 @@ import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates.alwaysTrue;
+import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.firstProposalContaining;
 import static org.robotframework.ide.eclipse.main.plugin.assist.Commons.prefixesMatcher;
 
 import java.util.Comparator;
@@ -136,7 +137,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b");
+        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b_");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw2 - file.robot",
@@ -213,7 +214,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b");
+        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b_");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_res_kw2 - res.robot",
@@ -316,7 +317,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b");
+        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b_");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw - stdLib", "a_kw - stdLib");
@@ -702,21 +703,5 @@ public class RedKeywordProposalsTest {
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("unknown");
         assertThat(bestMatch).isNotPresent();
-    }
-
-    private static Comparator<? super RedKeywordProposal> firstProposalContaining(final String toContain) {
-        return new Comparator<RedKeywordProposal>() {
-
-            @Override
-            public int compare(final RedKeywordProposal p1, final RedKeywordProposal p2) {
-                if (p1.equals(p2)) {
-                    return 0;
-                } else if (p1.getNameFromDefinition().contains(toContain)) {
-                    return -1;
-                } else {
-                    return 1;
-                }
-            }
-        };
     }
 }
