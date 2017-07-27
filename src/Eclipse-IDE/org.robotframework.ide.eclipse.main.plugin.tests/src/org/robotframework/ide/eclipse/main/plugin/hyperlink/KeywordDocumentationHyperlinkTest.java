@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.junit.Before;
-import org.junit.Rule;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
@@ -33,8 +33,8 @@ import com.google.common.collect.ImmutableMap;
 
 public class KeywordDocumentationHyperlinkTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(KeywordDocumentationHyperlinkTest.class);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(KeywordDocumentationHyperlinkTest.class);
 
     private final RobotModel model = new RobotModel();
 

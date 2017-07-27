@@ -10,14 +10,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
@@ -29,8 +32,8 @@ import org.robotframework.red.junit.ShellProvider;
 
 public class KeywordProposalsProviderTest {
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsProviderTest.class);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(KeywordProposalsInSettingsProviderTest.class);
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
@@ -38,13 +41,30 @@ public class KeywordProposalsProviderTest {
     @Rule
     public PreferenceUpdater preferenceUpdater = new PreferenceUpdater();
 
-    @Test
-    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
-        final IFile file = projectProvider.createFile("file.robot",
+    private static RobotModel robotModel;
+
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
+        robotModel = RedPlugin.getModelManager().getModel();
+
+        projectProvider.createFile("local_keywords_suite.robot",
                 "*** Keywords ***",
                 "kw1",
                 "kw2");
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
+        projectProvider.createFile("imported_keywords_suite.robot",
+                "*** Settings ***",
+                "Library  LibImported");
+    }
+
+    @AfterClass
+    public static void afterSuite() {
+        RedPlugin.getModelManager().dispose();
+    }
+
+    @Test
+    public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("local_keywords_suite.robot"));
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile);
 
         final RedContentProposal[] proposals = provider.getProposals("foo", 1, null);
@@ -56,11 +76,8 @@ public class KeywordProposalsProviderTest {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("foo");
 
-        final IFile file = projectProvider.createFile("file.robot",
-                "*** Keywords ***",
-                "kw1",
-                "kw2");
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("local_keywords_suite.robot"));
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile);
 
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 0, null);
@@ -78,13 +95,11 @@ public class KeywordProposalsProviderTest {
         refLibs.putAll(Libraries.createRefLib("LibImported", "kw1", "kw2"));
         refLibs.putAll(Libraries.createRefLib("LibNotImported", "kw3", "kw4"));
 
-        final RobotProject project = RedPlugin.getModelManager().createProject(projectProvider.getProject());
+        final RobotProject project = robotModel.createRobotProject(projectProvider.getProject());
         project.setReferencedLibraries(refLibs);
 
-        final IFile file = projectProvider.createFile("file.robot",
-                "*** Settings ***",
-                "Library  LibImported");
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
+        final RobotSuiteFile suiteFile = robotModel
+                .createSuiteFile(projectProvider.getFile("imported_keywords_suite.robot"));
         final KeywordProposalsProvider provider = new KeywordProposalsProvider(suiteFile);
 
         final RedContentProposal[] proposals = provider.getProposals("kw", 2, null);

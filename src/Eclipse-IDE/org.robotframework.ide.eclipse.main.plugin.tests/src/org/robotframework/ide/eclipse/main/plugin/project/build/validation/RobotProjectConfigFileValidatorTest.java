@@ -101,10 +101,10 @@ public class RobotProjectConfigFileValidatorTest {
         final RemoteLocation remoteLocation = RemoteLocation.create("http://127.0.0.1:" + findFreePort() + "/");
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addRemoteLocation(remoteLocation);
-        
+
         final Map<Object, ProblemPosition> locations = new HashMap<>();
         locations.put(remoteLocation, new ProblemPosition(42));
-        
+
         final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
@@ -138,7 +138,7 @@ public class RobotProjectConfigFileValidatorTest {
     @Test
     public void whenAbsoluteSearchPathExist_nothingIsReported() throws Exception {
         final File folder = temporaryFolder.newFolder();
-        
+
         final SearchPath searchPath = SearchPath.create(folder.getAbsolutePath());
 
         final RobotProjectConfig config = RobotProjectConfig.create();
@@ -229,7 +229,7 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenVariableFileDoesntExist_missingFileIsReported() throws Exception {
+    public void whenVariableFileDoesNotExist_missingFileIsReported() throws Exception {
         projectProvider.createDir(Path.fromPortableString("a"));
         projectProvider.createFile(Path.fromPortableString("a/vars2.py"), "VAR = 100");
 
@@ -270,7 +270,7 @@ public class RobotProjectConfigFileValidatorTest {
     }
 
     @Test
-    public void whenVariableFileDoesntExistAndIsRelatedWithAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
+    public void whenVariableFileDoesNotExistAndIsRelatedWithAbsolutePath_missingFileAndAbsolutePathWarningAreReported()
             throws Exception {
         projectProvider.createDir(Path.fromPortableString("a"));
         projectProvider.createFile(Path.fromPortableString("a/vars2.py"), "VAR = 100");

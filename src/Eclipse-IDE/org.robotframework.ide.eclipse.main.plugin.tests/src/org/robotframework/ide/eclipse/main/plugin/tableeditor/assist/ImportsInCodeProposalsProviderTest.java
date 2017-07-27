@@ -7,13 +7,15 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.junit.ProjectProvider;
@@ -27,13 +29,26 @@ public class ImportsInCodeProposalsProviderTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
-    @Test
-    public void thereAreNoProposalsProvided_whenThereIsNoImportMatchingCurrentInput() throws Exception {
-        final IFile file = projectProvider.createFile("file.robot",
+    private static RobotModel robotModel;
+
+    @BeforeClass
+    public static void beforeSuite() throws Exception {
+        robotModel = RedPlugin.getModelManager().getModel();
+
+        projectProvider.createFile("suite.robot",
                 "*** Settings ***",
                 "Resource  ares.robot",
                 "Resource  bres.robot");
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
+    }
+
+    @AfterClass
+    public static void afterSuite() {
+        RedPlugin.getModelManager().dispose();
+    }
+
+    @Test
+    public void thereAreNoProposalsProvided_whenThereIsNoImportMatchingCurrentInput() throws Exception {
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final ImportsInCodeProposalsProvider provider = new ImportsInCodeProposalsProvider(suiteFile);
 
         final RedContentProposal[] proposals = provider.getProposals("foo", 1, null);
@@ -45,11 +60,7 @@ public class ImportsInCodeProposalsProviderTest {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("abc");
 
-        final IFile file = projectProvider.createFile("file.robot",
-                "*** Settings ***",
-                "Resource  ares.robot",
-                "Resource  bres.robot");
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
         final ImportsInCodeProposalsProvider provider = new ImportsInCodeProposalsProvider(suiteFile);
 
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 1, null);

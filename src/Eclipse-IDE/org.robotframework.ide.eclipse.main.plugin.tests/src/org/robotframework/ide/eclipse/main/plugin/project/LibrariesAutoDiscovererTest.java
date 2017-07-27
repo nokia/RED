@@ -30,7 +30,7 @@ public class LibrariesAutoDiscovererTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(LibrariesAutoDiscovererTest.class);
 
-    private RobotProject project;
+    private RobotProject robotProject;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -47,7 +47,7 @@ public class LibrariesAutoDiscovererTest {
 
     @Before
     public void before() throws Exception {
-        project = new RobotModel().createRobotProject(projectProvider.getProject());
+        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
         projectProvider.configure();
     }
 
@@ -65,9 +65,9 @@ public class LibrariesAutoDiscovererTest {
         final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/OtherLib.py");
         final ReferencedLibrary lib3 = createLibrary("module", "module/__init__.py");
 
-        new LibrariesAutoDiscoverer(project, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2, lib3);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2, lib3);
     }
 
     @Test
@@ -77,9 +77,9 @@ public class LibrariesAutoDiscovererTest {
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(project, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     @Test
@@ -89,9 +89,9 @@ public class LibrariesAutoDiscovererTest {
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(project, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     @Test
@@ -105,9 +105,9 @@ public class LibrariesAutoDiscovererTest {
         config.setVariableMappings(Arrays.asList(VariableMapping.create("${xyz}", "other")));
         projectProvider.configure(config);
 
-        new LibrariesAutoDiscoverer(project, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     @Test
@@ -118,9 +118,9 @@ public class LibrariesAutoDiscovererTest {
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(project, resources, false, "TestLib").start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false, "TestLib").start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     @Test
@@ -128,9 +128,9 @@ public class LibrariesAutoDiscovererTest {
         final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
                 "*** Settings ***", "Library  NotExisting.py", "*** Test Cases ***"));
 
-        new LibrariesAutoDiscoverer(project, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
     }
 
     @Test
@@ -138,9 +138,9 @@ public class LibrariesAutoDiscovererTest {
         final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
                 "*** Settings ***", "Library  ./libs/TestLib.py", "*** Test Cases ***"));
 
-        new LibrariesAutoDiscoverer(project, resources, false, "NotExistingLib").start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false, "NotExistingLib").start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).isEmpty();
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
     }
 
     @Test
@@ -154,9 +154,9 @@ public class LibrariesAutoDiscovererTest {
         config.addReferencedLibrary(lib);
         projectProvider.configure(config);
 
-        new LibrariesAutoDiscoverer(project, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
 
-        assertThat(project.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     private ReferencedLibrary createLibrary(final String name, final String filePath)

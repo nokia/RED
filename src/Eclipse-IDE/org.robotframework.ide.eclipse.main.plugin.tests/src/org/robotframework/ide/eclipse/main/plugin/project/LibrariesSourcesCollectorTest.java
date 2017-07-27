@@ -27,17 +27,17 @@ public class LibrariesSourcesCollectorTest {
     @Rule
     public ProjectProvider projectProvider = new ProjectProvider(LibrariesSourcesCollectorTest.class);
 
-    private RobotProject project;
+    private RobotProject robotProject;
 
     @Before
     public void before() throws Exception {
-        project = new RobotModel().createRobotProject(projectProvider.getProject());
-        projectProvider.configure(new RobotProjectConfig());
+        projectProvider.configure();
+        robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
     }
 
     @Test
     public void defaultPathsAreCollectedForProjectWithoutLibs() throws Exception {
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
@@ -55,7 +55,7 @@ public class LibrariesSourcesCollectorTest {
         projectProvider.createFile("a/b/libB.py");
         projectProvider.createFile("a/b/c/libC.py");
 
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
@@ -72,7 +72,7 @@ public class LibrariesSourcesCollectorTest {
         projectProvider.createFile("lib1.py");
         projectProvider.createFile("lib2.py");
 
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
@@ -89,7 +89,7 @@ public class LibrariesSourcesCollectorTest {
         projectProvider.createFile("a/lib3.jar");
         projectProvider.createFile("a/lib4.py");
 
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
@@ -108,7 +108,7 @@ public class LibrariesSourcesCollectorTest {
         projectProvider.createFile("a/lib.py");
         projectProvider.createFile("a/b/lib");
 
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
@@ -133,7 +133,7 @@ public class LibrariesSourcesCollectorTest {
         config.addClassPath(SearchPath.create(projectProvider.getDir("java_path").getLocation().toOSString()));
         projectProvider.configure(config);
 
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources();
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
@@ -171,7 +171,7 @@ public class LibrariesSourcesCollectorTest {
         projectProvider.createFile("a/b/c/libC.py");
         projectProvider.createFile("a/b/c/libC.jar");
 
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources(1);
 
         final EnvironmentSearchPaths searchPaths = collector.getEnvironmentSearchPaths();
@@ -186,7 +186,7 @@ public class LibrariesSourcesCollectorTest {
     public void coreExceptionIsThrown_whenProjectIsClosed() throws Exception {
         projectProvider.getProject().close(null);
 
-        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(project);
+        final LibrariesSourcesCollector collector = new LibrariesSourcesCollector(robotProject);
         collector.collectPythonAndJavaLibrariesSources();
     }
 }
