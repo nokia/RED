@@ -17,12 +17,14 @@ import java.util.Map.Entry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Text;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.jface.assist.AssistantContext;
@@ -40,8 +42,12 @@ public class ImportsInSettingsProposalsProviderTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
+    private static RobotModel robotModel;
+
     @BeforeClass
     public static void beforeSuite() throws Exception {
+        robotModel = RedPlugin.getModelManager().getModel();
+
         projectProvider.createFile("all_settings.robot",
                 "*** Settings ***",
                 "Library",
@@ -74,10 +80,14 @@ public class ImportsInSettingsProposalsProviderTest {
                 "Default Tags");
     }
 
+    @AfterClass
+    public static void afterSuite() {
+        RedPlugin.getModelManager().dispose();
+    }
+
     @Test
     public void thereAreNoProposalsProvided_whenColumnIsDifferentThanSecond() {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("all_settings.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("all_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
@@ -98,7 +108,7 @@ public class ImportsInSettingsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenSettingIsNotKeywordBased() throws Exception {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
+        final RobotSuiteFile suiteFile = robotModel
                 .createSuiteFile(projectProvider.getFile("non_kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
 
@@ -115,8 +125,7 @@ public class ImportsInSettingsProposalsProviderTest {
 
     @Test
     public void thereAreNoProposalsProvided_whenThereIsNoKeywordMatchingCurrentInput() throws Exception {
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
         final List<RobotKeywordCall> settings = suiteFile.findSection(RobotSettingsSection.class).get().getChildren();
 
         final IRowDataProvider<Object> dataProvider = prepareSettingsProvider(settings);
@@ -135,8 +144,7 @@ public class ImportsInSettingsProposalsProviderTest {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("rrr");
 
-        final RobotSuiteFile suiteFile = RedPlugin.getModelManager()
-                .createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(projectProvider.getFile("kw_based_settings.robot"));
         final RobotSettingsSection settingsSection = (RobotSettingsSection) suiteFile
                 .createRobotSection(RobotSettingsSection.SECTION_NAME);
         settingsSection.createSetting("Resource", "", "res.robot");

@@ -24,7 +24,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -32,6 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -60,6 +60,8 @@ public class SuiteFileValidationListenerTest {
 
         projectProvider.getProject().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
 
+        final RobotModel robotModel = new RobotModel();
+
         final IFile varsFile = projectProvider.createFile(new Path("vars.robot"),
                 "*** Test Cases ***",
                 "*** Variables ***",
@@ -68,7 +70,7 @@ public class SuiteFileValidationListenerTest {
                 "${var1}  3  ${var}",
                 "{var}  4",
                 "{var}  4");
-        varsSuiteModel = RedPlugin.getModelManager().createSuiteFile(varsFile);
+        varsSuiteModel = robotModel.createSuiteFile(varsFile);
         final IFile settingsFile = projectProvider.createFile(new Path("settings.robot"),
                 "*** Test Cases ***",
                 "*** Settings ***",
@@ -76,7 +78,7 @@ public class SuiteFileValidationListenerTest {
                 "Suite Setup",
                 "Suite Teardown",
                 "Test Template  unknown  1  2");
-        settingsSuiteModel = RedPlugin.getModelManager().createSuiteFile(settingsFile);
+        settingsSuiteModel = robotModel.createSuiteFile(settingsFile);
         final IFile casesFile = projectProvider.createFile(new Path("cases.robot"),
                 "*** Test Cases ***",
                 "case1",
@@ -89,7 +91,7 @@ public class SuiteFileValidationListenerTest {
                 "Log",
                 "  [Arguments]  ${x}",
                 "  [Return]  ${x}");
-        casesSuiteModel = RedPlugin.getModelManager().createSuiteFile(casesFile);
+        casesSuiteModel = robotModel.createSuiteFile(casesFile);
         final IFile keywordsFile = projectProvider.createFile(new Path("keywords.robot"),
                 "*** Test Cases ***",
                 "*** Keywords ***",
@@ -105,7 +107,7 @@ public class SuiteFileValidationListenerTest {
                 "Log",
                 "  [Arguments]  ${x}",
                 "  [Return]  ${x}");
-        keywordsSuiteModel = RedPlugin.getModelManager().createSuiteFile(keywordsFile);
+        keywordsSuiteModel = robotModel.createSuiteFile(keywordsFile);
 
         RobotArtifactsValidator.revalidate(varsSuiteModel).join();
         RobotArtifactsValidator.revalidate(settingsSuiteModel).join();
@@ -149,10 +151,10 @@ public class SuiteFileValidationListenerTest {
                 .inWhich(varsSuiteModel)
                 .isInjectedInto(new SuiteFileValidationListener());
         listener.init();
-        
+
         assertThat(severityFor(listener, variables.get(0))).isNull();
         assertThat(messageFor(listener, variables.get(0))).isEmpty();
-        
+
         assertThat(severityFor(listener, variables.get(1))).isEqualTo(Severity.WARNING);
         assertThat(messageFor(listener, variables.get(1))).containsOnly("Duplicated variable definition 'var1'");
 
@@ -194,7 +196,7 @@ public class SuiteFileValidationListenerTest {
                 "Setting 'Test Template' is not applicable for arguments: [1, 2]. Only keyword name should be specified for templates.",
                 "Unknown keyword 'unknown'");
     }
-    
+
     @Test
     public void checkMarkersOnTestCases() {
         final RobotCasesSection section = casesSuiteModel.findSection(RobotCasesSection.class).get();

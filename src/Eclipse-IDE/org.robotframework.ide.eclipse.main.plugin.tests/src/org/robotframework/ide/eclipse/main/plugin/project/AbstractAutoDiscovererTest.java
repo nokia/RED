@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Shell;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -35,8 +36,8 @@ public class AbstractAutoDiscovererTest {
 
     private static final String PROJECT_NAME = AbstractAutoDiscovererTest.class.getSimpleName();
 
-    @Rule
-    public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    @ClassRule
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
