@@ -14,7 +14,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
@@ -42,8 +42,8 @@ import com.google.common.collect.ObjectArrays;
 
 public class VariableDefinitionLocatorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(VariableDefinitionLocatorTest.class);
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(VariableDefinitionLocatorTest.class);
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByOffset_1() throws Exception {
