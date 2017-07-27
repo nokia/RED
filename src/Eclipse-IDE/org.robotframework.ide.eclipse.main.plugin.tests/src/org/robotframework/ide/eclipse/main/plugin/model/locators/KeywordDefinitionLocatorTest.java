@@ -14,9 +14,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.ClassRule;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -30,21 +30,20 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class KeywordDefinitionLocatorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(KeywordDefinitionLocatorTest.class);
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(KeywordDefinitionLocatorTest.class);
 
-    private static RobotModel robotModel;
+    private RobotModel robotModel;
 
-    @BeforeClass
-    public static void beforeSuite() throws Exception {
+    @Before
+    public void beforeTest() throws Exception {
         robotModel = RedPlugin.getModelManager().getModel();
     }
 
-    @AfterClass
-    public static void afterSuite() {
+    @After
+    public void afterTest() {
         RedPlugin.getModelManager().dispose();
     }
-
 
     @Test
     public void libraryKeywordsFromDefinitionAreDetected() throws Exception {
