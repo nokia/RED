@@ -183,10 +183,20 @@ public class RedContentProposalAdapter {
 
         this.proposalProvider = proposalProvider;
         this.activationTrigger = activationTrigger;
-        this.triggerKeyStroke = activationTrigger.getKeyStrokes().length > 0 ? activationTrigger.getKeyStrokes()[0] : null;
+        this.triggerKeyStroke = determineTriggerKeyStroke(activationTrigger);
         this.autoActivateString = new String(autoActivationCharacters).intern();
         this.autoActivationDelay = autoActivationDelay;
         this.proposalAcceptanceStyle = acceptanceStyle;
+    }
+
+    private KeyStroke determineTriggerKeyStroke(final KeySequence activationTrigger) {
+        if (activationTrigger.getKeyStrokes().length > 0) {
+            final KeyStroke firstKeyStroke = activationTrigger.getKeyStrokes()[0];
+            final int modifierKeys = firstKeyStroke.getModifierKeys();
+            final int naturalKey = Character.toLowerCase(firstKeyStroke.getNaturalKey());
+            return KeyStroke.getInstance(modifierKeys, naturalKey);
+        }
+        return null;
     }
 
     private void addContentProposalListener(final RedContentProposalListener listener) {
