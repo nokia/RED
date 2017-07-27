@@ -120,6 +120,11 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
         return builder.toString();
     }
 
+    @Override
+    public String toString() {
+        return getLabel();
+    }
+
     public boolean isAccessible() {
         return true;
     }
