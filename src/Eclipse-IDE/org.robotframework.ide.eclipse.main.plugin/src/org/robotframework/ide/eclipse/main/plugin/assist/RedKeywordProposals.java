@@ -9,7 +9,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createNotAccessibleLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createUserKeywordProposal;
-import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabels;
+import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsPrefixedFirst;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -76,7 +76,7 @@ public class RedKeywordProposals {
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent) {
-        return getKeywordProposals(userContent, sortedByLabels());
+        return getKeywordProposals(userContent, sortedByLabelsPrefixedFirst(userContent));
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent,

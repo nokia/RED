@@ -90,6 +90,27 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
+    public void onlyLocalKeywordsMatchingGivenInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed()
+            throws Exception {
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Keywords ***",
+                "a_kw1",
+                "b_kw2",
+                "c_kw3",
+                "1_kw",
+                "2_kw",
+                "3_kw",
+                "*** Test Cases ***");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("2_kw - file.robot",
+                "b_kw2 - file.robot");
+    }
+
+    @Test
     public void onlyLocalKeywordsMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher()
             throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
@@ -137,7 +158,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b_");
+        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw2 - file.robot",
@@ -171,6 +192,29 @@ public class RedKeywordProposalsTest {
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("c_res_kw3 - res.robot");
+    }
+
+    @Test
+    public void onlyResourceKeywordsMatchingGivenInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed() throws Exception {
+        projectProvider.createFile("res2.robot",
+                "*** Keywords ***",
+                "a_res_kw1",
+                "b_res_kw2",
+                "c_res_kw3",
+                "1_res_kw",
+                "2_res_kw",
+                "3_res_kw");
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Settings ***",
+                "Resource  res2.robot",
+                "*** Test Cases ***");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("3_res_kw - res2.robot",
+                "c_res_kw3 - res2.robot");
     }
 
     @Test
@@ -214,7 +258,7 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b_");
+        final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("2");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_res_kw2 - res.robot",
@@ -262,6 +306,30 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
+    public void onlyLibraryKeywordsMatchingGivenInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed() throws Exception {
+        final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1", "b_slib_kw2", "c_slib_kw3",
+                "1_slib_kw", "2_slib_kw", "3_slib_kw"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1", "b_rlib_kw2", "c_rlib_kw3",
+                "1_rlib_kw", "2_rlib_kw", "3_rlib_kw"));
+
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Settings ***",
+                "Library  stdLib",
+                "Library  refLib",
+                "*** Test Cases ***");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("2_rlib_kw - refLib",
+                "2_slib_kw - stdLib",
+                "b_rlib_kw2 - refLib",
+                "b_slib_kw2 - stdLib");
+    }
+
+    @Test
     public void onlyLibraryKeywordsMatchedByGivenMatcherAreProvided_whenProvidingCustomMatcher() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1", "b_slib_kw2", "c_slib_kw3"));
@@ -300,7 +368,10 @@ public class RedKeywordProposalsTest {
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_rlib_kw1 - refLib",
                 "a_slib_kw1 - stdLib",
-                "b_rlib_kw2 - refLib", "b_slib_kw2 - stdLib", "c_rlib_kw3 - refLib", "c_slib_kw3 - stdLib");
+                "b_rlib_kw2 - refLib",
+                "b_slib_kw2 - stdLib",
+                "c_rlib_kw3 - refLib",
+                "c_slib_kw3 - stdLib");
     }
 
     @Test
@@ -320,7 +391,8 @@ public class RedKeywordProposalsTest {
         final Comparator<? super RedKeywordProposal> comparator = firstProposalContaining("b_");
         final List<? extends AssistProposal> proposals = provider.getKeywordProposals("", comparator);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw - stdLib", "a_kw - stdLib");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("b_kw - stdLib",
+                "a_kw - stdLib");
     }
 
     @Test
@@ -364,13 +436,14 @@ public class RedKeywordProposalsTest {
         for (final String bddPrefix : newArrayList("Given", "When", "And", "But", "Then")) {
             final List<? extends AssistProposal> proposals = provider.getKeywordProposals(bddPrefix + " a");
 
-            assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly(
-                    "a_kw - file.robot", "a_res_kw1 - res.robot", "a_slib_kw - stdLib");
+            assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_kw - file.robot",
+                    "a_res_kw1 - res.robot",
+                    "a_slib_kw - stdLib");
         }
     }
 
     @Test
-    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_1() throws Exception {
+    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenLibraryQualifiedNameIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
@@ -391,7 +464,8 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_withAlias() throws Exception {
+    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenLibraryQualifiedNameIsUsed_withAlias()
+            throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
@@ -413,7 +487,8 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_2() throws Exception {
+    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenResourceQualifiedNameIsUsed()
+            throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
@@ -436,7 +511,7 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenQualifiedNameIsUsed_3() throws Exception {
+    public void onlyKeywordProposalsMatchingQualifiedNameAreProvided_whenLocalQualifiedNameIsUsed() throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
         robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw"));
 
@@ -582,7 +657,8 @@ public class RedKeywordProposalsTest {
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("a_kw1 - BuiltIn",
                 "a_lib_kw1 - stdLib",
-                "a_other_kw1 - otherLib", "a_rlib_kw1 - refLib");
+                "a_other_kw1 - otherLib",
+                "a_rlib_kw1 - refLib");
     }
 
     @Test
