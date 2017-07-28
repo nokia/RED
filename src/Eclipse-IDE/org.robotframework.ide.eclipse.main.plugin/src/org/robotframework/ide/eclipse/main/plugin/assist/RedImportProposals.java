@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsPrefixedFirst;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -36,7 +38,7 @@ public class RedImportProposals {
     }
 
     public List<? extends AssistProposal> getImportsProposals(final String userContent) {
-        return getImportsProposals(userContent, AssistProposals.sortedByLabels());
+        return getImportsProposals(userContent, sortedByLabelsPrefixedFirst(userContent));
     }
 
     public List<? extends AssistProposal> getImportsProposals(final String userContent,
