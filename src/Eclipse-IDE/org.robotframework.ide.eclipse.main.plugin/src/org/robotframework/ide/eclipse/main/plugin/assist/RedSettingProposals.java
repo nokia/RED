@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Iterables.transform;
-import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabels;
+import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsPrefixedFirst;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -98,7 +98,7 @@ public class RedSettingProposals {
     }
 
     public List<? extends AssistProposal> getSettingsProposals(final String userContent) {
-        return getSettingsProposals(userContent, sortedByLabels());
+        return getSettingsProposals(userContent, sortedByLabelsPrefixedFirst(userContent));
     }
 
     public List<? extends AssistProposal> getSettingsProposals(final String userContent,

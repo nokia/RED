@@ -81,10 +81,10 @@ public class RedSettingProposalsTest {
     @Test
     public void generalSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
-                .getSettingsProposals("Test", reverseComparator(AssistProposals.sortedByLabels()));
+                .getSettingsProposals("Te", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("Te")));
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Test Timeout", "Test Template",
-                "Test Teardown", "Test Setup");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Suite Teardown", "Suite Setup",
+                "Test Timeout", "Test Template", "Test Teardown", "Test Setup");
     }
 
     @Test
@@ -94,6 +94,15 @@ public class RedSettingProposalsTest {
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Resource", "Test Setup",
                 "Test Teardown", "Test Template", "Test Timeout", "Variables");
+    }
+
+    @Test
+    public void onlyGeneralSettingsProposalsContainingInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed() {
+        final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.GENERAL)
+                .getSettingsProposals("me");
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Metadata", "Documentation",
+                "Test Timeout");
     }
 
     @Test
@@ -123,7 +132,7 @@ public class RedSettingProposalsTest {
     @Test
     public void keywordSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.KEYWORD)
-                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabels()));
+                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("[T")));
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Timeout]", "[Teardown]", "[Tags]");
     }
@@ -164,7 +173,7 @@ public class RedSettingProposalsTest {
     @Test
     public void testCaseSettingsProposalsAreProvidedInOrderInducedByGivenComparator_whenCustomComparatorIsProvided() {
         final List<? extends AssistProposal> proposals = new RedSettingProposals(SettingTarget.TEST_CASE)
-                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabels()));
+                .getSettingsProposals("[T", reverseComparator(AssistProposals.sortedByLabelsPrefixedFirst("[T")));
 
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("[Timeout]", "[Template]",
                 "[Teardown]", "[Tags]");

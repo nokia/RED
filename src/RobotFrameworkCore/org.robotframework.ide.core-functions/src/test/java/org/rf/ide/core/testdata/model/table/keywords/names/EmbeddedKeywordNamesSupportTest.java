@@ -74,8 +74,9 @@ public class EmbeddedKeywordNamesSupportTest {
         assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "xyz"))
                 .hasValue(Range.closedOpen(7, 10));
 
-        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "def"))
-                .hasValue(Range.closedOpen(3, 7));
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("${x}abc", "def")).isNotPresent();
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}xyz", "def")).isNotPresent();
+        assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x}", "def")).isNotPresent();
 
         assertThat(EmbeddedKeywordNamesSupport.containsIgnoreCase("abc${x:[}xyz", "def")).isNotPresent();
     }

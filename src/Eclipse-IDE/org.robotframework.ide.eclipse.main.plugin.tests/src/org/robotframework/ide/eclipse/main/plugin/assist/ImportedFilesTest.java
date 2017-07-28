@@ -66,33 +66,33 @@ public class ImportedFilesTest {
     public void pathsComparatorGivesPrecendenceForPathsInGivenProjectOverPathsFromDifferentProjects() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("project");
 
-        assertThat(compare(comparator, "/project/file.txt", "/other_project/file.txt")).isEqualTo(-1);
-        assertThat(compare(comparator, "/other_project/file.txt", "/project/file.txt")).isEqualTo(1);
+        assertThat(compare(comparator, "/project/file.txt", "/other_project/file.txt")).isNegative();
+        assertThat(compare(comparator, "/other_project/file.txt", "/project/file.txt")).isPositive();
     }
 
     @Test
     public void pathsComparatorGivesPrecendenceForShorterPathsInSameProject() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("project");
 
-        assertThat(compare(comparator, "/project/file.txt", "/project/dir/file.txt")).isEqualTo(-1);
-        assertThat(compare(comparator, "/project/dir/file.txt", "/project/file.txt")).isEqualTo(1);
+        assertThat(compare(comparator, "/project/file.txt", "/project/dir/file.txt")).isNegative();
+        assertThat(compare(comparator, "/project/dir/file.txt", "/project/file.txt")).isPositive();
     }
 
     @Test
     public void pathsComparatorGivesPrecendenceForPathWhichFirstDifferentSegmentIsLexicographicallySmaller() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("a");
 
-        assertThat(compare(comparator, "/a/bc/d.txt", "/a/bd/d.txt")).isEqualTo(-1);
-        assertThat(compare(comparator, "/a/bd/d.txt", "/a/bc/d.txt")).isEqualTo(1);
+        assertThat(compare(comparator, "/a/bc/d.txt", "/a/bd/d.txt")).isNegative();
+        assertThat(compare(comparator, "/a/bd/d.txt", "/a/bc/d.txt")).isPositive();
     }
 
     @Test
     public void pathsComparatorReturnZeroForSamePaths() {
         final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("a");
 
-        assertThat(compare(comparator, "/a", "/a")).isEqualTo(0);
-        assertThat(compare(comparator, "/a/bc", "/a/bc")).isEqualTo(0);
-        assertThat(compare(comparator, "/a/bc/d.txt", "/a/bc/d.txt")).isEqualTo(0);
+        assertThat(compare(comparator, "/a", "/a")).isZero();
+        assertThat(compare(comparator, "/a/bc", "/a/bc")).isZero();
+        assertThat(compare(comparator, "/a/bc/d.txt", "/a/bc/d.txt")).isZero();
     }
 
     private static int compare(final Comparator<IPath> comparator, final String p1, final String p2) {
