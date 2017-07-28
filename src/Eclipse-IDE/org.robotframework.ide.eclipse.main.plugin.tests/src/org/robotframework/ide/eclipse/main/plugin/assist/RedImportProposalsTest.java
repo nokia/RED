@@ -36,7 +36,8 @@ public class RedImportProposalsTest {
         robotModel = new RobotModel();
 
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(Libraries.createStdLibs("StdLib1", "StdLib2", "StdLib3"));
+        robotProject.setStandardLibraries(
+                Libraries.createStdLibs("StdLib1", "StdLib2", "StdLib3", "1StdLib", "2StdLib", "3StdLib"));
     }
 
     @Test
@@ -92,6 +93,25 @@ public class RedImportProposalsTest {
 
         final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("1");
         assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("StdLib1", "res1");
+    }
+
+    @Test
+    public void onlyImportProposalsContainingInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed()
+            throws Exception {
+        final IFile file = projectProvider.createFile("file.robot",
+                "*** Settings ***",
+                "Library  StdLib1",
+                "Library  1StdLib",
+                "Library  RefLib1",
+                "Resource  res1.robot",
+                "Resource  other.robot",
+                "*** Test Cases ***");
+        final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
+
+        final RedImportProposals proposalsProvider = new RedImportProposals(suiteFile);
+
+        final List<? extends AssistProposal> proposals = proposalsProvider.getImportsProposals("1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("1StdLib", "StdLib1", "res1");
     }
 
     @Test

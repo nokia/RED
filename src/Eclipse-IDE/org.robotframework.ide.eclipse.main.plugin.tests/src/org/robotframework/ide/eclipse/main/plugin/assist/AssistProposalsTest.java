@@ -42,10 +42,8 @@ import org.robotframework.red.junit.ProjectProvider;
 
 public class AssistProposalsTest {
 
-    private static final String PROJECT_NAME = AssistProposalsTest.class.getSimpleName();
-
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
+    public static ProjectProvider projectProvider = new ProjectProvider(AssistProposalsTest.class);
 
     private static IFile file;
 
@@ -391,7 +389,20 @@ public class AssistProposalsTest {
 
         Collections.sort(proposals, AssistProposals.sortedByLabels());
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("ABC", "abc1", "xyz", "Xyz1", "ZZZ", "zzz1");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("ABC", "abc1", "xyz", "Xyz1", "ZZZ",
+                "zzz1");
+    }
+
+    @Test
+    public void byLabelsPrefixedFirstComparatorProperlySortsProposals() {
+        final List<AssistProposal> proposals = newArrayList(proposal("xyz"), proposal("Xyz1"), proposal("Cd1"),
+                proposal("zzz1"), proposal("ZZZ"), proposal("CD345"), proposal("ABC"), proposal("abc1"),
+                proposal("cD2"), proposal("abCD"));
+
+        Collections.sort(proposals, AssistProposals.sortedByLabelsPrefixedFirst("cd"));
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Cd1", "cD2", "CD345", "ABC", "abc1",
+                "abCD", "xyz", "Xyz1", "ZZZ", "zzz1");
     }
 
     @Test
