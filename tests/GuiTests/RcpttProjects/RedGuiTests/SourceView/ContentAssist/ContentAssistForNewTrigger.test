@@ -1,0 +1,312 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContentAssistForNewTrigger
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _qngh8HH3Eee3fMF6qScr4Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/28/17 4:46 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "change_trigger-for-content-assist" [val new_key]{
+	// set new trigger for Alt+G
+	get-preferences-menu | click
+	with [get-window Preferences] {
+	    get-tree | select "General/Keys"
+	    get-editbox -after [get-label "Scheme:"] | set-text conten
+	    get-tree -after [get-label "Scheme:"] | select "Content Assist"
+	    get-editbox -after [get-label "Scheme:"] | set-text content
+	    with [get-editbox -after [get-label "Binding:"]] {
+	        set-text $new_key
+	    }
+	    get-button OK | click
+	}
+}
+
+change_trigger-for-content-assist "M3+G"
+//set text for test to open CA in table view
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log\n"
+    + "    \n"
+    + "test 2    \n\n\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    log  8\n"
+    + "    \n"
+    + "*** Variables ***\n"
+    + "${newScalar}     5"
+    
+    
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 4 5
+get-editor "TestFile.robot" | get-text-viewer | key-type "M3+g"
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "[Documentation]" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\[Documentation\\]" 
+    | key-type "TRAVERSE_ESCAPE"
+get-eclipse-window | key-type "M1+s"
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1/log" | click
+wait 300
+
+
+
+
+
+
+
+
+
+
+
+
+//add new line and open CA
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter 
+        wait 300
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M3+g"
+}
+//chrck 2 first items
+with [get-window -class ContentProposalPopup | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "[Documentation]" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "[Setup]" | verify-true
+}
+
+//select teardown
+with [get-window -class ContentProposalPopup | get-table] {
+    select "\\[Documentation\\]" | key-type Down
+    select "\\[Setup\\]" | key-type Down
+    select "\\[Tags\\]" | key-type Down
+    select "\\[Teardown\\]" | key-type Enter
+    click -default
+}
+//go to second cell and type cat to filter
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        set-focus
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text cat
+        key-type "M3+g"
+        key-type Enter
+        wait 200
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+//add new line in kw
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw/log" | click
+wait 300
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+        wait 200
+        key-type Enter
+    }
+    //add kw Continue For Loop If
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "M3+g"
+		key-type Down -times 16       
+        key-type Enter
+        wait 200
+        key-type Enter
+    }
+    //add None shall pass using filtering
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text non
+        key-type "M3+g"
+        wait 200
+        key-type Enter
+   		wait 200
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Variables | click
+}
+get-view Outline | get-tree | select "TestFile.robot/Variables/newScalar" | click
+
+wait 200
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type Right
+        key-type Enter
+    }
+    //add \n using CA
+    with [get-editbox -after [get-label Variables] -index 1] {
+        key-type "M3+g"
+        key-type Down -times 4    
+        key-type Enter 
+        wait 300
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log\n"
+    + "    [Teardown]    Catenate\n"
+    + "test 2\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    log  8\n"
+    + "    Continue For Loop If    None Shall Pass\n"
+    + "*** Variables ***\n"
+    + "${newScalar}     5\n"
+    + "${var}    ${\\n"
+    + "}" | verify-true
+
+    
+change_trigger-for-content-assist "9"
+
+
+
+
+
+//open Ca by pressing 9 - the restart isnot required
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 9 44
+    key-type Enter
+    type-text 9
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | get-property "getItems().TableItem[0].getText()" | equals "[Arguments]" | verify-true
+
+
+//check tat label is old
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-label "Press M3+G to show Keywords proposals" 
+    | get-property caption | equals "Press M3+G to show Keywords proposals" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\[Arguments\\]" 
+    | key-type "TRAVERSE_ESCAPE"
+
+//save and close to have new labels    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+get-view Outline | click
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//open CA and chceck label
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 10 5
+    type-text 9
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-label "Press 9 to show Keywords proposals" 
+    | get-property caption | equals "Press 9 to show Keywords proposals" | verify-true
+
+//add [Arg]
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\[Arguments\\]" | click 
+    -default
+    
+//save file and go to table view    
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 12 10
+        key-type "M1+s"
+        set-caret-pos 4 21
+        hover-text 4 23
+        key-type F4
+    }
+    //add new KW convert to bolean
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Up
+        key-type Right -times 2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+    	key-type 9
+    	key-type Down -times 6
+        key-type Enter
+        wait 300
+        key-type Enter 
+    }
+}
+
+//check deocrato if is with new name
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
+    | get-property "decorators[0].description" | equals "Press 9 for content assist" | verify-true
+    
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+
+change_trigger-for-content-assist "P"
+
+
+
+
+
+//add kw Contiunue if loop
+with [get-editor "TestFile.robot"] {
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+		key-type "p"
+		wait 300
+		key-type Down -times 3
+        key-type Enter
+        wait 300
+        key-type Enter
+    }
+}
+//add @emty
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+    	key-type "p"
+        key-type Up -times 4
+        key-type Enter
+        wait 300
+        key-type Enter
+    }
+}
+//check if new label is shown
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
+    | get-property "decorators[0].description" | equals "Press P for content assist" | verify-true
+    
+//go to source    
+get-editor "TestFile.robot" |get-editbox -after [get-label "Test Cases"] -index 1 |key-type "TRAVERSE_ESCAPE"
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Left
+        key-type F4
+    }
+    with [get-text-viewer] {
+        key-type End
+        type-text "  p"
+        wait 300
+        key-type Enter
+    }
+}
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log\n"
+    + "    [Teardown]    Catenate    Convert To Boolean    Continue For Loop    @{EMPTY}  Call Method    object    method_name    \n"
+    + "test 2\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    log  8\n"
+    + "    Continue For Loop If    None Shall Pass\n"
+    + "    [Arguments]\n"
+    + "*** Variables ***\n"
+    + "${newScalar}     5\n"
+    + "${var}    ${\\n"
+    + "}" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
