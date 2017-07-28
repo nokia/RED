@@ -24,33 +24,41 @@ public class EmbeddedKeywordNamesSupport {
     }
 
     /**
-     * @return optional first range in definition which matches with given occurrence
+     * @return an Optional describing first range in definition which matches with given occurrence,
+     *         or an empty Optional if no match or only embedded variable matches
      */
     public static Optional<Range<Integer>> containsIgnoreCase(final String definitionName,
             final String occurrenceName) {
         final int occurrenceIndex = definitionName.toLowerCase().indexOf(occurrenceName.toLowerCase());
         if (occurrenceIndex >= 0) {
             return Optional.of(Range.closedOpen(occurrenceIndex, occurrenceIndex + occurrenceName.length()));
-        } else if (definitionName.contains("$")) {
-            final RangeSet<Integer> varRanges = findEmbeddedArgumentsRanges(definitionName);
+        } else if (definitionName.indexOf('$') == -1) {
+            return Optional.empty();
+        }
 
-            int lowerIndex = 0;
-            while (lowerIndex < definitionName.length()) {
-                int upperIndex = definitionName.length();
-                while (lowerIndex <= upperIndex) {
-                    final String shortenedDefinition = definitionName.substring(lowerIndex, upperIndex);
-                    if (matchesIgnoreCase(shortenedDefinition, occurrenceName)) {
-                        return Optional.of(Range.closedOpen(lowerIndex, upperIndex));
-                    }
+        final RangeSet<Integer> varRanges = findEmbeddedArgumentsRanges(definitionName);
 
-                    upperIndex--;
-                    if (varRanges.contains(upperIndex)) {
-                        final Range<Integer> range = varRanges.rangeContaining(upperIndex);
-                        upperIndex = range.lowerEndpoint();
-                    }
+        int lowerIndex = 0;
+        while (lowerIndex < definitionName.length()) {
+            int upperIndex = definitionName.length();
+            while (lowerIndex <= upperIndex) {
+                if (lowerIndex < upperIndex && varRanges.encloses(Range.closedOpen(lowerIndex, upperIndex - 1))) {
+                    // we do not want to match variable only
+                    return Optional.empty();
                 }
-                lowerIndex++;
+
+                final String shortenedDefinition = definitionName.substring(lowerIndex, upperIndex);
+                if (matchesIgnoreCase(shortenedDefinition, occurrenceName)) {
+                    return Optional.of(Range.closedOpen(lowerIndex, upperIndex));
+                }
+
+                upperIndex--;
+                if (varRanges.contains(upperIndex)) {
+                    final Range<Integer> range = varRanges.rangeContaining(upperIndex);
+                    upperIndex = range.lowerEndpoint();
+                }
             }
+            lowerIndex++;
         }
 
         return Optional.empty();

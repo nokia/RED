@@ -181,6 +181,23 @@ public class AssistProposals {
         };
     }
 
+    public static Comparator<AssistProposal> sortedByLabelsPrefixedFirst(final String prefix) {
+        return new Comparator<AssistProposal>() {
+
+            @Override
+            public int compare(final AssistProposal proposal1, final AssistProposal proposal2) {
+                final String lowerCasePrefix = prefix.toLowerCase();
+                final boolean isPrefixed1 = proposal1.getLabel().toLowerCase().startsWith(lowerCasePrefix);
+                final boolean isPrefixed2 = proposal2.getLabel().toLowerCase().startsWith(lowerCasePrefix);
+                final int result = Boolean.compare(isPrefixed2, isPrefixed1);
+                if (result != 0) {
+                    return result;
+                }
+                return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+            }
+        };
+    }
+
     public static Comparator<RedVariableProposal> sortedByTypesAndOrigin() {
         final List<Character> typesOrder = newArrayList('$', '@', '&');
         return new Comparator<RedVariableProposal>() {
@@ -193,12 +210,11 @@ public class AssistProposals {
                 if (type1 == type2) {
                     final boolean isBuiltIn1 = proposal1.getOrigin() == VariableOrigin.BUILTIN;
                     final boolean isBuiltIn2 = proposal2.getOrigin() == VariableOrigin.BUILTIN;
-
-                    if (isBuiltIn1 == isBuiltIn2) {
-                        return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
-                    } else {
-                        return isBuiltIn1 ? 1 : -1;
+                    final int result = Boolean.compare(isBuiltIn1, isBuiltIn2);
+                    if (result != 0) {
+                        return result;
                     }
+                    return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
 
                 } else {
                     return Integer.compare(typesOrder.indexOf(type1), typesOrder.indexOf(type2));
