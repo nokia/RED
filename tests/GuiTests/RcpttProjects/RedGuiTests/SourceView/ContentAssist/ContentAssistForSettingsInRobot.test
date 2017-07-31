@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ZB4rYGuFEeaVB7Q9BJdfQg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 12:37 PM
+Save-Time: 7/31/17 11:04 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,6 +21,7 @@ with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 1
     type-text var
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter 
     wait 300
     key-type Enter 
@@ -72,6 +73,7 @@ with [get-editor "test.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
     type-text var
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
     key-type Down
     key-type Enter
@@ -97,6 +99,7 @@ with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 4 1
     type-text var
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
     key-type Down -times 2
     key-type Enter
