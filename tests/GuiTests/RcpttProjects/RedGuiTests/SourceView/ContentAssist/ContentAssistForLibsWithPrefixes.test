@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Xe9eMMbZEeaVRsIP7EWHyA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/21/17 11:40 AM
+Save-Time: 7/31/17 10:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -153,8 +153,9 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     key-type "M1+SPACE"
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "many_classes.Geography" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Log Many - BuiltIn" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "many_classes.Geography" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${/}" | verify-true
 }
 //add  many_classes.Geography.Geo    param2
 with [get-editor "lib_with_variable.robot"] {
@@ -162,6 +163,7 @@ with [get-editor "lib_with_variable.robot"] {
     with [get-text-viewer] {
         key-type ESC
         key-type "M1+SPACE"
+        key-type Down
 	    key-type Enter 
 	    wait 300
 	    key-type Enter
@@ -208,10 +210,13 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
 //check if prefixes from resource are visible
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property "getItems().TableItem[0].getText()" | equals "res from res 2 - res 2.tsv" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals Reserved | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "res 2" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals resource1 | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Import Resource - BuiltIn" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "kw from resource 1 - resource1.robot" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "second res - resource1.robot" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals Reserved | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "res 2" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals resource1 | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "${/}" | verify-true
 }
 with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     key-type Esc
@@ -225,7 +230,7 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
     //add resource with args
     type-text res
     key-type "M1+SPACE"
-    key-type Down -times 3
+    key-type Down -times 6
     key-type Enter
     key-type Down
     key-type Enter
