@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _88Mx8J2SEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 1/31/17 12:31 PM
+Save-Time: 7/31/17 10:27 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -26,6 +26,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     key-type Enter
     type-text Va
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
     wait 500
 }
@@ -76,6 +77,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     key-type Enter
     type-text var
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
     wait 500
     key-type Down -times 2
@@ -84,6 +86,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     //space in name/var here .py
     type-text Var
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
     wait 500
     key-type Down -times 7
@@ -92,6 +95,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     //space in name/ def.py
     type-text Var
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
     wait 200
 }
