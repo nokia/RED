@@ -283,12 +283,12 @@ public class DocumentUtilities {
         }
     }
 
-    public static String getPrefix(final IDocument document, final Optional<IRegion> optional, final int offset)
+    public static String getPrefix(final IDocument document, final Optional<IRegion> region, final int offset)
             throws BadLocationException {
-        if (!optional.isPresent()) {
+        if (!region.isPresent()) {
             return "";
         }
-        return document.get(optional.get().getOffset(), offset - optional.get().getOffset());
+        return document.get(region.get().getOffset(), offset - region.get().getOffset());
     }
 
     public static int getNumberOfCellSeparators(final String lineContentBefore, final boolean isTsv) {
