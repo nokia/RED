@@ -7,14 +7,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _YK-bkHH_EeeOFuKpK9KgAg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/26/17 3:58 PM
+Save-Time: 7/31/17 10:13 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-// open content assist when preferenc eis not selected
+// open content assist when preference is not selected
 get-view "Project Explorer" | get-tree | select "LibsProjects/TestFile.robot" | double-click
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 3 5
@@ -33,27 +33,27 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
 //write RE to check if only KW from built-in are shown
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 4 5
-    type-text RE
+    type-text RET
     key-type "M1+SPACE"
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "Regexp Escape - BuiltIn" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Reload Library - BuiltIn" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "Remove Tags - BuiltIn" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "Repeat Keyword - BuiltIn" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "Replace Variables - BuiltIn" | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "Return From Keyword - BuiltIn" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "Return From Keyword If - BuiltIn" | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals Reserved | verify-true
-    get-property "getItems().TableItem[8].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "Return From Keyword - BuiltIn" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "Return From Keyword If - BuiltIn" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "Run Keyword And Return - BuiltIn" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "Run Keyword And Return If - BuiltIn" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "Run Keyword And Return Status - BuiltIn" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "${:}" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Regexp Escape - BuiltIn" 
+
+
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Return From Keyword - BuiltIn"
     | key-type "TRAVERSE_ESCAPE"
     
 // add spaces    
 with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 4 6
-    select-range 4 7 3 1
+    set-caret-pos 4 7
+    select-range 4 8 4 5
     key-type BackSpace
     type-text "    "
     key-type "M1+s"
@@ -62,7 +62,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 
 
-//select prefernce
+//select preference
 get-preferences-menu | click
 with [get-window Preferences] {
     get-tree | select "Robot Framework/Editor/Content Assist"
@@ -101,7 +101,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "test\n"
     + "    My Lib" | verify-true
     
-//add re..    
+//add Remove Duplicates    
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 6 11
     key-type "NUMPAD_ENTER" "\\u000D"
@@ -131,7 +131,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     wait 300
     key-type Down
     key-type "NUMPAD_ENTER" "\\u000D"
-    select-range 10 25 10 29
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Library    DateTime\n"
