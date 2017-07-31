@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cr2voLk0EeWzJthH3JoEWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/21/17 11:55 AM
+Save-Time: 7/31/17 9:43 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,6 +25,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     //add variables
     type-text Va
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
 }
 //check variables files
@@ -56,6 +57,7 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
     type-text V
     key-type "M1+SPACE"
+    key-type Down
     key-type Enter
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "getVar.py" 
