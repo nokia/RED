@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _L2Q5ICQVEeeO6fW46SeMzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/20/17 10:32 AM
+Save-Time: 7/31/17 9:59 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -81,7 +81,7 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     wait 200
     key-type Down
     key-type Enter
-    type-text al
+    type-text ali
 }
 // verify content assist for library alias
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
