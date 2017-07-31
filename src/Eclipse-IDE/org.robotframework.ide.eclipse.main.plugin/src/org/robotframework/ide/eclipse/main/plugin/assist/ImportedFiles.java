@@ -5,10 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -25,28 +26,17 @@ class ImportedFiles {
 
     static List<IFile> getPythonFiles() {
         final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-        return getMatchingFiles(wsRoot, new FileMatcher() {
-
-            @Override
-            public boolean matches(final IFile file) {
-                return "py".equalsIgnoreCase(file.getFileExtension());
-            }
-        });
+        return getMatchingFiles(wsRoot, file -> "py".equalsIgnoreCase(file.getFileExtension()));
     }
 
     static List<IFile> getResourceFiles(final IFile importingFile) {
         final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-        return getMatchingFiles(wsRoot, new FileMatcher() {
-
-            @Override
-            public boolean matches(final IFile file) {
-                return !file.equals(importingFile) && ASuiteFileDescriber.isResourceFile(file);
-            }
-        });
+        return getMatchingFiles(wsRoot,
+                file -> !file.equals(importingFile) && ASuiteFileDescriber.isResourceFile(file));
     }
 
-    private static List<IFile> getMatchingFiles(final IResource wsRoot, final FileMatcher matcher) {
-        final List<IFile> matchingFiles = newArrayList();
+    private static List<IFile> getMatchingFiles(final IResource wsRoot, final Predicate<IFile> matcher) {
+        final List<IFile> matchingFiles = new ArrayList<>();
         try {
             wsRoot.accept(new IResourceVisitor() {
 
@@ -54,7 +44,7 @@ class ImportedFiles {
                 public boolean visit(final IResource resource) throws CoreException {
                     if (resource.getType() == IResource.FILE) {
                         final IFile file = (IFile) resource;
-                        if (matcher.matches(file)) {
+                        if (matcher.test(file)) {
                             matchingFiles.add(file);
                         }
                     }
@@ -67,8 +57,8 @@ class ImportedFiles {
         return matchingFiles;
     }
 
-    static Comparator<IFile> createComparator(final String projectFolderName) {
-        final Comparator<IPath> pathsComparator = createPathsComparator(projectFolderName);
+    static Comparator<IFile> createComparator(final String prefix, final String projectFolderName) {
+        final Comparator<IPath> pathsComparator = createPathsComparator(prefix, projectFolderName);
         return new Comparator<IFile>() {
 
             @Override
@@ -79,42 +69,48 @@ class ImportedFiles {
     }
 
     @VisibleForTesting
-    static Comparator<IPath> createPathsComparator(final String projectFolderName) {
+    static Comparator<IPath> createPathsComparator(final String prefix, final String projectFolderName) {
         return new Comparator<IPath>() {
 
             @Override
             public int compare(final IPath path1, final IPath path2) {
 
-                if (path1.segment(0).equals(projectFolderName) && !path2.segment(0).equals(projectFolderName)) {
-                    return -1;
-                } else if (!path1.segment(0).equals(projectFolderName) && path2.segment(0).equals(projectFolderName)) {
-                    return 1;
-                } else {
-                    int i = 0;
-                    for (; i < path1.segmentCount() && i < path2.segmentCount(); i++) {
-                        if (i == path1.segmentCount() - 1 && i < path2.segmentCount() - 1) {
-                            return -1;
-                        } else if (i < path1.segmentCount() - 1 && i == path2.segmentCount() - 1) {
-                            return 1;
-                        }
-
-                        final int segmentResult = path1.segment(i).compareTo(path2.segment(i));
-                        if (segmentResult != 0) {
-                            return segmentResult;
-                        }
-                    }
-
-                    if (i >= path1.segmentCount() && i >= path2.segmentCount()) {
-                        return 0;
-                    }
-                    return i < path1.segmentCount() ? -1 : 1;
+                final boolean isFromProject1 = path1.segment(0).equals(projectFolderName);
+                final boolean isFromProject2 = path2.segment(0).equals(projectFolderName);
+                final int isFromProjectResult = Boolean.compare(isFromProject2, isFromProject1);
+                if (isFromProjectResult != 0) {
+                    return isFromProjectResult;
                 }
+
+                if (path1.segmentCount() > 1 && path2.segmentCount() > 1) {
+                    final String lowerCasePrefix = prefix.toLowerCase();
+                    final boolean isPrefixed1 = path1.segment(1).toLowerCase().startsWith(lowerCasePrefix);
+                    final boolean isPrefixed2 = path2.segment(1).toLowerCase().startsWith(lowerCasePrefix);
+                    final int isPrefixedResult = Boolean.compare(isPrefixed2, isPrefixed1);
+                    if (isPrefixedResult != 0) {
+                        return isPrefixedResult;
+                    }
+                }
+
+                int i = 0;
+                for (; i < path1.segmentCount() && i < path2.segmentCount(); i++) {
+                    if (i == path1.segmentCount() - 1 && i < path2.segmentCount() - 1) {
+                        return -1;
+                    } else if (i < path1.segmentCount() - 1 && i == path2.segmentCount() - 1) {
+                        return 1;
+                    }
+
+                    final int segmentResult = path1.segment(i).compareTo(path2.segment(i));
+                    if (segmentResult != 0) {
+                        return segmentResult;
+                    }
+                }
+
+                if (i >= path1.segmentCount() && i >= path2.segmentCount()) {
+                    return 0;
+                }
+                return i < path1.segmentCount() ? -1 : 1;
             }
         };
-    }
-
-    private interface FileMatcher {
-
-        boolean matches(IFile file);
     }
 }
