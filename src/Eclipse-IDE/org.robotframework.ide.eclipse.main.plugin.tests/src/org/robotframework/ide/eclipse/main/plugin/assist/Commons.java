@@ -41,13 +41,13 @@ class Commons {
 
             @Override
             public int compare(final AssistProposal p1, final AssistProposal p2) {
-                if (p1.equals(p2)) {
-                    return 0;
-                } else if (p1.getLabel().contains(toContain)) {
-                    return -1;
-                } else {
-                    return 1;
+                final boolean contains1 = p1.getLabel().contains(toContain);
+                final boolean contains2 = p2.getLabel().contains(toContain);
+                final int result = Boolean.compare(contains2, contains1);
+                if (result != 0) {
+                    return result;
                 }
+                return Integer.compare(p1.getLabel().indexOf(toContain), p2.getLabel().indexOf(toContain));
             }
         };
     }

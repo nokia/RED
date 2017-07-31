@@ -856,7 +856,7 @@ public class RedVariableProposalsTest {
         final Comparator<? super RedVariableProposal> comparator = firstProposalContaining("b");
         final List<? extends AssistProposal> proposals = provider.getVariableProposals("", comparator, 100);
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_local}", "${b_arg}", "${a_arg}",
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("${b_arg}", "${b_local}", "${a_arg}",
                 "${a_local}");
     }
 
