@@ -49,7 +49,7 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
+            final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
         final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
         final boolean isInLastCell = atTheEndOfLine ? true
@@ -58,17 +58,17 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
 
         final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent);
         final List<? extends AssistProposal> wordsProposals = new RedWithNameProposals(wordsPredicate)
-                .getWithNameProposals(prefix);
+                .getWithNameProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : wordsProposals) {
             final List<String> args = isInLastCell ? proposal.getArguments() : new ArrayList<String>();
             final String contentSuffix = args.isEmpty() ? "" : (separator + Joiner.on(separator).join(args));
 
-            final Position toReplace = new Position(offset - prefix.length(), cellLength);
+            final Position toReplace = new Position(offset - userContent.length(), cellLength);
             final Position toSelect = contentSuffix.equals("")
-                    ? new Position(offset - prefix.length() + proposal.getContent().length(), 0)
-                    : new Position(offset - prefix.length() + proposal.getContent().length() + separator.length(),
+                    ? new Position(offset - userContent.length() + proposal.getContent().length(), 0)
+                    : new Position(offset - userContent.length() + proposal.getContent().length() + separator.length(),
                             proposal.getArguments().get(0).length());
 
             final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, toSelect);
@@ -77,7 +77,6 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
         }
         return proposals;
     }
-
 
     private AssistProposalPredicate<String> createPredicate(final String lineContentTillOffset) {
         final int separators = DocumentUtilities.getNumberOfCellSeparators(lineContentTillOffset, assist.isTsvFile());

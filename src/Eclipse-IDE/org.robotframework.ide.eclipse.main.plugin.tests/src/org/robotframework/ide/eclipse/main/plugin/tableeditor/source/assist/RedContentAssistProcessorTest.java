@@ -202,7 +202,7 @@ public class RedContentAssistProcessorTest {
 
             @Override
             protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-                    final int cellLength, final String prefix, final boolean atTheEndOfLine)
+                    final int cellLength, final String userContent, final boolean atTheEndOfLine)
                     throws BadLocationException {
                 return foundProposals;
             }

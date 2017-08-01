@@ -13,29 +13,28 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 
 /**
  * @author mmarzec
- *
  */
 public class SuiteSourceContextInformationValidator
         implements IContextInformationValidator, IContextInformationPresenter {
-	
-	private ITextViewer viewer;
-	
-	private int currentLine;
-	private int currentOffset;
 
-	@Override
-	public void install(final IContextInformation contextInformation, final ITextViewer viewer, final int offset) {
-		this.viewer = viewer;
-		
-		this.currentLine = viewer.getTextWidget().getLineAtOffset(offset);
+    private ITextViewer viewer;
+
+    private int currentLine;
+
+    private int currentOffset;
+
+    @Override
+    public void install(final IContextInformation contextInformation, final ITextViewer viewer, final int offset) {
+        this.viewer = viewer;
+        this.currentLine = viewer.getTextWidget().getLineAtOffset(offset);
         this.currentOffset = offset;
-	}
+    }
 
-	@Override
-	public boolean isContextInformationValid(final int offset) {
+    @Override
+    public boolean isContextInformationValid(final int offset) {
         final int line = viewer.getTextWidget().getLineAtOffset(offset);
         return line == currentLine && offset >= currentOffset;
-	}
+    }
 
     @Override
     public boolean updatePresentation(final int offset, final TextPresentation presentation) {

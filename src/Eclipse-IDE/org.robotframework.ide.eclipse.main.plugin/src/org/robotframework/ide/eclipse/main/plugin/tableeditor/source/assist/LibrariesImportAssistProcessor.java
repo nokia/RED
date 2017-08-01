@@ -22,12 +22,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
-import com.google.common.base.Joiner;
-
-
 /**
  * @author Michal Anglart
- *
  */
 public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
 
@@ -54,17 +50,18 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
+            final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
         final String separator = assist.getSeparatorToFollow();
 
         final List<AssistProposal> libProposals = new ArrayList<>();
 
         final List<? extends AssistProposal> librariesProposals = new RedLibraryProposals(assist.getModel())
-                .getLibrariesProposals(prefix);
+                .getLibrariesProposals(userContent);
 
         final List<? extends AssistProposal> libFilesProposals = RedFileLocationProposals
-                .create(SettingsGroup.LIBRARIES, assist.getModel()).getFilesLocationsProposals(prefix);
+                .create(SettingsGroup.LIBRARIES, assist.getModel())
+                .getFilesLocationsProposals(userContent);
 
         libProposals.addAll(librariesProposals);
         libProposals.addAll(libFilesProposals);
@@ -72,11 +69,9 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal libProposal : libProposals) {
             final List<String> args = libProposal.getArguments();
-            final String additionalContent = atTheEndOfLine
-                    ? separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args))
-                    : "";
+            final String additionalContent = atTheEndOfLine ? separator + String.join(separator, args) : "";
             final DocumentModification modification = new DocumentModification(additionalContent,
-                    new Position(offset - prefix.length(), cellLength));
+                    new Position(offset - userContent.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(libProposal, modification));
         }
