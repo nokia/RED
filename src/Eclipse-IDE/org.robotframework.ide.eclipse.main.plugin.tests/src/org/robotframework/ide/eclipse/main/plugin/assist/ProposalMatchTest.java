@@ -55,16 +55,39 @@ public class ProposalMatchTest {
 
     @Test
     public void singleRangeMatchMappingProperly() {
-        final ProposalMatch match = new ProposalMatch(Range.closedOpen(5, 10));
+        final ProposalMatch match = new ProposalMatch(Range.closedOpen(6, 9));
 
-        assertThat(match.mapAndShiftToFragment(0, 3)).isNotPresent();
         assertThat(match.mapAndShiftToFragment(0, 4)).isNotPresent();
-        assertThat(match.mapAndShiftToFragment(0, 5)).hasValue(new ProposalMatch(Range.closedOpen(5, 5)));
-        assertThat(match.mapAndShiftToFragment(2, 5)).hasValue(new ProposalMatch(Range.closedOpen(3, 5)));
-        assertThat(match.mapAndShiftToFragment(4, 8)).hasValue(new ProposalMatch(Range.closedOpen(1, 6)));
-        assertThat(match.mapAndShiftToFragment(6, 3)).hasValue(new ProposalMatch(Range.closedOpen(0, 3)));
-        assertThat(match.mapAndShiftToFragment(6, 8)).hasValue(new ProposalMatch(Range.closedOpen(0, 4)));
-        assertThat(match.mapAndShiftToFragment(10, 5)).hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
+        assertThat(match.mapAndShiftToFragment(0, 5)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(0, 6)).hasValue(new ProposalMatch(Range.closedOpen(6, 6)));
+        assertThat(match.mapAndShiftToFragment(2, 6)).hasValue(new ProposalMatch(Range.closedOpen(4, 6)));
+        assertThat(match.mapAndShiftToFragment(5, 8)).hasValue(new ProposalMatch(Range.closedOpen(1, 4)));
+        assertThat(match.mapAndShiftToFragment(5, 3)).hasValue(new ProposalMatch(Range.closedOpen(1, 3)));
+        assertThat(match.mapAndShiftToFragment(7, 1)).hasValue(new ProposalMatch(Range.closedOpen(0, 1)));
+        assertThat(match.mapAndShiftToFragment(7, 8)).hasValue(new ProposalMatch(Range.closedOpen(0, 2)));
+        assertThat(match.mapAndShiftToFragment(9, 5)).hasValue(new ProposalMatch(Range.closedOpen(0, 0)));
         assertThat(match.mapAndShiftToFragment(15, 5)).isNotPresent();
+    }
+
+    @Test
+    public void multipleRangeMatchMappingProperly() {
+        final ProposalMatch match = new ProposalMatch(Range.closedOpen(2, 3), Range.closedOpen(5, 7),
+                Range.closedOpen(10, 15));
+
+        assertThat(match.mapAndShiftToFragment(0, 1)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(0, 4)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(0, 9)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(0, 10))
+                .hasValue(new ProposalMatch(Range.closedOpen(2, 3), Range.closedOpen(5, 7), Range.closedOpen(10, 10)));
+        assertThat(match.mapAndShiftToFragment(1, 10))
+                .hasValue(new ProposalMatch(Range.closedOpen(1, 2), Range.closedOpen(4, 6), Range.closedOpen(9, 10)));
+        assertThat(match.mapAndShiftToFragment(2, 14))
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 1), Range.closedOpen(3, 5), Range.closedOpen(8, 13)));
+        assertThat(match.mapAndShiftToFragment(3, 10))
+                .hasValue(new ProposalMatch(Range.closedOpen(0, 0), Range.closedOpen(2, 4), Range.closedOpen(7, 10)));
+        assertThat(match.mapAndShiftToFragment(4, 8)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(4, 12)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(8, 8)).isNotPresent();
+        assertThat(match.mapAndShiftToFragment(20, 5)).isNotPresent();
     }
 }
