@@ -43,7 +43,7 @@ public class VariablesAssistProcessorTest {
     @BeforeClass
     public static void beforeSuite() throws Exception {
         robotModel = new RobotModel();
-        
+
         projectProvider.createFile("res.robot", "*** Keywords ***", "kw1", "kw2");
 
         projectProvider.createFile("suite.robot",
@@ -256,7 +256,7 @@ public class VariablesAssistProcessorTest {
 
     @Test
     public void allProposalsAreProvided_whenThereIsNoActualPrefixVariable() throws Exception {
-        final int offset = 33;
+        final int offset = 32;
 
         final ITextViewer viewer = mock(ITextViewer.class);
         final IDocument document = spy(documentFromSuiteFile("suite.robot"));
@@ -276,16 +276,16 @@ public class VariablesAssistProcessorTest {
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
-                new Document("*** Test Cases ***", "case", "  call  a${a}bc  d${bcdef", "*** Keywords ***", "keyword",
+                new Document("*** Test Cases ***", "case", "  call  ${a}  d${bcdef", "*** Keywords ***", "keyword",
                         "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
                         "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"),
-                new Document("*** Test Cases ***", "case", "  call  a${b}bc  d${bcdef", "*** Keywords ***", "keyword",
+                new Document("*** Test Cases ***", "case", "  call  ${b}  d${bcdef", "*** Keywords ***", "keyword",
                         "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
                         "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"),
-                new Document("*** Test Cases ***", "case", "  call  a@{c}bc  d${bcdef", "*** Keywords ***", "keyword",
+                new Document("*** Test Cases ***", "case", "  call  @{c}  d${bcdef", "*** Keywords ***", "keyword",
                         "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
                         "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"),
-                new Document("*** Test Cases ***", "case", "  call  a&{d}bc  d${bcdef", "*** Keywords ***", "keyword",
+                new Document("*** Test Cases ***", "case", "  call  &{d}  d${bcdef", "*** Keywords ***", "keyword",
                         "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
                         "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
     }
@@ -309,10 +309,9 @@ public class VariablesAssistProcessorTest {
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
-        assertThat(transformedDocuments).containsOnly(
-                new Document("*** Test Cases ***", "case", "  call  abc  d${b}cdef", "*** Keywords ***", "keyword",
-                        "  call  abc  d${abc}d", "*** Variables ***", "${a}  1", "${b}  2", "@{c}  1  2  3",
-                        "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
+        assertThat(transformedDocuments).containsOnly(new Document("*** Test Cases ***", "case",
+                "  call  abc  d${b}cdef", "*** Keywords ***", "keyword", "  call  abc  d${abc}d", "*** Variables ***",
+                "${a}  1", "${b}  2", "@{c}  1  2  3", "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
     }
 
     @Test
@@ -340,6 +339,54 @@ public class VariablesAssistProcessorTest {
     }
 
     @Test
+    public void onlyMatchingProposalsAreProvided_whenThereIsNoActualPrefixVariable_1() throws Exception {
+        final int offset = 33;
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+
+        when(viewer.getDocument()).thenReturn(document);
+        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+
+        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
+
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+
+        assertThat(proposals).hasSize(1).haveExactly(1,
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
+
+        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
+        assertThat(transformedDocuments).containsOnly(new Document("*** Test Cases ***", "case",
+                "  call  ${a}  d${bcdef", "*** Keywords ***", "keyword", "  call  abc  d${abc}d", "*** Variables ***",
+                "${a}  1", "${b}  2", "@{c}  1  2  3", "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
+    }
+
+    @Test
+    public void onlyMatchingProposalsAreProvided_whenThereIsNoActualPrefixVariable_2() throws Exception {
+        final int offset = 85;
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        final IDocument document = spy(documentFromSuiteFile("suite.robot"));
+
+        when(viewer.getDocument()).thenReturn(document);
+        when(document.getContentType(offset)).thenReturn(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+
+        final RobotSuiteFile model = robotModel.createSuiteFile(projectProvider.getFile("suite.robot"));
+        final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
+
+        final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
+
+        assertThat(proposals).hasSize(1).haveExactly(1,
+                proposalWithImage(ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage())));
+
+        final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
+        assertThat(transformedDocuments).containsOnly(new Document("*** Test Cases ***", "case",
+                "  call  abc  d${bcdef", "*** Keywords ***", "keyword", "  call  abc  &{d}", "*** Variables ***",
+                "${a}  1", "${b}  2", "@{c}  1  2  3", "&{d}  k1=v1  k2=v2", "*** Settings ***", "Metadata  abc  def"));
+    }
+
+    @Test
     public void allProposalsFromKeywordArgumentsAreProvided_whenInsideTheKeyword_1() throws Exception {
         final int offset = 59;
 
@@ -359,9 +406,9 @@ public class VariablesAssistProcessorTest {
 
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
-                new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  ${x}abc  def  ",
+                new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  ${x}  def  ",
                         "*** Test Cases ***"),
-                new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  ${y}abc  def  ",
+                new Document("*** Keywords ***", "keyword", "  [Arguments]  ${x}  ${y}", "  call  ${y}  def  ",
                         "*** Test Cases ***"));
     }
 

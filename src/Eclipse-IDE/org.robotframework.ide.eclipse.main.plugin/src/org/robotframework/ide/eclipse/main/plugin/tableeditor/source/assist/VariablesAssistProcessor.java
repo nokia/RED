@@ -64,14 +64,21 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
         final Optional<IRegion> liveVarRegion = DocumentUtilities.findLiveVariable(document, assist.isTsvFile(),
                 offset);
-        final String actualPrefix = DocumentUtilities.getPrefix(document, liveVarRegion, offset);
+        final String liveVarPrefix = DocumentUtilities.getPrefix(document, liveVarRegion, offset);
 
-        final Optional<IRegion> varRegion = DocumentUtilities.findVariable(document, assist.isTsvFile(), offset);
-        int lengthToReplace;
-        if (varRegion.isPresent()) {
-            lengthToReplace = varRegion.get().getLength();
+        final String actualPrefix;
+        final int lengthToReplace;
+        if (liveVarPrefix.isEmpty()) {
+            actualPrefix = prefix;
+            lengthToReplace = cellLength;
         } else {
-            lengthToReplace = liveVarRegion.isPresent() ? offset - liveVarRegion.get().getOffset() : 0;
+            actualPrefix = liveVarPrefix;
+            final Optional<IRegion> varRegion = DocumentUtilities.findVariable(document, assist.isTsvFile(), offset);
+            if (varRegion.isPresent()) {
+                lengthToReplace = varRegion.get().getLength();
+            } else {
+                lengthToReplace = liveVarRegion.isPresent() ? offset - liveVarRegion.get().getOffset() : 0;
+            }
         }
 
         final int line = DocumentUtilities.getLine(document, offset);
