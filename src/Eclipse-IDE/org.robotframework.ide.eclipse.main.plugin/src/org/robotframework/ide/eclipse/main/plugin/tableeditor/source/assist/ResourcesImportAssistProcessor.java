@@ -20,10 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
 
@@ -50,15 +48,16 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
+            final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
         final List<? extends AssistProposal> varFilesProposals = RedFileLocationProposals
-                .create(SettingsGroup.RESOURCES, assist.getModel()).getFilesLocationsProposals(prefix);
+                .create(SettingsGroup.RESOURCES, assist.getModel())
+                .getFilesLocationsProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : varFilesProposals) {
             final DocumentModification modification = new DocumentModification("",
-                    new Position(offset - prefix.length(), cellLength));
+                    new Position(offset - userContent.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
         }
