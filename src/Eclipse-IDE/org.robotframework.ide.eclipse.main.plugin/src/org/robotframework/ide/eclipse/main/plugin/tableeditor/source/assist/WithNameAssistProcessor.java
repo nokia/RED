@@ -65,13 +65,13 @@ public class WithNameAssistProcessor extends RedContentAssistProcessor {
             final List<String> args = isInLastCell ? proposal.getArguments() : new ArrayList<String>();
             final String contentSuffix = args.isEmpty() ? "" : (separator + Joiner.on(separator).join(args));
 
-            final Position toHighlight = contentSuffix.equals("")
+            final Position toReplace = new Position(offset - prefix.length(), cellLength);
+            final Position toSelect = contentSuffix.equals("")
                     ? new Position(offset - prefix.length() + proposal.getContent().length(), 0)
                     : new Position(offset - prefix.length() + proposal.getContent().length() + separator.length(),
                             proposal.getArguments().get(0).length());
 
-            final DocumentModification modification = new DocumentModification(contentSuffix,
-                    new Position(offset - prefix.length(), cellLength), toHighlight);
+            final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, toSelect);
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
         }
