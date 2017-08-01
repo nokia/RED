@@ -22,10 +22,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
@@ -61,17 +59,18 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
+            final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
         final String additionalContent = atTheEndOfLine ? assist.getSeparatorToFollow() : "";
 
         final List<? extends AssistProposal> settingsProposals = new RedSettingProposals(SettingTarget.GENERAL)
-                .getSettingsProposals(prefix);
+                .getSettingsProposals(userContent);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal settingProposal : settingsProposals) {
             final DocumentModification modification = new DocumentModification(additionalContent,
-                    new Position(offset - prefix.length(), cellLength), shouldActivate(settingProposal.getContent()));
+                    new Position(offset - userContent.length(), cellLength),
+                    shouldActivate(settingProposal.getContent()));
 
             proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));
         }
