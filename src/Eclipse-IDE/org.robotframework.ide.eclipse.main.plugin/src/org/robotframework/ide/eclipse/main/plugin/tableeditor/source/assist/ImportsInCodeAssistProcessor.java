@@ -45,14 +45,14 @@ public class ImportsInCodeAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
+            final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
         final List<? extends AssistProposal> importsProposals = new RedImportProposals(assist.getModel())
-                .getImportsProposals(prefix);
+                .getImportsProposals(userContent);
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : importsProposals) {
             final DocumentModification modification = new DocumentModification("",
-                    new Position(offset - prefix.length(), cellLength), true);
+                    new Position(offset - userContent.length(), cellLength), true);
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
         }

@@ -17,7 +17,6 @@ import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
- *
  */
 public class SuiteSourceAssistantContext {
 
@@ -79,8 +78,11 @@ public class SuiteSourceAssistantContext {
         private final RedPreferences redPreferences;
 
         private boolean isKeywordPrefixAutoAdditionEnabled;
+
         private String separatorToUseInTsv;
+
         private String separatorToUseInRobot;
+
         private char[] autoActivationChars;
 
         AssistPreferences(final RedPreferences redPreferences) {

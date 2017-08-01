@@ -65,10 +65,10 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
+            final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
         final List<RedKeywordProposal> kwProposals = new RedKeywordProposals(assist.getModel())
-                .getKeywordProposals(prefix);
+                .getKeywordProposals(userContent);
 
         final String separator = assist.getSeparatorToFollow();
         final List<ICompletionProposal> proposals = new ArrayList<>();
@@ -78,7 +78,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             final List<String> args = atTheEndOfLine ? getArguments(kwProposal, lineContent) : new ArrayList<>();
             final String contentSuffix = args.isEmpty() ? "" : (separator + String.join(separator, args));
 
-            final Position toReplace = new Position(offset - prefix.length(), cellLength);
+            final Position toReplace = new Position(offset - userContent.length(), cellLength);
 
             final DocumentModification modification = new DocumentModification(contentSuffix, toReplace, () -> {
                 final Collection<IRegion> regionsToLinkedEdit = atTheEndOfLine

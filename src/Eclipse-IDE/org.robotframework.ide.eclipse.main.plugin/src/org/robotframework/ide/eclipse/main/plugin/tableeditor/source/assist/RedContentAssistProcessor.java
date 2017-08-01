@@ -17,7 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 
 /**
  * @author Michal Anglart
- *
  */
 public abstract class RedContentAssistProcessor extends DefaultContentAssistProcessor {
 
@@ -47,10 +46,11 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
             if (shouldShowProposals(document, offset, lineContent)) {
                 final boolean isTsv = assist.isTsvFile();
                 final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
-                final String prefix = DocumentUtilities.getPrefix(document, cellRegion, offset);
-                final int contentLength = cellRegion.isPresent() ? cellRegion.get().getLength() : 0;
+                final int contentLength = cellRegion.map(IRegion::getLength).orElse(0);
+                final String userContent = DocumentUtilities.getPrefix(document, cellRegion, offset);
 
-                return computeProposals(document, offset, contentLength, prefix, isAtTheEndOfLine(document, offset));
+                return computeProposals(document, offset, contentLength, userContent,
+                        isAtTheEndOfLine(document, offset));
             }
         } catch (final BadLocationException e) {
             // we'll return nothing then
@@ -68,7 +68,7 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
             throws BadLocationException;
 
     protected abstract List<? extends ICompletionProposal> computeProposals(IDocument document, final int offset,
-            final int cellLength, final String prefix, boolean isAtTheEndOfLine) throws BadLocationException;
+            final int cellLength, final String userContent, boolean isAtTheEndOfLine) throws BadLocationException;
 
     protected final boolean isInApplicableContentType(final IDocument document, final int offset)
             throws BadLocationException {

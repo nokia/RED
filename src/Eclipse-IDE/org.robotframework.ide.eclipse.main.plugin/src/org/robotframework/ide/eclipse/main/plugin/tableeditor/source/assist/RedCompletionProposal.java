@@ -157,6 +157,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
     @Override
     public IInformationControlCreator getInformationControlCreator() {
         return additionalInfoAsHtml ? null : new IInformationControlCreator() {
+
             @Override
             public IInformationControl createInformationControl(final Shell parent) {
                 return new DefaultInformationControl(parent);

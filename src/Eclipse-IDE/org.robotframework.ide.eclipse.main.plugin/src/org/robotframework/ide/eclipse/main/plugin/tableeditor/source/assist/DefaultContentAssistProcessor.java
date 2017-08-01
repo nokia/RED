@@ -12,7 +12,6 @@ import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 
 /**
  * @author Michal Anglart
- *
  */
 public abstract class DefaultContentAssistProcessor implements IContentAssistProcessor {
 
