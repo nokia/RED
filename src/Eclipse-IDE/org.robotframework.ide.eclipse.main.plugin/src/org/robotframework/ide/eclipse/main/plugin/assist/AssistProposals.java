@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
+import org.rf.ide.core.testdata.model.table.keywords.names.CamelCaseKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.RedLibraryKeywordProposal;
@@ -194,6 +195,25 @@ public class AssistProposals {
                     return result;
                 }
                 return proposal1.getLabel().compareToIgnoreCase(proposal2.getLabel());
+            }
+        };
+    }
+
+    public static Comparator<RedKeywordProposal> sortedByLabelsCamelCaseAndPrefixedFirst(final String input) {
+        return new Comparator<RedKeywordProposal>() {
+
+            @Override
+            public int compare(final RedKeywordProposal proposal1, final RedKeywordProposal proposal2) {
+                final boolean isCamelCase1 = !CamelCaseKeywordNamesSupport.matches(proposal1.getLabel(), input)
+                        .isEmpty();
+                final boolean isCamelCase2 = !CamelCaseKeywordNamesSupport.matches(proposal2.getLabel(), input)
+                        .isEmpty();
+                final int result = Boolean.compare(isCamelCase2, isCamelCase1);
+                if (result != 0) {
+                    return result;
+                }
+                final Comparator<AssistProposal> prefixedComparator = sortedByLabelsPrefixedFirst(input);
+                return prefixedComparator.compare(proposal1, proposal2);
             }
         };
     }

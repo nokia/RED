@@ -5,8 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.rf.ide.core.testdata.model.table.keywords.names.CamelCaseKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 
 import com.google.common.collect.Range;
@@ -27,11 +29,15 @@ public class ProposalMatchers {
         };
     }
 
-    public static ProposalMatcher embeddedKeywordsMatcher() {
+    public static ProposalMatcher keywordsMatcher() {
         return new ProposalMatcher() {
 
             @Override
             public Optional<ProposalMatch> matches(final String userContent, final String proposalContent) {
+                final List<Range<Integer>> ranges = CamelCaseKeywordNamesSupport.matches(proposalContent, userContent);
+                if (!ranges.isEmpty()) {
+                    return Optional.of(new ProposalMatch(ranges));
+                }
                 return EmbeddedKeywordNamesSupport.containsIgnoreCase(proposalContent, userContent)
                         .map(ProposalMatch::new);
             }
