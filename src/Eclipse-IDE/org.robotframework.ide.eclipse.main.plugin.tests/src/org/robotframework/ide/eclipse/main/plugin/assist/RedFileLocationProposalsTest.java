@@ -214,13 +214,14 @@ public class RedFileLocationProposalsTest {
 
             @Override
             public int compare(final IFile o1, final IFile o2) {
-                if (o1.equals(o2)) {
-                    return 0;
-                } else if (o1.getName().contains(toContain)) {
-                    return -1;
-                } else {
-                    return 1;
+
+                final boolean contains1 = o1.getName().contains(toContain);
+                final boolean contains2 = o2.getName().contains(toContain);
+                final int result = Boolean.compare(contains2, contains1);
+                if (result != 0) {
+                    return result;
                 }
+                return Integer.compare(o1.getName().indexOf(toContain), o2.getName().indexOf(toContain));
             }
         };
     }
