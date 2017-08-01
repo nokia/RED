@@ -216,7 +216,8 @@ public class AssistProposalsTest {
         final IFolder dir = projectProvider.createDir("dir");
         final IFile toFile = projectProvider.createFile("dir/file.txt");
 
-        final RedFileLocationProposal proposal = AssistProposals.createFileLocationProposal(file, toFile, ProposalMatch.EMPTY);
+        final RedFileLocationProposal proposal = AssistProposals.createFileLocationProposal(file, toFile,
+                ProposalMatch.EMPTY);
         assertThat(proposal.getContent()).isEqualTo("dir/file.txt");
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getImageForResource(toFile));
@@ -234,7 +235,8 @@ public class AssistProposalsTest {
         libSpec.setName("library");
         libSpec.setDocumentation("docu");
 
-        final RedLibraryProposal proposal = AssistProposals.createLibraryProposal(suiteFile, libSpec, ProposalMatch.EMPTY);
+        final RedLibraryProposal proposal = AssistProposals.createLibraryProposal(suiteFile, libSpec,
+                ProposalMatch.EMPTY);
         assertThat(proposal.getContent()).isEqualTo("library");
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getLibraryImage());
@@ -406,6 +408,31 @@ public class AssistProposalsTest {
     }
 
     @Test
+    public void byLabelsCamelCaseAndPrefixedFirstComparatorProperlySortsProposals() {
+        final List<RedKeywordProposal> proposals = newArrayList(
+                kwProposal("xyz", "src1"),
+                kwProposal("Xyz1", "src2"),
+                kwProposal("Cd1", "src3"),
+                kwProposal("zzz1", "src1"),
+                kwProposal("Create Duplicated Name", "src2"),
+                kwProposal("ZZZ", "src3"),
+                kwProposal("CD345", "src1"),
+                kwProposal("ABC", "src2"),
+                kwProposal("Can Detect", "src3"),
+                kwProposal("abc1", "src1"),
+                kwProposal("cD2", "src2"),
+                kwProposal("abCD", "src3"),
+                kwProposal("Do Not Create Docs", "src1"));
+
+        Collections.sort(proposals, AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirst("CD"));
+
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Can Detect - src3",
+                "Create Duplicated Name - src2", "Cd1 - src3", "cD2 - src2", "CD345 - src1", "ABC - src2",
+                "abc1 - src1", "abCD - src3", "Do Not Create Docs - src1", "xyz - src1", "Xyz1 - src2", "ZZZ - src3",
+                "zzz1 - src1");
+    }
+
+    @Test
     public void byTypesAndOriginComparator_isSortingVariableProposalsFirstlyByTypesThenByOriginAndFinallyByNames() {
         final List<RedVariableProposal> proposals = newArrayList(
                 varProposal("${Xyz3}", VariableOrigin.BUILTIN),
@@ -452,12 +479,21 @@ public class AssistProposalsTest {
         };
     }
 
+    private RedKeywordProposal kwProposal(final String name, final String source) {
+        final LibrarySpecification libSpec = new LibrarySpecification();
+        libSpec.setName(source);
+        final KeywordSpecification kwSpec = new KeywordSpecification();
+        kwSpec.setName(name);
+        return AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "", KeywordScope.REF_LIBRARY, source,
+                new Path("test.robot"), AssistProposalPredicates.alwaysTrue(), ProposalMatch.EMPTY);
+    }
+
     private RedVariableProposal varProposal(final String name, final VariableOrigin origin) {
         return new RedVariableProposal(name, "source", "", "", origin, ProposalMatch.EMPTY);
     }
 
     private RedLibraryProposal libProposal(final String name, final boolean isImported) {
-        return new RedLibraryProposal(name, new ArrayList<String>(), isImported, "", ProposalMatch.EMPTY);
+        return new RedLibraryProposal(name, new ArrayList<>(), isImported, "", ProposalMatch.EMPTY);
     }
 
     private static RobotVariable createVariable() {
