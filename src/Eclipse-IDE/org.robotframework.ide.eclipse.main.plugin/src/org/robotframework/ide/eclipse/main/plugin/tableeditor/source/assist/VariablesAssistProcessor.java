@@ -27,10 +27,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUti
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentModification;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
@@ -46,8 +44,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     @Override
     protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION,
-                SuiteSourcePartitionScanner.SETTINGS_SECTION,
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
@@ -60,24 +57,24 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
     @Override
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
-            final int cellLength, final String prefix, final boolean atTheEndOfLine) throws BadLocationException {
+            final int cellLength, final String userContent, final boolean atTheEndOfLine) throws BadLocationException {
 
         final Optional<IRegion> liveVarRegion = DocumentUtilities.findLiveVariable(document, assist.isTsvFile(),
                 offset);
         final String liveVarPrefix = DocumentUtilities.getPrefix(document, liveVarRegion, offset);
 
-        final String actualPrefix;
+        final String userContentToReplace;
         final int lengthToReplace;
         if (liveVarPrefix.isEmpty()) {
-            actualPrefix = prefix;
+            userContentToReplace = userContent;
             lengthToReplace = cellLength;
         } else {
-            actualPrefix = liveVarPrefix;
+            userContentToReplace = liveVarPrefix;
             final Optional<IRegion> varRegion = DocumentUtilities.findVariable(document, assist.isTsvFile(), offset);
             if (varRegion.isPresent()) {
                 lengthToReplace = varRegion.get().getLength();
             } else {
-                lengthToReplace = liveVarRegion.isPresent() ? offset - liveVarRegion.get().getOffset() : 0;
+                lengthToReplace = liveVarRegion.map(region -> offset - region.getOffset()).orElse(0);
             }
         }
 
@@ -88,12 +85,12 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
                 assist.getModel());
 
         final List<? extends AssistProposal> variableProposals = new RedVariableProposals(assist.getModel(),
-                globalVarPredicate).getVariableProposals(actualPrefix, lastTokenOffset);
+                globalVarPredicate).getVariableProposals(userContentToReplace, lastTokenOffset);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal varProposal : variableProposals) {
             final DocumentModification modification = new DocumentModification("",
-                    new Position(offset - actualPrefix.length(), lengthToReplace));
+                    new Position(offset - userContentToReplace.length(), lengthToReplace));
 
             proposals.add(new RedCompletionProposalAdapter(varProposal, modification));
         }
