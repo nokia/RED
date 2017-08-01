@@ -48,8 +48,10 @@ public final class ProposalMatch implements Iterable<Range<Integer>> {
                     && startIndex <= match.upperEndpoint().intValue()) {
                 rangesInDomain.add(Range.closedOpen(startIndex, match.upperEndpoint()));
             } else if (match.lowerEndpoint().intValue() <= startIndex + length
-                    && startIndex + startIndex <= match.upperEndpoint().intValue()) {
+                    && startIndex + length <= match.upperEndpoint().intValue()) {
                 rangesInDomain.add(Range.closedOpen(match.lowerEndpoint(), startIndex + length));
+            } else {
+                return Optional.empty();
             }
         }
 
