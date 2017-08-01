@@ -9,7 +9,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createNotAccessibleLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createUserKeywordProposal;
-import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsPrefixedFirst;
+import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByLabelsCamelCaseAndPrefixedFirst;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,14 +56,13 @@ public class RedKeywordProposals {
     private final AssistProposalPredicate<LibrarySpecification> libraryPredicate;
 
     public RedKeywordProposals(final RobotSuiteFile suiteFile) {
-        this(RedPlugin.getModelManager().getModel(), suiteFile, ProposalMatchers.embeddedKeywordsMatcher(),
+        this(RedPlugin.getModelManager().getModel(), suiteFile, ProposalMatchers.keywordsMatcher(),
                 AssistProposalPredicates.reservedLibraryPredicate());
     }
 
     @VisibleForTesting
     public RedKeywordProposals(final RobotModel model, final RobotSuiteFile suiteFile) {
-        this(model, suiteFile, ProposalMatchers.embeddedKeywordsMatcher(),
-                AssistProposalPredicates.reservedLibraryPredicate());
+        this(model, suiteFile, ProposalMatchers.keywordsMatcher(), AssistProposalPredicates.reservedLibraryPredicate());
     }
 
     @VisibleForTesting
@@ -76,7 +75,7 @@ public class RedKeywordProposals {
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent) {
-        return getKeywordProposals(userContent, sortedByLabelsPrefixedFirst(userContent));
+        return getKeywordProposals(userContent, sortedByLabelsCamelCaseAndPrefixedFirst(userContent));
     }
 
     public List<RedKeywordProposal> getKeywordProposals(final String userContent,

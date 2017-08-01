@@ -94,20 +94,22 @@ public class RedKeywordProposalsTest {
             throws Exception {
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Keywords ***",
-                "a_kw1",
-                "b_kw2",
-                "c_kw3",
-                "1_kw",
-                "2_kw",
-                "3_kw",
+                "a_kw_ab",
+                "b_kw_cd",
+                "c_kw_ef",
+                "ab_kw",
+                "cd_kw",
+                "ef_kw",
+                "Enable Frequency",
+                "Edit Configuration File",
                 "*** Test Cases ***");
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("EF");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("2_kw - file.robot",
-                "b_kw2 - file.robot");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Enable Frequency - file.robot",
+                "ef_kw - file.robot", "c_kw_ef - file.robot");
     }
 
     @Test
@@ -195,15 +197,18 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void onlyResourceKeywordsMatchingGivenInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyResourceKeywordsMatchingGivenInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed()
+            throws Exception {
         projectProvider.createFile("res2.robot",
                 "*** Keywords ***",
-                "a_res_kw1",
-                "b_res_kw2",
-                "c_res_kw3",
-                "1_res_kw",
-                "2_res_kw",
-                "3_res_kw");
+                "a_res_kw_ab",
+                "b_res_kw_cd",
+                "c_res_kw_ef",
+                "ab_res_kw",
+                "cd_res_kw",
+                "ef_res_kw",
+                "Create Duplicate",
+                "Can Be Detected");
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
                 "Resource  res2.robot",
@@ -211,10 +216,10 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("3");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("CD");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("3_res_kw - res2.robot",
-                "c_res_kw3 - res2.robot");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Create Duplicate - res2.robot",
+                "cd_res_kw - res2.robot", "b_res_kw_cd - res2.robot");
     }
 
     @Test
@@ -306,12 +311,13 @@ public class RedKeywordProposalsTest {
     }
 
     @Test
-    public void onlyLibraryKeywordsMatchingGivenInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed() throws Exception {
+    public void onlyLibraryKeywordsMatchingGivenInputAreProvidedWithCorrectOrder_whenDefaultMatcherIsUsed()
+            throws Exception {
         final RobotProject robotProject = robotModel.createRobotProject(projectProvider.getProject());
-        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw1", "b_slib_kw2", "c_slib_kw3",
-                "1_slib_kw", "2_slib_kw", "3_slib_kw"));
-        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw1", "b_rlib_kw2", "c_rlib_kw3",
-                "1_rlib_kw", "2_rlib_kw", "3_rlib_kw"));
+        robotProject.setStandardLibraries(Libraries.createStdLib("stdLib", "a_slib_kw_ab", "b_slib_kw_cd",
+                "c_slib_kw_ef", "ab_slib_kw", "cd_slib_kw", "ef_slib_kw", "Add Bookmark", "Should Activate Block"));
+        robotProject.setReferencedLibraries(Libraries.createRefLib("refLib", "a_rlib_kw_ab", "b_rlib_kw_cd",
+                "c_rlib_kw_ef", "ab_rlib_kw", "cd_rlib_kw", "ef_rlib_kw", "Activate Bluetooth", "Get Active Block"));
 
         final IFile file = projectProvider.createFile("file.robot",
                 "*** Settings ***",
@@ -321,12 +327,14 @@ public class RedKeywordProposalsTest {
         final RobotSuiteFile suiteFile = robotModel.createSuiteFile(file);
 
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
-        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("2");
+        final List<? extends AssistProposal> proposals = provider.getKeywordProposals("AB");
 
-        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("2_rlib_kw - refLib",
-                "2_slib_kw - stdLib",
-                "b_rlib_kw2 - refLib",
-                "b_slib_kw2 - stdLib");
+        assertThat(transform(proposals, AssistProposal::getLabel)).containsExactly("Activate Bluetooth - refLib",
+                "Add Bookmark - stdLib",
+                "ab_rlib_kw - refLib",
+                "ab_slib_kw - stdLib",
+                "a_rlib_kw_ab - refLib",
+                "a_slib_kw_ab - stdLib");
     }
 
     @Test
