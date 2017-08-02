@@ -23,12 +23,14 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     UNREACHABLE_HOST {
+
         @Override
         public String getProblemDescription() {
             return "Unreachable remote server %s";
         }
     },
     ABSOLUTE_PATH {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.ABSOLUTE_PATH;
@@ -50,6 +52,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     MISSING_LIBRARY_FILE {
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -66,6 +69,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     MISSING_VARIABLE_FILE {
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -82,6 +86,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     MISSING_EXCLUDED_FOLDER {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.MISSING_PATH;
@@ -93,6 +98,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     JAVA_LIB_NOT_A_JAR_FILE {
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -109,6 +115,7 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     JAVA_LIB_MISSING_CLASS {
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -125,12 +132,14 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     JAVA_LIB_IN_NON_JAVA_ENV {
+
         @Override
         public String getProblemDescription() {
             return "Java library '%s' requires Jython, but %s environment is in use by this project";
         }
     },
     USELESS_FOLDER_EXCLUSION {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.DUPLICATED_PATH;
