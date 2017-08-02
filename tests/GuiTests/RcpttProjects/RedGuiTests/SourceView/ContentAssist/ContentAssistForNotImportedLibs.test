@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _YK-bkHH_EeeOFuKpK9KgAg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/31/17 10:13 AM
+Save-Time: 8/2/17 11:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,11 +24,9 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 //no kw is in CA
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "${/}" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "${:}" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "no proposals" | verify-true
 }
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${\\/}" 
-    | key-type "TRAVERSE_ESCAPE"
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | key-type "TRAVERSE_ESCAPE"
     
 //write RE to check if only KW from built-in are shown
 with [get-editor "TestFile.robot" | get-text-viewer] {
@@ -37,13 +35,12 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+SPACE"
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	get-property itemCount | equals 5 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "Return From Keyword - BuiltIn" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "Return From Keyword If - BuiltIn" | verify-true
     get-property "getItems().TableItem[2].getText()" | equals "Run Keyword And Return - BuiltIn" | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "Run Keyword And Return If - BuiltIn" | verify-true
     get-property "getItems().TableItem[4].getText()" | equals "Run Keyword And Return Status - BuiltIn" | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "${/}" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "${:}" | verify-true
 }
 
 
@@ -53,9 +50,8 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
 // add spaces    
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 4 7
-    select-range 4 8 4 5
+    select-range 4 8 3 5
     key-type BackSpace
-    type-text "    "
     key-type "M1+s"
 }
 
@@ -79,6 +75,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     wait 300
 }
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	get-property itemCount | equals 10 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "My Lib - simple_lib" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "My Lib10 - simple_lib10" | verify-true
     get-property "getItems().TableItem[2].getText()" | equals "My Lib2 - simple_lib2" | verify-true
@@ -89,7 +86,6 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[7].getText()" | equals "My Lib7 - simple_lib7" | verify-true
     get-property "getItems().TableItem[8].getText()" | equals "My Lib8 - simple_lib8" | verify-true
     get-property "getItems().TableItem[9].getText()" | equals "My Lib9 - simple_lib9" | verify-true
-    get-property "getItems().TableItem[10].getText()" | equals "${/}" | verify-true
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "My Lib - simple_lib" | click 
     -default
