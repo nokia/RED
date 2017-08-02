@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -21,7 +20,7 @@ public enum SuiteFileProblem implements IProblemCause {
         }
     },
     UNRECOGNIZED_TABLE_HEADER {
-        
+
         @Override
         public String getProblemDescription() {
             return "Unrecognized table header: '%s'";
@@ -33,11 +32,6 @@ public enum SuiteFileProblem implements IProblemCause {
         }
     },
     BUILD_ERROR_MESSAGE {
-        
-        @Override
-        public boolean hasResolution() {
-            return false;
-        }
 
         @Override
         public String getProblemDescription() {
@@ -45,12 +39,7 @@ public enum SuiteFileProblem implements IProblemCause {
         }
     },
     BUILD_WARNING_MESSAGE {
-        
-        @Override
-        public boolean hasResolution() {
-            return false;
-        }
-        
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.PARSER_WARNING;
@@ -64,11 +53,6 @@ public enum SuiteFileProblem implements IProblemCause {
     FILE_PARSING_FAILED {
 
         @Override
-        public boolean hasResolution() {
-            return false;
-        }
-        
-        @Override
         public String getProblemDescription() {
             return "Parsing file '%s' failed";
         }
@@ -76,12 +60,12 @@ public enum SuiteFileProblem implements IProblemCause {
 
     @Override
     public boolean hasResolution() {
-        return true;
+        return false;
     }
 
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override

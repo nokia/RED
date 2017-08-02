@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -145,7 +146,7 @@ public enum TestCasesProblem implements IProblemCause {
 
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override
