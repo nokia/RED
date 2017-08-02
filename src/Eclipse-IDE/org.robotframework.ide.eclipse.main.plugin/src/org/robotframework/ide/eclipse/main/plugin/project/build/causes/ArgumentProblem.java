@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -14,16 +13,17 @@ import org.eclipse.ui.IMarkerResolution;
 
 /**
  * @author Michal Anglart
- *
  */
 public enum ArgumentProblem implements IProblemCause {
     INVALID_NUMBER_OF_PARAMETERS {
+
         @Override
         public String getProblemDescription() {
             return "Invalid number of arguments. %s";
         }
     },
     POSITIONAL_ARGUMENT_AFTER_NAMED {
+
         @Override
         public String getProblemDescription() {
             return "Positional argument cannot be used after named arguments%s";
@@ -37,6 +37,7 @@ public enum ArgumentProblem implements IProblemCause {
         }
     },
     NO_VALUE_PROVIDED_FOR_REQUIRED_ARG {
+
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' requires '%s' argument to be specified";
@@ -50,6 +51,7 @@ public enum ArgumentProblem implements IProblemCause {
         }
     },
     DICT_ARGUMENT_SHOULD_PROVIDE_ARGS {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.COLLECTION_ARGUMENT_SIZE;
@@ -61,6 +63,7 @@ public enum ArgumentProblem implements IProblemCause {
         }
     },
     LIST_ARGUMENT_SHOULD_PROVIDE_ARGS {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.COLLECTION_ARGUMENT_SIZE;
@@ -91,7 +94,7 @@ public enum ArgumentProblem implements IProblemCause {
 
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override
