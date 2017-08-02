@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PV3F4L4iEeaIos8Jik5jow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 1:12 PM
+Save-Time: 8/2/17 10:34 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -87,12 +87,15 @@ with [get-editor "Test2.robot"] {
 }
 wait 500
 
+
+    
 //check if filtered are KW from datatime
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-property itemCount | equals 2 
+    | verify-true
+    
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     get-property "getItems().TableItem[0].getText()" | equals "Convert Date - 8" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "Convert Time - 8" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "${/}" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "${:}" | verify-true
 }
 
 //select Convert Date
