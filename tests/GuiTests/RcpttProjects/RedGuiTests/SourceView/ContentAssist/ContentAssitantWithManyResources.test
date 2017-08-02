@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6IIcwHjQEeWYifgNPLzx_Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 1:10 PM
+Save-Time: 8/2/17 11:13 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -77,40 +77,42 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-	    get-property "getItems().TableItem[0].getText()" | equals "${a}" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "${b}" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "${c}" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "${from_txt_res}" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "${j}" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "${not used var}" | verify-true
-	    get-property "getItems().TableItem[6].getText()" | equals "${n}" | verify-true
+		get-property "getItems().TableItem[0].getText()" | equals "!@#$%^&()_;" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "${c}" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "${from_txt_res}" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "${j}" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "${not used var}" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals "${n}" | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "${sc_1}" | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals "${sc_2}" | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals "${sc_3}" | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals "${scalar from simple res}" | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "${this is duplicate}" | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals "${this is duplicate}" | verify-true
+	    get-property "getItems().TableItem[14].getText()" | equals "${var from second project}" | verify-true
+	    get-property "getItems().TableItem[15].getText()" | equals "${/}" | verify-true
+		
+	}
+}-else{
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+		get-property "getItems().TableItem[0].getText()" | equals "!@#$%^&()_;" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "${b}" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "${c}" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "${from_txt_res}" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "${j}" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "${not used var}" | verify-true
 	    get-property "getItems().TableItem[7].getText()" | equals "${sc_1}" | verify-true
 	    get-property "getItems().TableItem[8].getText()" | equals "${sc_2}" | verify-true
 	    get-property "getItems().TableItem[9].getText()" | equals "${sc_3}" | verify-true
 	    get-property "getItems().TableItem[10].getText()" | equals "${scalar from simple res}" | verify-true
 	    get-property "getItems().TableItem[11].getText()" | equals "${this is duplicate}" | verify-true
 	    get-property "getItems().TableItem[12].getText()" | equals "${this is duplicate}" | verify-true
-	    get-property "getItems().TableItem[13].getText()" | equals "${var from second project}" | verify-true
+	    get-property "getItems().TableItem[13].getText()" | equals "${var from second project}" | verify-true	
 	    get-property "getItems().TableItem[14].getText()" | equals "${/}" | verify-true
-		
-	}
-}-else{
-
-with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-	    get-property "getItems().TableItem[0].getText()" | equals "${a}" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "${b}" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "${c}" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "${from_txt_res}" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "${j}" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "${not used var}" | verify-true
-	    get-property "getItems().TableItem[6].getText()" | equals "${sc_1}" | verify-true
-	    get-property "getItems().TableItem[7].getText()" | equals "${sc_2}" | verify-true
-	    get-property "getItems().TableItem[8].getText()" | equals "${sc_3}" | verify-true
-	    get-property "getItems().TableItem[9].getText()" | equals "${scalar from simple res}" | verify-true
-	    get-property "getItems().TableItem[10].getText()" | equals "${this is duplicate}" | verify-true
-	    get-property "getItems().TableItem[11].getText()" | equals "${this is duplicate}" | verify-true
-	    get-property "getItems().TableItem[12].getText()" | equals "${var from second project}" | verify-true	
-	    get-property "getItems().TableItem[13].getText()" | equals "${/}" | verify-true
 	}
 
 }
@@ -132,24 +134,26 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	
-	    get-property itemCount | equals 8 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "@{list form second project}" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "@{list1}" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "@{list2}" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "@{list3}" | verify-true
+	    get-property itemCount | equals 9 | verify-true
+	    get-property "getItems().TableItem[0].getText()" | equals "!@#$%^&()_;" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "@{list form second project}" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "@{list1}" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "@{list2}" | verify-true
+	    get-property "getItems().TableItem[4].getText()" | equals "@{list3}" | verify-true
+	    get-property "getItems().TableItem[5].getText()" | equals "@{list_from_simpl_res}" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals "@{list_from_txt_res}" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals "@{EMPTY}" | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals "@{TEST_TAGS}" | verify-true
+	}-else{
+		get-property itemCount | equals 8 | verify-true
+		get-property "getItems().TableItem[0].getText()" | equals "!@#$%^&()_;" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "@{list form second project}" | verify-true
+	    get-property "getItems().TableItem[2].getText()" | equals "@{list1}" | verify-true
+	    get-property "getItems().TableItem[3].getText()" | equals "@{list2}" | verify-true
 	    get-property "getItems().TableItem[4].getText()" | equals "@{list_from_simpl_res}" | verify-true
 	    get-property "getItems().TableItem[5].getText()" | equals "@{list_from_txt_res}" | verify-true
 	    get-property "getItems().TableItem[6].getText()" | equals "@{EMPTY}" | verify-true
 	    get-property "getItems().TableItem[7].getText()" | equals "@{TEST_TAGS}" | verify-true
-	}-else{
-		get-property itemCount | equals 7 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "@{list form second project}" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "@{list1}" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "@{list2}" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "@{list_from_simpl_res}" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "@{list_from_txt_res}" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "@{EMPTY}" | verify-true
-	    get-property "getItems().TableItem[6].getText()" | equals "@{TEST_TAGS}" | verify-true
 	
 	}
 }
