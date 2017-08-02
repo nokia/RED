@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JlES0PUTEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/17/17 3:12 PM
+Save-Time: 8/2/17 10:31 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,18 +27,19 @@ with [get-editor "Script.robot" | get-text-viewer] {
 }  
 
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().length" | equals 11 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "res1/res.robot" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "res1/simple_res.robot" | verify-true
     get-property "getItems().TableItem[2].getText()" | equals "res1/res3/deep_res.robot" | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "res1/res3/res.robot" | verify-true
     get-property "getItems().TableItem[4].getText()" | equals "res2/another_res.robot" | verify-true
     get-property "getItems().TableItem[5].getText()" | equals "res2/res.robot" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "../SecondProject/res1/res.robot" | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals "../SecondProject/res1/res3/RES.ROBOT" | verify-true
-    get-property "getItems().TableItem[8].getText()" | equals "../SecondProject/res1/res3/second project res.robot" 
+    get-property "getItems().TableItem[6].getText()" | equals "recurence_of_resources/1_res.robot" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "../SecondProject/res1/res.robot" | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals "../SecondProject/res1/res3/RES.ROBOT" | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "../SecondProject/res1/res3/second project res.robot" 
         | verify-true
-    get-property "getItems().TableItem[9].getText()" | equals "../SecondProject/res2/res.robot" | verify-true
-    get-property "getItems().TableItem[10].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "../SecondProject/res2/res.robot" | verify-true
 }
 
 //close window
@@ -52,9 +53,15 @@ with [get-editor "Script.robot" | get-text-viewer] {
     wait 300
     type-text "t/"
 }
+//olny path will be shown
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 5 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "t/n.robot" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "../SecondProject/res1/res.robot" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "../SecondProject/res1/res3/RES.ROBOT" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "../SecondProject/res1/res3/second project res.robot" 
+        | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "../SecondProject/res2/res.robot" | verify-true
 }
 
 //close window
@@ -71,12 +78,12 @@ with [get-editor "Script.robot" | get-text-viewer] {
 }
 
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	get-property itemCount | equals 4 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "../SecondProject/res1/res.robot" | verify-true
     get-property "getItems().TableItem[1].getText()" | equals "../SecondProject/res1/res3/RES.ROBOT" | verify-true
     get-property "getItems().TableItem[2].getText()" | equals "../SecondProject/res1/res3/second project res.robot" 
         | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "../SecondProject/res2/res.robot" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "${/}" | verify-true
 }
 
 //check file with space in name
@@ -89,20 +96,20 @@ with [get-editor "Script.robot" | get-text-viewer] {
 }
 
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+	get-property itemCount | equals 1 | verify-true
     get-property "getItems().TableItem[0].getText()" | equals "../SecondProject/res1/res3/second project res.robot" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "${/}" | verify-true
 }    
 
 //type file that not exist
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 2 18
-    key-type BackSpace -times 6
+    key-type BackSpace -times 6 
+    type-text "no f"
     key-type "M1+SPACE"
     wait 300
-    type-text "no f"
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | get-property "getItems().TableItem[0].getText()" | equals "${/}" | verify-true
+    | get-property "getItems().TableItem[0].getText()" | equals "no proposals" | verify-true
     
 //type special characters    
 with [get-editor "Script.robot" | get-text-viewer] {
