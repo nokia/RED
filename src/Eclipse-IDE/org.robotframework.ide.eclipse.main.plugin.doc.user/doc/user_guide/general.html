@@ -12,12 +12,14 @@ In Robot Framework preferences (Window -> Preferences), Tab behavior can be chan
  <br><br><img src="general/tab_behaviour.png"> <br><br>
 <h3>Content assistance - mode of working & preference</h3>
 Content assistance is a functionality provided by Eclipse platform extended to understand Robot data model.<br>
-It is invoked by pressing CTRL+SPACE key short-cut. It has multiple modes which are cycled by CTRL+SPACE, next mode type is visible at the bottom of assist window.
+It is invoked by pressing CTRL+SPACE key short-cut or by typing one of auto activation characters defined in preferences.<br>
+Assist window has multiple modes which are cycled by CTRL+SPACE. Next mode type is displayed at the bottom of the window.
 <br><br><img src="general/content-assist-modes.gif"> <br><br>
 <h4>Content assistance preferences </h4>
 Behavior of content assist can be changed in Robot Framework preferences (Window -> Preferences).<br>  
-Proposed items can be put into testcase by either by insert or override. <br>
-It can also be configured if library/resource prefix should ba always used when accepting content proposal.
+Auto activation triggers and delay can be specified to automatically show assist window when one of defined characters is typed.<br>
+It can also be configured if library/resource prefix should be always used when accepting content proposal.<br>
+Keyword propositions from libraries available in red.xml but not imported in robot file can be enabled too. Library import will be added automatically when such proposal is accepted.
 <br><br><img src="general/content_pref.png"> <br><br>
 <h3>Validating & revalidating whole project/workspace</h3>
 Validation of test case is triggered by any user actions, it is also done during files&project imports.<br>
