@@ -37,7 +37,7 @@ public interface IProblemCause {
      * @return
      */
     List<? extends IMarkerResolution> createFixers(IMarker marker);
-    
+
     /**
      * Returns category of problem. Multiple different problems may have the
      * same category. Categories can be used e.g. to set different severity

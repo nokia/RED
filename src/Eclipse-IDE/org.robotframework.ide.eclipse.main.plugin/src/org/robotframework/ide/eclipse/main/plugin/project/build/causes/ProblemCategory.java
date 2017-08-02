@@ -105,16 +105,16 @@ public enum ProblemCategory {
     DUPLICATED_VARIABLE(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Duplicated variable name",
-            "Occurs when variable name is duplicated and one variable value overrides another."),   
+            "Occurs when variable name is duplicated and one variable value overrides another."),
     DUPLICATED_TEST_CASE(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Duplicated test case name",
-            "Occurs when test case name is duplicated and both test cases can be run."),  
+            "Occurs when test case name is duplicated and both test cases can be run."),
     MASKED_KEYWORD(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Masked keyword name",
             "Occurs when keyword defined in test suite has the same name like keyword from imported library.\n"
-                    + "You can use fully qualified name when calling masked keyword."), 
+                    + "You can use fully qualified name when calling masked keyword."),
     EMPTY_SETTINGS(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Empty settings definition",
@@ -126,11 +126,11 @@ public enum ProblemCategory {
                     + "Only ***Settings***, ***Variables***, ***Test Cases*** or ***Keywords*** sections are valid."),
     DUPLICATED_PATH(
             ProblemCategoryType.UNNECESSARY_CODE,
-            "Duplicated configuration path", 
+            "Duplicated configuration path",
             "Occurs when path defined in configuration is subpath of different one. Such path is skipped."),
     MISSING_PATH(
             ProblemCategoryType.UNNECESSARY_CODE,
-            "Missing configuration path", 
+            "Missing configuration path",
             "Occurs when missing path is defined in configuration. Such path is skipped."),
     KEYWORD_FROM_NESTED_LIBRARY(
             ProblemCategoryType.CODE_STYLE,
@@ -146,7 +146,7 @@ public enum ProblemCategory {
             "Occurs when keyword name contains dots. It may be confused with fully qualified name."),
     VARIABLE_AS_KEYWORD_USAGE(
             ProblemCategoryType.CODE_STYLE,
-            "Variable given as keyword name", 
+            "Variable given as keyword name",
             "Occurs when variable is used as keyword call in test suite setup or teardown."),
     COLLECTION_ARGUMENT_SIZE(
             ProblemCategoryType.CODE_STYLE,
@@ -155,20 +155,20 @@ public enum ProblemCategory {
     TIME_FORMAT(
             ProblemCategoryType.CODE_STYLE,
             "Invalid time format",
-            "Occurs when time is not formatted correctly. Use number, time string or timer string."), 
+            "Occurs when time is not formatted correctly. Use number, time string or timer string."),
     ABSOLUTE_PATH(
             ProblemCategoryType.IMPORT,
-            "Absolute path used", 
+            "Absolute path used",
             "Occurs when absolute path is used. Workspace-relative paths are preferred in RED."),
     HTML_FORMAT(
             ProblemCategoryType.IMPORT,
-            "HTML format used", 
+            "HTML format used",
             "Occurs when imported file is in HTML format. Use supported formats only."),
     IMPORT_PATH_RELATIVE_VIA_MODULES_PATH(
             ProblemCategoryType.IMPORT,
-            "Import path relative via modules path", 
+            "Import path relative via modules path",
             "Occurs when imported path is relative to python path."),
-    PARSER_WARNING( 
+    PARSER_WARNING(
             ProblemCategoryType.RUNTIME,
             "RED parser warning",
             "Occurs when for some reason RED parser reports warning."),
@@ -184,13 +184,16 @@ public enum ProblemCategory {
 
         @Override
         public Severity[] getPossibleSeverities() {
-            return new Severity[] {Severity.ERROR};
+            return new Severity[] { Severity.ERROR };
         }
     };
 
     private String id;
+
     private ProblemCategoryType type;
+
     private String name;
+
     private String description;
 
     private ProblemCategory(final ProblemCategoryType type, final String name, final String description) {
@@ -215,13 +218,13 @@ public enum ProblemCategory {
     public Severity getSeverity() {
         return RedPlugin.getDefault().getPreferences().getProblemCategorySeverity(this);
     }
-    
+
     public Severity getDefaultSeverity() {
         return Severity.WARNING;
     }
-    
+
     public Severity[] getPossibleSeverities() {
-        return new Severity[] {Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE};
+        return new Severity[] { Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE };
     }
 
     public static Map<ProblemCategoryType, Collection<ProblemCategory>> getAllCategories() {
@@ -236,9 +239,15 @@ public enum ProblemCategory {
                 });
         return TreeMultimap.create(groupedCategories).asMap();
     }
-    
+
     public static enum ProblemCategoryType {
-        CODE_STYLE, NAME_SHADOWING_AND_CONFLICTS, UNNECESSARY_CODE, IMPORT, ROBOT_VERSION, RUNTIME, PROJECT_CONFIGURATION;
+        CODE_STYLE,
+        NAME_SHADOWING_AND_CONFLICTS,
+        UNNECESSARY_CODE,
+        IMPORT,
+        ROBOT_VERSION,
+        RUNTIME,
+        PROJECT_CONFIGURATION;
 
         public String getName() {
             final String name = name().toLowerCase();
@@ -255,10 +264,14 @@ public enum ProblemCategory {
 
         public static Severity fromMarkerSeverity(final int markerSeverity) {
             switch (markerSeverity) {
-                case IMarker.SEVERITY_ERROR: return ERROR;
-                case IMarker.SEVERITY_WARNING: return WARNING;
-                case IMarker.SEVERITY_INFO: return INFO;
-                default: throw new IllegalStateException("Unrecognized marker severity: " + markerSeverity);
+                case IMarker.SEVERITY_ERROR:
+                    return ERROR;
+                case IMarker.SEVERITY_WARNING:
+                    return WARNING;
+                case IMarker.SEVERITY_INFO:
+                    return INFO;
+                default:
+                    throw new IllegalStateException("Unrecognized marker severity: " + markerSeverity);
             }
         }
 

@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -22,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarker
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeLibraryPathToNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateResourceFileFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
@@ -166,6 +166,11 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
             final List<IMarkerResolution> fixers = new ArrayList<>();
             fixers.add(new AddLibraryToRedXmlFixer(isPath ? path : name, isPath));
+            if (isPath) {
+                final IPath invalidPath = Path.fromPortableString(path);
+                fixers.addAll(ChangeImportedPathFixer.createFixersForSameFile(suiteFile, invalidPath));
+                fixers.addAll(ChangeLibraryPathToNameFixer.createFixersForSameFile(suiteFile, invalidPath));
+            }
             if (isName) {
                 fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
                         new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, name)));
@@ -558,7 +563,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(
-                    ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker), Arrays.asList("WITH NAME")));
+                    ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker), newArrayList("WITH NAME")));
         }
     },
     VARIABLE_AS_KEYWORD_USAGE_IN_SETTING {
@@ -581,7 +586,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override

@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
@@ -16,6 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateConfig
 
 public enum ProjectConfigurationProblem implements IProblemCause {
     CONFIG_FILE_MISSING {
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -37,6 +39,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         }
     },
     CONFIG_FILE_READING_PROBLEM {
+
         @Override
         public String getProblemDescription() {
             return "FATAL: unable to read configuration file. %s Fix this problem in order to properly build project";
@@ -48,6 +51,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         }
     },
     ENVIRONMENT_MISSING {
+
         @Override
         public String getProblemDescription() {
             return "FATAL: %s Python environment is not defined in preferences. Fix this problem to build project";
@@ -59,6 +63,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         }
     },
     ENVIRONMENT_NOT_A_PYTHON {
+
         @Override
         public String getProblemDescription() {
             return "FATAL: %s is not a Python installation directory. Fix this problem to build project";
@@ -70,6 +75,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         }
     },
     ENVIRONMENT_HAS_NO_ROBOT {
+
         @Override
         public String getProblemDescription() {
             return "FATAL: Python installation %s has no Robot installed. Fix this problem to build project";
@@ -81,6 +87,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
         }
     },
     LIBRARY_SPEC_CANNOT_BE_GENERATED {
+
         @Override
         public String getProblemDescription() {
             return "FATAL: %s";
@@ -99,7 +106,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override
