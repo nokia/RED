@@ -22,9 +22,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateVariab
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveVariableFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveWhitespacesFromVariableNameFixer;
 
-
 public enum VariablesProblem implements IProblemCause {
     DUPLICATED_VARIABLE {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.DUPLICATED_VARIABLE;
@@ -36,14 +36,25 @@ public enum VariablesProblem implements IProblemCause {
         }
 
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveVariableFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null)));
         }
     },
     INVALID_TYPE {
+
         @Override
         public String getProblemDescription() {
             return "Invalid variable definition '%s'. Unable to recognize variable type";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
         }
 
         @Override
@@ -52,9 +63,15 @@ public enum VariablesProblem implements IProblemCause {
         }
     },
     INVALID_NAME {
+
         @Override
         public String getProblemDescription() {
             return "Invalid variable name '%s'. Name can't contain whitespaces after the type identificator";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
         }
 
         @Override
@@ -64,9 +81,15 @@ public enum VariablesProblem implements IProblemCause {
         }
     },
     UNDECLARED_VARIABLE_USE {
+
         @Override
         public String getProblemDescription() {
             return "Variable '%s' is used, but not defined";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
         }
 
         @Override
@@ -94,6 +117,11 @@ public enum VariablesProblem implements IProblemCause {
         }
 
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final IRegion problemRegion = RobotProblem.getRegionOf(marker);
             final String value = marker.getAttribute(AdditionalMarkerAttributes.VALUE, null);
@@ -106,6 +134,7 @@ public enum VariablesProblem implements IProblemCause {
         }
     },
     DICTIONARY_NOT_AVAILABLE {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.UNSUPPORTED_API;
@@ -115,13 +144,9 @@ public enum VariablesProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Invalid variable definition '%s'. Dictionary type is available since Robot Framework 2.9.x version";
         }
-
-        @Override
-        public boolean hasResolution() {
-            return false;
-        }
     },
     SCALAR_WITH_MULTIPLE_VALUES_2_7 {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.INCORRECT_INITIALIZATION;
@@ -131,13 +156,9 @@ public enum VariablesProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Scalar variable '%s' is initialized with list value";
         }
-
-        @Override
-        public boolean hasResolution() {
-            return false;
-        }
     },
     SCALAR_WITH_MULTIPLE_VALUES_2_8_x {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.UNSUPPORTED_API;
@@ -147,21 +168,16 @@ public enum VariablesProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Invalid variable definition '%s'. Scalar variable cannot have multiple value in RobotFramework 2.8.x";
         }
-
-        @Override
-        public boolean hasResolution() {
-            return false;
-        }
     };
 
     @Override
     public boolean hasResolution() {
-        return true;
+        return false;
     }
 
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override

@@ -47,7 +47,7 @@ public enum KeywordsProblem implements IProblemCause {
             final String keywordOriginalName = marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null);
             final IFile suiteFile = (IFile) marker.getResource();
 
-            final ArrayList<IMarkerResolution> fixers = newArrayList();
+            final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
             fixers.addAll(ImportLibraryFixer.createFixers(suiteFile, keywordName));
             fixers.addAll(CreateKeywordFixer.createFixers(keywordOriginalName));
             fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
@@ -70,7 +70,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            final ArrayList<IMarkerResolution> fixers = newArrayList();
+            final ArrayList<IMarkerResolution> fixers = new ArrayList<>();
             final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
             final List<String> sources = Splitter.on(';')
                     .splitToList(marker.getAttribute(AdditionalMarkerAttributes.SOURCES, ""));
@@ -138,12 +138,14 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     DUPLICATED_KEYWORD_SETTING {
+
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' %s setting is defined in multiple ways";
         }
     },
     ARGUMENT_DEFINED_TWICE {
+
         @Override
         public String getProblemDescription() {
             return "The '%s' argument is defined multiple times";
@@ -221,6 +223,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     KEYWORD_MASKS_OTHER_KEYWORD {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.MASKED_KEYWORD;
@@ -233,6 +236,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     DOCUMENT_SYNONYM {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.REMOVED_API;
@@ -254,6 +258,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     POSTCONDITION_SYNONYM {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.REMOVED_API;
@@ -275,6 +280,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     USER_KEYWORD_TABLE_HEADER_SYNONYM {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.REMOVED_API;
@@ -302,13 +308,9 @@ public enum KeywordsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Unknown keyword's setting definition '%s'";
         }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList();
-        }
     },
     EMPTY_KEYWORD_SETTING {
+
         @Override
         public ProblemCategory getProblemCategory() {
             return ProblemCategory.EMPTY_SETTINGS;
@@ -344,7 +346,7 @@ public enum KeywordsProblem implements IProblemCause {
 
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override
