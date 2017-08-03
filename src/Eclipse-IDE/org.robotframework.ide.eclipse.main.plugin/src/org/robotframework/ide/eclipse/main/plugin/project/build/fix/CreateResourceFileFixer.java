@@ -35,25 +35,22 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
     private final String label;
 
     public static CreateResourceFileFixer createFixer(final String nonExistingFile, final IMarker marker) {
-        final IPath pathToCreate = getValidPathToCreate(marker);
-        if (pathToCreate == null || !isExtensionValid(pathToCreate.getFileExtension())) {
-            return new CreateResourceFileFixer(CreateResourceFileFixer.createEmptyProposal(),
-                    "Missing resource file cannot be auto-created");
-        } else {
-            return new CreateResourceFileFixer(
-                    CreateResourceFileFixer.createProposal(marker, pathToCreate, nonExistingFile),
-                    "Create missing " + nonExistingFile + " file");
-        }
+        return getValidPathToCreate(marker)
+                .map(path -> new CreateResourceFileFixer(
+                        CreateResourceFileFixer.createProposal(marker, path, nonExistingFile),
+                        "Create missing " + nonExistingFile + " file"))
+                .orElseGet(() -> new CreateResourceFileFixer(CreateResourceFileFixer.createEmptyProposal(),
+                        "Missing resource file cannot be auto-created"));
     }
 
     @VisibleForTesting
-    static IPath getValidPathToCreate(final IMarker marker) {
+    static Optional<IPath> getValidPathToCreate(final IMarker marker) {
         final String srcPath = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
         final File file = new File(srcPath);
         try {
             file.getCanonicalPath();
         } catch (final IOException e) {
-            return null;
+            return Optional.empty();
         }
         final IPath fullPath = new Path(ResolvedImportPath.from(ImportPath.from(srcPath))
                 .get()
@@ -61,23 +58,26 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
                 .toString());
         final IPath workspaceDir = new Path(marker.getResource().getWorkspace().getRoot().getLocationURI().toString());
         if (workspaceDir.matchingFirstSegments(fullPath) != workspaceDir.segmentCount()) {
-            return null;
+            return Optional.empty();
         }
         final IPath pathToCreate = new Path(RedURI
                 .reverseUriSpecialCharsEscapes(fullPath.removeFirstSegments(workspaceDir.segmentCount()).toString()));
-        if (pathToCreate == null || pathToCreate.segmentCount() < 2
-                || !ResourcesPlugin.getWorkspace().getRoot().getProject(pathToCreate.segment(0)).isAccessible()
-                || !pathToCreate.isValidPath(pathToCreate.toPortableString())) {
-            return null;
+        if (isValidPathToCreate(pathToCreate)) {
+            return Optional.of(pathToCreate);
         } else {
-            return pathToCreate;
+            return Optional.empty();
         }
+    }
+
+    private static boolean isValidPathToCreate(final IPath path) {
+        return path.segmentCount() > 1 && isExtensionValid(path.getFileExtension())
+                && ResourcesPlugin.getWorkspace().getRoot().getProject(path.segment(0)).isAccessible()
+                && path.isValidPath(path.toPortableString());
     }
 
     // this method should be implemented elsewhere
     private static boolean isExtensionValid(final String extension) {
-        final List<String> validExts = Arrays
-                .asList(new String[] { "html", "htm", "xhtml", "tsv", "txt", "rst", "robot", "rest" });
+        final List<String> validExts = Arrays.asList("html", "htm", "xhtml", "tsv", "txt", "rst", "robot", "rest");
         return extension != null && validExts.contains(extension.toLowerCase());
     }
 
@@ -97,22 +97,24 @@ public class CreateResourceFileFixer extends RedSuiteMarkerResolution {
         return proposal;
     }
 
-    private static Optional<ICompletionProposal> createProposal(final IMarker marker, final IPath path, final String res) {
+    private static Optional<ICompletionProposal> createProposal(final IMarker marker, final IPath path,
+            final String res) {
         final MissingResourceFileCompletionProposal proposal = new MissingResourceFileCompletionProposal(
                 "Create missing " + res + " file",
                 "<b>" + res
                         + "</b><br> file will be created and opened for edition.<br><br>Resource path must be valid, "
                         + "inside project directory and must include robot resource extension. Any missing parent directories will be also created.",
                 marker, path);
-        return Optional.<ICompletionProposal> of(proposal);
+        return Optional.of(proposal);
     }
 
     private static Optional<ICompletionProposal> createEmptyProposal() {
-        final EmptyCompletionProposal proposal = new EmptyCompletionProposal("Missing resource file cannot be auto-created",
+        final EmptyCompletionProposal proposal = new EmptyCompletionProposal(
+                "Missing resource file cannot be auto-created",
                 "Please check your file path if you want to use this Quick Fix."
                         + "<br>Only valid and legal path to the file with explicit robot resource extension "
                         + "inside existing open project in this workspace can be used."
                         + "<br>All missing parent directories inside project will be auto-generated.");
-        return Optional.<ICompletionProposal> of(proposal);
+        return Optional.of(proposal);
     }
 }

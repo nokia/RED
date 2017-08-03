@@ -58,9 +58,8 @@ public class ChangeKeywordNameFixer extends RedSuiteMarkerResolution {
             final int charStart = (int) marker.getAttribute(IMarker.CHAR_START);
             final int charEnd = (int) marker.getAttribute(IMarker.CHAR_END);
             final IRegion regionToChange = new Region(charStart, charEnd - charStart);
-            return Optional.<ICompletionProposal> of(new CompletionProposal(toInsert, charStart, charEnd - charStart,
-                    toInsert.length(), image, getLabel(), null, Snippets.createSnippetInfo(document, regionToChange,
-                            toInsert)));
+            return Optional.of(new CompletionProposal(toInsert, charStart, charEnd - charStart, toInsert.length(),
+                    image, getLabel(), null, Snippets.createSnippetInfo(document, regionToChange, toInsert)));
         } catch (final CoreException e) {
             return Optional.empty();
         }
