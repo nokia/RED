@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cufqoN2BEea53q6vmC55pw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/10/17 4:40 PM
+Save-Time: 8/3/17 3:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,7 +34,7 @@ with [get-window "Run Configurations"] {
 }
 
 
-with [get-window "Run Configurations" | get-control Any -after [get-label "Name:"] -index 9] {
+with [get-window "Run Configurations" | get-control Any -after [get-label "Name:"] -index 8] {
     get-property "getChildren().length" | equals 4 | verify-true
     //label of table
     get-property "getChildren().Control[0].getText()" | equals "Environment variables to &set:" | verify-true
