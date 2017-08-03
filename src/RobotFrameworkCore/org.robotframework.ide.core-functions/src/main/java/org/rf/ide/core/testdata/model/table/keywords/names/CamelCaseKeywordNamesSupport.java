@@ -17,7 +17,8 @@ public class CamelCaseKeywordNamesSupport {
     private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("[A-Z][a-z]*");
 
     /**
-     * @return List of camel case parts from input, or empty if input is not camel case
+     * @return List of camel case parts from input, or empty if input is not in camel case format or
+     *         contains characters other than letters
      */
     static List<String> toCamelCaseParts(final String input) {
         final List<String> results = new ArrayList<>();
