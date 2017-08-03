@@ -451,7 +451,7 @@ class TestRunnerAgent:
             self._built_in.set_test_variable(var_name, *new_values)
 
         elif scope == 'test_suite':
-            if level >= len(self._built_in._variables._scopes) - len([s for s in self._built_in._variables._scopes_until_suite]):
+            if level >= len(self._built_in._variables._scopes) - len(list(self._built_in._variables._scopes_until_suite)):
                 # variable in lowest suite, so we'll use keyword
                 self._built_in.set_suite_variable(var_name, *new_values)
             else:
@@ -579,7 +579,8 @@ class TestRunnerAgent:
     
     def _encode_to_json(self, obj):
         try:
-            return self.decoder_encoder._encode(obj)
+            if self.decoder_encoder:
+                return self.decoder_encoder._encode(obj)
         except Exception:
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
