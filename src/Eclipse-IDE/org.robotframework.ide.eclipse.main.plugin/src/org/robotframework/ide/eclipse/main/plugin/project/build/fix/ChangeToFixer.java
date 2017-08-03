@@ -20,10 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class ChangeToFixer extends RedSuiteMarkerResolution {
 
@@ -62,7 +60,7 @@ public class ChangeToFixer extends RedSuiteMarkerResolution {
                 .displayedLabelShouldBe(getLabel())
                 .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getChangeImage()))
                 .create();
-        return Optional.<ICompletionProposal> of(proposal);
+        return Optional.of(proposal);
     }
 
 }
