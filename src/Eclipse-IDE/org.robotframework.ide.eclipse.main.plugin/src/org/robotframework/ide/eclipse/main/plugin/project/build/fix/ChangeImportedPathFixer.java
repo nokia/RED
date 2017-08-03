@@ -36,15 +36,15 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
 
     public static List<ChangeImportedPathFixer> createFixersForSameFile(final IFile problematicFile,
             final IPath invalidPath) {
-        final List<IPath> filePaths = findFilePathsWithTheSameLastSegment(invalidPath.lastSegment());
+        final List<IPath> filePaths = findFilePathsWithSameLastSegment(invalidPath.lastSegment());
         return filePaths.stream()
                 .sorted(createPathsComparator(problematicFile.getProject()))
-                .map(path -> createCurrentFileRelativePath(problematicFile.getFullPath(), path))
+                .map(path -> path.makeRelativeTo(problematicFile.getFullPath()).removeFirstSegments(1))
                 .map(ChangeImportedPathFixer::new)
                 .collect(Collectors.toList());
     }
 
-    private static List<IPath> findFilePathsWithTheSameLastSegment(final String lastSegment) {
+    private static List<IPath> findFilePathsWithSameLastSegment(final String lastSegment) {
         final List<IPath> paths = new ArrayList<>();
         try {
             ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
@@ -62,10 +62,6 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
             // ok, we'll return what we've gathered so far
         }
         return paths;
-    }
-
-    private static IPath createCurrentFileRelativePath(final IPath from, final IPath to) {
-        return to.makeRelativeTo(from).removeFirstSegments(1);
     }
 
     private static Comparator<IPath> createPathsComparator(final IProject project) {
@@ -103,9 +99,8 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
             final int charStart = (int) marker.getAttribute(IMarker.CHAR_START);
             final int charEnd = (int) marker.getAttribute(IMarker.CHAR_END);
             final IRegion regionToChange = new Region(charStart, charEnd - charStart);
-            return Optional.<ICompletionProposal> of(
-                    new CompletionProposal(toInsert, charStart, charEnd - charStart, toInsert.length(), image,
-                            getLabel(), null, Snippets.createSnippetInfo(document, regionToChange, toInsert)));
+            return Optional.of(new CompletionProposal(toInsert, charStart, charEnd - charStart, toInsert.length(),
+                    image, getLabel(), null, Snippets.createSnippetInfo(document, regionToChange, toInsert)));
         } catch (final CoreException e) {
             return Optional.empty();
         }

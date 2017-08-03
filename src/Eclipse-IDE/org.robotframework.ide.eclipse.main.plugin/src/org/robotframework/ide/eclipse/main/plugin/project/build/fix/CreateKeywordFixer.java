@@ -31,7 +31,6 @@ import com.google.common.base.Strings;
 
 /**
  * @author Michal Anglart
- *
  */
 public class CreateKeywordFixer extends RedSuiteMarkerResolution {
 
@@ -106,6 +105,6 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
                 .displayedLabelShouldBe(getLabel())
                 .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getUserKeywordImage()))
                 .create();
-        return Optional.<ICompletionProposal> of(proposal);
+        return Optional.of(proposal);
     }
 }
