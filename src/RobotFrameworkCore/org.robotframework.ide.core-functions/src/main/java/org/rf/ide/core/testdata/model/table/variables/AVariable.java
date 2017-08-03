@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model.table.variables;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -116,22 +117,46 @@ public abstract class AVariable extends AModelElement<VariableTable>
     }
 
     public enum VariableScope {
-        /**
-         * 
-         */
-        GLOBAL,
-        /**
-         * 
-         */
-        TEST_SUITE,
-        /**
-         * 
-         */
-        TEST_CASE,
-        /**
-         * 
-         */
-        LOCAL;
+        GLOBAL("Global Variables", 3),
+        TEST_SUITE("Test Suite Variables", 2),
+        TEST_CASE("Test Case Variables", 1),
+        LOCAL("Local Variables", 0);
+
+        public static VariableScope fromSimpleName(final String scopeName) {
+            switch (scopeName.toLowerCase()) {
+                case "global":
+                    return GLOBAL;
+                case "suite":
+                    return TEST_SUITE;
+                case "test":
+                    return TEST_CASE;
+                case "local":
+                    return LOCAL;
+                default:
+                    throw new IllegalArgumentException("Unrecognized scope: " + scopeName);
+            }
+        }
+
+        private String name;
+
+        private int priority;
+
+        private VariableScope(final String name, final int priority) {
+            this.name = name;
+            this.priority = priority;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static Comparator<VariableScope> fromWidest() {
+            return (a, b) -> Integer.compare(b.priority, a.priority);
+        }
+
+        public static Comparator<VariableScope> fromNarrowest() {
+            return (a, b) -> Integer.compare(a.priority, b.priority);
+        }
     }
 
     public enum VariableType {

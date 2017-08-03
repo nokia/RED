@@ -183,14 +183,14 @@ public class KeywordDefinitionLocator {
          *            Specification of library where keyword was detected
          * @param kwSpec
          *            Specification of detected keyword
-         * @param libraryAlias
+         * @param libraryAliases
          *            Library alias (may be empty)
          * @param exposingFile
          *            The file which imported given library
          * @return A decision whether detection should proceed
          */
         ContinueDecision accessibleLibraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
-                Set<String> libraryAlias, RobotSuiteFile exposingFile);
+                Set<String> libraryAliases, RobotSuiteFile exposingFile);
 
         /**
          * Called when keyword of given specification was found within given library which is about

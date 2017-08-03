@@ -46,20 +46,16 @@
 import os
 import sys
 import socket
-import threading
 import inspect
 import copy
 import json
 import time
-
-if sys.version_info < (3, 0, 0):
-    import SocketServer as socketserver
-else:
-    import socketserver
-
-from robot.running.signalhandler import STOP_SIGNAL_MONITOR
-from robot.errors import ExecutionFailed
-
+import traceback
+from collections import OrderedDict
+try:
+    from collections.abc import Mapping
+except:
+    from collections import Mapping
 
 # Setting Output encoding to UTF-8 and ignoring the platform specs
 import robot.utils.encoding
@@ -67,6 +63,8 @@ robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 # RF 2.6.3 and RF 2.5.7
 robot.utils.encoding._output_encoding = robot.utils.encoding.OUTPUT_ENCODING
 
+from robot.libraries.BuiltIn import BuiltIn
+from robot import version
 try:
     # RF 2.7.5
     from robot.running import EXECUTION_CONTEXTS
@@ -99,249 +97,405 @@ def _fix_unicode(max_length, data):
         return _truncate(max_length, data.encode('unicode_escape'))
     elif sys.version_info >= (3, 0, 0) and isinstance(data, str):
         return _truncate(max_length, data)
-    elif isinstance(data, dict):
-        data = dict((_fix_unicode(max_length, k), _fix_unicode(max_length, data[k])) for k in data)
+    elif isinstance(data, OrderedDict):
+        return OrderedDict((_fix_unicode(max_length, k), _fix_unicode(max_length, data[k])) for k in data)
+    elif isinstance(data, Mapping):
+        return dict((_fix_unicode(max_length, k), _fix_unicode(max_length, data[k])) for k in data)
+    elif isinstance(data, tuple):
+        return tuple(list(_fix_unicode(max_length, el) for el in data))
     elif isinstance(data, list):
-        range_fun = xrange if sys.version_info < (3, 0, 0) else range
-        for i in range_fun(0, len(data)):
-            data[i] = _fix_unicode(max_length, data[i])
+        return list(_fix_unicode(max_length, el) for el in data)
     elif data is None:
-        data = _fix_unicode(max_length, 'None')
+        return _fix_unicode(max_length, 'None')
     else:
-        data = _fix_unicode(max_length, str(data))
-    return data
+        return _fix_unicode(max_length, str(data))
+
     
 def _truncate(max_length, s):
     return s[:max_length] + ' <truncated>' if len(s) > max_length else s
 
 
+def _label_with_types(data):
+    value_type = type(data).__name__
+    if isinstance(data, Mapping):
+        return (value_type, dict((k, _label_with_types(data[k])) for k in data))
+    elif isinstance(data, list):
+        return (value_type, list(_label_with_types(el) for el in data))
+    else:
+        return (value_type, data)
+
+
+class RedResponseMessage:
+    
+    DO_START = 'do_start'
+    OPERATING_MODE = 'operating_mode'
+    PROTOCOL_VERSION = 'protocol_version'
+    TERMINATE = 'terminate'
+    DISCONNECT = 'disconnect'
+    CONTINUE = 'continue'
+    PAUSE = 'pause'
+    RESUME = 'resume'
+    EVALUATE_CONDITION = 'evaluate_condition'
+    CHANGE_VARIABLE = 'change_variable'
+    
+class AgentEventMessage:
+    
+    AGENT_INITIALIZING = 'agent_initializing'
+    READY_TO_START = 'ready_to_start'
+    VERSION = 'version'
+    START_SUITE = 'start_suite'
+    END_SUITE = 'end_suite'
+    START_TEST = 'start_test'
+    END_TEST = 'end_test'
+    PRE_START_KEYWORD = "pre_start_keyword"
+    START_KEYWORD = 'start_keyword'
+    PRE_END_KEYWORD = "pre_end_keyword"
+    END_KEYWORD = 'end_keyword'
+    SHOULD_CONTINUE = 'should_continue'
+    CONDITION_RESULT = 'condition_result'
+    VARS_CHANGED = 'vars_changed'
+    PAUSED = 'paused'
+    RESUMED = 'resumed'
+    RESOURCE_IMPORT = 'resource_import'
+    LIBRARY_IMPORT = 'library_import'
+    MESSAGE = 'message'
+    LOG_MESSAGE = 'log_message'
+    LOG_FILE = 'log_file'
+    REPORT_FILE = 'report_file'
+    OUTPUT_FILE = 'output_file'
+    CLOSE = 'close'
+    
+class AgentMode:
+    
+    RUN = 'run'
+    DEBUG = 'debug'
+    
+class PausingPoint:
+    
+    PRE_START_KEYWORD = 'PRE_START_KEYWORD'
+    START_KEYWORD = 'START_KEYWORD'
+    PRE_END_KEYWORD = 'PRE_END_KEYWORD'
+    END_KEYWORD = 'END_KEYWORD'
+
 class TestRunnerAgent:
     """Pass all listener events to a remote listener
 
-    If called with one argument, that argument is a port
-    If called with two, the first is a hostname, the second is a port
+    If called with one argument, that argument is a port, localhost is used as host, 30 seconds is a connection timeout
+    If called with two, the first is a host, the second is a port, 30 seconds is a connection timeout
+    If called with three, the first is a host, the second is a port, the third is a connection timeout
     """
     ROBOT_LISTENER_API_VERSION = 2
     
     CONNECTION_SLEEP_BETWEEN_TRIALS = 2
     
-    RED_AGENT_PROTOCOL_VERSION = 1
+    RED_AGENT_PROTOCOL_VERSION = 2
     
     MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
 
     def __init__(self, *args):
         if len(args) == 1:
-            self.host, self.port, connection_timeout = 'localhost', int(args[0]), 30
+            host, port, connection_timeout = 'localhost', int(args[0]), 30
         elif len(args) == 2:
-            self.host, self.port, connection_timeout = args[0], int(args[1]), 30
+            host, port, connection_timeout = args[0], int(args[1]), 30
         else:
-            self.host, self.port, connection_timeout = args[0], int(args[1]), int(args[2])
+            host, port, connection_timeout = args[0], int(args[1]), int(args[2])
         
-        self.sock = None
-        self.decoder_encoder = None
+        self._is_connected, self.sock, self.decoder_encoder = self._connect(host, port, connection_timeout)
         
-        if self._connect(connection_timeout):
-            self._is_debug_enabled, wait_for_signal = self._send_agent_initializing()
-            self._send_version()
-            if self._check_protocol_version():
-                self._send_global_variables()
-            else:
-                self._is_debug_enabled, wait_for_signal = False, False
+        if self._is_connected:
+            self._handshake()
+            self._built_in = BuiltIn()
         else:
-            self._is_debug_enabled, wait_for_signal = False, False
+            self._mode = None
         
-        self._debugger = RobotDebugger(self._is_debug_enabled)
-        self._create_kill_server()
+    def _handshake(self):
+        self._send_to_server(AgentEventMessage.AGENT_INITIALIZING)
+        self._mode, wait_for_signal = self._receive_operating_mode()
         
-        self._wait_for_requestor(wait_for_signal)
-
-    def _wait_for_requestor(self, wait_for_signal):
-        if wait_for_signal:
-            self._send_to_server('ready_to_start')
-            self._wait_for_reponse('do_start')
-
-    def _create_kill_server(self):
-        self._killer = RobotKillerServer(self._debugger)
-        self._server_thread = threading.Thread(
-                target=self._killer.serve_forever)
-        self._server_thread.setDaemon(True)
-        self._server_thread.start()
-        self._send_server_port(self._killer.server_address[1])
-
-    def _send_agent_initializing(self):
-        self._send_to_server('agent_initializing', '')
-        return self._receive_operating_mode()
+        self._send_version()
+        _, response = self._wait_for_reponse(RedResponseMessage.PROTOCOL_VERSION)
+        is_correct = response[RedResponseMessage.PROTOCOL_VERSION]['is_correct']
+        error = response[RedResponseMessage.PROTOCOL_VERSION]['error']
         
+        if is_correct and wait_for_signal:
+            self._send_to_server(AgentEventMessage.READY_TO_START)
+            self._wait_for_reponse(RedResponseMessage.DO_START)
+        elif not is_correct:
+            self._close_connection()
+            self._print_error_message(error +
+                 '\nClosing connection. Please use agent script as exported from RED instance you\'re using')
+            
     def _receive_operating_mode(self):
-        _, response = self._wait_for_reponse('operating_mode')
-        operating_mode = response['operating_mode']
-        return operating_mode['mode'].lower() == 'debug', operating_mode['wait_for_start_allowance']
+        _, response = self._wait_for_reponse(RedResponseMessage.OPERATING_MODE)
+        operating_mode = response[RedResponseMessage.OPERATING_MODE]
+        return operating_mode['mode'].lower(), operating_mode['wait_for_start_allowance']
         
     def _send_version(self):
-        from robot import version
         robot_version = 'Robot Framework ' + version.get_full_version()
-        info = {'python' : sys.version, 'robot' : robot_version, 'protocol' : self.RED_AGENT_PROTOCOL_VERSION}
-        self._send_to_server('version', info)
-        
-    def _check_protocol_version(self):
-        _, response = self._wait_for_reponse('protocol_version')
-        is_correct = response['protocol_version']['is_correct']
-        
-        if not is_correct:
-            self._close_connection()
-            self._print_error_message('TestRunnerAgent <-> RED protocol version mismatch. ' +
-                 'Closing connection. Please use agent script as exported from RED instance you\'re using')
-        return is_correct
-        
-    def _send_global_variables(self):
-        variables = {}
-        try:
-            try:
-                from robot.variables import GLOBAL_VARIABLES
-                variables = GLOBAL_VARIABLES
-            except ImportError:  # for robot >2.9
-                from robot.conf.settings import RobotSettings
-                from robot.variables.scopes import GlobalVariables
-                variables = GlobalVariables(RobotSettings()).as_dict()
-
-            data = {}
-            for key in variables.keys():
-                new_key = '${' + key + '}' if not key.startswith('${') and not key.startswith('@{') else key
-                data[new_key] = str(variables[key])
-            self._send_to_server('global_vars', 'global_vars', data)
-        except Exception as e:
-            self._print_error_message(
-                'Global variables sending error: ' + str(e) + ' Global variables: ' + str(variables))
-
-    def _send_server_port(self, port):
-        self._send_to_server('port', port)
-
-    def start_test(self, name, attrs):
-        self._send_to_server('start_test', name, attrs)
-
-    def end_test(self, name, attrs):
-        self._send_to_server('end_test', name, attrs)
+        info = {'cmd_line': ' '.join(sys.argv), 
+                'python' : sys.version, 
+                'robot' : robot_version, 
+                'protocol' : self.RED_AGENT_PROTOCOL_VERSION}
+        self._send_to_server(AgentEventMessage.VERSION, info)
 
     def start_suite(self, name, attrs):
-        self._send_to_server('start_suite', name, attrs)
+        attrs_copy = copy.copy(attrs)
+        del attrs_copy['doc']
+        attrs_copy['is_dir'] = os.path.isdir(attrs['source'])
+        attrs_copy['vars_scopes'] = self._collect_variables() if self._mode == AgentMode.DEBUG else []
+        
+        self._send_to_server(AgentEventMessage.START_SUITE, name, attrs_copy)
 
     def end_suite(self, name, attrs):
-        self._send_to_server('end_suite', name, attrs)
+        attrs_copy = copy.copy(attrs)
+        del attrs_copy['doc']
+        attrs_copy['is_dir'] = os.path.isdir(attrs['source'])
+        
+        self._send_to_server(AgentEventMessage.END_SUITE, name, attrs_copy)
+
+    def start_test(self, name, attrs):
+        attrs_copy = copy.copy(attrs)
+        del attrs_copy['doc']
+        attrs_copy['vars_scopes'] = self._collect_variables() if self._mode == AgentMode.DEBUG else []
+        self._send_to_server(AgentEventMessage.START_TEST, name, attrs_copy)
+
+    def end_test(self, name, attrs):
+        attrs_copy = copy.copy(attrs)
+        del attrs_copy['doc']
+        self._send_to_server(AgentEventMessage.END_TEST, name, attrs_copy)
 
     def start_keyword(self, name, attrs):
         # we're cutting args from original attrs dictionary, because it may contain 
         # objects which are not json-serializable and we don't need them anyway
         attrs_copy = copy.copy(attrs)
-        attrs_copy['args'] = list()
-        self._send_to_server('start_keyword', name, attrs_copy)
+        del attrs_copy['args']
+        del attrs_copy['doc']
+        del attrs_copy['assign']
+        attrs_copy['vars_scopes'] = self._collect_variables() if self._mode == AgentMode.DEBUG else []
         
-        if self._is_debug_enabled:
-            self._send_vars()
-            if self._should_stop_on_breakpoint():
-                self._send_to_server('paused')
+        # this is done in order to reuse json encoded objects as they are sent twice in DEBUG mode
+        json_obj = self._encode_to_json((name, attrs_copy))
+        if self._mode == AgentMode.DEBUG:
+            self._send_to_server_json(AgentEventMessage.PRE_START_KEYWORD, json_obj)
+            if self._is_connected and self._should_pause(PausingPoint.PRE_START_KEYWORD):
                 self._wait_for_resume()
 
-    def _send_vars(self):
-        vars = {}
-        try:
-            from robot.libraries.BuiltIn import BuiltIn
-            vars = BuiltIn().get_variables()
-            data = {}
-            for k in vars.keys():
-                value = vars[k]
-                if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
-                    try:
-                        if type(value) is list or isinstance(value, dict):
-                            data[k] = _fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, copy.copy(value))
-                        else:
-                            data[k] = str(_fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, value))
-                    except:
-                        data[k] = 'None'
-            self._send_to_server('vars', 'vars', data)
-        except Exception as e:
-            self._print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
-
-    def _wait_for_resume(self):
-        resumed = False
-        while not resumed:
-            response_name, response = self._wait_for_reponse('resume', 'interrupt', 'variable_change')
-        
-            if response_name == 'interrupt':
-                sys.exit()
-            elif response_name == 'variable_change':
-                self._check_changed_variable(response)
-            else:
-                self._debugger.resume()
-                resumed = True
-
-    def _should_stop_on_breakpoint(self):
-        self._send_to_server('check_condition')
-        while True:
-            response_name, response = self._wait_for_reponse('stop', 'continue', 'interrupt', 'keyword_condition')
-            if response_name == 'stop':
-                return True
-            elif response_name == 'continue':
-                return False
-            elif response_name == 'interrupt':
-                sys.exit()
-            elif response_name == 'keyword_condition':
-                self._run_condition_keyword(response)
-
-    def _run_condition_keyword(self, condition):
-        try:
-            elements = condition['keyword_condition']
-            keywordName, argList = elements[0], elements[1:]
-            
-            from robot.libraries.BuiltIn import BuiltIn
-            result = BuiltIn().run_keyword_and_return_status(keywordName, *argList)
-            
-            self._send_to_server('condition_result', result)
-        except Exception as e:
-            self._send_to_server('condition_error', str(e))
-        self._send_to_server('condition_checked')
-
-    def _check_changed_variable(self, data):
-        try:
-            js = data['variable_change']
-            from robot.libraries.BuiltIn import BuiltIn
-            vars = BuiltIn().get_variables()
-            for key in js.keys():
-                if key in vars:
-                    if len(js[key]) > 1:
-                        from robot.libraries.Collections import Collections
-                        if len(js[key]) == 2:
-                            if isinstance(vars[key], dict):
-                                Collections().set_to_dictionary(vars[key], js[key][0], js[key][1])
-                            else:
-                                Collections().set_list_value(vars[key], js[key][0], js[key][1])
-                        else:
-                            nestedList = vars[key]
-                            newValue = ''
-                            newValueIndex = 0
-                            indexList = 1
-                            for value in js[key]:
-                                if indexList < (len(js[key]) - 1):
-                                    nestedList = Collections().get_from_list(nestedList, int(value))
-                                    indexList = indexList + 1
-                                elif indexList == (len(js[key]) - 1):
-                                    newValueIndex = int(value)
-                                    indexList = indexList + 1
-                                elif indexList == len(js[key]):
-                                    newValue = value
-                            Collections().set_list_value(nestedList, newValueIndex, newValue)
-                    else:
-                        BuiltIn().set_test_variable(key, js[key][0])
-        except Exception as e:
-            self._print_error_message('Setting variables error: ' + str(e) + ' Received data:' + str(data))
+        self._send_to_server_json(AgentEventMessage.START_KEYWORD, json_obj)
+        if self._is_connected and self._should_pause(PausingPoint.START_KEYWORD):
+            self._wait_for_resume()
 
     def end_keyword(self, name, attrs):
         attrs_copy = copy.copy(attrs)
-        attrs_copy['args'] = list()
-        self._send_to_server('end_keyword', name, attrs_copy)
-        self._debugger.end_keyword(attrs['status'] == 'PASS')
+        del attrs_copy['args']
+        del attrs_copy['doc']
+        del attrs_copy['assign']
+        
+        json_obj = self._encode_to_json((name, attrs_copy))
+        if self._mode == AgentMode.DEBUG:
+            self._send_to_server_json(AgentEventMessage.PRE_END_KEYWORD, json_obj)
+            if self._is_connected and self._should_pause(PausingPoint.PRE_END_KEYWORD):
+                self._wait_for_resume()
+        
+        self._send_to_server_json(AgentEventMessage.END_KEYWORD, json_obj)
+        if self._is_connected and self._should_pause(PausingPoint.END_KEYWORD):
+            self._wait_for_resume()
+            
+    def _collect_variables(self):
+        # WARNING : this method uses protected RF methods/fields so it is sensitive for RF changes;
+        # currently works fine for RF 2.9 - 3.0
+        variables = self._built_in._variables
+        frames = variables._scopes
+        
+        all_frames = []
+        
+        i = 0
+        last_suite_index = frames.index(variables._suite)
+        test_index = frames.index(variables._test) if variables._test else -1
+        for current_frame in frames:
+
+            current_frame_values = {}
+            frame_vars = OrderedDict()
+            for variable in current_frame.store:
+                value = current_frame.store[variable]
+                var, _ = current_frame.store._decorate(variable, value)
+                if i == 0:
+                    identified_scope = 'global'
+                elif var in previous_frame_values and value == previous_frame_values[var][1]:
+                    identified_scope = previous_frame_values[var][0]
+                elif i <= last_suite_index:
+                    identified_scope = 'suite'
+                elif i == test_index:
+                    identified_scope = 'test' if '$' + var[1:] in variables._variables_set._test else 'local'
+                else:
+                    identified_scope = 'local'
+                
+                
+                if inspect.ismodule(value) or inspect.isfunction(value) or inspect.isclass(value):
+                    frame_vars[var] = (type(value).__name__, '<' + id(value) + '>', identified_scope)
+                else:
+                    try:
+                        labeled = _label_with_types(value)
+                        fixed = _fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, labeled)
+                        if type(value) is list or isinstance(value, Mapping):
+                            frame_vars[var] = (fixed[0], fixed[1], identified_scope)
+                        else:
+                            frame_vars[var] = (fixed[0], str(fixed[1]), identified_scope)
+                    except:
+                        frame_vars[var] = (type(value).__name__, '<error retrieving value>', identified_scope)
+
+                current_frame_values[var] = (identified_scope, value)    
+            
+            all_frames.append(frame_vars)
+            previous_frame_values = current_frame_values
+            i += 1
+        all_frames.reverse()
+        return all_frames
+            
+    def _should_pause(self, pausing_point):
+        self._send_to_server(AgentEventMessage.SHOULD_CONTINUE, {'pausing_point' : pausing_point})
+        
+        possible_responses = [
+            RedResponseMessage.CONTINUE, 
+            RedResponseMessage.PAUSE,
+            RedResponseMessage.TERMINATE, 
+            RedResponseMessage.DISCONNECT]
+        if self._mode == AgentMode.DEBUG and pausing_point in [PausingPoint.PRE_START_KEYWORD, PausingPoint.PRE_END_KEYWORD]:
+            possible_responses.append(RedResponseMessage.EVALUATE_CONDITION)
+        
+        response_name, response = self._wait_for_reponse(*possible_responses)
+        while True:
+            if response_name == RedResponseMessage.TERMINATE:
+                sys.exit()
+            elif response_name == RedResponseMessage.DISCONNECT:
+                self._close_connection()
+                return False
+            elif response_name == RedResponseMessage.CONTINUE:
+                return False
+            elif response_name == RedResponseMessage.PAUSE:
+                return True
+            elif response_name == RedResponseMessage.EVALUATE_CONDITION:
+                return self._evaluate_condition(response)
+                
+    def _evaluate_condition(self, condition):
+        try:
+            elements = condition[RedResponseMessage.EVALUATE_CONDITION]
+            keywordName, argList = elements[0], elements[1:]
+
+            result = self._built_in.run_keyword_and_return_status(keywordName, *argList)
+            self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'result': result})
+            return result
+        except Exception as e:
+            msg = 'Error occurred when evaluating breakpoint condition. ' + str(e)
+            self._send_to_server(AgentEventMessage.CONDITION_RESULT, {'error': msg})
+            return True
+
+    def _wait_for_resume(self):
+        possible_responses = [
+            RedResponseMessage.RESUME,
+            RedResponseMessage.TERMINATE, 
+            RedResponseMessage.DISCONNECT] 
+        if self._mode == AgentMode.DEBUG:
+            possible_responses.append(RedResponseMessage.CHANGE_VARIABLE)
+        
+        while True:
+            self._send_to_server(AgentEventMessage.PAUSED)
+            response_name, response = self._wait_for_reponse(*possible_responses)
+        
+            if response_name == RedResponseMessage.TERMINATE:
+                sys.exit()
+            elif response_name == RedResponseMessage.DISCONNECT:
+                self._close_connection()
+                return
+            elif response_name == RedResponseMessage.CHANGE_VARIABLE:
+                self._change_variable_value(response)
+            elif response_name == RedResponseMessage.RESUME:
+                self._send_to_server(AgentEventMessage.RESUMED)
+                return
+            
+    def _change_variable_value(self, response):
+        try:
+            arguments = response[RedResponseMessage.CHANGE_VARIABLE]
+            var_name = arguments['name']
+            scope = arguments['scope']
+            
+            if scope not in ['local', 'test_case', 'test_suite', 'global']:
+                err = 'Unable to change value of variable ' + var_name + ' inside unrecognized scope ' + str(scope)
+                self._print_error_message(err)
+                self._send_vars_changed(err)
+                
+            new_values = arguments['values']
+            level = arguments['level'] + 1 # adding one because globals are not taken into account
+            
+            if 'path' in arguments:
+                self._change_variable_inner_value(var_name, level, arguments['path'], new_values)
+            else:
+                self._change_variable_on_top_level(var_name, scope, level, new_values)
+            
+            self._send_vars_changed()
+        except Exception as e:
+            err = 'Unable to change value of variable ' + var_name + '. ' + str(e)
+            self._print_error_message(err)
+            self._send_vars_changed(err)
+            
+    def _change_variable_on_top_level(self, var_name, scope, level, new_values):
+        # WARNING : this method uses protected RF methods/fields so it is sensitive for RF changes;
+        # currently works fine for RF 2.9 - 3.0
+        if scope == 'local':
+            name = self._built_in._get_var_name(var_name)
+            value = self._built_in._get_var_value(name, new_values)
+            
+            self._built_in._variables._scopes[level][name] = value
+            self._built_in._log_set_variable(name, value)
+
+        elif scope == 'test_case':
+            self._built_in.set_test_variable(var_name, *new_values)
+
+        elif scope == 'test_suite':
+            if level >= len(self._built_in._variables._scopes) - len([s for s in self._built_in._variables._scopes_until_suite]):
+                # variable in lowest suite, so we'll use keyword
+                self._built_in.set_suite_variable(var_name, *new_values)
+            else:
+                # variable in higher order suite
+                name = self._built_in._get_var_name(var_name)
+                value = self._built_in._get_var_value(name, new_values)
+                
+                self._built_in._variables._scopes[level][name] = value
+                self._built_in._variables._variables_set._scopes[level - 1][name] = value
+                self._built_in._log_set_variable(name, value)
+
+        else:
+            self._built_in.set_global_variable(var_name, *new_values)
+    
+    def _change_variable_inner_value(self, name, level, path, new_values):
+        # WARNING : this method uses protected RF methods/fields so it is sensitive for RF changes;
+        # currently works fine for RF 2.9 - 3.0
+        types = {'scalar' : '$', 'list' : '@', 'dict' : '&'}
+        value = self._built_in._get_var_value(types[path[-1][0]] + '{temp_name}', new_values)
+        
+        old_value = self._built_in._variables._scopes[level].as_dict()[name]
+        
+        self._change_inner_value(old_value, path[:-1], value)
+        
+    def _change_inner_value(self, object, path, value):
+        val_kind, addr = path[0]
+        
+        if val_kind == 'list' and isinstance(object, list) or val_kind == 'dict' and isinstance(object, Mapping):
+            if len(path) == 1:
+                object[addr] = value
+            else:
+                self._change_inner_value(object[addr], path[1:], value)
+        else:
+            raise RuntimeError('Requested to change value in ' + val_kind + ' object type, but ' + type(object).__name__ + 'found')
+
+    def _send_vars_changed(self, error=None):
+        vars = self._collect_variables()
+        if error:
+            self._send_to_server(AgentEventMessage.VARS_CHANGED, {'var_scopes': vars, 'error': error})
+        else:
+            self._send_to_server(AgentEventMessage.VARS_CHANGED, {'var_scopes': vars})
 
     def resource_import(self, name, attributes):
-        self._send_to_server('resource_import', name, attributes)
+        self._send_to_server(AgentEventMessage.RESOURCE_IMPORT, name, attributes)
 
     def library_import(self, name, attributes):
         # equals org.python.core.ClasspathPyImporter.PYCLASSPATH_PREFIX
@@ -370,25 +524,25 @@ class TestRunnerAgent:
                     f = File(URL(path).getFile())
                     source_uri_txt = f.getAbsolutePath()
                 attributes['source'] = source_uri_txt
-        self._send_to_server('library_import', name, attributes)
+        self._send_to_server(AgentEventMessage.LIBRARY_IMPORT, name, attributes)
 
     def message(self, message):
         if message['level'] in ('ERROR', 'FAIL', 'NONE'):
-            self._send_to_server('message', message)
+            self._send_to_server(AgentEventMessage.MESSAGE, message)
 
     def log_message(self, message):
         if _is_logged(message['level']):
             message['message'] = _truncate(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, message['message'])
-            self._send_to_server('log_message', message)
+            self._send_to_server(AgentEventMessage.LOG_MESSAGE, message)
 
     def log_file(self, path):
-        self._send_to_server('log_file', path)
+        self._send_to_server(AgentEventMessage.LOG_FILE, path)
 
     def output_file(self, path):
-        self._send_to_server('output_file', path)
+        self._send_to_server(AgentEventMessage.OUTPUT_FILE, path)
 
     def report_file(self, path):
-        self._send_to_server('report_file', path)
+        self._send_to_server(AgentEventMessage.REPORT_FILE, path)
 
     def summary_file(self, path):
         pass
@@ -397,41 +551,39 @@ class TestRunnerAgent:
         pass
 
     def close(self):
-        self._send_to_server('close')
+        self._send_to_server(AgentEventMessage.CLOSE)
         self._close_connection()
-            
-    def _close_connection(self):
-        if self.sock:
-            self.decoder_encoder.close()
-            self.decoder_encoder = None
-            
-            self.sock.close()           
-            self.sock = None
 
     def _print_error_message(self, message):
         sys.stderr.write('[ ERROR ] ' + message + '\n')
         sys.stderr.flush()
 
-    def _connect(self, connection_timeout):
+    def _connect(self, host, port, connection_timeout):
         '''Establish a connection for sending data'''
         trials = 1
         start = time.time()
         
         while int(time.time() - start) < connection_timeout:
+            sock = None
             try:
-                self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.sock.connect((self.host, self.port))
-                self.decoder_encoder = MessagesDecoderEncoder(self.sock)
-                return True
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock.connect((host, port))
+                return True, sock, MessagesDecoderEncoder(sock)
             except socket.error as e:
                 print('TestRunnerAgent: connection trial #%s failed' % trials)
-                print('\tUnable to open socket to "%s:%s"'  % (self.host, self.port))
+                print('\tUnable to open socket to "%s:%s"'  % (host, port))
                 print('\terror: %s' % str(e))
-                self.sock = None
-                self.decoder_encoder = None
                 time.sleep(self.CONNECTION_SLEEP_BETWEEN_TRIALS)
             trials += 1
-        return False
+        return False, None, None
+    
+    def _encode_to_json(self, obj):
+        try:
+            return self.decoder_encoder._encode(obj)
+        except Exception:
+            traceback.print_exc(file=sys.stdout)
+            sys.stdout.flush()
+            raise
 
     def _send_to_server(self, name, *args):
         try:
@@ -439,18 +591,24 @@ class TestRunnerAgent:
                 packet = {name: args}
                 self.decoder_encoder.dump(packet)
         except Exception:
-            import traceback
+            traceback.print_exc(file=sys.stdout)
+            sys.stdout.flush()
+            raise
 
+    def _send_to_server_json(self, name, json_encoded_obj):
+        try:
+            if self.decoder_encoder:
+                self.decoder_encoder._write('{"%s": %s}' % (name, json_encoded_obj))
+        except Exception:
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
             raise
         
     def _wait_for_reponse(self, *expected_responses):
         response = self._receive_from_server()
-        response_key = list(response.keys())[0]
+        response_key = next(iter(response))
         while not response_key in expected_responses:
             response = self._receive_from_server()
-            response_key = list(response.keys())[0]
         return response_key, response
     
     def _receive_from_server(self):
@@ -458,39 +616,51 @@ class TestRunnerAgent:
             if self.decoder_encoder:
                 return self.decoder_encoder.load()
         except Exception:
-            import traceback
-
             traceback.print_exc(file=sys.stdout)
             sys.stdout.flush()
             raise
+            
+    def _close_connection(self):
+        if self._is_connected:
+            self._mode = None
+            self._is_connected = False
+            
+            self.decoder_encoder.close()
+            self.decoder_encoder = None
+            
+            self.sock.close()           
+            self.sock = None
+            
 
 class MessagesDecoderEncoder(object):
     
     def __init__(self, sock):
+        self._string_encoder = (lambda s : s) if sys.version_info < (3, 0, 0) else (lambda s : bytes(s, 'UTF-8'))
+        self._string_decoder = (lambda s : s) if sys.version_info < (3, 0, 0) else (lambda s : str(s, 'UTF-8')) 
         self._json_encoder = json.JSONEncoder(separators=(',', ':'), sort_keys=True).encode
         self._json_decoder = json.JSONDecoder(strict=False).decode
         # IronPython does not return right object type if not binary mode
         self._file_to_write = sock.makefile('wb')
         self._file_to_read = sock.makefile('rb')
 
+    def _encode(self, obj):
+        return self._json_encoder(obj)
+
     def dump(self, obj):
+        self._write(self._json_encoder(obj))
+        
+    def _write(self, json_encoded_obj):
         if not self._can_write():
             return
-        json_string = self._json_encoder(obj) + '\n'
-        if sys.version_info < (3, 0, 0):
-            self._file_to_write.write(json_string)
-        else:
-            self._file_to_write.write(bytes(json_string, 'UTF-8'))
+        json_string = json_encoded_obj + '\n'
+        self._file_to_write.write(self._string_encoder(json_string))
         self._file_to_write.flush()
             
     def load(self):
         if not self._can_read():
             return
         json_string = self._file_to_read.readline();
-        if sys.version_info < (3, 0, 0):
-            return self._json_decoder(json_string)
-        else:
-            return self._json_decoder(str(json_string, 'UTF-8'))
+        return self._json_decoder(self._string_decoder(json_string))
     
     def _can_write(self):
         return self._file_to_write is not None
@@ -503,90 +673,3 @@ class MessagesDecoderEncoder(object):
             self._file_to_write.close()
         if self._can_read():
             self._file_to_read.close()
-        
-
-class RobotDebugger(object):
-    def __init__(self, pause_on_failure=False):
-        self._state = 'running'
-        self._keyword_level = 0
-        self._pause_when_on_level = -1
-        self._pause_on_failure = pause_on_failure
-        self._resume = threading.Event()
-
-    @staticmethod
-    def is_breakpoint(name, attrs):
-        return name == 'BuiltIn.Comment' and attrs['args'] == ['PAUSE']
-
-    def pause(self):
-        self._resume.clear()
-        self._state = 'pause'
-
-    def pause_on_failure(self, pause):
-        self._pause_on_failure = pause
-
-    def resume(self):
-        self._state = 'running'
-        self._pause_when_on_level = -1
-        self._resume.set()
-
-    def step_next(self):
-        self._state = 'step_next'
-        self._resume.set()
-
-    def step_over(self):
-        self._state = 'step_over'
-        self._resume.set()
-
-    def start_keyword(self):
-        while self._state == 'pause':
-            self._resume.wait()
-            self._resume.clear()
-        if self._state == 'step_next':
-            self._state = 'pause'
-        elif self._state == 'step_over':
-            self._pause_when_on_level = self._keyword_level
-            self._state = 'resume'
-        self._keyword_level += 1
-
-    def end_keyword(self, passed=True):
-        self._keyword_level -= 1
-        if self._keyword_level == self._pause_when_on_level \
-                or (self._pause_on_failure and not passed):
-            self._state = 'pause'
-
-    def is_paused(self):
-        return self._state == 'pause'
-        
-
-class RobotKillerServer(socketserver.TCPServer):
-    allow_reuse_address = True
-
-    def __init__(self, debugger):
-        socketserver.TCPServer.__init__(self, ('', 0), RobotKillerHandler)
-        self.debugger = debugger
-
-
-class RobotKillerHandler(socketserver.StreamRequestHandler):
-    def handle(self):
-        data = self.request.makefile('r').read().strip()
-        if data == 'kill':
-            self._signal_kill()
-        elif data == 'pause':
-            self.server.debugger.pause()
-        elif data == 'resume':
-            self.server.debugger.resume()
-        elif data == 'step_next':
-            self.server.debugger.step_next()
-        elif data == 'step_over':
-            self.server.debugger.step_over()
-        elif data == 'pause_on_failure':
-            self.server.debugger.pause_on_failure(True)
-        elif data == 'do_not_pause_on_failure':
-            self.server.debugger.pause_on_failure(False)
-
-    @staticmethod
-    def _signal_kill():
-        try:
-            STOP_SIGNAL_MONITOR(1, '')
-        except ExecutionFailed:
-            pass

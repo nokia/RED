@@ -5,10 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
+import java.util.Optional;
+
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewPart;
@@ -48,7 +49,8 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
     public static class E4ShowInDocViewHandler {
 
         @Execute
-        public void showInDocView(@Optional @Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void showInDocView(
+                @org.eclipse.e4.core.di.annotations.Optional @Named(Selections.SELECTION) final IStructuredSelection selection,
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel) {
 
@@ -97,9 +99,9 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                         }
                     }
                     if (parent != null) {
-                        final RobotDefinitionSetting docSettingFromParent = parent
+                        final Optional<RobotDefinitionSetting> docSettingFromParent = parent
                                 .findSetting(ModelType.TEST_CASE_DOCUMENTATION, ModelType.USER_KEYWORD_DOCUMENTATION);
-                        view.showDocumentation(docSettingFromParent);
+                        view.showDocumentation(docSettingFromParent.orElse(null));
                     }
                 }
             }

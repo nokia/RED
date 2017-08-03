@@ -5,40 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
-import org.rf.ide.core.execution.server.AgentServerStatusListener;
+import org.rf.ide.core.execution.server.DefaultAgentServerStatusListener;
 
 
-class ServerProblemsHandler implements AgentServerStatusListener {
-
-    @Override
-    public void serverEstablished(final String host, final int port) {
-        // that's fine, nothing to do
-    }
-
-    @Override
-    public void clientConnected(final int clientId) {
-        // that's fine, nothing to do
-    }
-
-    @Override
-    public void clientConnectionClosed(final int clientId) {
-        // that's fine, nothing to do
-    }
-
-    @Override
-    public void clientConnectionTimedOut(final SocketTimeoutException e) {
-        // throw new RedServerException("Server error: timed out when waiting for agent connection",
-        // e);
-    }
-
-    @Override
-    public void clientConnectionError(final IOException e) {
-        // throw new RedServerException("Server error: problem connecting with agent", e);
-    }
+class ServerProblemsHandler extends DefaultAgentServerStatusListener {
 
     @Override
     public void clientEventHandlingError(final RobotAgentEventsListenerException e) {

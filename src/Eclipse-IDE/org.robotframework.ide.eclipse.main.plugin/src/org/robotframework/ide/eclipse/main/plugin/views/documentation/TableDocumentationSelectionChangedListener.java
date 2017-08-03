@@ -111,9 +111,9 @@ class TableDocumentationSelectionChangedListener implements ISelectionChangedLis
                 view.showLibdoc(robotFileInternalElement);
             } else if (docViewUpdateType == DocViewUpdateType.PARENT && currentElementParent != null) {
                 final RobotCodeHoldingElement<?> codeHoldingElement = (RobotCodeHoldingElement<?>) currentElementParent;
-                final RobotDefinitionSetting docSettingFromParent = codeHoldingElement
+                final Optional<RobotDefinitionSetting> docSettingFromParent = codeHoldingElement
                         .findSetting(ModelType.TEST_CASE_DOCUMENTATION, ModelType.USER_KEYWORD_DOCUMENTATION);
-                view.showDocumentation(docSettingFromParent);
+                view.showDocumentation(docSettingFromParent.orElse(null));
             }
             return Status.OK_STATUS;
         }

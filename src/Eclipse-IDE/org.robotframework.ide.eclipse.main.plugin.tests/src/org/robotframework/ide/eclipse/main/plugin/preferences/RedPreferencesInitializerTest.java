@@ -88,6 +88,8 @@ public class RedPreferencesInitializerTest {
         verify(preferences).put(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "127.0.0.1");
         verify(preferences).putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, 43_981);
         verify(preferences).putInt(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT, 30);
+        verify(preferences).put(RedPreferences.DEBUGGER_SUSPEND_ON_ERROR, "prompt");
+        verify(preferences).putBoolean(RedPreferences.DEBUGGER_OMIT_LIB_KEYWORDS, false);
     }
 
     @Test
