@@ -5,13 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -29,33 +31,54 @@ import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * @author Michal Anglart
- *
  */
 public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
 
-    public static List<ChangeImportedPathFixer> createFixersForSameFile(final IFile problematicFile, final IPath invalidPath) {
-        final List<ChangeImportedPathFixer> fixers = newArrayList();
-        final String lastSegment = invalidPath.lastSegment();
+    public static List<ChangeImportedPathFixer> createFixersForSameFile(final IFile problematicFile,
+            final IPath invalidPath) {
+        final List<IPath> filePaths = findFilePathsWithTheSameLastSegment(invalidPath.lastSegment());
+        return filePaths.stream()
+                .sorted(createPathsComparator(problematicFile.getProject()))
+                .map(path -> createCurrentFileRelativePath(problematicFile.getFullPath(), path))
+                .map(ChangeImportedPathFixer::new)
+                .collect(Collectors.toList());
+    }
+
+    private static List<IPath> findFilePathsWithTheSameLastSegment(final String lastSegment) {
+        final List<IPath> paths = new ArrayList<>();
         try {
             ResourcesPlugin.getWorkspace().getRoot().accept(new IResourceVisitor() {
+
                 @Override
                 public boolean visit(final IResource resource) throws CoreException {
-                    if (resource.getType() == IResource.FILE && resource.getFullPath().lastSegment().equals(lastSegment)) {
-                        final IPath resRelativePath = createCurrentFileRelativePath(problematicFile, (IFile) resource);
-
-                        fixers.add(new ChangeImportedPathFixer(resRelativePath));
+                    if (resource.getType() == IResource.FILE
+                            && resource.getFullPath().lastSegment().equals(lastSegment)) {
+                        paths.add(resource.getFullPath());
                     }
                     return true;
                 }
             });
         } catch (final CoreException e) {
-            return fixers;
+            // ok, we'll return what we've gathered so far
         }
-        return fixers;
+        return paths;
     }
 
-    private static IPath createCurrentFileRelativePath(final IFile from, final IFile to) {
-        return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1);
+    private static IPath createCurrentFileRelativePath(final IPath from, final IPath to) {
+        return to.makeRelativeTo(from).removeFirstSegments(1);
+    }
+
+    private static Comparator<IPath> createPathsComparator(final IProject project) {
+        return new Comparator<IPath>() {
+
+            @Override
+            public int compare(final IPath path1, final IPath path2) {
+                final String projectFolderName = project.getFullPath().segment(0);
+                final boolean isFromProject1 = path1.segment(0).equals(projectFolderName);
+                final boolean isFromProject2 = path2.segment(0).equals(projectFolderName);
+                return Boolean.compare(isFromProject2, isFromProject1);
+            }
+        };
     }
 
     private final IPath validFileRelativePath;
