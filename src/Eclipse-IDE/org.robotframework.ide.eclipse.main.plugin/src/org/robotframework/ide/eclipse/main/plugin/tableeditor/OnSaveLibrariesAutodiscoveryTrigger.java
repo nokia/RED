@@ -49,7 +49,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
     private static OnSaveLibrariesAutodiscoveryTrigger globalBatchSaveResponsibleTrigger = null;
 
-    private static final List<RobotSuiteFile> suitesForDiscover = new ArrayList<>();
+    private static final List<RobotSuiteFile> SUITES_FOR_DISCOVER = new ArrayList<>();
 
     private final DiscovererFactory discovererFactory;
 
@@ -80,7 +80,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     public void notHandled(final String commandId, final NotHandledException exception) {
         if (SAVE_ALL_COMMAND_ID.equals(commandId)) {
             globalBatchSaveResponsibleTrigger = null;
-            suitesForDiscover.clear();
+            SUITES_FOR_DISCOVER.clear();
         }
     }
 
@@ -88,7 +88,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     public void postExecuteFailure(final String commandId, final ExecutionException exception) {
         if (SAVE_ALL_COMMAND_ID.equals(commandId)) {
             globalBatchSaveResponsibleTrigger = null;
-            suitesForDiscover.clear();
+            SUITES_FOR_DISCOVER.clear();
         }
     }
 
@@ -97,14 +97,14 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         if (globalBatchSaveResponsibleTrigger == this && SAVE_ALL_COMMAND_ID.equals(commandId)) {
             globalBatchSaveResponsibleTrigger = null;
 
-            if (!suitesForDiscover.isEmpty()) {
-                final RobotProject project = suitesForDiscover.get(0).getProject();
-                final List<IFile> suites = suitesForDiscover.stream()
+            if (!SUITES_FOR_DISCOVER.isEmpty()) {
+                final RobotProject project = SUITES_FOR_DISCOVER.get(0).getProject();
+                final List<IFile> suites = SUITES_FOR_DISCOVER.stream()
                         .map(RobotSuiteFile::getFile)
                         .collect(Collectors.toList());
                 startAutoDiscovering(project, suites);
             }
-            suitesForDiscover.clear();
+            SUITES_FOR_DISCOVER.clear();
         }
     }
 
@@ -114,7 +114,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
             if (globalBatchSaveResponsibleTrigger == null) {
                 startAutoDiscovering(suite.getProject(), newArrayList(suite.getFile()));
             } else {
-                suitesForDiscover.add(suite);
+                SUITES_FOR_DISCOVER.add(suite);
             }
         }
     }
