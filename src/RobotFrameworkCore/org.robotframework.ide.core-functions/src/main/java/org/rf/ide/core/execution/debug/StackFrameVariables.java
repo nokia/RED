@@ -24,13 +24,13 @@ import com.google.common.base.Predicates;
 
 public class StackFrameVariables implements Iterable<StackFrameVariable> {
 
-    private static Set<String> SUITE_AUTOMATIC_VARIABLES = newHashSet("${suite_name}", "${suite_documentation}",
+    private static final Set<String> SUITE_AUTOMATIC_VARIABLES = newHashSet("${suite_name}", "${suite_documentation}",
             "${suite_source}", "&{suite_metadata}", "${suite_status}", "${suite_message}");
 
-    private static Set<String> TEST_AUTOMATIC_VARIABLES = newHashSet("${test_name}", "@{test_tags}",
+    private static final Set<String> TEST_AUTOMATIC_VARIABLES = newHashSet("${test_name}", "@{test_tags}",
             "${test_documentation}", "${test_status}", "${test_message}");
 
-    private static Set<String> LOCAL_AUTOMATIC_VARIABLES = newHashSet("${keyword_status}", "${keyword_message}");
+    private static final Set<String> LOCAL_AUTOMATIC_VARIABLES = newHashSet("${keyword_status}", "${keyword_message}");
 
     private final Map<String, StackFrameVariable> variables;
 

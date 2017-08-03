@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.execution.debug.contexts;
 
+@SuppressWarnings("PMD.VariableNamingConventions")
 public class ErrorMessages {
 
     static final String suiteNotFound_unknownLocalDir = "Unable to find directory for suite '%s'\n"
