@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IPath;
@@ -50,35 +51,38 @@ public class CreateResourceFileFixerTest {
     public void testGetValidPathToCreate_whenRelativeAndLegalPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/dir1/res.robot"));
+        assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/res.robot"));
     }
 
     @Test
     public void testGetValidPathToCreate_whenRelativeAndLegalNestedPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "dir2/dir3/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/dir1/dir2/dir3/res.robot"));
+        assertThat(path).hasValueSatisfying(
+                equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/dir2/dir3/res.robot"));
     }
 
     @Test
     public void testGetValidPathToCreate_whenRelativeAndLegalNestedNonExistingPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "../dir1/non/existing/path/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/dir1/non/existing/path/res.robot"));
+        assertThat(path).hasValueSatisfying(
+                equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/non/existing/path/res.robot"));
     }
 
     @Test
     public void testGetValidPathToCreate_whenRelativeAndLegalWithSpecialCharsPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "do!@#$% ^&()/res !@#$%^&().robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/dir1/do!@#$% ^&()/res !@#$%^&().robot"));
+        assertThat(path).hasValueSatisfying(
+                equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/do!@#$% ^&()/res !@#$%^&().robot"));
     }
 
     @Test
     public void testGetValidPathToCreate_whenRelativeAndLegalInProjectPath() throws Exception {
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "../res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/res.robot"));
+        assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/res.robot"));
     }
 
     @Test
@@ -86,7 +90,7 @@ public class CreateResourceFileFixerTest {
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
                 "../../" + projectProvider.getProject().getName() + "/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/res.robot"));
+        assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/res.robot"));
     }
 
     @Test
@@ -110,7 +114,8 @@ public class CreateResourceFileFixerTest {
         if (RedSystemProperties.isWindowsPlatform()) {
             assertThat(path).isNotPresent();
         } else {
-            assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/dir1/illeg*l/res.robot"));
+            assertThat(path).hasValueSatisfying(
+                    equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/illeg*l/res.robot"));
         }
     }
 
@@ -119,7 +124,7 @@ public class CreateResourceFileFixerTest {
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
                 workspaceDir + "/" + projectProvider.getProject().getName() + "/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/res.robot"));
+        assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/res.robot"));
     }
 
     @Test
@@ -127,7 +132,7 @@ public class CreateResourceFileFixerTest {
         marker.setAttribute(AdditionalMarkerAttributes.PATH,
                 workspaceDir + "/" + projectProvider.getProject().getName() + "/dir1/../dir1/res.robot");
         final Optional<IPath> path = CreateResourceFileFixer.getValidPathToCreate(marker);
-        assertThat(path).hasValue(new Path("file:CreateResourceFileFixerTest/dir1/res.robot"));
+        assertThat(path).hasValueSatisfying(equalSegmentCountRequirement("CreateResourceFileFixerTest/dir1/res.robot"));
     }
 
     @Test
@@ -159,5 +164,9 @@ public class CreateResourceFileFixerTest {
         marker.setAttribute(AdditionalMarkerAttributes.PATH, "/../res.robot");
         final CreateResourceFileFixer fixer = CreateResourceFileFixer.createFixer("res.robot", marker);
         assertThat(fixer.getLabel()).isEqualTo("Missing resource file cannot be auto-created");
+    }
+
+    private Consumer<IPath> equalSegmentCountRequirement(final String fullPath) {
+        return path -> assertThat(path.segmentCount()).isEqualTo(path.matchingFirstSegments(new Path(fullPath)));
     }
 }
