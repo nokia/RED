@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -57,8 +57,8 @@ class ImportedFiles {
         return matchingFiles;
     }
 
-    static Comparator<IFile> createComparator(final String prefix, final String projectFolderName) {
-        final Comparator<IPath> pathsComparator = createPathsComparator(prefix, projectFolderName);
+    static Comparator<IFile> createComparator(final IProject project, final String prefix) {
+        final Comparator<IPath> pathsComparator = createPathsComparator(project, prefix);
         return new Comparator<IFile>() {
 
             @Override
@@ -69,12 +69,12 @@ class ImportedFiles {
     }
 
     @VisibleForTesting
-    static Comparator<IPath> createPathsComparator(final String prefix, final String projectFolderName) {
+    static Comparator<IPath> createPathsComparator(final IProject project, final String prefix) {
         return new Comparator<IPath>() {
 
             @Override
             public int compare(final IPath path1, final IPath path2) {
-
+                final String projectFolderName = project.getFullPath().segment(0);
                 final boolean isFromProject1 = path1.segment(0).equals(projectFolderName);
                 final boolean isFromProject2 = path2.segment(0).equals(projectFolderName);
                 final int isFromProjectResult = Boolean.compare(isFromProject2, isFromProject1);
