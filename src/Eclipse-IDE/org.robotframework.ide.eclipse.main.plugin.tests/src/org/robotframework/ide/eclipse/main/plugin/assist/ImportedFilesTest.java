@@ -64,45 +64,49 @@ public class ImportedFilesTest {
 
     @Test
     public void pathsComparatorGivesPrecendenceForPathsInGivenProjectOverPathsFromDifferentProjects() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("", "project");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
 
-        assertThat(compare(comparator, "/project/file.txt", "/other_project/file.txt")).isNegative();
-        assertThat(compare(comparator, "/other_project/file.txt", "/project/file.txt")).isPositive();
+        assertThat(compare(comparator, "/ImportedFilesTest/file.txt", "/Other/file.txt")).isNegative();
+        assertThat(compare(comparator, "/Other/file.txt", "/ImportedFilesTest/file.txt")).isPositive();
     }
 
     @Test
     public void pathsComparatorGivesPrecendenceForShorterPathsInSameProject() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("", "project");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
 
-        assertThat(compare(comparator, "/project/file.txt", "/project/dir/file.txt")).isNegative();
-        assertThat(compare(comparator, "/project/dir/file.txt", "/project/file.txt")).isPositive();
+        assertThat(compare(comparator, "/ImportedFilesTest/file.txt", "/ImportedFilesTest/dir/file.txt")).isNegative();
+        assertThat(compare(comparator, "/ImportedFilesTest/dir/file.txt", "/ImportedFilesTest/file.txt")).isPositive();
     }
 
     @Test
     public void pathsComparatorGivesPrecendenceForPathWithSecondSegmentStartingFromPrefixInSameProject() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("xyz", "project");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "xyz");
 
-        assertThat(compare(comparator, "/project/xyz_file.txt", "/project/file_xyz.txt")).isNegative();
-        assertThat(compare(comparator, "/project/file_xyz.txt", "/project/xyz_file.txt")).isPositive();
-        assertThat(compare(comparator, "/project/xyz/file.txt", "/project/dir/file.txt")).isNegative();
-        assertThat(compare(comparator, "/project/dir/file.txt", "/project/xyz/file.txt")).isPositive();
+        assertThat(compare(comparator, "ImportedFilesTest/xyz_file.txt", "ImportedFilesTest/file_xyz.txt"))
+                .isNegative();
+        assertThat(compare(comparator, "ImportedFilesTest/file_xyz.txt", "ImportedFilesTest/xyz_file.txt"))
+                .isPositive();
+        assertThat(compare(comparator, "ImportedFilesTest/xyz/file.txt", "ImportedFilesTest/dir/file.txt"))
+                .isNegative();
+        assertThat(compare(comparator, "ImportedFilesTest/dir/file.txt", "ImportedFilesTest/xyz/file.txt"))
+                .isPositive();
     }
 
     @Test
     public void pathsComparatorGivesPrecendenceForPathWhichFirstDifferentSegmentIsLexicographicallySmaller() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("", "a");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
 
-        assertThat(compare(comparator, "/a/bc/d.txt", "/a/bd/d.txt")).isNegative();
-        assertThat(compare(comparator, "/a/bd/d.txt", "/a/bc/d.txt")).isPositive();
+        assertThat(compare(comparator, "/ImportedFilesTest/bc/d.txt", "/ImportedFilesTest/bd/d.txt")).isNegative();
+        assertThat(compare(comparator, "/ImportedFilesTest/bd/d.txt", "/ImportedFilesTest/bc/d.txt")).isPositive();
     }
 
     @Test
     public void pathsComparatorReturnZeroForSamePaths() {
-        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator("", "a");
+        final Comparator<IPath> comparator = ImportedFiles.createPathsComparator(projectProvider.getProject(), "");
 
-        assertThat(compare(comparator, "/a", "/a")).isZero();
-        assertThat(compare(comparator, "/a/bc", "/a/bc")).isZero();
-        assertThat(compare(comparator, "/a/bc/d.txt", "/a/bc/d.txt")).isZero();
+        assertThat(compare(comparator, "/ImportedFilesTest", "/ImportedFilesTest")).isZero();
+        assertThat(compare(comparator, "/ImportedFilesTest/bc", "/ImportedFilesTest/bc")).isZero();
+        assertThat(compare(comparator, "/ImportedFilesTest/bc/d.txt", "/ImportedFilesTest/bc/d.txt")).isZero();
     }
 
     private static int compare(final Comparator<IPath> comparator, final String p1, final String p2) {
