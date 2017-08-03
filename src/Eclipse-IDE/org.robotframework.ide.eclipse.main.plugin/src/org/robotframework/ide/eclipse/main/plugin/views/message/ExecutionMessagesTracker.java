@@ -5,8 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.message;
 
-import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -20,14 +21,15 @@ public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleAgentInitializing() {
+    public void handleAgentInitializing(final AgentInitializingEvent event) {
         testsLaunchContext.getExecutionData(ExecutionMessagesStore.class, ExecutionMessagesStore::new);
     }
 
     @Override
-    public void handleLogMessage(final String msg, final LogLevel level, final String timestamp) {
+    public void handleLogMessage(final MessageEvent event) {
         testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
-                store -> store.append(timestamp + " : " + level.name() + " : " + msg + "\n"));
+                store -> store.append(
+                        event.getTimestamp() + " : " + event.getLevel().name() + " : " + event.getMessage() + "\n"));
     }
 
     @Override

@@ -18,7 +18,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @author mmarzec
  *
  */
-public class RobotLineBreakpoint extends LineBreakpoint {
+public class RobotLineBreakpoint extends LineBreakpoint implements org.rf.ide.core.execution.debug.RobotLineBreakpoint {
     
     @VisibleForTesting static final String MARKER_ID = "org.robotframework.ide.eclipse.main.plugin.robot.lineBreakpoint.marker";
 
@@ -27,6 +27,9 @@ public class RobotLineBreakpoint extends LineBreakpoint {
 
     @VisibleForTesting static final String CONDITION_ENABLED_ATTRIBUTE = "robot.breakpoint.conditional.enablement";
     @VisibleForTesting static final String CONDITION_ATTRIBUTE = "robot.breakpoint.conditional";
+
+    private long currentHitCounter = 0;
+    private boolean isDisabledDueToHitCounter = false;
 
     /**
      * Default constructor is required for the breakpoint manager
@@ -80,6 +83,15 @@ public class RobotLineBreakpoint extends LineBreakpoint {
         return marker == null ? "" : marker.getAttribute(IMarker.LOCATION, "");
     }
 
+    @Override
+    public void setEnabled(final boolean enabled) throws CoreException {
+        if (enabled != isEnabled()) {
+            currentHitCounter = 0;
+            isDisabledDueToHitCounter = false;
+        }
+        super.setEnabled(enabled);
+    }
+
     public boolean isHitCountEnabled() {
         final IMarker marker = getMarker();
         return marker == null ? false : marker.getAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, false);
@@ -99,9 +111,47 @@ public class RobotLineBreakpoint extends LineBreakpoint {
     public void setHitCount(final int hitCount) throws CoreException {
         if (hitCount != getHitCount()) {
             setAttribute(HIT_COUNT_ATTRIBUTE, hitCount);
+            if (isDisabledDueToHitCounter) {
+                setEnabled(true);
+            }
+            currentHitCounter = 0;
+            isDisabledDueToHitCounter = false;
         }
     }
 
+    @Override
+    public boolean evaluateHitCount() {
+        // TODO : the hit counter does not depend upon launches, so the counter is "global" and
+        // hence two running debug sessions may change it; consider what to do with this issue, when
+        // it would be possible to launch multiple debug sessions
+
+        if (!isHitCountEnabled()) {
+            return true;
+        }
+        currentHitCounter++;
+
+        if (currentHitCounter == getHitCount()) {
+            try {
+                setEnabled(false);
+                currentHitCounter = 0;
+                isDisabledDueToHitCounter = true;
+            } catch (final CoreException e) {
+                // alright, let it stay enabled
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public void enableIfDisabledByHitCounter() throws CoreException {
+        if (!isEnabled() && isDisabledDueToHitCounter) {
+            setEnabled(true);
+            isDisabledDueToHitCounter = false;
+        }
+        currentHitCounter = 0;
+    }
+
+    @Override
     public boolean isConditionEnabled() {
         final IMarker marker = getMarker();
         return marker == null ? false : marker.getAttribute(CONDITION_ENABLED_ATTRIBUTE, false);
@@ -113,6 +163,7 @@ public class RobotLineBreakpoint extends LineBreakpoint {
         }
     }
 
+    @Override
     public String getCondition() {
         final IMarker marker = getMarker();
         return marker == null ? "" : marker.getAttribute(CONDITION_ATTRIBUTE, "");

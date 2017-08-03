@@ -81,7 +81,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     }
 
     public RobotDefinitionSetting getArgumentsSetting() {
-        return findSetting(ModelType.USER_KEYWORD_ARGUMENTS);
+        return findSetting(ModelType.USER_KEYWORD_ARGUMENTS).orElse(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -91,13 +91,10 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     }
 
     public String getDocumentation() {
-        final RobotDefinitionSetting documentationSetting = findSetting(ModelType.USER_KEYWORD_DOCUMENTATION);
-        if (documentationSetting != null) {
-            final KeywordDocumentation documentation = (KeywordDocumentation) documentationSetting.getLinkedElement();
-
-            return DocumentationServiceHandler.toShowConsolidated(documentation);
-        }
-        return "<not documented>";
+        return findSetting(ModelType.USER_KEYWORD_DOCUMENTATION).map(RobotKeywordCall::getLinkedElement)
+                .map(KeywordDocumentation.class::cast)
+                .map(DocumentationServiceHandler::toShowConsolidated)
+                .orElse("<not documented>");
     }
 
     public ArgumentsDescriptor createArgumentsDescriptor() {

@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.OutputFileEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
@@ -32,7 +33,7 @@ public class ExecutionStatusTrackerTest {
 
         assertThat(context.getExecutionData(ExecutionStatusStore.class)).isEqualTo(Optional.empty());
 
-        tracker.handleAgentInitializing();
+        tracker.handleAgentInitializing(new AgentInitializingEvent(null));
 
         final Optional<ExecutionStatusStore> optionalStore = context.getExecutionData(ExecutionStatusStore.class);
         assertThat(optionalStore.isPresent()).isTrue();
@@ -52,7 +53,7 @@ public class ExecutionStatusTrackerTest {
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
 
-        tracker.handleAgentInitializing();
+        tracker.handleAgentInitializing(new AgentInitializingEvent(null));
 
         for (int i = 0; i < 10; i++) {
             assertThat(context.getExecutionData(ExecutionStatusStore.class).get()).isSameAs(existingStore);
@@ -67,8 +68,8 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///suite.robot"), 2, new ArrayList<>(),
-                new ArrayList<>()));
+        tracker.handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///suite.robot"), false, 2,
+                new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
         verify(store).suiteStarted("suite", new URI("file:///suite.robot"), 2, new ArrayList<>(), new ArrayList<>());
         verifyNoMoreInteractions(store);
@@ -96,7 +97,7 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleTestStarted(new TestStartedEvent("test", "teeeeest"));
+        tracker.handleTestStarted(new TestStartedEvent("test", "teeeeest", null, new ArrayList<>()));
 
         verify(store).testStarted();
         verifyNoMoreInteractions(store);

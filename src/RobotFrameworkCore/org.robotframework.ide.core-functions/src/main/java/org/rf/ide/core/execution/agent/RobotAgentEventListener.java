@@ -5,30 +5,33 @@
  */
 package org.rf.ide.core.execution.agent;
 
-import java.util.Map;
-
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
+import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.PausedEvent;
+import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
-import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VersionsEvent;
 
 public interface RobotAgentEventListener {
 
-    void setClient(AgentClient client);
-
     boolean isHandlingEvents();
 
-    void handleAgentInitializing();
+    void handleAgentInitializing(AgentInitializingEvent event);
 
-    void handleAgentIsReadyToStart();
+    void handleAgentIsReadyToStart(ReadyToStartEvent event);
 
-    void handleVersions(String pythonVersion, String robotVersion, int protocolVersion);
+    void handleVersions(VersionsEvent event);
 
     void handleSuiteStarted(SuiteStartedEvent event);
 
@@ -38,35 +41,35 @@ public interface RobotAgentEventListener {
 
     void handleTestEnded(TestEndedEvent event);
 
+    void handleKeywordAboutToStart(KeywordStartedEvent event);
+
     void handleKeywordStarted(KeywordStartedEvent event);
+
+    void handleKeywordAboutToEnd(KeywordEndedEvent event);
 
     void handleKeywordEnded(KeywordEndedEvent event);
 
     void handleResourceImport(ResourceImportEvent event);
 
-    void handleGlobalVariables(Map<String, String> globalVars);
+    void handleLibraryImport(LibraryImportEvent event);
 
-    void handleVariables(Map<String, Object> vars);
+    void handleVariablesChanged(VariablesChangedEvent event);
 
-    void handleLogMessage(String msg, LogLevel level, String timestamp);
+    void handleLogMessage(MessageEvent event);
+
+    void handleMessage(MessageEvent event);
 
     void handleOutputFile(OutputFileEvent event);
 
-    void handleCheckCondition();
+    void handleShouldContinue(ShouldContinueEvent event);
 
-    void handleConditionError(String error);
+    void handleConditionEvaluated(ConditionEvaluatedEvent event);
 
-    void handleConditionResult(boolean result);
+    void handlePaused(PausedEvent event);
 
-    void handleConditionChecked();
+    void handleResumed();
 
     void handleClosed();
-
-    void handlePaused();
-
-    void handleMessage(String msg, LogLevel level);
-
-    void handleLibraryImport(LibraryImportEvent event);
 
     public static class RobotAgentEventsListenerException extends RuntimeException {
 

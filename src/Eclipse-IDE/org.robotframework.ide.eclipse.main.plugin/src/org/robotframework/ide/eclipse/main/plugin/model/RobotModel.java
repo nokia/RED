@@ -8,15 +8,26 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.jface.resource.ImageDescriptor;
 
 public class RobotModel implements RobotElement {
 
     private final List<RobotElement> projects = new ArrayList<>();
+
+    public RobotContainer createRobotContainer(final IContainer container) {
+        if (container.getType() == IResource.PROJECT) {
+            return createRobotProject((IProject) container);
+        } else if (container.getType() == IResource.FOLDER) {
+            return createRobotSuite((IFolder) container);
+        }
+        return null;
+    }
 
     public synchronized RobotProject createRobotProject(final IProject project) {
         if (project == null) {
@@ -31,7 +42,7 @@ public class RobotModel implements RobotElement {
         }
     }
 
-    synchronized RobotFolder createRobotSuite(final IFolder folder) {
+    public synchronized RobotFolder createRobotSuite(final IFolder folder) {
         if (folder == null) {
             return null;
         }

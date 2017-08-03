@@ -20,6 +20,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 
 public class RobotDryRunKeywordEventListenerTest {
@@ -41,7 +42,8 @@ public class RobotDryRunKeywordEventListenerTest {
                 startSuiteHandler);
 
         listener.handleSuiteStarted(
-                new SuiteStartedEvent("abc", new URI("file:///path"), 5, newArrayList(), newArrayList()));
+                new SuiteStartedEvent("abc", new URI("file:///path"), true, 5, newArrayList(), newArrayList(),
+                        newArrayList()));
 
         verify(startSuiteHandler).accept("abc");
         verifyNoMoreInteractions(startSuiteHandler);
@@ -53,7 +55,7 @@ public class RobotDryRunKeywordEventListenerTest {
         final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage("kw_message_789", LogLevel.NONE);
+        listener.handleMessage(new MessageEvent("kw_message_789", LogLevel.NONE, null));
 
         verify(kwSourceCollector).collectFromMessageEvent("kw_message_789");
         verifyNoMoreInteractions(kwSourceCollector);
@@ -65,12 +67,12 @@ public class RobotDryRunKeywordEventListenerTest {
         final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage("msg", LogLevel.TRACE);
-        listener.handleMessage("msg", LogLevel.DEBUG);
-        listener.handleMessage("msg", LogLevel.INFO);
-        listener.handleMessage("msg", LogLevel.WARN);
-        listener.handleMessage("msg", LogLevel.ERROR);
-        listener.handleMessage("msg", LogLevel.FAIL);
+        listener.handleMessage(new MessageEvent("msg", LogLevel.TRACE, null));
+        listener.handleMessage(new MessageEvent("msg", LogLevel.DEBUG, null));
+        listener.handleMessage(new MessageEvent("msg", LogLevel.INFO, null));
+        listener.handleMessage(new MessageEvent("msg", LogLevel.WARN, null));
+        listener.handleMessage(new MessageEvent("msg", LogLevel.ERROR, null));
+        listener.handleMessage(new MessageEvent("msg", LogLevel.FAIL, null));
 
         verifyZeroInteractions(startSuiteHandler);
         verifyZeroInteractions(kwSourceCollector);
@@ -81,9 +83,9 @@ public class RobotDryRunKeywordEventListenerTest {
         final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage("kw_2", LogLevel.NONE);
-        listener.handleMessage("kw_1", LogLevel.NONE);
-        listener.handleMessage("kw_3", LogLevel.NONE);
+        listener.handleMessage(new MessageEvent("kw_2", LogLevel.NONE, null));
+        listener.handleMessage(new MessageEvent("kw_1", LogLevel.NONE, null));
+        listener.handleMessage(new MessageEvent("kw_3", LogLevel.NONE, null));
 
         final InOrder inOrder = inOrder(kwSourceCollector);
 

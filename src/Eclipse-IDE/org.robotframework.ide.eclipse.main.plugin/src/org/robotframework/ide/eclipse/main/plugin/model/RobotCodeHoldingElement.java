@@ -199,9 +199,9 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         return Iterables.any(calls, instanceOf(RobotDefinitionSetting.class));
     }
 
-    public RobotDefinitionSetting findSetting(final ModelType... modelTypes) {
+    public Optional<RobotDefinitionSetting> findSetting(final ModelType... modelTypes) {
         final List<RobotDefinitionSetting> settings = findSettings(modelTypes);
-        return settings.isEmpty() ? null : settings.get(0);
+        return settings.isEmpty() ? Optional.empty() : Optional.of(settings.get(0));
     }
 
     protected final List<RobotDefinitionSetting> findSettings(final ModelType... modelTypes) {

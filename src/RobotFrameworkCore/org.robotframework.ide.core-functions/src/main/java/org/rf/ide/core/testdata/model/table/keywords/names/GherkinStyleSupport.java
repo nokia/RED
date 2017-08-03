@@ -9,6 +9,8 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * @author Michal Anglart
@@ -19,30 +21,30 @@ public class GherkinStyleSupport {
     private static final Set<String> PREFIXES = newHashSet("given", "when", "and", "but", "then");
 
     public static <T> Optional<T> firstNameTransformationResult(final String originalName,
-            final NameTransformation<T> transformation) {
+            final Function<String, Optional<T>> transformation) {
         String current = originalName;
         String gherkinFree = GherkinStyleSupport.removeGherkinPrefix(originalName);
 
-        Optional<T> transformed = transformation.transform(current);
+        Optional<T> transformed = transformation.apply(current);
         while (!transformed.isPresent() && !gherkinFree.equals(current)) {
             current = gherkinFree;
             gherkinFree = GherkinStyleSupport.removeGherkinPrefix(current);
 
-            transformed = transformation.transform(current);
+            transformed = transformation.apply(current);
         }
         return transformed;
     }
 
-    public static void forEachPossibleGherkinName(final String originalName, final NameOperation operation) {
+    public static void forEachPossibleGherkinName(final String originalName, final Consumer<String> operation) {
         String current = originalName;
         String gherkinFree = GherkinStyleSupport.removeGherkinPrefix(originalName);
 
-        operation.perform(current);
+        operation.accept(current);
         while (!gherkinFree.equals(current)) {
             current = gherkinFree;
             gherkinFree = GherkinStyleSupport.removeGherkinPrefix(current);
 
-            operation.perform(current);
+            operation.accept(current);
         }
     }
 
@@ -70,21 +72,12 @@ public class GherkinStyleSupport {
             if (name.toLowerCase().startsWith(prefix)) {
                 final String suffix = name.substring(prefix.length());
                 final String trimmedsuffix = suffix.trim();
-                if (suffix.equals(trimmedsuffix))
+                if (suffix.equals(trimmedsuffix)) {
                     continue;
+                }
                 return trimmedsuffix;
             }
         }
         return name;
-    }
-
-    public interface NameOperation {
-        void perform(String gherkinNameVariant);
-    }
-
-    
-    public interface NameTransformation<T> {
-
-        Optional<T> transform(String gherkinNameVariant);
     }
 }

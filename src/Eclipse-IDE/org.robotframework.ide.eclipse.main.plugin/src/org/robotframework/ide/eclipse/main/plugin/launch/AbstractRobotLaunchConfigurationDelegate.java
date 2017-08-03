@@ -138,6 +138,10 @@ public abstract class AbstractRobotLaunchConfigurationDelegate extends LaunchCon
         public IRobotProcess getRobotProcess() {
             return robotProcess;
         }
+
+        public AgentConnectionServerJob getServerJob() {
+            return serverJob;
+        }
     }
 
 }

@@ -94,4 +94,9 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
         return modelType == ModelType.TEST_CASE_SETUP || modelType == ModelType.TEST_CASE_TEARDOWN
                 || modelType == ModelType.TEST_CASE_TEMPLATE || modelType == ModelType.USER_KEYWORD_TEARDOWN;
     }
+
+    public boolean isTeardown() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return modelType == ModelType.TEST_CASE_TEARDOWN || modelType == ModelType.USER_KEYWORD_TEARDOWN;
+    }
 }

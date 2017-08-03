@@ -18,7 +18,6 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.ui.IMarkerResolution;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameOperation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -42,12 +41,9 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
             return fixers;
         }
 
-        GherkinStyleSupport.forEachPossibleGherkinName(name, new NameOperation() {
-            @Override
-            public void perform(final String gherkinNameVariant) {
-                if (!gherkinNameVariant.isEmpty()) {
-                    fixers.add(new CreateKeywordFixer(gherkinNameVariant));
-                }
+        GherkinStyleSupport.forEachPossibleGherkinName(name, gherkinNameVariant -> {
+            if (!gherkinNameVariant.isEmpty()) {
+                fixers.add(new CreateKeywordFixer(gherkinNameVariant));
             }
         });
         return fixers;

@@ -5,26 +5,25 @@
  */
 package org.rf.ide.core.execution.agent;
 
-import java.util.Map;
-
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
+import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.PausedEvent;
+import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
-import org.rf.ide.core.execution.server.AgentClient;
+import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VersionsEvent;
 
 public abstract class RobotDefaultAgentEventListener implements RobotAgentEventListener {
-
-    @Override
-    public void setClient(final AgentClient client) {
-        // those listeners which want to talk back to client should use given object for this
-        // purposes
-    }
 
     @Override
     public boolean isHandlingEvents() {
@@ -32,17 +31,17 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleAgentInitializing() {
+    public void handleAgentInitializing(final AgentInitializingEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleAgentIsReadyToStart() {
+    public void handleAgentIsReadyToStart(final ReadyToStartEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleVersions(final String pythonVersion, final String robotVersion, final int protocolVersion) {
+    public void handleVersions(final VersionsEvent event) {
         // implement in subclasses
     }
 
@@ -67,7 +66,17 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
+    public void handleKeywordAboutToStart(final KeywordStartedEvent event) {
+        // implement in subclasses
+    }
+
+    @Override
     public void handleKeywordStarted(final KeywordStartedEvent event) {
+        // implement in subclasses
+    }
+
+    @Override
+    public void handleKeywordAboutToEnd(final KeywordEndedEvent event) {
         // implement in subclasses
     }
 
@@ -82,17 +91,22 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleGlobalVariables(final Map<String, String> globalVars) {
+    public void handleLibraryImport(final LibraryImportEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleVariables(final Map<String, Object> vars) {
+    public void handleVariablesChanged(final VariablesChangedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleLogMessage(final String msg, final LogLevel level, final String timestamp) {
+    public void handleLogMessage(final MessageEvent event) {
+        // implement in subclasses
+    }
+
+    @Override
+    public void handleMessage(final MessageEvent event) {
         // implement in subclasses
     }
 
@@ -102,42 +116,27 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     }
 
     @Override
-    public void handleCheckCondition() {
+    public void handleShouldContinue(final ShouldContinueEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleConditionError(final String error) {
+    public void handleConditionEvaluated(final ConditionEvaluatedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleConditionResult(final boolean result) {
+    public void handlePaused(final PausedEvent event) {
         // implement in subclasses
     }
 
     @Override
-    public void handleConditionChecked() {
+    public void handleResumed() {
         // implement in subclasses
     }
 
     @Override
     public void handleClosed() {
-        // implement in subclasses
-    }
-
-    @Override
-    public void handlePaused() {
-        // implement in subclasses
-    }
-
-    @Override
-    public void handleMessage(final String msg, final LogLevel level) {
-        // implement in subclasses
-    }
-
-    @Override
-    public void handleLibraryImport(final LibraryImportEvent event) {
         // implement in subclasses
     }
 }

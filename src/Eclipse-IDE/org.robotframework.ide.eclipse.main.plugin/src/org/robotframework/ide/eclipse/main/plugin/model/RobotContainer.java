@@ -5,14 +5,19 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 public abstract class RobotContainer implements RobotElement {
 
@@ -78,6 +83,10 @@ public abstract class RobotContainer implements RobotElement {
         return parent;
     }
 
+    public IContainer getContainer() {
+        return container;
+    }
+
     @Override
     public List<RobotElement> getChildren() {
         return elements;
@@ -133,5 +142,19 @@ public abstract class RobotContainer implements RobotElement {
 
     private boolean isRemoved(final IResourceDelta elementDelta) {
         return elementDelta != null && elementDelta.getKind() == IResourceDelta.REMOVED;
+    }
+
+    public Optional<RobotSuiteFile> getInitFileModel() {
+        for (final String initName : newArrayList("__init__.robot", "__init__.tsv", "__init__.txt")) {
+            final IFile file = container.getFile(new Path(initName));
+            if (file.exists() && ASuiteFileDescriber.isInitializationFile(file)) {
+                final RobotSuiteFile suiteFile = createSuiteFile(file);
+                if (suiteFile.getLinkedElement() == null) {
+                    suiteFile.parse();
+                }
+                return Optional.of(suiteFile);
+            }
+        }
+        return Optional.empty();
     }
 }

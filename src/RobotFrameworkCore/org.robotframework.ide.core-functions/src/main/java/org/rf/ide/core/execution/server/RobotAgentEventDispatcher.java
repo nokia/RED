@@ -6,28 +6,34 @@
 package org.rf.ide.core.execution.server;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.Collections.synchronizedList;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
+import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 import org.rf.ide.core.execution.agent.event.OutputFileEvent;
+import org.rf.ide.core.execution.agent.event.PausedEvent;
+import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
+import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
+import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VersionsEvent;
 
 import com.google.common.collect.Iterables;
 
@@ -35,14 +41,11 @@ class RobotAgentEventDispatcher {
 
     private final List<RobotAgentEventListener> eventsListeners;
 
-    RobotAgentEventDispatcher(final AgentClient client, final RobotAgentEventListener... eventsListeners) {
-        final List<RobotAgentEventListener> listeners = newArrayList(eventsListeners);
-        listeners.add(0, new AgentServerProtocolVersionChecker());
-        this.eventsListeners = Collections.synchronizedList(listeners);
+    private final AgentClient client;
 
-        for (final RobotAgentEventListener listener : this.eventsListeners) {
-            listener.setClient(client);
-        }
+    RobotAgentEventDispatcher(final AgentClient client, final RobotAgentEventListener... eventsListeners) {
+        this.client = client;
+        this.eventsListeners = synchronizedList(newArrayList(eventsListeners));
     }
 
     void addEventsListener(final RobotAgentEventListener listener) {
@@ -67,17 +70,20 @@ class RobotAgentEventDispatcher {
             }
 
             switch (eventType) {
-                case "ready_to_start":
-                    handleReadyToStart();
-                    break;
                 case "agent_initializing":
                     handleAgentInitializing();
                     break;
                 case "version":
                     handleVersion(eventMap);
                     break;
+                case "ready_to_start":
+                    handleReadyToStart();
+                    break;
                 case "resource_import":
                     handleResourceImport(eventMap);
+                    break;
+                case "library_import":
+                    handleLibraryImport(eventMap);
                     break;
                 case "start_suite":
                     handleStartSuite(eventMap);
@@ -91,47 +97,44 @@ class RobotAgentEventDispatcher {
                 case "end_test":
                     handleEndTest(eventMap);
                     break;
+                case "pre_start_keyword":
+                    handlePreStartKeyword(eventMap);
+                    break;
                 case "start_keyword":
                     handleStartKeyword(eventMap);
+                    break;
+                case "pre_end_keyword":
+                    handlePreEndKeyword(eventMap);
                     break;
                 case "end_keyword":
                     handleEndKeyword(eventMap);
                     break;
-                case "vars":
-                    handleVariables(eventMap);
+                case "vars_changed":
+                    handleVariablesChanged(eventMap);
                     break;
-                case "global_vars":
-                    handleGlobalVariables(eventMap);
-                    break;
-                case "check_condition":
-                    handleCheckCondition();
+                case "should_continue":
+                    handleShouldContinue(eventMap);
                     break;
                 case "condition_result":
                     handleConditionResult(eventMap);
                     break;
-                case "condition_error":
-                    handleConditionError(eventMap);
-                    break;
-                case "condition_checked":
-                    handleConditionChecked();
-                    break;
                 case "paused":
                     handlePause();
                     break;
-                case "close":
-                    handleClose();
+                case "resumed":
+                    handleResumed();
                     break;
                 case "log_message":
                     handleLogMessage(eventMap);
                     break;
+                case "message":
+                    handleMessage(eventMap);
+                    break;
                 case "output_file":
                     handleOutputFile(eventMap);
                     break;
-                case "library_import":
-                    handleLibraryImport(eventMap);
-                    break;
-                case "message":
-                    handleMessage(eventMap);
+                case "close":
+                    handleClose();
                     break;
                 default:
                     break;
@@ -141,27 +144,21 @@ class RobotAgentEventDispatcher {
         }
     }
 
-    private void handleReadyToStart() {
-        for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleAgentIsReadyToStart();
-        }
-    }
-
     private void handleAgentInitializing() {
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleAgentInitializing();
+            listener.handleAgentInitializing(AgentInitializingEvent.from(client));
         }
     }
 
     private void handleVersion(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("version");
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
-        final String pythonVersion = (String) attributes.get("python");
-        final String robotVersion = (String) attributes.get("robot");
-        final int protocolVersion = (Integer) attributes.get("protocol");
-
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleVersions(pythonVersion, robotVersion, protocolVersion);
+            listener.handleVersions(VersionsEvent.from(client, eventMap));
+        }
+    }
+
+    private void handleReadyToStart() {
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleAgentIsReadyToStart(ReadyToStartEvent.from(client));
         }
     }
 
@@ -200,10 +197,24 @@ class RobotAgentEventDispatcher {
         }
     }
 
+    private void handlePreStartKeyword(final Map<String, Object> eventMap) {
+        final KeywordStartedEvent event = KeywordStartedEvent.fromPre(eventMap);
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleKeywordAboutToStart(event);
+        }
+    }
+
     private void handleStartKeyword(final Map<String, Object> eventMap) {
         final KeywordStartedEvent event = KeywordStartedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleKeywordStarted(event);
+        }
+    }
+
+    private void handlePreEndKeyword(final Map<String, Object> eventMap) {
+        final KeywordEndedEvent event = KeywordEndedEvent.fromPre(eventMap);
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleKeywordAboutToEnd(event);
         }
     }
 
@@ -214,75 +225,43 @@ class RobotAgentEventDispatcher {
         }
     }
 
-    private void handleVariables(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("vars");
-        final Map<String, Object> vars = ensureOrderedMapOfStringsToObjects((Map<?, ?>) arguments.get(1));
-
+    private void handleVariablesChanged(final Map<String, Object> eventMap) {
+        final VariablesChangedEvent event = VariablesChangedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleVariables(vars);
+            listener.handleVariablesChanged(event);
         }
     }
 
-    private void handleGlobalVariables(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("global_vars");
-        final Map<String, String> globalVars = ensureOrderedMapOfStringsToStrings((Map<?, ?>) arguments.get(1));
-
+    private void handleShouldContinue(final Map<String, Object> eventMap) {
+        final ShouldContinueEvent event = ShouldContinueEvent.from(client, eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleGlobalVariables(globalVars);
-        }
-    }
-
-    private void handleCheckCondition() {
-        for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleCheckCondition();
+            listener.handleShouldContinue(event);
         }
     }
 
     private void handleConditionResult(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("condition_result");
-        final boolean result = (Boolean) arguments.get(0);
-
+        final ConditionEvaluatedEvent event = ConditionEvaluatedEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleConditionResult(result);
-        }
-    }
-
-    private void handleConditionError(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("condition_error");
-        final String error = (String) arguments.get(0);
-
-        for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleConditionError(error);
-        }
-    }
-
-    private void handleConditionChecked() {
-        for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleConditionChecked();
+            listener.handleConditionEvaluated(event);
         }
     }
 
     private void handlePause() {
+        final PausedEvent event = PausedEvent.from(client);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handlePaused();
+            listener.handlePaused(event);
+        }
+    }
+
+    private void handleResumed() {
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleResumed();
         }
     }
 
     private void handleClose() {
         for (final RobotAgentEventListener listener : eventsListeners) {
             listener.handleClosed();
-        }
-    }
-
-    private void handleLogMessage(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("log_message");
-        final Map<?, ?> message = (Map<?, ?>) arguments.get(0);
-        final String msg = (String) message.get("message");
-        final String timestamp = (String) message.get("timestamp");
-        final LogLevel level = LogLevel.valueOf(((String) message.get("level")).toUpperCase());
-
-        for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleLogMessage(msg, level, timestamp);
         }
     }
 
@@ -300,14 +279,17 @@ class RobotAgentEventDispatcher {
         }
     }
 
-    private void handleMessage(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("message");
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
-        final String msg = (String) attributes.get("message");
-        final LogLevel level = LogLevel.valueOf(((String) attributes.get("level")).toUpperCase());
-
+    private void handleLogMessage(final Map<String, Object> eventMap) {
+        final MessageEvent event = MessageEvent.fromLogMessage(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleMessage(msg, level);
+            listener.handleLogMessage(event);
+        }
+    }
+
+    private void handleMessage(final Map<String, Object> eventMap) {
+        final MessageEvent event = MessageEvent.fromMessage(eventMap);
+        for (final RobotAgentEventListener listener : eventsListeners) {
+            listener.handleMessage(event);
         }
     }
 
@@ -325,17 +307,5 @@ class RobotAgentEventDispatcher {
             }
         }
         return false;
-    }
-
-    private static Map<String, Object> ensureOrderedMapOfStringsToObjects(final Map<?, ?> map) {
-        final LinkedHashMap<String, Object> result = new LinkedHashMap<>();
-        map.entrySet().stream().forEach(e -> result.put((String) e.getKey(), e.getValue()));
-        return result;
-    }
-
-    private static Map<String, String> ensureOrderedMapOfStringsToStrings(final Map<?, ?> map) {
-        final LinkedHashMap<String, String> result = new LinkedHashMap<>();
-        map.entrySet().stream().forEach(e -> result.put((String) e.getKey(), (String) e.getValue()));
-        return result;
     }
 }

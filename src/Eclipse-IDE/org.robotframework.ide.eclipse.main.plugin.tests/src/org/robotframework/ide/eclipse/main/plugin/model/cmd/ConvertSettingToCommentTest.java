@@ -48,7 +48,7 @@ public class ConvertSettingToCommentTest {
                 .appendLine("  [Teardown]  Log  1  #comment")
                 .build();
         final RobotCase testCase = model.findSection(RobotCasesSection.class).get().getChildren().get(0);
-        final RobotDefinitionSetting setting = testCase.findSetting(ModelType.TEST_CASE_TEARDOWN);
+        final RobotDefinitionSetting setting = testCase.findSetting(ModelType.TEST_CASE_TEARDOWN).get();
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)

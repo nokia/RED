@@ -10,7 +10,6 @@ import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 
 public class RobotLaunchConfigurationTabGroup extends AbstractLaunchConfigurationTabGroup {
 
@@ -20,7 +19,6 @@ public class RobotLaunchConfigurationTabGroup extends AbstractLaunchConfiguratio
                 new LaunchConfigurationRobotTab(),
                 new LaunchConfigurationListenerTab(true),
                 new LaunchConfigurationExecutorTab(),
-                new SourceLookupTab(),
                 new EnvironmentTab(),
                 new CommonTab()
         });

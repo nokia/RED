@@ -13,7 +13,6 @@ import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.junit.Test;
 
 public class RobotLaunchConfigurationTabGroupTest {
@@ -24,13 +23,12 @@ public class RobotLaunchConfigurationTabGroupTest {
         group.createTabs(mock(ILaunchConfigurationDialog.class), ILaunchManager.RUN_MODE);
 
         final ILaunchConfigurationTab[] tabs = group.getTabs();
-        assertThat(tabs.length).isEqualTo(6);
+        assertThat(tabs.length).isEqualTo(5);
         assertThat(tabs[0]).isInstanceOf(LaunchConfigurationRobotTab.class);
         assertThat(tabs[1]).isInstanceOf(LaunchConfigurationListenerTab.class);
         assertThat(tabs[2]).isInstanceOf(LaunchConfigurationExecutorTab.class);
-        assertThat(tabs[3]).isInstanceOf(SourceLookupTab.class);
-        assertThat(tabs[4]).isInstanceOf(EnvironmentTab.class);
-        assertThat(tabs[5]).isInstanceOf(CommonTab.class);
+        assertThat(tabs[3]).isInstanceOf(EnvironmentTab.class);
+        assertThat(tabs[4]).isInstanceOf(CommonTab.class);
     }
 
     @Test
@@ -39,13 +37,12 @@ public class RobotLaunchConfigurationTabGroupTest {
         group.createTabs(mock(ILaunchConfigurationDialog.class), ILaunchManager.DEBUG_MODE);
 
         final ILaunchConfigurationTab[] tabs = group.getTabs();
-        assertThat(tabs.length).isEqualTo(6);
+        assertThat(tabs.length).isEqualTo(5);
         assertThat(tabs[0]).isInstanceOf(LaunchConfigurationRobotTab.class);
         assertThat(tabs[1]).isInstanceOf(LaunchConfigurationListenerTab.class);
         assertThat(tabs[2]).isInstanceOf(LaunchConfigurationExecutorTab.class);
-        assertThat(tabs[3]).isInstanceOf(SourceLookupTab.class);
-        assertThat(tabs[4]).isInstanceOf(EnvironmentTab.class);
-        assertThat(tabs[5]).isInstanceOf(CommonTab.class);
+        assertThat(tabs[3]).isInstanceOf(EnvironmentTab.class);
+        assertThat(tabs[4]).isInstanceOf(CommonTab.class);
     }
 
 }

@@ -14,11 +14,11 @@ public class EvaluateConditionTest {
 
     @Test
     public void properMessageIsConstructed_forKeywordConditionMessage() {
-        assertThat(new EvaluateCondition(newArrayList()).toMessage()).isEqualTo("{\"keyword_condition\":[]}");
-        assertThat(new EvaluateCondition(newArrayList("a")).toMessage()).isEqualTo("{\"keyword_condition\":[\"a\"]}");
+        assertThat(new EvaluateCondition(newArrayList()).toMessage()).isEqualTo("{\"evaluate_condition\":[]}");
+        assertThat(new EvaluateCondition(newArrayList("a")).toMessage()).isEqualTo("{\"evaluate_condition\":[\"a\"]}");
         assertThat(new EvaluateCondition(newArrayList("a", "b")).toMessage())
-                .isEqualTo("{\"keyword_condition\":[\"a\",\"b\"]}");
+                .isEqualTo("{\"evaluate_condition\":[\"a\",\"b\"]}");
         assertThat(new EvaluateCondition(newArrayList("a", "b", "c")).toMessage())
-                .isEqualTo("{\"keyword_condition\":[\"a\",\"b\",\"c\"]}");
+                .isEqualTo("{\"evaluate_condition\":[\"a\",\"b\",\"c\"]}");
     }
 }

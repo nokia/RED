@@ -7,15 +7,16 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.debug.core.model.IDisconnect;
+import org.eclipse.debug.core.model.ISuspendResume;
+import org.eclipse.debug.core.model.ITerminate;
 
-/**
- * @author mmarzec
- *
- */
-public class RobotDebugElement extends PlatformObject implements IDebugElement {
+public class RobotDebugElement extends PlatformObject
+        implements IDebugElement, ITerminate, ISuspendResume, IDisconnect {
 
     public static final String DEBUG_MODEL_ID = "org.eclipse.debug.robot";
 
@@ -59,7 +60,7 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
         fireEvent(new DebugEvent(this, DebugEvent.RESUME, detail));
     }
 
-    protected final void fireSuspendEvent(final int detail) {
+    public final void fireSuspendEvent(final int detail) {
         fireEvent(new DebugEvent(this, DebugEvent.SUSPEND, detail));
     }
 
@@ -67,11 +68,66 @@ public class RobotDebugElement extends PlatformObject implements IDebugElement {
         fireEvent(new DebugEvent(this, DebugEvent.CHANGE, detail));
     }
 
-    protected final void fireTerminateEvent() {
+    public final void fireTerminateEvent() {
         fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
     }
 
     private void fireEvent(final DebugEvent event) {
         DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
+    }
+
+    @Override
+    public boolean canResume() {
+        return getDebugTarget().canResume();
+    }
+
+    @Override
+    public void resume() {
+        getDebugTarget().resume();
+    }
+
+    @Override
+    public boolean canSuspend() {
+        return getDebugTarget().canSuspend();
+    }
+
+    @Override
+    public boolean isSuspended() {
+        return getDebugTarget().isSuspended();
+    }
+
+    @Override
+    public void suspend() {
+        getDebugTarget().suspend();
+    }
+
+    @Override
+    public boolean canDisconnect() {
+        return getDebugTarget().canDisconnect();
+    }
+
+    @Override
+    public boolean isDisconnected() {
+        return getDebugTarget().isDisconnected();
+    }
+
+    @Override
+    public void disconnect() {
+        getDebugTarget().disconnect();
+    }
+
+    @Override
+    public boolean canTerminate() {
+        return getDebugTarget().canTerminate();
+    }
+
+    @Override
+    public boolean isTerminated() {
+        return getDebugTarget().isTerminated();
+    }
+
+    @Override
+    public void terminate() throws DebugException {
+        getDebugTarget().terminate();
     }
 }

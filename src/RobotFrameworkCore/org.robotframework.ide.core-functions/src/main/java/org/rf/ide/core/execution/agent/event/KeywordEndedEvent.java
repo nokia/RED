@@ -15,8 +15,15 @@ public final class KeywordEndedEvent {
 
     private final String keywordType;
 
+    public static KeywordEndedEvent fromPre(final Map<String, Object> eventMap) {
+        return fromEventArguments((List<?>) eventMap.get("pre_end_keyword"));
+    }
+
     public static KeywordEndedEvent from(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("end_keyword");
+        return fromEventArguments((List<?>) eventMap.get("end_keyword"));
+    }
+
+    private static KeywordEndedEvent fromEventArguments(final List<?> arguments) {
         final String name = (String) arguments.get(0);
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
         final String keywordType = (String) attributes.get("type");

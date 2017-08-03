@@ -13,7 +13,9 @@ public class ProtocolVersionTest {
 
     @Test
     public void properMessageIsConstructed_forProtocolVersionMessage() {
-        assertThat(new ProtocolVersion(true).toMessage()).isEqualTo("{\"protocol_version\":{\"is_correct\":true}}");
-        assertThat(new ProtocolVersion(false).toMessage()).isEqualTo("{\"protocol_version\":{\"is_correct\":false}}");
+        assertThat(new ProtocolVersion(null).toMessage())
+                .isEqualTo("{\"protocol_version\":{\"error\":\"\",\"is_correct\":true}}");
+        assertThat(new ProtocolVersion("oops").toMessage())
+                .isEqualTo("{\"protocol_version\":{\"error\":\"oops\",\"is_correct\":false}}");
     }
 }

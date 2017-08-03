@@ -15,14 +15,16 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStreamMonitor;
 import org.eclipse.debug.core.model.IStreamsProxy;
 import org.eclipse.debug.core.model.IStreamsProxy2;
+import org.rf.ide.core.execution.debug.UserProcessController;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 
-public class RemoteProcess implements IRobotProcess {
+public class RemoteProcess implements IRobotProcess, IDisconnect {
 
     private Map<String, String> attributes;
 
@@ -32,18 +34,32 @@ public class RemoteProcess implements IRobotProcess {
 
     private final String label;
 
-    private boolean isTerminated;
+    private UserProcessController userProcessController;
+    
+    private boolean isConnectedToTests = false;
+    private boolean isSuspended = false;
+    private boolean isTerminated = false;
+    private boolean isDisconnected = false;
 
-    private Runnable onTerminateHook;
+    private Runnable onDisconnectHook;
 
     public RemoteProcess(final ILaunch launch, final String label) {
         this.launch = launch;
         this.label = label;
         this.streamsProxy = new NullStreamsProxy();
-        this.isTerminated = false;
 
         launch.addProcess(this);
-        fireEvent(new DebugEvent(this, DebugEvent.CREATE));
+        fireEvent(DebugEvent.CREATE);
+    }
+
+    @Override
+    public void setUserProcessController(final UserProcessController controller) {
+        this.userProcessController = controller;
+    }
+
+    @Override
+    public UserProcessController getUserProcessController() {
+        return userProcessController;
     }
 
     @Override
@@ -51,10 +67,80 @@ public class RemoteProcess implements IRobotProcess {
         return RobotConsoleFacade.provide(launch.getLaunchConfiguration(), consoleDescription);
     }
 
-
     @Override
     public void onTerminate(final Runnable operation) {
-        this.onTerminateHook = operation;
+        this.onDisconnectHook = operation;
+    }
+
+    @Override
+    public void setConnectedToTests(final boolean isConnected) {
+        this.isConnectedToTests = isConnected;
+    }
+
+    @Override
+    public boolean canResume() {
+        return isConnectedToTests && isSuspended;
+    }
+
+    @Override
+    public void resume() {
+        userProcessController.resume(this::resumed);
+        fireEvent(DebugEvent.CHANGE);
+    }
+
+    @Override
+    public void resumed() {
+        isSuspended = false;
+        fireEvent(DebugEvent.RESUME);
+    }
+
+    @Override
+    public boolean canSuspend() {
+        return isConnectedToTests && !isSuspended;
+    }
+
+    @Override
+    public boolean isSuspended() {
+        return isSuspended;
+    }
+
+    @Override
+    public void suspend() {
+        userProcessController.pause(this::suspended);
+        fireEvent(DebugEvent.CHANGE);
+    }
+
+    @Override
+    public void suspended() {
+        isSuspended = true;
+        fireEvent(DebugEvent.SUSPEND);
+    }
+
+    @Override
+    public boolean canDisconnect() {
+        return isConnectedToTests && !isDisconnected;
+    }
+
+    @Override
+    public boolean isDisconnected() {
+        return isDisconnected;
+    }
+
+    @Override
+    public void disconnect() {
+        userProcessController.disconnect(this::disconnected);
+        fireEvent(DebugEvent.CHANGE);
+    }
+
+    private void disconnected() {
+        isConnectedToTests = false;
+        isDisconnected = true;
+        isSuspended = false;
+
+        if (onDisconnectHook != null) {
+            onDisconnectHook.run();
+        }
+        fireEvent(DebugEvent.CHANGE);
     }
 
     @Override
@@ -69,19 +155,30 @@ public class RemoteProcess implements IRobotProcess {
 
     @Override
     public void terminate() {
-        if (onTerminateHook != null) {
-            onTerminateHook.run();
-        }
-        if (!isTerminated) {
-            isTerminated = true;
-
-            fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
+        if (isConnectedToTests) {
+            userProcessController.terminate(this::terminated);
+            fireEvent(DebugEvent.CHANGE);
+        } else {
+            terminated();
         }
     }
 
     @Override
+    public void terminated() {
+        isTerminated = true;
+        isConnectedToTests = false;
+        isDisconnected = true;
+        isSuspended = false;
+
+        if (onDisconnectHook != null) {
+            onDisconnectHook.run();
+        }
+        fireEvent(DebugEvent.TERMINATE);
+    }
+
+    @Override
     public String getLabel() {
-        return label;
+        return (isSuspended() ? "<supsended>" : "") + label;
     }
 
     @Override
@@ -112,6 +209,10 @@ public class RemoteProcess implements IRobotProcess {
             return null;
         }
         return attributes.get(key);
+    }
+
+    private void fireEvent(final int kind) {
+        fireEvent(new DebugEvent(this, kind));
     }
 
     private void fireEvent(final DebugEvent event) {

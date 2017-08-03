@@ -13,13 +13,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
-import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
-import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.TestsMode;
+import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
+import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.rf.ide.core.execution.server.response.StartExecution;
 
 public class AgentServerTestsStarterTest {
@@ -31,11 +31,10 @@ public class AgentServerTestsStarterTest {
         final AgentClient client = mock(AgentClient.class);
 
         final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
-        starter.setClient(client);
 
         final Thread serverThread = new Thread(() -> {
             try {
-                starter.handleAgentIsReadyToStart();
+                starter.handleAgentIsReadyToStart(ReadyToStartEvent.from(client));
             } catch (final RobotAgentEventsListenerException e) {
                 interruptedCaught.set(true);
             }
@@ -48,7 +47,7 @@ public class AgentServerTestsStarterTest {
         serverThread.join();
 
         assertThat(interruptedCaught.get()).isTrue();
-        verify(starter).handleAgentIsReadyToStart();
+        verify(starter).handleAgentIsReadyToStart(any(ReadyToStartEvent.class));
         verifyZeroInteractions(client);
     }
 
@@ -60,35 +59,10 @@ public class AgentServerTestsStarterTest {
         doThrow(ResponseException.class).when(client).send(any(StartExecution.class));
 
         final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
-        starter.setClient(client);
 
         final Thread serverThread = new Thread(() -> {
             try {
-                starter.handleAgentIsReadyToStart();
-            } catch (final RobotAgentEventsListenerException e) {
-                responseExceptionCaught.set(true);
-            }
-        });
-        serverThread.start();
-        starter.allowClientTestsStart();
-        serverThread.join();
-
-        assertThat(responseExceptionCaught.get()).isTrue();
-    }
-
-    @Test
-    public void exceptionIsThrown_whenAgentServerHasProblemSendingResponse() throws Exception {
-        final AtomicBoolean responseExceptionCaught = new AtomicBoolean(false);
-
-        final AgentClient client = mock(AgentClient.class);
-        doThrow(IOException.class).when(client).send(any(StartExecution.class));
-
-        final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
-        starter.setClient(client);
-
-        final Thread serverThread = new Thread(() -> {
-            try {
-                starter.handleAgentIsReadyToStart();
+                starter.handleAgentIsReadyToStart(ReadyToStartEvent.from(client));
             } catch (final RobotAgentEventsListenerException e) {
                 responseExceptionCaught.set(true);
             }
@@ -105,9 +79,8 @@ public class AgentServerTestsStarterTest {
         final AgentClient client = mock(AgentClient.class);
 
         final AgentServerTestsStarter starter = spy(new AgentServerTestsStarter(TestsMode.RUN));
-        starter.setClient(client);
 
-        final Thread serverThread = new Thread(() -> starter.handleAgentIsReadyToStart());
+        final Thread serverThread = new Thread(() -> starter.handleAgentIsReadyToStart(ReadyToStartEvent.from(client)));
         serverThread.start();
         starter.allowClientTestsStart();
         serverThread.join();

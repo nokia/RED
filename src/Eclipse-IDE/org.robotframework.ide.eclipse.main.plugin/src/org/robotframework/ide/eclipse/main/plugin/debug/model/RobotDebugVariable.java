@@ -8,62 +8,87 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.rf.ide.core.execution.debug.StackFrameVariable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 
 /**
  * @author mmarzec
  */
 public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
+    static final String AUTOMATIC_NAME = "Automatic Variables";
+
+    private final RobotStackFrame frame;
     private final RobotDebugVariable parent;
+    private RobotDebugValue value;
+    private boolean valueChanged;
 
-    private final String name;
+    private String name;
+    private final StackFrameVariable stackVariable;
 
-    private final RobotDebugValue debugValue;
+    private final boolean isArtificial;
 
-    private boolean hasValueChanged;
-    private boolean isValueModificationSupported;
-
-    public RobotDebugVariable(final RobotDebugTarget target, final String name, final Object value) {
-        super(target);
+    public RobotDebugVariable(final RobotStackFrame frame, final StackFrameVariable stackVariable) {
+        super(frame.getDebugTarget());
+        this.frame = frame;
         this.parent = null;
-        this.name = name;
-        this.debugValue = RobotDebugValue.createFromValue(this, value);
+        this.value = RobotDebugValue.createFromValue(this, stackVariable.getType(), stackVariable.getValue());
+        this.valueChanged = false;
 
-        this.isValueModificationSupported = true;
-        this.hasValueChanged = false;
+        this.name = stackVariable.getName();
+        this.stackVariable = stackVariable;
+
+        this.isArtificial = false;
     }
 
-    public RobotDebugVariable(final RobotDebugTarget target, final String name, final RobotDebugValue value) {
-        super(target);
-        this.parent = null;
-        this.name = name;
-        this.debugValue = value;
-
-        this.isValueModificationSupported = true;
-        this.hasValueChanged = false;
-    }
-
-    public RobotDebugVariable(final RobotDebugVariable parent, final String name, final Object value) {
+    RobotDebugVariable(final RobotDebugVariable parent, final String name, final String type, final Object value) {
         super(parent.getDebugTarget());
+        this.frame = parent.frame;
         this.parent = parent;
-        this.name = name;
-        this.debugValue = RobotDebugValue.createFromValue(this, value);
+        this.value = RobotDebugValue.createFromValue(this, type, value);
+        this.valueChanged = false;
 
-        this.isValueModificationSupported = true;
-        this.hasValueChanged = false;
+        this.name = name;
+        this.stackVariable = null;
+
+        this.isArtificial = false;
     }
 
-    @Override
-    public RobotDebugValue getValue() {
-        return debugValue;
+    private RobotDebugVariable(final RobotStackFrame frame, final RobotDebugValue value) {
+        super(frame.getDebugTarget());
+        this.frame = frame;
+        this.parent = null;
+        this.value = value;
+        this.valueChanged = false;
+
+        this.name = AUTOMATIC_NAME;
+        this.stackVariable = null;
+
+        this.isArtificial = true;
+    }
+
+    static RobotDebugVariable createAutomatic(final RobotStackFrame frame,
+            final List<RobotDebugVariable> automaticVars) {
+        final RobotDebugValue automaticVarsValue = new RobotDebugValueOfDictionary(frame.getDebugTarget(), "", "",
+                automaticVars);
+        return new RobotDebugVariable(frame, automaticVarsValue);
+    }
+
+    RobotDebugVariable getParent() {
+        return parent;
     }
 
     @Override
@@ -73,60 +98,101 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     @Override
     public String getReferenceTypeName() {
-        return "RobotVariable";
+        return "";
     }
 
     @Override
     public boolean hasValueChanged() {
-        return hasValueChanged;
+        return valueChanged;
+    }
+
+    @Override
+    public RobotDebugValue getValue() {
+        return value;
     }
 
     @Override
     public void setValue(final String expression) {
-        debugValue.setValue(expression);
-        hasValueChanged = true;
-
-        fireChangeEvent(DebugEvent.CLIENT_REQUEST);
-
-        final List<String> path = getPath();
-        final String rootName = path.get(0);
-        final List<String> arguments = newArrayList(path.subList(1, path.size()));
-        arguments.add(expression);
-
-        getDebugTarget().sendChangeRequest(rootName, arguments);
+        final List<String> arguments = extractArguments(expression.replaceAll("\\\\", "\\\\\\\\"));
+        if (stackVariable != null) {
+            changeVariable(arguments);
+        } else {
+            changeVariableInnerValue(arguments);
+        }
     }
 
-    private List<String> getPath() {
-        final List<String> allNames = new ArrayList<>();
+    private List<String> extractArguments(final String expression) {
+        if (value instanceof RobotDebugValueOfScalar) {
+            return newArrayList(expression);
+
+        } else if ((value instanceof RobotDebugValueOfList && expression.startsWith("[")
+                        && expression.endsWith("]"))
+                || (value instanceof RobotDebugValueOfDictionary && expression.startsWith("{")
+                        && expression.endsWith("}"))) {
+            return Splitter.on(',')
+                    .splitToList(expression.substring(1, expression.length() - 1))
+                    .stream()
+                    .map(String::trim)
+                    .collect(toList());
+        }
+        return newArrayList(expression.split("\\s{2,}|\t"));
+    }
+
+    private void changeVariable(final List<String> arguments) {
+        getDebugTarget().changeVariable(frame.getFrame(), stackVariable, arguments);
+    }
+
+    private void changeVariableInnerValue(final List<String> arguments) {
+        final Object f = newArrayList(typeIdentifierOf(this), null);
+        final List<Object> path = newArrayList(f);
         RobotDebugVariable current = this;
         while (current != null) {
-            allNames.add(current.getName());
+            if (current.stackVariable != null) {
+                final StackFrameVariable variable = current.stackVariable;
+                getDebugTarget().changeVariableInnerValue(frame.getFrame(), variable, path, arguments);
+                return;
+            }
+            path.add(0, newArrayList(typeIdentifierOf(current.parent), extractIndexOrKey(current.name)));
             current = current.parent;
         }
-        Collections.reverse(allNames);
-        return allNames.stream().map(this::extractChildName).collect(toList());
+        throw new IllegalStateException(
+                "Every non-artificial IVariable has to have real variable in some predecessor");
     }
 
-    private String extractChildName(final String variableName) {
-        if (variableName.startsWith("[") && variableName.endsWith("]")) {
-            return variableName.substring(1, variableName.length() - 1);
+    private static String typeIdentifierOf(final RobotDebugVariable variable) {
+        if (variable.value instanceof RobotDebugValueOfDictionary) {
+            return "dict";
+
+        } else if (variable.value instanceof RobotDebugValueOfList) {
+            return "list";
+
+        } else if (variable.value instanceof RobotDebugValueOfScalar) {
+            return "scalar";
+
+        } else {
+            throw new IllegalStateException("Unrecognized type of variable value");
         }
-        return variableName;
+    }
+
+    private static Object extractIndexOrKey(final String name) {
+        if (name.startsWith("[") && name.endsWith("]")) {
+            return Integer.valueOf( name.substring(1, name.length() - 1));
+        }
+        return name;
     }
 
     @Override
-    public void setValue(final IValue value) throws DebugException {
-        debugValue.setValue(value.getValueString());
-        hasValueChanged = true;
+    public void setValue(final IValue newValue) throws DebugException {
+        value.setValue(newValue.getValueString());
+    }
+
+    void setValueChanged(final boolean valueChanged) {
+        this.valueChanged = valueChanged;
     }
 
     @Override
     public boolean supportsValueModification() {
-        return isValueModificationSupported && debugValue.supportsModification();
-    }
-
-    public void disableValueModificationSupport() {
-        this.isValueModificationSupported = false;
+        return !isArtificial;
     }
 
     @Override
@@ -139,11 +205,69 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return true;
     }
 
-    public void setHasValueChanged(final boolean valueChanged) {
-        hasValueChanged = valueChanged;
+    void syncValue(final String name, final String type, final Object newValue) {
+        this.name = name;
+        if (newValue instanceof List<?> && value instanceof RobotDebugValueOfList) {
+            value.syncValue(this, type, newValue);
+
+        } else if (newValue instanceof Map<?, ?> && value instanceof RobotDebugValueOfDictionary) {
+            value.syncValue(this, type, newValue);
+
+        } else if (!(newValue instanceof List<?> || newValue instanceof Map<?, ?>)
+                && value instanceof RobotDebugValueOfScalar) {
+            value.syncValue(this, type, newValue == null ? null : newValue.toString());
+
+        } else {
+            value = RobotDebugValue.createFromValue(this, type, newValue);
+        }
     }
 
-    public RobotDebugVariable getParent() {
-        return parent;
+    public void syncAutomaticValue(final Map<String, RobotDebugVariable> variables) {
+        Preconditions.checkState(isArtificial);
+        ((RobotDebugValueOfDictionary) value).setVariables(variables);
+    }
+
+    void visitAllVariables(final RobotDebugVariableVisitor visitor) {
+        visitor.visit(this);
+        value.visitAllVariables(visitor);
+    }
+
+    public ImageDescriptor getImage() {
+        if (isArtificial) {
+            return RedImages.getElementImage();
+        } else if (value instanceof RobotDebugValueOfScalar) {
+            return RedImages.VARIABLES.getDebugScalarVariableImage();
+        } else if (value instanceof RobotDebugValueOfList) {
+            return RedImages.VARIABLES.getDebugListVariableImage();
+        } else if (value instanceof RobotDebugValueOfDictionary) {
+            return RedImages.VARIABLES.getDebugDictionaryVariableImage();
+        } else {
+            return null;
+        }
+    }
+
+    public Optional<VariableScope> getScope() {
+        return Optional.ofNullable(stackVariable).map(StackFrameVariable::getScope);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof RobotDebugVariable) {
+            final RobotDebugVariable that = (RobotDebugVariable) obj;
+            return Objects.equal(this.stackVariable, that.stackVariable) && this.name.equals(that.name)
+                    && this.parent == that.parent;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(stackVariable, name, parent);
+    }
+
+    @FunctionalInterface
+    public static interface RobotDebugVariableVisitor {
+
+        void visit(RobotDebugVariable variable);
     }
 }

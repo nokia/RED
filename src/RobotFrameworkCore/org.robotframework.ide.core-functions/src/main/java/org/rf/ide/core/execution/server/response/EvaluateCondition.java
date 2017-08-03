@@ -13,7 +13,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.common.collect.ImmutableMap;
 
-public final class EvaluateCondition implements ServerResponse {
+public final class EvaluateCondition implements ServerResponseOnShouldContinue {
 
     private final List<String> conditionWithArguments;
 
@@ -24,7 +24,7 @@ public final class EvaluateCondition implements ServerResponse {
     @Override
     public String toMessage() {
         try {
-            final Map<String, Object> value = ImmutableMap.of("keyword_condition", conditionWithArguments);
+            final Map<String, Object> value = ImmutableMap.of("evaluate_condition", conditionWithArguments);
 
             return new ObjectMapper().writeValueAsString(value);
         } catch (final IOException e) {
