@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
 import org.rf.ide.core.execution.agent.event.OutputFileEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
@@ -23,7 +24,7 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleAgentInitializing() {
+    public void handleAgentInitializing(final AgentInitializingEvent event) {
         testsLaunchContext.getExecutionData(ExecutionStatusStore.class, ExecutionStatusStore::new);
     }
 
@@ -42,7 +43,7 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
 
     @Override
     public void handleTestStarted(final TestStartedEvent event) {
-        testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class, 
+        testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class,
                 store -> store.testStarted());
     }
 

@@ -6,24 +6,33 @@
 package org.rf.ide.core.execution.server.response;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 public final class ProtocolVersion implements ServerResponse {
 
-    private final boolean isCorrect;
+    private final String error;
 
-    public ProtocolVersion(final boolean isCorrect) {
-        this.isCorrect = isCorrect;
+    public ProtocolVersion() {
+        this(null);
+    }
+
+    public ProtocolVersion(final String error) {
+        this.error = error;
     }
 
     @Override
     public String toMessage() {
         try {
-            final Map<String, Boolean> arguments = ImmutableMap.of("is_correct", Boolean.valueOf(isCorrect));
+            final Map<String, Object> arguments = new HashMap<>();
+            arguments.put("is_correct", error == null);
+            arguments.put("error", Strings.nullToEmpty(error));
             final Map<String, Object> value = ImmutableMap.of("protocol_version", arguments);
 
             return new ObjectMapper().writeValueAsString(value);
@@ -36,13 +45,13 @@ public final class ProtocolVersion implements ServerResponse {
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass() == ProtocolVersion.class) {
             final ProtocolVersion that = (ProtocolVersion) obj;
-            return this.isCorrect == that.isCorrect;
+            return Objects.equal(this.error, that.error);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Boolean.hashCode(isCorrect);
+        return Objects.hashCode(error);
     }
 }

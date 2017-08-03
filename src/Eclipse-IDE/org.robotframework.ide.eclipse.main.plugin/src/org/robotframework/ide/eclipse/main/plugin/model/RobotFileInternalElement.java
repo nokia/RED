@@ -13,6 +13,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.FileRegion;
 
 /**
  * @author Michal Anglart
@@ -179,6 +180,12 @@ public interface RobotFileInternalElement extends RobotElement {
 
         public IRegion toRegion() {
             return new Region(offset, length);
+        }
+
+        public FileRegion toFileRegion() {
+            final FilePosition start = new FilePosition(line, -1, offset);
+            final FilePosition end = new FilePosition(line, -1, offset + length);
+            return new FileRegion(start, end);
         }
     }
 }

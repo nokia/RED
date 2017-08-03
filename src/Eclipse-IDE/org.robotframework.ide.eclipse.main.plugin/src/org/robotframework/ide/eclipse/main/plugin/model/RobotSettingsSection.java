@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -194,6 +195,15 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 return (((RobotSetting) element).getGroup() == group);
             }
         }));
+    }
+
+    public synchronized Optional<RobotSetting> getSetting(final ModelType type) {
+        for (final RobotKeywordCall setting : getChildren()) {
+            if (setting.getLinkedElement().getModelType() == type) {
+                return Optional.of((RobotSetting) setting);
+            }
+        }
+        return Optional.empty();
     }
 
     public synchronized RobotSetting getSetting(final String name) {

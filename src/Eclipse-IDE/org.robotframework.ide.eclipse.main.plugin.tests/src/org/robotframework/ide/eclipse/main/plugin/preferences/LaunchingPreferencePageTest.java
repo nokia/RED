@@ -53,5 +53,4 @@ public class LaunchingPreferencePageTest {
         }
         assertThat(booleanPrefNames).isEmpty();
     }
-
 }

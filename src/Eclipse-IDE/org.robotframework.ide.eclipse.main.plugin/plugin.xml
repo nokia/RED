@@ -327,6 +327,12 @@
               id="org.robotframework.ide.project.editor"
               name="RED Project Editor">
         </editor>
+        <editor
+              class="org.robotframework.ide.eclipse.main.plugin.debug.RedDebuggerAssistantEditorWrapper"
+              default="false"
+              id="org.robotframework.red.debug.assistance.editor"
+              name="RED Debugger Assistant Editor">
+        </editor>
     </extension>
  <extension
          point="org.eclipse.ui.views">
@@ -5408,7 +5414,58 @@
    <type
          name="org.robotframework.red.cellHighlighting">
    </type>
-	</extension>	
+   <type
+         name="org.robotframework.red.debug.currentErrorIP">
+   </type>
+   <type
+         name="org.robotframework.red.debug.secondaryErrorIP">
+   </type>
+	</extension>
+      <extension
+            point="org.eclipse.ui.editors.markerAnnotationSpecification">
+         <specification
+               annotationType="org.robotframework.red.debug.currentErrorIP"
+               colorPreferenceKey="org.robotframework.red.debug.currentErrorIP.color"
+               colorPreferenceValue="255,150,145"
+               contributesToHeader="true"
+               highlightPreferenceKey="org.robotframework.red.debug.currentErrorIP.highlight"
+               highlightPreferenceValue="true"
+               icon="resources/error_primary_ip.png"
+               includeOnPreferencePage="true"
+               isGoToNextNavigationTarget="false"
+               isGoToPreviousNavigationTarget="false"
+               label="RED Erroneous Debug Current Instruction Pointer"
+               overviewRulerPreferenceKey="org.robotframework.red.debug.currentErrorIP.overviewRuler"
+               overviewRulerPreferenceValue="true"
+               presentationLayer="6"
+               showInNextPrevDropdownToolbarAction="false"
+               textPreferenceKey="org.robotframework.red.debug.currentErrorIP.text"
+               textPreferenceValue="true"
+               verticalRulerPreferenceKey="org.robotframework.red.debug.currentErrorIP.verticalRuler"
+               verticalRulerPreferenceValue="true">
+         </specification>
+         <specification
+               annotationType="org.robotframework.red.debug.secondaryErrorIP"
+               colorPreferenceKey="org.robotframework.red.debug.secondaryErrorIP.color"
+               colorPreferenceValue="255,200,195"
+               contributesToHeader="true"
+               highlightPreferenceKey="org.robotframework.red.debug.secondaryErrorIP.highlight"
+               highlightPreferenceValue="true"
+               icon="resources/error_secondary_ip.png"
+               includeOnPreferencePage="true"
+               isGoToNextNavigationTarget="false"
+               isGoToPreviousNavigationTarget="false"
+               label="RED Erroneous Debug Call Stack"
+               overviewRulerPreferenceKey="org.robotframework.red.debug.secondaryErrorIP.overviewRuler"
+               overviewRulerPreferenceValue="true"
+               presentationLayer="6"
+               showInNextPrevDropdownToolbarAction="false"
+               textPreferenceKey="org.robotframework.red.debug.secondaryErrorIP.text"
+               textPreferenceValue="true"
+               verticalRulerPreferenceKey="org.robotframework.red.debug.secondaryErrorIP.verticalRuler"
+               verticalRulerPreferenceValue="true">
+         </specification>
+      </extension>
  	<extension
          point="org.eclipse.debug.core.breakpoints">
       <breakpoint
@@ -5526,6 +5583,12 @@
             class="org.robotframework.ide.eclipse.main.plugin.preferences.LaunchingPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.launch"
             name="Launching">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.launch"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.DebuggerPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.launch.debugger"
+            name="Debugger">
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.launch"

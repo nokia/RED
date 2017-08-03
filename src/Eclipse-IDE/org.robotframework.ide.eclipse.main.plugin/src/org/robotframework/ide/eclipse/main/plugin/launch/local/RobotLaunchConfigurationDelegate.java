@@ -5,10 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -20,8 +22,17 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.TestsMode;
+import org.rf.ide.core.execution.debug.ExecutionPauseContinueListener;
+import org.rf.ide.core.execution.debug.Stacktrace;
+import org.rf.ide.core.execution.debug.StacktraceBuilder;
+import org.rf.ide.core.execution.debug.UserProcessController;
+import org.rf.ide.core.execution.debug.UserProcessDebugController;
+import org.rf.ide.core.execution.debug.UserProcessDebugController.DebuggerPreferences;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
+import org.rf.ide.core.execution.server.AgentServerStatusListener;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
+import org.rf.ide.core.execution.server.AgentServerVersionsChecker;
+import org.rf.ide.core.execution.server.AgentServerVersionsDebugChecker;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder;
@@ -30,14 +41,21 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotBreakpoints;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.launch.AbstractRobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
-import org.robotframework.ide.eclipse.main.plugin.launch.DebugExecutionEventsListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.BreakpointsEnabler;
+import org.robotframework.ide.eclipse.main.plugin.launch.DebuggerErrorDecider;
+import org.robotframework.ide.eclipse.main.plugin.launch.EclipseElementsLocator;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
+import org.robotframework.ide.eclipse.main.plugin.launch.ProcessConnectingInDebugServerListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.ProcessConnectingInRunServerListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsolePatternsListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotEvaluationErrorsHandler;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
+import org.robotframework.ide.eclipse.main.plugin.launch.TestsExecutionTerminationSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusTracker;
@@ -58,24 +76,56 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         final int timeout = robotConfig.getAgentConnectionTimeout();
 
         try {
+            final UserProcessController userController;
             final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(testsMode);
+
             final LaunchExecution launchExecution;
             if (testsMode == TestsMode.RUN) {
-                launchExecution = doLaunch(robotConfig, launch, testsLaunchContext, host, port, timeout,
-                        Arrays.asList(testsStarter));
+                userController = new UserProcessController();
+
+                final ArrayList<AgentServerStatusListener> additionalServerListeners = newArrayList(
+                        new ProcessConnectingInRunServerListener(launch));
+                
+                final List<RobotAgentEventListener> additionalAgentListeners = new ArrayList<>();
+                additionalAgentListeners.add(new AgentServerVersionsChecker());
+                additionalAgentListeners.add(testsStarter);
+
+                launchExecution = doLaunch(robotConfig, launch, testsLaunchContext, host, port, timeout, userController,
+                        additionalServerListeners, additionalAgentListeners);
+                testsStarter.allowClientTestsStart();
             } else {
-                final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot Test at " + host + ":" + port, launch);
-                final DebugExecutionEventsListener debugListener = new DebugExecutionEventsListener(debugTarget,
-                        robotConfig.getResourcesUnderDebug());
+                final Stacktrace stacktrace = new Stacktrace();
+                final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+                userController = new UserProcessDebugController(stacktrace,
+                        new DebuggerPreferences(new DebuggerErrorDecider(preferences),
+                                !preferences.shouldDebuggerOmitLibraryKeywords()));
 
-                launchExecution = doLaunch(robotConfig, launch, testsLaunchContext, host, port, timeout,
-                        Arrays.asList(testsStarter, debugListener));
+                final RobotDebugTarget debugTarget = new RobotDebugTarget("Robot Test at " + host + ":" + port,
+                        launch, stacktrace, (UserProcessDebugController) userController);
 
-                if (launchExecution.getRobotProcess() != null) {
-                    debugTarget.connectWith(launchExecution.getRobotProcess());
-                }
+                final EclipseElementsLocator elementsLocator = new EclipseElementsLocator(robotConfig.getProject());
+
+                final List<AgentServerStatusListener> additionalServerListeners = newArrayList(
+                        new ProcessConnectingInDebugServerListener(launch), new BreakpointsEnabler());
+
+                final List<RobotAgentEventListener> additionalAgentListeners = new ArrayList<>();
+                additionalAgentListeners.add(new AgentServerVersionsDebugChecker());
+                additionalAgentListeners.add(testsStarter);
+                additionalAgentListeners.add(new StacktraceBuilder(stacktrace, elementsLocator,
+                        (uri, line) -> new RobotBreakpoints().getBreakpointAtLine(line, uri)));
+                additionalAgentListeners.add(new RobotEvaluationErrorsHandler());
+
+                launchExecution = doLaunch(robotConfig, launch, testsLaunchContext, host, port, timeout, userController,
+                        additionalServerListeners, additionalAgentListeners);
+                TestsExecutionTerminationSupport.installTerminationSupport(launchExecution.getServerJob(), debugTarget);
+                testsStarter.allowClientTestsStart();
+
+                launch.addDebugTarget(debugTarget);
+                debugTarget.setProcess(launchExecution.getRobotProcess());
             }
-            testsStarter.allowClientTestsStart();
+            if (launchExecution.getRobotProcess() != null) {
+                launchExecution.getRobotProcess().setUserProcessController(userController);
+            }
 
             return launchExecution;
         } catch (final InterruptedException e) {
@@ -87,7 +137,8 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
 
     private LaunchExecution doLaunch(final RobotLaunchConfiguration robotConfig, final ILaunch launch,
             final RobotTestsLaunch testsLaunchContext, final String host, final int port, final int timeout,
-            final List<RobotAgentEventListener> additionalListeners)
+            final UserProcessController userController, final List<AgentServerStatusListener> additionalServerListeners,
+            final List<RobotAgentEventListener> additionalAgentListeners)
             throws InterruptedException, CoreException, IOException {
 
         final RobotModel model = RedPlugin.getModelManager().getModel();
@@ -97,7 +148,9 @@ public class RobotLaunchConfigurationDelegate extends AbstractRobotLaunchConfigu
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                 .serverStatusHandledBy(new ServerProblemsHandler())
-                .agentEventsListenedBy(additionalListeners)
+                .serverStatusHandledBy(additionalServerListeners)
+                .agentEventsListenedBy(additionalAgentListeners)
+                .agentEventsListenedBy(new ExecutionPauseContinueListener(userController))
                 .agentEventsListenedBy(new ExecutionMessagesTracker(testsLaunchContext))
                 .agentEventsListenedBy(new ExecutionStatusTracker(testsLaunchContext))
                 .agentEventsListenedBy(new AgentServerKeepAlive())

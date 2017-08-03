@@ -125,6 +125,14 @@ public final class RobotVersion implements Comparable<RobotVersion> {
         return Objects.hash(major, minor, patch);
     }
 
+    public String asString() {
+        if (patch.isPresent()) {
+            return major + "." + minor + "." + patch.get().intValue();
+        } else {
+            return major + "." + minor;
+        }
+    }
+
     @Override
     public String toString() {
         return String.format(getClass().getName() + "[major=%s, minor=%s, patch=%s]", this.major, this.minor,
