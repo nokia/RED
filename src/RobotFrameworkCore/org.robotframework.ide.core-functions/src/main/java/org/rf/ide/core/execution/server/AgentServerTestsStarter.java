@@ -5,14 +5,13 @@
  */
 package org.rf.ide.core.execution.server;
 
-import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.TestsMode;
-import org.rf.ide.core.execution.server.response.InitializeAgent;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
+import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
-import org.rf.ide.core.execution.server.response.StartExecution;
 
 
 public class AgentServerTestsStarter extends RobotDefaultAgentEventListener {
@@ -21,32 +20,25 @@ public class AgentServerTestsStarter extends RobotDefaultAgentEventListener {
 
     private final TestsMode mode;
 
-    private AgentClient client;
-
     public AgentServerTestsStarter(final TestsMode mode) {
         this.mode = mode;
     }
 
     @Override
-    public void setClient(final AgentClient client) {
-        this.client = client;
-    }
-
-    @Override
-    public void handleAgentInitializing() {
+    public void handleAgentInitializing(final AgentInitializingEvent event) {
         try {
-            client.send(new InitializeAgent(mode, true));
-        } catch (ResponseException | IOException e) {
+            event.responder().initialize(mode, true);
+        } catch (final ResponseException e) {
             throw new RobotAgentEventsListenerException("Unable to send response to client", e);
         }
     }
 
     @Override
-    public void handleAgentIsReadyToStart() {
+    public void handleAgentIsReadyToStart(final ReadyToStartEvent event) {
         try {
             startSemaphore.acquire();
-            client.send(new StartExecution());
-        } catch (ResponseException | IOException e) {
+            event.responder().startExecution();
+        } catch (final ResponseException e) {
             throw new RobotAgentEventsListenerException("Unable to send response to client", e);
         } catch (final InterruptedException e) {
             throw new RobotAgentEventsListenerException("Server thread interrupted when waiting for start", e);

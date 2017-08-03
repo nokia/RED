@@ -5,12 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.debug.core.model.IValue;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable.RobotDebugVariableVisitor;
 
 /**
  * @author mmarzec
@@ -18,53 +17,37 @@ import org.eclipse.debug.core.model.IValue;
  */
 public abstract class RobotDebugValue extends RobotDebugElement implements IValue {
 
+    private String type;
+
     private String value;
     
-    protected RobotDebugValue(final RobotDebugTarget target, final String value) {
+    protected RobotDebugValue(final RobotDebugTarget target, final String type, final String value) {
         super(target);
+        this.type = type;
         this.value = value;
     }
 
-    public static RobotDebugValue createFromValue(final RobotDebugVariable parent, final Object value) {
+    public static RobotDebugValue createFromValue(final RobotDebugVariable parent, final String type,
+            final Object value) {
+
         if (value instanceof List<?>) {
-            return createFromList(parent, (List<?>) value);
+            return RobotDebugValueOfList.create(parent, type, (List<?>) value);
 
         } else if (value instanceof Map<?, ?>) {
-            return createFromMap(parent, (Map<?, ?>) value);
+            return RobotDebugValueOfDictionary.create(parent, type, (Map<?, ?>) value);
 
         } else {
-            return new RobotDebugValueOfScalar(parent.getDebugTarget(), value.toString());
+            return RobotDebugValueOfScalar.create(parent, type, value == null ? null : value.toString());
         }
-    }
-
-    private static RobotDebugValue createFromList(final RobotDebugVariable parent, final List<?> list) {
-        final List<RobotDebugVariable> nestedVariables = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++) {
-            nestedVariables.add(new RobotDebugVariable(parent, "[" + i + "]", list.get(i)));
-        }
-        return new RobotDebugValueOfList(parent.getDebugTarget(), nestedVariables);
-    }
-
-    private static RobotDebugValue createFromMap(final RobotDebugVariable parent, final Map<?, ?> map) {
-        final List<RobotDebugVariable> nestedVariables = new ArrayList<>();
-        for (final Entry<?, ?> entry : map.entrySet()) {
-            nestedVariables.add(new RobotDebugVariable(parent, entry.getKey().toString(), entry.getValue()));
-        }
-        return new RobotDebugValueOfDictionary(parent.getDebugTarget(), nestedVariables);
     }
 
     @Override
     public String getReferenceTypeName() {
-        try {
-            Integer.parseInt(value);
-            return "integer";
-        } catch (final NumberFormatException e) {
-            return "text";
-        }
+        return type;
     }
 
-    public boolean supportsModification() {
-        return false;
+    protected final void setType(final String type) {
+        this.type = type;
     }
 
     @Override
@@ -92,4 +75,21 @@ public abstract class RobotDebugValue extends RobotDebugElement implements IValu
     public RobotDebugVariable[] getVariables() {
         return new RobotDebugVariable[0];
     }
+
+    RobotDebugVariable getVariable(final String varName) {
+        for (final RobotDebugVariable variable : getVariables()) {
+            if (variable.getName().equals(varName)) {
+                return variable;
+            }
+        }
+        return null;
+    }
+
+    public void visitAllVariables(final RobotDebugVariableVisitor visitor) {
+        for (final RobotDebugVariable var : getVariables()) {
+            var.visitAllVariables(visitor);
+        }
+    }
+
+    protected abstract void syncValue(RobotDebugVariable parent, final String type, final Object newValue);
 }

@@ -18,7 +18,10 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 @SuppressWarnings("PMD.GodClass")
 public class RedImages {
 
+    public static final VariableImages VARIABLES = new VariableImages();
+    
     private static final Map<ImageDescriptor, ImageDescriptor> GRAY_IMAGES = new HashMap<>(0);
+
 
     public static ImageDescriptor getFilterImage() {
         return RedPlugin.getImageDescriptor("resources/filter.png");
@@ -52,6 +55,10 @@ public class RedImages {
         return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
     }
 
+    public static ImageDescriptor getBigErrorImage() {
+        return RedPlugin.getImageDescriptor("resources/big_error.png");
+    }
+
     public static ImageDescriptor getRefreshImage() {
         return RedPlugin.getImageDescriptor("resources/refresh.png");
     }
@@ -70,18 +77,6 @@ public class RedImages {
 
     public static ImageDescriptor getScriptRobotImage() {
         return RedPlugin.getImageDescriptor("resources/robot_script.png");
-    }
-
-    public static ImageDescriptor getRobotSuiteFolderDecoratorImage() {
-        return RedPlugin.getImageDescriptor("resources/decorator_suite_folder.png");
-    }
-
-    public static ImageDescriptor getRobotResourceDecoratorImage() {
-        return RedPlugin.getImageDescriptor("resources/decorator_resource_file.png");
-    }
-
-    public static ImageDescriptor getRobotInitFileDecoratorImage() {
-        return RedPlugin.getImageDescriptor("resources/decorator_init_file.png");
     }
 
     public static ImageDescriptor getRobotCasesFileSectionImage() {
@@ -210,6 +205,10 @@ public class RedImages {
 
     public static ImageDescriptor getBookImage() {
         return RedPlugin.getImageDescriptor("resources/book.png");
+    }
+
+    public static ImageDescriptor getBigKeywordImage() {
+        return RedPlugin.getImageDescriptor("resources/big_keyword.png");
     }
 
     public static ImageDescriptor getKeywordImage() {
@@ -376,6 +375,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/edit.png");
     }
 
+    public static ImageDescriptor getStackFrameImage() {
+        return RedPlugin.getImageDescriptor("resources/stackframe.png");
+    }
+
     public static ImageDescriptor getImageForResource(final IResource resource) {
         return resource.getAdapter(IWorkbenchAdapter.class).getImageDescriptor(resource);
     }
@@ -402,5 +405,55 @@ public class RedImages {
             GRAY_IMAGES.put(descriptor, grayImage);
         }
         return grayImage;
+    }
+
+    public static class VariableImages {
+
+        public ImageDescriptor getDebugScalarVariableImage() {
+            return RedPlugin.getImageDescriptor("resources/variable_scalar_debug.png");
+        }
+
+        public ImageDescriptor getDebugListVariableImage() {
+            return RedPlugin.getImageDescriptor("resources/variable_list_debug.png");
+        }
+
+        public ImageDescriptor getDebugDictionaryVariableImage() {
+            return RedPlugin.getImageDescriptor("resources/variable_dict_debug.png");
+        }
+
+        public ImageDescriptor getDebugGlobalScopeDecorator() {
+            return RedPlugin.getImageDescriptor("resources/variable_debug_global.png");
+        }
+
+        public ImageDescriptor getDebugSuiteScopeDecorator() {
+            return RedPlugin.getImageDescriptor("resources/variable_debug_suite.png");
+        }
+
+        public ImageDescriptor getDebugTestScopeDecorator() {
+            return RedPlugin.getImageDescriptor("resources/variable_debug_test.png");
+        }
+
+        public ImageDescriptor getDebugLocalScopeDecorator() {
+            return RedPlugin.getImageDescriptor("resources/variable_debug_local.png");
+        }
+    }
+
+    public static class Decorators {
+
+        public static ImageDescriptor getRobotDecorator() {
+            return RedPlugin.getImageDescriptor("resources/decorator_robot.png");
+        }
+
+        public static ImageDescriptor getFolderDecorator() {
+            return RedPlugin.getImageDescriptor("resources/decorator_folder.png");
+        }
+
+        public static ImageDescriptor getResourceDecorator() {
+            return RedPlugin.getImageDescriptor("resources/decorator_resource_file.png");
+        }
+
+        public static ImageDescriptor getInitFileDecorator() {
+            return RedPlugin.getImageDescriptor("resources/decorator_init_file.png");
+        }
     }
 }

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -122,12 +123,17 @@ public class AgentConnectionServerJob extends Job {
             return this;
         }
 
+        public AgentConnectionServerJobBuilder serverStatusHandledBy(final Collection<AgentServerStatusListener> listener) {
+            serverListeners.addAll(listener);
+            return this;
+        }
+
         public AgentConnectionServerJobBuilder agentEventsListenedBy(final RobotAgentEventListener listener) {
             agentEventListeners.add(listener);
             return this;
         }
 
-        public AgentConnectionServerJobBuilder agentEventsListenedBy(final List<RobotAgentEventListener> listeners) {
+        public AgentConnectionServerJobBuilder agentEventsListenedBy(final Collection<RobotAgentEventListener> listeners) {
             agentEventListeners.addAll(listeners);
             return this;
         }

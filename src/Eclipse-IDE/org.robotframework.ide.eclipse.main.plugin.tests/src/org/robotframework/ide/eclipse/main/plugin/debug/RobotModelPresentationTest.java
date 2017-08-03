@@ -19,20 +19,21 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILineBreakpoint;
-import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IFileEditorInput;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValueOfDictionary;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValueOfList;
-import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugValueOfScalar;
+import org.rf.ide.core.execution.agent.event.VariableTypedValue;
+import org.rf.ide.core.execution.debug.StackFrameVariable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
+import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+
+import com.google.common.collect.ImmutableMap;
 
 public class RobotModelPresentationTest {
 
@@ -81,8 +82,8 @@ public class RobotModelPresentationTest {
     public void stackframeNameIsProvided_whenStackframeIsGiven() throws CoreException {
         final RobotModelPresentation presentation = new RobotModelPresentation();
 
-        final IStackFrame frame = mock(IStackFrame.class);
-        when(frame.getName()).thenReturn("frame");
+        final RobotStackFrame frame = mock(RobotStackFrame.class);
+        when(frame.getLabel()).thenReturn("frame");
 
         assertThat(presentation.getText(frame)).isEqualTo("frame");
     }
@@ -153,7 +154,7 @@ public class RobotModelPresentationTest {
     }
 
     @Test
-    public void nullEditorIdIsProvided_whenArbitraryObjectIsGiven() {
+    public void noEditorIdIsProvided_whenArbitraryObjectIsGiven() {
         final RobotModelPresentation presentation = new RobotModelPresentation();
 
         final String id = presentation.getEditorId(mock(IEditorInput.class), new Object());
@@ -161,7 +162,7 @@ public class RobotModelPresentationTest {
     }
 
     @Test
-    public void nullEditorInputIsProvided_whenArbitraryObjectIsGiven() {
+    public void noEditorInputIsProvided_whenArbitraryObjectIsGiven() {
         final RobotModelPresentation presentation = new RobotModelPresentation();
 
         final IEditorInput input = presentation.getEditorInput(new Object());
@@ -174,15 +175,17 @@ public class RobotModelPresentationTest {
 
         final IValueDetailListener listener = mock(IValueDetailListener.class);
 
-        final IValue value1 = new RobotDebugValueOfScalar(null, "val");
-        final IValue value2 = new RobotDebugValueOfList(null, newArrayList(
-                new RobotDebugVariable((RobotDebugTarget) null, "1", "x"),
-                new RobotDebugVariable((RobotDebugTarget) null, "2", "y"),
-                new RobotDebugVariable((RobotDebugTarget) null, "3", "z")));
-        final IValue value3 = new RobotDebugValueOfDictionary(null, newArrayList(
-                new RobotDebugVariable((RobotDebugTarget) null, "k1", "x"),
-                new RobotDebugVariable((RobotDebugTarget) null, "k2", "y"),
-                new RobotDebugVariable((RobotDebugTarget) null, "k3", "z")));
+        final StackFrameVariable variable1 = new StackFrameVariable(VariableScope.LOCAL, false, "scalar", "str", "val");
+        final StackFrameVariable variable2 = new StackFrameVariable(VariableScope.LOCAL, false, "list", "list",
+                newArrayList(new VariableTypedValue("str", "x"), new VariableTypedValue("str", "y"),
+                        new VariableTypedValue("str", "z")));
+        final StackFrameVariable variable3 = new StackFrameVariable(VariableScope.LOCAL, false, "map", "dict",
+                ImmutableMap.of("k1", new VariableTypedValue("str", "x"), "k2", new VariableTypedValue("str", "y"),
+                        "k3", new VariableTypedValue("str", "z")));
+
+        final IValue value1 = new RobotDebugVariable(mock(RobotStackFrame.class), variable1).getValue();
+        final IValue value2 = new RobotDebugVariable(mock(RobotStackFrame.class), variable2).getValue();
+        final IValue value3 = new RobotDebugVariable(mock(RobotStackFrame.class), variable3).getValue();
 
         presentation.computeDetail(value1, listener);
         presentation.computeDetail(value2, listener);

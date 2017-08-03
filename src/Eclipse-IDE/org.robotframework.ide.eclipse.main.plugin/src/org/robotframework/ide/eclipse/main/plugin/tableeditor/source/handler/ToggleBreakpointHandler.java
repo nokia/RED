@@ -19,7 +19,7 @@ import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.ui.ISources;
-import org.rf.ide.core.execution.context.RobotDebugExecutableLineChecker;
+import org.rf.ide.core.execution.debug.ExecutableLineChecker;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotLineBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -77,7 +77,7 @@ public class ToggleBreakpointHandler extends DIParameterizedHandler<E4ToggleBrea
             if (file instanceof IFile) {
                 final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) file);
                 if (robotSuiteFile != null) {
-                    return RobotDebugExecutableLineChecker.isExecutableLine(robotSuiteFile.getLinkedElement(), line);
+                    return ExecutableLineChecker.isExecutableLine(robotSuiteFile.getLinkedElement(), line);
                 }
             }
             return false;

@@ -78,6 +78,8 @@ public class RedPreferences {
 
     public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
 
+    public static final String DEBUGGER_SUSPEND_ON_ERROR = "red.launch.debug.suspsendOnError";
+    public static final String DEBUGGER_OMIT_LIB_KEYWORDS = "red.launch.debug.omitLibraryKeywords";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -234,6 +236,18 @@ public class RedPreferences {
         return store.getBoolean(LAUNCH_USE_SINGLE_FILE_DATA_SOURCE);
     }
 
+    public IssuesStrategy getDebuggerShouldPauseOnError() {
+        return IssuesStrategy.valueOf(store.getString(DEBUGGER_SUSPEND_ON_ERROR).toUpperCase());
+    }
+
+    public void setDebuggerShouldPauseOnError(final IssuesStrategy strategy) {
+        store.putValue(DEBUGGER_SUSPEND_ON_ERROR, strategy.name().toLowerCase());
+    }
+
+    public boolean shouldDebuggerOmitLibraryKeywords() {
+        return store.getBoolean(DEBUGGER_OMIT_LIB_KEYWORDS);
+    }
+
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
         final int fontStyle = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".fontStyle");
         final int red = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.r");
@@ -291,5 +305,11 @@ public class RedPreferences {
         KEYWORDS,
         CASES,
         DOCUMENTATION
+    }
+
+    public enum IssuesStrategy {
+        NEVER,
+        ALWAYS,
+        PROMPT
     }
 }

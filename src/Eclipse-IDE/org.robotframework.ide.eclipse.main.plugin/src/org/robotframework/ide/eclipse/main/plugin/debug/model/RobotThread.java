@@ -5,38 +5,58 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import org.eclipse.debug.core.model.IBreakpoint;
-import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.debug.core.model.IThread;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * @author mmarzec
- *
- */
+import org.eclipse.debug.core.model.IBreakpoint;
+import org.eclipse.debug.core.model.IThread;
+import org.rf.ide.core.execution.debug.StackFrame;
+import org.rf.ide.core.execution.debug.Stacktrace;
+import org.rf.ide.core.execution.debug.Stacktrace.StacktraceListener;
+import org.rf.ide.core.execution.debug.UserProcessDebugController;
+
 public class RobotThread extends RobotDebugElement implements IThread {
 
-    /**
-     * Breakpoints this thread is suspended at or <code>null</code> if none.
-     */
-    private IBreakpoint[] breakpoints;
+    // breakpoints this thread is suspended at
+    private final List<IBreakpoint> breakpoints;
 
-    private boolean isStepping = false;
-    private boolean isSteppingOver = false;
-    private boolean isSteppingReturn = false;
+    private final UserProcessDebugController userController;
 
-    public RobotThread(final RobotDebugTarget target) {
+    private final Stacktrace stacktrace;
+
+    private final List<RobotStackFrame> frames;
+
+    public RobotThread(final RobotDebugTarget target, final Stacktrace stacktrace,
+            final UserProcessDebugController userController) {
         super(target);
-    }
+        this.breakpoints = new ArrayList<>();
+        this.userController = userController;
+        this.stacktrace = stacktrace;
+        this.frames = new ArrayList<>();
+        this.stacktrace.addListener(new StacktraceListener() {
 
-    @Override
-    public IStackFrame[] getStackFrames() {
-        final IStackFrame[] stackFrames = getDebugTarget().getStackFrames();
-        return stackFrames == null ? new IStackFrame[0] : stackFrames;
+            @Override
+            public void framePushed(final Stacktrace stack, final StackFrame frame) {
+                final RobotStackFrame newFrame = new RobotStackFrame(RobotThread.this, frame, userController);
+                newFrame.createVariables();
+                frames.add(0, newFrame);
+            }
+
+            @Override
+            public void framePopped(final Stacktrace stack, final StackFrame frame) {
+                frames.remove(0);
+            }
+        });
     }
 
     @Override
     public boolean hasStackFrames() {
-        return isSuspended();
+        return isSuspended() && !stacktrace.isEmpty();
+    }
+
+    @Override
+    public RobotStackFrame[] getStackFrames() {
+        return frames.toArray(new RobotStackFrame[0]);
     }
 
     @Override
@@ -45,119 +65,62 @@ public class RobotThread extends RobotDebugElement implements IThread {
     }
 
     @Override
-    public IStackFrame getTopStackFrame() {
-        final IStackFrame[] frames = getStackFrames();
-        return frames.length > 0 ? frames[0] : null;
+    public RobotStackFrame getTopStackFrame() {
+        final RobotStackFrame[] frames = getStackFrames();
+        return frames != null && frames.length > 0 ? frames[0] : null;
     }
 
     @Override
     public String getName() {
-        return "Thread [main]";
+        return "Tests execution thread";
     }
 
     @Override
     public IBreakpoint[] getBreakpoints() {
-        return breakpoints == null ? new IBreakpoint[0] : breakpoints;
+        return breakpoints.toArray(new IBreakpoint[0]);
     }
 
-    void setSuspendedAt(final IBreakpoint breakpoint) {
-        this.breakpoints = new IBreakpoint[] { breakpoint };
+    public void suspendedAt(final IBreakpoint breakpoint) {
+        breakpoints.clear();
+        breakpoints.add(breakpoint);
     }
 
-    @Override
-    public boolean canResume() {
-        return isSuspended();
-    }
-
-    @Override
-    public boolean canSuspend() {
-        return !isSuspended() && !isTerminated();
-    }
-
-    @Override
-    public boolean isSuspended() {
-        return getDebugTarget().isSuspended();
-    }
-
-    @Override
-    public void resume() {
-        getDebugTarget().resume();
-    }
-
-    @Override
-    public void suspend() {
-        getDebugTarget().suspend();
-    }
-
-    @Override
-    public boolean canStepInto() {
-        return isSuspended();
-    }
-
-    @Override
-    public boolean canStepOver() {
-        return isSuspended();
-    }
-
-    @Override
-    public boolean canStepReturn() {
-        return isSuspended() && getDebugTarget().getCurrentKeywordsContext().size() > 1;
+    void resumedFromBreakpoint() {
+        breakpoints.clear();
     }
 
     @Override
     public boolean isStepping() {
-        return isStepping;
+        return userController.isStepping();
     }
 
-    void setStepping(final boolean stepping) {
-        isStepping = stepping;
+    @Override
+    public boolean canStepInto() {
+        return isSuspended() && !stacktrace.isEmpty() && getTopStackFrame().canStepInto();
     }
 
-    public void setSteppingOver(final boolean stepping) {
-        isSteppingOver = stepping;
+    @Override
+    public boolean canStepOver() {
+        return isSuspended() && !stacktrace.isEmpty() && getTopStackFrame().canStepOver();
     }
 
-    boolean isSteppingOver() {
-        return isSteppingOver;
-    }
-
-    public void setSteppingReturn(final boolean stepping) {
-        isSteppingReturn = stepping;
-    }
-
-    boolean isSteppingReturn() {
-        return isSteppingReturn;
+    @Override
+    public boolean canStepReturn() {
+        return isSuspended() && !stacktrace.isEmpty() && getTopStackFrame().canStepReturn();
     }
 
     @Override
     public void stepInto() {
-        getDebugTarget().step();
+        getTopStackFrame().stepInto();
     }
 
     @Override
     public void stepOver() {
-        isSteppingOver = true;
-        getDebugTarget().stepOver();
+        getTopStackFrame().stepOver();
     }
 
     @Override
     public void stepReturn() {
-        isSteppingReturn = true;
-        getDebugTarget().stepReturn();
-    }
-
-    @Override
-    public boolean canTerminate() {
-        return !isTerminated();
-    }
-
-    @Override
-    public boolean isTerminated() {
-        return getDebugTarget().isTerminated();
-    }
-
-    @Override
-    public void terminate() {
-        getDebugTarget().terminate();
+        getTopStackFrame().stepReturn();
     }
 }

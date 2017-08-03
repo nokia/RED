@@ -40,7 +40,7 @@ public final class QualifiedKeywordName {
         return new QualifiedKeywordName(unifyDefinition(name), name.toLowerCase(), source);
     }
     
-    public static QualifiedKeywordName fromOccurrenceWithDots(final String givenWholeName) { 
+    public static QualifiedKeywordName fromOccurrenceWithDots(final String givenWholeName) {
         // ignore keyword source
         return new QualifiedKeywordName(unifyDefinition(givenWholeName), givenWholeName.toLowerCase(), "");
     }
@@ -54,12 +54,16 @@ public final class QualifiedKeywordName {
     }
     
     public static boolean isOccurrenceEqualToDefinition(final String keywordOccurrence, final String keywordDefinition) {
-        if(EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition)) { // ignore embedded keyword names 
+        if(EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition)) { // ignore embedded keyword names
             return true;
         }
         final List<String> splittedOccurrence = Splitter.on('.').splitToList(keywordOccurrence);
         final String nameInOccurrence = splittedOccurrence.get(splittedOccurrence.size() - 1).trim();
         return nameInOccurrence.equalsIgnoreCase(keywordDefinition);
+    }
+
+    public static String asCall(final String keywordName, final String source) {
+        return source.isEmpty() ? keywordName : source + "." + keywordName;
     }
 
     public String getKeywordName() {

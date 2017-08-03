@@ -23,7 +23,7 @@ import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsL
 
 public class AgentConnectionServer {
 
-    public static final int RED_AGENT_PROTOCOL_VERSION = 1;
+    public static final int RED_AGENT_PROTOCOL_VERSION = 2;
 
     public static final String DEFAULT_CONNECTION_HOST = "127.0.0.1";
 
@@ -78,6 +78,7 @@ public class AgentConnectionServer {
     }
 
     public void start(final RobotAgentEventListener... eventsListeners) throws IOException {
+        AgentClient client = null;
         try {
             serverSetupSemaphore.release();
 
@@ -94,8 +95,9 @@ public class AgentConnectionServer {
                         new InputStreamReader(clientSocket.getInputStream()));
                 final PrintWriter eventsWriter = new PrintWriter(clientSocket.getOutputStream());
 
+                client = new AgentClient(clientId, eventsWriter);
                 final RobotAgentEventDispatcher eventsDispatcher = new RobotAgentEventDispatcher(
-                        new AgentClient(clientId, eventsWriter), eventsListeners);
+                        client, eventsListeners);
 
                 listeners.forEach(listener -> listener.clientConnected(clientId));
                 eventsDispatcher.runEventsLoop(eventsReader);
@@ -109,6 +111,9 @@ public class AgentConnectionServer {
                 listeners.forEach(listener -> listener.clientConnectionError(e));
             }
         } finally {
+            if (client != null) {
+                client.dispose();
+            }
             stop();
         }
     }

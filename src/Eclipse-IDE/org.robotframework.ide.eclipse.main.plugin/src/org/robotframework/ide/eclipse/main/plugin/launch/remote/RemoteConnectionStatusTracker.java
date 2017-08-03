@@ -13,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.execution.server.AgentServerStatusListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 
@@ -67,9 +68,10 @@ class RemoteConnectionStatusTracker extends RobotDefaultAgentEventListener imple
     }
 
     @Override
-    public void handleVersions(final String pythonVersion, final String robotVersion, final int protocolVersion) {
-        writeMessageLine("client python version: " + pythonVersion);
-        writeMessageLine("client robot version: " + robotVersion);
+    public void handleVersions(final VersionsEvent event) {
+        writeMessageLine("client command line: " + event.getCommandLine());
+        writeMessageLine("client python version: " + event.getPythonVersion());
+        writeMessageLine("client robot version: " + event.getRobotVersion());
     }
 
     @Override
