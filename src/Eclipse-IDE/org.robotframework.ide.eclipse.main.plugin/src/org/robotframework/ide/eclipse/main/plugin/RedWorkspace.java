@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -24,27 +25,48 @@ public class RedWorkspace {
     }
 
     public IResource forUri(final URI absolutePath) {
-        final IContainer[] containers = root.findContainersForLocationURI(absolutePath);
+        final Optional<IContainer> container = containerForUri(absolutePath);
+        if (container.isPresent()) {
+            return container.get();
+        }
+        return fileForUri(absolutePath).orElse(null);
+    }
+
+    public boolean hasContainerForUri(final URI absolutePath) {
+        return containerForUri(absolutePath).isPresent();
+    }
+
+    public Optional<IContainer> containerForUri(final URI absolutePath) {
+        final IContainer[] containers = absolutePath == null ? new IContainer[0]
+                : root.findContainersForLocationURI(absolutePath);
         for (final IContainer container : containers) {
             final IPath realLocation = container.getLocation();
             if (realLocation != null) {
                 final File realLocationAsFile = realLocation.toFile();
                 if (realLocationAsFile.exists() && realLocationAsFile.isDirectory()) {
-                    return container;
+                    return Optional.of(container);
                 }
             }
         }
-        final IFile[] files = root.findFilesForLocationURI(absolutePath);
+        return Optional.empty();
+    }
+
+    public boolean hasFileForUri(final URI absolutePath) {
+        return fileForUri(absolutePath).isPresent();
+    }
+
+    public Optional<IFile> fileForUri(final URI absolutePath) {
+        final IFile[] files = absolutePath == null ? new IFile[0] : root.findFilesForLocationURI(absolutePath);
         for (final IFile file : files) {
             final IPath realLocation = file.getLocation();
             if (realLocation != null) {
                 final File realLocationAsFile = realLocation.toFile();
                 if (realLocationAsFile.exists() && realLocationAsFile.isFile()) {
-                    return file;
+                    return Optional.of(file);
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public static class Paths {

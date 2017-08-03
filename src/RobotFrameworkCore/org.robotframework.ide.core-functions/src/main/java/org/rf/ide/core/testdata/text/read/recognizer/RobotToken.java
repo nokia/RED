@@ -8,10 +8,12 @@ package org.rf.ide.core.testdata.text.read.recognizer;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
@@ -31,6 +33,10 @@ public class RobotToken implements IRobotLineElement, Serializable {
     private boolean isDirty = false;
 
     private boolean wasFirstInit = false;
+
+    public static Comparator<RobotToken> byStartOffset() {
+        return (t1, t2) -> Integer.compare(t1.getStartOffset(), t2.getStartOffset());
+    }
 
     public static RobotToken create(final String rawAndText) {
         return create(rawAndText, new ArrayList<IRobotTokenType>());
@@ -152,6 +158,14 @@ public class RobotToken implements IRobotLineElement, Serializable {
 
     public void setFilePosition(final FilePosition fp) {
         this.fp = fp;
+    }
+
+    public FilePosition getEndFilePosition() {
+        return new FilePosition(getLineNumber(), getEndColumn(), getEndOffset());
+    }
+
+    public FileRegion getFileRegion() {
+        return new FileRegion(fp.copy(), new FilePosition(getLineNumber(), getEndColumn(), getEndOffset()));
     }
 
     @Override

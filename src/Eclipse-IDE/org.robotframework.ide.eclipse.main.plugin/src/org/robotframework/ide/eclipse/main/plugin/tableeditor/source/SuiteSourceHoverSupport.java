@@ -48,6 +48,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
+import org.robotframework.ide.eclipse.main.plugin.debug.RobotModelPresentation;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotStackFrame;
@@ -56,6 +57,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 
 public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 
@@ -76,11 +78,12 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         try {
             final IDocument document = textViewer.getDocument();
             final boolean isTsv = suiteFile.isTsvFile();
+
             Optional<IRegion> region = DocumentUtilities.findVariable(document, isTsv, offset);
             if (!region.isPresent()) {
                 region = DocumentUtilities.findCellRegion(document, isTsv, offset);
                 if (!region.isPresent()) {
-                    region = Optional.of(new Region(0, 0));
+                    region = Optional.of(new Region(offset, 0));
                 }
             }
             return region.get();
@@ -93,9 +96,12 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     @Override
     public Object getHoverInfo2(final ITextViewer textViewer, final IRegion hoverRegion) {
         try {
-            final String problem = getErrorMsgs(textViewer, hoverRegion);
+            final String problem = getAnnotationInfo(textViewer, hoverRegion);
             if (problem != null) {
                 return problem;
+            }
+            if (hoverRegion.getLength() == 0) {
+                return null;
             }
 
             final IDocument document = textViewer.getDocument();
@@ -137,12 +143,40 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         return false;
     }
 
-    private String getErrorMsgs(final ITextViewer textViewer, final IRegion hoverRegion) throws CoreException {
+    private String getAnnotationInfo(final ITextViewer textViewer, final IRegion hoverRegion) throws CoreException {
         final IAnnotationModel model = getAnnotationModel((ISourceViewer) textViewer);
         if (model == null) {
             return null;
         }
+        final String debuggerError = getInstructionPointerErrorMsgs(model, hoverRegion);
+        if (debuggerError != null) {
+            return debuggerError;
+        }
+        return getErrorMsgs(model, hoverRegion);
 
+    }
+
+    private String getInstructionPointerErrorMsgs(final IAnnotationModel model, final IRegion hoverRegion)
+            throws CoreException {
+        final Iterator<?> iter = model.getAnnotationIterator();
+        while (iter.hasNext()) {
+            final Annotation annotation = (Annotation) iter.next();
+            if (RobotModelPresentation.RED_DEBUG_ERROR_CURRENT_IP.equals(annotation.getType())
+                    || RobotModelPresentation.RED_DEBUG_ERROR_SECONDARY_IP.equals(annotation.getType())) {
+                final Position position = model.getPosition(annotation);
+                if (position != null && position.overlapsWith(hoverRegion.getOffset(), hoverRegion.getLength())) {
+                    final String msg = annotation.getText();
+                    if (msg != null && msg.trim().length() > 0) {
+                        return msg.trim();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getErrorMsgs(final IAnnotationModel model, final IRegion hoverRegion)
+            throws CoreException {
         final List<String> msgs = newArrayList();
         final Iterator<?> iter = model.getAnnotationIterator();
         while (iter.hasNext()) {
@@ -159,9 +193,10 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         }
         if (msgs.isEmpty()) {
             return null;
+        } else if (msgs.size() == 1) {
+            return msgs.get(0);
         } else {
-            final String prefix = msgs.size() == 1 ? "" : "Multiple markers at this line:\n- ";
-            return prefix + Joiner.on("\n- ").join(msgs);
+            return "Multiple markers at this line:\n- " + Joiner.on("\n- ").join(msgs);
         }
     }
 
@@ -182,9 +217,9 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                 if (!robotTarget.isSuspended()) {
                     continue;
                 }
-                for (final IStackFrame stackFrame : robotTarget.getRobotThread().getStackFrames()) {
+                for (final IStackFrame stackFrame : robotTarget.getThread().getStackFrames()) {
                     final RobotStackFrame robotStackFrame = (RobotStackFrame) stackFrame;
-                    if (robotStackFrame.getSourceName().equals(suiteFile.getFile().getName())) {
+                    if (Objects.equal(robotStackFrame.getPath(), Optional.of(suiteFile.getFile().getLocationURI()))) {
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
                             if (VariableNamesSupport.hasEqualNames(variable.getName(), variableName)) {
                                 final String value = ((RobotDebugVariable) variable).getValue().getDetailedValue();

@@ -5,121 +5,79 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IMarkerDelta;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.model.IMemoryBlock;
-import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
-import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
-import org.rf.ide.core.execution.server.AgentClient;
-import org.rf.ide.core.execution.server.response.ChangeVariable;
-import org.rf.ide.core.execution.server.response.InterruptExecution;
-import org.rf.ide.core.execution.server.response.ResumeExecution;
-import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugStackFrameManager;
-import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
+import org.rf.ide.core.execution.debug.RobotLineBreakpoint;
+import org.rf.ide.core.execution.debug.StackFrame;
+import org.rf.ide.core.execution.debug.StackFrameVariable;
+import org.rf.ide.core.execution.debug.Stacktrace;
+import org.rf.ide.core.execution.debug.UserProcessDebugController;
+import org.rf.ide.core.execution.debug.UserProcessDebugController.PauseReasonListener;
+import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 
-import com.google.common.collect.Iterables;
-
-/**
- * @author mmarzec
- */
-@SuppressWarnings({ "PMD.TooManyFields", "PMD.TooManyMethods", "PMD.GodClass" })
 public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget {
 
-    // associated system process (Robot)
-    private IProcess process;
-
-    // containing launch object
     private final ILaunch launch;
 
-    // program name
+    private IRobotProcess process;
+
+    private RobotThread singleThread;
+
     private final String name;
-    
-    // suspend state
-    private boolean isSuspended;
 
-    private IThread[] threads;
+    private final Stacktrace stacktrace;
 
-    private final Map<String, KeywordContext> currentKeywordsDebugContextMap;
+    private final UserProcessDebugController userController;
 
-    private int currentStepOverLevel;
-    
-    private int currentStepReturnLevel;
-
-    private final RobotDebugVariablesManager robotVariablesManager;
-    
-    private RobotDebugStackFrameManager robotDebugStackFrameManager;
-    
-    private AgentClient client;
-
-    public RobotDebugTarget(final String name, final ILaunch launch) {
+    public RobotDebugTarget(final String name, final ILaunch launch, final Stacktrace stacktrace,
+            final UserProcessDebugController userController) {
         super(null);
         this.name = name;
         this.launch = launch;
-        this.currentKeywordsDebugContextMap = new LinkedHashMap<>();
-        this.robotVariablesManager = new RobotDebugVariablesManager(this);
-
-        this.threads = null;
-
-        this.isSuspended = false;
-        this.currentStepOverLevel = 0;
-        this.currentStepReturnLevel = 0;
-
-        this.robotDebugStackFrameManager = null;
+        this.stacktrace = stacktrace;
+        this.userController = userController;
+        this.userController.whenSuspended(new ExecutionPauseReasonsListener());
     }
 
-    public void connectWith(final IProcess process) {
-        this.process = process;
-
-        threads = new IThread[] { new RobotThread(this) };
-        robotDebugStackFrameManager = new RobotDebugStackFrameManager(getThread());
-
-        DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
-
-        launch.addDebugTarget(this);
-    }
-
-    public void setClient(final AgentClient client) {
-        this.client = client;
+    public void connected() {
+        this.singleThread = new RobotThread(this, stacktrace, userController);
     }
 
     @Override
-    public IProcess getProcess() {
+    public IRobotProcess getProcess() {
         return process;
     }
 
-    @Override
-    public IThread[] getThreads() {
-        return threads;
-    }
-
-    private RobotThread getThread() {
-        return threads.length == 0 ? null : (RobotThread) threads[0];
+    public void setProcess(final IRobotProcess process) {
+        this.process = process;
     }
 
     @Override
     public boolean hasThreads() {
-        return true;
+        return singleThread != null;
+    }
+
+    @Override
+    public IThread[] getThreads() {
+        return hasThreads() ? new IThread[] { singleThread } : new IThread[0];
+    }
+
+    public RobotThread getThread() {
+        return singleThread;
     }
 
     @Override
     public String getName() {
-        return name;
+        return (isSuspended() ? "<suspended>" : "") + name;
     }
 
     @Override
@@ -129,17 +87,23 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     @Override
     public boolean canDisconnect() {
-        return false;
+        return getProcess().canDisconnect();
     }
 
     @Override
     public boolean isDisconnected() {
-        return false;
+        return getProcess().isDisconnected();
     }
 
     @Override
     public void disconnect() {
+        singleThread = null;
+        getProcess().disconnect();
 
+        // this is needed because eclipse source facility is clearing
+        // current instruction pointers annotations in opened editors
+        // only on resume/terminate events
+        fireTerminateEvent();
     }
 
     @Override
@@ -153,144 +117,79 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     @Override
-    public void terminate() {
-        if (client != null) {
-            try {
-                client.send(new InterruptExecution());
-            } catch (ResponseException | IOException e) {
-                throw new RobotAgentEventsListenerException("Unable to send response to client", e);
-            }
-        }
-        terminated();
+    public void terminate() throws DebugException {
+        singleThread = null;
+        getProcess().terminate();
+
+        fireTerminateEvent();
     }
 
     @Override
     public boolean canSuspend() {
-        return !isTerminated() && !isSuspended();
+        return getProcess().canSuspend();
     }
 
     @Override
     public boolean isSuspended() {
-        return isSuspended;
+        return getProcess().isSuspended();
     }
 
     @Override
     public void suspend() {
-
+        getProcess().suspend();
     }
 
     @Override
     public boolean canResume() {
-        return !isTerminated() && isSuspended();
+        return getProcess().canResume();
     }
 
     @Override
     public void resume() {
-        getThread().setStepping(false);
+        getProcess().resume();
 
-        try {
-            client.send(new ResumeExecution());
-        } catch (ResponseException | IOException e) {
-            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
-        }
-        resumed(DebugEvent.CLIENT_REQUEST);
+        getThread().resumedFromBreakpoint();
+        getThread().fireResumeEvent(DebugEvent.CLIENT_REQUEST);
     }
 
-    protected void step() {
-        getThread().setStepping(true);
-
-        try {
-            client.send(new ResumeExecution());
-        } catch (ResponseException | IOException e) {
-            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
-        }
-        resumed(DebugEvent.CLIENT_REQUEST);
+    void changeVariable(final StackFrame frame, final StackFrameVariable variable, final List<String> arguments) {
+        userController.changeVariable(frame, variable, arguments);
     }
 
-    protected void stepOver() {
-        currentStepOverLevel = currentKeywordsDebugContextMap.size();
-        step();
-    }
-    
-    protected void stepReturn() {
-        currentStepReturnLevel = currentKeywordsDebugContextMap.size();
-        step();
-    }
-
-    /**
-     * Notification the target has resumed for the given reason
-     * 
-     * @param detail
-     *            reason for the resume
-     */
-    private void resumed(final int detail) {
-        isSuspended = false;
-        getThread().fireResumeEvent(detail);
-    }
-
-    /**
-     * Notification the target has suspended for the given reason
-     * 
-     * @param detail
-     *            reason for the suspend
-     */
-    public void suspended(final int detail) {
-        isSuspended = true;
-        getThread().fireSuspendEvent(detail);
-    }
-
-    /**
-     * Notification we have connected to the Agent and it has started.
-     */
-    public void started() {
-        fireCreationEvent();
-    }
-
-    /**
-     * Called when this debug target terminates.
-     */
-    public void terminated() {
-        isSuspended = false;
-        DebugPlugin.getDefault().getBreakpointManager().removeBreakpointListener(this);
-        fireTerminateEvent();
-       
-        final IProcess process = getProcess();
-        if (process != null) {
-            try {
-                getProcess().terminate();
-            } catch (final DebugException e) {
-                e.printStackTrace();
-            }
-        }
+    void changeVariableInnerValue(final StackFrame frame, final StackFrameVariable variable, final List<Object> path,
+            final List<String> arguments) {
+        userController.changeVariableInnerValue(frame, variable, path, arguments);
     }
 
     @Override
     public void breakpointAdded(final IBreakpoint breakpoint) {
-
+        // nothing to do
     }
 
     @Override
     public void breakpointRemoved(final IBreakpoint breakpoint, final IMarkerDelta delta) {
-
+        // nothing to do
     }
 
     @Override
     public void breakpointChanged(final IBreakpoint breakpoint, final IMarkerDelta delta) {
-        if (supportsBreakpoint(breakpoint)) {
-            try {
-                if (breakpoint.isEnabled()) {
-                    breakpointAdded(breakpoint);
-                } else {
-                    breakpointRemoved(breakpoint, null);
-                }
-            } catch (final CoreException e) {
-            }
-        }
+        // nothing to do
     }
 
     @Override
     public boolean supportsBreakpoint(final IBreakpoint breakpoint) {
         return breakpoint.getModelIdentifier().equals(RobotDebugElement.DEBUG_MODEL_ID);
+    }
+
+    /**
+     * Set the thread's breakpoint
+     * 
+     * @param breakpoint
+     */
+    public void breakpointHit(final IBreakpoint breakpoint) {
+        if (breakpoint instanceof ILineBreakpoint) {
+            getThread().suspendedAt(breakpoint);
+        }
     }
 
     @Override
@@ -303,66 +202,42 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return null;
     }
 
-    /**
-     * Returns the current stack frames in the target.
-     * 
-     * @return the current stack frames in the target
-     */
-    protected IStackFrame[] getStackFrames() {
-        return robotDebugStackFrameManager.getStackFrames(currentKeywordsDebugContextMap);
-    }
+    private class ExecutionPauseReasonsListener implements PauseReasonListener {
 
-    public void setHasStackFramesCreated(final boolean hasStackFramesCreated) {
-        robotDebugStackFrameManager.setHasStackFramesCreated(hasStackFramesCreated);
-    }
-    
-    public void clearStackFrames() {
-        robotDebugStackFrameManager.setStackFrames(null);
-    }
-
-    /**
-     * Set the thread's breakpoint
-     * 
-     * @param breakpoint
-     */
-    public void breakpointHit(final IBreakpoint breakpoint) {
-        if (breakpoint instanceof ILineBreakpoint) {
-            getThread().setSuspendedAt(breakpoint);
+        @Override
+        public void pausedOnBreakpoint(final RobotLineBreakpoint breakpoint) {
+            suspended(DebugEvent.BREAKPOINT);
+            breakpointHit((IBreakpoint) breakpoint);
         }
-    }
 
-    void sendChangeRequest(final String variableName, final List<String> values) {
-        try {
-            client.send(new ChangeVariable(variableName, values));
-        } catch (ResponseException | IOException e) {
-            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+        @Override
+        public void pausedByUser() {
+            suspended(DebugEvent.CLIENT_REQUEST);
         }
-    }
-    
-    public boolean hasStepOver() {
-        return getThread().isSteppingOver() && currentStepOverLevel <= currentKeywordsDebugContextMap.size();
-    }
-    
-    public boolean hasStepReturn() {
-        return getThread().isSteppingReturn() && currentStepReturnLevel <= currentKeywordsDebugContextMap.size() + 1;
-    }
 
-    public RobotThread getRobotThread() {
-        return getThread();
-    }
-
-    public Map<String, KeywordContext> getCurrentKeywordsContext() {
-        return currentKeywordsDebugContextMap;
-    }
-
-    public KeywordContext getLastKeywordFromCurrentContext() {
-        if(currentKeywordsDebugContextMap.size() > 0) {
-            return Iterables.getLast(currentKeywordsDebugContextMap.values());
+        @Override
+        public void pausedByStepping() {
+            suspended(DebugEvent.STEP_END);
         }
-        return new KeywordContext();
-    }
-    
-    public RobotDebugVariablesManager getRobotVariablesManager() {
-        return robotVariablesManager;
+
+        @Override
+        public void pausedOnError(final String error) {
+            suspended(DebugEvent.CLIENT_REQUEST);
+        }
+
+        @Override
+        public void pausedAfterVariableChange(final int frameLevel) {
+            // only refreshes the variables of frame given by the level
+            for (final RobotStackFrame frame : getThread().getStackFrames()) {
+                if (frame.getFrame().getLevel() == frameLevel) {
+                    frame.fireChangeEvent(DebugEvent.CONTENT);
+                }
+            }
+        }
+
+        private void suspended(final int detail) {
+            getProcess().suspended();
+            getThread().fireSuspendEvent(detail);
+        }
     }
 }

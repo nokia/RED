@@ -7,8 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
 public class RobotDebugValueOfScalar extends RobotDebugValue {
 
-    public RobotDebugValueOfScalar(final RobotDebugTarget target, final String value) {
-        super(target, value);
+    public static RobotDebugValue create(final RobotDebugVariable parent, final String type, final String value) {
+        return new RobotDebugValueOfScalar(parent.getDebugTarget(), type, value);
+    }
+
+
+    private RobotDebugValueOfScalar(final RobotDebugTarget target, final String type, final String value) {
+        super(target, type, value);
     }
 
     @Override
@@ -17,7 +22,8 @@ public class RobotDebugValueOfScalar extends RobotDebugValue {
     }
 
     @Override
-    public boolean supportsModification() {
-        return true;
+    protected void syncValue(final RobotDebugVariable parent, final String type, final Object newValue) {
+        setType(type);
+        setValue((String) newValue);
     }
 }

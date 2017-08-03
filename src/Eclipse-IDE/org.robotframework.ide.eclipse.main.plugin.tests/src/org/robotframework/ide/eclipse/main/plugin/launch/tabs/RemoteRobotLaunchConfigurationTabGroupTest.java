@@ -12,7 +12,6 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.debug.ui.sourcelookup.SourceLookupTab;
 import org.junit.Test;
 
 public class RemoteRobotLaunchConfigurationTabGroupTest {
@@ -23,10 +22,9 @@ public class RemoteRobotLaunchConfigurationTabGroupTest {
         group.createTabs(mock(ILaunchConfigurationDialog.class), ILaunchManager.RUN_MODE);
 
         final ILaunchConfigurationTab[] tabs = group.getTabs();
-        assertThat(tabs.length).isEqualTo(3);
+        assertThat(tabs.length).isEqualTo(2);
         assertThat(tabs[0]).isInstanceOf(LaunchConfigurationListenerTab.class);
-        assertThat(tabs[1]).isInstanceOf(SourceLookupTab.class);
-        assertThat(tabs[2]).isInstanceOf(CommonTab.class);
+        assertThat(tabs[1]).isInstanceOf(CommonTab.class);
     }
 
     @Test
@@ -35,10 +33,9 @@ public class RemoteRobotLaunchConfigurationTabGroupTest {
         group.createTabs(mock(ILaunchConfigurationDialog.class), ILaunchManager.DEBUG_MODE);
 
         final ILaunchConfigurationTab[] tabs = group.getTabs();
-        assertThat(tabs.length).isEqualTo(3);
+        assertThat(tabs.length).isEqualTo(2);
         assertThat(tabs[0]).isInstanceOf(LaunchConfigurationListenerTab.class);
-        assertThat(tabs[1]).isInstanceOf(SourceLookupTab.class);
-        assertThat(tabs[2]).isInstanceOf(CommonTab.class);
+        assertThat(tabs[1]).isInstanceOf(CommonTab.class);
     }
 
 }

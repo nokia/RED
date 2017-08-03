@@ -30,6 +30,7 @@ import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
+import org.rf.ide.core.execution.server.AgentServerVersionsChecker;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -143,6 +144,7 @@ public abstract class AbstractAutoDiscoverer {
         final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN);
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
+                .agentEventsListenedBy(new AgentServerVersionsChecker())
                 .agentEventsListenedBy(testsStarter)
                 .agentEventsListenedBy(createDryRunEventListener(startSuiteHandler))
                 .agentEventsListenedBy(new AgentServerKeepAlive())

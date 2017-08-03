@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameOperation;
 
 class BddMatchesHelper {
 
@@ -22,10 +21,7 @@ class BddMatchesHelper {
     BddAwareProposalMatch findBddAwareMatch(final String userContent, final String proposalContent) {
         final StringBuilder gherkinPrefix = new StringBuilder();
         final AtomicReference<Optional<ProposalMatch>> match = new AtomicReference<>(Optional.empty());
-        GherkinStyleSupport.forEachPossibleGherkinName(userContent, new NameOperation() {
-
-            @Override
-            public void perform(final String gherkinNameVariant) {
+        GherkinStyleSupport.forEachPossibleGherkinName(userContent, gherkinNameVariant -> {
                 if (match.get().isPresent()) {
                     return;
                 }
@@ -35,7 +31,7 @@ class BddMatchesHelper {
                     gherkinPrefix.append(userContent.substring(0, userContent.length() - gherkinNameVariant.length()));
                 }
             }
-        });
+        );
         return new BddAwareProposalMatch(match.get(), gherkinPrefix.toString());
     }
 

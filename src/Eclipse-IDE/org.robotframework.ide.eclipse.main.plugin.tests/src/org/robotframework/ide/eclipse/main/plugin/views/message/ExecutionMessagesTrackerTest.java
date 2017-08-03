@@ -7,9 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.Status;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
@@ -22,7 +26,7 @@ public class ExecutionMessagesTrackerTest {
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
 
         assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).isPresent()).isFalse();
-        tracker.handleAgentInitializing();
+        tracker.handleAgentInitializing(new AgentInitializingEvent(null));
 
         assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).isPresent()).isTrue();
     }
@@ -35,7 +39,7 @@ public class ExecutionMessagesTrackerTest {
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
 
-        tracker.handleAgentInitializing();
+        tracker.handleAgentInitializing(new AgentInitializingEvent(null));
 
         assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).isPresent()).isTrue();
         assertThat(launchContext.getExecutionData(ExecutionMessagesStore.class).get()).isSameAs(store);
@@ -48,7 +52,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case"));
+        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null, new ArrayList<>()));
 
         assertThat(store.getMessage()).isEqualTo("Starting test: test_case\n");
     }
@@ -58,7 +62,7 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case"));
+        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null, new ArrayList<>()));
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);
@@ -96,7 +100,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleLogMessage("msg", LogLevel.INFO, "stamp");
+        tracker.handleLogMessage(new MessageEvent("msg", LogLevel.INFO, "stamp"));
 
         assertThat(store.getMessage()).isEqualTo("stamp : INFO : msg\n");
     }
@@ -106,7 +110,7 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleLogMessage("msg", LogLevel.INFO, "stamp");
+        tracker.handleLogMessage(new MessageEvent("msg", LogLevel.INFO, "stamp"));
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);

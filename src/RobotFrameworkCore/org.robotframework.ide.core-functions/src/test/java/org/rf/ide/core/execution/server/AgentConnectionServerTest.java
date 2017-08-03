@@ -27,6 +27,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
+import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -56,7 +57,8 @@ public class AgentConnectionServerTest {
         final AgentServerStatusListener serverStatusListener = mock(AgentServerStatusListener.class);
         final RobotAgentEventListener robotEventListener = mock(RobotAgentEventListener.class);
         when(robotEventListener.isHandlingEvents()).thenReturn(true);
-        doThrow(RobotAgentEventsListenerException.class).when(robotEventListener).handleAgentIsReadyToStart();
+        doThrow(RobotAgentEventsListenerException.class).when(robotEventListener)
+                .handleAgentIsReadyToStart(any(ReadyToStartEvent.class));
 
         final AgentConnectionServer server = new AgentConnectionServer(host, port);
         server.addStatusListener(serverStatusListener);

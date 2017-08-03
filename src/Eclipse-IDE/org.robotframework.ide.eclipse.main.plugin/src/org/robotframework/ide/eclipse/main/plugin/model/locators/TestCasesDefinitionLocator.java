@@ -35,6 +35,7 @@ public class TestCasesDefinitionLocator {
 
     public void locateTestCaseDefinition(final TestCaseDetector detector) {
         final RobotSuiteFile suiteFile = model.createSuiteFile(file);
+        
         final Optional<RobotCasesSection> section = suiteFile.findSection(RobotCasesSection.class);
         if (!section.isPresent()) {
             return;
@@ -47,6 +48,7 @@ public class TestCasesDefinitionLocator {
         }
     }
 
+    @FunctionalInterface
     public interface TestCaseDetector {
 
         ContinueDecision testCaseDetected(RobotSuiteFile file, RobotCase testCase);

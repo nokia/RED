@@ -42,50 +42,8 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
         final Composite parent = getFieldEditorParent();
 
         createLink(parent);
-        createRobotLaunchingPreferences(parent);
-        createExecutableFileLaunchingPreferences(parent);
-    }
-
-    private void createRobotLaunchingPreferences(final Composite parent) {
-        final Group robotGroup = new Group(parent, SWT.NONE);
-        robotGroup.setText("Robot");
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(robotGroup);
-        GridLayoutFactory.fillDefaults().applyTo(robotGroup);
-
-        final BooleanFieldEditor agentFileEditor = new BooleanFieldEditor(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
-                "Pass Robot arguments using arguments file", robotGroup);
-        final Button button = (Button) agentFileEditor.getDescriptionControl(robotGroup);
-        GridDataFactory.fillDefaults().indent(5, 15).applyTo(button);
-        addField(agentFileEditor);
-
-        final BooleanFieldEditor singleFileDataSourceEditor = new BooleanFieldEditor(
-                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, "Run single suite using suite path", robotGroup);
-        final Button singleFileDataSourceButton = (Button) singleFileDataSourceEditor.getDescriptionControl(robotGroup);
-        GridDataFactory.fillDefaults().indent(5, 15).applyTo(singleFileDataSourceButton);
-        addField(singleFileDataSourceEditor);
-
-        final Label singleFileDataSourceDescription = new Label(robotGroup, SWT.WRAP);
-        singleFileDataSourceDescription.setText(
-                "When single suite or test cases from one suite are run, path to test suite will be used instead of path to project. "
-                        + "Robot __init__ files will not be used then.");
-        GridDataFactory.fillDefaults()
-                .hint(150, SWT.DEFAULT)
-                .indent(5, 2)
-                .grab(true, false)
-                .applyTo(singleFileDataSourceDescription);
-    }
-
-    private void createExecutableFileLaunchingPreferences(final Composite parent) {
-        final Group executableGroup = new Group(parent, SWT.NONE);
-        executableGroup.setText("Executor");
-        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(executableGroup);
-        GridLayoutFactory.fillDefaults().applyTo(executableGroup);
-
-        final BooleanFieldEditor editor = new BooleanFieldEditor(RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT,
-                "Use single argument to pass robot execution command line", executableGroup);
-        final Button button = (Button) editor.getDescriptionControl(executableGroup);
-        GridDataFactory.fillDefaults().indent(5, 15).applyTo(button);
-        addField(editor);
+        createLaunchingGroup(parent);
+        createExecutorGroup(parent);
     }
 
     private void createLink(final Composite parent) {
@@ -116,5 +74,47 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
                 }
             }
         });
+    }
+
+    private void createLaunchingGroup(final Composite parent) {
+        final Group robotGroup = new Group(parent, SWT.NONE);
+        robotGroup.setText("Robot");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(robotGroup);
+        GridLayoutFactory.fillDefaults().applyTo(robotGroup);
+
+        final BooleanFieldEditor agentFileEditor = new BooleanFieldEditor(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
+                "Pass Robot arguments using arguments file", robotGroup);
+        final Button button = (Button) agentFileEditor.getDescriptionControl(robotGroup);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
+        addField(agentFileEditor);
+
+        final BooleanFieldEditor singleFileDataSourceEditor = new BooleanFieldEditor(
+                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE, "Run single suite using suite path", robotGroup);
+        final Button singleFileDataSourceButton = (Button) singleFileDataSourceEditor.getDescriptionControl(robotGroup);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(singleFileDataSourceButton);
+        addField(singleFileDataSourceEditor);
+
+        final Label singleFileDataSourceDescription = new Label(robotGroup, SWT.WRAP);
+        singleFileDataSourceDescription.setText(
+                "When single suite or test cases from one suite are run, path to test suite will be used instead of path to project. "
+                        + "Robot __init__ files will not be used then.");
+        GridDataFactory.fillDefaults()
+                .hint(150, SWT.DEFAULT)
+                .indent(5, 2)
+                .grab(true, false)
+                .applyTo(singleFileDataSourceDescription);
+    }
+
+    private void createExecutorGroup(final Composite parent) {
+        final Group executableGroup = new Group(parent, SWT.NONE);
+        executableGroup.setText("Executor");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(executableGroup);
+        GridLayoutFactory.fillDefaults().applyTo(executableGroup);
+
+        final BooleanFieldEditor editor = new BooleanFieldEditor(RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT,
+                "Use single argument to pass robot execution command line", executableGroup);
+        final Button button = (Button) editor.getDescriptionControl(executableGroup);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
+        addField(editor);
     }
 }
