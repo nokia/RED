@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _HO73kPzXEeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/28/17 11:38 AM
+Save-Time: 8/3/17 3:47 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -56,10 +56,9 @@ get-window "Run Configurations" | get-tree | select "Robot Remote" | double-clic
 //check ho may tabs is config
 with [get-window "Run Configurations" | get-tab-folder] {
     get-property "pages[0]" | equals Listener | verify-true
-    get-property "pages[1]" | equals Source | verify-true
-    get-property "pages[2]" | equals "&Common" | verify-true
+    get-property "pages[1]" | equals "&Common" | verify-true
     get-property activePage | equals Listener | verify-true
-    get-property tabCount | equals 3 | verify-true
+    get-property tabCount | equals 2 | verify-true
 }
 
 //click all tabs - here was bug that clicking was changing run config
