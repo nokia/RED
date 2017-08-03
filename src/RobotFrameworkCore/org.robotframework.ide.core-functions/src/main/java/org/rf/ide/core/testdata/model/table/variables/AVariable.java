@@ -8,7 +8,6 @@ package org.rf.ide.core.testdata.model.table.variables;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -117,10 +116,10 @@ public abstract class AVariable extends AModelElement<VariableTable>
     }
 
     public enum VariableScope {
-        GLOBAL("Global Variables", 3),
-        TEST_SUITE("Test Suite Variables", 2),
-        TEST_CASE("Test Case Variables", 1),
-        LOCAL("Local Variables", 0);
+        GLOBAL("Global Variables"),
+        TEST_SUITE("Test Suite Variables"),
+        TEST_CASE("Test Case Variables"),
+        LOCAL("Local Variables");
 
         public static VariableScope fromSimpleName(final String scopeName) {
             switch (scopeName.toLowerCase()) {
@@ -139,23 +138,12 @@ public abstract class AVariable extends AModelElement<VariableTable>
 
         private String name;
 
-        private int priority;
-
-        private VariableScope(final String name, final int priority) {
+        private VariableScope(final String name) {
             this.name = name;
-            this.priority = priority;
         }
 
         public String getName() {
             return name;
-        }
-
-        public static Comparator<VariableScope> fromWidest() {
-            return (a, b) -> Integer.compare(b.priority, a.priority);
-        }
-
-        public static Comparator<VariableScope> fromNarrowest() {
-            return (a, b) -> Integer.compare(a.priority, b.priority);
         }
     }
 
