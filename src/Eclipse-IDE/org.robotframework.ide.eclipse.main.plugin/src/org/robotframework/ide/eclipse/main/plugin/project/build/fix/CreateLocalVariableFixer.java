@@ -25,7 +25,6 @@ import org.robotframework.red.graphics.ImagesManager;
 
 /**
  * @author Michal Anglart
- *
  */
 public class CreateLocalVariableFixer extends RedSuiteMarkerResolution {
 
@@ -70,7 +69,7 @@ public class CreateLocalVariableFixer extends RedSuiteMarkerResolution {
                     .proposalsShouldHaveIcon(image)
                     .create();
 
-            return Optional.<ICompletionProposal> of(proposal);
+            return Optional.of(proposal);
         } catch (final CoreException | BadLocationException e) {
             return Optional.empty();
         }
