@@ -26,7 +26,6 @@ import com.google.common.base.Strings;
 
 /**
  * @author Michal Anglart
- *
  */
 public class CreateVariableFixer extends RedSuiteMarkerResolution {
 
@@ -84,6 +83,6 @@ public class CreateVariableFixer extends RedSuiteMarkerResolution {
                 .displayedLabelShouldBe(getLabel())
                 .proposalsShouldHaveIcon(ImagesManager.getImage(RedImages.getRobotVariableImage()))
                 .create();
-        return Optional.<ICompletionProposal> of(proposal);
+        return Optional.of(proposal);
     }
 }
