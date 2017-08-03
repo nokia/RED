@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: HitCountAndConditionalInDebug
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _4qmyUPRNEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/10/17 4:49 PM
+Save-Time: 8/3/17 4:55 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -88,12 +88,11 @@ exec-with-options -disableJobWaiting -command {
 	
 	wait 2000
 	try -times 5 -delay 1000 -command{
-		get-window "Conditional Breakpoint Error" 
-		    | get-label "Reason:Keyword 'BuiltIn.Should Be Equal' expected 2 to 5 arguments, got 1." | get-property caption 
-		    | equals "Reason:\n"
-		    + "Keyword 'BuiltIn.Should Be Equal' expected 2 to 5 arguments, got 1." | verify-true
+		get-window "Debugger Error" 
+		    | get-label "Error occurred when evaluating breakpoint condition. Keyword 'BuiltIn.Should Be Equal' expected 2 to 5 arguments, got 1." | get-property caption 
+		    | equals "Error occurred when evaluating breakpoint condition. Keyword 'BuiltIn.Should Be Equal' expected 2 to 5 arguments, got 1." | verify-true
 	}    
-	get-window "Conditional Breakpoint Error" | get-button OK | click
+	get-window "Debugger Error" | get-button OK | click
 	get-button "Resume (F8)" | click
 }
 wait-for-console

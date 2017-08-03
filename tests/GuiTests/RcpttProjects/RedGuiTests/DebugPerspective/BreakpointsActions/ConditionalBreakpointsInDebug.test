@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: ConditionalBreakpointsInDebug
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _S92Q4PQzEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/11/17 3:21 PM
+Save-Time: 8/3/17 4:52 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -83,11 +83,13 @@ exec-with-options -disableJobWaiting -command {
 	
 	try -times 4 -delay 1000 -command{
 		//error
-		get-window "Conditional Breakpoint Error" | get-label "Reason:Keyword 'my kw with args' expected 1 argument, got 2." 
-		    | get-property caption | equals "Reason:\n"
-		    + "Keyword 'my kw with args' expected 1 argument, got 2." | verify-true
+		get-window "Debugger Error" 
+		    | get-label "Error occurred when evaluating breakpoint condition. Keyword 'my kw with args' expected 1 argument, got 2." 
+		    | get-property caption 
+		    | equals "Error occurred when evaluating breakpoint condition. Keyword 'my kw with args' expected 1 argument, got 2." 
+		    | verify-true
 	}	    
-	get-window "Conditional Breakpoint Error" | get-button OK | click
+	get-window "Debugger Error" | get-button OK | click
 	
 	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	get-button "Resume (F8)" | click
@@ -106,11 +108,13 @@ exec-with-options -disableJobWaiting -command {
 	
 	//error
 	try -times 4 -delay 1000 -command{
-		get-window "Conditional Breakpoint Error" | get-label "Reason:Keyword 'my kw with args' expected 1 argument, got 0." 
-		    | get-property caption | equals "Reason:\n"
-		    + "Keyword 'my kw with args' expected 1 argument, got 0." | verify-true
+		get-window "Debugger Error" 
+		    | get-label "Error occurred when evaluating breakpoint condition. Keyword 'my kw with args' expected 1 argument, got 0." 
+		    | get-property caption 
+		    | equals "Error occurred when evaluating breakpoint condition. Keyword 'my kw with args' expected 1 argument, got 0." 
+		    | verify-true
 	}	    
-	get-window "Conditional Breakpoint Error" | get-button OK | click
+	get-window "Debugger Error" | get-button OK | click
 	
 	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	get-button "Resume (F8)" | click
@@ -162,11 +166,10 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click
 	
 	try -times 4 -delay 1000 -command{
-		get-window "Conditional Breakpoint Error" | get-label "Reason:No keyword with name 'no kw' found." 
-		    | get-property caption | equals "Reason:\n"
-		    + "No keyword with name 'no kw' found." | verify-true
+		get-window "Debugger Error" | get-label "Error occurred when evaluating breakpoint condition. No keyword with name 'no kw' found." 
+		    | get-property caption | equals "Error occurred when evaluating breakpoint condition. No keyword with name 'no kw' found." | verify-true
 	}		    
-	get-window "Conditional Breakpoint Error" | get-button OK | click
+	get-window "Debugger Error" | get-button OK | click
 	with [get-button "Resume (F8)"] {
 	    click
 	    wait 500
@@ -209,9 +212,13 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click
 	wait-for-thread -file "TestFile.robot"
 	
+	get-button "Resume (F8)" | click
+	try -times 4 -delay 1000 -command{
+		get-window "Debugger Error" | get-label "Error occurred when evaluating breakpoint condition. Keyword name cannot be empty." 
+		    | get-property caption | equals "Error occurred when evaluating breakpoint condition. Keyword name cannot be empty."  | verify-true
+	}
+	get-window "Debugger Error" | get-button OK | click
 	with [get-button "Resume (F8)"] {
-	    click
-	    wait 500
 	    click
 	}
 }
@@ -235,11 +242,10 @@ get-button "Save All (M1+M2+S)" | click
 exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click
 	try -times 4 -delay 1000 -command{
-		get-window "Conditional Breakpoint Error" | get-label "Reason:Keyword 'my kw with args' expected 1 argument, got 2." 
-		    | get-property caption | equals "Reason:\n"
-		    + "Keyword 'my kw with args' expected 1 argument, got 2." | verify-true
+		get-window "Debugger Error" | get-label "Error occurred when evaluating breakpoint condition. Keyword 'my kw with args' expected 1 argument, got 2." 
+		    | get-property caption | equals "Error occurred when evaluating breakpoint condition. Keyword 'my kw with args' expected 1 argument, got 2." | verify-true
 	}	    
-	get-window "Conditional Breakpoint Error" | get-button OK | click
+	get-window "Debugger Error" | get-button OK | click
 	get-button "Terminate (M1+F2)" | click
 }	
 
