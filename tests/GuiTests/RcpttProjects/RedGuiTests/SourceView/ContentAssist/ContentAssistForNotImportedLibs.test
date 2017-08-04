@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _YK-bkHH_EeeOFuKpK9KgAg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 2:36 PM
+Save-Time: 8/4/17 11:39 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -182,7 +182,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     
 //go to TC table    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
-
+wait 500
 
 get-view Outline | get-tree | select "TestFile.robot/Test Cases/test/Open Connection" | click
 wait 300
@@ -208,6 +208,7 @@ with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
     get-section Imports | click
 }
+get-editor "TestFile.robot" | get-section General | click
 
 check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 5 -import "Library" -name "Screenshot"
 
@@ -242,6 +243,7 @@ with [get-editor "TestFile.robot"] {
     }
     get-tab-folder | get-tab-item Keywords | click
 }
+wait 500
 get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw" |click
 wait 300
 
