@@ -17,14 +17,12 @@ import java.util.function.Predicate;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
-import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -77,10 +75,7 @@ public class RobotProjectHolder {
             knownVariables.put("${outputdir}", projectLocation.getAbsolutePath());
         }
         if (currentConfiguration != null) {
-            for (final VariableMapping mapping : currentConfiguration.getVariableMappings()) {
-                knownVariables.put(VariableNamesSupport.extractUnifiedVariableName(mapping.getName()),
-                        mapping.getValue());
-            }
+            knownVariables.putAll(VariableMappingsResolver.resolve(currentConfiguration.getVariableMappings()));
         }
         this.variableMappings = knownVariables;
     }
@@ -200,10 +195,8 @@ public class RobotProjectHolder {
             if (robotFile != null) {
                 final List<VariablesFileImportReference> varImports = robotFile
                         .getVariablesImportReferences(RobotProjectHolder.this, pathsProvider);
-                for (final VariablesFileImportReference variablesFileImportReference : varImports) {
-                    if (variablesFileImportReference.getVariablesFile()
-                            .getAbsolutePath()
-                            .equals(toFound.getAbsolutePath())) {
+                for (final VariablesFileImportReference importReference : varImports) {
+                    if (importReference.getVariablesFile().getAbsolutePath().equals(toFound.getAbsolutePath())) {
                         matchResult = true;
                         break;
                     }
