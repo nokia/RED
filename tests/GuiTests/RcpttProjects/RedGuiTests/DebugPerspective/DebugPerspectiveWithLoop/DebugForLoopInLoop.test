@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _rmeqAJ2XEeWVv_UItyy1RQ,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _rmeqAJ2XEeWVv_UItyy1RQ,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: DebugForLoopInLoop
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _iiMbgJ2WEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 6:03 PM
+Save-Time: 8/4/17 3:57 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -15,18 +15,22 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-proc "wait-for-resume" [val nr_items_in_thread 3]{	
+proc "wait-for-resume" [val nr_items_in_thread]{	
 	try -times 5 -delay 1000 -command{
-		get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
-    		| get-property childCount | equals $nr_items_in_thread | verify-true
+		get-view Debug | get-tree 
+	    	| get-item ".* \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	    	|	 get-property childCount | equals $nr_items_in_thread | verify-true
+//    
+//		get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
+//    		| get-property childCount | equals $nr_items_in_thread | verify-true
     
 	}
-	try -times 3 -delay 1000 -command{
-		with [get-view Debug | get-tree] {
-		   get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
-		        | get-property [format "getItems().TreeItem[%s].getText()" [minus $nr_items_in_thread 1]] -raw|  not-eq "" | verify-true
-		}
-	}
+//	try -times 3 -delay 1000 -command{
+//		with [get-view Debug | get-tree] {
+//		   get-view Debug | get-tree | get-item ".*\\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]"  -index 0
+//		        | get-property [format "getItems().TreeItem[%s].getText()" [minus $nr_items_in_thread 1]] -raw|  not-eq "" | verify-true
+//		}
+//	}
 	
 }
 
@@ -41,172 +45,176 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
 	
 	wait 3000
-	wait-for-resume
+	wait-for-resume -nr_items_in_thread 5
 	check-debug-marker-on-ruler -line 5 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
-    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-        | get-property "getItems().length" | equals 3 | verify-true
-    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-        | get-property "getItems().TreeItem[0].getText()" | equals "My loop [line:5]" | verify-true
-    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-        | get-property "getItems().TreeItem[1].getText()" | equals "${item2} = 0 [line:3]" | verify-true
-    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-        | get-property "getItems().TreeItem[2].getText()" | equals "${item2} IN RANGE [ 1 ] [line:3]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals ":FOR iteration ${item2} = 0 [line: 5]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals ":FOR ${item2} IN RANGE [ 1 ] [line: 3]" 
+	        | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals "[Test] double loop [line: 3]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
-	
 	//line 18
 	get-button "Step Into (F5)" | click
-	wait-for-resume -nr_items_in_thread 4
+	wait 500
+	get-button "Step Into (F5)" | click
+	
+	wait-for-resume -nr_items_in_thread 6
 	check-debug-marker-on-ruler -line 18 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount 
-	        | equals 4 | verify-true
-	    wait 1000
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${i} IN RANGE [ 100 | 102 ] [line:18]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "My loop [line:5]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[2].getText()" | equals "${item2} = 0 [line:3]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[3].getText()" | equals "${item2} IN RANGE [ 1 ] [line:3]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "My loop [line: 18]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals ":FOR iteration ${item2} = 0 [line: 5]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals ":FOR ${item2} IN RANGE [ 1 ] [line: 3]" 
+	        | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals "[Test] double loop [line: 3]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[5].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
 	
 	//line 8
 	get-button "Resume (F8)" | click
-	wait-for-resume -nr_items_in_thread 1
+	wait-for-resume -nr_items_in_thread 3
 	check-debug-marker-on-ruler -line 8 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount 
-	        | equals 1 | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
 	
-	//step into - the same line is shown: 8
+	//line 8
 	get-button "Step Into (F5)" | click
-	wait-for-resume -nr_items_in_thread 2
+	
+	//step into - the same line is shown: 8
+	wait-for-resume -nr_items_in_thread 5
 	check-debug-marker-on-ruler -line 8 -script_name "TestFile.robot"
 	
 	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount 
-	        | equals 2 | verify-true
-	    wait 1500
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${item} = 0 [line:8]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals ":FOR iteration ${item} = 0 [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals ":FOR ${item} IN RANGE [ 3 ] [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
 	//line 9
 	get-button "Step Into (F5)" | click
-	wait-for-resume
+	wait-for-resume -nr_items_in_thread 5
 	check-debug-marker-on-ruler -line 9 -script_name "TestFile.robot"
-	with [get-view Debug | get-tree] {
-		wait 1000
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Log [line:9]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "${item} = 0 [line:8]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[2].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
-	}
 	
 	//line 10
 	get-button "Step Into (F5)" | click
-	wait-for-resume
+	
+	wait-for-resume -nr_items_in_thread 5
 	check-debug-marker-on-ruler -line 10 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "Keyword With Loop [line:10]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "${item} = 0 [line:8]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[2].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals ":FOR iteration ${item} = 0 [line: 10]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals ":FOR ${item} IN RANGE [ 3 ] [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
-	//line 14
+	//line 13
 	get-button "Step Into (F5)" | click
-	wait-for-resume -nr_items_in_thread 4
-	check-debug-marker-on-ruler -line 14 -script_name "TestFile.robot"
-	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount 
-	        | equals 4 | verify-true
-	    wait 1000
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "My loop [line:14]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "Keyword With Loop [line:10]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[2].getText()" | equals "${item} = 0 [line:8]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[3].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
-	}
-	//line 18
-	get-button "Step Into (F5)" | click
-	wait-for-resume -nr_items_in_thread 5
-	check-debug-marker-on-ruler -line 18 -script_name "TestFile.robot"
-	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount 
-	        | equals 5 | verify-true
-	    wait 1500
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${i} IN RANGE [ 100 | 102 ] [line:18]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "My loop [line:14]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[2].getText()" | equals "Keyword With Loop [line:10]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[3].getText()" | equals "${item} = 0 [line:8]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[4].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
-	}
-	//line 18
+	wait 500
 	get-button "Step Into (F5)" | click
 	wait-for-resume -nr_items_in_thread 6
-	check-debug-marker-on-ruler -line 18 -script_name "TestFile.robot"
+	check-debug-marker-on-ruler -line 14 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "${i} = 100 [line:18]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "${i} IN RANGE [ 100 | 102 ] [line:18]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[2].getText()" | equals "My loop [line:14]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[3].getText()" | equals "Keyword With Loop [line:10]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[4].getText()" | equals "${item} = 0 [line:8]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[5].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "Keyword With Loop [line: 14]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals ":FOR iteration ${item} = 0 [line: 10]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals ":FOR ${item} IN RANGE [ 3 ] [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[5].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
-	//line 20
+	//line 17
+	get-button "Step Into (F5)" | click
+	wait 500
+	
+	//line 18
 	get-button "Step Into (F5)" | click
 	wait-for-resume -nr_items_in_thread 7
+	check-debug-marker-on-ruler -line 18 -script_name "TestFile.robot"
+	with [get-view Debug | get-tree] {
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals "My loop [line: 18]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals "Keyword With Loop [line: 14]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals ":FOR iteration ${item} = 0 [line: 10]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals ":FOR ${item} IN RANGE [ 3 ] [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[5].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[6].getText()" | equals "[Suite] RobotProject" | verify-true
+	}
+	//line 18
+	get-button "Step Into (F5)" | click
+	wait-for-resume -nr_items_in_thread 9
+	check-debug-marker-on-ruler -line 18 -script_name "TestFile.robot"
+
+	//line 20
+	get-button "Step Into (F5)" | click
+	wait-for-resume -nr_items_in_thread 9
 	check-debug-marker-on-ruler -line 20 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount 
-	        | equals 7 | verify-true
-	    wait 1500
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Evaluate [line:20]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[1].getText()" | equals "${i} = 100 [line:18]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[2].getText()" | equals "${i} IN RANGE [ 100 | 102 ] [line:18]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[3].getText()" | equals "My loop [line:14]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[4].getText()" | equals "Keyword With Loop [line:10]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[5].getText()" | equals "${item} = 0 [line:8]" | verify-true
-	    get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	        | get-property "getItems().TreeItem[6].getText()" | equals "${item} IN RANGE [ 3 ] [line:8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals ":FOR iteration ${i} = 100 [line: 20]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals ":FOR ${i} IN RANGE [ 100 | 102 ] [line: 18]" 
+	        | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals "My loop [line: 18]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals "Keyword With Loop [line: 14]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals ":FOR iteration ${item} = 0 [line: 10]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[5].getText()" | equals ":FOR ${item} IN RANGE [ 3 ] [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[6].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[7].getText()" | equals "[Suite] TestFile" | verify-true
+	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[8].getText()" | equals "[Suite] RobotProject" | verify-true
 	}
-	
+		
 	with [get-button "Resume (F8)"] {
 	    click
 	    wait 1000
-	    click
-	    wait 1000
-	    click
 	}
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
