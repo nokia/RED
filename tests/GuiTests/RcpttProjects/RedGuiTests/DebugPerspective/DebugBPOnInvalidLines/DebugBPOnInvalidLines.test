@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ljgl0BEMEeWWSplrwZ3vkg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/15/17 2:16 PM
+Save-Time: 8/4/17 4:14 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -43,10 +43,11 @@ with [get-view Breakpoints | get-tree] {
     get-property itemCount | equals 0 | verify-true
 }
 
-get-button Resume | get-property enablement | equals false | verify-true
+get-button "Resume( \(F8\))?" | get-property enablement | equals false | verify-true
 get-button Suspend | get-property enablement | equals false | verify-true
-get-button Terminate -index 1 | get-property enablement | equals false | verify-true
-get-button "Step Into" | get-property enablement | equals false | verify-true
-get-button "Step Over" | get-property enablement | equals false | verify-true
-get-button "Step Return" | get-property enablement | equals false | verify-true
+get-button "Terminate.*" | get-property enablement | equals false | verify-true
+get-button "Step Into( \\(F5\\))?" | get-property enablement | equals false | verify-true
+get-button "Step Over( \\(F6\\))?" | get-property enablement | equals false | verify-true
+get-button "Step Return( \\(F7\\))?" | get-property enablement | equals false | verify-true
+get-button "Disconnect" | get-property enablement | equals false | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
