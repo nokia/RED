@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pNdEgA47EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/4/17 5:53 PM
+Save-Time: 8/4/17 12:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -37,7 +37,7 @@ exec-with-options {
 	    get-window "Problem Occurred" | get-label "'Agent connection server' has encountered a problem." 
 	        | get-property caption | equals "'Agent connection server' has encountered a problem." | verify-true
     }    
-    get-window "Problem Occurred" | get-label "Unable to start server on www.niema-niema.com:43981Unknown host" 
+     get-window "Problem Occurred" | get-label "Unable to start server on www.niema-niema.com:43981Unknown host" 
         | get-property caption | equals "Unable to start server on www.niema-niema.com:43981\n"
         + "Unknown host" | verify-true
     get-window "Problem Occurred" | get-button "Details >>" | click
@@ -102,10 +102,14 @@ exec-with-options {
 	        | get-property caption | equals "Unable to start server on wrbboxv01.emea.nsn-net.net:8080\n"
 	        + "Cannot assign requested address: JVM_Bind" | verify-true
 	}-else{
-		get-window "Problem Occurred" 
-	        | get-label "Unable to start server on wrbboxv01.emea.nsn-net.net:8080Cannot assign requested address" 
+	
+	    get-window "Problem Occurred" | get-label "'Agent connection server' has encountered a problem." 
+	        | get-property caption | equals "'Agent connection server' has encountered a problem." | verify-true
+	    get-window "Problem Occurred" 
+	        | get-label "Unable to start server on wrbboxv01.emea.nsn-net.net:8080Cannot assign requested address (Bind failed)" 
 	        | get-property caption | equals "Unable to start server on wrbboxv01.emea.nsn-net.net:8080\n"
-	        + "Cannot assign requested address" | verify-true
+	        + "Cannot assign requested address (Bind failed)" | verify-true
+
 	}        
     get-window "Problem Occurred" | get-button OK | click
 } -allowStatusDialog
