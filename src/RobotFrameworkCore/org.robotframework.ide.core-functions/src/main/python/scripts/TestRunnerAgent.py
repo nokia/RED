@@ -199,7 +199,8 @@ class TestRunnerAgent:
             host, port, connection_timeout = args[0], int(args[1]), 30
         else:
             host, port, connection_timeout = args[0], int(args[1]), int(args[2])
-        
+
+        self._last_pause_check = time.time()
         self._is_connected, self.sock, self.decoder_encoder = self._connect(host, port, connection_timeout)
         
         if self._is_connected:
@@ -265,6 +266,9 @@ class TestRunnerAgent:
         self._send_to_server(AgentEventMessage.END_TEST, name, attrs_copy)
 
     def start_keyword(self, name, attrs):
+        if not self._is_connected:
+            return
+        
         # we're cutting args from original attrs dictionary, because it may contain 
         # objects which are not json-serializable and we don't need them anyway
         attrs_copy = copy.copy(attrs)
@@ -277,14 +281,29 @@ class TestRunnerAgent:
         json_obj = self._encode_to_json((name, attrs_copy))
         if self._mode == AgentMode.DEBUG:
             self._send_to_server_json(AgentEventMessage.PRE_START_KEYWORD, json_obj)
-            if self._is_connected and self._should_pause(PausingPoint.PRE_START_KEYWORD):
+            if self._should_pause(PausingPoint.PRE_START_KEYWORD):
                 self._wait_for_resume()
 
         self._send_to_server_json(AgentEventMessage.START_KEYWORD, json_obj)
-        if self._is_connected and self._should_pause(PausingPoint.START_KEYWORD):
-            self._wait_for_resume()
+        if self._should_ask_for_pause_on_start():
+            if self._should_pause(PausingPoint.START_KEYWORD):
+                self._wait_for_resume()
+            
+    def _should_ask_for_pause_on_start(self):
+        if self._mode == AgentMode.RUN:
+            current_time = time.time()
+            if current_time - self._last_pause_check > 2:
+                self._last_pause_check = current_time
+                return True
+            else:
+                return False
+        else:
+            return True
 
     def end_keyword(self, name, attrs):
+        if not self._is_connected:
+            return
+        
         attrs_copy = copy.copy(attrs)
         del attrs_copy['args']
         del attrs_copy['doc']
@@ -293,12 +312,16 @@ class TestRunnerAgent:
         json_obj = self._encode_to_json((name, attrs_copy))
         if self._mode == AgentMode.DEBUG:
             self._send_to_server_json(AgentEventMessage.PRE_END_KEYWORD, json_obj)
-            if self._is_connected and self._should_pause(PausingPoint.PRE_END_KEYWORD):
+            if self._should_pause(PausingPoint.PRE_END_KEYWORD):
                 self._wait_for_resume()
         
         self._send_to_server_json(AgentEventMessage.END_KEYWORD, json_obj)
-        if self._is_connected and self._should_pause(PausingPoint.END_KEYWORD):
-            self._wait_for_resume()
+        if self._should_ask_for_pause_on_end():
+            if self._should_pause(PausingPoint.END_KEYWORD):
+                self._wait_for_resume()
+            
+    def _should_ask_for_pause_on_end(self):
+        return self._mode == AgentMode.DEBUG
             
     def _collect_variables(self):
         # WARNING : this method uses protected RF methods/fields so it is sensitive for RF changes;
