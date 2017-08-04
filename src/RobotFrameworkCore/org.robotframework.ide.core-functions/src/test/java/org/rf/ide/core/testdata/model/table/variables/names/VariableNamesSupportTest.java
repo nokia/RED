@@ -13,8 +13,7 @@ import static org.rf.ide.core.testdata.model.table.variables.names.VariableNames
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.extractUnifiedVariableNames;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.hasEqualNames;
 import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.isDefinedVariable;
-
-import java.util.List;
+import static org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport.isDefinedVariableInsideComputation;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
@@ -29,6 +28,7 @@ public class VariableNamesSupportTest {
     public void testExtractUnifiedVariableName() {
         assertThat(extractUnifiedVariableName(null)).isEmpty();
         assertThat(extractUnifiedVariableName("")).isEmpty();
+
         assertThat(extractUnifiedVariableName("${var 1}")).isEqualTo("${var1}");
         assertThat(extractUnifiedVariableName("${ va r 1}")).isEqualTo("${var1}");
         assertThat(extractUnifiedVariableName("${var_1}")).isEqualTo("${var1}");
@@ -45,33 +45,62 @@ public class VariableNamesSupportTest {
         assertThat(extractUnifiedVariableNameWithoutBrackets("$")).isEmpty();
         assertThat(extractUnifiedVariableNameWithoutBrackets("${var1")).isEmpty();
         assertThat(extractUnifiedVariableNameWithoutBrackets("$var1}")).isEmpty();
+
         assertThat(extractUnifiedVariableNameWithoutBrackets("${Var _1}")).isEqualTo("var1");
     }
 
     @Test
     public void testHasEqualNames() {
-        assertThat(hasEqualNames("${Va_r 1}", "@{_va R1}")).isTrue();
         assertThat(hasEqualNames("${Va_r 1}", "@{_va R2}")).isFalse();
+
+        assertThat(hasEqualNames("${Va_r 1}", "@{_va R1}")).isTrue();
     }
 
     @Test
-    public void testIsDefinedVariable() {
-        assertThat(isDefinedVariable(createVariableDeclaration("${var1}"), newHashSet())).isFalse();
-        assertThat(isDefinedVariable(createVariableDeclaration("${var1}"), newHashSet("${var1}"))).isTrue();
-        assertThat(isDefinedVariable(createVariableDeclaration("@{V ar_1}"), newHashSet("${var1}"))).isTrue();
-        assertThat(isDefinedVariable(createVariableDeclaration("&{vaR__ 1}"), newHashSet("${var1}"))).isTrue();
-        assertThat(isDefinedVariable(createVariableDeclaration("${var1.object.name}"), newHashSet("${var1}"))).isTrue();
-        assertThat(isDefinedVariable(createVariableDeclaration("${var2}"), newHashSet("${var1}"))).isFalse();
+    public void testIsDefinedVariable1() {
+        assertThat(isDefinedVariable(varDeclaration("${var1}"), newHashSet())).isFalse();
+        assertThat(isDefinedVariable(varDeclaration("${var2}"), newHashSet("${var1}"))).isFalse();
+
+        assertThat(isDefinedVariable(varDeclaration("${var1}"), newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable(varDeclaration("@{var1}"), newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable(varDeclaration("&{var1}"), newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable(varDeclaration("${var1}"), newHashSet("@{var1}"))).isTrue();
+        assertThat(isDefinedVariable(varDeclaration("${var1}"), newHashSet("&{var1}"))).isTrue();
+        assertThat(isDefinedVariable(varDeclaration("${V ar_1}"), newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable(varDeclaration("${vaR__ 1}"), newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable(varDeclaration("${var1.object.name}"), newHashSet("${var1}"))).isTrue();
+    }
+
+    @Test
+    public void testIsDefinedVariable2() {
+        assertThat(isDefinedVariable("var1", "$", newHashSet())).isFalse();
+        assertThat(isDefinedVariable("var2", "$", newHashSet("${var1}"))).isFalse();
+
+        assertThat(isDefinedVariable("var1", "$", newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable("var1", "@", newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable("var1", "&", newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable("var1", "$", newHashSet("@{var1}"))).isTrue();
+        assertThat(isDefinedVariable("var1", "$", newHashSet("&{var1}"))).isTrue();
+        assertThat(isDefinedVariable("V ar_1", "$", newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable("vaR__ 1", "$", newHashSet("${var1}"))).isTrue();
+        assertThat(isDefinedVariable("var1.object.name", "$", newHashSet("${var1}"))).isTrue();
+    }
+
+    @Test
+    public void testIsDefinedVariableInsideComputation() {
+        assertThat(isDefinedVariableInsideComputation(varDeclaration("${x}"), newHashSet())).isFalse();
+
+        assertThat(isDefinedVariableInsideComputation(varDeclaration("${x * 10}"), newHashSet("${x}"))).isTrue();
+        assertThat(isDefinedVariableInsideComputation(varDeclaration("${1 + 10}"), newHashSet())).isTrue();
     }
 
     @Test
     public void testExtractUnifiedVariableNames() {
-        final List<VariableDeclaration> assignments = newArrayList(createVariableDeclaration("${VAR_1}"),
-                createVariableDeclaration("@{VAR 2}"));
-        assertThat(extractUnifiedVariableNames(assignments)).containsExactly("${var1}", "@{var2}");
+        assertThat(extractUnifiedVariableNames(newArrayList(varDeclaration("${VAR_1}"), varDeclaration("@{VAR 2}"))))
+                .containsExactly("${var1}", "@{var2}");
     }
 
-    private VariableDeclaration createVariableDeclaration(final String text) {
+    private VariableDeclaration varDeclaration(final String text) {
         final RobotToken rt = new RobotToken();
         rt.setLineNumber(0);
         rt.setStartOffset(0);
