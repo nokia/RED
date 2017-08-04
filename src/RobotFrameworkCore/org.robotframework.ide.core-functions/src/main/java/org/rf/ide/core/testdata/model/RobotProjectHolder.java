@@ -5,8 +5,6 @@
  */
 package org.rf.ide.core.testdata.model;
 
-import static com.google.common.collect.Maps.newHashMap;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
@@ -63,13 +62,13 @@ public class RobotProjectHolder {
 
     @VisibleForTesting
     protected void initGlobalVariables() {
-        final Map<String, Object> variables = robotRuntime == null ? new HashMap<String, Object>()
+        final Map<String, Object> variables = robotRuntime == null ? new HashMap<>()
                 : robotRuntime.getGlobalVariables();
         globalVariables.addAll(map(variables));
     }
 
     private void initVariableMappings(final File projectLocation) {
-        final Map<String, String> knownVariables = newHashMap();
+        final Map<String, String> knownVariables = new HashMap<>();
         knownVariables.put("${/}", File.separator);
         knownVariables.put("${curdir}", ".");
         knownVariables.put("${space}", " ");
@@ -184,7 +183,7 @@ public class RobotProjectHolder {
         return findFile(new SearchByVariablesImport(pathsProvider, variableFile));
     }
 
-    private class SearchByVariablesImport implements ISearchCriteria {
+    private class SearchByVariablesImport implements Predicate<RobotFileOutput> {
 
         private final File toFound;
 
@@ -196,7 +195,7 @@ public class RobotProjectHolder {
         }
 
         @Override
-        public boolean matchCriteria(final RobotFileOutput robotFile) {
+        public boolean test(final RobotFileOutput robotFile) {
             boolean matchResult = false;
             if (robotFile != null) {
                 final List<VariablesFileImportReference> varImports = robotFile
@@ -220,7 +219,7 @@ public class RobotProjectHolder {
         return findFile(new SearchByName(file));
     }
 
-    private class SearchByName implements ISearchCriteria {
+    private class SearchByName implements Predicate<RobotFileOutput> {
 
         private final File toFound;
 
@@ -229,7 +228,7 @@ public class RobotProjectHolder {
         }
 
         @Override
-        public boolean matchCriteria(final RobotFileOutput robotFile) {
+        public boolean test(final RobotFileOutput robotFile) {
             boolean result = false;
             if (robotFile != null && robotFile.getProcessedFile() != null) {
                 result = robotFile.getProcessedFile().getAbsolutePath().equals(toFound.getAbsolutePath());
@@ -239,18 +238,13 @@ public class RobotProjectHolder {
         }
     }
 
-    protected RobotFileOutput findFile(final ISearchCriteria criteria) {
+    protected RobotFileOutput findFile(final Predicate<RobotFileOutput> criteria) {
         for (int i = 0; i < readableProjectFiles.size(); i++) {
             final RobotFileOutput robotFile = readableProjectFiles.get(i);
-            if (criteria.matchCriteria(robotFile)) {
+            if (criteria.test(robotFile)) {
                 return robotFile;
             }
         }
         return null;
-    }
-
-    protected interface ISearchCriteria {
-
-        boolean matchCriteria(final RobotFileOutput robotFile);
     }
 }
