@@ -177,11 +177,12 @@ public abstract class AbstractAutoDiscoverer {
     }
 
     private List<String> getVariableMappings() {
-        return robotProject.getRobotProjectConfig()
+        return robotProject.getRobotProjectHolder()
                 .getVariableMappings()
+                .entrySet()
                 .stream()
-                .map(v -> VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(v.getName()) + ":"
-                        + v.getValue())
+                .map(e -> VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(e.getKey()) + ":"
+                        + e.getValue())
                 .collect(Collectors.toList());
     }
 
