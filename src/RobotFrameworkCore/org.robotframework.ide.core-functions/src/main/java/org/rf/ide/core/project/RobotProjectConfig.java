@@ -6,12 +6,12 @@
 package org.rf.ide.core.project;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -301,7 +301,7 @@ public class RobotProjectConfig {
 
     public boolean addReferencedLibrary(final ReferencedLibrary referencedLibrary) {
         if (libraries == null) {
-            libraries = newArrayList();
+            libraries = new ArrayList<>();
         }
         if (!libraries.contains(referencedLibrary)) {
             libraries.add(referencedLibrary);
@@ -316,7 +316,7 @@ public class RobotProjectConfig {
 
     public void addRemoteLocation(final RemoteLocation remoteLocation) {
         if (remoteLocations == null) {
-            remoteLocations = newArrayList();
+            remoteLocations = new ArrayList<>();
         }
         remoteLocations.add(remoteLocation);
     }
@@ -328,7 +328,7 @@ public class RobotProjectConfig {
 
     public void addVariableMapping(final VariableMapping mapping) {
         if (variableMappings == null) {
-            variableMappings = newArrayList();
+            variableMappings = new ArrayList<>();
         }
         variableMappings.add(mapping);
     }
@@ -379,7 +379,7 @@ public class RobotProjectConfig {
 
     public void addReferencedVariableFile(final ReferencedVariableFile variableFile) {
         if (referencedVariableFiles == null) {
-            referencedVariableFiles = newArrayList();
+            referencedVariableFiles = new ArrayList<>();
         }
         if (!referencedVariableFiles.contains(variableFile)) {
             referencedVariableFiles.add(variableFile);
@@ -666,7 +666,7 @@ public class RobotProjectConfig {
             if (variables == null) {
                 return null;
             }
-            final Map<String, Object> varsWithTypes = newLinkedHashMap();
+            final Map<String, Object> varsWithTypes = new LinkedHashMap<>();
             for (final Entry<String, Object> var : variables.entrySet()) {
                 String name = var.getKey();
                 if (name.matches("^[$@&]\\{.+\\}$")) {
