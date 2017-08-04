@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _znjMEBtDEeWSh6BKjAxDIw,_UpLf4LrQEeaIos8Jik5jow,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _znjMEBtDEeWSh6BKjAxDIw,_UpLf4LrQEeaIos8Jik5jow,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: DebugForEmbeddedKeyword
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: __cffsLrPEeaIos8Jik5jow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/18/17 3:23 PM
+Save-Time: 8/4/17 4:18 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -29,6 +29,8 @@ exec-with-options -disableJobWaiting -command{
 	//got to embedded kw
 	get-button "Step Into (F5)" |click
 	wait 500
+	get-button "Step Into (F5)" |click
+	wait 500
 	check-debug-marker-on-ruler -line 11 -script_name "Test.robot"
 	
 	get-button "Step Over (F6)" | click
@@ -41,6 +43,11 @@ exec-with-options -disableJobWaiting -command{
 	check-debug-marker-on-ruler -line 7 -script_name "Test.robot"
 		
 	//step in in res kw
+	get-button "Step Into (F5)" |click
+	wait-for-thread -file "Test.robot"
+	check-debug-marker-on-ruler -line 3 -script_name "res.robot"
+	
+	
 	get-button "Step Into (F5)" |click
 	wait-for-thread -file "Test.robot"
 	check-debug-marker-on-ruler -line 4 -script_name "res.robot"
@@ -79,6 +86,9 @@ exec-with-options -disableJobWaiting -command{
 	wait-for-thread -file "Test.robot \\(Selected Test Cases\\)"
 	
 	//focus is in res KW
+	get-button "Step Into (F5)" |click
+	check-debug-marker-on-ruler -line 3 -script_name "res.robot"
+	
 	get-button "Step Into (F5)" |click
 	check-debug-marker-on-ruler -line 4 -script_name "res.robot"
 	
