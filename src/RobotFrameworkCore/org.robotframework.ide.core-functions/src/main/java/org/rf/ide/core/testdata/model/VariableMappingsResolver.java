@@ -12,9 +12,9 @@ import java.util.Map;
 import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 
-public class VariableMappingsResolver {
+class VariableMappingsResolver {
 
-    public static Map<String, String> resolve(final List<VariableMapping> variableMappings) {
+    static Map<String, String> resolve(final List<VariableMapping> variableMappings) {
         final Map<String, String> variables = new HashMap<>();
         for (final VariableMapping mapping : variableMappings) {
             variables.put(VariableNamesSupport.extractUnifiedVariableName(mapping.getName()), mapping.getValue());
