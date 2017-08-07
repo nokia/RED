@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_znjMEBtDEeWSh6BKjAxDIw,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_znjMEBtDEeWSh6BKjAxDIw,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: DebugVariableValuesInInfoWindow
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _oetugJnLEeWXV_VOYkM3Sw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 5:34 PM
+Save-Time: 8/7/17 2:49 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -72,10 +72,8 @@ exec-with-options -disableJobWaiting -command {
 	check-variable-in-info-window -value  "text7"
 	    
 	//step into   
-	try -times 5 -delay 500 -command{
-		get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
-	} 
 	get-button "Step Into (F5)" | click
+	
 	//x
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 10 12
 	check-variable-in-info-window -value 6
@@ -89,11 +87,14 @@ exec-with-options -disableJobWaiting -command {
 	    click
 	}
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 12 12
-	//here will be checking line: Log  ${d}
+	check-variable-in-info-window -value 10
+	
 	try -times 5 -delay 500 -command{
 		get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
 	}
 	with [get-button "Step Into (F5)"] {
+	    click
+	    wait 1000
 	    click
 	    wait 1000
 	    click
