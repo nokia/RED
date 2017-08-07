@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OPRvEF18EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/6/17 1:35 PM
+Save-Time: 8/7/17 11:44 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -120,6 +120,7 @@ wait 1000
 
 //cut kw-2
 get-view Outline | get-tree | select "TestFile.robot/Keywords/kw-2" | click
+wait 300
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Row/Cut row" | click
 
 //paste it when selection is om kw5
@@ -206,7 +207,9 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     
 // one more verification of [Documentation] setting location
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | double-click
+wait 300
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | click
+wait 200
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Down
