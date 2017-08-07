@@ -1,14 +1,14 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _znjMEBtDEeWSh6BKjAxDIw,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_9-xakCEDEee-Coyh1uHlyw
+Contexts: _znjMEBtDEeWSh6BKjAxDIw,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_9-xakCEDEee-Coyh1uHlyw,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: DebugWithMultipleInit
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _BO8x4CEEEee-Coyh1uHlyw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 1:23 PM
-Tags: notTestable
+Save-Time: 8/7/17 4:22 PM
+Tags: Debug
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -59,6 +59,10 @@ exec-with-options -disableJobWaiting -command {
 	//Suite Setup second kw in init test\__init__.robot 
 	get-button "Step Into (F5)" | click
     wait 1000   
+    check-debug-marker-on-ruler -line 9 -script_name "__init__.robot"
+    
+    get-button "Step Into (F5)" | click
+    wait 1000   
     check-debug-marker-on-ruler -line 10 -script_name "__init__.robot"
     
     //test setup in test
@@ -69,6 +73,7 @@ exec-with-options -disableJobWaiting -command {
     //go to kw in setup
     get-button "Step Into (F5)" | click
     wait 1000   
+    get-button "Step Into (F5)" | click
     check-debug-marker-on-ruler -line 10 -script_name "RobotTest.robot"
     
     //go to Log kw in test
@@ -83,7 +88,9 @@ exec-with-options -disableJobWaiting -command {
     
     //go to "My kw" in test
     get-button "Step Into (F5)" | click
+    check-debug-marker-on-ruler -line 15 -script_name "RobotTest.robot"
     wait 1000   
+    get-button "Step Into (F5)" | click
     check-debug-marker-on-ruler -line 16 -script_name "RobotTest.robot"
     
     //go to syuite teardown in init file
@@ -93,7 +100,7 @@ exec-with-options -disableJobWaiting -command {
 
 	get-button "Step Into (F5)" | click
     wait 1000   
-    check-debug-marker-on-ruler -line 13 -script_name "__init__.robot"
+    check-debug-marker-on-ruler -line 12 -script_name "__init__.robot"
 
 	get-button "Resume (F8)" | click
 }    
