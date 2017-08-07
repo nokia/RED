@@ -5,8 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.variables.names;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +28,7 @@ public class VariableNamesSupport {
     }
 
     public static List<String> extractUnifiedVariableNames(final List<VariableDeclaration> assignments) {
-        final List<String> vars = newArrayList();
+        final List<String> vars = new ArrayList<>();
         for (final VariableDeclaration variableDeclaration : assignments) {
             vars.add(extractUnifiedVariableName(variableDeclaration.asToken().getText()));
         }
@@ -109,7 +108,7 @@ public class VariableNamesSupport {
     }
 
     private static List<String> extractPossibleVariableDefinitions(final String variableName) {
-        final List<String> possibleVariableDefinitions = newArrayList();
+        final List<String> possibleVariableDefinitions = new ArrayList<>();
         final String variableDefinition = extractUnifiedVariableName(variableName);
 
         final String varDefinitionWithBrackets = createVariableDefinitionWithBrackets(variableDefinition);
