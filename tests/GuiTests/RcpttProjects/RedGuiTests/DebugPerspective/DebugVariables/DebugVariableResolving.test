@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Qz9jYLX5EeWiPpdsqt1XOg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/30/17 8:47 AM
+Save-Time: 8/7/17 2:42 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -48,7 +48,6 @@ exec-with-options -disableJobWaiting -command {
 	// verify if different type duplicated variable value is shown - list should shown in informaiton window: @{list}
 	// verify if value of ${x 1} is shown
 	with [get-view Variables | get-tree] {
-    	select "${SUITE_DOCUMENTATION}" | key-type PageUp
     	select "${x 1}"
 	}
 	get-view Variables | get-tree | select "@{list}" | double-click
@@ -64,7 +63,7 @@ exec-with-options -disableJobWaiting -command {
 	}
 	get-eclipse-window | key-type F5
 	wait 500
-	get-eclipse-window | key-type F5
+	get-eclipse-window | key-type F8
 }
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
