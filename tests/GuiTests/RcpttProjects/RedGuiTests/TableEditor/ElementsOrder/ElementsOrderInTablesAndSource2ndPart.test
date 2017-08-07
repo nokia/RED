@@ -1,0 +1,275 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: ElementsOrderInTablesAndSource2ndPart
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _uHEw0HtSEeeC1ZqkNwDPeQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/7/17 11:46 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    [Teardown]    log    9\n"
+    + "    [Setup]    log    10\n"
+    + "    log  10\n"
+    + "    [Tags]    tag1    tag2\n"
+    + "    [Timeout]\t\t500\n"
+    + "    log  2\n"
+    + "    [Template]\t\tComment    message\n"
+    + "    [Documentation]    documentation\n"
+    + "    log  loglog\n"
+    + "    log  10\n"
+    + "    my keyword  10\n"
+    + "    second kw  10\n"
+    + "*** Keywords ***\n"
+    + "my keyword\n"
+    + "    log  1\n"
+    + "    # [Return]    return\n"
+    + "    [Arguments]    ${var}\n"
+    + "    log  9\n"
+    + "    [Timeout]    700\n"
+    + "second kw\n"
+    + "    # [Documentation]    documentation\n"
+    + "    [Tags]\t\ttag1    tag2\n"
+    + "    [Teardown]    log    9\n"
+    + "    log  19"
+// change some keyword in setting and setting in keyword
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 7 13
+        select-range 7 14 7 5
+        type-text log
+        key-type Down -times 5
+        key-type BackSpace -times 3
+        type-text "[Timeout]"
+        key-type "M1+s"
+    }
+    // verify Test Cases view
+    get-tab-folder | get-tab-item "Test Cases" | click
+    check-test_case-row -file "TestFile.robot"  -row 6 -tc "log" -c1 500
+	check-test_case-row -file "TestFile.robot"  -row 11 -tc "[Timeout]" -c1 10
+}
+// go to Test Cases and replace some keyword and setting
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test" | double-click
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down -times 10
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        set-text log
+    }
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Up -times 5
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        set-text "[Timeout]"
+    }
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+s"
+}
+// verify Source content
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    [Teardown]    log    9\n"
+    + "    [Setup]    log    10\n"
+    + "    log  10\n"
+    + "    [Tags]    tag1    tag2\n"
+    + "    [Timeout]    500\n"
+    + "    log  2\n"
+    + "    [Template]\t\tComment    message\n"
+    + "    [Documentation]    documentation\n"
+    + "    log  loglog\n"
+    + "    log    10\n"
+    + "    my keyword  10\n"
+    + "    second kw  10\n"
+    + "*** Keywords ***\n"
+    + "my keyword\n"
+    + "    log  1\n"
+    + "    # [Return]    return\n"
+    + "    [Arguments]    ${var}\n"
+    + "    log  9\n"
+    + "    [Timeout]    700\n"
+    + "second kw\n"
+    + "    # [Documentation]    documentation\n"
+    + "    [Tags]\t\ttag1    tag2\n"
+    + "    [Teardown]    log    9\n"
+    + "    log  19" | verify-true
+// make some changes in Source
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 19 15
+        select-range 19 16 19 5
+        type-text log
+        hover-text 20 6
+        key-type "M1+z" -times 2
+        set-caret-pos 19 26
+        key-type "M1+/"
+        key-type Up
+        key-type Enter
+        type-text "log  10"
+        key-type "M1+s"
+        key-type Down
+        key-type "M1+/"
+        key-type "M1+s"
+        key-type Up -times 2
+        key-type "M1+/"
+        key-type Down -times 6
+        key-type "M1+/"
+        key-type "M1+s"
+        key-type Up -times 6
+        key-type BackSpace -times 23
+        key-type "M1+s"
+        key-type Up -times 14
+        key-type Left -times 6
+        key-type Enter
+        key-type Up
+        type-text "log  loglog"
+        key-type "M1+s"
+        key-type Down -times 24
+        key-type Enter
+        type-text "[Timeout]  1000"
+        key-type "M1+s"
+    }
+    // verify Test Cases tab content
+    get-tab-item "Test Cases" | click
+	get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+	check-test_case-row -file "TestFile.robot"  -row 1 -tc "test"
+	check-test_case-row -file "TestFile.robot"  -row 2 -tc "log" -c1 "loglog"
+	check-test_case-row -file "TestFile.robot"  -row 3 -tc "[Teardown]" -c1 "log" -c2 9
+	check-test_case-row -file "TestFile.robot"  -row 4 -tc "[Setup]" -c1 "log" -c2 10
+	check-test_case-row -file "TestFile.robot"  -row 5 -tc "log" -c1 10
+	check-test_case-row -file "TestFile.robot"  -row 6 -tc "[Tags]" -c1 "tag1" -c2 "tag2"
+	check-test_case-row -file "TestFile.robot"  -row 7 -tc "[Timeout]" -c1 500
+	check-test_case-row -file "TestFile.robot"  -row 8 -tc "log" -c1 2
+	check-test_case-row -file "TestFile.robot"  -row 9 -tc "[Template]" -c1 "Comment" -c2 "message"
+	check-test_case-row -file "TestFile.robot"  -row 10 -tc "[Documentation]" -c1 "documentation"
+	check-test_case-row -file "TestFile.robot"  -row 11 -tc "log" -c1 "loglog"
+	check-test_case-row -file "TestFile.robot"  -row 12 -tc "log" -c1 10
+	check-test_case-row -file "TestFile.robot"  -row 13 -tc "my keyword" -c1 10
+	check-test_case-row -file "TestFile.robot"  -row 14 -tc "second kw" -c1 10
+}
+// verify Keyword tab content
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+check-keyword-row -file "TestFile.robot" -row 1 -kw "my keyword" -c1 "${var}"
+check-keyword-row -file "TestFile.robot" -row 2 -kw "log" -c1 1
+check-keyword-row -file "TestFile.robot" -row 3 -kw "log" -c1 "10"
+check-keyword-row -file "TestFile.robot" -row 4 -kw "log" -c1 9
+check-keyword-row -file "TestFile.robot" -row 5 -kw "[Timeout]" -c1 700
+
+check-keyword-row -file "TestFile.robot" -row 7 -kw "second kw"
+check-keyword-row -file "TestFile.robot" -row 8 -kw "[Documentation]" -c1 "documentation"
+check-keyword-row -file "TestFile.robot" -row 9 -kw "[Tags]" -c1 "tag1" -c2 "tag2"
+check-keyword-row -file "TestFile.robot" -row 10 -kw "[Teardown]" -c1 "log" -c2 9
+check-keyword-row -file "TestFile.robot" -row 11 -kw "log" -c1 19
+check-keyword-row -file "TestFile.robot" -row 12 -kw "[Timeout]" -c1 1000
+//go to Keyword table and move some rows
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my keyword" | double-click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down -times 4
+    key-type "M1+ARROW_UP"
+    key-type "M1+ARROW_UP"
+    key-type "M1+s" -times 2
+}
+get-view Outline | get-tree | select "TestFile.robot/Keywords/second kw" | double-click
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 4
+        key-type "M1+ARROW_UP"
+        key-type "M1+ARROW_UP"
+        key-type "M1+ARROW_UP"
+        key-type Down
+        key-type "M1+ARROW_DOWN"
+        key-type "M1+ARROW_DOWN"
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+// verify Source content
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  loglog\n"
+    + "    [Teardown]    log    9\n"
+    + "    [Setup]    log    10\n"
+    + "    log  10\n"
+    + "    [Tags]    tag1    tag2\n"
+    + "    [Timeout]    500\n"
+    + "    log  2\n"
+    + "    [Template]\t\tComment    message\n"
+    + "    [Documentation]    documentation\n"
+    + "    log  loglog\n"
+    + "    log    10\n"
+    + "    my keyword  10\n"
+    + "    second kw  10\n"
+    + "*** Keywords ***\n"
+    + "my keyword\n"
+    + "    log  1\n"
+    + "    log  10\n"
+    + "    [Timeout]    700\n"
+    + "    [Arguments]    ${var}\n"
+    + "    log  9\n"
+    + "second kw\n"
+    + "    log  19\n"
+    + "    [Tags]\t\ttag1    tag2\n"
+    + "    [Teardown]    log    9\n"
+    + "    [Documentation]    documentation\n"
+    + "    [Timeout]  1000" | verify-true
+// go to Test Cases and move some rows
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test" | double-click
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down -times 8
+        key-type "M1+ARROW_UP"
+        key-type "M1+ARROW_UP"
+        key-type "M1+ARROW_UP"
+        key-type "M1+ARROW_UP"
+        key-type "M1+ARROW_UP"
+        key-type "M1+ARROW_UP"
+        key-type Down
+        key-type "M1+ARROW_DOWN"
+        key-type "M1+ARROW_DOWN"
+        key-type "M1+s"
+    }
+}
+// verify Source content
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  loglog\n"
+    + "    [Template]\t\tComment    message\n"
+    + "    [Setup]    log    10\n"
+    + "    log  10\n"
+    + "    [Teardown]    log    9\n"
+    + "    [Tags]    tag1    tag2\n"
+    + "    [Timeout]    500\n"
+    + "    log  2\n"
+    + "    [Documentation]    documentation\n"
+    + "    log  loglog\n"
+    + "    log    10\n"
+    + "    my keyword  10\n"
+    + "    second kw  10\n"
+    + "*** Keywords ***\n"
+    + "my keyword\n"
+    + "    log  1\n"
+    + "    log  10\n"
+    + "    [Timeout]    700\n"
+    + "    [Arguments]    ${var}\n"
+    + "    log  9\n"
+    + "second kw\n"
+    + "    log  19\n"
+    + "    [Tags]\t\ttag1    tag2\n"
+    + "    [Teardown]    log    9\n"
+    + "    [Documentation]    documentation\n"
+    + "    [Timeout]  1000" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
