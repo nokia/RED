@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _ur0DkAf5Eee0EKWnoBYU9g,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_pjyZ0Af5Eee0EKWnoBYU9g,_2Q6oEPOSEeaWpbE3jg39cA,_ThULYA4_EeePcNCRX_abWA,_s-ctEA4_EeePcNCRX_abWA
+Contexts: _ur0DkAf5Eee0EKWnoBYU9g,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_pjyZ0Af5Eee0EKWnoBYU9g,_2Q6oEPOSEeaWpbE3jg39cA,_ThULYA4_EeePcNCRX_abWA,_s-ctEA4_EeePcNCRX_abWA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: RunCorrectRemoteDebugTest
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _vURJgAffEee0EKWnoBYU9g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 4:26 PM
+Save-Time: 8/7/17 4:41 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -41,6 +41,7 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 			
 			run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
 			
+			
 //			get-view Breakpoints | click
 //			get-view Breakpoints | get-tree | get-property "getItems().TreeItem[0].getText()" | equals "TestFile.robot [line: 9]" 
 //    		| verify-true
@@ -49,7 +50,11 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 			wait-for-thread-in-remote -child_count 4
 			check-debug-marker-on-ruler -line 2 -script_name "res.robot"
 			
-			get-button "Resume (F8)" | click
+			get-button "Step Into (F5)" | click
+			wait 1000
+			check-debug-marker-on-ruler -line 3 -script_name "res.robot"
+			
+			get-button "Step Into (F5)" | click
 			wait 1000
 	
 		}
