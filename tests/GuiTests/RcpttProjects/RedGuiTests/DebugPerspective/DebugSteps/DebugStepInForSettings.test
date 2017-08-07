@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: DebugStepInForSettings
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _abAfEB78EeWzFLX4y33zdA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 5:28 PM
+Save-Time: 8/7/17 2:09 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -28,13 +28,15 @@ with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column Annotatio
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
-	wait 2000
-	try -times 5 -delay 500 -command{
-		get-view Debug | get-tree | get-item "BigScript.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/my_setup \\[line:5\\]" 
-    		| get-property caption | equals "my_setup [line:5]" | verify-true
-   	}
+	wait-for-thread -file "BigScript.robot"
+   	
 	
 	check-debug-marker-on-ruler -line 5 -script_name "BigScript.robot"
+	
+	get-button "Step Into (F5)" | click
+	wait-for-thread -file "BigScript.robot" 
+	check-debug-marker-on-ruler -line 107 -script_name "BigScript.robot"
+	
 	
 	get-button "Step Into (F5)" | click
 	wait-for-thread -file "BigScript.robot" 
@@ -53,7 +55,9 @@ exec-with-options -disableJobWaiting -command {
 	check-debug-marker-on-ruler -line 17 -script_name "BigScript.robot"
 	
 	//go to keyword
-	get-button "Step Into (F5)" | click
+	get-button "Step Into (F5)" | click 
+	wait 500
+	get-button "Step Into (F5)" | click 
 	wait-for-thread -file "BigScript.robot" 
 	check-debug-marker-on-ruler -line 97 -script_name "BigScript.robot"
 	
@@ -73,12 +77,20 @@ exec-with-options -disableJobWaiting -command {
 	
 	get-button "Step Into (F5)" | click
 	wait-for-thread -file "BigScript.robot" 
+	check-debug-marker-on-ruler -line 18 -script_name "my_keywords.robot"
+	
+	get-button "Step Into (F5)" | click
+	wait-for-thread -file "BigScript.robot" 
 	check-debug-marker-on-ruler -line 19 -script_name "my_keywords.robot"
 	
 	//back to setup
 	get-button "Step Into (F5)" | click
 	wait-for-thread -file "BigScript.robot" 
 	check-debug-marker-on-ruler -line 5 -script_name "BigScript.robot"
+	
+	get-button "Step Into (F5)" | click
+	wait-for-thread -file "BigScript.robot" 
+	check-debug-marker-on-ruler -line 107 -script_name "BigScript.robot"
 	
 	get-button "Step Into (F5)" | click
 	wait-for-thread -file "BigScript.robot" 
