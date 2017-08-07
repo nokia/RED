@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RviRIHEBEeas5uogJbgGYA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/8/16 5:00 PM
+Save-Time: 8/7/17 10:38 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -108,6 +108,8 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     key-type Down -times 5
     get-menu "Add new line" | click
 }
+
+get-editor "TestFile.robot" | maximize
 
 check-test_case-row -file  "TestFile.robot" -row 1 -tc "case"
 check-test_case-row -file  "TestFile.robot" -row 2 -tc "1 line"
