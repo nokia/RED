@@ -38,7 +38,8 @@ public class LibrariesAutoDiscovererTest {
         projectProvider.createFile("libs/TestLib.py", "def kw():", " pass");
 
         projectProvider.createDir("other");
-        projectProvider.createFile("other/OtherLib.py", "def other_kw():", " pass");
+        projectProvider.createDir("other/dir");
+        projectProvider.createFile("other/dir/OtherLib.py", "def other_kw():", " pass");
         projectProvider.createFile("other/ErrorLib.py", "error():");
 
         projectProvider.createDir("module");
@@ -55,14 +56,14 @@ public class LibrariesAutoDiscovererTest {
     public void libsAreAddedToProjectConfig_whenExistAndAreCorrect() throws Exception {
         projectProvider.createFile("test1.robot", "*** Settings ***", "Library  ./libs/TestLib.py",
                 "*** Test Cases ***");
-        projectProvider.createFile("test2.robot", "*** Settings ***", "Library  ./other/OtherLib.py",
+        projectProvider.createFile("test2.robot", "*** Settings ***", "Library  ./other/dir/OtherLib.py",
                 "*** Test Cases ***");
         projectProvider.createFile("test3.robot", "*** Settings ***", "Library  module",
                 "Library  ./libs/NotExisting.py", "*** Test Cases ***");
         final List<? extends IResource> resources = Arrays.asList(projectProvider.getProject());
 
         final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
-        final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/OtherLib.py");
+        final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
         final ReferencedLibrary lib3 = createLibrary("module", "module/__init__.py");
 
         new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
@@ -99,10 +100,11 @@ public class LibrariesAutoDiscovererTest {
         final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
                 "*** Settings ***", "Library  ${var}/TestLib.py", "Library  ${xyz}/OtherLib.py", "*** Test Cases ***"));
 
-        final ReferencedLibrary lib = createLibrary("OtherLib", "other/OtherLib.py");
+        final ReferencedLibrary lib = createLibrary("OtherLib", "other/dir/OtherLib.py");
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.setVariableMappings(Arrays.asList(VariableMapping.create("${xyz}", "other")));
+        config.setVariableMappings(Arrays.asList(VariableMapping.create("${ABC}", "other"),
+                VariableMapping.create("${XYZ}", "${ABC}/dir")));
         projectProvider.configure(config);
 
         new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
@@ -113,7 +115,7 @@ public class LibrariesAutoDiscovererTest {
     @Test
     public void libsAreAddedToProjectConfig_whenExistingLibIsFound() throws Exception {
         final List<? extends IResource> resources = Arrays
-                .asList(projectProvider.createFile("test.robot", "*** Settings ***", "Library  other/OtherLib.py",
+                .asList(projectProvider.createFile("test.robot", "*** Settings ***", "Library  other/dir/OtherLib.py",
                         "Library  ./libs/TestLib.py", "Library  ./libs/NotExisting.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
