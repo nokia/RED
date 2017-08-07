@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _KIn6oA8kEeePcNCRX_abWA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/5/17 4:54 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/11/17 10:51 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -94,7 +94,7 @@ get-window Preferences | get-tree | select "Robot Framework/Editor"
 with [get-window Preferences] {
     get-combo -after [get-label "Prefer opening file elements from Project Explorer in"] 
         | select "designated table page of editor"
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 //set Varaibles tab for resource and close it
 get-button Robot | click

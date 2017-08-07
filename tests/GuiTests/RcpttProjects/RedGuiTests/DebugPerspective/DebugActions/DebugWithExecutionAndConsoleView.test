@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_znjMEBtDEeWSh6BKjAxDIw
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_znjMEBtDEeWSh6BKjAxDIw,_2Q6oEPOSEeaWpbE3jg39cA
 Element-Name: DebugWithExecutionAndConsoleView
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _OVxNoN8BEeWvV6AMcH1t9Q
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/28/17 4:21 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 7/11/17 11:05 AM
 Tags: Debug
 Testcase-Type: ecl
 Verifications: _ytMH0N-fEeWvV6AMcH1t9Q
@@ -38,11 +38,7 @@ get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
 	wait 3000
-	try -times 5 -delay 1000 -command{
-		get-view Debug | get-tree 
-		    | get-item "TestFile.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/BuiltIn.Log \\[line:6\\]" 
-		    | get-property caption | equals "BuiltIn.Log [line:6]" | verify-true
-	}
+	wait-for-thread -file "TestFile.robot" 
 	
 	with [get-view "Execution View" | get-tree] {
 	    get-item "RobotProject/TestFile" | get-property childCount | equals 3 | verify-true
