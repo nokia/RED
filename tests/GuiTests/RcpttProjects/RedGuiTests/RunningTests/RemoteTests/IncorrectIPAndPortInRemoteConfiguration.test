@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pNdEgA47EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/7/17 11:31 AM
+Save-Time: 8/7/17 5:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -106,7 +106,7 @@ exec-with-options {
 	    get-window "Problem Occurred" | get-label "'Agent connection server' has encountered a problem." 
 	        | get-property caption | equals "'Agent connection server' has encountered a problem." | verify-true
 	    get-window "Problem Occurred" 
-	        | get-label "Unable to start server on wrbboxv01.emea.nsn-net.net:8080Cannot assign requested address (Bind failed)" 
+	        | get-label "Unable to start server on wrbboxv01.emea.nsn-net.net:8080Cannot assign requested address.*" 
 	        | get-property caption | equals "Unable to start server on wrbboxv01.emea.nsn-net.net:8080\n"
 	        + "Cannot assign requested address( \(Bind failed\))?" | verify-true
 
