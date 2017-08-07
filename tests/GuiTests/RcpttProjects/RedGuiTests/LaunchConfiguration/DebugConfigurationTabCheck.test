@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _gCszcJREEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/16/17 5:08 PM
+Save-Time: 8/7/17 4:46 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -33,8 +33,8 @@ with [get-window "Debug Configurations"] {
     get-tab-folder | get-property activePage | equals Robot | verify-true
 }
 // check tab Source
-get-window "Debug Configurations" | get-tab-folder | get-tab-item Source | click
-get-window "Debug Configurations" | get-tab-folder | get-property activePage | equals Source | verify-true
+get-window "Debug Configurations" | get-tab-folder | get-tab-item Listener | click
+get-window "Debug Configurations" | get-tab-folder | get-property activePage | equals Listener | verify-true
 // check tab Common
 get-window "Debug Configurations" | get-tab-folder | get-tab-item Common | click
 get-window "Debug Configurations" | get-tab-folder | get-property activePage | equals "&Common" | verify-true
