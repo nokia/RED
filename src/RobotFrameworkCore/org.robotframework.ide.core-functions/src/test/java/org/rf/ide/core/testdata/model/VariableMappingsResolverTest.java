@@ -98,5 +98,14 @@ public class VariableMappingsResolverTest {
                                 .hasSize(4)
                                 .containsAllEntriesOf(ImmutableMap.of("${a}", "x\\y", "${b}", "xyz\\${C}", "${c}",
                                         "x\\y\\${Z}", "${d}", "x\\y\\${Z}\\${Z}"));
+
+        assertThat(VariableMappingsResolver.resolve(newArrayList(VariableMapping.create("${A}", "${B}"),
+                VariableMapping.create("${B}", "X"), VariableMapping.create("${C}", "${B}"),
+                VariableMapping.create("${B}", "Y"), VariableMapping.create("${D}", "${B}")))).hasSize(4)
+                        .containsAllEntriesOf(ImmutableMap.of("${a}", "${B}", "${b}", "Y", "${c}", "X", "${d}", "Y"));
+
+        assertThat(VariableMappingsResolver.resolve(newArrayList(VariableMapping.create("${A}", "B"),
+                VariableMapping.create("${B}", "X"), VariableMapping.create("${C}", "${${A}}")))).hasSize(3)
+                        .containsAllEntriesOf(ImmutableMap.of("${a}", "B", "${b}", "X", "${c}", "${B}"));
     }
 }
