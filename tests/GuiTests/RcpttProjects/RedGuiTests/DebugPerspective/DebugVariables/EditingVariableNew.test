@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __AGDkGyEEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/21/17 5:21 PM
+Save-Time: 8/7/17 2:52 PM
 Tags: notTestable
 Testcase-Type: ecl
 
@@ -158,10 +158,9 @@ exec-with-options -disableJobWaiting -command {
 	
 	//assigne non-existing param
 	change-var-value "${b}" "${new}"
-	get-window "Debugger Error" 
-	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Variable '${new}' not found." 
-	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
-	    + "Setting variables error: Variable '${new}' not found." | verify-true
+	get-window "Debugger Error" | get-label "Unable to change value of variable ${b}. Variable '${new}' not found." 
+	    | get-property caption | equals "Unable to change value of variable ${b}. Variable '${new}' not found." 
+	    | verify-true
 	get-window "Debugger Error" | get-button OK | click
 	
 	//check if old value was restored
