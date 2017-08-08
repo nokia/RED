@@ -1,14 +1,14 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_d8aMACuvEeW667Afdo4DcA
-Element-Name: EditingVariableNew
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_d8aMACuvEeW667Afdo4DcA,_jcbUQGu1Eeeps9cepQRw2Q
+Element-Name: EditingDifferentVariableTypes
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: __AGDkGyEEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/7/17 2:52 PM
-Tags: notTestable
+Save-Time: 8/8/17 2:39 PM
+Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -63,15 +63,18 @@ exec-with-options -disableJobWaiting -command {
 	change-var-value "${a}"  999
 	
 	//change value in list @{c}
+	get-view Variables | get-tree |	get-item "@{c}" | expand
+	try -times 5 -delay 500 -command{
+		get-view Variables | get-tree | get-item "@{c}/\\[2\\]" | get-property "values['Value']" | equals z | verify-true
+	}
 	change-var-value  "@{c}/\\[1\\]" middle
 
-	//check i values are changed in list that contains list @{c}
-	wait 1000
-//	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
-	wait 1000
+	//check if values are changed in list that contains list @{c}
+	get-view Variables | get-tree |	get-item "@{assigned}" | expand
+	try -times 5 -delay 500 -command{
+		get-view Variables | get-tree | get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	}
 	with [get-view Variables | get-tree] {
-		get-item "@{assigned}" | expand
-		wait 1000
 	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Value']" | equals x | verify-true
 	    get-item "@{assigned}/\\[0\\]/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
@@ -92,10 +95,10 @@ exec-with-options -disableJobWaiting -command {
 	
 	//change last value in list
 	change-var-value "@{assigned}/\\[3\\]"   t1
-	with [get-button "Step Over (F6)"] {
-	    click
-	    wait 500
-	    click
+			with [get-button "Step Over (F6)"] {
+			    click
+			    wait 500
+			    click
 	}
 	//check values
 	with [get-view Variables | get-tree] {
@@ -130,6 +133,7 @@ exec-with-options -disableJobWaiting -command {
 	}
 	//check dict
 	with [get-view Variables | get-tree] {
+		get-item "&{dict}" | expand
 	    get-item "&{dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
 	    get-item "&{dict}/fruit" | get-property "values['Value']" | equals " apple" | verify-true
 	    get-item "&{dict}/key" | get-property "values['Name']" | equals key | verify-true
@@ -138,6 +142,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "&{dict}/last" | get-property "values['Value']" | equals "45" | verify-true
 	}
 	with [get-view Variables | get-tree] {
+	 	get-item "@{list}" | expand
 	    get-item "@{list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{list}/\\[0\\]" | get-property "values['Value']" | equals 66 | verify-true
 	    get-item "@{list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
@@ -168,21 +173,17 @@ exec-with-options -disableJobWaiting -command {
 	
 	//add value with double spaces
 	change-var-value "${b}" "  text"
-	get-window "Debugger Error" 
-	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
-	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
-	    + "Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
-	    | verify-true
-	get-window "Debugger Error" | get-button OK | click
+	verify-error {get-window "Debugger Error"}
 	
 	
 	//assigne non-existing list to variable
 	change-var-value "${b}" "@{abc}"
 	get-window "Debugger Error" 
-	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
-	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
-	    + "Setting variables error: Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
+	    | get-label "Unable to change value of variable ${b}. Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
+	    | get-property caption 
+	    | equals "Unable to change value of variable ${b}. Setting list value to scalar variable '${b}' is not supported anymore. Create list variable '@{b}' instead." 
 	    | verify-true
+		    
 	get-window "Debugger Error" | get-button OK | click
 	
 	
@@ -192,7 +193,7 @@ exec-with-options -disableJobWaiting -command {
 	get-view Variables | get-tree | get-item "${b}" | get-property "values['Value']" | equals "" | verify-true
 	
 	//change param to list
-	change-var-value "${b}" "${c}"
+	change-var-value "${a}" "${c}"
 	with [get-view Variables | get-tree] {
 	    get-item "${b}" | get-property "values['Value']" | equals "" | verify-true
 	    get-item "@{a}" | get-property "values['Name']" | equals "@{a}" | verify-true
@@ -206,29 +207,33 @@ exec-with-options -disableJobWaiting -command {
 	}
 	
 	//change value to non-existing param 
-	change-var-value "@{c}/\\[2\\]"   "${ghi}"
+	get-view Variables | get-tree |	get-item "@{c}" | expand
+	try -times 5 -delay 500 -command{
+		get-view Variables | get-tree | get-item "@{c}/\\[0\\]/\\[2\\]" | get-property "values['Value']" | equals z 
+    		| verify-true
+	}
+	change-var-value "@{c}/[0]"  "${ghi}"
 	
 	get-window "Debugger Error" 
-	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Variable '${ghi}' not found." 
-	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
-	    + "Setting variables error: Variable '${ghi}' not found." | verify-true
+	    | get-label "Unable to change value of variable @{list}. Variable '${ghi}' not found." 
+	    | get-property caption 
+	    | equals "Unable to change value of variable @{list}. Variable '${ghi}' not found." 
+	    | verify-true
+	    
 	get-window "Debugger Error" | get-button OK | click
 	
 	//change value for key in dict
 	change-var-value "&{dict}/key"   "${z}"
 	get-window "Debugger Error" 
-	    | get-label "Error occurred when trying to change value of variable:Setting variables error: Variable '${z}' not found." 
-	    | get-property caption | equals "Error occurred when trying to change value of variable:\n\n"
-	    + "Setting variables error: Variable '${z}' not found." | verify-true
+	    | get-label "Unable to change value of variable &{dict}. Variable '${z}' not found." 
+	    | get-property caption 
+	    | equals "Unable to change value of variable &{dict}. Variable '${z}' not found." 
+	    | verify-true
 	get-window "Debugger Error" | get-button OK | click
 
+	get-button "Terminate (M1+F2)" | click
 	
 }
 
 
-//   Append To List    ${list}    omamo    
-//    Insert Into List    ${list}     1   bede na 1
-//    Set To Dictionary  ${dict}   nowiuski_klucz=na koniec
-//    log many  ${dict} 
-//    Log Many    ${list}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
