@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -229,7 +228,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                     && !isNonCollectionVar(useSiteArg)) {
 
                 if (!defs.isEmpty()) {
-                    final List<Argument> required = newArrayList(filter(defs, Argument::isRequired));
+                    final List<Argument> required = defs.stream().filter(Argument::isRequired).collect(toList());
                     if (!required.isEmpty()) {
                         final ArgumentProblem cause = useSiteArg.getTypes()
                                 .contains(RobotTokenType.VARIABLES_LIST_DECLARATION)

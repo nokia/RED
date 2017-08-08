@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,7 +23,6 @@ import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -39,11 +39,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.Variables
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 public class GeneralSettingsTableValidatorTest {
@@ -174,7 +171,7 @@ public class GeneralSettingsTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "var");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
@@ -197,7 +194,7 @@ public class GeneralSettingsTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final Set<String> accessibleVariables = new HashSet<>();
         accessibleVariables.add("${var}");
@@ -287,7 +284,7 @@ public class GeneralSettingsTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw1 ${arg}",
                 new Path("/suite.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1 ${arg}",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
@@ -368,38 +365,26 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     private static FileValidationContext prepareContext() {
-        return prepareContext(new HashMap<String, Collection<KeywordEntity>>());
+        return prepareContext(new HashMap<>());
     }
 
     private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(createKeywordsCollector(map), new HashSet<String>());
+        return prepareContext(() -> map, new HashSet<>());
     }
 
     private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map,
             final Set<String> accessibleVariables) {
-        return prepareContext(createKeywordsCollector(map), accessibleVariables);
+        return prepareContext(() -> map, accessibleVariables);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector,
             final Set<String> accessibleVariables) {
         final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
-                Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
+                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
         final IFile file = mock(IFile.class);
         when(file.getFullPath()).thenReturn(new Path("/suite.robot"));
         final FileValidationContext context = new FileValidationContext(parentContext, file, collector,
                 accessibleVariables);
         return context;
-    }
-
-    private static AccessibleKeywordsCollector createKeywordsCollector(
-            final Map<String, Collection<KeywordEntity>> map) {
-        return new AccessibleKeywordsCollector() {
-
-            @Override
-            public Map<String, Collection<KeywordEntity>> collect() {
-                return map;
-            }
-        };
     }
 }
