@@ -144,7 +144,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final IPath libraryPath = Path.fromPortableString(library.getPath());
         final ProblemPosition position = linesMapping.get(library);
 
-        final Map<String, Object> additional = ImmutableMap.<String, Object> of(ConfigFileProblem.LIBRARY_INDEX, index);
+        final Map<String, Object> additional = ImmutableMap.of(ConfigFileProblem.LIBRARY_INDEX, index);
         List<RobotProblem> libProblems;
         switch (libType) {
             case JAVA:
