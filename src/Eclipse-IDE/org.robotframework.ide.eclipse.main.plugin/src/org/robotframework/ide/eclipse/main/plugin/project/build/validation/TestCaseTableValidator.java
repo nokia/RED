@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -58,7 +59,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testc
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
@@ -128,8 +128,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
             if (!hasAnythingToExecute(testCase)) {
                 final String name = caseName.getText();
                 final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE).formatMessageWith(name);
-                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                        name);
+                final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
                 reporter.handleProblem(problem, validationContext.getFile(), caseName, arguments);
             }
         }
@@ -167,7 +166,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.DUPLICATED_CASE)
                         .formatMessageWith(name);
-                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
+                final Map<String, Object> additionalArguments = ImmutableMap.of("name", name);
                 reporter.handleProblem(problem, validationContext.getFile(), caseName, additionalArguments);
             }
         }
@@ -274,8 +273,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
 
         if (!nameToUse.isPresent()) {
             reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD).formatMessageWith(name),
-                    validationContext.getFile(), position,
-                    ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, name,
+                    validationContext.getFile(), position, ImmutableMap.of(AdditionalMarkerAttributes.NAME, name,
                             AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName.getText()));
             return;
         }
@@ -302,7 +300,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
                             RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
                                     .formatMessageWith(name, keyword.getNameFromDefinition()),
                             validationContext.getFile(), position,
-                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, name,
+                            ImmutableMap.of(AdditionalMarkerAttributes.NAME, name,
                                     AdditionalMarkerAttributes.ORIGINAL_NAME, keyword.getNameFromDefinition(),
                                     AdditionalMarkerAttributes.SOURCES, keyword.getSourceNameInUse()));
                 }
@@ -323,9 +321,9 @@ class TestCaseTableValidator implements ModelUnitValidator {
                         RobotProblem.causedBy(KeywordsProblem.AMBIGUOUS_KEYWORD).formatMessageWith(name,
                                 "[" + Joiner.on(", ").join(sources) + "]"),
                         validationContext.getFile(), position,
-                        ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, name,
-                                AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName.getText(),
-                                AdditionalMarkerAttributes.SOURCES, Joiner.on(';').join(sources)));
+                        ImmutableMap.of(AdditionalMarkerAttributes.NAME, name, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                                keywordName.getText(), AdditionalMarkerAttributes.SOURCES,
+                                Joiner.on(';').join(sources)));
                 break;
             }
         }
@@ -404,7 +402,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
         final Set<String> definedVariables = newHashSet(variables);
 
         final Map<String, Object> additionalMarkerAttributes = ImmutableMap
-                .<String, Object> of(AdditionalMarkerAttributes.DEFINE_VAR_LOCALLY, Boolean.TRUE);
+                .of(AdditionalMarkerAttributes.DEFINE_VAR_LOCALLY, Boolean.TRUE);
         final ProblemsReportingStrategy reportingStrategy = AttributesAugmentingReportingStrategy
                 .create(reporter, additionalMarkerAttributes);
 
@@ -412,14 +410,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
         for (final RobotExecutableRow<?> row : executables) {
             if (row.isExecutable()) {
                 final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
-                final Predicate<VariableDeclaration> isInvalid = new Predicate<VariableDeclaration>() {
-
-                    @Override
-                    public boolean apply(final VariableDeclaration variableDeclaration) {
-                        return isInvalidVariableDeclaration(validationContext, definedVariables, lineDescription,
-                                variableDeclaration);
-                    }
-                };
+                final Predicate<VariableDeclaration> isInvalid = isInvalidVariableDeclaration(validationContext,
+                        definedVariables, lineDescription);
                 unknownVarsValidator.reportUnknownVariables(lineDescription.getUsedVariables(), isInvalid);
                 definedVariables.addAll(
                         VariableNamesSupport.extractUnifiedVariableNames(lineDescription.getCreatedVariables()));
@@ -427,12 +419,17 @@ class TestCaseTableValidator implements ModelUnitValidator {
         }
     }
 
-    static boolean isInvalidVariableDeclaration(final FileValidationContext validationContext,
-            final Set<String> variables, final IExecutableRowDescriptor<?> lineDescription,
-            final VariableDeclaration declaration) {
-        return UnknownVariables.isInvalidVariableDeclaration(variables, declaration)
-                && !isVariableInSetterOrGetterOrCommentKeyword(validationContext, variables, lineDescription,
-                        declaration);
+    static Predicate<VariableDeclaration> isInvalidVariableDeclaration(final FileValidationContext validationContext,
+            final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription) {
+        return new Predicate<VariableDeclaration>() {
+
+            @Override
+            public boolean test(final VariableDeclaration variableDeclaration) {
+                return UnknownVariables.isInvalidVariableDeclaration(definedVariables).test(variableDeclaration)
+                        && !isVariableInSetterOrGetterOrCommentKeyword(validationContext, definedVariables,
+                                lineDescription, variableDeclaration);
+            }
+        };
     }
 
     private static boolean isVariableInSetterOrGetterOrCommentKeyword(final FileValidationContext validationContext,

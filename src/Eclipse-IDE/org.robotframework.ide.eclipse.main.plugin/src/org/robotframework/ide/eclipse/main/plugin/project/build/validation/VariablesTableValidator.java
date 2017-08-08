@@ -95,8 +95,8 @@ class VariablesTableValidator implements ModelUnitValidator {
                     if (variableName.charAt(1) != '{') {
                         final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_NAME)
                                 .formatMessageWith(variableName);
-                        final Map<String, Object> attributes = ImmutableMap
-                                .<String, Object> of(AdditionalMarkerAttributes.NAME, variableName);
+                        final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
+                                variableName);
                         reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(),
                                 attributes);
                     }
@@ -110,7 +110,7 @@ class VariablesTableValidator implements ModelUnitValidator {
             if (variable.getType() == VariableType.INVALID) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.INVALID_TYPE)
                         .formatMessageWith(variable.getName());
-                final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
                         variable.getName());
                 reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
             }
@@ -137,7 +137,7 @@ class VariablesTableValidator implements ModelUnitValidator {
                     && duplicatedNames.contains(VariableNamesSupport.extractUnifiedVariableName(variable.getName()))) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.DUPLICATED_VARIABLE)
                         .formatMessageWith(variable.getName());
-                final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
                         variable.getName());
                 reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
             }
@@ -178,8 +178,8 @@ class VariablesTableValidator implements ModelUnitValidator {
                 .causedBy(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX)
                 .formatMessageWith(value, variableDef.getName(), additionalMsg);
         final Map<String, Object> attributes = change
-                ? ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.VALUE, value)
-                : ImmutableMap.<String, Object> of();
+                ? ImmutableMap.of(AdditionalMarkerAttributes.VALUE, value)
+                : ImmutableMap.of();
 
         reporter.handleProblem(problem, validationContext.getFile(), pair.getRaw(), attributes);
     }
