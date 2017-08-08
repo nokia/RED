@@ -5,14 +5,13 @@
  */
 package org.robotframework.red.nattable;
 
+import java.util.function.Predicate;
+
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
-
-import com.google.common.base.Predicate;
-
 
 public class AssistanceLabelAccumulator implements IConfigLabelAccumulator {
 
@@ -32,8 +31,8 @@ public class AssistanceLabelAccumulator implements IConfigLabelAccumulator {
 
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
-        if (positionPredicate.apply(new PositionCoordinateSerializer(columnPosition, rowPosition))
-                && rowObjectPredicate.apply(provider.getRowObject(rowPosition))) {
+        if (positionPredicate.test(new PositionCoordinateSerializer(columnPosition, rowPosition))
+                && rowObjectPredicate.test(provider.getRowObject(rowPosition))) {
             configLabels.addLabel(TableConfigurationLabels.ASSIST_REQUIRED);
         }
     }

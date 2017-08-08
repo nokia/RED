@@ -43,7 +43,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setti
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -269,7 +268,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             }
         }
     }
-    
+
     private void validateMetadatas(final List<Metadata> metadatas) {
         for (final Metadata metadata : metadatas) {
             if (metadata.getKey() == null) {
@@ -301,7 +300,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             }
         }
     }
-    
+
     private void validateVariablesInSetupAndTeardownExeRows(final List<RobotExecutableRow<?>> executableRows) {
         if (!executableRows.isEmpty()) {
             final Set<String> variables = validationContext.getAccessibleVariables();
@@ -310,12 +309,6 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     }
 
     private static List<String> toString(final List<RobotToken> tokens) {
-        return newArrayList(Lists.transform(tokens, new Function<RobotToken, String>() {
-
-            @Override
-            public String apply(final RobotToken token) {
-                return token.getText().trim();
-            }
-        }));
+        return newArrayList(Lists.transform(tokens, token -> token.getText().trim()));
     }
 }

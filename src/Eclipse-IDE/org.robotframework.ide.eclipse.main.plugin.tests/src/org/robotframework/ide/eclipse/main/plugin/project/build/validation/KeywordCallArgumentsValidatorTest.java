@@ -144,7 +144,7 @@ public class KeywordCallArgumentsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenNumberOfArgumentsAreInUnoundedRange() throws CoreException {
+    public void nothingIsReported_whenNumberOfArgumentsAreInUnboundedRange() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
                 .appendLine("*** Test Cases ***")
                 .appendLine("test")

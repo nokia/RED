@@ -201,7 +201,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private void reportDuplicatedArguments() {
         final String fileName = validationContext.getFile().getName();
-        
+
         final Multimap<String, RobotToken> arguments = extractArgumentVariables(keyword, new VariableExtractor(),
                 fileName);
 
@@ -220,7 +220,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     private Multimap<String, RobotToken> extractArgumentVariables(final UserKeyword keyword,
             final VariableExtractor extractor, final String fileName) {
         final Multimap<String, RobotToken> arguments = ArrayListMultimap.create();
-        
+
         // first add arguments embedded in name, then from [Arguments] setting
         final Multimap<String, RobotToken> embeddedArguments = VariableNamesSupport
                 .extractUnifiedVariables(newArrayList(keyword.getKeywordName()), extractor, fileName);
@@ -307,8 +307,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                         if (isInvalidVariableDeclaration(definedVariables, unifiedDefinitionName, entry)) {
                             final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                                     .formatMessageWith(entry.getValue().getText());
-                            final Map<String, Object> additional = ImmutableMap
-                                    .<String, Object> of(AdditionalMarkerAttributes.NAME, entry.getKey());
+                            final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
+                                    entry.getKey());
                             reporter.handleProblem(problem, validationContext.getFile(), entry.getValue(), additional);
                         }
                     }

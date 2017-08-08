@@ -80,8 +80,6 @@ import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Viewers;
 
-import com.google.common.base.Predicate;
-
 /**
  * @author Michal Anglart
  */
@@ -315,13 +313,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private Set<ProjectTreeElement> getExcludedElementsInTheTree(final Collection<ProjectTreeElement> allElements) {
-        return newHashSet(filter(allElements, new Predicate<ProjectTreeElement>() {
-
-            @Override
-            public boolean apply(final ProjectTreeElement elem) {
-                return elem.isExcluded();
-            }
-        }));
+        return newHashSet(filter(allElements, ProjectTreeElement::isExcluded));
     }
 
     private List<ExcludedFolderPath> getExcludedNotShownInTheTree(final List<ExcludedFolderPath> allExcluded,
