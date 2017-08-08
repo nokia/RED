@@ -28,9 +28,11 @@ public class RobotEvaluationErrorsHandler extends RobotDefaultAgentEventListener
     }
 
     private static void handleError(final Optional<String> error) {
+        // replacing dollars with double dollars, as single dollar is used as mnemonic in labels
         error.ifPresent(e -> {
             final Display display = PlatformUI.getWorkbench().getDisplay();
-            display.asyncExec(() -> MessageDialog.openError(display.getActiveShell(), "Debugger Error", e));
+            final String msg = e.replaceAll("&", "&&");
+            display.asyncExec(() -> MessageDialog.openError(display.getActiveShell(), "Debugger Error", msg));
         });
     }
 
