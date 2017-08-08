@@ -429,7 +429,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
             final VariableDeclaration variableDeclaration) {
         final String keywordName = QualifiedKeywordName.fromOccurrence(getKeyword(lineDescription)).getKeywordName();
-        if (keywordName.equals("settestvariable") && isKeywordFromBuiltin(validationContext, keywordName)) {
+        if ((keywordName.equals("setglobalvariable") || keywordName.equals("setsuitevariable")
+                || keywordName.equals("settestvariable")) && isKeywordFromBuiltin(validationContext, keywordName)) {
             final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
             if (!usedVariables.isEmpty()) {
                 definedVariables

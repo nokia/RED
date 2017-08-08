@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -42,7 +44,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescr
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
@@ -65,7 +66,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -86,7 +87,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -108,7 +109,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -149,7 +150,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "var");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -188,7 +189,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -212,7 +213,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -235,7 +236,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newDeprecatedValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -260,8 +261,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "lib", "kw2",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw2",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
+                newArrayList(entity1), "kw2", newArrayList(entity2));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -286,7 +286,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "kw",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
+                newArrayList(entity1, entity2));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -306,7 +306,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "library", "lib", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -326,7 +326,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "library", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -351,7 +351,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw1",
                 new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -384,7 +384,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res2", "kw",
                 new Path("/res2.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
+                newArrayList(entity1, entity2));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -409,7 +409,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res2", "kw",
                 new Path("/res2.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
+                newArrayList(entity1, entity2));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -430,10 +430,9 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "var2");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var2}");
+        final Set<String> accessibleVariables = newHashSet("${var2}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -455,7 +454,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -475,10 +474,9 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var}");
+        final Set<String> accessibleVariables = newHashSet("${var}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -499,7 +497,53 @@ public class TestCaseTableValidatorTest {
                 new Path("/suite.robot"), "var");
 
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("comment",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
+                newArrayList(entity1));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+    }
+
+    @Test
+    public void variableInSetGlobalVariableKeywordIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Global Variable  ${V_ar}")
+                .appendLine("    kw  ${var}")
+                .build();
+
+        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+                "Set Global Variable", new Path("/suite.robot"), "arg");
+        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("setglobalvariable",
+                newArrayList(entity1), "kw", newArrayList(entity2));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+    }
+
+    @Test
+    public void variableInSetSuiteVariableKeywordIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Suite Variable  ${V_ar}")
+                .appendLine("    kw  ${var}")
+                .build();
+
+        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+                "Set Suite Variable", new Path("/suite.robot"), "arg");
+        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("setsuitevariable",
+                newArrayList(entity1), "kw", newArrayList(entity2));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -522,8 +566,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("settestvariable",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
+                newArrayList(entity1), "kw", newArrayList(entity2));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -544,7 +587,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -568,7 +611,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -595,11 +638,9 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn", "Set Variable",
                 new Path("/suite.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "setvariable",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
+                newArrayList(entity1), "setvariable", newArrayList(entity2));
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var1}");
+        final Set<String> accessibleVariables = newHashSet("${var1}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -621,10 +662,9 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var}");
+        final Set<String> accessibleVariables = newHashSet("${var}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -650,7 +690,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -673,7 +713,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -694,7 +734,7 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
         final Set<String> accessibleVariables = new HashSet<>();
         accessibleVariables.add("${var1}");
@@ -723,10 +763,9 @@ public class TestCaseTableValidatorTest {
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+                newArrayList(entity));
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var1}");
+        final Set<String> accessibleVariables = newHashSet("${var1}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -757,16 +796,16 @@ public class TestCaseTableValidatorTest {
     }
 
     private static FileValidationContext prepareContext() {
-        return prepareContext(new HashMap<String, Collection<KeywordEntity>>());
+        return prepareContext(new HashMap<>());
     }
 
     private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(createKeywordsCollector(map), new HashSet<String>());
+        return prepareContext(() -> map, new HashSet<>());
     }
 
     private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map,
             final Set<String> accessibleVariables) {
-        return prepareContext(createKeywordsCollector(map), accessibleVariables);
+        return prepareContext(() -> map, accessibleVariables);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector,
@@ -779,16 +818,5 @@ public class TestCaseTableValidatorTest {
         final FileValidationContext context = new FileValidationContext(parentContext, file, collector,
                 accessibleVariables);
         return context;
-    }
-
-    private static AccessibleKeywordsCollector createKeywordsCollector(
-            final Map<String, Collection<KeywordEntity>> map) {
-        return new AccessibleKeywordsCollector() {
-
-            @Override
-            public Map<String, Collection<KeywordEntity>> collect() {
-                return map;
-            }
-        };
     }
 }
