@@ -1,19 +1,34 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _pjyZ0Af5Eee0EKWnoBYU9g,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA,_OCxtEBRGEeWWV9IuysVI_A,_kJ0i8BXWEeW05sQKg0mypw,_ThULYA4_EeePcNCRX_abWA,_s-ctEA4_EeePcNCRX_abWA
+Contexts: _pjyZ0Af5Eee0EKWnoBYU9g,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA,_OCxtEBRGEeWWV9IuysVI_A,_kJ0i8BXWEeW05sQKg0mypw,_ThULYA4_EeePcNCRX_abWA,_s-ctEA4_EeePcNCRX_abWA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: RemoteDebugForWrongTest
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-6fSwAjXEee0EKWnoBYU9g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/24/17 9:10 AM
+Save-Time: 8/8/17 5:42 PM
 Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+proc "check-thread-list"[val suite_index] [val proj_index] [val frame_amount]{
+
+	with [get-view Debug | get-tree] {
+	    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property childCount | equals $frame_amount | verify-true
+	        	        
+	        
+	    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property [format "getItems().TreeItem[%s].getText()" $suite_index ] | equals "[Suite] TestFile" | verify-true
+	    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property [format"getItems().TreeItem[%s].getText()" $proj_index] | equals "[Suite] RemoteProject" | verify-true
+	}
+
+}
 
 //here project name and test name are different
 
@@ -41,16 +56,76 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		wait-for-remote-connection 
 		
 		run-remote-test-in-background -path  $remote_project_path -project_name "RemoteProject"
-	}
-	exec-with-options -disableJobWaiting -command {
-		try -times 4 -delay 1000-command{
-			get-window "Debug Execution Context Error" 
-			    | get-label "Invalid execution context: suite='TestFile.robot', name='BuiltIn.Log', type='Keyword'" 
-			    | get-property caption 
-			    | equals "Invalid execution context: suite='TestFile.robot', name='BuiltIn.Log', type='Keyword'" 
-			    | verify-true
-			get-window "Debug Execution Context Error" | get-button OK | click	
+
+		with [get-window "Debugger error"] {
+		    get-button "Remember my decision" | check
+		    get-button Suspend | click
 		}
+		
+		//test was stopped on test name: test 1
+		with [get-view Debug | get-tree] {
+		    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "[Test] test 1" | verify-true
+		
+		}
+		check-thread-list -suite_index 1 -proj_index 2 -frame_amount 3
+		
+		//step in
+		get-button "Step Into (F5)" | click
+		
+		//check if error about Log was shown
+		get-editor "BuiltIn.Log" | get-editbox -after [get-label "Unable to find test 'test 1'"] | get-property text 
+		    | equals "RED was unable to find suite where the test could be located\n"
+		    + "Unable to find executable call of 'BuiltIn.Log' keyword" | verify-true
+		with [get-view Debug | get-tree] {
+		    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Log" | verify-true
+		    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+		        | get-property "getItems().TreeItem[1].getText()" | equals "[Test] test 1" | verify-true
+		}
+		check-thread-list -suite_index 2 -proj_index 3 -frame_amount 4
+		
+		
+		get-button "Step Into (F5)" | click
+		with [get-view Debug | get-tree] {
+		    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "[Test] test 2" | verify-true
+		}
+		check-thread-list -suite_index 1 -proj_index 2 -frame_amount 3
+		
+		get-editor "[Test] test 2" | get-editbox -after [get-label "Unable to find test 'test 1'"] | get-property text 
+		    | equals "RED was unable to find suite where the test could be located\n"
+		    + "Unable to find executable call of 'BuiltIn.Log' keyword" | verify-true
+		    
+		get-button "Step Into (F5)" | click
+		
+		
+		with [get-view Debug | get-tree] {
+		    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+		        | get-property "getItems().TreeItem[0].getText()" | equals "res.kw from res" | verify-true
+		    get-item "MediumRobotTest \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+		        | get-property "getItems().TreeItem[1].getText()" | equals "[Test] test 2" | verify-true
+		}
+		
+		check-thread-list -suite_index 2 -proj_index 3 -frame_amount 4
+		get-editor "res.kw from res" | get-editbox -after [get-label "Unable to find test 'test 1'"] | get-property text 
+		    | equals "RED was unable to find suite where the test could be located\n"
+		    + "Unable to find executable call of 'BuiltIn.Log' keyword" | verify-true
+    
+		with [get-button "Step Into (F5)"] {
+		    click
+		    click
+		    click
+		}
+		
 	} -allowStatusDialog
+	
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RemoteProject.TestFile.test 1\n"
+	    + ".* : INFO : 5\n"
+	    + "Ending test: RemoteProject.TestFile.test 1\n\n"
+	    + "Starting test: RemoteProject.TestFile.test 2\n"
+	    + ".* : INFO : 9\n"
+	    + "Ending test: RemoteProject.TestFile.test 2" | verify-true
+		
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
