@@ -264,7 +264,7 @@ public class VariablesTableValidatorTest {
     }
 
     private static FileValidationContext prepareContext() {
-        return prepareContext(new HashSet<String>());
+        return prepareContext(new HashSet<>());
     }
 
     private static FileValidationContext prepareContext(final Set<String> variables) {

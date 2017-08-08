@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.assertj.core.api.Condition;
@@ -31,7 +30,6 @@ import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
@@ -42,7 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
 import org.robotframework.red.junit.ResourceCreator;
 
@@ -436,11 +433,9 @@ public class GeneralSettingsVariablesImportValidatorTest {
     }
 
     private FileValidationContext prepareContext(final RobotSuiteFile suiteFile) {
-        final Map<String, LibrarySpecification> specs = new HashMap<>();
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        final ValidationContext context = new ValidationContext(model, RobotVersion.from("0.0"),
-                SuiteExecutor.Python, specs, refLibs);
-        return new FileValidationContext(context, suiteFile.getFile());
+        final ValidationContext parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
+                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
+        return new FileValidationContext(parentContext, suiteFile.getFile());
     }
 
     private VariablesImport getImport(final RobotSuiteFile suiteFile) {
