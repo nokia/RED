@@ -33,7 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Multimaps;
 
 public class RevalidateSelectionHandler extends DIParameterizedHandler<E4RevalidateSelectionHandler> {
@@ -50,7 +49,7 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
 
             final Map<IProject, Collection<RobotSuiteFile>> grouped = RobotSuiteFileCollector
                     .collectGroupedByProject(selectedResources);
-            for (Entry<IProject, Collection<RobotSuiteFile>> entry : grouped.entrySet()) {
+            for (final Entry<IProject, Collection<RobotSuiteFile>> entry : grouped.entrySet()) {
                 final IProject project = entry.getKey();
                 final Collection<RobotSuiteFile> suiteModels = entry.getValue();
                 final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
@@ -64,13 +63,7 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
 
         static Map<IProject, Collection<RobotSuiteFile>> collectGroupedByProject(final Collection<IResource> resources) {
             final Set<RobotSuiteFile> files = collectFiles(resources);
-            return Multimaps.index(files, new Function<RobotSuiteFile, IProject>() {
-
-                @Override
-                public IProject apply(final RobotSuiteFile file) {
-                    return file.getProject().getProject();
-                }
-            }).asMap();
+            return Multimaps.index(files, file -> file.getProject().getProject()).asMap();
         }
 
         static Set<RobotSuiteFile> collectFiles(final Collection<IResource> resources) {
@@ -93,7 +86,7 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
         private static Set<RobotSuiteFile> collectNestedFiles(final IContainer container) {
             try {
                 return collectFiles(Arrays.asList(container.members()));
-            } catch (CoreException e) {
+            } catch (final CoreException e) {
                 return Collections.emptySet();
             }
         }
