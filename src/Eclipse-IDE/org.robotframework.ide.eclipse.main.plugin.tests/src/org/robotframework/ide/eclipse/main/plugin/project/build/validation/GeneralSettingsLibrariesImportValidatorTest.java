@@ -577,9 +577,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
             specsByName.put(refLib.getName(), refLibs.get(refLib));
         }
 
-        final ValidationContext context = new ValidationContext(model, RobotVersion.from("0.0"), SuiteExecutor.Python,
-                specsByName, refLibs);
-        return new FileValidationContext(context, suiteFile.getFile());
+        final ValidationContext parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
+                SuiteExecutor.Python, specsByName, refLibs);
+        return new FileValidationContext(parentContext, suiteFile.getFile());
     }
 
     private static File getFile(final File root, final String... path) {
