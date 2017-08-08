@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -196,8 +197,7 @@ public class GeneralSettingsTableValidatorTest {
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
                 newArrayList(entity));
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var}");
+        final Set<String> accessibleVariables = newHashSet("${var}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
@@ -216,11 +216,9 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Test Teardown  ${var}")
                 .build();
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var}");
+        final Set<String> accessibleVariables = newHashSet("${var}");
 
-        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(),
-                accessibleVariables);
+        final FileValidationContext context = prepareContext(new HashMap<>(), accessibleVariables);
         final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
                 file.findSection(RobotSettingsSection.class), reporter);
         validator.validate(null);
@@ -244,11 +242,9 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Force Tags  ${var}  ${var2}")
                 .build();
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var}");
+        final Set<String> accessibleVariables = newHashSet("${var}");
 
-        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(),
-                accessibleVariables);
+        final FileValidationContext context = prepareContext(new HashMap<>(), accessibleVariables);
         final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
                 file.findSection(RobotSettingsSection.class), reporter);
         validator.validate(null);
@@ -346,11 +342,9 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Test Timeout  ${var}")
                 .build();
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var}");
+        final Set<String> accessibleVariables = newHashSet("${var}");
 
-        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(),
-                accessibleVariables);
+        final FileValidationContext context = prepareContext(new HashMap<>(), accessibleVariables);
         final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
                 file.findSection(RobotSettingsSection.class), reporter);
         validator.validate(null);
@@ -383,8 +377,6 @@ public class GeneralSettingsTableValidatorTest {
                 SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
         final IFile file = mock(IFile.class);
         when(file.getFullPath()).thenReturn(new Path("/suite.robot"));
-        final FileValidationContext context = new FileValidationContext(parentContext, file, collector,
-                accessibleVariables);
-        return context;
+        return new FileValidationContext(parentContext, file, collector, accessibleVariables);
     }
 }
