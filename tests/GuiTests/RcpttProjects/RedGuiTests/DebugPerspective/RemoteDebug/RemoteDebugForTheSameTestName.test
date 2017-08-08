@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wTBW0A4sEeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/24/17 10:03 AM
+Save-Time: 8/8/17 3:32 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -23,7 +23,7 @@ with [get-window Preferences] {
     get-button Apply | click
     get-button OK | click
 }
-//change test content - now ther is no test with the same name
+//change test content - now there is no test with the same name
 get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | double-click
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "my test\n"
@@ -44,12 +44,19 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 	
 	//run test
 	exec-with-options -disableJobWaiting -command {
-		get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | select "RemoteProject/TestFile.robot" 
+		get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" 
 		    | get-menu "Debug As/2 Robot Remote Test" | click
 		
 		wait-for-remote-connection 
 		
 		run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
+		
+		check-debug-error-for-wrong-state
+		get-window "Debugger error" | get-button Continue | click
+		
+		wait 1000
+		check-debug-error-for-wrong-state
+		get-window "Debugger error" | get-button Continue | click
 	}		
 }	
 //test should not be stopped on BP but should be run
