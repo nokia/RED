@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -109,12 +108,7 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
     }
 
     public String getDescription() {
-        final Iterable<String> args = Iterables.transform(arguments, new Function<Argument, String>() {
-            @Override
-            public String apply(final Argument arg) {
-                return arg.getDescription();
-            }
-        });
+        final Iterable<String> args = Iterables.transform(arguments, Argument::getDescription);
         return "[" + Joiner.on(", ").join(args) + "]";
     }
 
