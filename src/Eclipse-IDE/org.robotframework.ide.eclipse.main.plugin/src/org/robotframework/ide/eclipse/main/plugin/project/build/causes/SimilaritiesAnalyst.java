@@ -29,7 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinit
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
 /**
@@ -61,13 +60,7 @@ class SimilaritiesAnalyst {
     Collection<String> provideSimilarLibraries(final IFile suiteFile, final String libraryName) {
         final RobotProject robotProject = RedPlugin.getModelManager().createProject(suiteFile.getProject());
         final Collection<String> allLibs = newArrayList(
-                transform(robotProject.getLibrariesSpecifications(), new Function<LibrarySpecification, String>() {
-
-                    @Override
-                    public String apply(final LibrarySpecification lib) {
-                        return lib.getName();
-                    }
-                }));
+                transform(robotProject.getLibrariesSpecifications(), LibrarySpecification::getName));
         return limit(similaritiesAlgorithm.onlyWordsWithinDistance(allLibs, libraryName, maximumDistance));
     }
 

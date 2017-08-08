@@ -57,7 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testc
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PostconditionDeclarationExistenceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PreconditionDeclarationExistenceValidator;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
@@ -310,13 +309,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 }
                 break;
             } else if (keywordEntities.size() > 1) {
-                final Iterable<?> sources = transform(keywordEntities, new Function<KeywordEntity, String>() {
-
-                    @Override
-                    public String apply(final KeywordEntity kw) {
-                        return kw.getSourceNameInUse();
-                    }
-                });
+                final Iterable<?> sources = transform(keywordEntities, KeywordEntity::getSourceNameInUse);
                 reporter.handleProblem(
                         RobotProblem.causedBy(KeywordsProblem.AMBIGUOUS_KEYWORD).formatMessageWith(name,
                                 "[" + Joiner.on(", ").join(sources) + "]"),

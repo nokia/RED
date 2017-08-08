@@ -15,7 +15,6 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 import com.google.common.base.CaseFormat;
-import com.google.common.base.Function;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.TreeMultimap;
@@ -230,13 +229,7 @@ public enum ProblemCategory {
     public static Map<ProblemCategoryType, Collection<ProblemCategory>> getAllCategories() {
         final List<ProblemCategory> categories = Arrays.asList(ProblemCategory.values());
         final Multimap<ProblemCategoryType, ProblemCategory> groupedCategories = Multimaps.index(categories,
-                new Function<ProblemCategory, ProblemCategoryType>() {
-
-                    @Override
-                    public ProblemCategoryType apply(final ProblemCategory category) {
-                        return category.type;
-                    }
-                });
+                category -> category.type);
         return TreeMultimap.create(groupedCategories).asMap();
     }
 

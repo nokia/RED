@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.primitives.Ints;
 
@@ -47,13 +46,7 @@ class SimilarityWithLevenshteinDistance {
             }
         }
         Collections.sort(result);
-        return newArrayList(transform(result, new Function<StringWithDistance, String>() {
-
-            @Override
-            public String apply(final StringWithDistance stringWithDistance) {
-                return stringWithDistance.word;
-            }
-        }));
+        return newArrayList(transform(result, stringWithDistance -> stringWithDistance.word));
     }
 
     private int distance(final String word1, final String word2) {
