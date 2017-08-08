@@ -1,19 +1,42 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _OCxtEBRGEeWWV9IuysVI_A,_2APkAP1CEeS5jLC3g3M4Lw,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_2APkAP1CEeS5jLC3g3M4Lw,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
 Element-Name: DebugPerspectiveFor200Loop
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 2/16/17 5:15 PM
+Save-Time: 8/8/17 10:21 AM
 Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+proc "check-items-in-thred-view" [val index] [val line]{
+	with [get-view Debug | get-tree] {
+		// 5 items
+	    get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property childCount | equals 5 | verify-true
+	        
+	    //item    
+	    get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[0].getText()" | equals [format ":FOR iteration ${i} = %s [line: %s]" $index $line] | verify-true
+	    
+	    //kw, test, file, project name
+	    get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[1].getText()" | equals ":FOR ${i} IN RANGE [ 0 | 200 ] [line: 7]" 
+	        | verify-true
+	    get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[2].getText()" | equals "[Test] test [line: 7]" | verify-true
+	    get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[3].getText()" | equals "[Suite] For200TestSuite" | verify-true
+	    get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        | get-property "getItems().TreeItem[4].getText()" | equals "[Suite] For200Project" | verify-true
+	}
+}
 
 get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" | double-click
 
@@ -22,52 +45,37 @@ get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column Annotatio
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
 	    | get-menu "Debug As/1 Robot Test" | click
-	wait 5000    	   
+   	wait-for-thread -file "For200TestSuite.robot"
+   	   
 	repeat [val index] -times 5 -command{
-	
-		wait-for-thread -file "For200TestSuite.robot"
+		
 		//check highlighting
 		check-debug-marker-on-ruler -line 8 -script_name "For200TestSuite.robot"
-		try -times 4 -delay 500 -command{
-			get-view Variables | get-tree | get-item "${i}" | get-property index | equals 0 | verify-true
-		}
-		//check Variables table
-		with [get-view Variables | get-tree] {
-	    	get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
-	    
-	    //Therad has two items
-	    get-view Debug | get-tree | get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-	    | get-property childCount | equals 3 | verify-true
-	    
-		}
-		        
-	    // check Threads    
-	    with  [get-view Debug | get-tree ]{
-	    get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/.*" -index 0 
-	        | get-property caption | equals "BuiltIn.Log [line:8]" | verify-true
-	        
-	    get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/.*" -index 1  
-	        | get-property caption | equals [format "${i} = %s [line:7]" $index ]| verify-true
-	        
-	    get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/.*" -index 2
-	        | get-property caption | equals "${i} IN RANGE [ 0 | 200 ] [line:7]" | verify-true
-	    }    
-		
 	
-	
-		//step over - will go to FOR KW
+		//check Variables value
+		get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
+	    
+	    //Therad 
+	    check-items-in-thred-view -index $index -line 8
+
+		//------------------------------------------------------------------------------------------------------------------------------------
+					
+		//step over - will go to FOR KW - line 7
 		get-button "Step Over (F6)" | click
 	
 		try -times 10 -delay 300 -command{
-		get-view Debug | get-tree | get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
-    		| get-property childCount | equals 2 | verify-true
+			get-view Debug | get-tree 
+			    | get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+			    | get-property childCount | equals 5 | verify-true
 		}
-	
 		check-debug-marker-on-ruler -line 7 -script_name "For200TestSuite.robot"	
 		
-		try -times 4 -delay 500 -command{
-			get-view Variables | get-tree | get-item "${i}" | get-property index | equals 0 | verify-true
+		with [get-view Variables | get-tree] {
+		    get-property itemCount | equals 2 | verify-true
+		    get-property "getItems().TreeItem[0].getText()" | equals "${i}" | verify-true
+		    get-property "getItems().TreeItem[1].getText()" | equals "Automatic Variables" | verify-true
 		}
+		
 		
 		if [$robot_version | matches "^Robot Framework 2\.8\.\d .*"] {	
 			get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals $index | verify-true
@@ -75,35 +83,33 @@ exec-with-options -disableJobWaiting -command {
 			get-view Variables | get-tree | get-item "${i}" | get-property "values['Value']" | equals [plus $index 1] | verify-true
 		}
 		
-		//Thread has 2 items
-		with [get-view Debug | get-tree] {
-		get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount | equals 2
-	        | verify-true       
-	    }    
-	    // check Threads     
-	 	with [get-view Debug | get-tree] {
-	    get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/.*" -index 0 
-	        | get-property caption | equals [format "${i} = %s [line:7]"[plus $index 1]] | verify-true
-	    get-item "For200TestSuite.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]/${i} IN RANGE \\[ 0 | 200 \\] \\[line:7\\]" 
-	        | get-property caption | equals "${i} IN RANGE [ 0 | 200 ] [line:7]" | verify-true
-		}
+		check-items-in-thred-view -index [plus $index 1 ] -line 7
+			
 	
-	
-		//step over - will go to Log KW
-
+		//step over - will go to Log KW 8
 		get-button "Step Over (F6)" | click
 		wait 1000
 	}
 	
 	get-button "Terminate (M1+F2)" | click
 }	
-	//check Mesage log
-	get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 7 | verify-true
-	get-view "Message Log" | get-editbox | get-property text -raw | split -sep "\n" |to-list |each [val item]  [val index]{
-		$item | matches [concat $msg_log_regex_INFO  $index]
-	}
+
+//check Mesage log
+get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 7 | verify-true
+get-view "Message Log" | get-editbox | get-property text -raw | split -sep "\n" |to-list |each [val item]  [val index]{
+	$item | matches [concat $msg_log_regex_INFO  $index]
+}
 	
-	//check Console log
-	get-view Console | get-text-viewer | get-property text -raw | matches "^Command: .*\nSuite Executor: Robot Framework.*\n={78}\nFor200Project\s*\n={78}\nFor200Project.For200TestSuite[ ]*\n={78}\ntest[ ]*\[ ERROR \] Execution stopped by user."
-	
+//check Console log
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .*\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "==============================================================================\n"
+    + "For200Project                                                                 \n"
+    + "==============================================================================\n"
+    + "For200Project.For200TestSuite                                                 \n"
+    + "==============================================================================\n"
+    + "test[ ]*(\[ ERROR \] Execution stopped by user.)?" | verify-true
+    
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
