@@ -10,6 +10,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -34,9 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.Variables
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
 public class VariablesTableValidatorTest {
@@ -51,7 +49,7 @@ public class VariablesTableValidatorTest {
     @Test
     public void nothingIsReported_whenThereIsNoVariablesSection() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("").build();
-        
+
         final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
@@ -76,7 +74,7 @@ public class VariablesTableValidatorTest {
 
         assertThat(reporter.wasProblemReported()).isFalse();
     }
-    
+
     @Test
     public void customProblemsAreRaised_whenVersionDependentValidatorsAreUsed() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -186,7 +184,7 @@ public class VariablesTableValidatorTest {
                 new Problem(VariablesProblem.DUPLICATED_VARIABLE, new ProblemPosition(2, Range.closed(18, 24))),
                 new Problem(VariablesProblem.DUPLICATED_VARIABLE, new ProblemPosition(3, Range.closed(28, 34))));
     }
-    
+
     @Test
     public void invalidDictionaryItemsAreReported() throws Exception {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -206,7 +204,7 @@ public class VariablesTableValidatorTest {
                 new Problem(VariablesProblem.INVALID_DICTIONARY_ELEMENT_SYNTAX,
                         new ProblemPosition(2, Range.closed(30, 34))));
     }
-    
+
     @Test
     public void unknownVariablesAreReportedInValues() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -229,7 +227,7 @@ public class VariablesTableValidatorTest {
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(4, Range.closed(66, 70))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(4, Range.closed(75, 79))));
     }
-    
+
     @Test
     public void multipleProblemsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
@@ -250,7 +248,7 @@ public class VariablesTableValidatorTest {
                 new Problem(VariablesProblem.INVALID_NAME, new ProblemPosition(3, Range.closed(28, 33))),
                 new Problem(VariablesProblem.DUPLICATED_VARIABLE, new ProblemPosition(4, Range.closed(37, 43))),
                 new Problem(VariablesProblem.DUPLICATED_VARIABLE, new ProblemPosition(5, Range.closed(47, 53))));
-        
+
     }
 
     private static VersionDependentValidators createVersionDependentValidators(
@@ -271,8 +269,7 @@ public class VariablesTableValidatorTest {
 
     private static FileValidationContext prepareContext(final Set<String> variables) {
         final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
-                Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
+                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
         return new FileValidationContext(parentContext, mock(IFile.class), null, variables);
     }
 }
