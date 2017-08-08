@@ -101,7 +101,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     private void reportUnresolvedParameterizedImport(final RobotToken pathOrNameToken) {
         final String path = pathOrNameToken.getText();
-        final Map<String, Object> additional = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, path);
+        final Map<String, Object> additional = ImmutableMap.of(AdditionalMarkerAttributes.NAME, path);
         reporter.handleProblem(
                 RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_PARAMETERIZED).formatMessageWith(path),
                 validationContext.getFile(), pathOrNameToken, additional);
@@ -181,8 +181,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     private void reportNonExistingResource(final String path, final RobotToken pathToken,
             final String workspaceRelativePath) {
         final Map<String, Object> attributes = workspaceRelativePath != null
-                ? ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH, workspaceRelativePath)
-                : ImmutableMap.<String, Object> of();
+                ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, workspaceRelativePath)
+                : ImmutableMap.of();
         reporter.handleProblem(RobotProblem.causedBy(getCauseForNonExistingImport()).formatMessageWith(path),
                 validationContext.getFile(), pathToken, attributes);
     }
@@ -193,7 +193,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     private void reportModuleSearchPathRelativeness(final String path, final RobotToken pathToken,
             final IPath importPath, final URI absoluteUri) {
-        final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
+        final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
         final String absolutePath = RedURI
                 .reverseUriSpecialCharsEscapes(
@@ -221,7 +221,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     protected void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
-        final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
+        final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
         reporter.handleProblem(RobotProblem.causedBy(getCauseForNonExistingImport()).formatMessageWith(path),
                 validationContext.getFile(), pathToken, attributes);
