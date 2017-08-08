@@ -7,8 +7,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UAxzsGu3Eeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/21/17 5:21 PM
-Tags: notTestable
+Save-Time: 8/8/17 2:53 PM
+Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -55,7 +55,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//--------------------- click on test name--------------------------------------------------------------------------------
 	get-view Debug | get-tree
-    	| select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/this is main test"
+    	| select "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Test] this is main test [line: 17]"
     	
     //check if my kw was highlighted	
 	get-editor "test1.robot" | get-text-viewer | get-property "markers['17'][0].Type" 
@@ -87,7 +87,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//--------------  go to  file level --------------------------------------------------------------------------------
 	get-view Debug | get-tree 
-    	| select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Test1"
+    	| select "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Suite] Test1"
 
 	get-view Variables | maximize
 	with [get-view Variables | get-tree] {
@@ -113,7 +113,7 @@ exec-with-options -disableJobWaiting -command {
 	//------------------ go to level of dir --------------------------------------------------------------------------------
 	
 	get-view Debug | get-tree 
-	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Tests <directory>"
+	    | select "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Suite] Tests"
 	with [get-view Variables | get-tree] {
 	    get-property "getItems().length" | equals 5 | verify-true
 	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
@@ -128,7 +128,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//-------------------------go to level of project --------------------------------------------------------------------------------
 	get-view Debug | get-tree 
-	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/ScopeProject <directory>"
+	    | select  "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Suite] ScopeProject"
 	with [get-view Variables | get-tree] {
 	    get-property itemCount | equals 3 | verify-true
 	    get-property "getItems().TreeItem[0].getText()" | equals "${this is global from test}" | verify-true
@@ -142,7 +142,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click
 	
 	get-view Debug | get-tree 
-	    | get-item "test1.robot \\[Robot\\]/<suspended>Robot Test at .*/Tests execution thread/test 2" 
+	    | get-item "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Test] test 2 [line: 19]"
 	    | get-property selected | equals true | verify-true
 	    
 //	check-debug-marker-on-ruler -line 19 -script_name "test1.robot"
@@ -162,15 +162,15 @@ exec-with-options -disableJobWaiting -command {
 	//check value on different levels
 	//test
 	get-view Debug | get-tree 
-    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Test1"
+    | select "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Suite] Test1"
 	get-view Variables | get-tree | get-item "${a}" | get-property "values['Value']" | equals 2121 | verify-true
 	
 	//folder
 	get-view Debug | get-tree 
-	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Tests <directory>"
+	    | select "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Suite] Tests"
 	get-view Variables | get-tree | get-item "${a}" | get-property "values['Value']" | equals "a from init" | verify-true
 	get-view Debug | get-tree 
-	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/test 2"
+	    | select "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Test] test 2 [line: 19]"
 
 	//check variables
 	get-view Variables | maximize
@@ -216,8 +216,6 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "@{main list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
 	    get-item "@{main list}/\\[2\\]" | get-property "values['Value']" | equals 555 | verify-true
 	}
-	get-view Debug | get-tree 
-	    | select "test1.robot [Robot]/<suspended>Robot Test at .*/Tests execution thread/Test1"
 	get-button "Resume (F8)" | click
 }
 
