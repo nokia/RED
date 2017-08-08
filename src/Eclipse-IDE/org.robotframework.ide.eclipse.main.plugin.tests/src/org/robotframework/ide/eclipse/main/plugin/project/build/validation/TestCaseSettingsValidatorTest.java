@@ -23,7 +23,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -39,9 +38,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCases
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Range;
 
 public class TestCaseSettingsValidatorTest {
@@ -277,8 +275,7 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Setup]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = new HashMap<>();
-        keywords.put("keyword",
+        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
         final FileValidationContext context = prepareContext(keywords);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
@@ -296,8 +293,7 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Setup]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = new HashMap<>();
-        keywords.put("keyword",
+        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
         final FileValidationContext context = prepareContext(keywords);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
@@ -315,8 +311,7 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Setup]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = new HashMap<>();
-        keywords.put("keyword",
+        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"), "x")));
         final FileValidationContext context = prepareContext(keywords);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
@@ -348,8 +343,7 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Teardown]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = new HashMap<>();
-        keywords.put("keyword",
+        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
         final FileValidationContext context = prepareContext(keywords);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
@@ -367,8 +361,7 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Teardown]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = new HashMap<>();
-        keywords.put("keyword",
+        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
         final FileValidationContext context = prepareContext(keywords);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
@@ -386,8 +379,7 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Teardown]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = new HashMap<>();
-        keywords.put("keyword",
+        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"), "x")));
         final FileValidationContext context = prepareContext(keywords);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
@@ -413,26 +405,14 @@ public class TestCaseSettingsValidatorTest {
     }
 
     private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(createKeywordsCollector(map));
+        return prepareContext(() -> map);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector) {
         final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
-                SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
-                Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
+                SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
         final FileValidationContext context = new FileValidationContext(parentContext, mock(IFile.class), collector,
                 new HashSet<String>());
         return context;
-    }
-
-    private static AccessibleKeywordsCollector createKeywordsCollector(
-            final Map<String, Collection<KeywordEntity>> map) {
-        return new AccessibleKeywordsCollector() {
-
-            @Override
-            public Map<String, Collection<KeywordEntity>> collect() {
-                return map;
-            }
-        };
     }
 }
