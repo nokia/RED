@@ -48,7 +48,7 @@ public class MockReporter extends ProblemsReportingStrategy {
     @Override
     public void handleProblem(final RobotProblem problem, final IFile file, final int line)
             throws ReportingInterruptedException {
-        handleProblem(problem, file, new ProblemPosition(line), new HashMap<String, Object>());
+        handleProblem(problem, file, new ProblemPosition(line), new HashMap<>());
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MockReporter extends ProblemsReportingStrategy {
     public void handleProblem(final RobotProblem problem, final IFile file, final RobotToken token) {
         final ProblemPosition position = new ProblemPosition(token.getLineNumber(),
                 Range.closed(token.getStartOffset(), token.getStartOffset() + token.getText().length()));
-        handleProblem(problem, file, position, new HashMap<String, Object>());
+        handleProblem(problem, file, position, new HashMap<>());
     }
 
     @Override
@@ -74,7 +74,7 @@ public class MockReporter extends ProblemsReportingStrategy {
 
     @Override
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition) {
-        handleProblem(problem, file, filePosition, new HashMap<String, Object>());
+        handleProblem(problem, file, filePosition, new HashMap<>());
     }
 
     @Override

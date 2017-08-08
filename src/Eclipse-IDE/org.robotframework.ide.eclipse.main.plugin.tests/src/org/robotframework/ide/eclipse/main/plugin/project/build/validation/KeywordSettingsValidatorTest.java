@@ -668,8 +668,6 @@ public class KeywordSettingsValidatorTest {
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector) {
         final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
                 SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
-        final FileValidationContext context = new FileValidationContext(parentContext, mock(IFile.class), collector,
-                new HashSet<String>());
-        return context;
+        return new FileValidationContext(parentContext, mock(IFile.class), collector, new HashSet<>());
     }
 }

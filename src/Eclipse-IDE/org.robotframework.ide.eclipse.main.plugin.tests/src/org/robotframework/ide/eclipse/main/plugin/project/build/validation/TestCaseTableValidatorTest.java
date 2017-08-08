@@ -733,8 +733,7 @@ public class TestCaseTableValidatorTest {
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
                 newArrayList(entity));
 
-        final Set<String> accessibleVariables = new HashSet<>();
-        accessibleVariables.add("${var1}");
+        final Set<String> accessibleVariables = newHashSet("${var1}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
@@ -811,8 +810,6 @@ public class TestCaseTableValidatorTest {
                 SuiteExecutor.Python, new HashMap<>(), new HashMap<>());
         final IFile file = mock(IFile.class);
         when(file.getFullPath()).thenReturn(new Path("/suite.robot"));
-        final FileValidationContext context = new FileValidationContext(parentContext, file, collector,
-                accessibleVariables);
-        return context;
+        return new FileValidationContext(parentContext, file, collector, accessibleVariables);
     }
 }
