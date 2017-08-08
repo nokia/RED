@@ -97,8 +97,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             if (isReturnEmpty(keyword) && !hasAnythingToExecute(keyword)) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD)
                         .formatMessageWith(name);
-                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                        name);
+                final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
                 reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
             }
         }
@@ -111,8 +110,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             if (name.contains(".")) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_WITH_DOTS)
                         .formatMessageWith(name);
-                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                        name);
+                final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
                 reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
             }
         }
@@ -183,8 +181,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             if (duplicatedNames.contains(QualifiedKeywordName.unifyDefinition(name.toLowerCase()))) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD)
                         .formatMessageWith(name);
-                final Map<String, Object> additionalArguments = ImmutableMap
-                        .<String, Object> of(AdditionalMarkerAttributes.NAME, name);
+                final Map<String, Object> additionalArguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
                 reporter.handleProblem(problem, validationContext.getFile(), keywordName, additionalArguments);
             }
         }

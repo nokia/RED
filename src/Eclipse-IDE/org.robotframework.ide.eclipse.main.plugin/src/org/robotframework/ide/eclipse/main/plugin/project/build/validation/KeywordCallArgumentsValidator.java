@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.tryFind;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescr
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
@@ -105,13 +103,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
     }
 
     private boolean hasTokenOfType(final RobotTokenType type) {
-        return tryFind(arguments, new Predicate<RobotToken>() {
-
-            @Override
-            public boolean apply(final RobotToken argToken) {
-                return argToken.getTypes().contains(type);
-            }
-        }).isPresent();
+        return arguments.stream().anyMatch(token -> token.getTypes().contains(type));
     }
 
     private Map<String, Argument> namesToArgsMapping() {
@@ -237,7 +229,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                     && !isNonCollectionVar(useSiteArg)) {
 
                 if (!defs.isEmpty()) {
-                    final List<Argument> required = newArrayList(filter(defs, onlyRequired()));
+                    final List<Argument> required = newArrayList(filter(defs, Argument::isRequired));
                     if (!required.isEmpty()) {
                         final ArgumentProblem cause = useSiteArg.getTypes()
                                 .contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
@@ -260,15 +252,6 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                 }
             }
         }
-    }
-
-    private static Predicate<Argument> onlyRequired() {
-        return new Predicate<Argument>() {
-            @Override
-            public boolean apply(final Argument arg) {
-                return arg.isRequired();
-            }
-        };
     }
 
     private boolean isNamed(final RobotToken arg, final Collection<String> argumentNames) {
@@ -318,9 +301,9 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
     private static class ArgumentsBinding<D, U> {
 
-        public void bind(final D key, final U val) {
-            defToUsageMapping.put(key, val);
-            usageToDefMapping.put(val, key);
+        public void bind(final D key, final U value) {
+            defToUsageMapping.put(key, value);
+            usageToDefMapping.put(value, key);
         }
 
         public List<U> getDefinitionsMapping(final D arg) {

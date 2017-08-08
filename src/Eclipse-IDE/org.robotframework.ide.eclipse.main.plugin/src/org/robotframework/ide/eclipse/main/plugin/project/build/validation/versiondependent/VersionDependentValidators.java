@@ -11,7 +11,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -40,8 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versi
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.ScalarAsListInOlderRobotValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.ScalarAsListValidator;
 
-import com.google.common.base.Predicate;
-
 public class VersionDependentValidators {
 
     public Iterable<VersionDependentModelUnitValidator> getVariableValidators(
@@ -54,12 +51,12 @@ public class VersionDependentValidators {
                 new ScalarAsListInOlderRobotValidator(file, variable, reporter),
                 new ScalarAsListValidator(file, variable, reporter));
 
-        return filter(allValidators, onlyValidatorsApplicableFor(validationContext.getVersion()));
+        return filter(allValidators, validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 
     public Iterable<VersionDependentModelUnitValidator> getGeneralSettingsValidators(
-            final FileValidationContext validationContext,
-            final RobotSettingsSection section, final ProblemsReportingStrategy reporter) {
+            final FileValidationContext validationContext, final RobotSettingsSection section,
+            final ProblemsReportingStrategy reporter) {
         final IFile file = validationContext.getFile();
         final List<VersionDependentModelUnitValidator> allValidators = newArrayList(
                 new DuplicatedTemplateInOlderValidator(file, section, reporter),
@@ -83,15 +80,6 @@ public class VersionDependentValidators {
                 new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, section, reporter),
                 new MetadataKeyInColumnOfSettingValidatorStartFromRF30(file, section, reporter));
 
-        return filter(allValidators, onlyValidatorsApplicableFor(validationContext.getVersion()));
-    }
-
-    private static Predicate<VersionDependentModelUnitValidator> onlyValidatorsApplicableFor(final RobotVersion version) {
-        return new Predicate<VersionDependentModelUnitValidator>() {
-            @Override
-            public boolean apply(final VersionDependentModelUnitValidator validator) {
-                return validator.isApplicableFor(version);
-            }
-        };
+        return filter(allValidators, validator -> validator.isApplicableFor(validationContext.getVersion()));
     }
 }

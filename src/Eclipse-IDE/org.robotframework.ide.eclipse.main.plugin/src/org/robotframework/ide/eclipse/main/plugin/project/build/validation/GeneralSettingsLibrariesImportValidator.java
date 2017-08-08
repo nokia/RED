@@ -113,8 +113,8 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
                     .formatMessageWith(pathOrName);
             final Map<String, Object> additional = isPath
-                    ? ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH, pathOrName)
-                    : ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, pathOrName);
+                    ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathOrName)
+                    : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
             reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
         }
     }
