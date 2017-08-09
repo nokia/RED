@@ -53,7 +53,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void unkownSettingsAreReported() throws CoreException {
+    public void unknownSettingsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [SomeSetting]")
@@ -609,7 +609,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whendDefaultValuesUsesVariableDefinedJustBefore() throws CoreException {
+    public void nothingIsReported_whenDefaultValuesUsesVariableDefinedJustBefore() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  ${x}  ${y}=${x}")
@@ -624,7 +624,7 @@ public class KeywordSettingsValidatorTest {
     }
 
     @Test
-    public void syntaxProblesAreReported_whenDefinitionIsInvalid() throws CoreException {
+    public void syntaxProblemsAreReported_whenDefinitionIsInvalid() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Arguments]  123  ${x  {y}  ${x} =123  ${}  ${a} ${b}  @{m}=0")
@@ -661,8 +661,8 @@ public class KeywordSettingsValidatorTest {
         return prepareContext(new HashMap<>());
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(() -> map);
+    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws) {
+        return prepareContext(() -> accessibleKws);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector) {

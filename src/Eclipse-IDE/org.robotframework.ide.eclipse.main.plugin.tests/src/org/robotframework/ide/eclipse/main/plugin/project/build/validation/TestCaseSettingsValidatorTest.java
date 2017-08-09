@@ -52,7 +52,7 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void unkownSettingsAreReported() throws CoreException {
+    public void unknownSettingsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [SomeSetting]")
@@ -129,7 +129,7 @@ public class TestCaseSettingsValidatorTest {
     }
 
     @Test
-    public void nothingIsReported_whenThereIsADocuDefined() throws CoreException {
+    public void nothingIsReported_whenThereIsADocumentationDefined() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("case")
                 .appendLine("  [Documentation]    doc")
@@ -275,9 +275,9 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Setup]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
+        final Map<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
-        final FileValidationContext context = prepareContext(keywords);
+        final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
         validator.validate(null);
 
@@ -293,9 +293,9 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Setup]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
+        final Map<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
-        final FileValidationContext context = prepareContext(keywords);
+        final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
         validator.validate(null);
 
@@ -311,9 +311,9 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Setup]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
+        final Map<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"), "x")));
-        final FileValidationContext context = prepareContext(keywords);
+        final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
         validator.validate(null);
 
@@ -343,9 +343,9 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Teardown]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
+        final Map<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
-        final FileValidationContext context = prepareContext(keywords);
+        final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
         validator.validate(null);
 
@@ -361,9 +361,9 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Teardown]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
+        final Map<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"))));
-        final FileValidationContext context = prepareContext(keywords);
+        final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
         validator.validate(null);
 
@@ -379,9 +379,9 @@ public class TestCaseSettingsValidatorTest {
                 .appendLine("  [Teardown]    keyword")
                 .build();
 
-        final Map<String, Collection<KeywordEntity>> keywords = ImmutableMap.of("keyword",
+        final Map<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("keyword",
                 newArrayList(newValidationKeywordEntity(KeywordScope.LOCAL, "file", "keyword", new Path("file"), "x")));
-        final FileValidationContext context = prepareContext(keywords);
+        final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseSettingsValidator validator = new TestCaseSettingsValidator(context, getTestCase(file), reporter);
         validator.validate(null);
 
@@ -404,8 +404,8 @@ public class TestCaseSettingsValidatorTest {
         return prepareContext(new HashMap<>());
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(() -> map);
+    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws) {
+        return prepareContext(() -> accessibleKws);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector) {
