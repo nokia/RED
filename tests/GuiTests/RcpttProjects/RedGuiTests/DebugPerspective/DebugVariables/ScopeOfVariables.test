@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UAxzsGu3Eeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/8/17 2:53 PM
+Save-Time: 8/9/17 3:58 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -49,6 +49,7 @@ exec-with-options -disableJobWaiting -command {
 	check-list-and-dicts
 	//expand automatic variables and check them
 	get-view Variables | get-tree | select "Automatic Variables/${\\/}" | expand-all
+	wait-for-automatic-vars
 	check-automatic-var-values -project "ScopeProject" -suite_name "ScopeProject.Tests.Test1" -test_name "this is main test" -suite_source [concat $sys_sep2 "test1.robot"]
 
 	get-view Variables |  restore
