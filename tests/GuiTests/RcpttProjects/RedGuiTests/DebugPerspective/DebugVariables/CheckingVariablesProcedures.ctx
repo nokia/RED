@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _MyJrwGxlEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 3:58 PM
+Save-Time: 8/9/17 4:16 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -16,7 +16,18 @@ global [val sys_sep2 [get-by-os -win "\\\\" -linux "/"]]
 global [val project_path [concat [  replace $RED_workspace_path -old "\\" -new "\\\\"] $sys_sep2 "ScopeProject"]]
 global [val temp_dir [replace [get-java-property "java.io.tmpdir" | invoke toLowerCase | invoke replaceAll "\\\$" "" ] -old "\\" -new "\\\\"]] 
 
+proc "wait-for-automatic-vars"{
+	try -times 3 -delay 1000 -command{
+		get-view Variables | get-tree | get-item "Automatic Variables/&{SUITE_METADATA}" | get-property caption 
+	    | equals "&{SUITE_METADATA}" | verify-true
+	}
+}
+
 proc "check_automatic_variable_order" [val is_test_level True]{
+	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click	
+	get-view Variables | get-tree | get-item "Automatic Variables" | expand-all
+	wait-for-automatic-vars
+	
 	with [get-view Variables | get-tree] {
 	    get-item "Automatic Variables" | get-property "getItems().TreeItem[0].getText()" | equals "${/}" | verify-true
 	    get-item "Automatic Variables" | get-property "getItems().TreeItem[1].getText()" | equals "${:}" | verify-true
@@ -82,6 +93,11 @@ proc "check_automatic_variable_order" [val is_test_level True]{
 
 proc "check-automatic-var-values" [val project] [val prev_test_msg ""] [val prev_test_name ""]  [val prev_test_status ""]
 		[val suite_name ""] [val test_name ""] [val suite_source "" ] [val is_test_level True]{
+	
+	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click	
+	get-view Variables | get-tree | get-item "Automatic Variables" | expand-all
+	wait-for-automatic-vars
+			
 	with [get-view Variables | get-tree] {
 		
 	    get-item "Automatic Variables/${\\/}" | get-property "values['Value']" | equals "\\\\\\\\" | verify-true
@@ -209,10 +225,12 @@ proc "check-list-and-dicts"{
 	}
 }	
 
-proc "wait-for-automatic-vars"{
-	try -times 3 -delay 1000 -command{
-		get-view Variables | get-tree | get-item "Automatic Variables/&{SUITE_METADATA}" | get-property caption 
-	    | equals "&{SUITE_METADATA}" | verify-true
+    
+proc "wait-for-last-item-to-be-visible"{
+	try -times 3 -delay 500 -command{
+		get-view Variables | get-tree | get-item "@{main list}/\\[3\\]" | get-property "values['Value']" | equals 99 
+   		 | verify-true
 	}
 }    
+    
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
