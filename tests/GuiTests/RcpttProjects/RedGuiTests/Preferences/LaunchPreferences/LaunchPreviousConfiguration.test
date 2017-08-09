@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _IufRUPUtEeaWpbE3jg39cA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/4/17 11:21 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/9/17 4:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -106,19 +106,18 @@ get-view Console | get-text-viewer | get-property text
 //set focus in editor and run test    
 get-editor "FirstFile.robot" | get-text-viewer | set-caret-pos 13 5
 
-//tu blad - test 6 powinien byc odpalony
 get-button "Run.*" | click
 
-    
-get-view Console | get-text-viewer | get-property text 
-    | contains 
-     "test 5                                                                | PASS |\n"
-    + "------------------------------------------------------------------------------\n"
-    + "test 6                                                                | PASS |\n"
-    + "------------------------------------------------------------------------------\n"
-    + "test 7                                                                | PASS |\n"
-    + "------------------------------------------------------------------------------\n"
-    + "LaunchesTests.SecondTest                                              | PASS |\n"
-    + "3 critical tests, 3 passed, 0 failed\n" | verify-true
-//    
+try -times 3 -delay 1000 -command{    
+	get-view Console | get-text-viewer | get-property text 
+	    | contains 
+	     "test 5                                                                | PASS |\n"
+	    + "------------------------------------------------------------------------------\n"
+	    + "test 6                                                                | PASS |\n"
+	    + "------------------------------------------------------------------------------\n"
+	    + "test 7                                                                | PASS |\n"
+	    + "------------------------------------------------------------------------------\n"
+	    + "LaunchesTests.SecondTest                                              | PASS |\n"
+	    + "3 critical tests, 3 passed, 0 failed\n" | verify-true
+}   
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
