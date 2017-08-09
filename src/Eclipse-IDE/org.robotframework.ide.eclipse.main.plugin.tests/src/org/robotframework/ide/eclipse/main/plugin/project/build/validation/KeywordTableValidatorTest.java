@@ -351,8 +351,8 @@ public class KeywordTableValidatorTest {
         return prepareContext(new HashMap<>());
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(() -> map);
+    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws) {
+        return prepareContext(() -> accessibleKws);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector) {
