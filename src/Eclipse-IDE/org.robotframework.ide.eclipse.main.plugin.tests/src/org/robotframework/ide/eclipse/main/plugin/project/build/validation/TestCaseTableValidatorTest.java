@@ -291,6 +291,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -311,6 +312,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -331,6 +333,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -414,6 +417,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -459,6 +463,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -481,6 +486,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -502,6 +508,30 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void variableInGetVariableValueIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Get Variable Value  ${x}")
+                .build();
+
+        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+                "Get Variable Value", new Path("/suite.robot"), "arg");
+        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("setglobalvariable",
+                newArrayList(entity1), "kw", newArrayList(entity2));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -516,7 +546,7 @@ public class TestCaseTableValidatorTest {
                 "Set Global Variable", new Path("/suite.robot"), "arg");
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "arg");
-        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("setglobalvariable",
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("getvariablevalue",
                 newArrayList(entity1), "kw", newArrayList(entity2));
 
         final FileValidationContext context = prepareContext(accessibleKws);
@@ -525,6 +555,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -548,6 +579,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -571,6 +603,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -645,6 +678,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -718,6 +752,7 @@ public class TestCaseTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -795,13 +830,13 @@ public class TestCaseTableValidatorTest {
         return prepareContext(new HashMap<>());
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(() -> map, new HashSet<>());
+    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws) {
+        return prepareContext(() -> accessibleKws, new HashSet<>());
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map,
+    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws,
             final Set<String> accessibleVariables) {
-        return prepareContext(() -> map, accessibleVariables);
+        return prepareContext(() -> accessibleKws, accessibleVariables);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector,

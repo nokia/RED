@@ -362,13 +362,13 @@ public class GeneralSettingsTableValidatorTest {
         return prepareContext(new HashMap<>());
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map) {
-        return prepareContext(() -> map, new HashSet<>());
+    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws) {
+        return prepareContext(() -> accessibleKws, new HashSet<>());
     }
 
-    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> map,
+    private static FileValidationContext prepareContext(final Map<String, Collection<KeywordEntity>> accessibleKws,
             final Set<String> accessibleVariables) {
-        return prepareContext(() -> map, accessibleVariables);
+        return prepareContext(() -> accessibleKws, accessibleVariables);
     }
 
     private static FileValidationContext prepareContext(final AccessibleKeywordsCollector collector,
