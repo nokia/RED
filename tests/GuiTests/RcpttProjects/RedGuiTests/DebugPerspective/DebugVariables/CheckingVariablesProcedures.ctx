@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _MyJrwGxlEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/19/17 2:21 PM
+Save-Time: 8/9/17 3:58 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -208,4 +208,11 @@ proc "check-list-and-dicts"{
 	    get-item "@{main list}/\\[3\\]" | get-property "values['Value']" | equals 99 | verify-true
 	}
 }	
+
+proc "wait-for-automatic-vars"{
+	try -times 3 -delay 1000 -command{
+		get-view Variables | get-tree | get-item "Automatic Variables/&{SUITE_METADATA}" | get-property caption 
+	    | equals "&{SUITE_METADATA}" | verify-true
+	}
+}    
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
