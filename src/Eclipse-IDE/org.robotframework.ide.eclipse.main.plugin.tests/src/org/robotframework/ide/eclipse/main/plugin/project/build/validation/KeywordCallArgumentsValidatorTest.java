@@ -44,13 +44,14 @@ public class KeywordCallArgumentsValidatorTest {
                 .appendLine("test")
                 .appendLine("    keyword    arg")
                 .build();
-        
+
         final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x");
 
         validate(file, tokens, descriptor);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -60,7 +61,7 @@ public class KeywordCallArgumentsValidatorTest {
                 .appendLine("test")
                 .appendLine("    keyword")
                 .build();
-        
+
         final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x");
 
@@ -96,13 +97,14 @@ public class KeywordCallArgumentsValidatorTest {
                 .appendLine("test")
                 .appendLine("    keyword    arg1    arg2")
                 .build();
-        
+
         final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y=1", "z=2");
 
         validate(file, tokens, descriptor);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -113,7 +115,7 @@ public class KeywordCallArgumentsValidatorTest {
                 .appendLine("test")
                 .appendLine("    keyword")
                 .build();
-        
+
         final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y=1", "z=2");
 
@@ -150,13 +152,14 @@ public class KeywordCallArgumentsValidatorTest {
                 .appendLine("test")
                 .appendLine("    keyword    arg1    arg2    arg3")
                 .build();
-        
+
         final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y", "*z");
 
         validate(file, tokens, descriptor);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     @Test
@@ -167,7 +170,7 @@ public class KeywordCallArgumentsValidatorTest {
                 .appendLine("test")
                 .appendLine("    keyword    arg")
                 .build();
-        
+
         final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y", "*z");
 
@@ -177,7 +180,7 @@ public class KeywordCallArgumentsValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
                 ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS, new ProblemPosition(3, Range.closed(28, 35))));
     }
-    
+
     @Test
     public void positionalArgumentsAreReported_whenTheyAreUsedAfterNamedOnes_1() {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -227,6 +230,7 @@ public class KeywordCallArgumentsValidatorTest {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y=0");
 
         validate(file, tokens, descriptor);
+
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
                 ArgumentProblem.MULTIPLE_MATCH_TO_SINGLE_ARG, new ProblemPosition(3, Range.closed(44, 47))));
@@ -244,11 +248,12 @@ public class KeywordCallArgumentsValidatorTest {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y=0", "z=0");
 
         validate(file, tokens, descriptor);
+
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
                 ArgumentProblem.MULTIPLE_MATCH_TO_SINGLE_ARG, new ProblemPosition(3, Range.closed(51, 54))));
     }
-    
+
     @Test
     public void namedArgumentIsReported_whenItMatchesArgumentAlreadyDefinedByOtherNamedOneInPresenceOfKwargs() {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -265,7 +270,6 @@ public class KeywordCallArgumentsValidatorTest {
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
                 ArgumentProblem.MULTIPLE_MATCH_TO_SINGLE_ARG, new ProblemPosition(3, Range.closed(43, 48))));
-        
     }
 
     @Test
@@ -280,6 +284,7 @@ public class KeywordCallArgumentsValidatorTest {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y=0");
 
         validate(file, tokens, descriptor);
+
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
                 ArgumentProblem.NO_VALUE_PROVIDED_FOR_REQUIRED_ARG, new ProblemPosition(3, Range.closed(28, 35))));
@@ -297,7 +302,8 @@ public class KeywordCallArgumentsValidatorTest {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("arg", "*args");
 
         validate(file, tokens, descriptor);
-        
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
@@ -313,7 +319,8 @@ public class KeywordCallArgumentsValidatorTest {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("arg", "**kwargs");
 
         validate(file, tokens, descriptor);
-        
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
@@ -329,10 +336,11 @@ public class KeywordCallArgumentsValidatorTest {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("arg", "**kwargs");
 
         validate(file, tokens, descriptor);
-        
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
-    
+
     @Test
     public void positionalArgumentsAreReported_whenTheyWereMatchedToKwargsArgument() {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -405,7 +413,7 @@ public class KeywordCallArgumentsValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
                 ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS, new ProblemPosition(3, Range.closed(48, 60))));
     }
-    
+
     @Test
     public void nothingIsReported_whenSomethingWhichSeemToBeAListIsUsed() {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -419,9 +427,10 @@ public class KeywordCallArgumentsValidatorTest {
 
         validate(file, tokens, descriptor);
 
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
-    
+
     @Test
     public void nothingIsReported_whenSomethingWhichSeemToBeADictionaryIsUsed() {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
@@ -435,6 +444,7 @@ public class KeywordCallArgumentsValidatorTest {
 
         validate(file, tokens, descriptor);
 
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
