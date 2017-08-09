@@ -83,6 +83,8 @@ public class RedDebuggerAssistantEditorWrapper extends DIEditorPart<RedDebuggerA
                     parent.redraw();
                     parent.layout();
                 }
+            } else {
+                controlsCreator.setInput(input);
             }
         }
 
