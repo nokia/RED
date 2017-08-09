@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Jh43wIMTEeW3Y6KfPyHe6A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/7/17 2:30 PM
+Save-Time: 8/9/17 5:28 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -21,7 +21,7 @@ with [get-view "Project Explorer" | get-tree] {
 }
 with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
     double-click-ruler 17
-    double-click-ruler 42
+    double-click-ruler 66
 }
 
 exec-with-options -disableJobWaiting -command {
@@ -30,38 +30,80 @@ exec-with-options -disableJobWaiting -command {
 	    
 	wait-for-thread -file "BigScript.robot"
 	
+	// first BP
 	check-debug-marker-on-ruler -line 17 -script_name "BigScript.robot" 
-	get-button "Step Return (F7)" | get-property enablement | equals true | verify-true
 	
-	//go to keyword
+	// go into user kw
 	get-button "Step Into (F5)" | click
-	wait-for-specific-nr-of-threads -nr_items_in_thread 4
-	get-button "Step Into (F5)" | click
-	check-debug-marker-on-ruler -line 97 -script_name "BigScript.robot"
+	wait-for-specified_line-in-first-thread -line 96
 	
-	//return to test (this is last line so go back to Teardown)
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread -line 97
+	
+	// step return to test case
 	get-button "Step Return (F7)" | click
-	wait-for-specific-nr-of-threads -nr_items_in_thread 1
-	check-debug-marker-on-ruler -line 6  -script_name "BigScript.robot"
+	wait-for-specified_line-in-first-thread -line 17
+	check-debug-marker-on-ruler -line 17 -script_name "BigScript.robot" 
 	
-	//resume: go to next user keyword
+	//return to test setup
+	get-view Debug | get-tree | key-type F7
+	wait-for-specified_line-in-first-thread -line 5
+	check-debug-marker-on-ruler -line 5 -script_name "BigScript.robot" 
+	
+	
+	//step into test setup kw
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread -line 107
+	check-debug-marker-on-ruler -line 107 -script_name "BigScript.robot" 
+	
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread -line 108
+	
+	// return to setup in line 5
+	get-button "Step Return (F7)" | click
+	wait-for-specified_line-in-first-thread -line 5
+	check-debug-marker-on-ruler -line 5 -script_name "BigScript.robot"
+	
+	//step into test: test 1
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread -line 21
+	check-debug-marker-on-ruler -line 21 -script_name "BigScript.robot" 
+	
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread -line 22
+	
+	//return - setup again
+	get-button "Step Return (F7)" | click
+	wait-for-specified_line-in-first-thread -line 5
+	
+	//step over to go to next test: test 2
+	get-button "Step Over (F6)" | click
+	wait-for-specified_line-in-first-thread -line 35
+	
+	//resume to go to next BP
 	get-button "Resume (F8)" | click
-	wait-for-specific-nr-of-threads -nr_items_in_thread 1
-	check-debug-marker-on-ruler -line 42  -script_name "BigScript.robot"
+	wait-for-specified_line-in-first-thread -line 66
+	
+	//stopped on Kw name
 	get-button "Step Into (F5)" | click
-	wait-for-specific-nr-of-threads -nr_items_in_thread 2
-	check-debug-marker-on-ruler -line 82  -script_name "BigScript.robot"
+	wait-for-specified_line-in-first-thread -line 11
+	check-debug-marker-on-ruler -line 11 -script_name "my_keywords.robot" 
 	
-	//return - will go back to last line of test
+	get-button "Step Into (F5)" | click
+	wait 1000
+	get-button "Step Into (F5)" | click
+	
+	
+	//back to test
 	get-button "Step Return (F7)" | click
-	wait-for-specific-nr-of-threads -nr_items_in_thread 1
-	check-debug-marker-on-ruler -line 43  -script_name "BigScript.robot"
+	wait-for-specified_line-in-first-thread -line 66
+	check-debug-marker-on-ruler -line 66 -script_name "BigScript.robot" 
 	
-	//check that Return is disabled
-	get-button "Step Return (F7)" | get-property enablement | equals false | verify-true
 
 	get-button "Resume (F8)" | click
-	
-
 }
+
+get-view "Message Log" | get-editbox | get-property text 
+    | contains   "Ending test: ScriptWithResource.BigScript.double loop" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
