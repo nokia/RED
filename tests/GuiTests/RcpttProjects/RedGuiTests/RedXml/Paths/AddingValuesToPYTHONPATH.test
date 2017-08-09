@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:27 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/9/17 11:44 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -260,7 +260,7 @@ get-view Console | get-text-viewer | get-property text
 get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
 with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
     select a | key-type End
-    select "...add new search path"
+    select "...add new search path" | click
 }
 
 get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
