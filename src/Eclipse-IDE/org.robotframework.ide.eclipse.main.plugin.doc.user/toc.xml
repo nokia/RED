@@ -34,9 +34,10 @@
         </topic>
         <topic href="doc/user_guide/working_with_RED/remote_library.html" label="Remote library">
         </topic>
-         <topic href="doc/user_guide/working_with_RED/red_xml.html" label="Red.xml description">
+        <topic href="doc/user_guide/working_with_RED/red_xml.html" label="Red.xml description">
         </topic>
-    
+        <topic href="doc/user_guide/working_with_RED/content_assist.html" label="Content assistance">
+        </topic>    
     </topic>
     <topic href="doc/user_guide/validation.html" label="Validation">
        <topic href="doc/user_guide/validation/scope.html" label="Limiting validation scope">
