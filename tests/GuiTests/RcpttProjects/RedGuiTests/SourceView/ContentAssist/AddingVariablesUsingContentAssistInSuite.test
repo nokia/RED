@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _YRYqkISeEeWImNPXuPy_LQ
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/8/16 2:09 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/10/17 10:03 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -149,5 +149,45 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "@{new list}    abc1    def2\n"
     + "&{dict2}    music=metal    \n\n\n"
     + "&{dict_after_changes}    t2=val    new_key" | verify-true
-    
+
+// use variables with Content Assist in Test Cases 
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 10 18
+    key-type Down
+    key-type Enter -times 2
+    type-text TC
+    key-type "M1+SPACE"
+    key-type BackSpace -times 2
+    type-text Case
+    key-type "M1+SPACE"
+    key-type Down -times 3
+    key-type Enter
+    type-text "test 1"
+    key-type Enter
+    type-text scal
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "${my_scalar}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${newScalar}" | verify-true
+}
+
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    select "${my_scalar}" | key-type Enter
+    click -default
+}
+get-eclipse-window | key-type Right
+get-eclipse-window | key-type Enter
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 13 17
+    key-type Enter
+    type-text DI
+    key-type "M1+SPACE"
+    key-type Up
+    key-type Enter -times 2
+    type-text li
+    key-type "M1+SPACE"
+    key-type Up -times 2
+    key-type Enter -times 2
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
