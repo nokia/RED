@@ -1,0 +1,31 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Content assistance</h2>
+Content assistance is a functionality provided by Eclipse platform extended to understand Robot data model.<br>
+By default it is invoked by pressing CTRL+SPACE key short-cut, but it can be changed in binding keys preferences.<br> 
+It can be also invoked by typing one of auto activation characters defined in preferences.<br>
+
+<h3>Content assistance mode of working</h3>
+Assist window has multiple modes which are cycled by CTRL+SPACE. Next mode type is displayed at the bottom of the window.
+<br><br><img src="content_assist/content-assist-modes.gif"> <br><br><br>
+
+All proposal containing given input are displayed. Proposals starting with given input are displayed first.
+<br><br><img src="content_assist/content-assist-search.png"> <br><br><br>
+
+When given input is camel case string (for example: REA, CrBiFi, WaUCr) keywords proposals that match that string are displayed before other matches.
+<br><br><img src="content_assist/content-assist-camel-case.png"> <br><br><br>
+
+<h3>Content assistance preferences </h3>
+Behavior of content assist can be changed in Robot Framework preferences (Window -> Preferences).<br>  
+Auto activation triggers and delay can be specified to automatically show assist window when one of defined characters is typed.<br>
+It can also be configured if library/resource prefix should be always used when accepting content proposal.<br>
+Keyword propositions from libraries available in red.xml but not imported in robot file can be enabled too. Library import will be added automatically when such proposal is accepted.
+<br><br><img src="content_assist/content_pref.png"> <br><br>
+
+</body>
+</html>
