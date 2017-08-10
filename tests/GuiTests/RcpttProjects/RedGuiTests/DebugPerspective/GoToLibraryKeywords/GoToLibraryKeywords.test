@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oHsHgHziEeeUiMBqkyjlBQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/10/17 9:37 AM
+Save-Time: 8/10/17 5:45 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -44,8 +44,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Step Into (F5)" | click
 	
 	//check that new editor is shown
-	check-library-kw-editor "BuiltIn.Log"
-	
+	wait-for-specific-nr-of-threads -nr_items_in_thread 4
 	
 	//open link to Log kw from editor
 	get-editor "BuiltIn.Log" | get-link "Click here" | click
@@ -68,7 +67,7 @@ exec-with-options -disableJobWaiting -command {
 	    wait 500
 	    click
 	}
-	
+	wait-for-specific-nr-of-threads 4
 	check-library-kw-editor "BuiltIn.Convert To String"
 	
 	//go to Kw in the same file
@@ -78,6 +77,7 @@ exec-with-options -disableJobWaiting -command {
 	    click
 	    wait 500
 	    click
+	    wait 500
 	}
 	//REVERSE my list is now debbuging
 	check-debug-marker-on-ruler -line 17 -script_name "Script.robot"
@@ -103,8 +103,9 @@ exec-with-options -disableJobWaiting -command {
 	wait 500
 	get-button "Step Into (F5)" | click
 	
-	check-library-kw-editor -kw_name "BuiltIn.Should Be Equal"
-	
+	try -times 3 -delay 1000 -command{
+		check-library-kw-editor -kw_name "BuiltIn.Should Be Equal"
+	}
 	//open preference window
 	get-editor "BuiltIn.Should Be Equal" | get-link Preferences | click
 	
@@ -128,11 +129,11 @@ exec-with-options -disableJobWaiting -command {
 	
 	// go into kw from python file
 	get-button "Step Into (F5)" | click
-	check-library-kw-editor -kw_name "simple_lib.Kw From Python File"
-
+	
 	try -times 3 -delay 1000 -command{
 		get-editor "simple_lib.Kw From Python File"
 	}
+	check-library-kw-editor -kw_name "simple_lib.Kw From Python File"
 	
 	//click to link	
 	get-editor "simple_lib.Kw From Python File" | get-link "Click here" | click
@@ -161,6 +162,8 @@ exec-with-options -disableJobWaiting -command {
 		check-library-kw-editor -kw_name "BuiltIn.Should Be Equal"
 	}
 	
+	get-button "Resume (F8)" | click
+	
 }	
-get-button "Resume (F8)" | click
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
