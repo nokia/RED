@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 9:40 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/10/17 3:07 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -90,7 +90,7 @@ substitute-variables "${eclipse_home}" | let [val eclipse_home_path -input]{
 
 global [val RED_workspace_path [get-workspace-location]]
 global [val RED_workspace_path_unix_style [replace $RED_workspace_path -old "\\" -new "/"]]
-
+global [val RED_workspace_path_double_slaches [replace $RED_workspace_path -old "\\" -new "\\\\"]]
 global [val user_folder [get-java-property "user.home"]]
 
 global [val sys_sep [os-specific "\\" "/"]]
