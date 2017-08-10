@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Jh43wIMTEeW3Y6KfPyHe6A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 5:28 PM
+Save-Time: 8/10/17 10:06 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -35,58 +35,58 @@ exec-with-options -disableJobWaiting -command {
 	
 	// go into user kw
 	get-button "Step Into (F5)" | click
-	wait-for-specified_line-in-first-thread -line 96
+	wait-for-specified_line-in-first-thread -line 96 -nr_of_frames 4
 	
 	get-button "Step Into (F5)" | click
-	wait-for-specified_line-in-first-thread -line 97
+	wait-for-specified_line-in-first-thread -line 97 -nr_of_frames 4
 	
 	// step return to test case
 	get-button "Step Return (F7)" | click
-	wait-for-specified_line-in-first-thread -line 17
+	wait-for-specified_line-in-first-thread -line 17 -nr_of_frames 3
 	check-debug-marker-on-ruler -line 17 -script_name "BigScript.robot" 
 	
 	//return to test setup
 	get-view Debug | get-tree | key-type F7
-	wait-for-specified_line-in-first-thread -line 5
+	wait-for-specified_line-in-first-thread -line 5 -nr_of_frames 3
 	check-debug-marker-on-ruler -line 5 -script_name "BigScript.robot" 
 	
 	
 	//step into test setup kw
 	get-button "Step Into (F5)" | click
-	wait-for-specified_line-in-first-thread -line 107
+	wait-for-specified_line-in-first-thread -line 107 -nr_of_frames 4
 	check-debug-marker-on-ruler -line 107 -script_name "BigScript.robot" 
 	
 	get-button "Step Into (F5)" | click
-	wait-for-specified_line-in-first-thread -line 108
+	wait-for-specified_line-in-first-thread -line 108 -nr_of_frames 4
 	
 	// return to setup in line 5
 	get-button "Step Return (F7)" | click
-	wait-for-specified_line-in-first-thread -line 5
+	wait-for-specified_line-in-first-thread -line 5 -nr_of_frames 3
 	check-debug-marker-on-ruler -line 5 -script_name "BigScript.robot"
 	
 	//step into test: test 1
 	get-button "Step Into (F5)" | click
-	wait-for-specified_line-in-first-thread -line 21
+	wait-for-specified_line-in-first-thread -line 21 -nr_of_frames 3
 	check-debug-marker-on-ruler -line 21 -script_name "BigScript.robot" 
 	
 	get-button "Step Into (F5)" | click
-	wait-for-specified_line-in-first-thread -line 22
+	wait-for-specified_line-in-first-thread -line 22 -nr_of_frames 3
 	
 	//return - setup again
 	get-button "Step Return (F7)" | click
-	wait-for-specified_line-in-first-thread -line 5
+	wait-for-specified_line-in-first-thread -line 5 -nr_of_frames 3
 	
 	//step over to go to next test: test 2
 	get-button "Step Over (F6)" | click
-	wait-for-specified_line-in-first-thread -line 35
+	wait-for-specified_line-in-first-thread -line 35 -nr_of_frames 3
 	
 	//resume to go to next BP
 	get-button "Resume (F8)" | click
-	wait-for-specified_line-in-first-thread -line 66
+	wait-for-specified_line-in-first-thread -line 66 -nr_of_frames 3
 	
 	//stopped on Kw name
 	get-button "Step Into (F5)" | click
-	wait-for-specified_line-in-first-thread -line 11
+	wait-for-specified_line-in-first-thread -line 11 -nr_of_frames 4
 	check-debug-marker-on-ruler -line 11 -script_name "my_keywords.robot" 
 	
 	get-button "Step Into (F5)" | click
@@ -96,7 +96,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//back to test
 	get-button "Step Return (F7)" | click
-	wait-for-specified_line-in-first-thread -line 66
+	wait-for-specified_line-in-first-thread -line 66 -nr_of_frames 3
 	check-debug-marker-on-ruler -line 66 -script_name "BigScript.robot" 
 	
 
