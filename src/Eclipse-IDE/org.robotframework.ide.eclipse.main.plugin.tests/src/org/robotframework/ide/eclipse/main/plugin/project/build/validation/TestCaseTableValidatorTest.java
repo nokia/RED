@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities.AccessibleKeywordsCollector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
@@ -515,11 +516,61 @@ public class TestCaseTableValidatorTest {
     public void variableInGetVariableValueIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
-                .appendLine("    Get Variable Value  ${x}")
+                .appendLine("    ${var} =  Get Variable Value  ${x}")
+                .appendLine("    kw  ${var}")
                 .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
                 "Get Variable Value", new Path("/suite.robot"), "arg");
+        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("getvariablevalue",
+                newArrayList(entity1), "kw", newArrayList(entity2));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void variableInGetVariableValueIsReported_whenSyntaxIncorrect() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    ${var} =  Get Variable Value  %{x}")
+                .appendLine("    kw  ${var}")
+                .build();
+
+        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+                "Get Variable Value", new Path("/suite.robot"), "arg");
+        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("getvariablevalue",
+                newArrayList(entity1), "kw", newArrayList(entity2));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(3, Range.closed(58, 62))));
+    }
+
+    @Test
+    public void variableInSetGlobalVariableKeywordIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Global Variable  ${V_ar}")
+                .appendLine("    kw  ${var}")
+                .build();
+
+        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+                "Set Global Variable", new Path("/suite.robot"), "arg");
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("setglobalvariable",
@@ -535,27 +586,25 @@ public class TestCaseTableValidatorTest {
     }
 
     @Test
-    public void variableInSetGlobalVariableKeywordIsNotReported() throws CoreException {
+    public void variableInSetGlobalVariableKeywordIsReported_whenSyntaxIncorrect() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
-                .appendLine("    Set Global Variable  ${V_ar}")
-                .appendLine("    kw  ${var}")
+                .appendLine("    Set Global Variable  %{V_ar}")
                 .build();
 
-        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
                 "Set Global Variable", new Path("/suite.robot"), "arg");
-        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-                new Path("/res.robot"), "arg");
-        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("getvariablevalue",
-                newArrayList(entity1), "kw", newArrayList(entity2));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("setglobalvariable",
+                newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
         final TestCaseTableValidator validator = new TestCaseTableValidator(context,
                 file.findSection(RobotCasesSection.class), reporter);
         validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
-        assertThat(reporter.getReportedProblems()).isEmpty();
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(3, Range.closed(49, 56))));
     }
 
     @Test
@@ -583,6 +632,28 @@ public class TestCaseTableValidatorTest {
     }
 
     @Test
+    public void variableInSetSuiteVariableKeywordIsReported_whenSyntaxIncorrect() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Suite Variable  %{V_ar}")
+                .build();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+                "Set Suite Variable", new Path("/suite.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("setsuitevariable",
+                newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(3, Range.closed(48, 55))));
+    }
+
+    @Test
     public void variableInSetTestVariableKeywordIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
@@ -604,6 +675,28 @@ public class TestCaseTableValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
         assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void variableInSetTestVariableKeywordIsReported_whenSyntaxIncorrect() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Test Variable  %{V_ar}")
+                .build();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
+                "Set Test Variable", new Path("/suite.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("settestvariable",
+                newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(3, Range.closed(47, 54))));
     }
 
     @Test
