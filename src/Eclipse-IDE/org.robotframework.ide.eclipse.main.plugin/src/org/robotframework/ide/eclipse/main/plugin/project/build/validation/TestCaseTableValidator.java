@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +58,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testc
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PreconditionDeclarationExistenceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
@@ -310,14 +309,14 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 }
                 break;
             } else if (keywordEntities.size() > 1) {
-                final Iterable<?> sources = transform(keywordEntities, KeywordEntity::getSourceNameInUse);
+                final List<String> sources = keywordEntities.stream().map(KeywordEntity::getSourceNameInUse).collect(
+                        toList());
                 reporter.handleProblem(
                         RobotProblem.causedBy(KeywordsProblem.AMBIGUOUS_KEYWORD).formatMessageWith(name,
-                                "[" + Joiner.on(", ").join(sources) + "]"),
+                                "[" + String.join(", ", sources) + "]"),
                         validationContext.getFile(), position,
                         ImmutableMap.of(AdditionalMarkerAttributes.NAME, name, AdditionalMarkerAttributes.ORIGINAL_NAME,
-                                keywordName.getText(), AdditionalMarkerAttributes.SOURCES,
-                                Joiner.on(';').join(sources)));
+                                keywordName.getText(), AdditionalMarkerAttributes.SOURCES, String.join(";", sources)));
                 break;
             }
         }
@@ -328,11 +327,14 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
             final List<RobotToken> arguments) {
         final Optional<BuiltinKeywords> builtinKw = BuiltinKeywords.from(definingToken, validationContext);
-        final boolean isVariableSetterOrGetter = builtinKw
-                .filter(kw -> kw == BuiltinKeywords.VARIABLE_SETTER || kw == BuiltinKeywords.VARIABLE_GETTER)
-                .isPresent();
-        return new KeywordCallArgumentsValidator(validationContext.getFile(), definingToken, reporter,
-                argumentsDescriptor, arguments, isVariableSetterOrGetter);
+        if (builtinKw.isPresent() && (builtinKw.get() == BuiltinKeywords.VARIABLE_SETTER
+                || builtinKw.get() == BuiltinKeywords.VARIABLE_GETTER)) {
+            return new VariableSetterOrGetterCallArgumentsValidator(validationContext.getFile(), definingToken, reporter,
+                    argumentsDescriptor, arguments);
+        } else {
+            return new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), definingToken, reporter,
+                    argumentsDescriptor, arguments);
+        }
     }
 
     private void reportUnknownVariables(final List<TestCase> cases) {
@@ -441,20 +443,22 @@ class TestCaseTableValidator implements ModelUnitValidator {
                     final VariableDeclaration variableDeclaration) {
                 final Optional<BuiltinKeywords> builtinKw = BuiltinKeywords.from(getKeyword(lineDescription),
                         validationContext);
-                if (builtinKw.filter(kw -> kw == BuiltinKeywords.VARIABLE_SETTER).isPresent()) {
-                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-                    if (!usedVariables.isEmpty()) {
-                        definedVariables.add(VariableNamesSupport
-                                .extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
+                if (builtinKw.isPresent()) {
+                    if (builtinKw.get() == BuiltinKeywords.VARIABLE_SETTER) {
+                        final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+                        if (!usedVariables.isEmpty()) {
+                            definedVariables.add(VariableNamesSupport
+                                    .extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
+                            return true;
+                        }
+                    } else if (builtinKw.get() == BuiltinKeywords.VARIABLE_GETTER) {
+                        final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+                        if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
+                            return true;
+                        }
+                    } else if (builtinKw.get() == BuiltinKeywords.COMMENT) {
                         return true;
                     }
-                } else if (builtinKw.filter(kw -> kw == BuiltinKeywords.VARIABLE_GETTER).isPresent()) {
-                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-                    if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
-                        return true;
-                    }
-                } else if (builtinKw.filter(kw -> kw == BuiltinKeywords.COMMENT).isPresent()) {
-                    return true;
                 }
                 return false;
             }

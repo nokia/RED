@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Nokia Solutions and Networks
+ * Copyright 2017 Nokia Solutions and Networks
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
@@ -107,8 +107,8 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final ArgumentsDescriptor descriptor = specification.getConstructor() == null
                     ? ArgumentsDescriptor.createDescriptor()
                     : specification.getConstructor().createArgumentsDescriptor();
-            new KeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
-                    importArguments, false).validate(new NullProgressMonitor());
+            new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
+                    importArguments).validate(new NullProgressMonitor());
         } else {
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
                     .formatMessageWith(pathOrName);
