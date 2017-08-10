@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _R1ijQIMDEeW3Y6KfPyHe6A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 3:35 PM
+Save-Time: 8/10/17 9:47 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -29,7 +29,7 @@ exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
 	wait 2000
-	wait-for-thread -file "BigScript.robot"
+	wait-for-specific-nr-of-threads  3
 	
 	// Bp and user keyword
 	check-debug-marker-on-ruler -line 42 -script_name "BigScript.robot" 
