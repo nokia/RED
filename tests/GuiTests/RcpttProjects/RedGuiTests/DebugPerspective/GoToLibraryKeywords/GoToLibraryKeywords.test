@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oHsHgHziEeeUiMBqkyjlBQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 5:44 PM
+Save-Time: 8/10/17 9:37 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -38,7 +38,7 @@ with [get-editor "Script.robot"] {
 
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "GoToKeyword/Script.robot" | get-menu "Debug As/1 Robot Test" | click
-	wait-for-thread -file "Script.robot"
+	wait-for-specific-nr-of-threads -nr_items_in_thread 3
 	
 	//go to Log kw
 	get-button "Step Into (F5)" | click
