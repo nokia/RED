@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 3:35 PM
+Save-Time: 8/10/17 9:50 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -85,11 +85,17 @@ proc "wait-for-specific-nr-of-threads" [val nr_items_in_thread 3]{
 	
 }
 
-proc "wait-for-specified_line-in-first-thread" [val line]{
+proc "wait-for-specified_line-in-first-thread" [val line] [val nr_of_frames]{
 	try -times 5 -delay 1000 -command{
 		get-view Debug | get-tree 
 		    | get-item ".* \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
 		    | get-property "getItems().TreeItem[0].getText()" | equals [format ".*\[line: %s\]" $line]| verify-true
+	}
+	try -times 3 -delay 1000 -command{
+		with [get-view Debug | get-tree] {
+		   get-view Debug | get-tree | get-item ".* \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread"   -index 0
+		        | get-property [format "getItems().TreeItem[%s].getText()" [minus $nr_of_frames 1]] -raw|  not-eq "" | verify-true
+		}
 	}
 }    
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
