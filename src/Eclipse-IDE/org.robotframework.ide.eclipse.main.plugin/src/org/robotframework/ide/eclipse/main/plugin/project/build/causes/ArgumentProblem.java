@@ -85,6 +85,13 @@ public enum ArgumentProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Invalid time format '%s'";
         }
+    },
+    INVALID_VARIABLE_SYNTAX {
+
+        @Override
+        public String getProblemDescription() {
+            return "Invalid variable syntax '%s'";
+        }
     };
 
     @Override

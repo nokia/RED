@@ -448,10 +448,80 @@ public class KeywordCallArgumentsValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
+    @Test
+    public void nothingIsReported_whenVariableSetterOrGetterIsCalledWithScalarVariableAsFirstArgument() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Or Get Variable    ${x}  v")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("var", "*args");
+
+        validate(file, tokens, descriptor, true);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenVariableSetterOrGetterIsCalledWithListVariableAsFirstArgument() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Or Get Variable    @{x}  v1  v2")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("var", "*args");
+
+        validate(file, tokens, descriptor, true);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void nothingIsReported_whenVariableSetterOrGetterIsCalledWithDictionaryVariableAsFirstArgument() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Or Get Variable    &{x}  k1=v1")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("var", "*args");
+
+        validate(file, tokens, descriptor, true);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void invalidVariableSyntaxIsReported_whenVariableSetterOrGetterIsCalledWithoutVariableAsFirstArgument() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Or Get Variable    &b  arg")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("var", "*args");
+
+        validate(file, tokens, descriptor, true);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(ArgumentProblem.INVALID_VARIABLE_SYNTAX, new ProblemPosition(3, Range.closed(51, 53))));
+    }
+
     private void validate(final RobotSuiteFile file, final DefiningTokenWithArgumentTokens tokens,
             final ArgumentsDescriptor descriptor) {
+        validate(file, tokens, descriptor, false);
+    }
+
+    private void validate(final RobotSuiteFile file, final DefiningTokenWithArgumentTokens tokens,
+            final ArgumentsDescriptor descriptor, final boolean isVariableSetterOrGetter) {
         final KeywordCallArgumentsValidator validator = new KeywordCallArgumentsValidator(file.getFile(),
-                tokens.definingToken, reporter, descriptor, tokens.argumentTokens);
+                tokens.definingToken, reporter, descriptor, tokens.argumentTokens, isVariableSetterOrGetter);
         validator.validate(null);
     }
 

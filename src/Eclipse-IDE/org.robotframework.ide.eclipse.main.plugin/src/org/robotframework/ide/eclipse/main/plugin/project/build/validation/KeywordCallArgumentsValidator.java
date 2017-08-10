@@ -48,14 +48,17 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
     private final List<RobotToken> arguments;
 
+    private final boolean isVariableSetterOrGetter;
+
     KeywordCallArgumentsValidator(final IFile file, final RobotToken definingToken,
             final ProblemsReportingStrategy reporter, final ArgumentsDescriptor descriptor,
-            final List<RobotToken> arguments) {
+            final List<RobotToken> arguments, final boolean isVariableSetterOrGetter) {
         this.file = file;
         this.definingToken = definingToken;
         this.reporter = reporter;
         this.descriptor = descriptor;
         this.arguments = arguments;
+        this.isVariableSetterOrGetter = isVariableSetterOrGetter;
     }
 
     @Override
@@ -64,6 +67,12 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         if (!shallContinue) {
             return;
         }
+
+        if (isVariableSetterOrGetter) {
+            validateVariableSetterOrGetterFirstArgument();
+            return;
+        }
+
         final Map<String, Argument> namesToArgs = namesToArgsMapping();
 
         shallContinue = validatePositionalAndNamedArgsOrder(namesToArgs.keySet());
@@ -103,6 +112,17 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
     private boolean hasTokenOfType(final RobotTokenType type) {
         return arguments.stream().anyMatch(token -> token.getTypes().contains(type));
+    }
+
+    private void validateVariableSetterOrGetterFirstArgument() {
+        final RobotToken firstArg = arguments.get(0);
+        if (!firstArg.getTypes().contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)
+                && !firstArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                && !firstArg.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
+            final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_VARIABLE_SYNTAX)
+                    .formatMessageWith(firstArg.getText());
+            reporter.handleProblem(problem, file, firstArg);
+        }
     }
 
     private Map<String, Argument> namesToArgsMapping() {

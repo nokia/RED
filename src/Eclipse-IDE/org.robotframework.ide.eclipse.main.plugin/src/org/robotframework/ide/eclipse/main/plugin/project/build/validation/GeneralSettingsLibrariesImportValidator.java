@@ -108,7 +108,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                     ? ArgumentsDescriptor.createDescriptor()
                     : specification.getConstructor().createArgumentsDescriptor();
             new KeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
-                    importArguments).validate(new NullProgressMonitor());
+                    importArguments, false).validate(new NullProgressMonitor());
         } else {
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
                     .formatMessageWith(pathOrName);
