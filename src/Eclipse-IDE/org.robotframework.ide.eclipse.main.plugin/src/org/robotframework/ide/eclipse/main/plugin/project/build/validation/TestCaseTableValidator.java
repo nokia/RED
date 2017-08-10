@@ -56,6 +56,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.DocumentationTestCaseDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PostconditionDeclarationExistenceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PreconditionDeclarationExistenceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
@@ -304,7 +305,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
                                     AdditionalMarkerAttributes.SOURCES, keyword.getSourceNameInUse()));
                 }
                 if (arguments.isPresent()) {
-                    new KeywordCallArgumentsValidator(validationContext.getFile(), keywordName, reporter,
+                    createKeywordCallArgumentsValidator(validationContext, reporter, keywordName,
                             keyword.getArgumentsDescriptor(), arguments.get()).validate(new NullProgressMonitor());
                 }
                 break;
@@ -320,6 +321,18 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 break;
             }
         }
+    }
+
+    private static KeywordCallArgumentsValidator createKeywordCallArgumentsValidator(
+            final FileValidationContext validationContext, final ProblemsReportingStrategy reporter,
+            final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
+            final List<RobotToken> arguments) {
+        final Optional<BuiltinKeywords> builtinKw = BuiltinKeywords.from(definingToken, validationContext);
+        final boolean isVariableSetterOrGetter = builtinKw
+                .filter(kw -> kw == BuiltinKeywords.VARIABLE_SETTER || kw == BuiltinKeywords.VARIABLE_GETTER)
+                .isPresent();
+        return new KeywordCallArgumentsValidator(validationContext.getFile(), definingToken, reporter,
+                argumentsDescriptor, arguments, isVariableSetterOrGetter);
     }
 
     private void reportUnknownVariables(final List<TestCase> cases) {
@@ -422,57 +435,76 @@ class TestCaseTableValidator implements ModelUnitValidator {
                         && !isVariableInSetterOrGetterOrCommentKeyword(validationContext, definedVariables,
                                 lineDescription, variableDeclaration);
             }
-        };
-    }
 
-    private static boolean isVariableInSetterOrGetterOrCommentKeyword(final FileValidationContext validationContext,
-            final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
-            final VariableDeclaration variableDeclaration) {
-        final String keywordName = QualifiedKeywordName.fromOccurrence(getKeyword(lineDescription)).getKeywordName();
-        if ((keywordName.equals("setglobalvariable") || keywordName.equals("setsuitevariable")
-                || keywordName.equals("settestvariable")) && isKeywordFromBuiltin(validationContext, keywordName)) {
-            final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-            if (!usedVariables.isEmpty()) {
-                definedVariables
-                        .add(VariableNamesSupport.extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
-                return true;
-            }
-        } else if (keywordName.equals("getvariablevalue") && isKeywordFromBuiltin(validationContext, keywordName)) {
-            final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-            if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
-                return true;
-            }
-        } else if (keywordName.equals("comment") && isKeywordFromBuiltin(validationContext, keywordName)) {
-            return true;
-        }
-        return false;
-    }
-
-    private static boolean isKeywordFromBuiltin(final FileValidationContext validationContext,
-            final String keywordName) {
-
-        for (final KeywordScope scope : KeywordScope.defaultOrder()) {
-            final List<KeywordEntity> possible = validationContext.getPossibleKeywords(keywordName, true).get(scope);
-            if (scope != KeywordScope.STD_LIBRARY && !possible.isEmpty()) {
+            private boolean isVariableInSetterOrGetterOrCommentKeyword(final FileValidationContext validationContext,
+                    final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
+                    final VariableDeclaration variableDeclaration) {
+                final Optional<BuiltinKeywords> builtinKw = BuiltinKeywords.from(getKeyword(lineDescription),
+                        validationContext);
+                if (builtinKw.filter(kw -> kw == BuiltinKeywords.VARIABLE_SETTER).isPresent()) {
+                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+                    if (!usedVariables.isEmpty()) {
+                        definedVariables.add(VariableNamesSupport
+                                .extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
+                        return true;
+                    }
+                } else if (builtinKw.filter(kw -> kw == BuiltinKeywords.VARIABLE_GETTER).isPresent()) {
+                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+                    if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
+                        return true;
+                    }
+                } else if (builtinKw.filter(kw -> kw == BuiltinKeywords.COMMENT).isPresent()) {
+                    return true;
+                }
                 return false;
-            } else if (scope == KeywordScope.STD_LIBRARY) {
-                return possible.size() == 1 && possible.get(0).getSourceNameInUse().equals("BuiltIn");
             }
-        }
-        return false;
-    }
 
-    private static String getKeyword(final IExecutableRowDescriptor<?> lineDescription) {
-        final RobotAction action;
-        if (lineDescription.getRowType() == ERowType.FOR_CONTINUE) {
-            action = ((ForLoopContinueRowDescriptor<?>) lineDescription).getKeywordAction();
-        } else {
-            action = lineDescription.getAction();
-        }
-        return action.getToken().getText();
+            private RobotToken getKeyword(final IExecutableRowDescriptor<?> lineDescription) {
+                final RobotAction action;
+                if (lineDescription.getRowType() == ERowType.FOR_CONTINUE) {
+                    action = ((ForLoopContinueRowDescriptor<?>) lineDescription).getKeywordAction();
+                } else {
+                    action = lineDescription.getAction();
+                }
+                return action.getToken();
+            }
+        };
     }
 
     private boolean isTemplateFromTestCasesTable(final RobotCase testCase) {
         return testCase.getLinkedElement().getRobotViewAboutTestTemplate() != null;
+    }
+
+    private enum BuiltinKeywords {
+        VARIABLE_SETTER,
+        VARIABLE_GETTER,
+        COMMENT;
+
+        private static Optional<BuiltinKeywords> from(final RobotToken keyword,
+                final FileValidationContext validationContext) {
+            final String keywordName = QualifiedKeywordName.fromOccurrence(keyword.getText()).getKeywordName();
+            if ((keywordName.equals("setglobalvariable") || keywordName.equals("setsuitevariable")
+                    || keywordName.equals("settestvariable")) && isFromBuiltin(keywordName, validationContext)) {
+                return Optional.of(VARIABLE_SETTER);
+            } else if (keywordName.equals("getvariablevalue") && isFromBuiltin(keywordName, validationContext)) {
+                return Optional.of(VARIABLE_GETTER);
+            } else if (keywordName.equals("comment") && isFromBuiltin(keywordName, validationContext)) {
+                return Optional.of(COMMENT);
+            }
+            return Optional.empty();
+        }
+
+        private static boolean isFromBuiltin(final String keywordName, final FileValidationContext validationContext) {
+            for (final KeywordScope scope : KeywordScope.defaultOrder()) {
+                final List<KeywordEntity> possible = validationContext.getPossibleKeywords(keywordName, true)
+                        .get(scope);
+                if (scope != KeywordScope.STD_LIBRARY && !possible.isEmpty()) {
+                    return false;
+                } else if (scope == KeywordScope.STD_LIBRARY) {
+                    return possible.size() == 1 && possible.get(0).getSourceNameInUse().equals("BuiltIn");
+                }
+            }
+            return false;
+        }
     }
 }
