@@ -94,7 +94,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenImportingUnknownLibraryByName() throws CoreException {
+    public void markerIsReported_whenImportingUnknownLibraryByName() {
         validateLibraryImport("ExampleLibrary");
 
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
@@ -110,7 +110,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenUsingUnescapedWindowsPaths_1() throws CoreException {
+    public void markerIsReported_whenUsingUnescapedWindowsPaths_1() {
         validateLibraryImport("C:\\test\\ExampleLibrary.py");
 
         assertThat(reporter.getReportedProblems())
@@ -119,7 +119,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenUsingUnescapedWindowsPaths_2() throws CoreException {
+    public void markerIsReported_whenUsingUnescapedWindowsPaths_2() {
         validateLibraryImport("..\\..\\ExampleLibrary.py");
 
         assertThat(reporter.getReportedProblems())
@@ -128,7 +128,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
-    public void markerIsReported_whenUsingUnescapedWindowsPaths_3() throws CoreException {
+    public void markerIsReported_whenUsingUnescapedWindowsPaths_3() {
         validateLibraryImport("../..\\ExampleLibrary.py");
 
         assertThat(reporter.getReportedProblems())
