@@ -1,0 +1,156 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_pjyZ0Af5Eee0EKWnoBYU9g,_s-ctEA4_EeePcNCRX_abWA,_2Q6oEPOSEeaWpbE3jg39cA,_ur0DkAf5Eee0EKWnoBYU9g
+Element-Name: ErroneousStatePreferenceForDebug
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _DrNlsH3aEeeUiMBqkyjlBQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/11/17 2:40 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-preference-for-erroneous-state" [val always false] [val never false] [val prompt false]{
+	with [get-window Preferences | get-group "Suspend execution whenever debugger goes into erroneous state"] {
+	    get-property caption | equals "Suspend execution whenever debugger goes into erroneous state" | verify-true
+	    get-property "getChildren().length" | equals 3 | verify-true
+	    
+	    
+	    get-property "getChildren().Control[0].getText()" | equals Always | verify-true
+	    get-property "getChildren().Control[0].getSelection()" | equals $always | verify-true
+	    
+	    get-property "getChildren().Control[1].getText()" | equals Never | verify-true
+	    get-property "getChildren().Control[1].getSelection()" | equals $never | verify-true
+	    
+	    //prompt is selected by default
+	    get-property "getChildren().Control[2].getText()" | equals Prompt | verify-true
+	    get-property "getChildren().Control[2].getSelection()" | equals $prompt | verify-true
+	}
+}
+
+//decrease timeout in preference
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Launching/Default Launch Configurations"
+    get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 15
+    get-button Apply | click
+    get-button OK | click
+}
+//change test content - now there is no test with the same name
+get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "my test\n"
+    + "    log  8\n"
+    + "    Should Be Equal As Integers    4    4 \n"
+    + "    \n"
+    + "second test\n"
+    + "    Catenate    5   6" 
+
+//save and BP
+get-button "Save \((Ctrl|M1)\+S\)" | click
+get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 7
+
+
+//check preference for errones state
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Launching/Debugger"
+
+check-preference-for-erroneous-state -prompt true
+get-window Preferences | get-button OK | click
+
+
+let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
+	//export listener
+	export-agent-to-folder -folder $remote_project_path
+	
+	
+	// ----------------------------------- prompt -------------------------------------------------
+	//run test
+	exec-with-options -disableJobWaiting -command {
+		get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" 
+		    | get-menu "Debug As/2 Robot Remote Test" | click
+		
+		wait-for-remote-connection 
+		
+		run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
+		
+		//select to continue and remeber decision
+		with [get-window "Debugger error"] {
+		    get-button "Remember my decision" | check
+		    get-button Continue | click
+		}
+		wait-for-console -times 3 -delay 1000
+		//test will end 
+		get-view Debug | get-tree 
+		    | get-item "<terminated>RemoteProject \\[Robot Remote\\]/<terminated, exit value: 0>TCP connection using 127.0.0.1@43981" 
+		    | get-property caption | equals "<terminated, exit value: 0>TCP connection using 127.0.0.1@43981" | verify-true
+	}		
+
+
+    //------------------------- never --------------------------------------------	
+    get-preferences-menu | click
+	get-window Preferences | get-tree | select "Robot Framework/Launching/Debugger"
+	check-preference-for-erroneous-state -never true
+	get-window Preferences | get-button OK | click
+	
+	//run test - it should not stop
+	exec-with-options -disableJobWaiting -command {
+		get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" 
+			    | get-menu "Debug As/2 Robot Remote Test" | click
+		
+		wait-for-remote-connection 
+		run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
+	}
+	
+	get-view Debug | get-tree 
+	    | get-item "<terminated>RemoteProject \\[Robot Remote\\]/<terminated, exit value: 0>TCP connection using 127.0.0.1@43981" 
+	    | get-property caption | equals "<terminated, exit value: 0>TCP connection using 127.0.0.1@43981" | verify-true
+	    
+	    
+	    
+	// ---------------------------- always -----------------------------------------------
+	
+	get-preferences-menu | click
+	get-window Preferences | get-tree | select "Robot Framework/Launching/Debugger"
+	with [get-window Preferences] {
+	    get-group "Suspend execution whenever debugger goes into erroneous state" | get-button Always | click
+	    get-button OK | click
+	}
+	    
+	exec-with-options -disableJobWaiting -command {
+		get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" 
+			    | get-menu "Debug As/2 Robot Remote Test" | click
+	
+	
+		wait-for-remote-connection 
+		run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
+		
+		//check that test was stopped on first line
+		with [get-editor "TestFile.robot" | get-text-viewer] {
+		    get-property "markers['1'][0].Type" | equals "org.robotframework.red.debug.currentErrorIP" | verify-true
+		    get-property "markers['1'][0].text" | equals "RED debugger: Unable to find test 'test 1'\n"
+		        + "There is no such test in current suite\n"
+		        + "Unable to find executable call of 'BuiltIn.Log' keyword\n" | verify-true
+		}
+		
+		get-view Debug | get-tree 
+		    | get-item "RemoteProject \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:43981/Tests execution thread/\\[Test\\] test 1 \\[line: 1\\]" 
+		    | get-property caption | equals "[Test] test 1 [line: 1]" | verify-true
+		    
+		//go to next test
+		get-button "Resume (F8)" | click
+		get-view Debug | get-tree 
+		    | get-item "RemoteProject \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:43981/Tests execution thread/\\[Test\\] test 2 \\[line: 1\\]" 
+		    | get-property caption | equals "[Test] test 2 [line: 1]" | verify-true
+		get-button "Resume (F8)" | click
+	
+	}    
+}
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
