@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _iyS6MNymEeWGC6qnJEsRYg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/31/17 9:41 AM
+Save-Time: 8/11/17 9:17 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,8 +27,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     type-text Su
     key-type Enter
     
-    //add Catante
-    key-type Down
+    //add Catenate
+    type-text tenate
     key-type Enter
     type-text "I  will be added  ${param}"
     key-type Enter -times 2
@@ -40,7 +40,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type Enter
     
     //add Should be equal
-    type-text Shou
+    type-text SBE
     key-type Down
     key-type Enter
     type-text item1
@@ -48,18 +48,16 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     type-text item2
     key-type Enter -times 2
     
-       // add new test
+    // add new test
     set-caret-pos 6 19
     key-type Enter
     type-text "test 1"
     key-type Enter
    	
    	// add keyword Should be equal as integer
-    type-text SH
+    type-text SBEAI
     key-type "M1+SPACE"
     wait 200
-    key-type Down -times 2
-    wait 100
     key-type Enter
     // remove first item
     key-type Del
@@ -152,7 +150,7 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     //go to new line
     key-type Enter
     // add "kw with no args"
-    type-text kw
+    type-text "with no"
     key-type "M1+SPACE"
     key-type Enter -times 2
     
@@ -175,9 +173,9 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     key-type Enter
     
     // add Should Be Equal As Numbers with additional arg
-    type-text Sho
+    type-text "Equal As Numbers"
     key-type "M1+SPACE"
-    key-type Down -times 3
+//    key-type Down -times 3
     key-type Enter
     type-text 67
     key-type Tab
