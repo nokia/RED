@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _L2Q5ICQVEeeO6fW46SeMzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/31/17 9:59 AM
+Save-Time: 8/11/17 9:20 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -30,7 +30,7 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     key-type Enter
     
     //library1
-    type-text Libra
+    type-text brary
     key-type "M1+SPACE"
     wait 200
     key-type Enter
@@ -60,7 +60,7 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     key-type Enter -times 2
     
     // enter Suite Setup for library
-    type-text Su
+    type-text "te Set"
     key-type "M1+SPACE"
     wait 200
     key-type Enter
