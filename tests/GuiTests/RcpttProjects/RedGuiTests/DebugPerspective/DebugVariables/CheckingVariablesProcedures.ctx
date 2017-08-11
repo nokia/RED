@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _MyJrwGxlEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 4:16 PM
+Save-Time: 8/11/17 3:39 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -232,5 +232,46 @@ proc "wait-for-last-item-to-be-visible"{
    		 | verify-true
 	}
 }    
-    
+
+proc "check-all-automatic-vars-decorators"{
+	repeat [val index] -times 15 -command{
+		check-decorators-on-variables -item "Automatic Variables/.*" -index $index -decorator_type global
+	}
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 15 -decorator_type suite
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 16 -decorator_type suite
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 17 -decorator_type suite
+	
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 18 -decorator_type global
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 19 -decorator_type test
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 20 -decorator_type test
+	
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 21 -decorator_type global
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 22 -decorator_type global
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 23 -decorator_type global
+	
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 24 -decorator_type suite
+	check-decorators-on-variables -item "Automatic Variables/.*" -index 25 -decorator_type test
+	
+}
+
+proc "check-decorators-on-variables" [val item] [val index 0] [val decorator_type] {
+
+	$decorator_type|  switch [case "suite" {
+		echo ".*/variable_debug_suite.png"
+	}] [case "global" {
+		echo ".*/variable_debug_global.png" 
+	}] [case "test" {
+		echo ".*/variable_debug_test.png"			 	
+	}] - default {
+		echo "Unknown item"
+	} | let [val decorator_img -input] {
+	
+		get-view Variables | get-tree
+	    	| get-item $item -index $index| get-property "image.decorations[0].path" 
+	        | equals $decorator_img | verify-true
+	}
+}
+
+
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
