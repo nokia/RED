@@ -1,65 +1,38 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _Q9XWMIfGEeWYGL6nmNUhSg,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA
+Contexts: _Q9XWMIfGEeWYGL6nmNUhSg,_OCxtEBRGEeWWV9IuysVI_A,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q,_MyJrwGxlEeeps9cepQRw2Q
 Element-Name: VariablesDuringDebugging
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _bbykIIlLEeWHhtZu19MBKw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/19/17 11:24 AM
-Tags: Unstable
+Save-Time: 8/16/17 3:26 PM
+Tags: Debug
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Project Explorer" | get-tree | select "MediumRobotTest/OnlyVariables.robot" | select "MediumRobotTest/OnlyVariables.robot" 
-    | double-click
-with [get-editor "OnlyVariables.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
-    double-click-ruler 17
-    double-click-ruler 27
-}
+proc "check-decorators-for-test-vars" [val x_var] [val a_var] [val list_from_test "suite"]{
+	check-decorators-on-variable -item "${a}" -decorator_type $a_var
+	check-decorators-on-variable -item "${booleas_arg}" -decorator_type "suite"
+	check-decorators-on-variable -item "${from_resource}" -decorator_type "suite"
+	check-decorators-on-variable -item "${x}" -decorator_type $x_var
+	check-decorators-on-variable -item "&{newDict}" -decorator_type "suite"
+	check-decorators-on-variable -item "@{list_for_res}" -decorator_type "suite"
+	check-decorators-on-variable -item "@{list_from_test}" -decorator_type $list_from_test
+}	
 
-
-exec-with-options -disableJobWaiting -command {
-	get-view "Project Explorer" | get-tree | select "MediumRobotTest/OnlyVariables.robot" | get-menu "Debug As/1 Robot Test" 
-	    | click
-	wait-for-thread -file "OnlyVariables.robot"
-	
-	//check test name
-	
-    get-view Variables | maximize
-	get-view Variables | get-tree | select "${TEST_NAME}"
+proc "check-list-and-dicts_from_test"{
+	//dictionary
 	with [get-view Variables | get-tree] {
-	    get-item "${TEST_NAME}" | get-property index | equals 8 | verify-true
-	    get-item "${TEST_NAME}" | get-property "columns[0]" | equals "${TEST_NAME}" | verify-true
-	    get-item "${TEST_NAME}" | get-property "columns[1]" | equals "set new variable as global" | verify-true
+	    get-item "&{newDict}" | get-property childCount | equals 1 | verify-true
+	    get-item "&{newDict}/key" | get-property "values['Name']" | equals key | verify-true
+	    get-item "&{newDict}/key" | get-property "values['Value']" | equals value | verify-true
 	}
-	//check if in first run background color is white
-	with [get-view Variables | get-tree] {
-	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[0]" | equals "#FFFFFF" | verify-true
-	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[1]" | equals "#FFFFFF" | verify-true
-	}
-
-	//check first 5 variables
-	with [get-view Variables | get-tree] {
-	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
-	    get-property "getItems().TreeItem[0].getData().getValue().getValueString()" | equals "from test" | verify-true
-	    get-property "getItems().TreeItem[1].getText()" | equals "${booleas_arg}" | verify-true
-	    get-property "getItems().TreeItem[1].getData().getValue().getValueString()" | equals True | verify-true
-	    get-property "getItems().TreeItem[2].getText()" | equals "${from_resource}" | verify-true
-	    get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals 3 | verify-true
-	    get-property "getItems().TreeItem[3].getText()" | equals "${x}" | verify-true
-	    get-property "getItems().TreeItem[3].getData().getValue().getValueString()" | equals 5 | verify-true
-	}
-	//check list and dict
-	with [get-view Variables | get-tree] {
-	    select "@{list_for_res}" | double-click
-	    wait 200
-	    select "@{list_from_test}" | double-click
-	}
+	//list created in resource
 	with [get-view Variables | get-tree] {
 	    get-item "@{list_for_res}" | get-property "getItems().TreeItem[0].getText()" | equals "[0]" | verify-true
 	    get-item "@{list_for_res}" | get-property "getItems().TreeItem[0].getData().getValue().getValueString()" | equals 1 
@@ -71,9 +44,8 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "@{list_for_res}" | get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals 3 
 	        | verify-true
 	}
-	get-view Variables | get-tree | select "@{list_from_test}" | double-click
-	wait 500
 	
+	//list created in suite
 	with [get-view Variables | get-tree] {
 	    get-item "@{list_from_test}" | get-property "getItems().TreeItem[0].getText()" | equals "[0]" | verify-true
 	    get-item "@{list_from_test}" | get-property "getItems().TreeItem[0].getData().getValue().getValueString()" 
@@ -85,194 +57,221 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "@{list_from_test}" | get-property "getItems().TreeItem[2].getData().getValue().getValueString()" 
 	        | equals 9 | verify-true
 	}
-	
+}	
 
-	get-button "Step Into (F5)" | click
-	wait 1000
+
+//set different test
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/OnlyVariables.robot" 
+    | double-click
+
+get-editor "OnlyVariables.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n\n"
+    + "Resource    resource.robot\n"
+    + "Library    RedLibrary.py\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${a}   from test\n"
+    + "@{list_from_test}  7  8  9    \n"
+    + "${booleas_arg}    ${true}   \n"
+    + "&{newDict}    key=value    \n"
+    + "*** Test Cases ***\n"
+    + "set new variable as global\n"
+    + "\t${x}=  Set Variable    6\n"
+    + "\tLog  ${x}\n"
+    + "    ${list_from_test}  Create List    j   k\n"
+    + "    Log Many    ${list_from_test}\n"
+    + "    \n"
+    + "create new variable\n"
+    + "    ${local}=  Set Variable    music \n"
+    + "    Log  ${local}\n"
+    + "    Set Global Variable    ${glob}   123    \n\n"
+    + "checking scope\n"
+    + "    ${a}=  Set Variable    4\n"
+    + "    Log  ${a}\n"
+    + "    log a variable from resource"
+
+with [get-editor "OnlyVariables.robot" | get-text-viewer] {
+    set-caret-pos 11 31
+    key-type "M1+s"
+}
+   
+//set BP     
+with [get-editor "OnlyVariables.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+    double-click-ruler 16
+    double-click-ruler 19
+    double-click-ruler 29
+}
+
+
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "MediumRobotTest/OnlyVariables.robot" | get-menu "Debug As/1 Robot Test" 
+	    | click
+	wait-for-specified_line-in-first-thread -line 16 -nr_of_frames 3
 	
+	//check test name
+    get-view Variables | maximize
+    get-view Variables | get-tree | get-item "Automatic Variables" | expand
+    wait-for-automatic-vars
+    
+	get-view Variables | get-tree | select "Automatic Variables/${TEST_NAME}"
+	with [get-view Variables | get-tree] {
+	    get-item "Automatic Variables/${TEST_NAME}" | get-property "columns[0]" | equals "${TEST_NAME}" | verify-true
+	    get-item "Automatic Variables/${TEST_NAME}" | get-property "columns[1]" | equals "set new variable as global" | verify-true
+	}
+
+	//check first 5 variables
+	with [get-view Variables | get-tree] {
+	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[0].getData().getValue().getValueString()" | equals "from test" | verify-true
+	    
+	    get-property "getItems().TreeItem[1].getText()" | equals "${booleas_arg}" | verify-true
+	    get-property "getItems().TreeItem[1].getData().getValue().getValueString()" | equals True | verify-true
+	    
+	    get-property "getItems().TreeItem[2].getText()" | equals "${from_resource}" | verify-true
+	    get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals 3 | verify-true
+	    
+	    get-property "getItems().TreeItem[3].getText()" | equals "${x}" | verify-true
+	    get-property "getItems().TreeItem[3].getData().getValue().getValueString()" | equals 5 | verify-true
+	}
+	
+	check-list-and-dicts_from_test
+	
+	//check lables	
+	check-decorators-for-test-vars -a_var "suite" -x_var "suite"
+	get-view Variables | restore
+	
+	//--------------------------------------------------
+	// go down to log new local var
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread -line 17 -nr_of_frames 3
+	get-view Variables | maximize
+   
 	//var x background color is changed to yellow
 	with [get-view Variables | get-tree] {
 	    get-item "${x}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
 	    get-item "${x}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
 	}
-	//backgrounf color is still white
+	get-view Variables | get-tree | get-item "Automatic Variables" | expand
+    wait-for-automatic-vars
+	//background color of test name is still white
 	with [get-view Variables | get-tree] {
-	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[0]" | equals "#FFFFFF" | verify-true
-	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[1]" | equals "#FFFFFF" | verify-true
+	    get-item "Automatic Variables/${TEST_NAME}" | get-property "columnsBackgroundColor[0]" | equals "#FFFFFF" | verify-true
+	    get-item "Automatic Variables/${TEST_NAME}" | get-property "columnsBackgroundColor[1]" | equals "#FFFFFF" | verify-true
 	}	
 	
+	check-decorators-for-test-vars -a_var "suite" -x_var "local"
+	check-list-and-dicts_from_test
+	get-view Variables | restore
+	
+	
+	//----------------------------------------
+	//reusme to Bp in line 19
+	get-button "Resume (F8)" | click
+	wait-for-specified_line-in-first-thread -line 19 -nr_of_frames 3
+	
+	//check if list is highlighted in yellow
+	with [get-view Variables | get-tree] {
+	    get-item "@{list_from_test}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
+	    get-item "@{list_from_test}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
+	}
+	//list is changed
+	get-view Variables | get-tree | select "@{list_from_test}" | double-click
+	with [get-view Variables | get-tree] {
+	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Value']" | equals j | verify-true
+	    get-item "@{list_from_test}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{list_from_test}/\\[1\\]" | get-property "values['Value']" | equals k | verify-true
+	}
+	check-decorators-for-test-vars -x_var "local"  -a_var "suite" -list_from_test "local"
+	
+	//----------------------------------------
 	//go to next test		
 	get-button "Step Into (F5)" | click
 	wait 1000
-	with [get-view Variables | get-tree] {
-	    get-item "${TEST_NAME}" | get-property "values['Name']" | equals "${TEST_NAME}" | verify-true
-	    get-item "${TEST_NAME}" | get-property "values['Value']" | equals "create new variable" | verify-true
-	}
-	//x scalar reset to global name - yellow color
-	with [get-view Variables | get-tree] {
-    	get-item "${x}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
-	    get-item "${x}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
-	}
-		
-	//check variables
-	with [get-view Variables | get-tree] {
-	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
-	    get-property "getItems().TreeItem[0].getData().getValue().getValueString()" | equals "from test" | verify-true
-	    get-property "getItems().TreeItem[1].getText()" | equals "${booleas_arg}" | verify-true
-	    get-property "getItems().TreeItem[1].getData().getValue().getValueString()" | equals True | verify-true
-	    get-property "getItems().TreeItem[2].getText()" | equals "${from_resource}" | verify-true
-	    get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals 3 | verify-true
-	    get-property "getItems().TreeItem[3].getText()" | equals "${x}" | verify-true
-	    get-property "getItems().TreeItem[3].getData().getValue().getValueString()" | equals 5 | verify-true
-	}
-	//check list and dict
-	get-view Variables | get-tree | get-item "@{list_for_res}" | expand-all
-	wait 500
-	with [get-view Variables | get-tree] {
-	    get-property "getItems().TreeItem[4].getItems().TreeItem[0].getText()" | equals "[0]" | verify-true
-	    get-property "getItems().TreeItem[4].getItems().TreeItem[0].getData().getValue().getValueString()" | equals 1 
-	        | verify-true
-	    get-property "getItems().TreeItem[4].getItems().TreeItem[1].getText()" | equals "[1]" | verify-true
-	    get-property "getItems().TreeItem[4].getItems().TreeItem[1].getData().getValue().getValueString()" | equals 2 
-	        | verify-true
-	    get-property "getItems().TreeItem[4].getItems().TreeItem[2].getText()" | equals "[2]" | verify-true
-	    get-property "getItems().TreeItem[4].getItems().TreeItem[2].getData().getValue().getValueString()" | equals 3 
-	        | verify-true
-	    get-property "getItems().TreeItem[4].getText()" | equals "@{list_for_res}" | verify-true
-	}
-	with [get-view Variables | get-tree] {
-		select "@{list_for_res}" | double-click
-	    select "@{list_from_test}" | double-click
-	}
-	with [get-view Variables | get-tree] {
-	    get-property "getItems().TreeItem[5].getItems().TreeItem[0].getText()" | equals "[0]" | verify-true
-	    get-property "getItems().TreeItem[5].getItems().TreeItem[0].getData().getValue().getValueString()" | equals 7 
-	        | verify-true
-	    get-property "getItems().TreeItem[5].getItems().TreeItem[1].getText()" | equals "[1]" | verify-true
-	    get-property "getItems().TreeItem[5].getItems().TreeItem[1].getData().getValue().getValueString()" | equals 8 
-	        | verify-true
-	    get-property "getItems().TreeItem[5].getItems().TreeItem[2].getText()" | equals "[2]" | verify-true
-	    get-property "getItems().TreeItem[5].getItems().TreeItem[2].getData().getValue().getValueString()" | equals 9 
-	        | verify-true
-	    get-property "getItems().TreeItem[5].getText()" | equals "@{list_from_test}" | verify-true
-	}
 	
-
-//-----------
-	//add new varibale	
+	
+	get-view Variables | maximize
+	get-view Variables | get-tree | get-item "Automatic Variables" | expand
+    wait-for-automatic-vars
+    
+	with [get-view Variables | get-tree] {
+	    get-item "Automatic Variables/${TEST_NAME}" | get-property "values['Name']" | equals "${TEST_NAME}" | verify-true
+	    get-item "Automatic Variables/${TEST_NAME}" | get-property "values['Value']" | equals "create new variable" | verify-true
+	}
+	check-decorators-for-test-vars -x_var "suite" -a_var "suite"
+	check-list-and-dicts_from_test
+	get-view Variables | restore
+	
+	//-----------
+	//add new local variable	
 	get-button "Step Into (F5)" | click
 	wait 1000
 	get-view Variables | get-tree | select "${local}"
+
+//	  tu bedzie zmienieone eby nowe byly na wierzchu
+//	with [get-view Variables | get-tree] {
+//	    get-property "getItems().TreeItem[0].getText()" | equals "${local}" | verify-true
+//	    get-property "getItems().TreeItem[0].getData().getValue().getValueString()" | equals music | verify-true
+//	    get-property "getItems().TreeItem[1].getText()" | equals "${a}" | verify-true
+//	    get-property "getItems().TreeItem[1].getData().getValue().getValueString()" | equals "from test" | verify-true
+//	    get-property "getItems().TreeItem[2].getText()" | equals "${booleas_arg}" | verify-true
+//	    get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals True | verify-true
+//	    get-property "getItems().TreeItem[3].getData().getValue().getValueString()" | equals 3 | verify-true
+//	    get-property "getItems().TreeItem[4].getText()" | equals "${x}" | verify-true
+//	    get-property "getItems().TreeItem[4].getData().getValue().getValueString()" | equals 5 | verify-true
+//	}
+//	
+	check-decorators-on-variable -item "${local}" -decorator_type "local"
 	
-	with [get-view Variables | get-tree] {
-	    get-property "getItems().TreeItem[0].getText()" | equals "${local}" | verify-true
-	    get-property "getItems().TreeItem[0].getData().getValue().getValueString()" | equals music | verify-true
-	    get-property "getItems().TreeItem[1].getText()" | equals "${a}" | verify-true
-	    get-property "getItems().TreeItem[1].getData().getValue().getValueString()" | equals "from test" | verify-true
-	    get-property "getItems().TreeItem[2].getText()" | equals "${booleas_arg}" | verify-true
-	    get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals True | verify-true
-	    get-property "getItems().TreeItem[3].getData().getValue().getValueString()" | equals 3 | verify-true
-	    get-property "getItems().TreeItem[4].getText()" | equals "${x}" | verify-true
-	    get-property "getItems().TreeItem[4].getData().getValue().getValueString()" | equals 5 | verify-true
-	}
-	
-	get-view Variables | restore
-	//go to next test
-	get-button "Step Into (F5)" | click
-	wait-for-thread -file "OnlyVariables.robot"
+	//-------------------------------------------------------
+	//go to next test - line 29
+	get-button "Resume (F8)" | click
+	wait-for-specified_line-in-first-thread -line 29 -nr_of_frames 3 
 	
 	
 	get-view Variables | maximize
 	//test name changed
 	with [get-view Variables | get-tree] {
-	    //get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
-	    //get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
-	    get-item "${TEST_NAME}" | get-property "values['Value']" | equals "checking scope" | verify-true
+	    get-item "Automatic Variables/${TEST_NAME}" | get-property "values['Value']" | equals "checking scope" | verify-true
 	}
-	//added new variable
+	//check orde of variables - new global is still visible
+	with [get-view Variables | get-tree] {
+	    get-property itemCount | equals 9 | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${booleas_arg}" | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "${from_resource}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${glob}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "${x}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "&{newDict}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "@{list_for_res}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "@{list_from_test}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "Automatic Variables" | verify-true
+	}
+
+	check-decorators-for-test-vars -x_var "suite" -a_var "local"
+	check-list-and-dicts_from_test
+	
+	//----------------------------------------------------------
+	//go to resource
 	get-button "Step Into (F5)" | click
 	wait 1000
-	with [get-view Variables | get-tree] {
-	    get-item "${a}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
-	    get-item "${a}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
-	    get-item "${a}" | get-property "values['Name']" | equals "${a}" | verify-true
-	    get-item "${a}" | get-property "values['Value']" | equals 4 | verify-true
-	}
-	get-view Variables | restore
-	//go to resource
-	with [get-button "Step Into (F5)"] {
-	    click
-	    wait-for-thread -file "OnlyVariables.robot"
-	    click   //go to 8 line
-	}
-	wait-for-thread -file "OnlyVariables.robot"
-	get-view Variables | maximize
+	get-button "Step Into (F5)" | click
 	
-	//varaible replace with new value from main test
+	
 	with [get-view Variables | get-tree] {
 	    get-item "${a}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
 	    get-item "${a}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
 	    get-item "${a}" | get-property "values['Name']" | equals "${a}" | verify-true
 	    get-item "${a}" | get-property "values['Value']" | equals "from test" | verify-true
 	}
-	//new test
-	get-button "Step Into (F5)" | click
-	wait 1000
-	
-    
-    get-view Variables | get-tree | select "${TEST_NAME}"
-	with [get-view Variables | get-tree] {
-	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
-	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
-	    get-item "${TEST_NAME}" | get-property "values['Value']" | equals "create new list" | verify-true
-	}
-	with [get-button "Step Into (F5)"] {
-	    click
-	    wait 1000
-	    click
-	}
-	
-	wait 1000
-	//new list 
-	get-view Variables | get-tree | select "@{vegetable}" | double-click
-	with [get-view Variables | get-tree] {
-	    get-item "@{vegetable}" | get-property childCount | equals 2 | verify-true
-	    get-item "@{vegetable}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
-	    get-item "@{vegetable}/\\[0\\]" | get-property "values['Value']" | equals onion | verify-true
-	    get-item "@{vegetable}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
-	    get-item "@{vegetable}/\\[1\\]" | get-property "values['Value']" | equals tomato | verify-true
-	}
 	get-view Variables | restore
-
-	with [get-button "Step Into (F5)"] {
-	    click
-	    wait-for-thread -file "OnlyVariables.robot"
-	    click
-	    wait-for-thread -file "OnlyVariables.robot"
-	    click
-	    wait-for-thread -file "OnlyVariables.robot"
-	}
-	
-	get-view Variables | maximize
-	get-view Variables | get-tree | select "@{list_from_test}" | double-click
-	with [get-view Variables | get-tree] {
-	    get-item "@{list_from_test}" | get-property index | equals 5 | verify-true
-	    get-item "@{list_from_test}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
-	    get-item "@{list_from_test}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
-	    get-item "@{list_from_test}" | get-property "values['Name']" | equals "@{list_from_test}" | verify-true
-	    get-item "@{list_from_test}" | get-property "values['Value']" | equals "List[4]" | verify-true
-	}
-	with [get-view Variables | get-tree] {
-	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
-	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Value']" | equals 7 | verify-true
-	}
-	
-	get-button "Terminate (M1+F2)" | click
-
+	get-button "Step Into (F5)" | click
 }
 
-wait 1000
+wait-for-console -times 3 -delay 1000
+
 get-view Variables | get-tree | get-property itemCount | equals 0 | verify-true
-get-view Variables | restore
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
