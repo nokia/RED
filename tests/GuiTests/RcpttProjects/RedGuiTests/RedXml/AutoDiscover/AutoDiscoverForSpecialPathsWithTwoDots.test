@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PqJNkIJTEeeVzuwK_hMKqA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/16/17 2:39 PM
+Save-Time: 8/16/17 2:45 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -115,7 +115,10 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     click -default
 }
 wait -ms 2000
-get-window ".*" | get-button OK | click
+get-window ".*" | {
+with [get-window ".*" | get-text-viewer] {
+    key-type Enter
+}
 // ------------- more deep path---------------
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 25
