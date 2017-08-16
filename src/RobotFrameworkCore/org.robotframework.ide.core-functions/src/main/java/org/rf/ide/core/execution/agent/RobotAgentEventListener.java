@@ -20,7 +20,7 @@ import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
-import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VariablesEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 
 public interface RobotAgentEventListener {
@@ -53,7 +53,7 @@ public interface RobotAgentEventListener {
 
     void handleLibraryImport(LibraryImportEvent event);
 
-    void handleVariablesChanged(VariablesChangedEvent event);
+    void handleVariables(VariablesEvent event);
 
     void handleLogMessage(MessageEvent event);
 

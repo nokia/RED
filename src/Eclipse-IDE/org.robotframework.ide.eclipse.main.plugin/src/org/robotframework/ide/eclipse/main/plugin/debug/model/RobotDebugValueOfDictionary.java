@@ -54,34 +54,4 @@ public class RobotDebugValueOfDictionary extends RobotDebugValue {
     public RobotDebugVariable[] getVariables() {
         return nestedVariables.toArray(new RobotDebugVariable[0]);
     }
-
-    @Override
-    protected void syncValue(final RobotDebugVariable parent, final String type, final Object newValue) {
-        final Map<?, ?> newValueDict = (Map<?, ?>) newValue;
-
-        setType(type);
-        setValue(type == null ? "" : type + "[" + newValueDict.size() + "]");
-
-        int i = 0;
-        for (final Entry<?, ?> entry : newValueDict.entrySet()) {
-            final VariableTypedValue typeWithValue = (VariableTypedValue) entry.getValue();
-
-            if (i < nestedVariables.size()) {
-                nestedVariables.get(i).syncValue(entry.getKey().toString(), typeWithValue.getType(),
-                        typeWithValue.getValue());
-            } else {
-                nestedVariables.add(new RobotDebugVariable(parent, entry.getKey().toString(), typeWithValue.getType(),
-                        typeWithValue.getValue()));
-            }
-            i++;
-        }
-        while (i < nestedVariables.size()) {
-            nestedVariables.remove(i);
-        }
-    }
-
-    void setVariables(final Map<String, RobotDebugVariable> variables) {
-        nestedVariables.clear();
-        nestedVariables.addAll(variables.values());
-    }
 }

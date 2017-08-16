@@ -5,12 +5,7 @@
  */
 package org.rf.ide.core.execution.debug;
 
-import static com.google.common.collect.Lists.reverse;
-import static java.util.stream.Collectors.toList;
-
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
@@ -20,9 +15,7 @@ import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
-import org.rf.ide.core.execution.agent.event.Variable;
-import org.rf.ide.core.execution.agent.event.VariableTypedValue;
-import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VariablesEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesFixer;
 import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesForRf29Fixer;
@@ -63,45 +56,26 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final String suiteName = event.getName();
         final URI suitePath = event.getPath();
         final boolean suiteIsDirectory = event.isDirectory();
-        final List<Map<Variable, VariableTypedValue>> variableScopes = event.getVariables();
 
-        if (stacktrace.isEmpty()) { // root suite
-            final StackFrameVariables globalVars = StackFrameVariables
-                    .newGlobalVariables(variableScopes.get(variableScopes.size() - 1));
-            stacktrace.setGlobalVariables(globalVars);
-        }
-
-        updateVariables(variableScopes.stream().skip(1).collect(toList()));
-
-        final StackFrameVariables newFrameVariables = StackFrameVariables.newSuiteVariables(variableScopes.get(0),
-                stacktrace.getGlobalVariables());
         final StackFrameContext context = locator.findContextForSuite(suiteName, suitePath, suiteIsDirectory,
                 currentPath);
-        stacktrace.push(new StackFrame(suiteName, FrameCategory.SUITE, stacktrace.size(), context, newFrameVariables));
+        stacktrace.push(new StackFrame(suiteName, FrameCategory.SUITE, stacktrace.size(), context));
     }
 
     @Override
     public void handleTestStarted(final TestStartedEvent event) {
         final String testName = event.getName();
         final Optional<String> template = event.getTemplate();
-        final List<Map<Variable, VariableTypedValue>> variableScopes = event.getVariables();
-
-        updateVariables(variableScopes.stream().skip(1).collect(toList()));
-
-        final StackFrameVariables newFrameVariables = StackFrameVariables.newTestVariables(variableScopes.get(0),
-                stacktrace.peekCurrentFrame().map(StackFrame::getVariables).get());
 
         final URI path = stacktrace.getContextPath().orElse(null);
         final StackFrameContext context = locator.findContextForTestCase(testName, path, template);
-        stacktrace.push(new StackFrame(testName, FrameCategory.TEST, stacktrace.size(), context, newFrameVariables));
+        stacktrace.push(new StackFrame(testName, FrameCategory.TEST, stacktrace.size(), context));
     }
 
     @Override
     public void handleKeywordAboutToStart(final KeywordStartedEvent event) {
         final StackFrameContext context = stacktrace.peekCurrentFrame().map(StackFrame::getContext).orElse(null);
         final RunningKeyword keyword = keywordsTypesFixer.keywordStarting(event.getRunningKeyword(), context);
-
-        updateVariables(event.getVariables());
 
         stacktrace.peekCurrentFrame().ifPresent(frame -> frame.moveToKeyword(keyword, breakpointSupplier));
     }
@@ -111,10 +85,6 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final String keywordName = event.getName();
         final String libraryName = event.getLibraryName();
         final RunningKeyword keyword = keywordsTypesFixer.keywordStarted(event.getRunningKeyword());
-
-        final StackFrameVariables newFrameVariables = StackFrameVariables
-                .newLocalVariables(stacktrace.getFirstTestOrSuiteFrame().map(StackFrame::getVariables).get(),
-                        keyword.isForLoop() || keyword.isForIteration());
 
         final boolean isSuiteSetupTeardown = (keyword.isSetup() || keyword.isTeardown())
                 && stacktrace.hasCategoryOnTop(FrameCategory.SUITE);
@@ -150,12 +120,10 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
             frameNamePrefix = "";
         }
 
-        // there are no separate variable frames in RF for FOR and FOR_ITEM elements as well
-        // as library keywords
         final String frameName = frameNamePrefix + QualifiedKeywordName.asCall(keywordName, libraryName);
         final StackFrame frame = context.isLibraryKeywordContext()
-                ? new StackFrame(frameName, category, level, context, newFrameVariables, () -> currentSuitePath)
-                : new StackFrame(frameName, category, level, context, newFrameVariables);
+                ? new StackFrame(frameName, category, level, context, () -> currentSuitePath)
+                : new StackFrame(frameName, category, level, context);
 
         stacktrace.push(frame);
     }
@@ -183,27 +151,12 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
     }
 
     @Override
-    public void handleVariablesChanged(final VariablesChangedEvent event) {
-        updateVariables(event.getVariables());
+    public void handleVariables(final VariablesEvent event) {
+        stacktrace.updateVariables(event.getVariables());
     }
 
     @Override
     public void handleClosed() {
         stacktrace.destroy();
-    }
-
-    private void updateVariables(final List<Map<Variable, VariableTypedValue>> variables) {
-        final List<StackFrame> reversedFrames = reverse(stacktrace.stream().collect(toList()));
-        final List<Map<Variable, VariableTypedValue>> reversedVariables = reverse(variables);
-
-        stacktrace.getGlobalVariables().update(reversedVariables.get(0));
-        for (final StackFrame frame : reversedFrames) {
-            if (frame.isLibraryKeywordFrame()) {
-                // nothing to update in library keywords frames plus there is no frame on Robot side
-                continue;
-            }
-            final Map<Variable, VariableTypedValue> vars = reversedVariables.get(frame.getLevel() + 1);
-            frame.updateVariables(vars);
-        }
     }
 }

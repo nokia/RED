@@ -22,6 +22,7 @@ import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.rf.ide.core.execution.debug.StackFrame;
 import org.rf.ide.core.execution.debug.StackFrameVariable;
+import org.rf.ide.core.execution.debug.StackFrameVariables;
 import org.rf.ide.core.execution.debug.StackFrameVariables.StackVariablesDelta;
 import org.rf.ide.core.execution.debug.UserProcessDebugController;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -38,88 +39,13 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     private final UserProcessDebugController userController;
 
-    private Map<String, RobotDebugVariable> variables;
 
-    protected RobotStackFrame(final RobotThread thread, final StackFrame frame,
+    RobotStackFrame(final RobotThread thread, final StackFrame frame,
             final UserProcessDebugController userController) {
         super(thread.getDebugTarget());
         this.thread = thread;
         this.frame = frame;
         this.userController = userController;
-        this.variables = new LinkedHashMap<>();
-
-        this.frame.addVariablesChangesListener(delta -> updateVariables(delta));
-        this.frame.addContextChangesListener(() -> this.fireChangeEvent(DebugEvent.CONTENT));
-    }
-
-    void createVariables() {
-        final List<RobotDebugVariable> nonAutomaticVariables = Streams.stream(frame.getVariables())
-                .filter(not(StackFrameVariable::isAutomatic))
-                .map(var -> new RobotDebugVariable(this, var))
-                .collect(toList());
-
-        final List<RobotDebugVariable> automaticVars = Streams.stream(frame.getVariables())
-                .filter(StackFrameVariable::isAutomatic)
-                .map(var -> new RobotDebugVariable(this, var))
-                .collect(toList());
-
-        for (final RobotDebugVariable var : nonAutomaticVariables) {
-            this.variables.put(var.getName(), var);
-        }
-        final RobotDebugVariable automatic = RobotDebugVariable.createAutomatic(this, automaticVars);
-        this.variables.put(automatic.getName(), automatic);
-    }
-
-    private void updateVariables(final StackVariablesDelta delta) {
-        final RobotDebugVariable automaticGroup = variables.get(RobotDebugVariable.AUTOMATIC_NAME);
-        
-        final Function<StackFrameVariable, RobotDebugVariable> variablesSupplier = variable -> {
-            if (variable.isAutomatic()) {
-                return automaticGroup.getValue().getVariable(variable.getName());
-            } else {
-                return variables.get(variable.getName());
-            }
-        };
-        
-        final Map<String, RobotDebugVariable> newAutomaticVariables = new LinkedHashMap<>();
-        final Map<String, RobotDebugVariable> newVariables = new LinkedHashMap<>();
-
-        for (final StackFrameVariable variable : frame.getVariables()) {
-            final Map<String, RobotDebugVariable> targetMapping = variable.isAutomatic() ? newAutomaticVariables
-                    : newVariables;
-            final String varName = variable.getName();
-
-            RobotDebugVariable currentVar = variablesSupplier.apply(variable);
-
-            if (delta.isUnchanged(varName)) {
-                currentVar.setValueChanged(false);
-                targetMapping.put(varName, currentVar);
-
-            } else if (delta.isChanged(varName)) {
-                currentVar.setValueChanged(true);
-                if (variable.isAutomatic()) {
-                    automaticGroup.setValueChanged(true);
-                }
-                currentVar.syncValue(varName, variable.getType(), variable.getValue());
-                targetMapping.put(varName, currentVar);
-
-            } else if (delta.isAdded(varName)) {
-                currentVar = new RobotDebugVariable(this, variable);
-                currentVar.setValueChanged(true);
-                if (variable.isAutomatic()) {
-                    automaticGroup.setValueChanged(true);
-                }
-                targetMapping.put(varName, currentVar);
-            }
-            // otherwise it was removed, so we won't add it to new map
-        }
-        automaticGroup.syncAutomaticValue(newAutomaticVariables);
-        newVariables.put(RobotDebugVariable.AUTOMATIC_NAME, automaticGroup);
-        this.variables = newVariables;
-    }
-
-    public StackFrame getFrame() {
-        return frame;
     }
 
     public Optional<URI> getPath() {
@@ -128,6 +54,22 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     public Optional<URI> getContextPath() {
         return frame.getContextPath();
+    }
+
+    public boolean isErroneous() {
+        return frame.isErroneous();
+    }
+
+    public boolean isLibraryKeywordFrame() {
+        return frame.isLibraryKeywordFrame();
+    }
+
+    public boolean isSuiteDirectoryContext() {
+        return frame.isSuiteDirectoryContext();
+    }
+
+    public boolean isSuiteFileContext() {
+        return frame.isSuiteFileContext();
     }
 
     public String getLabel() {
@@ -163,6 +105,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     @Override
     public void stepInto() {
         userController.stepInto(() -> {
+            thread.resumed();
             getDebugTarget().getProcess().resumed();
             getThread().fireResumeEvent(DebugEvent.STEP_INTO);
         }, () -> {
@@ -178,6 +121,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     @Override
     public void stepOver() {
         userController.stepOver(frame, () -> {
+            thread.resumed();
             getDebugTarget().getProcess().resumed();
             getThread().fireResumeEvent(DebugEvent.STEP_OVER);
         }, () -> {
@@ -193,6 +137,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     @Override
     public void stepReturn() {
         userController.stepReturn(frame, () -> {
+            thread.resumed();
             getDebugTarget().getProcess().resumed();
             getThread().fireResumeEvent(DebugEvent.STEP_RETURN);
         }, () -> {
@@ -212,17 +157,75 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     @Override
     public boolean hasVariables() {
-        return getThread().isSuspended() && !variables.isEmpty();
+        return getThread().isSuspended();
     }
 
     @Override
-    public RobotDebugVariable[] getVariables() {
+    public synchronized RobotDebugVariable[] getVariables() {
+        final Map<String, RobotDebugVariable> variables = createVariables(frame.getVariables());
+        if (frame.getLastDelta().isPresent()) {
+            markChanges(variables, frame.getLastDelta().get());
+        }
         return variables.values().toArray(new RobotDebugVariable[0]);
+    }
+
+    Map<String, RobotDebugVariable> createVariables(final StackFrameVariables variables) {
+        final List<RobotDebugVariable> nonAutomaticVariables = Streams.stream(variables)
+                .filter(not(StackFrameVariable::isAutomatic))
+                .map(var -> new RobotDebugVariable(this, var))
+                .collect(toList());
+
+        final List<RobotDebugVariable> automaticVars = Streams.stream(variables)
+                .filter(StackFrameVariable::isAutomatic)
+                .map(var -> new RobotDebugVariable(this, var))
+                .collect(toList());
+
+        final Map<String, RobotDebugVariable> vars = new LinkedHashMap<>();
+        for (final RobotDebugVariable var : nonAutomaticVariables) {
+            vars.put(var.getName(), var);
+        }
+        final RobotDebugVariable automatic = RobotDebugVariable.createAutomatic(this, automaticVars);
+        vars.put(automatic.getName(), automatic);
+        return vars;
+    }
+
+    private void markChanges(final Map<String, RobotDebugVariable> variables,
+            final StackVariablesDelta delta) {
+
+        final RobotDebugVariable automaticGroup = variables.get(RobotDebugVariable.AUTOMATIC_NAME);
+
+        final Function<StackFrameVariable, RobotDebugVariable> variablesSelector = variable -> {
+            if (variable.isAutomatic()) {
+                return automaticGroup.getValue().getVariable(variable.getName());
+            } else {
+                return variables.get(variable.getName());
+            }
+        };
+
+        for (final StackFrameVariable variable : frame.getVariables()) {
+            final String varName = variable.getName();
+            final boolean shouldMark = delta.isChanged(varName) || delta.isAdded(varName);
+
+            final RobotDebugVariable var = variablesSelector.apply(variable);
+            var.setValueChanged(shouldMark);
+            if (variable.isAutomatic() && shouldMark) {
+                automaticGroup.setValueChanged(true);
+            }
+        }
+    }
+
+    public void changeVariable(final StackFrameVariable stackVariable, final List<String> arguments) {
+        getDebugTarget().changeVariable(frame, stackVariable, arguments);
+    }
+
+    public void changeVariableInnerValue(final StackFrameVariable variable, final List<Object> path,
+            final List<String> arguments) {
+        getDebugTarget().changeVariableInnerValue(frame, variable, path, arguments);
     }
 
     public List<? extends RobotDebugVariable> getAllVariables() {
         final List<RobotDebugVariable> allVariables = new ArrayList<>();
-        for (final RobotDebugVariable var : this.variables.values()) {
+        for (final RobotDebugVariable var : getVariables()) {
             var.visitAllVariables(v -> allVariables.add(v));
         }
         return allVariables;

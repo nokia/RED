@@ -136,6 +136,7 @@ class RedResponseMessage:
     PAUSE = 'pause'
     RESUME = 'resume'
     EVALUATE_CONDITION = 'evaluate_condition'
+    GET_VARIABLES = 'get_variables'
     CHANGE_VARIABLE = 'change_variable'
     
 class AgentEventMessage:
@@ -153,7 +154,7 @@ class AgentEventMessage:
     END_KEYWORD = 'end_keyword'
     SHOULD_CONTINUE = 'should_continue'
     CONDITION_RESULT = 'condition_result'
-    VARS_CHANGED = 'vars_changed'
+    VARIABLES = 'variables'
     PAUSED = 'paused'
     RESUMED = 'resumed'
     RESOURCE_IMPORT = 'resource_import'
@@ -243,7 +244,6 @@ class TestRunnerAgent:
         attrs_copy = copy.copy(attrs)
         del attrs_copy['doc']
         attrs_copy['is_dir'] = os.path.isdir(attrs['source'])
-        attrs_copy['vars_scopes'] = self._collect_variables() if self._mode == AgentMode.DEBUG else []
         
         self._send_to_server(AgentEventMessage.START_SUITE, name, attrs_copy)
 
@@ -257,7 +257,6 @@ class TestRunnerAgent:
     def start_test(self, name, attrs):
         attrs_copy = copy.copy(attrs)
         del attrs_copy['doc']
-        attrs_copy['vars_scopes'] = self._collect_variables() if self._mode == AgentMode.DEBUG else []
         self._send_to_server(AgentEventMessage.START_TEST, name, attrs_copy)
 
     def end_test(self, name, attrs):
@@ -275,7 +274,6 @@ class TestRunnerAgent:
         del attrs_copy['args']
         del attrs_copy['doc']
         del attrs_copy['assign']
-        attrs_copy['vars_scopes'] = self._collect_variables() if self._mode == AgentMode.DEBUG else []
         
         # this is done in order to reuse json encoded objects as they are sent twice in DEBUG mode
         json_obj = self._encode_to_json((name, attrs_copy))
@@ -323,57 +321,6 @@ class TestRunnerAgent:
     def _should_ask_for_pause_on_end(self):
         return self._mode == AgentMode.DEBUG
             
-    def _collect_variables(self):
-        # WARNING : this method uses protected RF methods/fields so it is sensitive for RF changes;
-        # currently works fine for RF 2.9 - 3.0
-        variables = self._built_in._variables
-        frames = variables._scopes
-        
-        all_frames = []
-        
-        i = 0
-        last_suite_index = frames.index(variables._suite)
-        test_index = frames.index(variables._test) if variables._test else -1
-        for current_frame in frames:
-
-            current_frame_values = {}
-            frame_vars = OrderedDict()
-            for variable in current_frame.store:
-                value = current_frame.store[variable]
-                var, _ = current_frame.store._decorate(variable, value)
-                if i == 0:
-                    identified_scope = 'global'
-                elif var in previous_frame_values and value == previous_frame_values[var][1]:
-                    identified_scope = previous_frame_values[var][0]
-                elif i <= last_suite_index:
-                    identified_scope = 'suite'
-                elif i == test_index:
-                    identified_scope = 'test' if '$' + var[1:] in variables._variables_set._test else 'local'
-                else:
-                    identified_scope = 'local'
-                
-                
-                if inspect.ismodule(value) or inspect.isfunction(value) or inspect.isclass(value):
-                    frame_vars[var] = (type(value).__name__, '<' + id(value) + '>', identified_scope)
-                else:
-                    try:
-                        labeled = _label_with_types(value)
-                        fixed = _fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, labeled)
-                        if type(value) is list or isinstance(value, Mapping):
-                            frame_vars[var] = (fixed[0], fixed[1], identified_scope)
-                        else:
-                            frame_vars[var] = (fixed[0], str(fixed[1]), identified_scope)
-                    except:
-                        frame_vars[var] = (type(value).__name__, '<error retrieving value>', identified_scope)
-
-                current_frame_values[var] = (identified_scope, value)    
-            
-            all_frames.append(frame_vars)
-            previous_frame_values = current_frame_values
-            i += 1
-        all_frames.reverse()
-        return all_frames
-            
     def _should_pause(self, pausing_point):
         self._send_to_server(AgentEventMessage.SHOULD_CONTINUE, {'pausing_point' : pausing_point})
         
@@ -420,21 +367,27 @@ class TestRunnerAgent:
         if self._mode == AgentMode.DEBUG:
             possible_responses.append(RedResponseMessage.CHANGE_VARIABLE)
         
+        self._send_variables()
         while True:
             self._send_to_server(AgentEventMessage.PAUSED)
             response_name, response = self._wait_for_reponse(*possible_responses)
         
-            if response_name == RedResponseMessage.TERMINATE:
+            if response_name == RedResponseMessage.RESUME:
+                self._send_to_server(AgentEventMessage.RESUMED)
+                return
+            elif response_name == RedResponseMessage.TERMINATE:
                 sys.exit()
             elif response_name == RedResponseMessage.DISCONNECT:
                 self._close_connection()
                 return
             elif response_name == RedResponseMessage.CHANGE_VARIABLE:
-                self._change_variable_value(response)
-            elif response_name == RedResponseMessage.RESUME:
-                self._send_to_server(AgentEventMessage.RESUMED)
-                return
-            
+                try:
+                    self._change_variable_value(response)
+                    self._send_variables()
+                except ValueError as e:
+                    self._print_error_message(str(e))
+                    self._send_variables(str(e))
+                    
     def _change_variable_value(self, response):
         try:
             arguments = response[RedResponseMessage.CHANGE_VARIABLE]
@@ -442,9 +395,7 @@ class TestRunnerAgent:
             scope = arguments['scope']
             
             if scope not in ['local', 'test_case', 'test_suite', 'global']:
-                err = 'Unable to change value of variable ' + var_name + ' inside unrecognized scope ' + str(scope)
-                self._print_error_message(err)
-                self._send_vars_changed(err)
+                raise ValueError('Unable to change value of variable ' + var_name + ' inside unrecognized scope ' + str(scope))
                 
             new_values = arguments['values']
             level = arguments['level'] + 1 # adding one because globals are not taken into account
@@ -453,12 +404,9 @@ class TestRunnerAgent:
                 self._change_variable_inner_value(var_name, level, arguments['path'], new_values)
             else:
                 self._change_variable_on_top_level(var_name, scope, level, new_values)
-            
-            self._send_vars_changed()
+
         except Exception as e:
-            err = 'Unable to change value of variable ' + var_name + '. ' + str(e)
-            self._print_error_message(err)
-            self._send_vars_changed(err)
+            raise ValueError('Unable to change value of variable ' + var_name + '. ' + str(e))
             
     def _change_variable_on_top_level(self, var_name, scope, level, new_values):
         # WARNING : this method uses protected RF methods/fields so it is sensitive for RF changes;
@@ -510,12 +458,63 @@ class TestRunnerAgent:
         else:
             raise RuntimeError('Requested to change value in ' + val_kind + ' object type, but ' + type(object).__name__ + 'found')
 
-    def _send_vars_changed(self, error=None):
+    def _send_variables(self, error=None):
         vars = self._collect_variables()
         if error:
-            self._send_to_server(AgentEventMessage.VARS_CHANGED, {'var_scopes': vars, 'error': error})
+            self._send_to_server(AgentEventMessage.VARIABLES, {'var_scopes': vars, 'error': error})
         else:
-            self._send_to_server(AgentEventMessage.VARS_CHANGED, {'var_scopes': vars})
+            self._send_to_server(AgentEventMessage.VARIABLES, {'var_scopes': vars})
+            
+    def _collect_variables(self):
+        # WARNING : this method uses protected RF methods/fields so it is sensitive for RF changes;
+        # currently works fine for RF 2.9 - 3.0
+        variables = self._built_in._variables
+        frames = variables._scopes
+        
+        all_frames = []
+        
+        i = 0
+        last_suite_index = frames.index(variables._suite)
+        test_index = frames.index(variables._test) if variables._test else -1
+        for current_frame in frames:
+
+            current_frame_values = {}
+            frame_vars = OrderedDict()
+            for variable in current_frame.store:
+                value = current_frame.store[variable]
+                var, _ = current_frame.store._decorate(variable, value)
+                if i == 0:
+                    identified_scope = 'global'
+                elif var in previous_frame_values and value == previous_frame_values[var][1]:
+                    identified_scope = previous_frame_values[var][0]
+                elif i <= last_suite_index:
+                    identified_scope = 'suite'
+                elif i == test_index:
+                    identified_scope = 'test' if '$' + var[1:] in variables._variables_set._test else 'local'
+                else:
+                    identified_scope = 'local'
+                
+                
+                if inspect.ismodule(value) or inspect.isfunction(value) or inspect.isclass(value):
+                    frame_vars[var] = (type(value).__name__, '<' + id(value) + '>', identified_scope)
+                else:
+                    try:
+                        labeled = _label_with_types(value)
+                        fixed = _fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, labeled)
+                        if type(value) is list or isinstance(value, Mapping):
+                            frame_vars[var] = (fixed[0], fixed[1], identified_scope)
+                        else:
+                            frame_vars[var] = (fixed[0], str(fixed[1]), identified_scope)
+                    except:
+                        frame_vars[var] = (type(value).__name__, '<error retrieving value>', identified_scope)
+
+                current_frame_values[var] = (identified_scope, value)    
+            
+            all_frames.append(frame_vars)
+            previous_frame_values = current_frame_values
+            i += 1
+        all_frames.reverse()
+        return all_frames
 
     def resource_import(self, name, attributes):
         self._send_to_server(AgentEventMessage.RESOURCE_IMPORT, name, attributes)
