@@ -20,10 +20,4 @@ public class RobotDebugValueOfScalar extends RobotDebugValue {
     public String getDetailedValue() {
         return getValueString();
     }
-
-    @Override
-    protected void syncValue(final RobotDebugVariable parent, final String type, final Object newValue) {
-        setType(type);
-        setValue((String) newValue);
-    }
 }

@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.ArrayList;
-
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.Status;
@@ -52,7 +50,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null, new ArrayList<>()));
+        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null));
 
         assertThat(store.getMessage()).isEqualTo("Starting test: test_case\n");
     }
@@ -62,7 +60,7 @@ public class ExecutionMessagesTrackerTest {
         final RobotTestsLaunch launchContext = new RobotTestsLaunch(null);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
-        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null, new ArrayList<>()));
+        tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null));
 
         final ExecutionMessagesStore store = launchContext.getExecutionData(ExecutionMessagesStore.class,
                 ExecutionMessagesStore::new);

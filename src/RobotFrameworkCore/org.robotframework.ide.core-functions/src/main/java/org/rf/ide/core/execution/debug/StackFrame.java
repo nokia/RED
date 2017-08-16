@@ -6,9 +6,7 @@
 package org.rf.ide.core.execution.debug;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -28,70 +26,52 @@ public class StackFrame {
     private final int level;
 
     private StackFrameContext context;
-
-    private final StackFrameVariables variables;
-
-    private final List<VariablesChangesListener> variablesChangesListeners;
-
-    private final List<ContextChangesListener> contextChangesListeners;
-
-    private final EnumSet<StackFrameMarker> markers;
-
     private final Optional<URI> contextPath;
-
     private final String originalErrorMessage;
 
-    StackFrame(final String name, final FrameCategory category, final int level, final StackFrameContext context,
-            final StackFrameVariables variables) {
-        this(name, category, level, context, variables, () -> null);
+    private StackFrameVariables variables;
+    private StackVariablesDelta lastDelta;
+    
+    private final EnumSet<StackFrameMarker> markers;
+
+    StackFrame(final String name, final FrameCategory category, final int level, final StackFrameContext context) {
+        this(name, category, level, context, () -> null);
     }
 
     StackFrame(final String name, final FrameCategory category, final int level, final StackFrameContext context,
-            final StackFrameVariables variables, final Supplier<URI> contextPathSupplier) {
+            final Supplier<URI> contextPathSupplier) {
         this.name = name;
         this.category = category;
         this.level = level;
         this.context = context;
         this.originalErrorMessage = context.isErroneous() ? context.getErrorMessage().get() : "";
-        this.variables = variables;
-        this.variablesChangesListeners = new ArrayList<>();
-        this.contextChangesListeners = new ArrayList<>();
         this.markers = EnumSet.noneOf(StackFrameMarker.class);
         this.contextPath = Optional.ofNullable(context.getAssociatedPath().orElseGet(contextPathSupplier));
-    }
-
-    public void addVariablesChangesListener(final VariablesChangesListener listener) {
-        variablesChangesListeners.add(listener);
-    }
-
-    public void removeVariablesChangesListener(final VariablesChangesListener listener) {
-        variablesChangesListeners.remove(listener);
-    }
-
-    public void addContextChangesListener(final ContextChangesListener listener) {
-        contextChangesListeners.add(listener);
-    }
-
-    public void removeContextChangesListener(final ContextChangesListener listener) {
-        contextChangesListeners.remove(listener);
-    }
-
-    public void destroy() {
-        variables.clear();
-        variablesChangesListeners.clear();
-        contextChangesListeners.clear();
     }
 
     public String getName() {
         return name;
     }
 
+    int getLevel() {
+        return level;
+    }
+
     public boolean hasCategory(final FrameCategory category) {
         return this.category == category;
     }
 
-    public int getLevel() {
-        return level;
+    public boolean isSuiteDirectoryContext() {
+        return hasCategory(FrameCategory.SUITE) && context instanceof SuiteContext
+                && ((SuiteContext) context).isDirectory();
+    }
+
+    public boolean isSuiteFileContext() {
+        return hasCategory(FrameCategory.SUITE) && !(isSuiteDirectoryContext());
+    }
+
+    public boolean isTestContext() {
+        return hasCategory(FrameCategory.TEST);
     }
 
     /**
@@ -103,7 +83,7 @@ public class StackFrame {
         return context.getAssociatedPath();
     }
 
-    public StackFrameContext getContext() {
+    StackFrameContext getContext() {
         return context;
     }
 
@@ -120,19 +100,6 @@ public class StackFrame {
 
     public Optional<FileRegion> getFileRegion() {
         return context.getFileRegion();
-    }
-
-    public boolean isSuiteDirectoryContext() {
-        return hasCategory(FrameCategory.SUITE) && context instanceof SuiteContext
-                && ((SuiteContext) context).isDirectory();
-    }
-
-    public boolean isSuiteFileContext() {
-        return hasCategory(FrameCategory.SUITE) && !(isSuiteDirectoryContext());
-    }
-
-    public boolean isTestContext() {
-        return hasCategory(FrameCategory.TEST);
     }
 
     public boolean isLibraryKeywordFrame() {
@@ -152,65 +119,48 @@ public class StackFrame {
         }
     }
 
-    public boolean isMarkedStepping() {
+    boolean isMarkedStepping() {
         return markers.contains(StackFrameMarker.STEPPING);
     }
 
-    public boolean isMarkedError() {
+    boolean isMarkedError() {
         return markers.contains(StackFrameMarker.ERROR);
     }
 
-    public void mark(final StackFrameMarker marker) {
+    void mark(final StackFrameMarker marker) {
         markers.add(marker);
     }
 
-    public void unmark(final StackFrameMarker marker) {
+    void unmark(final StackFrameMarker marker) {
         markers.remove(marker);
     }
 
-    public Optional<RobotLineBreakpoint> getBreakpoint() {
+    Optional<RobotLineBreakpoint> getBreakpoint() {
         return context.getLineBreakpoint();
     }
 
-    public void moveToKeyword(final RunningKeyword keyword, final RobotBreakpointSupplier breakpointSupplier) {
-        final Optional<URI> previousPath = context.getAssociatedPath();
+    void moveToKeyword(final RunningKeyword keyword, final RobotBreakpointSupplier breakpointSupplier) {
         this.context = context.moveTo(keyword, breakpointSupplier);
-
-        if (!previousPath.equals(context.getAssociatedPath())) {
-            contextChangesListeners.stream().forEach(listener -> listener.contextChanged());
-        }
     }
 
-    public void moveOutOfKeyword() {
-        final Optional<URI> previousPath = context.getAssociatedPath();
+    void moveOutOfKeyword() {
         this.context = context.moveOut();
-
-        if (!previousPath.equals(context.getAssociatedPath())) {
-            contextChangesListeners.stream().forEach(listener -> listener.contextChanged());
-        }
     }
 
-    public StackVariablesDelta updateVariables(final Map<Variable, VariableTypedValue> vars) {
-        final StackVariablesDelta delta = variables.update(vars);
-        variablesChangesListeners.stream().forEach(listener -> listener.variablesChanged(delta));
-        return delta;
+    void updateVariables(final Map<Variable, VariableTypedValue> vars) {
+        lastDelta = variables.update(vars);
     }
 
     public StackFrameVariables getVariables() {
         return variables;
     }
 
-    @FunctionalInterface
-    public static interface VariablesChangesListener {
-
-        void variablesChanged(StackVariablesDelta variablesDelta);
-
+    void setVariables(final StackFrameVariables variables) {
+        this.variables = variables;
     }
 
-    @FunctionalInterface
-    public static interface ContextChangesListener {
-
-        void contextChanged();
+    public Optional<StackVariablesDelta> getLastDelta() {
+        return Optional.ofNullable(lastDelta);
     }
 
     public static enum FrameCategory {

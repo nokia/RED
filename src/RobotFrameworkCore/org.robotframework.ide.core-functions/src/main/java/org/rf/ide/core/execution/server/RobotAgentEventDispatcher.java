@@ -32,7 +32,7 @@ import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
-import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VariablesEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 
 import com.google.common.collect.Iterables;
@@ -109,8 +109,8 @@ class RobotAgentEventDispatcher {
                 case "end_keyword":
                     handleEndKeyword(eventMap);
                     break;
-                case "vars_changed":
-                    handleVariablesChanged(eventMap);
+                case "variables":
+                    handleVariables(eventMap);
                     break;
                 case "should_continue":
                     handleShouldContinue(eventMap);
@@ -225,10 +225,10 @@ class RobotAgentEventDispatcher {
         }
     }
 
-    private void handleVariablesChanged(final Map<String, Object> eventMap) {
-        final VariablesChangedEvent event = VariablesChangedEvent.from(eventMap);
+    private void handleVariables(final Map<String, Object> eventMap) {
+        final VariablesEvent event = VariablesEvent.from(eventMap);
         for (final RobotAgentEventListener listener : eventsListeners) {
-            listener.handleVariablesChanged(event);
+            listener.handleVariables(event);
         }
     }
 

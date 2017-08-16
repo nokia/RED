@@ -51,28 +51,4 @@ public class RobotDebugValueOfList extends RobotDebugValue {
     public RobotDebugVariable[] getVariables() {
         return nestedVariables.toArray(new RobotDebugVariable[0]);
     }
-
-    @Override
-    protected void syncValue(final RobotDebugVariable parent, final String type, final Object newValue) {
-        final List<?> newValueList = (List<?>) newValue;
-
-        setType(type);
-        setValue(type == null ? "" : type + "[" + newValueList.size() + "]");
-
-        int i = 0;
-        for (final Object val : newValueList) {
-            final VariableTypedValue typeWithValue = (VariableTypedValue) val;
-
-            if (i < nestedVariables.size()) {
-                nestedVariables.get(i).syncValue("[" + i + "]", typeWithValue.getType(), typeWithValue.getValue());
-            } else {
-                nestedVariables.add(new RobotDebugVariable(parent, "[" + i + "]", typeWithValue.getType(),
-                        typeWithValue.getValue()));
-            }
-            i++;
-        }
-        while (i < nestedVariables.size()) {
-            nestedVariables.remove(i);
-        }
-    }
 }
