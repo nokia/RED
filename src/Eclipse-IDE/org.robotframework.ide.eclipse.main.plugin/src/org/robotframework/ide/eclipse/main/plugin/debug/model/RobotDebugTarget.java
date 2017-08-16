@@ -148,7 +148,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     public void resume() {
         getProcess().resume();
 
-        getThread().resumedFromBreakpoint();
+        getThread().resumed();
         getThread().fireResumeEvent(DebugEvent.CLIENT_REQUEST);
     }
 
@@ -227,12 +227,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         @Override
         public void pausedAfterVariableChange(final int frameLevel) {
-            // only refreshes the variables of frame given by the level
-            for (final RobotStackFrame frame : getThread().getStackFrames()) {
-                if (frame.getFrame().getLevel() == frameLevel) {
-                    frame.fireChangeEvent(DebugEvent.CONTENT);
-                }
-            }
+            suspended(DebugEvent.EVALUATION);
         }
 
         private void suspended(final int detail) {

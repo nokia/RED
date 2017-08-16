@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.event.ConditionEvaluatedEvent;
-import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VariablesEvent;
 
 
 public class RobotEvaluationErrorsHandler extends RobotDefaultAgentEventListener {
@@ -23,7 +23,7 @@ public class RobotEvaluationErrorsHandler extends RobotDefaultAgentEventListener
     }
 
     @Override
-    public void handleVariablesChanged(final VariablesChangedEvent event) {
+    public void handleVariables(final VariablesEvent event) {
         handleError(event.getError());
     }
 
