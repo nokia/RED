@@ -26,9 +26,6 @@ public final class SuiteStartedEvent {
 
     private final List<String> childTests;
 
-    private final List<Map<Variable, VariableTypedValue>> variables;
-
-
     public static SuiteStartedEvent from(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("start_suite");
         final String name = (String) arguments.get(0);
@@ -39,22 +36,18 @@ public final class SuiteStartedEvent {
         final List<String> childSuites = Events.ensureListOfStrings((List<?>) attributes.get("suites"));
         final List<String> childTests = Events.ensureListOfStrings((List<?>) attributes.get("tests"));
         final int totalTests = (Integer) attributes.get("totaltests");
-        final List<Map<Variable, VariableTypedValue>> variables = Events
-                .extractVariableScopes((List<?>) attributes.get("vars_scopes"));
 
-        return new SuiteStartedEvent(name, suiteFilePath, isDir, totalTests, childSuites, childTests, variables);
+        return new SuiteStartedEvent(name, suiteFilePath, isDir, totalTests, childSuites, childTests);
     }
 
     public SuiteStartedEvent(final String name, final URI suiteFilePath, final boolean isDir, final int totalTests,
-            final List<String> childSuites, final List<String> childTests,
-            final List<Map<Variable, VariableTypedValue>> variables) {
+            final List<String> childSuites, final List<String> childTests) {
         this.name = name;
         this.suiteFilePath = suiteFilePath;
         this.isDir = isDir;
         this.totalTests = totalTests;
         this.childSuites = childSuites;
         this.childTests = childTests;
-        this.variables = variables;
     }
 
     public String getName() {
@@ -81,24 +74,19 @@ public final class SuiteStartedEvent {
         return ImmutableList.copyOf(childTests);
     }
 
-    public List<Map<Variable, VariableTypedValue>> getVariables() {
-        return variables;
-    }
-
     @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass() == SuiteStartedEvent.class) {
             final SuiteStartedEvent that = (SuiteStartedEvent) obj;
             return this.name.equals(that.name) && this.suiteFilePath.equals(that.suiteFilePath)
                     && this.isDir == that.isDir && this.totalTests == that.totalTests
-                    && this.childSuites.equals(that.childSuites) && this.childTests.equals(that.childTests)
-                    && this.variables.equals(that.variables);
+                    && this.childSuites.equals(that.childSuites) && this.childTests.equals(that.childTests);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, suiteFilePath, isDir, totalTests, childSuites, childTests, variables);
+        return Objects.hash(name, suiteFilePath, isDir, totalTests, childSuites, childTests);
     }
 }

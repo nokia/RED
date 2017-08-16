@@ -69,7 +69,7 @@ public class ExecutionStatusTrackerTest {
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
         tracker.handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///suite.robot"), false, 2,
-                new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                new ArrayList<>(), new ArrayList<>()));
 
         verify(store).suiteStarted("suite", new URI("file:///suite.robot"), 2, new ArrayList<>(), new ArrayList<>());
         verifyNoMoreInteractions(store);
@@ -97,7 +97,7 @@ public class ExecutionStatusTrackerTest {
         context.getExecutionData(ExecutionStatusStore.class, () -> store);
 
         final ExecutionStatusTracker tracker = new ExecutionStatusTracker(context);
-        tracker.handleTestStarted(new TestStartedEvent("test", "teeeeest", null, new ArrayList<>()));
+        tracker.handleTestStarted(new TestStartedEvent("test", "teeeeest", null));
 
         verify(store).testStarted();
         verifyNoMoreInteractions(store);

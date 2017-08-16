@@ -10,9 +10,7 @@ import java.util.List;
 
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IThread;
-import org.rf.ide.core.execution.debug.StackFrame;
 import org.rf.ide.core.execution.debug.Stacktrace;
-import org.rf.ide.core.execution.debug.Stacktrace.StacktraceListener;
 import org.rf.ide.core.execution.debug.UserProcessDebugController;
 
 public class RobotThread extends RobotDebugElement implements IThread {
@@ -24,29 +22,12 @@ public class RobotThread extends RobotDebugElement implements IThread {
 
     private final Stacktrace stacktrace;
 
-    private final List<RobotStackFrame> frames;
-
     public RobotThread(final RobotDebugTarget target, final Stacktrace stacktrace,
             final UserProcessDebugController userController) {
         super(target);
         this.breakpoints = new ArrayList<>();
         this.userController = userController;
         this.stacktrace = stacktrace;
-        this.frames = new ArrayList<>();
-        this.stacktrace.addListener(new StacktraceListener() {
-
-            @Override
-            public void framePushed(final Stacktrace stack, final StackFrame frame) {
-                final RobotStackFrame newFrame = new RobotStackFrame(RobotThread.this, frame, userController);
-                newFrame.createVariables();
-                frames.add(0, newFrame);
-            }
-
-            @Override
-            public void framePopped(final Stacktrace stack, final StackFrame frame) {
-                frames.remove(0);
-            }
-        });
     }
 
     @Override
@@ -55,8 +36,10 @@ public class RobotThread extends RobotDebugElement implements IThread {
     }
 
     @Override
-    public RobotStackFrame[] getStackFrames() {
-        return frames.toArray(new RobotStackFrame[0]);
+    public synchronized RobotStackFrame[] getStackFrames() {
+        return stacktrace.stream()
+                .map(f -> new RobotStackFrame(this, f, userController))
+                .toArray(RobotStackFrame[]::new);
     }
 
     @Override
@@ -66,8 +49,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
 
     @Override
     public RobotStackFrame getTopStackFrame() {
-        final RobotStackFrame[] frames = getStackFrames();
-        return frames != null && frames.length > 0 ? frames[0] : null;
+        return hasStackFrames() ? new RobotStackFrame(this, stacktrace.iterator().next(), userController) : null;
     }
 
     @Override
@@ -85,7 +67,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
         breakpoints.add(breakpoint);
     }
 
-    void resumedFromBreakpoint() {
+    void resumed() {
         breakpoints.clear();
     }
 
@@ -96,17 +78,17 @@ public class RobotThread extends RobotDebugElement implements IThread {
 
     @Override
     public boolean canStepInto() {
-        return isSuspended() && !stacktrace.isEmpty() && getTopStackFrame().canStepInto();
+        return isSuspended() && !stacktrace.isEmpty();
     }
 
     @Override
     public boolean canStepOver() {
-        return isSuspended() && !stacktrace.isEmpty() && getTopStackFrame().canStepOver();
+        return isSuspended() && !stacktrace.isEmpty();
     }
 
     @Override
     public boolean canStepReturn() {
-        return isSuspended() && !stacktrace.isEmpty() && getTopStackFrame().canStepReturn();
+        return isSuspended() && !stacktrace.isEmpty();
     }
 
     @Override

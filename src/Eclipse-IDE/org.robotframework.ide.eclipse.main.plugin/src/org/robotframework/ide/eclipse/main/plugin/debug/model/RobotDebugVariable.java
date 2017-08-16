@@ -9,9 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
@@ -21,7 +21,6 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 
 /**
@@ -33,10 +32,10 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     private final RobotStackFrame frame;
     private final RobotDebugVariable parent;
-    private RobotDebugValue value;
+    private final RobotDebugValue value;
     private boolean valueChanged;
 
-    private String name;
+    private final String name;
     private final StackFrameVariable stackVariable;
 
     private final boolean isArtificial;
@@ -119,6 +118,8 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         } else {
             changeVariableInnerValue(arguments);
         }
+        setValueChanged(true);
+        frame.fireResumeEvent(DebugEvent.EVALUATION);
     }
 
     private List<String> extractArguments(final String expression) {
@@ -139,7 +140,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     }
 
     private void changeVariable(final List<String> arguments) {
-        getDebugTarget().changeVariable(frame.getFrame(), stackVariable, arguments);
+        frame.changeVariable(stackVariable, arguments);
     }
 
     private void changeVariableInnerValue(final List<String> arguments) {
@@ -148,8 +149,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         RobotDebugVariable current = this;
         while (current != null) {
             if (current.stackVariable != null) {
-                final StackFrameVariable variable = current.stackVariable;
-                getDebugTarget().changeVariableInnerValue(frame.getFrame(), variable, path, arguments);
+                frame.changeVariableInnerValue(current.stackVariable, path, arguments);
                 return;
             }
             path.add(0, newArrayList(typeIdentifierOf(current.parent), extractIndexOrKey(current.name)));
@@ -205,28 +205,6 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return true;
     }
 
-    void syncValue(final String name, final String type, final Object newValue) {
-        this.name = name;
-        if (newValue instanceof List<?> && value instanceof RobotDebugValueOfList) {
-            value.syncValue(this, type, newValue);
-
-        } else if (newValue instanceof Map<?, ?> && value instanceof RobotDebugValueOfDictionary) {
-            value.syncValue(this, type, newValue);
-
-        } else if (!(newValue instanceof List<?> || newValue instanceof Map<?, ?>)
-                && value instanceof RobotDebugValueOfScalar) {
-            value.syncValue(this, type, newValue == null ? null : newValue.toString());
-
-        } else {
-            value = RobotDebugValue.createFromValue(this, type, newValue);
-        }
-    }
-
-    public void syncAutomaticValue(final Map<String, RobotDebugVariable> variables) {
-        Preconditions.checkState(isArtificial);
-        ((RobotDebugValueOfDictionary) value).setVariables(variables);
-    }
-
     void visitAllVariables(final RobotDebugVariableVisitor visitor) {
         visitor.visit(this);
         value.visitAllVariables(visitor);
@@ -254,7 +232,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     public boolean equals(final Object obj) {
         if (obj instanceof RobotDebugVariable) {
             final RobotDebugVariable that = (RobotDebugVariable) obj;
-            return Objects.equal(this.stackVariable, that.stackVariable) && this.name.equals(that.name)
+            return this.stackVariable == that.stackVariable && this.name.equals(that.name)
                     && this.parent == that.parent;
         }
         return false;

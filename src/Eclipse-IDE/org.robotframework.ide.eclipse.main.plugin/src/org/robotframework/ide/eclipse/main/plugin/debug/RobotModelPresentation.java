@@ -28,7 +28,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
-import org.rf.ide.core.execution.debug.StackFrame;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.debug.SourceInLibraryEditorInput.SourceOfStackFrameInLibrary;
@@ -62,8 +61,8 @@ public class RobotModelPresentation extends LabelProvider
             final Image frameImage = ImagesManager.getImage(RedImages.getStackFrameImage());
 
             final ImageDescriptor[] overlays = new ImageDescriptor[5];
-            fillTopLeftDecoration(overlays, frame.getFrame());
-            fillBottomRightDecoration(overlays, frame.getFrame());
+            fillTopLeftDecoration(overlays, frame);
+            fillBottomRightDecoration(overlays, frame);
             return Stream.of(overlays).anyMatch(Objects::nonNull)
                     ? ImagesManager.getImage(new DecorationOverlayIcon(frameImage, overlays))
                     : frameImage;
@@ -97,13 +96,13 @@ public class RobotModelPresentation extends LabelProvider
         return null;
     }
 
-    private void fillTopLeftDecoration(final ImageDescriptor[] overlays, final StackFrame frame) {
+    private void fillTopLeftDecoration(final ImageDescriptor[] overlays, final RobotStackFrame frame) {
         if (frame.isErroneous()) {
             overlays[IDecoration.TOP_LEFT] = RedImages.getErrorImage();
         }
     }
 
-    private void fillBottomRightDecoration(final ImageDescriptor[] overlays, final StackFrame frame) {
+    private void fillBottomRightDecoration(final ImageDescriptor[] overlays, final RobotStackFrame frame) {
         if (frame.isSuiteDirectoryContext()) {
             overlays[IDecoration.BOTTOM_RIGHT] = RedImages.Decorators.getFolderDecorator();
         } else if (frame.isSuiteFileContext()) {
@@ -166,7 +165,7 @@ public class RobotModelPresentation extends LabelProvider
     public String getInstructionPointerAnnotationType(final IEditorPart editorPart, final IStackFrame frame) {
         if (frame instanceof RobotStackFrame) {
             final RobotStackFrame robotStackFrame = (RobotStackFrame) frame;
-            if (robotStackFrame.getFrame().isErroneous()) {
+            if (robotStackFrame.isErroneous()) {
                 return robotStackFrame.isTopFrame() ? RED_DEBUG_ERROR_CURRENT_IP : RED_DEBUG_ERROR_SECONDARY_IP;
             }
         }

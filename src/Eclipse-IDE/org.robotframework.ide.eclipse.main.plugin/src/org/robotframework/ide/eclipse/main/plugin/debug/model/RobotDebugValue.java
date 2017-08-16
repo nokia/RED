@@ -90,6 +90,4 @@ public abstract class RobotDebugValue extends RobotDebugElement implements IValu
             var.visitAllVariables(visitor);
         }
     }
-
-    protected abstract void syncValue(RobotDebugVariable parent, final String type, final Object newValue);
 }

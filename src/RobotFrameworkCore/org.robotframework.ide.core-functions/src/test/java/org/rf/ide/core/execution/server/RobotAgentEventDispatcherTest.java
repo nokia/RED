@@ -44,7 +44,7 @@ import org.rf.ide.core.execution.agent.event.TestEndedEvent;
 import org.rf.ide.core.execution.agent.event.TestStartedEvent;
 import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
-import org.rf.ide.core.execution.agent.event.VariablesChangedEvent;
+import org.rf.ide.core.execution.agent.event.VariablesEvent;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
@@ -211,10 +211,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///a/b/suite.robot"), false, 7,
-                newArrayList("s1", "s2"), newArrayList("t1", "t2"),
-                newArrayList(ImmutableMap.of(
-                        new Variable("a", VariableScope.GLOBAL), new VariableTypedValue("t", 1),
-                        new Variable("b", VariableScope.LOCAL), new VariableTypedValue("t", 2)))));
+                newArrayList("s1", "s2"), newArrayList("t1", "t2")));
         verifyNoMoreInteractions(listener);
     }
 
@@ -249,10 +246,7 @@ public class RobotAgentEventDispatcherTest {
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleTestStarted(new TestStartedEvent("test", "suite-a-b-test", "",
-                newArrayList(ImmutableMap.of(
-                        new Variable("a", VariableScope.TEST_CASE), new VariableTypedValue("t", 1),
-                        new Variable("b", VariableScope.LOCAL), new VariableTypedValue("t", 2)))));
+        verify(listener).handleTestStarted(new TestStartedEvent("test", "suite-a-b-test", ""));
         verifyNoMoreInteractions(listener);
     }
 
@@ -287,10 +281,7 @@ public class RobotAgentEventDispatcherTest {
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleKeywordStarted(new KeywordStartedEvent("kw", "Keyword", "lib",
-                newArrayList(ImmutableMap.of(
-                        new Variable("a", VariableScope.GLOBAL), new VariableTypedValue("t", 1),
-                        new Variable("b", VariableScope.TEST_SUITE), new VariableTypedValue("t", 2)))));
+        verify(listener).handleKeywordStarted(new KeywordStartedEvent("kw", "Keyword", "lib"));
         verifyNoMoreInteractions(listener);
     }
 
@@ -320,11 +311,11 @@ public class RobotAgentEventDispatcherTest {
         final List<Map<String, Object>> attributes = newArrayList(
                 ImmutableMap.of("a", newArrayList("t", 1, "test"), "b", newArrayList("t", 2, "suite")));
         final String json = toJson(
-                ImmutableMap.of("vars_changed", newArrayList(ImmutableMap.of("var_scopes", attributes))));
+                ImmutableMap.of("variables", newArrayList(ImmutableMap.of("var_scopes", attributes))));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleVariablesChanged(new VariablesChangedEvent(
+        verify(listener).handleVariables(new VariablesEvent(
                 newArrayList(ImmutableMap.of(
                         new Variable("a", VariableScope.TEST_CASE), new VariableTypedValue("t", 1),
                         new Variable("b", VariableScope.TEST_SUITE), new VariableTypedValue("t", 2))),

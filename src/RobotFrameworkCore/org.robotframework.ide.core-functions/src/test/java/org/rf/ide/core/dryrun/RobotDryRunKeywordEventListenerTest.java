@@ -42,8 +42,7 @@ public class RobotDryRunKeywordEventListenerTest {
                 startSuiteHandler);
 
         listener.handleSuiteStarted(
-                new SuiteStartedEvent("abc", new URI("file:///path"), true, 5, newArrayList(), newArrayList(),
-                        newArrayList()));
+                new SuiteStartedEvent("abc", new URI("file:///path"), true, 5, newArrayList(), newArrayList()));
 
         verify(startSuiteHandler).accept("abc");
         verifyNoMoreInteractions(startSuiteHandler);
