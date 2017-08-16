@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PqJNkIJTEeeVzuwK_hMKqA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/16/17 1:56 PM
+Save-Time: 8/16/17 2:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -65,6 +65,9 @@ with [get-editor "test.robot" | get-text-viewer] {
     key-type Enter
     key-type "M1+s"
 }
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 2 26
+}
 // check if there is no Problems
 wait-for-zero-items -times 4 -delay 1000
 // set agin wrong path and use QF
@@ -112,70 +115,75 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     click -default
 }
 // empty lib list
-get-window ".*" | get-button OK | click
-
-// ------------- more deep path---------------
-with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 2 25
-    key-type Right
-    type-text ".py"
-    key-type "M1+s"
-}
-// add few folders
-get-view "Project Explorer" | get-tree | select "AutoProject/test" | get-menu "New/Folder" | click
-with [get-window "New Folder"] {
-    get-editbox -after [get-label "Folder name:"] | set-text test2
-    get-button Finish | click
-}
-get-view "Project Explorer" | get-tree | select "AutoProject/test/test2" | get-menu "New/Folder" | click
-with [get-window "New Folder"] {
-    get-editbox -after [get-label "Folder name:"] | set-text test3
-    get-button Finish | click
-}
-get-view "Project Explorer" | get-tree | select "AutoProject/test/test2/test3" | get-menu "New/Folder" | click
-with [get-window "New Folder"] {
-    get-editbox -after [get-label "Folder name:"] | set-text test4
-    get-button Finish | click
-}
-// move test file
-with [get-view "Project Explorer" | get-tree] {
-    select "AutoProject/test/test.robot"
-    get-item "AutoProject/test/test.robot" | drag-start 20 10
-    get-item "AutoProject/test/test2/test3/test4" | drag-enter 42 5 -detail move
-    get-item "AutoProject/test/test2/test3/test4" | drag-over 26 7 -detail move
-    get-item "AutoProject/test/test2/test3/test4" | drag-exit
-    get-item "AutoProject/test/test2/test3/test4" | drag-accept 26 7 -detail move
-    drag-set-data
-    get-item "AutoProject/test/test2/test3/test4" | drop 26 7 -detail move
-    drag-end -detail move
-    select "AutoProject/test/test2/test3/test4" | double-click
-    select "AutoProject/test/test2/test3/test4/test.robot" | double-click
-}
-get-editor "test.robot" | get-text-viewer | set-caret-pos 2 18
-// use QF
-with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 2 16
-    key-type Backspace
-    key-type "M1+1"
-}
-// verify QF list
-with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().length" | equals 3 | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "Change to ../../../../libs/discover.py" | verify-true
-}
-// choose valid file
-with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    select "Change to ..\\/..\\/..\\/..\\/libs\\/discover.py" | key-type Enter
-    click -default
-}
-// verify if there is no Problems
-wait-for-zero-items -times 3 -delay 500
-with [get-view "Project Explorer" | get-tree] {
-    select "AutoProject/Robot Referenced libraries" | double-click
-    select "AutoProject/Robot Referenced libraries"
-}
-// verify libraries list
-get-view "Project Explorer" | get-tree 
-    | get-item "AutoProject/Robot Referenced libraries/discover AutoProject\\/libs \\(1\\)" | get-property caption 
-    | equals "discover AutoProject/libs (1)" | verify-true
+//with [get-editor "test.robot" | get-text-viewer] {
+//    hover-text 2 18
+//    set-caret-pos 2 20
+//    key-type "M1+1"
+//    key-type Enter
+//}
+get-window "Discovering libraries summary" | get-button OK | click
+//// ------------- more deep path---------------
+//with [get-editor "test.robot" | get-text-viewer] {
+//    set-caret-pos 2 25
+//    key-type Right
+//    type-text ".py"
+//    key-type "M1+s"
+//}
+//// add few folders
+//get-view "Project Explorer" | get-tree | select "AutoProject/test" | get-menu "New/Folder" | click
+//with [get-window "New Folder"] {
+//    get-editbox -after [get-label "Folder name:"] | set-text test2
+//    get-button Finish | click
+//}
+//get-view "Project Explorer" | get-tree | select "AutoProject/test/test2" | get-menu "New/Folder" | click
+//with [get-window "New Folder"] {
+//    get-editbox -after [get-label "Folder name:"] | set-text test3
+//    get-button Finish | click
+//}
+//get-view "Project Explorer" | get-tree | select "AutoProject/test/test2/test3" | get-menu "New/Folder" | click
+//with [get-window "New Folder"] {
+//    get-editbox -after [get-label "Folder name:"] | set-text test4
+//    get-button Finish | click
+//}
+//// move test file
+//with [get-view "Project Explorer" | get-tree] {
+//    select "AutoProject/test/test.robot"
+//    get-item "AutoProject/test/test.robot" | drag-start 20 10
+//    get-item "AutoProject/test/test2/test3/test4" | drag-enter 42 5 -detail move
+//    get-item "AutoProject/test/test2/test3/test4" | drag-over 26 7 -detail move
+//    get-item "AutoProject/test/test2/test3/test4" | drag-exit
+//    get-item "AutoProject/test/test2/test3/test4" | drag-accept 26 7 -detail move
+//    drag-set-data
+//    get-item "AutoProject/test/test2/test3/test4" | drop 26 7 -detail move
+//    drag-end -detail move
+//    select "AutoProject/test/test2/test3/test4" | double-click
+//    select "AutoProject/test/test2/test3/test4/test.robot" | double-click
+//}
+//get-editor "test.robot" | get-text-viewer | set-caret-pos 2 18
+//// use QF
+//with [get-editor "test.robot" | get-text-viewer] {
+//    set-caret-pos 2 16
+//    key-type Backspace
+//    key-type "M1+1"
+//}
+//// verify QF list
+//with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+//    get-property "getItems().length" | equals 3 | verify-true
+//    get-property "getItems().TableItem[1].getText()" | equals "Change to ../../../../libs/discover.py" | verify-true
+//}
+//// choose valid file
+//with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+//    select "Change to ..\\/..\\/..\\/..\\/libs\\/discover.py" | key-type Enter
+//    click -default
+//}
+//// verify if there is no Problems
+//wait-for-zero-items -times 3 -delay 500
+//with [get-view "Project Explorer" | get-tree] {
+//    select "AutoProject/Robot Referenced libraries" | double-click
+//    select "AutoProject/Robot Referenced libraries"
+//}
+//// verify libraries list
+//get-view "Project Explorer" | get-tree 
+//    | get-item "AutoProject/Robot Referenced libraries/discover AutoProject\\/libs \\(1\\)" | get-property caption 
+//    | equals "discover AutoProject/libs (1)" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
