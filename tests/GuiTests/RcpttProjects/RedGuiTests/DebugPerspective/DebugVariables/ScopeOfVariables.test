@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UAxzsGu3Eeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/11/17 3:46 PM
+Save-Time: 8/16/17 2:09 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -53,20 +53,20 @@ exec-with-options -disableJobWaiting -command {
 	check_automatic_variable_order
 	check-all-automatic-vars-decorators
 	
-	check-decorators-on-variables -item "${a}"  -decorator_type suite
-	check-decorators-on-variables -item "${b1}" -decorator_type suite
-	check-decorators-on-variables -item "${b}"  -decorator_type suite
-	check-decorators-on-variables -item  "${res var}"  -decorator_type suite
-	check-decorators-on-variables -item "&{main dict}"  -decorator_type suite
-	check-decorators-on-variables -item "&{main dict}"  -decorator_type suite
-	check-decorators-on-variables -item "&{main dict}"  -decorator_type suite
-	check-decorators-on-variables -item "&{main dict}"  -decorator_type suite
-	check-decorators-on-variables -item "@{b2_list}"  -decorator_type suite
-	check-decorators-on-variables -item "@{list from res}"  -decorator_type suite
-	check-decorators-on-variables -item "@{main list}"  -decorator_type suite
-	check-decorators-on-variables -item "${this is global from test}"  -decorator_type global
-	check-decorators-on-variables -item "${this is test var}"  -decorator_type test
-	check-decorators-on-variables -item  "${global from kw}" -decorator_type global
+	check-decorators-on-variable -item "${a}"  -decorator_type suite
+	check-decorators-on-variable -item "${b1}" -decorator_type suite
+	check-decorators-on-variable -item "${b}"  -decorator_type suite
+	check-decorators-on-variable -item  "${res var}"  -decorator_type suite
+	check-decorators-on-variable -item "&{main dict}"  -decorator_type suite
+	check-decorators-on-variable -item "&{main dict}"  -decorator_type suite
+	check-decorators-on-variable -item "&{main dict}"  -decorator_type suite
+	check-decorators-on-variable -item "&{main dict}"  -decorator_type suite
+	check-decorators-on-variable -item "@{b2_list}"  -decorator_type suite
+	check-decorators-on-variable -item "@{list from res}"  -decorator_type suite
+	check-decorators-on-variable -item "@{main list}"  -decorator_type suite
+	check-decorators-on-variable -item "${this is global from test}"  -decorator_type global
+	check-decorators-on-variable -item "${this is test var}"  -decorator_type test
+	check-decorators-on-variable -item  "${global from kw}" -decorator_type global
 	
 	
 	
