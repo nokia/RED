@@ -5,53 +5,32 @@
  */
 package org.rf.ide.core.execution.debug;
 
+import static com.google.common.collect.Lists.reverse;
+import static java.util.stream.Collectors.toList;
+
 import java.net.URI;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.rf.ide.core.execution.agent.event.Variable;
+import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
 
 public class Stacktrace implements Iterable<StackFrame> {
 
     private final Deque<StackFrame> frames = new ArrayDeque<>();
 
-    private final List<StacktraceListener> listeners = new ArrayList<>();
-
-    private StackFrameVariables globalVars;
-
-
-    void setGlobalVariables(final StackFrameVariables globalVars) {
-        this.globalVars = globalVars;
-    }
-
-    StackFrameVariables getGlobalVariables() {
-        return globalVars;
-    }
-
-    public void addListener(final StacktraceListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removeListener(final StacktraceListener listener) {
-        listeners.remove(listener);
-    }
-
     void push(final StackFrame frame) {
         frames.push(frame);
-
-        listeners.stream().forEach(listener -> listener.framePushed(this, frame));
     }
 
     void pop() {
-        final StackFrame frame = frames.pop();
-
-        listeners.stream().forEach(listener -> listener.framePopped(this, frame));
-        frame.destroy();
+        frames.pop();
     }
 
     @Override
@@ -59,7 +38,7 @@ public class Stacktrace implements Iterable<StackFrame> {
         return frames.iterator();
     }
 
-    Stream<StackFrame> stream() {
+    public Stream<StackFrame> stream() {
         return frames.stream();
     }
 
@@ -108,18 +87,42 @@ public class Stacktrace implements Iterable<StackFrame> {
 
     void destroy() {
         frames.clear();
-        listeners.clear();
+    }
+
+    void updateVariables(final List<Map<Variable, VariableTypedValue>> variables) {
+        final List<StackFrame> reversedFrames = reverse(stream().collect(toList()));
+        final List<Map<Variable, VariableTypedValue>> reversedVariables = reverse(variables);
+
+        StackFrameVariables parentVars = StackFrameVariables.newGlobalVariables(reversedVariables.get(0));
+        for (final StackFrame frame : reversedFrames) {
+            final int index = frame.getLevel() + 1;
+            // when there is a keyword starting there is not variables yet send from agent for its
+            // frame, so index may be equal to size of the list
+            final Map<Variable, VariableTypedValue> vars = index < reversedVariables.size()
+                    ? reversedVariables.get(index)
+                    : null;
+
+            if (frame.getVariables() == null) {
+                StackFrameVariables newFrameVariables;
+                if (frame.hasCategory(FrameCategory.SUITE)) {
+                    newFrameVariables = StackFrameVariables.newSuiteVariables(vars, parentVars);
+                } else if (frame.hasCategory(FrameCategory.TEST)) {
+                    newFrameVariables = StackFrameVariables.newTestVariables(vars, parentVars);
+                } else {
+                    newFrameVariables = StackFrameVariables.newLocalVariables(parentVars,
+                            frame.hasCategory(FrameCategory.FOR) || frame.hasCategory(FrameCategory.FOR_ITEM));
+                }
+                frame.setVariables(newFrameVariables);
+            }
+            if (vars != null) {
+                frame.updateVariables(vars);
+            }
+            parentVars = frame.getVariables();
+        }
     }
 
     @Override
     public String toString() {
         return frames.toString();
-    }
-
-    public static interface StacktraceListener {
-
-        public void framePushed(Stacktrace stack, StackFrame frame);
-
-        public void framePopped(Stacktrace stack, StackFrame frame);
     }
 }

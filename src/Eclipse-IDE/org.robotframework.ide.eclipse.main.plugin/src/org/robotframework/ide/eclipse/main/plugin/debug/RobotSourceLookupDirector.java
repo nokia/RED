@@ -45,13 +45,13 @@ public class RobotSourceLookupDirector extends AbstractSourceLookupDirector {
                 cacheResolvedElement(sources, element);
                 return sources;
 
-            } else if (frame.getFrame().isErroneous()) {
+            } else if (frame.isErroneous()) {
                 final List<Object> sources = newArrayList(
                         new SourceOfStackFrameNotFound(frame.getLabel(), frame.getInstructionPointerText()));
                 cacheResolvedElement(sources, element);
                 return sources;
 
-            } else if (frame.getFrame().isLibraryKeywordFrame()) {
+            } else if (frame.isLibraryKeywordFrame()) {
                 final List<Object> sources = newArrayList(
                         new SourceOfStackFrameInLibrary(frame.getName(), frame.getContextPath().orElse(null)));
                 cacheResolvedElement(sources, element);
