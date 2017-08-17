@@ -20,9 +20,16 @@ import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Predicates;
 
 public class StackFrameVariables implements Iterable<StackFrameVariable> {
+
+    // hardcoded variable names; has to be checked after release of new RF
+
+    private static final Set<String> GLOBAL_AUTOMATIC_VARIABLES = newHashSet("${/}", "${:}", "${\\n}", "${curdir}",
+            "${tempdir}", "${execdir}", "${none}", "${null}", "${true}", "${false}", "${space}", "${empty}", "@{empty}",
+            "&{empty}", "${prev_test_name}", "${prev_test_message}", "${prev_test_status}", "${suite_name}",
+            "${suite_source}", "${log_level}", "${output_file}", "${log_file}", "${report_file}", "${debug_file}",
+            "${output_dir}");
 
     private static final Set<String> SUITE_AUTOMATIC_VARIABLES = newHashSet("${suite_name}", "${suite_documentation}",
             "${suite_source}", "&{suite_metadata}", "${suite_status}", "${suite_message}");
@@ -36,7 +43,7 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
 
     static StackFrameVariables newGlobalVariables(final Map<Variable, VariableTypedValue> variables) {
         // all globals are automatic variables at the very beginning of execution (no user globals exist yet)
-        return newVariables(variables, Predicates.alwaysTrue());
+        return newVariables(variables, name -> GLOBAL_AUTOMATIC_VARIABLES.contains(name.toLowerCase()));
     }
 
     static StackFrameVariables newSuiteVariables(final Map<Variable, VariableTypedValue> variables,
