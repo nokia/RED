@@ -288,7 +288,10 @@ class TestRunnerAgent:
                 self._wait_for_resume()
             
     def _should_ask_for_pause_on_start(self):
-        if self._mode == AgentMode.RUN:
+        if not self._is_connected:
+            return False
+        elif self._mode == AgentMode.RUN:
+            # in run mode we will check for pause only from time to time (in at least 2 sec intervals)
             current_time = time.time()
             if current_time - self._last_pause_check > 2:
                 self._last_pause_check = current_time
@@ -319,7 +322,7 @@ class TestRunnerAgent:
                 self._wait_for_resume()
             
     def _should_ask_for_pause_on_end(self):
-        return self._mode == AgentMode.DEBUG
+        return self._is_connected and self._mode == AgentMode.DEBUG
             
     def _should_pause(self, pausing_point):
         self._send_to_server(AgentEventMessage.SHOULD_CONTINUE, {'pausing_point' : pausing_point})
@@ -360,6 +363,8 @@ class TestRunnerAgent:
             return True
 
     def _wait_for_resume(self):
+        if not self._is_connected:
+            return
         possible_responses = [
             RedResponseMessage.RESUME,
             RedResponseMessage.TERMINATE, 
