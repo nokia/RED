@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/11/17 3:47 PM
+Save-Time: 8/18/17 2:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -128,15 +128,17 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     hover-text 9 20
     set-caret-pos 9 19
     key-type "M1+1"
+    wait 200
     key-type Enter
 }
 with [get-window "Add variable mapping"] {
     get-editbox -after [get-label Value] | set-text "${path}/second"
     get-button OK | click
 }
+wait 1000
 // check if no Problems
-get-editor "TestSuite.robot" | click
 get-editor "ProjectWithResource/red.xml" |  key-type "M1+s" | close
+
 get-editor "TestSuite.robot" | get-text-viewer | key-type "M1+s"
 wait-for-zero-items -times 4 -delay 500
 // check Message Log if it's working
@@ -144,6 +146,7 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     set-caret-pos 8 32
     key-type "M1+F11"
 }
+wait-for-console -times 3 -delay 1000
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: ProjectWithResource.TestSuite.Test\n"
     + ".* : INFO : log_from_test_resource\n"
     + ".* : INFO : log_from_test_resource_second\n"
