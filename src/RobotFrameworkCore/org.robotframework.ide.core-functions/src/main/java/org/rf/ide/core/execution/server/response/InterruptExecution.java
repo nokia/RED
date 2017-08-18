@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.google.common.collect.ImmutableMap;
 
 public final class InterruptExecution implements ServerResponse {
@@ -22,7 +20,7 @@ public final class InterruptExecution implements ServerResponse {
             final List<Object> arguments = new ArrayList<>();
             final Map<String, Object> value = ImmutableMap.of("interrupt", arguments);
 
-            return new ObjectMapper().writeValueAsString(value);
+            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize interrupt response arguments to json", e);
         }
