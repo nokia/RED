@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
 import com.google.common.collect.ImmutableMap;
@@ -55,7 +54,7 @@ public final class ChangeVariable implements ServerResponse {
             }
             final Map<String, Object> value = ImmutableMap.of("change_variable", argsBuilder.build());
 
-            return new ObjectMapper().writeValueAsString(value);
+            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize change variable response arguments to json", e);
         }

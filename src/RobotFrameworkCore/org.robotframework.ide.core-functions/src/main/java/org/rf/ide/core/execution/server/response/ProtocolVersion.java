@@ -9,8 +9,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -35,7 +33,7 @@ public final class ProtocolVersion implements ServerResponse {
             arguments.put("error", Strings.nullToEmpty(error));
             final Map<String, Object> value = ImmutableMap.of("protocol_version", arguments);
 
-            return new ObjectMapper().writeValueAsString(value);
+            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize protocol version response arguments to json", e);
         }

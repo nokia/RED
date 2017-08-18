@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.google.common.collect.ImmutableMap;
 
 public final class TerminateExecution implements ServerResponseOnShouldContinue {
@@ -22,7 +20,7 @@ public final class TerminateExecution implements ServerResponseOnShouldContinue 
             final List<Object> arguments = new ArrayList<>();
             final Map<String, Object> value = ImmutableMap.of("terminate", arguments);
 
-            return new ObjectMapper().writeValueAsString(value);
+            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize terminate response arguments to json", e);
         }
