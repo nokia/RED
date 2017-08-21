@@ -326,11 +326,10 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final FileValidationContext validationContext, final ProblemsReportingStrategy reporter,
             final RobotToken definingToken, final ArgumentsDescriptor argumentsDescriptor,
             final List<RobotToken> arguments) {
-        final Optional<BuiltinKeywords> builtinKw = BuiltinKeywords.from(definingToken, validationContext);
-        if (builtinKw.isPresent() && (builtinKw.get() == BuiltinKeywords.VARIABLE_SETTER
-                || builtinKw.get() == BuiltinKeywords.VARIABLE_GETTER)) {
-            return new VariableSetterOrGetterCallArgumentsValidator(validationContext.getFile(), definingToken, reporter,
-                    argumentsDescriptor, arguments);
+        final BuiltinKeyword builtinKw = BuiltinKeyword.from(definingToken, validationContext);
+        if (builtinKw == BuiltinKeyword.VARIABLE_SETTER || builtinKw == BuiltinKeyword.VARIABLE_GETTER) {
+            return new VariableSetterOrGetterCallArgumentsValidator(validationContext.getFile(), definingToken,
+                    reporter, argumentsDescriptor, arguments);
         } else {
             return new GeneralKeywordCallArgumentsValidator(validationContext.getFile(), definingToken, reporter,
                     argumentsDescriptor, arguments);
@@ -441,24 +440,21 @@ class TestCaseTableValidator implements ModelUnitValidator {
             private boolean isVariableInSetterOrGetterOrCommentKeyword(final FileValidationContext validationContext,
                     final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
                     final VariableDeclaration variableDeclaration) {
-                final Optional<BuiltinKeywords> builtinKw = BuiltinKeywords.from(getKeyword(lineDescription),
-                        validationContext);
-                if (builtinKw.isPresent()) {
-                    if (builtinKw.get() == BuiltinKeywords.VARIABLE_SETTER) {
-                        final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-                        if (!usedVariables.isEmpty()) {
-                            definedVariables.add(VariableNamesSupport
-                                    .extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
-                            return true;
-                        }
-                    } else if (builtinKw.get() == BuiltinKeywords.VARIABLE_GETTER) {
-                        final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
-                        if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
-                            return true;
-                        }
-                    } else if (builtinKw.get() == BuiltinKeywords.COMMENT) {
+                final BuiltinKeyword builtinKw = BuiltinKeyword.from(getKeyword(lineDescription), validationContext);
+                if (builtinKw == BuiltinKeyword.VARIABLE_SETTER) {
+                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+                    if (!usedVariables.isEmpty()) {
+                        definedVariables.add(VariableNamesSupport
+                                .extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
                         return true;
                     }
+                } else if (builtinKw == BuiltinKeyword.VARIABLE_GETTER) {
+                    final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+                    if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
+                        return true;
+                    }
+                } else if (builtinKw == BuiltinKeyword.COMMENT) {
+                    return true;
                 }
                 return false;
             }
@@ -479,23 +475,23 @@ class TestCaseTableValidator implements ModelUnitValidator {
         return testCase.getLinkedElement().getRobotViewAboutTestTemplate() != null;
     }
 
-    private enum BuiltinKeywords {
+    private enum BuiltinKeyword {
         VARIABLE_SETTER,
         VARIABLE_GETTER,
-        COMMENT;
+        COMMENT,
+        UNKNOWN;
 
-        private static Optional<BuiltinKeywords> from(final RobotToken keyword,
-                final FileValidationContext validationContext) {
+        private static BuiltinKeyword from(final RobotToken keyword, final FileValidationContext validationContext) {
             final String keywordName = QualifiedKeywordName.fromOccurrence(keyword.getText()).getKeywordName();
             if ((keywordName.equals("setglobalvariable") || keywordName.equals("setsuitevariable")
                     || keywordName.equals("settestvariable")) && isFromBuiltin(keywordName, validationContext)) {
-                return Optional.of(VARIABLE_SETTER);
+                return VARIABLE_SETTER;
             } else if (keywordName.equals("getvariablevalue") && isFromBuiltin(keywordName, validationContext)) {
-                return Optional.of(VARIABLE_GETTER);
+                return VARIABLE_GETTER;
             } else if (keywordName.equals("comment") && isFromBuiltin(keywordName, validationContext)) {
-                return Optional.of(COMMENT);
+                return COMMENT;
             }
-            return Optional.empty();
+            return UNKNOWN;
         }
 
         private static boolean isFromBuiltin(final String keywordName, final FileValidationContext validationContext) {
