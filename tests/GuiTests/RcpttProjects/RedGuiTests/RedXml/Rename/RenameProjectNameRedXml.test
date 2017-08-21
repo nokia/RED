@@ -11,7 +11,6 @@ Save-Time: 6/28/17 12:23 PM
 Tags: notTestable
 Testcase-Type: ecl
 
-------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
@@ -77,4 +76,3 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
     + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
-------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
