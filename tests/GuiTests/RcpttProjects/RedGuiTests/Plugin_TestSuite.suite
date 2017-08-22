@@ -1,0 +1,38 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: Plugin_TestSuite
+Element-Type: testsuite
+Element-Version: 2.0
+Id: _Jz9eEEXeEeepzpQUdbPx3w
+Manually-Ordered: true
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 6/1/17 11:24 AM
+
+------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8
+Content-Type: text/testcase
+Entry-Name: testcase-items
+
+_nOD4UOgpEeSj7KhHriu9rA	// kind: 'test' name: 'CheckRobotPerspective' path: 'BasicTestCases/CheckRobotPerspective/CheckRobotPerspective.test'
+_XE7KQB3QEeeaa6EbsZptdA	// kind: 'test' name: 'BreakpointsSettingWithShortcutKey' path: 'DebugPerspective/BreakpointsActions/BreakpointsSettingWithShortcutKey.test'
+_iiMbgJ2WEeWVv_UItyy1RQ	// kind: 'test' name: 'DebugForLoopInLoop' path: 'DebugPerspective/DebugPerspectiveWithLoop/DebugForLoopInLoop.test'
+_R1ijQIMDEeW3Y6KfPyHe6A	// kind: 'test' name: 'DebugStepOver' path: 'DebugPerspective/DebugSteps/DebugStepOver.test'
+_YQTIILklEeWzhqlyblQz1g	// kind: 'test' name: 'DebugWithInit' path: 'DebugPerspective/DebugWithInit/DebugWithInit.test'
+_vURJgAffEee0EKWnoBYU9g	// kind: 'test' name: 'RunCorrectRemoteDebugTest' path: 'DebugPerspective/RemoteDebug/RunCorrectRemoteDebugTest.test'
+_FeB-gDF4EeetW-gzvhCHGw	// kind: 'test' name: 'ExecutionViewForManyTestCases' path: 'ExecutionView/ExecutionViewForManyTestCases.test'
+_kmM50CsHEeW667Afdo4DcA	// kind: 'test' name: 'CreateRobotProjectWithFolderAndSuite' path: 'ProjectExplorer/CreateActions/CreateAndRemoveRobotProject/CreateRobotProjectWithFolderAndSuite.test'
+_nWFw0HJ_EeWGwMKsQg8irg	// kind: 'test' name: 'SwitchFromResourceToSuiteFile' path: 'ProjectExplorer/OpenEditors/ChangingFileType/SwitchFromResourceToSuiteFile.test'
+_w29nkB8kEeWYlfCPyvfohw	// kind: 'test' name: 'OpenDifferentEditors' path: 'ProjectExplorer/OpenEditors/OpenDifferentEditors.test'
+_sSLVQEdzEeaRB_Xz0tiYpg	// kind: 'test' name: 'ReconfiguringNotRobotProject' path: 'ProjectExplorer/ReconfigureProjects/ReconfiguringNotRobotProject.test'
+_vyNuIIPOEeWImNPXuPy_LQ	// kind: 'test' name: 'RenameProject' path: 'ProjectExplorer/RenameActions/RenameProject.test'
+_fiIkUBulEeezQPN39rc8sA	// kind: 'test' name: 'AutoDiscoverForSpecialPaths' path: 'RedXml/AutoDiscover/AutoDiscoverForSpecialPaths.test'
+_j2wUgCr0EeW667Afdo4DcA	// kind: 'test' name: 'RunScriptInAllWays' path: 'RunningTests/NormalTests/RunScriptInAllWays.test'
+_nv-loA5WEeePcNCRX_abWA	// kind: 'test' name: 'RunRemoteWithDifferentTest' path: 'RunningTests/RemoteTests/RunRemoteWithDifferentTest.test'
+_g9HWcFJ0Eea8WJ7bbC6OBw	// kind: 'test' name: 'AddingDefaultKeywordName' path: 'TableEditor/KeywordsView/AddingElements/AddingDefaultKeywordName.test'
+_RBRS8DlIEeaMk_UgyvYHpA	// kind: 'test' name: 'DifferentValuesInSettings' path: 'TableEditor/SettingsView/Metadata/DifferentValuesInSettings.test'
+_qc8gsHXQEeaTdNH0nRm1gg	// kind: 'test' name: 'CopyPasteCellsInTestCasesTable' path: 'TableEditor/TestcasesView/CellsOperation/CopyPasteCellsInTestCasesTable.test'
+_ERiB0PnjEea7hL0QdGOb6w	// kind: 'test' name: 'GoToDefinitionInTables' path: 'TableEditor/TestcasesView/GoToDefintion/GoToDefinitionInTables.test'
+_58w70DoTEeaMk_UgyvYHpA	// kind: 'test' name: 'VariablesFromDifferentSources' path: 'TableEditor/VariablesView/ReadingFromSource/VariablesFromDifferentSources.test'
+_0soLkHJoEeWGwMKsQg8irg	// kind: 'test' name: 'AddingAllSectionUsingContentAssist' path: 'SourceView/ContentAssist/AddingAllSectionUsingContentAssist.test'
+_-8FTwKSdEeW4l-rLhvMqpg	// kind: 'test' name: 'ContenAssistForAutomaticVariableInSuite' path: 'SourceView/ContentAssist/ContenAssistForAutomaticVariableInSuite.test'
+
+------=_testcase-items-62c497da-4241-31f4-811a-6b453a3ecff8--
