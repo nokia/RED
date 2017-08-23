@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -45,20 +43,29 @@ public class VariableProposalsProvider implements RedContentProposalProvider {
     @Override
     public RedContentProposal[] getProposals(final String contents, final int position,
             final AssistantContext context) {
-        final Optional<IRegion> varRegion = DocumentUtilities.findLiveVariable(contents, position);
-        final String prefix = varRegion.isPresent() ? contents.substring(varRegion.get().getOffset(), position) : "";
+        final Optional<IRegion> liveVarRegion = DocumentUtilities.findLiveVariable(contents, position);
+        final String liveVarPrefix = liveVarRegion.isPresent()
+                ? contents.substring(liveVarRegion.get().getOffset(), position)
+                : "";
+
+        final String userContentToReplace;
+        final ModificationStrategy modificationStrategy;
+        if (liveVarPrefix.isEmpty()) {
+            userContentToReplace = contents.substring(0, position);
+            modificationStrategy = null;
+        } else {
+            userContentToReplace = liveVarPrefix;
+            modificationStrategy = new VariableTextModificationStrategy();
+        }
 
         final Object rowElement = dataProvider.getRowObject(((NatTableAssistantContext) context).getRow());
         final AssistProposalPredicate<String> predicate = createGlobalVarPredicate(rowElement);
         final List<? extends AssistProposal> variableEntities = new RedVariableProposals(suiteFile, predicate)
-                .getVariableProposals(prefix, getModelElement(rowElement));
+                .getVariableProposals(userContentToReplace, getModelElement(rowElement));
 
-        final List<IContentProposal> proposals = newArrayList();
-        for (final AssistProposal proposedVariable : variableEntities) {
-
-            proposals.add(new AssistProposalAdapter(proposedVariable, new VariableTextModificationStrategy()));
-        }
-        return proposals.toArray(new RedContentProposal[0]);
+        return variableEntities.stream()
+                .map(proposal -> new AssistProposalAdapter(proposal, modificationStrategy))
+                .toArray(RedContentProposal[]::new);
     }
 
     private AssistProposalPredicate<String> createGlobalVarPredicate(final Object rowElement) {
