@@ -5,11 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.execution;
 
-import static com.google.common.base.Predicates.instanceOf;
 import static java.util.stream.Collectors.toList;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.ui.services.IDisposable;
@@ -20,7 +18,8 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class ExecutionStatusStore implements IDisposable {
 
-    private boolean isDisposed;
+    private boolean isDisposed = false;
+    private boolean isDirty = false;
 
     private ExecutionTreeNode root;
     private ExecutionTreeNode current;
@@ -31,8 +30,6 @@ public class ExecutionStatusStore implements IDisposable {
     private int totalTests;
 
     private URI outputFile;
-
-    private final List<ExecutionStatusStoreListener> storeListeners = new ArrayList<>();
 
     public ExecutionTreeNode getExecutionTree() {
         return root;
@@ -59,6 +56,7 @@ public class ExecutionStatusStore implements IDisposable {
 
     protected void setOutputFilePath(final URI outputFilepath) {
         this.outputFile = outputFilepath;
+        isDirty = true;
     }
 
     int getCurrentTest() {
@@ -88,7 +86,6 @@ public class ExecutionStatusStore implements IDisposable {
         root = null;
         current = null;
 
-        storeListeners.clear();
         isDisposed = true;
     }
 
@@ -99,12 +96,10 @@ public class ExecutionStatusStore implements IDisposable {
     protected void suiteStarted(final String suiteName, final URI suiteFilePath, final int totalTests,
             final List<String> childSuites, final List<String> childTests) {
 
-        boolean notifyAboutProgress = false;
         if (root == null) {
             this.totalTests = totalTests;
             root = new ExecutionTreeNode(null, ElementKind.SUITE, suiteName);
             current = root;
-            notifyAboutProgress = true;
         }
 
         current.setStatus(Status.RUNNING);
@@ -116,20 +111,14 @@ public class ExecutionStatusStore implements IDisposable {
                 .map(childTest -> new ExecutionTreeNode(current, ElementKind.TEST, childTest, suiteFilePath))
                 .collect(toList()));
 
-        final ExecutionTreeNode previous = current;
         current = current.getChildren().isEmpty() ? current : current.getChildren().get(0);
-
-        notifyTreeChanges(previous);
-        if (notifyAboutProgress) {
-            notifyProgress();
-        }
+        isDirty = true;
     }
 
     protected void testStarted() {
         current.setStatus(Status.RUNNING);
         currentTest++;
-        notifyTreeChanges(current);
-        notifyProgress();
+        isDirty = true;
     }
 
     protected void elementEnded(final int elapsedTime, final Status status, final String errorMessage) {
@@ -137,17 +126,14 @@ public class ExecutionStatusStore implements IDisposable {
         current.setStatus(status);
         current.setMessage(errorMessage);
 
-        boolean notifyAboutProgress = false;
         if (current.getKind() == ElementKind.TEST) {
             if (status == Status.PASS) {
                 passedTests++;
             } else {
                 failedTests++;
             }
-            notifyAboutProgress = true;
         }
 
-        final ExecutionTreeNode previous = current;
         final ExecutionTreeNode parent = current.getParent();
         if (parent == null) {
             current = null;
@@ -159,59 +145,12 @@ public class ExecutionStatusStore implements IDisposable {
                 current = parent.getChildren().get(index + 1);
             }
         }
-
-        notifyTreeChanges(previous);
-        if (notifyAboutProgress) {
-            notifyProgress();
-        }
+        isDirty = true;
     }
 
-    void addTreeListener(final ExecutionTreeElementListener storeListener) {
-        storeListeners.add(storeListener);
-    }
-
-    void addProgressListener(final ExecutionProgressListener storeListener) {
-        storeListeners.add(storeListener);
-    }
-
-    @VisibleForTesting
-    List<ExecutionStatusStoreListener> getListeners() {
-        return storeListeners;
-    }
-
-    private void notifyTreeChanges(final ExecutionTreeNode node) {
-        storeListeners.stream()
-                .filter(instanceOf(ExecutionTreeElementListener.class))
-                .map(ExecutionTreeElementListener.class::cast)
-                .forEach(l -> l.nodeChanged(this, node));
-    }
-
-    private void notifyProgress() {
-        storeListeners.stream()
-                .filter(instanceOf(ExecutionProgressListener.class))
-                .map(ExecutionProgressListener.class::cast)
-                .forEach(l -> l.progressChanged(currentTest, passedTests, failedTests, totalTests));
-    }
-
-    void removeStoreListener(final ExecutionStatusStoreListener... storeListeners) {
-        for (final ExecutionStatusStoreListener storeListener : storeListeners) {
-            this.storeListeners.remove(storeListener);
-        }
-    }
-
-    protected static interface ExecutionStatusStoreListener {
-        // just a common interface to store lambdas on single list
-    }
-
-    @FunctionalInterface
-    protected static interface ExecutionTreeElementListener extends ExecutionStatusStoreListener {
-
-        void nodeChanged(ExecutionStatusStore store, ExecutionTreeNode node);
-    }
-
-    @FunctionalInterface
-    protected static interface ExecutionProgressListener extends ExecutionStatusStoreListener {
-
-        void progressChanged(int currentTest, int passedSoFar, int failedSoFar, int totalTests);
+    boolean checkDirtyAndReset() {
+        final boolean wasDirty = isDirty;
+        isDirty = false;
+        return wasDirty;
     }
 }
