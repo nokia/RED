@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.views.message.ExecutionMessagesStore.ExecutionMessagesStoreListener;
 
 public class ExecutionMessagesStoreTest {
 
@@ -39,40 +38,14 @@ public class ExecutionMessagesStoreTest {
     }
 
     @Test
-    public void storeListenersAreNotified_whenMessageIsAppended() {
-        final StringBuilder str1 = new StringBuilder();
-        final StringBuilder str2 = new StringBuilder();
-
-        final ExecutionMessagesStoreListener listener1 = msg -> str1.append(msg);
-        final ExecutionMessagesStoreListener listener2 = msg -> str2.append(msg);
-        
+    public void storeGetsFirsty_whenMessageIsAppended() {
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
-        store.addStoreListener(listener1);
         store.append("msg1");
-        store.addStoreListener(listener2);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
+
         store.append("msg2");
-
-        assertThat(str1.toString()).isEqualTo("msg1msg2");
-        assertThat(str2.toString()).isEqualTo("msg2");
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
-
-    @Test
-    public void storeListenersAreRemoved_whenDisposed() {
-        final StringBuilder str1 = new StringBuilder();
-        final StringBuilder str2 = new StringBuilder();
-
-        final ExecutionMessagesStoreListener listener1 = msg -> str1.append(msg);
-        final ExecutionMessagesStoreListener listener2 = msg -> str2.append(msg);
-
-        final ExecutionMessagesStore store = new ExecutionMessagesStore();
-        store.addStoreListener(listener1);
-        store.addStoreListener(listener2);
-        store.append("msg1");
-        store.dispose();
-        store.append("msg2");
-
-        assertThat(str1.toString()).isEqualTo("msg1");
-        assertThat(str2.toString()).isEqualTo("msg1");
-    }
-
 }
