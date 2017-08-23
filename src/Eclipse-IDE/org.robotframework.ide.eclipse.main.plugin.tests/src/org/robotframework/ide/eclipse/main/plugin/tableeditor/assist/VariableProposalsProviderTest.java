@@ -136,7 +136,7 @@ public class VariableProposalsProviderTest {
     @Test
     public void thereAreVariablesProposalsProvided_whenThereIsAProposalMatchingCurrentContent_2() {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
-        text.setText("ab");
+        text.setText("abc");
         text.setSelection(1);
 
         final RobotSuiteFile suite = new RobotModel().createSuiteFile(projectProvider.getFile("suite.robot"));
@@ -151,10 +151,10 @@ public class VariableProposalsProviderTest {
 
         final AssistantContext context = new NatTableAssistantContext(0, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), text.getSelection().x, context);
-        assertThat(proposals).hasSize(3);
+        assertThat(proposals).hasSize(2);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
-        assertThat(text.getText()).isEqualTo("a${a_var}b");
+        assertThat(text.getText()).isEqualTo("${a_var}");
     }
 
     @Test
