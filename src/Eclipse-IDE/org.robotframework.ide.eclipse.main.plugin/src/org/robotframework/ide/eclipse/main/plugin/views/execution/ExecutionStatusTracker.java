@@ -59,4 +59,8 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
                 store -> store.setOutputFilePath(event.getPath().orElse(null)));
     }
 
+    @Override
+    public void eventsProcessingFinished() {
+        testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class, ExecutionStatusStore::close);
+    }
 }

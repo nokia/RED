@@ -7,19 +7,33 @@ package org.robotframework.ide.eclipse.main.plugin.views.message;
 
 import org.eclipse.ui.services.IDisposable;
 
+import com.google.common.base.Preconditions;
+
 class ExecutionMessagesStore implements IDisposable {
 
     private final StringBuilder message = new StringBuilder();
 
+    private boolean isOpen = true;
     private boolean isDirty = false;
 
     void append(final String msg) {
+        // can't change store state when store is closed
+        Preconditions.checkState(isOpen);
+
         message.append(msg);
         isDirty = true;
     }
 
     String getMessage() {
         return message.toString();
+    }
+
+    boolean isOpen() {
+        return isOpen;
+    }
+
+    void close() {
+        this.isOpen = false;
     }
 
     @Override
