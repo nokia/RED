@@ -71,6 +71,8 @@ public interface RobotAgentEventListener {
 
     void handleClosed();
 
+    void eventsProcessingFinished();
+
     public static class RobotAgentEventsListenerException extends RuntimeException {
 
         private static final long serialVersionUID = 1L;
