@@ -43,4 +43,9 @@ public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
         testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class,
                 store -> store.append("Ending test: " + event.getLongName() + "\n\n"));
     }
+
+    @Override
+    public void eventsProcessingFinished() {
+        testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class, ExecutionMessagesStore::close);
+    }
 }

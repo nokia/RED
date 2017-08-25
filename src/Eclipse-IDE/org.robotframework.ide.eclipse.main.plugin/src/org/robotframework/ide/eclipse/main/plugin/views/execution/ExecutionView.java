@@ -363,18 +363,25 @@ public class ExecutionView {
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
             });
-            executor.shutdown();
-
-            // in order to be sure that there is nothing missing
-            SwtThread.asyncExec(() -> {
-                try {
-                    // let's wait because there might be a still running by the executor
-                    executor.awaitTermination(3, TimeUnit.SECONDS);
-                } catch (final InterruptedException e) {
-                    // ok, fine
+            // execution ended, however the statys store can still be updated by server thread;
+            // we're scheduling a single task (last one as executor will be shutdown) which will
+            // wait for store to be closed and then will set the input for the view
+            executor.schedule(() -> {
+                final ExecutionStatusStore messagesStore = launch.getExecutionData(ExecutionStatusStore.class,
+                        ExecutionStatusStore::new);
+                while (messagesStore.isOpen()) {
+                    try {
+                        Thread.sleep(200);
+                    } catch (final InterruptedException e) {
+                        // fine, let's wait more
+                    }
                 }
-                setInput(launch);
-            });
+                SwtThread.asyncExec(() -> {
+                    setInput(launch);
+                });
+
+            }, 0, TimeUnit.SECONDS);
+            executor.shutdown();
         }
     }
 }

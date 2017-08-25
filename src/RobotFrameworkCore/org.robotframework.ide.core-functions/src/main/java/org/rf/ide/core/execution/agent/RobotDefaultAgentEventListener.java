@@ -139,4 +139,9 @@ public abstract class RobotDefaultAgentEventListener implements RobotAgentEventL
     public void handleClosed() {
         // implement in subclasses
     }
+
+    @Override
+    public void eventsProcessingFinished() {
+        // implement in subclasses
+    }
 }
