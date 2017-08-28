@@ -36,13 +36,6 @@ public interface StackFrameContext {
     Optional<URI> getAssociatedPath();
 
     /**
-     * Returns true if this context is a context of library keyword
-     * 
-     * @return
-     */
-    boolean isLibraryKeywordContext();
-
-    /**
      * Returns file region for which context was created
      * 
      * @return
