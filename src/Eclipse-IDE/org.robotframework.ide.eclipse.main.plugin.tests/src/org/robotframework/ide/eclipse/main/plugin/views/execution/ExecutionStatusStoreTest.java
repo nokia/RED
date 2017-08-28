@@ -8,9 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.views.execution;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -18,8 +15,6 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.Status;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore.ExecutionProgressListener;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore.ExecutionTreeElementListener;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 public class ExecutionStatusStoreTest {
@@ -60,36 +55,12 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenSuiteStartsAndStoreIsFreshlyCreated_listenersAreNotifiedAboutChangedNode() throws Exception {
+    public void whenSuiteStartsAndStoreIsFreshlyCreated_theStoreGetsDirty() throws Exception {
         final ExecutionStatusStore store = new ExecutionStatusStore();
 
-        final ExecutionTreeElementListener listener1 = mock(ExecutionTreeElementListener.class);
-        final ExecutionTreeElementListener listener2 = mock(ExecutionTreeElementListener.class);
-
-        store.addTreeListener(listener1);
-        store.addTreeListener(listener2);
-
         store.suiteStarted("suite", new URI("file:///suite"), 42, newArrayList("s1", "s2"), new ArrayList<>());
-
-        final ExecutionTreeNode root = store.getExecutionTree();
-        verify(listener1).nodeChanged(store, root);
-        verify(listener2).nodeChanged(store, root);
-    }
-
-    @Test
-    public void whenSuiteStartsAndStoreIsFreshlyCreated_listenersAreNotifiedAboutProgress() throws Exception {
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-
-        final ExecutionProgressListener listener1 = mock(ExecutionProgressListener.class);
-        final ExecutionProgressListener listener2 = mock(ExecutionProgressListener.class);
-
-        store.addProgressListener(listener1);
-        store.addProgressListener(listener2);
-
-        store.suiteStarted("suite", new URI("file:///suite"), 42, newArrayList("s1", "s2"), new ArrayList<>());
-
-        verify(listener1).progressChanged(0, 0, 0, 42);
-        verify(listener2).progressChanged(0, 0, 0, 42);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
     @Test
@@ -120,7 +91,7 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenSuiteStartsAndStoreHasRootEstablished_listenersAreNotifiedAboutChangedNode() throws Exception {
+    public void whenSuiteStartsAndStoreHasRootEstablished_theStoreGetsDirty() throws Exception {
         final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
         final ExecutionTreeNode current = new ExecutionTreeNode(root, ElementKind.SUITE, "inner");
         root.addChildren(newArrayList(current));
@@ -129,38 +100,9 @@ public class ExecutionStatusStoreTest {
         store.setExecutionTree(root);
         store.setCurrent(current);
 
-        final ExecutionTreeElementListener listener1 = mock(ExecutionTreeElementListener.class);
-        final ExecutionTreeElementListener listener2 = mock(ExecutionTreeElementListener.class);
-
-        store.addTreeListener(listener1);
-        store.addTreeListener(listener2);
-
         store.suiteStarted("another", new URI("file:///another"), 30, new ArrayList<>(), newArrayList("t1", "t2"));
-
-        verify(listener1).nodeChanged(store, current);
-        verify(listener2).nodeChanged(store, current);
-    }
-
-    @Test
-    public void whenSuiteStartsAndStoreHasRootEstablished_listenersAreNotNotifiedAboutProgress() throws Exception {
-        final ExecutionTreeNode root = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode current = new ExecutionTreeNode(root, ElementKind.SUITE, "inner");
-        root.addChildren(newArrayList(current));
-
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-        store.setExecutionTree(root);
-        store.setCurrent(current);
-
-        final ExecutionProgressListener listener1 = mock(ExecutionProgressListener.class);
-        final ExecutionProgressListener listener2 = mock(ExecutionProgressListener.class);
-
-        store.addProgressListener(listener1);
-        store.addProgressListener(listener2);
-
-        store.suiteStarted("another", new URI("file:///another"), 30, new ArrayList<>(), newArrayList("t1", "t2"));
-
-        verifyZeroInteractions(listener1);
-        verifyZeroInteractions(listener2);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
     @Test
@@ -180,41 +122,15 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenSuiteEnds_listenersAreNotifiedAboutChangedNode_1() {
+    public void whenSuiteEnds_theStoreGetsDirty_1() {
         final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setCurrent(current);
 
-        final ExecutionTreeElementListener listener1 = mock(ExecutionTreeElementListener.class);
-        final ExecutionTreeElementListener listener2 = mock(ExecutionTreeElementListener.class);
-
-        store.addTreeListener(listener1);
-        store.addTreeListener(listener2);
-
         store.elementEnded(100, Status.PASS, "");
-
-        verify(listener1).nodeChanged(store, current);
-        verify(listener2).nodeChanged(store, current);
-    }
-
-    @Test
-    public void whenSuiteEnds_listenersAreNotifiedAboutProgress_1() {
-        final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
-
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-        store.setCurrent(current);
-
-        final ExecutionProgressListener listener1 = mock(ExecutionProgressListener.class);
-        final ExecutionProgressListener listener2 = mock(ExecutionProgressListener.class);
-
-        store.addProgressListener(listener1);
-        store.addProgressListener(listener2);
-
-        store.elementEnded(100, Status.PASS, "");
-
-        verifyZeroInteractions(listener1);
-        verifyZeroInteractions(listener2);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
     @Test
@@ -228,6 +144,8 @@ public class ExecutionStatusStoreTest {
         store.setCurrent(current);
 
         store.elementEnded(100, Status.PASS, "");
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
 
         assertThat(current.getStatus()).isEqualTo(Optional.of(Status.PASS));
         assertThat(current.getMessage()).isEmpty();
@@ -237,7 +155,7 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenSuiteEnds_listenersAreNotifiedAboutChangedNode_2() {
+    public void whenSuiteEnds_theStoreGetsDirty_2() {
         final ExecutionTreeNode parent = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
         final ExecutionTreeNode previous = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner1");
         final ExecutionTreeNode current = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner2");
@@ -246,38 +164,9 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setCurrent(current);
 
-        final ExecutionTreeElementListener listener1 = mock(ExecutionTreeElementListener.class);
-        final ExecutionTreeElementListener listener2 = mock(ExecutionTreeElementListener.class);
-
-        store.addTreeListener(listener1);
-        store.addTreeListener(listener2);
-
         store.elementEnded(100, Status.PASS, "");
-
-        verify(listener1).nodeChanged(store, current);
-        verify(listener2).nodeChanged(store, current);
-    }
-
-    @Test
-    public void whenSuiteEnds_listenersAreNotifiedAboutProgress_2() {
-        final ExecutionTreeNode parent = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode previous = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner1");
-        final ExecutionTreeNode current = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner2");
-        parent.addChildren(newArrayList(previous, current));
-
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-        store.setCurrent(current);
-
-        final ExecutionProgressListener listener1 = mock(ExecutionProgressListener.class);
-        final ExecutionProgressListener listener2 = mock(ExecutionProgressListener.class);
-
-        store.addProgressListener(listener1);
-        store.addProgressListener(listener2);
-
-        store.elementEnded(100, Status.PASS, "");
-
-        verifyZeroInteractions(listener1);
-        verifyZeroInteractions(listener2);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
     @Test
@@ -300,7 +189,7 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenSuiteEnds_listenersAreNotifiedAboutChangedNode_3() {
+    public void whenSuiteEnds_theStoreGetsDirty_3() {
         final ExecutionTreeNode parent = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
         final ExecutionTreeNode current = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner1");
         final ExecutionTreeNode next = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner2");
@@ -309,38 +198,9 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setCurrent(current);
 
-        final ExecutionTreeElementListener listener1 = mock(ExecutionTreeElementListener.class);
-        final ExecutionTreeElementListener listener2 = mock(ExecutionTreeElementListener.class);
-
-        store.addTreeListener(listener1);
-        store.addTreeListener(listener2);
-
         store.elementEnded(100, Status.PASS, "");
-
-        verify(listener1).nodeChanged(store, current);
-        verify(listener2).nodeChanged(store, current);
-    }
-
-    @Test
-    public void whenSuiteEnds_listenersAreNotifiedAboutProgress_3() {
-        final ExecutionTreeNode parent = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode current = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner1");
-        final ExecutionTreeNode next = new ExecutionTreeNode(parent, ElementKind.SUITE, "inner2");
-        parent.addChildren(newArrayList(current, next));
-
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-        store.setCurrent(current);
-
-        final ExecutionProgressListener listener1 = mock(ExecutionProgressListener.class);
-        final ExecutionProgressListener listener2 = mock(ExecutionProgressListener.class);
-
-        store.addProgressListener(listener1);
-        store.addProgressListener(listener2);
-
-        store.elementEnded(100, Status.PASS, "");
-
-        verifyZeroInteractions(listener1);
-        verifyZeroInteractions(listener2);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
     @Test
@@ -357,43 +217,17 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenTestStarts_listenersAreNotifiedAboutChangedNode() {
+    public void whenTestStarts_theStoreGetsDirty() {
         final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.TEST, "test");
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setCurrent(current);
 
-        final ExecutionTreeElementListener listener1 = mock(ExecutionTreeElementListener.class);
-        final ExecutionTreeElementListener listener2 = mock(ExecutionTreeElementListener.class);
-
-        store.addTreeListener(listener1);
-        store.addTreeListener(listener2);
-
         store.testStarted();
-
-        verify(listener1).nodeChanged(store, current);
-        verify(listener2).nodeChanged(store, current);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
-    @Test
-    public void whenTestStarts_listenersAreNotifiedAboutProgress() {
-        final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.TEST, "test");
-
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-        store.setCurrent(current);
-
-        final ExecutionProgressListener listener1 = mock(ExecutionProgressListener.class);
-        final ExecutionProgressListener listener2 = mock(ExecutionProgressListener.class);
-
-        store.addProgressListener(listener1);
-        store.addProgressListener(listener2);
-
-        store.testStarted();
-
-        verify(listener1).progressChanged(1, 0, 0, 0);
-        verify(listener2).progressChanged(1, 0, 0, 0);
-    }
-    
     @Test
     public void whenTestEnds_currentNodeChangesStatusCountersAreChanged_currentIsMovedToParentIfThereIsNoSibling() {
         final ExecutionTreeNode parent = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
@@ -435,7 +269,7 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenTestEnds_listenersAreNotifiedAboutChangedNode() {
+    public void whenTestEnds_theStoreGetsDirty() {
         final ExecutionTreeNode parent = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
         final ExecutionTreeNode current = new ExecutionTreeNode(parent, ElementKind.TEST, "test1");
         final ExecutionTreeNode next = new ExecutionTreeNode(parent, ElementKind.TEST, "test2");
@@ -444,38 +278,9 @@ public class ExecutionStatusStoreTest {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setCurrent(current);
 
-        final ExecutionTreeElementListener listener1 = mock(ExecutionTreeElementListener.class);
-        final ExecutionTreeElementListener listener2 = mock(ExecutionTreeElementListener.class);
-
-        store.addTreeListener(listener1);
-        store.addTreeListener(listener2);
-
         store.elementEnded(42, Status.FAIL, "");
-
-        verify(listener1).nodeChanged(store, current);
-        verify(listener2).nodeChanged(store, current);
-    }
-
-    @Test
-    public void whenTestEnds_listenersAreNotifiedAboutProgress() {
-        final ExecutionTreeNode parent = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
-        final ExecutionTreeNode current = new ExecutionTreeNode(parent, ElementKind.TEST, "test1");
-        final ExecutionTreeNode next = new ExecutionTreeNode(parent, ElementKind.TEST, "test2");
-        parent.addChildren(newArrayList(current, next));
-
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-        store.setCurrent(current);
-
-        final ExecutionProgressListener listener1 = mock(ExecutionProgressListener.class);
-        final ExecutionProgressListener listener2 = mock(ExecutionProgressListener.class);
-
-        store.addProgressListener(listener1);
-        store.addProgressListener(listener2);
-
-        store.elementEnded(42, Status.FAIL, "");
-
-        verify(listener1).progressChanged(0, 0, 1, 0);
-        verify(listener2).progressChanged(0, 0, 1, 0);
+        assertThat(store.checkDirtyAndReset()).isTrue();
+        assertThat(store.checkDirtyAndReset()).isFalse();
     }
 
     @Test
@@ -487,45 +292,17 @@ public class ExecutionStatusStoreTest {
     }
 
     @Test
-    public void whenStoreIsDisposed_treeIsRemovedAndListenersAreClearedToo() {
+    public void whenStoreIsDisposed_treeIsRemoved() {
         final ExecutionStatusStore store = new ExecutionStatusStore();
         store.setExecutionTree(new ExecutionTreeNode(null, ElementKind.SUITE, "r"));
         store.setCurrent(new ExecutionTreeNode(null, ElementKind.SUITE, "s"));
         
-        store.addProgressListener((c,p,f,t) -> {});
-        store.addProgressListener((c,p,f,t) -> {});
-        store.addTreeListener((s, n) -> {});
-        store.addTreeListener((s, n) -> {});
-
-        assertThat(store.getListeners()).hasSize(4);
         assertThat(store.isDisposed()).isFalse();
 
         store.dispose();
 
         assertThat(store.getExecutionTree()).isNull();
         assertThat(store.getCurrent()).isNull();
-        assertThat(store.getListeners()).isEmpty();
         assertThat(store.isDisposed()).isTrue();
-    }
-
-    @Test
-    public void listenersAreProperlyRemovedFromStore() {
-        final ExecutionStatusStore store = new ExecutionStatusStore();
-
-        final ExecutionProgressListener l1 = (c, p, f, t) -> { };
-        final ExecutionProgressListener l2 = (c, p, f, t) -> { };
-        final ExecutionTreeElementListener l3 = (s, n) -> { };
-        final ExecutionTreeElementListener l4 = (s, n) -> { };
-
-        store.addProgressListener(l1);
-        store.addProgressListener(l2);
-        store.addTreeListener(l3);
-        store.addTreeListener(l4);
-
-        assertThat(store.getListeners()).containsExactly(l1, l2, l3, l4);
-
-        store.removeStoreListener(l2, l4);
-
-        assertThat(store.getListeners()).containsExactly(l1, l3);
     }
 }
