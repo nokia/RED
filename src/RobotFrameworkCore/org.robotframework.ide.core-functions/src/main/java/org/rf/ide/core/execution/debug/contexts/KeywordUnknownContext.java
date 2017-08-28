@@ -14,7 +14,7 @@ import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FileRegion;
 
 
-public class KeywordUnknownContext extends DefaultContext {
+public class KeywordUnknownContext extends KeywordContext {
 
     private final URI locationUri;
 
