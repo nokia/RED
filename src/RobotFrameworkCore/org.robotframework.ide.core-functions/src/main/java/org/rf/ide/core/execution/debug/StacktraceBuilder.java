@@ -5,12 +5,18 @@
  */
 package org.rf.ide.core.execution.debug;
 
+import static com.google.common.base.Predicates.or;
+
 import java.net.URI;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.event.KeywordEndedEvent;
 import org.rf.ide.core.execution.agent.event.KeywordStartedEvent;
+import org.rf.ide.core.execution.agent.event.ResourceImportEvent;
 import org.rf.ide.core.execution.agent.event.SuiteEndedEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 import org.rf.ide.core.execution.agent.event.TestEndedEvent;
@@ -22,6 +28,9 @@ import org.rf.ide.core.execution.debug.KeywordCallType.KeywordsTypesForRf29Fixer
 import org.rf.ide.core.execution.debug.StackFrame.FrameCategory;
 import org.rf.ide.core.execution.debug.contexts.ForLoopContext;
 import org.rf.ide.core.execution.debug.contexts.ForLoopIterationContext;
+import org.rf.ide.core.execution.debug.contexts.KeywordContext;
+import org.rf.ide.core.execution.debug.contexts.SuiteContext;
+import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
@@ -34,6 +43,8 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
     private final RobotBreakpointSupplier breakpointSupplier;
 
     private KeywordsTypesFixer keywordsTypesFixer;
+
+    private final Set<URI> currentlyImportedResources = new LinkedHashSet<>();
 
     public StacktraceBuilder(final Stacktrace stacktrace, final ElementsLocator locator,
             final RobotBreakpointSupplier breakpointSupplier) {
@@ -57,9 +68,12 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final URI suitePath = event.getPath();
         final boolean suiteIsDirectory = event.isDirectory();
 
-        final StackFrameContext context = locator.findContextForSuite(suiteName, suitePath, suiteIsDirectory,
+        final SuiteContext context = locator.findContextForSuite(suiteName, suitePath, suiteIsDirectory,
                 currentPath);
+        context.addLoadedResources(currentlyImportedResources);
         stacktrace.push(new StackFrame(suiteName, FrameCategory.SUITE, stacktrace.size(), context));
+
+        currentlyImportedResources.clear();
     }
 
     @Override
@@ -68,7 +82,7 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final Optional<String> template = event.getTemplate();
 
         final URI path = stacktrace.getContextPath().orElse(null);
-        final StackFrameContext context = locator.findContextForTestCase(testName, path, template);
+        final TestCaseContext context = locator.findContextForTestCase(testName, path, template);
         stacktrace.push(new StackFrame(testName, FrameCategory.TEST, stacktrace.size(), context));
     }
 
@@ -96,36 +110,46 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final FrameCategory category;
         final int level;
         final StackFrameContext context;
+        final Supplier<URI> contextPathSupplier;
         if (keyword.isForLoop()) {
             final StackFrameContext currentContext = stacktrace.peekCurrentFrame().get().getContext();
             context = ForLoopContext.findContextForLoop(currentContext);
             category = FrameCategory.FOR;
             level = stacktrace.peekCurrentFrame().get().getLevel();
             frameNamePrefix = ":FOR ";
+            contextPathSupplier = () -> null;
+
         } else if (stacktrace.hasCategoryOnTop(FrameCategory.FOR)) {
             final StackFrameContext currentContext = stacktrace.peekCurrentFrame().get().getContext();
             context = ForLoopIterationContext.findContextForLoopIteration(currentContext, keywordName);
             category = FrameCategory.FOR_ITEM;
             level = stacktrace.peekCurrentFrame().get().getLevel();
             frameNamePrefix = ":FOR iteration ";
+            contextPathSupplier = () -> null;
+
         } else {
-            context = locator.findContextForKeyword(libraryName, keywordName, currentSuitePath);
+            final SuiteContext suiteContext = (SuiteContext) stacktrace
+                    .getFirstFrameSatisfying(StackFrame::isSuiteContext)
+                    .get()
+                    .getContext();
+            final KeywordContext kwContext = locator.findContextForKeyword(libraryName, keywordName, currentSuitePath,
+                    suiteContext.getLoadedResources());
+            context = kwContext;
             category = FrameCategory.KEYWORD;
+
             // library keyword have to point to variables taken from lowest test or suite if test
             // does not exist
-            level = context.isLibraryKeywordContext()
-                    ? stacktrace.getFirstTestOrSuiteFrame().map(StackFrame::getLevel).get()
+            level = kwContext.isLibraryKeywordContext()
+                    ? stacktrace.getFirstFrameSatisfying(or(StackFrame::isTestContext, StackFrame::isSuiteContext))
+                            .map(StackFrame::getLevel)
+                            .get()
                     : stacktrace.peekCurrentFrame().get().getLevel() + 1;
-            
             frameNamePrefix = "";
+            contextPathSupplier = () -> currentSuitePath;
         }
 
         final String frameName = frameNamePrefix + QualifiedKeywordName.asCall(keywordName, libraryName);
-        final StackFrame frame = context.isLibraryKeywordContext()
-                ? new StackFrame(frameName, category, level, context, () -> currentSuitePath)
-                : new StackFrame(frameName, category, level, context);
-
-        stacktrace.push(frame);
+        stacktrace.push(new StackFrame(frameName, category, level, context, contextPathSupplier));
     }
 
     @Override
@@ -148,6 +172,20 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
     @Override
     public void handleSuiteEnded(final SuiteEndedEvent event) {
         stacktrace.pop();
+    }
+
+    @Override
+    public void handleResourceImport(final ResourceImportEvent event) {
+        if (event.isDynamicallyImported()) {
+            final SuiteContext suiteContext = (SuiteContext) stacktrace
+                    .getFirstFrameSatisfying(StackFrame::isSuiteContext)
+                    .get()
+                    .getContext();
+            suiteContext.addLoadedResource(event.getPath());
+        } else {
+            // if resources is imported normally it is done prior to suite start
+            this.currentlyImportedResources.add(event.getPath());
+        }
     }
 
     @Override

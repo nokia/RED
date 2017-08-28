@@ -191,12 +191,14 @@ public class RobotAgentEventDispatcherTest {
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, String> attributes = ImmutableMap.of("source", "/a/b/file.robot");
+        final Map<String, String> attributes = ImmutableMap.of("source", "/a/b/file.robot", "importer",
+                "/a/b/suite.robot");
         final String json = toJson(ImmutableMap.of("resource_import", newArrayList("file", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleResourceImport(new ResourceImportEvent(new URI("file:///a/b/file.robot")));
+        verify(listener).handleResourceImport(
+                new ResourceImportEvent(new URI("file:///a/b/file.robot"), new URI("file:///a/b/suite.robot")));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
