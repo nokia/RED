@@ -10,6 +10,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -42,8 +45,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestExecutionListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotTestExecutionService.RobotTestsLaunch;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore.ExecutionProgressListener;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionStatusStore.ExecutionTreeElementListener;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ExecutionViewPropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.GoToFileHandler.E4GoToFileHandler;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.ShowFailedOnlyHandler;
@@ -61,19 +62,17 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class ExecutionView {
     
+    public static final String ID = "org.robotframework.ide.ExecutionView";
+    private static final String MENU_ID = "org.robotframework.ide.ExecutionView.viewer";
+
     @Inject
     private IEvaluationService evaluationService;
 
-    public static final String ID = "org.robotframework.ide.ExecutionView";
-    private static final String MENU_ID = "org.robotframework.ide.ExecutionView.viewer";
+    private ScheduledExecutorService executor;
 
     private final RobotTestExecutionService executionService;
     private RobotTestsLaunch launch;
     private RobotTestExecutionListener executionListener;
-    private final ExecutionTreeElementListener storeListener = this::refreshChangedNode;
-    private final ExecutionProgressListener progressListener = this::refreshProgress;
-
-    private Composite parent;
 
     private CLabel testsCounterLabel;
     private CLabel passCounterLabel;
@@ -106,7 +105,6 @@ public class ExecutionView {
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part, final IMenuService menuService) {
-        this.parent = parent;
         GridDataFactory.fillDefaults().grab(true, true).applyTo(parent);
         GridLayoutFactory.fillDefaults().applyTo(parent);
 
@@ -186,30 +184,67 @@ public class ExecutionView {
             executionListener = new ExecutionListener();
             executionService.addExecutionListener(executionListener);
 
-            final Optional<RobotTestsLaunch> lastLaunch = executionService.getLastLaunch();
-            if (lastLaunch.isPresent()) {
-                launch = lastLaunch.get();
+            executionService.getLastLaunch().ifPresent(l -> {
+                this.launch = l;
+                setInput(launch);
+            });
+        }
+    }
 
-                // this launch may be currently running, so we have to synchronize in order
-                // to get proper state of messages, as other threads may change it in the meantime
-                synchronized (launch) {
-                    final ExecutionStatusStore elementsStore = launch.getExecutionData(ExecutionStatusStore.class,
-                            ExecutionStatusStore::new);
-                    elementsStore.addTreeListener(storeListener);
-                    elementsStore.addProgressListener(progressListener);
+    private void setInput(final RobotTestsLaunch launch) {
+        if (executor != null) {
+            executor.shutdownNow();
+        }
+        SwtThread.syncExec(this::resetView);
 
-                    SwtThread.asyncExec(() -> {
-                        final ExecutionTreeNode root = elementsStore.getExecutionTree();
-                        executionViewer.setInput(root == null ? null : newArrayList(root));
-                        refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
-                                elementsStore.getFailedTests(), elementsStore.getTotalTests());
+        // this launch may be currently running, so we have to synchronize in order
+        // to get proper state of messages, as other threads may change it in the meantime
+        synchronized (launch) {
+            final ExecutionStatusStore elementsStore = launch.getExecutionData(ExecutionStatusStore.class,
+                    ExecutionStatusStore::new);
 
-                        if (root != null) {
-                            expandAllFailedOrRunning(root);
-                        }
-                    });
-                }
+            if (launch.isTerminated()) {
+                refreshEverything(elementsStore);
+            } else {
+                executor = Executors.newScheduledThreadPool(1);
+                final Runnable command = () -> {
+                    if (elementsStore.checkDirtyAndReset()) {
+                        SwtThread.asyncExec(() -> {
+                            refreshEverything(elementsStore);
+                        });
+                    }
+                };
+                executor.scheduleAtFixedRate(command, 0, 300, TimeUnit.MILLISECONDS);
             }
+        }
+    }
+
+    private void resetView() {
+        executionViewer.setInput(null);
+        messageText.setText("");
+
+        testsCounterLabel.setText("Tests: 0/0");
+        passCounterLabel.setText("Passed: 0");
+        failCounterLabel.setText("Failed: 0");
+
+        progressBar.reset();
+
+        executionViewer.refresh();
+    }
+
+    private void refreshEverything(final ExecutionStatusStore elementsStore) {
+        setProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(), elementsStore.getFailedTests(),
+                elementsStore.getTotalTests());
+
+        executionViewer.getTree().setRedraw(false);
+        try {
+            final ExecutionTreeNode root = elementsStore.getExecutionTree();
+            executionViewer.setInput(root == null ? null : newArrayList(root));
+            if (root != null) {
+                expandAllFailedOrRunning(root);
+            }
+        } finally {
+            executionViewer.getTree().setRedraw(true);
         }
     }
 
@@ -270,57 +305,22 @@ public class ExecutionView {
     public void dispose() {
         synchronized (executionService) {
             executionService.removeExecutionListener(executionListener);
-            executionService.forEachLaunch(launch -> launch.getExecutionData(ExecutionStatusStore.class)
-                    .ifPresent(store -> store.removeStoreListener(storeListener, progressListener)));
+        }
+        if (executor != null) {
+            executor.shutdownNow();
         }
     }
 
-    private void refreshChangedNode(final ExecutionStatusStore store, final ExecutionTreeNode node) {
-        SwtThread.asyncExec(() -> {
-            // it could have been queued earlier in main thread...
-            if (parent == null || parent.isDisposed()) {
-                return;
-            }
-
-            if (executionViewer.getInput() == null) {
-                executionViewer.setInput(newArrayList(store.getExecutionTree()));
-            }
-            executionViewer.refresh(node);
-
-            final List<ExecutionTreeNode> p = new ArrayList<>();
-            ExecutionTreeNode e = node;
-            while (e != null) {
-                p.add(0, e);
-                e = e.getParent();
-            }
-
-            final TreePath path = new TreePath(p.toArray());
-            final Status status = node.getStatus().orElse(null);
-            if (status == Status.RUNNING || status == Status.FAIL) {
-                executionViewer.expandToLevel(path, 0);
-            } else {
-                executionViewer.collapseToLevel(path, p.size());
-            }
-        });
-    }
-
-    private void refreshProgress(final int currentTest, final int passedSoFar, final int failedSoFar,
+    private void setProgress(final int currentTest, final int passedSoFar, final int failedSoFar,
             final int totalTests) {
-        SwtThread.asyncExec(() -> {
-            // it could have been queued earlier in main thread...
-            if (parent == null || parent.isDisposed()) {
-                return;
-            }
+        testsCounterLabel.setText(String.format("Tests: %d/%d", currentTest, totalTests));
+        passCounterLabel.setText("Passed: " + passedSoFar);
+        failCounterLabel.setText("Failed: " + failedSoFar);
 
-            testsCounterLabel.setText(String.format("Tests: %d/%d", currentTest, totalTests));
-            passCounterLabel.setText("Passed: " + passedSoFar);
-            failCounterLabel.setText("Failed: " + failedSoFar);
-
-            final Color progressBarColor = failedSoFar > 0 ? ColorsManager.getColor(180, 0, 0)
-                    : ColorsManager.getColor(0, 180, 0);
-            progressBar.setBarColor(progressBarColor);
-            progressBar.setProgress(passedSoFar + failedSoFar, totalTests);
-        });
+        final Color progressBarColor = failedSoFar > 0 ? ColorsManager.getColor(180, 0, 0)
+                : ColorsManager.getColor(0, 180, 0);
+        progressBar.setBarColor(progressBarColor);
+        progressBar.setProgress(passedSoFar + failedSoFar, totalTests);
     }
 
     private ISelectionChangedListener createSelectionChangedListener() {
@@ -352,28 +352,28 @@ public class ExecutionView {
             SwtThread.asyncExec(() -> {
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
-                clearView();
             });
 
-            synchronized (ExecutionView.this.launch) {
-                final ExecutionStatusStore elementsStore = launch.getExecutionData(ExecutionStatusStore.class,
-                        ExecutionStatusStore::new);
-                elementsStore.addTreeListener(storeListener);
-                elementsStore.addProgressListener(progressListener);
-
-                SwtThread.asyncExec(() -> {
-                    refreshProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(),
-                            elementsStore.getFailedTests(), elementsStore.getTotalTests());
-                });
-            }
+            setInput(launch);
         }
 
         @Override
         public void executionEnded(final RobotTestsLaunch launch) {
-            // nothing to do
             SwtThread.asyncExec(() -> {
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
+            });
+            executor.shutdown();
+
+            // in order to be sure that there is nothing missing
+            SwtThread.asyncExec(() -> {
+                try {
+                    // let's wait because there might be a still running by the executor
+                    executor.awaitTermination(3, TimeUnit.SECONDS);
+                } catch (final InterruptedException e) {
+                    // ok, fine
+                }
+                setInput(launch);
             });
         }
     }
