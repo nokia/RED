@@ -25,7 +25,7 @@ class ClassesRetrievingTests(unittest.TestCase):
         response = get_classes_from_module(module_location, None, [], [])
 
         self.assertEqual(response,
-                         {'result': ['module', 'mod_1', 'mod_2', 'module.module', 'module.mod_1', 'module.mod_2'],
+                         {'result': ['module','module.module', 'module.mod_1', 'module.mod_2'],
                           'exception': None})
 
     def test_retrieving_classes_from_python_module_with_several_classes(self):
@@ -35,8 +35,7 @@ class ClassesRetrievingTests(unittest.TestCase):
         response = get_classes_from_module(module_location, None, [], [])
 
         self.assertEqual(response,
-                         {'result': ['mod_2', 'mod_2.mod_2', 'mod_2.other_mod_2', 'module.mod_2', 'module.mod_2.mod_2',
-                                     'module.mod_2.other_mod_2'], 'exception': None})
+                         {'result': ['mod_2', 'module.mod_2', 'module.other_mod_2'], 'exception': None})
 
     def test_retrieving_classes_from_python_module_in_zip(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
