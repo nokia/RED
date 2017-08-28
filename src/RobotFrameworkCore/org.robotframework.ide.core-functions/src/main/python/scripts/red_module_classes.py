@@ -133,6 +133,9 @@ def _get_module_name_by_path(start_path):
 
 
 def _get_names_combinations(names, module_name):
+    for mod_index in range(len(names) - 1, 0, -1):
+        if '.' in names[mod_index]:
+            names[mod_index] = names[mod_index].split(".", 1)[1] 
     result = list(names)
 
     if len(names) == 1 and names[0] == module_name:
@@ -143,7 +146,12 @@ def _get_names_combinations(names, module_name):
             for mod_index in range(len(module_names) - 1, -1, -1):
                 pre_index = '.'.join(module_names[mod_index:])
                 for get_index in range(0, len(names)):
-                    result.append(pre_index + '.' + names[get_index])
+                    if not pre_index + '.' + names[get_index] in result:
+                        result.append(pre_index + '.' + names[get_index])
+                    
+
+    for mod_index in range(len(names) - 1, 0, -1):
+        if names[mod_index] in result: result.remove(names[mod_index])
 
     return result
 
