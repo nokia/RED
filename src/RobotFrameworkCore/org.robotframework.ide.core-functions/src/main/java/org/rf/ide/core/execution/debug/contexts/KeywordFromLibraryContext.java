@@ -10,7 +10,7 @@ import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
 
 
-public class KeywordFromLibraryContext extends DefaultContext {
+public class KeywordFromLibraryContext extends KeywordContext {
 
     @Override
     public boolean isLibraryKeywordContext() {

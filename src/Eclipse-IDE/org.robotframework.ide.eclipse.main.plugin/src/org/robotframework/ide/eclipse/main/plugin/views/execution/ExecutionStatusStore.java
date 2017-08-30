@@ -15,9 +15,11 @@ import org.rf.ide.core.execution.agent.Status;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionTreeNode.ElementKind;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 
 public class ExecutionStatusStore implements IDisposable {
 
+    private boolean isOpen = true;
     private boolean isDisposed = false;
     private boolean isDirty = false;
 
@@ -55,6 +57,8 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     protected void setOutputFilePath(final URI outputFilepath) {
+        Preconditions.checkArgument(isOpen);
+
         this.outputFile = outputFilepath;
         isDirty = true;
     }
@@ -95,6 +99,7 @@ public class ExecutionStatusStore implements IDisposable {
 
     protected void suiteStarted(final String suiteName, final URI suiteFilePath, final int totalTests,
             final List<String> childSuites, final List<String> childTests) {
+        Preconditions.checkArgument(isOpen);
 
         if (root == null) {
             this.totalTests = totalTests;
@@ -116,12 +121,16 @@ public class ExecutionStatusStore implements IDisposable {
     }
 
     protected void testStarted() {
+        Preconditions.checkArgument(isOpen);
+
         current.setStatus(Status.RUNNING);
         currentTest++;
         isDirty = true;
     }
 
     protected void elementEnded(final int elapsedTime, final Status status, final String errorMessage) {
+        Preconditions.checkArgument(isOpen);
+
         current.setElapsedTime(elapsedTime);
         current.setStatus(status);
         current.setMessage(errorMessage);
@@ -152,5 +161,13 @@ public class ExecutionStatusStore implements IDisposable {
         final boolean wasDirty = isDirty;
         isDirty = false;
         return wasDirty;
+    }
+
+    boolean isOpen() {
+        return isOpen;
+    }
+
+    void close() {
+        isOpen = false;
     }
 }
