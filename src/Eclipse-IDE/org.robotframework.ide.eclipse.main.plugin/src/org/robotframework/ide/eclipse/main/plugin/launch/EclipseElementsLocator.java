@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -26,8 +27,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.execution.debug.ElementsLocator;
-import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.execution.debug.contexts.ErrorMessages;
+import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordFromLibraryContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordOfUserContext;
 import org.rf.ide.core.execution.debug.contexts.KeywordUnknownContext;
@@ -57,16 +58,49 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefini
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
 public class EclipseElementsLocator implements ElementsLocator {
 
     private final RobotModel model;
-
     private final RedWorkspace workspace;
 
     private final IProject project;
+
+    private final LoadingCache<TypedUri, URI> pathsTranslationsCache = CacheBuilder.newBuilder()
+            .maximumSize(10000)
+            .build(new CacheLoader<TypedUri, URI>() {
+
+                @Override
+                public URI load(final TypedUri remoteUri) {
+                    return translate(remoteUri.uri, remoteUri.isDirectory);
+                }
+            });
+
+    private final LoadingCache<IFile, AccessibleKeywordsEntities> entitiesCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .build(new CacheLoader<IFile, AccessibleKeywordsEntities>() {
+                @Override
+                public AccessibleKeywordsEntities load(final IFile file) {
+                    return new AccessibleKeywordsEntities(file.getFullPath(),
+                            new DebuggerAccessibleKeywordsCollector(model, file));
+                }
+            });
+    private final LoadingCache<KeywordWithFile, ListMultimap<KeywordScope, KeywordEntity>> keywordsCache = CacheBuilder
+            .newBuilder()
+            .maximumSize(100)
+            .build(new CacheLoader<KeywordWithFile, ListMultimap<KeywordScope, KeywordEntity>>() {
+
+                @Override
+                public ListMultimap<KeywordScope, KeywordEntity> load(final KeywordWithFile kwWithFile) {
+                    final AccessibleKeywordsEntities keywordEntities = entitiesCache.getUnchecked(kwWithFile.file);
+                    return keywordEntities.getPossibleKeywords(kwWithFile.keywordName, false);
+                }
+            });
 
     private final Map<IPath, AccessibleKeywordsEntities> keywords = new HashMap<>();
 
@@ -144,7 +178,7 @@ public class EclipseElementsLocator implements ElementsLocator {
     }
 
     @Override
-    public StackFrameContext findContextForSuite(final String suiteName, final URI path, final boolean isDirectory,
+    public SuiteContext findContextForSuite(final String suiteName, final URI path, final boolean isDirectory,
             final URI currentLocalSuitePath) {
         if (path == null) {
             // only for top-level merged suites (when Robot runs on multiple data sources)
@@ -152,7 +186,7 @@ public class EclipseElementsLocator implements ElementsLocator {
         }
 
         final URI localUri = currentLocalSuitePath == null
-                ? translate(path, isDirectory)
+                ? pathsTranslationsCache.getUnchecked(new TypedUri(path, isDirectory))
                 : resolve(currentLocalSuitePath, path);
 
         if (localUri == null) {
@@ -163,7 +197,7 @@ public class EclipseElementsLocator implements ElementsLocator {
         }
 
 
-        Function<URI, Optional<RobotFile>> associatedModelProvider;
+        final Function<URI, Optional<RobotFile>> associatedModelProvider;
         final boolean isFoundInWorkspace;
         if (isDirectory) {
             associatedModelProvider = uri -> workspace.containerForUri(uri)
@@ -199,7 +233,7 @@ public class EclipseElementsLocator implements ElementsLocator {
     }
 
     @Override
-    public StackFrameContext findContextForTestCase(final String testCaseName, final URI currentSuitePath,
+    public TestCaseContext findContextForTestCase(final String testCaseName, final URI currentSuitePath,
             final Optional<String> template) {
         final Optional<IFile> suiteFile = Optional.ofNullable(currentSuitePath)
                 .map(uri -> (IFile) workspace.forUri(uri));
@@ -254,13 +288,36 @@ public class EclipseElementsLocator implements ElementsLocator {
     }
 
     @Override
-    public StackFrameContext findContextForKeyword(final String libOrResourceName, final String keywordName,
-            final URI currentSuitePath) {
+    public KeywordContext findContextForKeyword(final String libOrResourceName, final String keywordName,
+            final URI currentSuitePath, final Set<URI> loadedResources) {
         if (currentSuitePath == null) {
             return new KeywordUnknownContext(String.format(ErrorMessages.keywordNotFound,
                     QualifiedKeywordName.asCall(keywordName, libOrResourceName)));
         }
 
+        KeywordContext context = findKeywordContext(libOrResourceName, keywordName, currentSuitePath);
+        if (context != null) {
+            return context;
+        }
+        // no keyword found, but maybe it could be found in dynamically loaded resources set
+        for (final URI dynResourceRemoteUri : loadedResources) {
+            final URI dynamicResourceLocalUri = pathsTranslationsCache
+                    .getUnchecked(new TypedUri(dynResourceRemoteUri, false));
+            if (dynamicResourceLocalUri != null) {
+                context = findKeywordContext(libOrResourceName, keywordName, dynamicResourceLocalUri);
+                if (context != null) {
+                    return context;
+                }
+            }
+        }
+
+        final String errorMsg = String.format(ErrorMessages.keywordNotFound_noMatch,
+                QualifiedKeywordName.asCall(keywordName, libOrResourceName), new File(currentSuitePath));
+        return new KeywordUnknownContext(errorMsg);
+    }
+
+    private KeywordContext findKeywordContext(final String libOrResourceName, final String keywordName,
+            final URI currentSuitePath) {
         final IFile suiteFile = (IFile) workspace.forUri(currentSuitePath);
         final ListMultimap<KeywordScope, KeywordEntity> possibleKeywords = getPossibleKeywords(
                 QualifiedKeywordName.asCall(keywordName, libOrResourceName), suiteFile);
@@ -285,21 +342,12 @@ public class EclipseElementsLocator implements ElementsLocator {
                 return new KeywordUnknownContext(errorMsg);
             }
         }
-        final String errorMsg = String.format(ErrorMessages.keywordNotFound_noMatch,
-                QualifiedKeywordName.asCall(keywordName, libOrResourceName), new File(suiteFile.getLocationURI()));
-        return new KeywordUnknownContext(errorMsg);
+        return null;
     }
 
     private ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(final String keywordName,
             final IFile suiteFile) {
-        if (!keywords.containsKey(suiteFile.getFullPath())) {
-            keywords.put(suiteFile.getFullPath(), new AccessibleKeywordsEntities(suiteFile.getFullPath(),
-                    new DebuggerAccessibleKeywordsCollector(model, suiteFile)));
-        }
-        final AccessibleKeywordsEntities keywordEntities = keywords.get(suiteFile.getFullPath());
-        final ListMultimap<KeywordScope, KeywordEntity> possibleKeywords = keywordEntities
-                .getPossibleKeywords(keywordName, false);
-        return possibleKeywords;
+        return keywordsCache.getUnchecked(new KeywordWithFile(suiteFile, keywordName));
     }
 
     private List<RobotFile> collectSuiteAndInitFileModelsAbove(final IFile startingSuite) {
@@ -412,6 +460,58 @@ public class EclipseElementsLocator implements ElementsLocator {
             super(scope, sourceName, keywordName, alias, isDeprecated, null, expostingFilePath);
             this.userKeyword = userKeyword;
             this.kwSpec = kwSpec;
+        }
+    }
+
+    private static final class TypedUri {
+
+        private final boolean isDirectory;
+
+        private final URI uri;
+
+        public TypedUri(final URI uri, final boolean isDirectory) {
+            this.uri = uri;
+            this.isDirectory = isDirectory;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == TypedUri.class) {
+                final TypedUri that = (TypedUri) obj;
+                return this.isDirectory == that.isDirectory && Objects.equals(this.uri, that.uri);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(uri, isDirectory);
+        }
+    }
+
+    private static final class KeywordWithFile {
+
+        private final IFile file;
+
+        private final String keywordName;
+
+        public KeywordWithFile(final IFile file, final String keywordName) {
+            this.file = file;
+            this.keywordName = keywordName;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == KeywordWithFile.class) {
+                final KeywordWithFile that = (KeywordWithFile) obj;
+                return Objects.equals(this.keywordName, that.keywordName) && Objects.equals(this.file, that.file);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(file, keywordName);
         }
     }
 }
