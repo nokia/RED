@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.rf.ide.core.execution.agent.event.Variable;
@@ -46,9 +47,9 @@ public class Stacktrace implements Iterable<StackFrame> {
         return Optional.ofNullable(frames.peek());
     }
 
-    Optional<StackFrame> getFirstTestOrSuiteFrame() {
+    Optional<StackFrame> getFirstFrameSatisfying(final Predicate<StackFrame> framePredicate) {
         return frames.stream()
-                .filter(frame -> frame.hasCategory(FrameCategory.TEST) || frame.hasCategory(FrameCategory.SUITE))
+                .filter(framePredicate)
                 .findFirst();
     }
 
