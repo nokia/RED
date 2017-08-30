@@ -57,6 +57,16 @@ class RobotAgentEventDispatcher {
     }
 
     void runEventsLoop(final BufferedReader eventReader) throws IOException, RobotAgentEventsListenerException {
+        try {
+            eventsLoop(eventReader);
+        } finally {
+            for (final RobotAgentEventListener listener : eventsListeners) {
+                listener.eventsProcessingFinished();
+            }
+        }
+    }
+
+    private void eventsLoop(final BufferedReader eventReader) throws IOException, RobotAgentEventsListenerException {
         String event = eventReader.readLine();
         final ObjectMapper mapper = new ObjectMapper();
         while (event != null && anyListenerIsHandlingEvents()) {
