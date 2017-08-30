@@ -5,10 +5,15 @@
  */
 package org.rf.ide.core.execution.debug.contexts;
 
+import static java.util.Collections.unmodifiableSet;
+
 import java.io.File;
 import java.net.URI;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
@@ -18,7 +23,6 @@ import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
 
 public class SuiteContext extends DefaultContext {
 
@@ -31,6 +35,8 @@ public class SuiteContext extends DefaultContext {
     private final String errorMessage;
 
     private final Function<URI, Optional<RobotFile>> associatedFileModelProvider;
+
+    private final LinkedHashSet<URI> loadedResources;
 
     public SuiteContext(final String suiteName) {
         this(suiteName, null, true, null, uri -> Optional.empty());
@@ -51,16 +57,30 @@ public class SuiteContext extends DefaultContext {
     }
 
     private SuiteContext(final String suiteName, final URI locationUri, final boolean isDirectory,
-            final String errorMessage, final Function<URI, Optional<RobotFile>> associatedFileModelProvider) {
+            final String errorMessage,
+            final Function<URI, Optional<RobotFile>> associatedFileModelProvider) {
         this.suiteName = suiteName;
         this.locationUri = locationUri;
         this.isDirectory = isDirectory;
         this.errorMessage = errorMessage;
+        this.loadedResources = new LinkedHashSet<>();
         this.associatedFileModelProvider = associatedFileModelProvider;
     }
 
     public boolean isDirectory() {
         return isDirectory;
+    }
+
+    public Set<URI> getLoadedResources() {
+        return unmodifiableSet(loadedResources);
+    }
+
+    public void addLoadedResource(final URI resourceUri) {
+        loadedResources.add(resourceUri);
+    }
+
+    public void addLoadedResources(final Collection<URI> resourceUris) {
+        loadedResources.addAll(resourceUris);
     }
 
     @Override
