@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.debug.StackFrameVariables.StackVariablesDelta;
+import org.rf.ide.core.execution.debug.contexts.KeywordContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 import org.rf.ide.core.testdata.model.FileRegion;
 
@@ -61,6 +62,10 @@ public class StackFrame {
         return this.category == category;
     }
 
+    public boolean isSuiteContext() {
+        return hasCategory(FrameCategory.SUITE) && context instanceof SuiteContext;
+    }
+
     public boolean isSuiteDirectoryContext() {
         return hasCategory(FrameCategory.SUITE) && context instanceof SuiteContext
                 && ((SuiteContext) context).isDirectory();
@@ -103,7 +108,7 @@ public class StackFrame {
     }
 
     public boolean isLibraryKeywordFrame() {
-        return context.isLibraryKeywordContext();
+        return context instanceof KeywordContext && ((KeywordContext) context).isLibraryKeywordContext();
     }
 
     public boolean isErroneous() {

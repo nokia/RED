@@ -8,38 +8,54 @@ package org.rf.ide.core.execution.agent.event;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 public final class ResourceImportEvent {
 
     private final URI path;
 
+    private final URI importerPath;
+
     public static ResourceImportEvent from(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("resource_import");
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
         final URI path = Events.toFileUri((String) attributes.get("source"));
+        final URI importerPath = Events.toFileUri((String) attributes.get("importer"));
 
-        return new ResourceImportEvent(path);
+        return new ResourceImportEvent(path, importerPath);
     }
 
-    public ResourceImportEvent(final URI path) {
+    public ResourceImportEvent(final URI path, final URI importerPath) {
         this.path = path;
+        this.importerPath = importerPath;
     }
 
     public URI getPath() {
         return path;
     }
 
+    public boolean isDynamicallyImported() {
+        // by RF user guide: null is provided under 'importer' key when resource is loaded
+        // dynamically
+        return importerPath == null;
+    }
+
+    public Optional<URI> getImporterPath() {
+        return Optional.ofNullable(importerPath);
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass() == ResourceImportEvent.class) {
             final ResourceImportEvent that = (ResourceImportEvent) obj;
-            return this.path.equals(that.path);
+            return this.path.equals(that.path) && Objects.equals(this.importerPath, that.importerPath);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return path.hashCode();
+        return Objects.hash(this.path, this.importerPath);
     }
 }

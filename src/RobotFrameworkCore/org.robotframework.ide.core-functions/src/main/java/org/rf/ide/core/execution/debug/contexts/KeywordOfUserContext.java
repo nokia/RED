@@ -19,7 +19,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 
 
-public class KeywordOfUserContext extends DefaultContext {
+public class KeywordOfUserContext extends KeywordContext {
 
     private final UserKeyword keyword;
 
