@@ -284,7 +284,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public int startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
+    public void startLibraryAutoDiscovering(final int port, final List<String> suiteNames,
             final List<String> variableMappings, final List<String> dataSourcePaths,
             final EnvironmentSearchPaths additionalPaths) {
         try {
@@ -292,8 +292,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_library_autodiscover.py");
 
-            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, String.valueOf(port),
-                    String.valueOf(timeout));
+            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, String.valueOf(port));
             if (!suiteNames.isEmpty()) {
                 cmdLine.add("-suitenames");
                 cmdLine.add(String.join(";", suiteNames));
@@ -307,10 +306,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                 cmdLine.add(String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType)));
             }
 
-            final StringBuilder result = new StringBuilder();
-            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> result.append(line));
-
-            return Integer.parseInt(result.toString());
+            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> {});
         } catch (final IOException | NumberFormatException e) {
             throw new RobotEnvironmentException("Unable to start library autodiscovering.");
         }

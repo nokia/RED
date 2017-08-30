@@ -378,12 +378,12 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public int startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
+    public void startLibraryAutoDiscovering(final int port, final List<String> suiteNames,
             final List<String> variableMappings, final List<String> dataSourcePaths,
             final EnvironmentSearchPaths additionalPaths) {
         try {
-            return (int) callRpcFunction("startLibraryAutoDiscovering", port, timeout, suiteNames, variableMappings,
-                    dataSourcePaths, newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
+            callRpcFunction("startLibraryAutoDiscovering", port, suiteNames, variableMappings, dataSourcePaths,
+                    newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);

@@ -15,7 +15,6 @@ from robot.running.builder import TestSuiteBuilder
 from robot.api import SuiteVisitor
 from robot.running import TestLibrary
 from robot.running.testlibraries import _BaseTestLibrary
-from robot.running.model import TestCase, Keyword
 from robot.running.handlers import _DynamicHandler, _JavaHandler
 from robot.output import LOGGER, Message
 
@@ -30,37 +29,51 @@ class RedTestSuiteBuilder(TestSuiteBuilder):
 
 class SuiteVisitorImportProxy(SuiteVisitor):
     """ suite names should be passed as arguments """
+    
+    LIB_IMPORT_TIMEOUT = 60
 
-    def __init__(self, *args, **kwargs):
-        self.__wrap_importer(kwargs["timeout"])
+    def __init__(self, *args):
         self.f_suites = [name for name in args if name]
+        self.__wrap_importer()
 
-    def __wrap_importer(self, lib_import_timeout):
+    def __wrap_importer(self):
         import robot
         import robot.running.namespace
         import robot.running.importer
         current = robot.running.namespace.IMPORTER
         to_wrap = current if isinstance(current, robot.running.importer.Importer) else current.importer
-        robot.running.namespace.IMPORTER = RedImporter(to_wrap, lib_import_timeout)
+        robot.running.namespace.IMPORTER = RedImporter(to_wrap, self.LIB_IMPORT_TIMEOUT)
 
-    def start_suite(self, suite):
-        if suite:
-            if suite.parent:
-                suite.parent.keywords.clear()
-                suite.tests.clear()
-                t = TestCase(name='Fake_' + str(int(round(time.time() * 1000))))
-                suite.tests.append(t)
-            else:
-                if len(suite.tests) == 0 or suite.test_count == 0:
-                    current_suite = RedTestSuiteBuilder().build(suite.source)
-                    if len(self.f_suites) == 0:
-                        suite.suites = current_suite.suites
-                    else:
-                        suite.suites = self.filter_by_name(current_suite.suites)
+    def visit_suite(self, suite):
+        if suite.parent:
+            suite.parent.tests.clear()
+            suite.parent.keywords.clear()
+        else:
+            if len(suite.tests) == 0 or suite.test_count == 0:
+                current_suite = RedTestSuiteBuilder().build(suite.source)
+                if len(self.f_suites) == 0:
+                    suite.suites = current_suite.suites
+                else:
+                    suite.suites = self.__filter_by_name(current_suite.suites)
 
-            suite.keywords.clear()
+        suite.tests.clear()
+        suite.keywords.clear()
 
-    def filter_by_name(self, suites):
+        suite.suites.visit(self)
+
+    def visit_test(self, test):
+        # test visiting skipped
+        pass
+
+    def visit_keyword(self, kw):
+        # keyword visiting skipped
+        pass
+
+    def visit_message(self, msg):
+        # message visiting skipped
+        pass
+
+    def __filter_by_name(self, suites):
         matched_suites = []
 
         for suite in suites:
@@ -78,15 +91,9 @@ class SuiteVisitorImportProxy(SuiteVisitor):
                 if meet and (after_remove == '' or after_remove.startswith('.') or after_remove.startswith(
                         '*') or after_remove.startswith('?')):
                     matched_suites.append(suite)
-                    suite.suites = self.filter_by_name(suite.suites)
+                    suite.suites = self.__filter_by_name(suite.suites)
 
         return matched_suites
-
-    def start_test(self, test):
-        if test:
-            test.name = 'Fake_' + str(int(round(time.time() * 1000)))
-            test.keywords.clear()
-            test.keywords.append(Keyword(name='BuiltIn.No Operation'))
 
 
 class RedImporter(object):

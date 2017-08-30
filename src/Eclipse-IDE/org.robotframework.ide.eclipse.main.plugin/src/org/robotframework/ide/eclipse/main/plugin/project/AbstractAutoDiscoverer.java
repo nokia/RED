@@ -134,7 +134,7 @@ public abstract class AbstractAutoDiscoverer {
 
         serverJob = startDryRunServer(host, port, timeout, startSuiteHandler);
 
-        startDryRunClient(runtimeEnvironment, port, timeout);
+        startDryRunClient(runtimeEnvironment, port);
 
         serverJob.join();
     }
@@ -158,9 +158,8 @@ public abstract class AbstractAutoDiscoverer {
 
     abstract RobotAgentEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler);
 
-    private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port,
-            final int timeout) {
-        runtimeEnvironment.startLibraryAutoDiscovering(port, timeout, dryRunTargetsCollector.getSuiteNames(),
+    private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port) {
+        runtimeEnvironment.startLibraryAutoDiscovering(port, dryRunTargetsCollector.getSuiteNames(),
                 getVariableMappings(), getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
     }
 
