@@ -501,7 +501,8 @@ class TestRunnerAgent:
                 
                 
                 if inspect.ismodule(value) or inspect.isfunction(value) or inspect.isclass(value):
-                    frame_vars[var] = (type(value).__name__, '<' + id(value) + '>', identified_scope)
+                    type_name = type(value).__name__
+                    frame_vars[var] = (type_name, type_name + '@' + str(id(value)), identified_scope)
                 else:
                     try:
                         labeled = _label_with_types(value)
