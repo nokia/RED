@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/11/17 10:26 AM
+Save-Time: 8/31/17 10:02 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -250,7 +250,9 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
         key-type Down
         key-type Left
-        key-type Enter -times 2
+        key-type Enter
+        wait 200
+        key-type Enter
     }
     
     //type text and add new varaibles
