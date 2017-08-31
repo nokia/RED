@@ -5,44 +5,45 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.message;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.ui.services.IDisposable;
+
+import com.google.common.base.Preconditions;
 
 class ExecutionMessagesStore implements IDisposable {
 
     private final StringBuilder message = new StringBuilder();
 
-    private final List<ExecutionMessagesStoreListener> listeners = new ArrayList<>();
-
-    void addStoreListener(final ExecutionMessagesStoreListener listener) {
-        listeners.add(listener);
-    }
-
-    void removeStoreListener(final ExecutionMessagesStoreListener listener) {
-        listeners.remove(listener);
-    }
-
-    @Override
-    public void dispose() {
-        message.setLength(0);
-        listeners.clear();
-    }
+    private boolean isOpen = true;
+    private boolean isDirty = false;
 
     void append(final String msg) {
+        // can't change store state when store is closed
+        Preconditions.checkState(isOpen);
+
         message.append(msg);
-        listeners.forEach(listener -> listener.storeAppended(msg));
+        isDirty = true;
     }
 
     String getMessage() {
         return message.toString();
     }
 
-    @FunctionalInterface
-    static interface ExecutionMessagesStoreListener {
-
-        void storeAppended(String appendedMsg);
+    boolean isOpen() {
+        return isOpen;
     }
 
+    void close() {
+        this.isOpen = false;
+    }
+
+    @Override
+    public void dispose() {
+        message.setLength(0);
+    }
+
+    boolean checkDirtyAndReset() {
+        final boolean wasDirty = isDirty;
+        isDirty = false;
+        return wasDirty;
+    }
 }
