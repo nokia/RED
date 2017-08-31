@@ -464,8 +464,6 @@ public class RobotRuntimeEnvironment {
      *
      * @param port
      *            Port number for communication with AgentConnectionServer
-     * @param timeout
-     *            Library import timeout
      * @param suiteNames
      *            Suite names in robot format (no suite filtering if empty)
      * @param variableMappings
@@ -474,22 +472,16 @@ public class RobotRuntimeEnvironment {
      *            Robot data source paths
      * @param additionalPaths
      *            Additional pythonPaths and classPaths
-     * @return exit code
-     *         Zero means that tests were executed and no critical test failed, values up
-     *         to 250 denote the number of failed critical tests, and values between
-     *         251-255 are for other statuses documented in the Robot Framework User Guide.
      * @throws RobotEnvironmentException
      */
-    public int startLibraryAutoDiscovering(final int port, final int timeout, final List<String> suiteNames,
+    public void startLibraryAutoDiscovering(final int port, final List<String> suiteNames,
             final List<String> variableMappings, final List<String> dataSourcePaths,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.startLibraryAutoDiscovering(port, timeout, suiteNames, variableMappings, dataSourcePaths,
-                    additionalPaths);
+            executor.startLibraryAutoDiscovering(port, suiteNames, variableMappings, dataSourcePaths, additionalPaths);
         }
-        return -1;
     }
 
     @Override
