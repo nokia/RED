@@ -1,0 +1,113 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _IYiXMIzSEeeQ1rr93JCGzA,_OCxtEBRGEeWWV9IuysVI_A,_d8aMACuvEeW667Afdo4DcA,_2Q6oEPOSEeaWpbE3jg39cA,_jcbUQGu1Eeeps9cepQRw2Q
+Element-Name: VariablesFromPythonFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _tolVAIzMEeeQ1rr93JCGzA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/31/17 10:05 AM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "vars/test.robot" | double-click
+with [get-editor "test.robot" | get-left-ruler] {
+    with [get-ruler-column AnnotationColumn] {
+        hover-ruler -line 11
+        click-ruler -line 11 -button Right
+    }
+    get-menu "Toggle Breakpoint" | click
+}
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "vars/test.robot" | get-menu "Debug As/1 Robot Test" | click
+	
+	wait-for-specified_line-in-first-thread -line 11 -nr_of_frames 3
+	
+	//check order of variables
+	get-view Variables | maximize
+	with [get-view Variables | get-tree] {
+	    get-property "getItemCount()" | equals 14 | verify-true
+	    
+	    //check values for scalars
+	    get-property "getItems().TreeItem[0].getText()" | equals "${MyClass}" | verify-true
+	    get-property "getItems().TreeItem[0].getData().getValue().getValueString()" | equals "type@\d{8}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${a}" | verify-true
+	    get-property "getItems().TreeItem[1].getData().getValue().getValueString()" | equals 2 | verify-true
+	    get-property "getItems().TreeItem[2].getText()" | equals "${country}" | verify-true
+	    get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals Poland | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${d1}" | verify-true
+	    get-property "getItems().TreeItem[3].getData().getValue().getValueString()" | equals v1 | verify-true
+	    get-property "getItems().TreeItem[4].getData().getValue().getValueString()" | equals 7 | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "${r1}" | verify-true
+	    get-property "getItems().TreeItem[5].getData().getValue().getValueString()" | equals R22 | verify-true
+	    
+	    get-property "getItems().TreeItem[6].getText()" | equals "&{b}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "&{river}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "&{wege}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "@{city}" | verify-true
+	    get-property "getItems().TreeItem[10].getText()" | equals "@{c}" | verify-true
+	    get-property "getItems().TreeItem[11].getText()" | equals "@{d1_list}" | verify-true
+	    get-property "getItems().TreeItem[12].getText()" | equals "@{f}" | verify-true
+	    get-property "getItems().TreeItem[13].getText()" | equals "Automatic Variables" | verify-true
+	}
+	
+	//expand all lists and dicts
+	with [get-view Variables | get-tree] {
+	    select "&{b}" | double-click
+	    select "&{river}" | double-click
+	    select "&{wege}" | double-click
+	    select "@{city}" | double-click
+	    select "@{c}" | double-click
+	    select "@{d1_list}" | double-click
+	    select "@{f}" | double-click
+	}
+	
+	//check values of list
+	with [get-view Variables | get-tree] {
+	    get-item "&{b}/apples" | get-property "values['Name']" | equals apples | verify-true
+	    get-item "&{b}/apples" | get-property "values['Value']" | equals 6 | verify-true
+	    get-item "&{b}/oranges" | get-property "values['Name']" | equals oranges | verify-true
+	    get-item "&{b}/oranges" | get-property "values['Value']" | equals 1 | verify-true
+	    get-item "&{b}" | get-property "getItems().TreeItem[0].getText()" | equals apples | verify-true
+	    get-item "&{b}" | get-property "getItems().TreeItem[1].getText()" | equals oranges | verify-true
+	    
+	    get-item "&{wege}/potatos" | get-property "values['Name']" | equals potatos | verify-true
+	    get-item "&{wege}/potatos" | get-property "values['Value']" | equals 6263 | verify-true
+	    get-item "&{wege}/tomatos" | get-property "values['Name']" | equals tomatos | verify-true
+	    get-item "&{wege}/tomatos" | get-property "values['Value']" | equals 6778 | verify-true
+	    get-item "&{wege}" | get-property "getItems().TreeItem[0].getText()" | equals potatos | verify-true
+	    get-item "&{wege}" | get-property "getItems().TreeItem[1].getText()" | equals tomatos | verify-true
+
+	    get-item "@{city}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{city}/\\[0\\]" | get-property "values['Value']" | equals Wroclaw | verify-true
+	    get-item "@{city}" | get-property "getItems().TreeItem[0].getText()" | equals "[0]" | verify-true
+	    
+	    get-item "@{c}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{c}/\\[0\\]" | get-property "values['Value']" | equals 34 | verify-true
+	    get-item "@{c}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{c}/\\[1\\]" | get-property "values['Value']" | equals 35 | verify-true
+	    get-item "@{c}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+	    get-item "@{c}/\\[2\\]" | get-property "values['Value']" | equals 36 | verify-true
+	    
+	    get-item "@{d1_list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{d1_list}/\\[0\\]" | get-property "values['Value']" | equals k1 | verify-true
+	    get-item "@{d1_list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{d1_list}/\\[1\\]" | get-property "values['Value']" | equals k2 | verify-true
+	    
+	    get-item "@{f}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
+	    get-item "@{f}/\\[0\\]" | get-property "values['Value']" | equals a1 | verify-true
+	    get-item "@{f}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+	    get-item "@{f}/\\[1\\]" | get-property "values['Value']" | equals a2 | verify-true
+	}
+	
+	get-view Variables | restore
+	get-button "Resume (F8)" | click
+	
+	
+}	
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
