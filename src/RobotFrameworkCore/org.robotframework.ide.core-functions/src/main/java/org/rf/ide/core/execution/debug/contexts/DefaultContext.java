@@ -31,11 +31,6 @@ abstract class DefaultContext implements StackFrameContext {
     }
 
     @Override
-    public boolean isLibraryKeywordContext() {
-        return false;
-    }
-
-    @Override
     public Optional<FileRegion> getFileRegion() {
         return Optional.empty();
     }

@@ -69,6 +69,7 @@ public class RobotAgentEventDispatcherTest {
 
         dispatcher.runEventsLoop(readerFor(""));
 
+        verify(listener).eventsProcessingFinished();
         verifyZeroInteractions(listener);
     }
 
@@ -83,6 +84,7 @@ public class RobotAgentEventDispatcherTest {
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -97,6 +99,7 @@ public class RobotAgentEventDispatcherTest {
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -117,14 +120,17 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener1, atLeast(0)).isHandlingEvents();
         verify(listener1).handleAgentIsReadyToStart(new ReadyToStartEvent(null));
+        verify(listener1).eventsProcessingFinished();
         verifyNoMoreInteractions(listener1);
 
         verify(listener2, atLeast(1)).isHandlingEvents();
         verify(listener2).handleAgentIsReadyToStart(new ReadyToStartEvent(null));
+        verify(listener2).eventsProcessingFinished();
         verifyNoMoreInteractions(listener2);
 
         verify(listener3, atLeast(0)).isHandlingEvents();
         verify(listener3).handleAgentIsReadyToStart(new ReadyToStartEvent(null));
+        verify(listener3).eventsProcessingFinished();
         verifyNoMoreInteractions(listener3);
     }
 
@@ -140,6 +146,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleAgentIsReadyToStart(new ReadyToStartEvent(null));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -155,6 +162,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleAgentInitializing(new AgentInitializingEvent(null));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -172,6 +180,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleVersions(new VersionsEvent(null, "cmdLine", "py3", "1.2.3", 2));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -182,12 +191,15 @@ public class RobotAgentEventDispatcherTest {
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, String> attributes = ImmutableMap.of("source", "/a/b/file.robot");
+        final Map<String, String> attributes = ImmutableMap.of("source", "/a/b/file.robot", "importer",
+                "/a/b/suite.robot");
         final String json = toJson(ImmutableMap.of("resource_import", newArrayList("file", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleResourceImport(new ResourceImportEvent(new URI("file:///a/b/file.robot")));
+        verify(listener).handleResourceImport(
+                new ResourceImportEvent(new URI("file:///a/b/file.robot"), new URI("file:///a/b/suite.robot")));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -212,6 +224,7 @@ public class RobotAgentEventDispatcherTest {
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleSuiteStarted(new SuiteStartedEvent("suite", new URI("file:///a/b/suite.robot"), false, 7,
                 newArrayList("s1", "s2"), newArrayList("t1", "t2")));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -229,6 +242,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleSuiteEnded(new SuiteEndedEvent("suite", 10, Status.PASS, "msg"));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -247,6 +261,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleTestStarted(new TestStartedEvent("test", "suite-a-b-test", ""));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -264,6 +279,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleTestEnded(new TestEndedEvent("test", "suite-a-b-test", 10, Status.FAIL, "msg"));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -282,6 +298,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleKeywordStarted(new KeywordStartedEvent("kw", "Keyword", "lib"));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -298,6 +315,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleKeywordEnded(new KeywordEndedEvent("kw", "Setup"));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -320,6 +338,7 @@ public class RobotAgentEventDispatcherTest {
                         new Variable("a", VariableScope.TEST_CASE), new VariableTypedValue("t", 1),
                         new Variable("b", VariableScope.TEST_SUITE), new VariableTypedValue("t", 2))),
                 null));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -336,6 +355,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleShouldContinue(new ShouldContinueEvent(null, PausingPoint.START_KEYWORD));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -352,6 +372,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleConditionEvaluated(new ConditionEvaluatedEvent(true));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -368,6 +389,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleConditionEvaluated(new ConditionEvaluatedEvent("Error evaluating condition"));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -383,6 +405,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handlePaused(new PausedEvent(null));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -398,6 +421,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleClosed();
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -414,6 +438,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleLogMessage(new MessageEvent("msg", LogLevel.INFO, "time"));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -429,6 +454,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleOutputFile(new OutputFileEvent(new URI("file:///a/b/file.xml")));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -447,6 +473,7 @@ public class RobotAgentEventDispatcherTest {
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleLibraryImport(new LibraryImportEvent("lib1", new URI("file:///importerPath"),
                 new URI("file:///sourcePath"), newArrayList("arg1", "arg2")));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -465,6 +492,7 @@ public class RobotAgentEventDispatcherTest {
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleLibraryImport(new LibraryImportEvent("lib2", new URI("file:///importerPath"), new URI("file:///sourcePath"),
                         newArrayList("arg1", "arg2")));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 
@@ -481,6 +509,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleMessage(new MessageEvent("abc", LogLevel.ERROR, "time"));
+        verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }
 

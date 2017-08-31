@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UAxzsGu3Eeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/16/17 2:09 PM
+Save-Time: 8/30/17 2:29 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -36,14 +36,16 @@ exec-with-options -disableJobWaiting -command {
 	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
 	    get-property "getItems().TreeItem[1].getText()" | equals "${b1}" | verify-true
 	    get-property "getItems().TreeItem[2].getText()" | equals "${b}" | verify-true
-	    get-property "getItems().TreeItem[3].getText()" | equals "${res var}" | verify-true
-	    get-property "getItems().TreeItem[4].getText()" | equals "&{main dict}" | verify-true
-	    get-property "getItems().TreeItem[5].getText()" | equals "@{b2_list}" | verify-true
-	    get-property "getItems().TreeItem[6].getText()" | equals "@{list from res}" | verify-true
-	    get-property "getItems().TreeItem[7].getText()" | equals "@{main list}" | verify-true
-	    get-property "getItems().TreeItem[8].getText()" | equals "${this is global from test}" | verify-true
-	    get-property "getItems().TreeItem[9].getText()" | equals "${this is test var}" | verify-true
-	    get-property "getItems().TreeItem[10].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "${res var}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "${this is test var}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "&{main dict}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "@{b2_list}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "@{list from res}" | verify-true
+	    get-property "getItems().TreeItem[10].getText()" | equals "@{main list}" | verify-true
+	    
+	    
 	    get-property "getItems().TreeItem[11].getText()" | equals "Automatic Variables" | verify-true
 	}
 	check-list-and-dicts
@@ -84,18 +86,19 @@ exec-with-options -disableJobWaiting -command {
 	get-view Variables |  maximize
 	with [get-view Variables | get-tree] {
 	    get-property "getItems().length" | equals 13 | verify-true
+	    
 	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
 	    get-property "getItems().TreeItem[1].getText()" | equals "${b1}" | verify-true
 	    get-property "getItems().TreeItem[2].getText()" | equals "${b}" | verify-true
-	    get-property "getItems().TreeItem[3].getText()" | equals "${res var}" | verify-true
-	    get-property "getItems().TreeItem[4].getText()" | equals "&{main dict}" | verify-true
-	    get-property "getItems().TreeItem[5].getText()" | equals "@{b2_list}" | verify-true
-	    get-property "getItems().TreeItem[6].getText()" | equals "@{list from res}" | verify-true
-	    get-property "getItems().TreeItem[7].getText()" | equals "@{main list}" | verify-true
-	    get-property "getItems().TreeItem[8].getText()" | equals "${this is global from test}" | verify-true
-	    get-property "getItems().TreeItem[9].getText()" | equals "${this is test var}" | verify-true
-	    get-property "getItems().TreeItem[10].getText()" | equals "${normal_var}" | verify-true
-	    get-property "getItems().TreeItem[11].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "${normal_var}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "${res var}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "${this is test var}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "&{main dict}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "@{b2_list}" | verify-true
+	    get-property "getItems().TreeItem[10].getText()" | equals "@{list from res}" | verify-true
+	    get-property "getItems().TreeItem[11].getText()" | equals "@{main list}" | verify-true
 	    get-property "getItems().TreeItem[12].getText()" | equals "Automatic Variables" | verify-true
 	}
 	check-list-and-dicts
@@ -113,13 +116,15 @@ exec-with-options -disableJobWaiting -command {
 	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
 	    get-property "getItems().TreeItem[1].getText()" | equals "${b1}" | verify-true
 	    get-property "getItems().TreeItem[2].getText()" | equals "${b}" | verify-true
-	    get-property "getItems().TreeItem[3].getText()" | equals "${res var}" | verify-true
-	    get-property "getItems().TreeItem[4].getText()" | equals "&{main dict}" | verify-true
-	    get-property "getItems().TreeItem[5].getText()" | equals "@{b2_list}" | verify-true
-	    get-property "getItems().TreeItem[6].getText()" | equals "@{list from res}" | verify-true
-	    get-property "getItems().TreeItem[7].getText()" | equals "@{main list}" | verify-true
-	    get-property "getItems().TreeItem[8].getText()" | equals "${this is global from test}" | verify-true
-	    get-property "getItems().TreeItem[9].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[4].getText()" | equals "${res var}" | verify-true
+	    get-property "getItems().TreeItem[5].getText()" | equals "${this is global from test}" | verify-true
+	    get-property "getItems().TreeItem[6].getText()" | equals "&{main dict}" | verify-true
+	    get-property "getItems().TreeItem[7].getText()" | equals "@{b2_list}" | verify-true
+	    get-property "getItems().TreeItem[8].getText()" | equals "@{list from res}" | verify-true
+	    get-property "getItems().TreeItem[9].getText()" | equals "@{main list}" | verify-true
+	    
+	    
 	    get-property "getItems().TreeItem[10].getText()" | equals "Automatic Variables" | verify-true
 	}
 
@@ -136,9 +141,9 @@ exec-with-options -disableJobWaiting -command {
 	with [get-view Variables | get-tree] {
 	    get-property "getItems().length" | equals 5 | verify-true
 	    get-property "getItems().TreeItem[0].getText()" | equals "${a}" | verify-true
-	    get-property "getItems().TreeItem[1].getText()" | equals "${this var is from init}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${global from kw}" | verify-true
 	    get-property "getItems().TreeItem[2].getText()" | equals "${this is global from test}" | verify-true
-	    get-property "getItems().TreeItem[3].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[3].getText()" | equals "${this var is from init}" | verify-true
 	    get-property "getItems().TreeItem[4].getText()" | equals "Automatic Variables" | verify-true
 	}
 	
@@ -150,8 +155,8 @@ exec-with-options -disableJobWaiting -command {
 	    | select  "test1.robot [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Suite] ScopeProject"
 	with [get-view Variables | get-tree] {
 	    get-property itemCount | equals 3 | verify-true
-	    get-property "getItems().TreeItem[0].getText()" | equals "${this is global from test}" | verify-true
-	    get-property "getItems().TreeItem[1].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[0].getText()" | equals "${global from kw}" | verify-true
+	    get-property "getItems().TreeItem[1].getText()" | equals "${this is global from test}" | verify-true
 	    get-property "getItems().TreeItem[2].getText()" | equals "Automatic Variables" | verify-true
 	}
 	
@@ -229,9 +234,9 @@ exec-with-options -disableJobWaiting -command {
 	        key-type BackSpace -times 3
 	        type-text 555
 	        key-type "M1+s"
-	        set-caret-pos 1 1
 	    }
 	}
+	wait 1000
 	with [get-view Variables | get-tree] {
 	    get-item "@{main list}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
 	    get-item "@{main list}/\\[2\\]" | get-property "values['Value']" | equals 555 | verify-true
