@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z2XpsP28EeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/7/17 2:56 PM
+Save-Time: 8/28/17 4:57 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -181,7 +181,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "&{browsers}/ff" | get-property "values['Name']" | equals ff | verify-true
 	    get-item "&{browsers}/ff" | get-property "values['Value']" | equals firefox | verify-true
 	    get-item "&{empty_dict}" | get-property "values['Name']" | equals "&{empty_dict}" | verify-true
-	    get-item "&{empty_dict}" | get-property "values['Value']" | equals "Dictionary[0]" | verify-true
+	    get-item "&{empty_dict}" | get-property "values['Value']" | equals "DotDict[0]" | verify-true
 	}
 	with [get-view Variables | get-tree] {
 	    get-item "@{my list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true

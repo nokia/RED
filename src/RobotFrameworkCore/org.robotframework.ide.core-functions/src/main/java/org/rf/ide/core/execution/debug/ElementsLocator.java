@@ -7,6 +7,11 @@ package org.rf.ide.core.execution.debug;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.Set;
+
+import org.rf.ide.core.execution.debug.contexts.KeywordContext;
+import org.rf.ide.core.execution.debug.contexts.SuiteContext;
+import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
 
 public interface ElementsLocator {
 
@@ -22,11 +27,12 @@ public interface ElementsLocator {
      */
     URI translate(URI remotePath, boolean isDirectory);
 
-    StackFrameContext findContextForSuite(final String suiteName, final URI path, boolean isDirectory,
+    SuiteContext findContextForSuite(final String suiteName, final URI path, boolean isDirectory,
             final URI currentLocalSuitePath);
 
-    StackFrameContext findContextForTestCase(String testCaseName, URI currentSuitePath, Optional<String> template);
+    TestCaseContext findContextForTestCase(String testCaseName, URI currentSuitePath, Optional<String> template);
 
-    StackFrameContext findContextForKeyword(String libOrResourceName, String keywordName, URI currentSuitePath);
+    KeywordContext findContextForKeyword(String libOrResourceName, String keywordName, URI currentSuitePath,
+            Set<URI> loadedResources);
 
 }
