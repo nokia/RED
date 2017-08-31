@@ -18,28 +18,79 @@ class LibdocGenerationTests(unittest.TestCase):
 
 
 class ClassesRetrievingTests(unittest.TestCase):
-    def test_retrieving_classes_from_python_module_with_init(self):
+    def test_retrieving_classes_from_empty_file(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'module', '__init__.py')
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'empty.py')
 
         response = get_classes_from_module(module_location, None, [], [])
 
         self.assertEqual(response,
-                         {'result': ['module','module.module', 'module.mod_1', 'module.mod_2'],
+                         {'result': ['empty'],
                           'exception': None})
-
-    def test_retrieving_classes_from_python_module_with_several_classes(self):
+        
+    def test_retrieving_classes_from_file_with_same_class_name(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'module', 'mod_2.py')
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'ClassName.py')
 
         response = get_classes_from_module(module_location, None, [], [])
 
         self.assertEqual(response,
-                         {'result': ['mod_2', 'module.mod_2', 'module.other_mod_2'], 'exception': None})
+                         {'result': ['ClassName', 'ClassName.ClassName'],
+                          'exception': None})
+        
+    def test_retrieving_classes_from_file_with_different_class_name(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'DifferentClassName.py')
+
+        response = get_classes_from_module(module_location, None, [], [])
+
+        self.assertEqual(response,
+                         {'result': ['DifferentClassName', 'DifferentClassName.ClassName'],
+                          'exception': None})
+        
+    def test_retrieving_classes_from_file_with_several_classes(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'several_classes.py')
+
+        response = get_classes_from_module(module_location, None, [], [])
+
+        self.assertEqual(response,
+                         {'result': ['several_classes', 'several_classes.First', 'several_classes.Second', 'several_classes.Third'],
+                          'exception': None})
+        
+    def test_retrieving_classes_from_python_module_with_init_1(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'init', '__init__.py')
+
+        response = get_classes_from_module(module_location, None, [], [])
+
+        self.assertEqual(response,
+                         {'result': ['init', 'init.InitClass', 'init.OtherInitClass'],
+                          'exception': None})
+        
+    def test_retrieving_classes_from_python_module_with_init_2(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'module', '__init__.py')
+
+        response = get_classes_from_module(module_location, None, [], [])
+
+        self.assertEqual(response,
+                         {'result': ['module', 'ModuleClass', 'OtherModuleClass', 'module.ModuleClass', 'module.OtherModuleClass'],
+                          'exception': None})
+        
+    def test_retrieving_classes_from_python_module_with_init_3(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'init_and_module', '__init__.py')
+
+        response = get_classes_from_module(module_location, None, [], [])
+
+        self.assertEqual(response,
+                         {'result': ['init_and_module', 'init_and_module.InitClass', 'init_and_module.OtherInitClass', 'ModuleClass', 'OtherModuleClass', 'init_and_module.ModuleClass', 'init_and_module.OtherModuleClass'],
+                          'exception': None})
 
     def test_retrieving_classes_from_python_module_in_zip(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'module', 'compressed.zip')
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'compressed.zip')
 
         response = get_classes_from_module(module_location, None, [], [])
 
@@ -48,7 +99,7 @@ class ClassesRetrievingTests(unittest.TestCase):
 
     def test_retrieving_classes_from_python_module_in_jar(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'module', 'compressed.jar')
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'compressed.jar')
 
         response = get_classes_from_module(module_location, None, [], [])
 
@@ -57,7 +108,7 @@ class ClassesRetrievingTests(unittest.TestCase):
 
     def test_if_sys_path_is_not_extended_after_retrieving_classes_from_python_module(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'module', '__init__.py')
+        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'module', '__init__.py')
         python_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'a')]
         class_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'b')]
         old_sys_path = sorted(sys.path)
