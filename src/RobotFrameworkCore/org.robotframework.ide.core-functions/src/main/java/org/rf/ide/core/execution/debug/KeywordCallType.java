@@ -26,9 +26,9 @@ public enum KeywordCallType {
 
     private static final Set<String> TEARDOWNS = newHashSet("suite teardown", "test teardown", "teardown");
 
-    private static final Set<String> FORS = newHashSet("test for", "for");
+    private static final Set<String> FORS = newHashSet("suite for", "test for", "for");
 
-    private static final Set<String> FOR_ITEMS = newHashSet("test foritem", "for item");
+    private static final Set<String> FOR_ITEMS = newHashSet("suite foritem", "test foritem", "for item");
 
     public static KeywordCallType from(final String keywordType) {
         if (keywordType.equalsIgnoreCase("keyword")) {
