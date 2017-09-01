@@ -352,6 +352,11 @@ public class ExecutionView {
             SwtThread.asyncExec(() -> {
                 evaluationService.requestEvaluation(ExecutionViewPropertyTester.PROPERTY_CURRENT_LAUNCH_IS_TERMINATED);
                 actionBars.updateActionBars();
+
+                final ExecutionViewContentProvider provider = (ExecutionViewContentProvider) executionViewer
+                        .getContentProvider();
+                provider.setFailedFilter(false);
+                ShowFailedOnlyHandler.setCommandState(false);
             });
 
             setInput(launch);
