@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tolVAIzMEeeQ1rr93JCGzA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/31/17 10:05 AM
+Save-Time: 8/31/17 4:56 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -65,6 +65,10 @@ exec-with-options -disableJobWaiting -command {
 	    select "@{c}" | double-click
 	    select "@{d1_list}" | double-click
 	    select "@{f}" | double-click
+	}
+	
+	try -times 5 -delay 500 -command{
+		get-view Variables | get-tree | get-item "@{f}/\\[1\\]" | get-property "values['Value']" | equals a2 | verify-true
 	}
 	
 	//check values of list

@@ -170,15 +170,10 @@ def is_virtualenv():
 @logresult
 @encode_result_or_exception
 @logargs
-def start_library_auto_discovering(port, timeout, suite_names, variable_mappings, data_source_paths, python_paths,
-                                   class_paths):
-    def to_call():
-        import red_library_autodiscover
-        return __cleanup_modules(red_library_autodiscover.start_library_auto_discovering)(port, timeout, suite_names,
-                                                                                          variable_mappings,
-                                                                                          data_source_paths)
-
-    return __extend_paths(to_call, python_paths, class_paths)
+def start_library_auto_discovering(port, suite_names, variable_mappings, data_source_paths, python_paths, class_paths):
+    import red_library_autodiscover
+    red_library_autodiscover.start_library_auto_discovering_process(port, suite_names, variable_mappings, 
+                                                                    data_source_paths, python_paths, class_paths)
 
 
 @logresult
@@ -239,7 +234,7 @@ def __extend_paths(to_call, python_paths, class_paths):
 def __extend_classpath(class_paths):
     import platform
 
-    if platform.python_implementation() == 'Jython':
+    if 'Jython' in platform.python_implementation():
         for class_path in class_paths:
             from classpath_updater import ClassPathUpdater
             cp_updater = ClassPathUpdater()
