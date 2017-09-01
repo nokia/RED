@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/18/17 2:59 PM
+Save-Time: 9/1/17 2:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -274,6 +274,16 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     hover-text 7 18
     key-type "M1+1"
     key-type Enter
+}
+// varify Select library class items list
+with [get-window "Select library class" | get-control Any -index 1] {
+    get-property "getChildren().Control[2].getChildren().Control[0].getItems().length" | equals 3 | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[0].getItems().TableItem[0].getText()" 
+        | equals "calculator_2" | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[0].getItems().TableItem[1].getText()" 
+        | equals "calculator_2.CalculationError" | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[0].getItems().TableItem[2].getText()" 
+        | equals "calculator_2.Calculator" | verify-true
 }
 with [get-window "Select library class"] {
     get-table | select "calculator_2"
