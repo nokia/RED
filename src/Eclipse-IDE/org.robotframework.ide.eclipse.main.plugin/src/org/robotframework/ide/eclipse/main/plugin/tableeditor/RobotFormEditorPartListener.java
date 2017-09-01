@@ -10,11 +10,8 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
@@ -45,13 +42,7 @@ class RobotFormEditorPartListener implements IPartListener {
 
     @Override
     public void partBroughtToTop(final IWorkbenchPart part) {
-        if (part instanceof RobotFormEditor) {
-            final IWorkbenchWindow window = part.getSite().getWorkbenchWindow();
-            final IPerspectiveDescriptor perspective = window.getActivePage().getPerspective();
-            if (IDebugUIConstants.ID_DEBUG_PERSPECTIVE.equals(perspective.getId())) {
-                RobotFormEditor.activateSourcePageInActiveEditor(window);
-            }
-        }
+        // nothing to do
     }
 
     @Override
