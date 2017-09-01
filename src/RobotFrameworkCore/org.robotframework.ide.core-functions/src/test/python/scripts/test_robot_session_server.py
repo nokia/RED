@@ -22,7 +22,7 @@ class RobotSessionServerTests(unittest.TestCase):
 
 
 class LibdocGenerationTests(unittest.TestCase):
-    def test_subsequent_lidocs_for_same_name_libs_under_different_paths_returns_different_libdocs(self):
+    def test_subsequent_calls_for_same_lib_name_under_different_paths_return_different_libdocs(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
 
         response1 = create_libdoc("lib", [os.path.join(parent_path, 'res_test_robot_session_server', 'a')], [])
@@ -30,15 +30,34 @@ class LibdocGenerationTests(unittest.TestCase):
 
         self.assertNotEqual(response1, response2)
 
-
-class ClassesRetrievingTests(unittest.TestCase):
-    def test_if_sys_path_is_not_extended_after_retrieving_classes_from_python_module(self):
+    def test_if_sys_path_is_not_extended_after_generating_libdoc(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
-        module_location = os.path.join(parent_path, 'res_test_robot_session_server', 'classes', 'module', '__init__.py')
+        
         python_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'a')]
         class_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'b')]
         old_sys_path = sorted(sys.path)
 
-        get_classes_from_module(module_location, None, python_paths, class_paths)
+        create_libdoc("lib", python_paths, class_paths)
 
+        self.assertListEqual(old_sys_path, sorted(sys.path))
+
+
+class ClassesRetrievingTests(unittest.TestCase):
+    def test_subsequent_calls_for_same_class_name_under_different_paths_return_different_class_names(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+
+        response1 = get_classes_from_module(os.path.join(parent_path, 'res_test_robot_session_server', 'a', 'LibClass.py'), None, [], [])
+        response2 = get_classes_from_module(os.path.join(parent_path, 'res_test_robot_session_server', 'b', 'LibClass.py'), None, [], [])
+
+        self.assertNotEqual(response1, response2)
+
+    def test_if_sys_path_is_not_extended_after_retrieving_classes_from_python_module(self):
+        parent_path = os.path.dirname(os.path.realpath(__file__))
+        
+        python_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'a')]
+        class_paths = [os.path.join(parent_path, 'res_test_robot_session_server', 'b')]
+        old_sys_path = sorted(sys.path)
+ 
+        get_classes_from_module(os.path.join(parent_path, 'res_test_robot_session_server', 'a', 'LibClass.py'), None, python_paths, class_paths)
+ 
         self.assertListEqual(old_sys_path, sorted(sys.path))
