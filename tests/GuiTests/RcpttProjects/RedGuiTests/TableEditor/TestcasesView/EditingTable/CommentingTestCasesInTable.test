@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _IlBPkBq5EeexL8zyucnNEw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/18/17 3:05 PM
+Save-Time: 9/1/17 11:36 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -121,6 +121,7 @@ get-editor "TestFile.tsv" | get-text-viewer | get-property text | equals "*** Te
 //go back to test cases
 with [get-editor "TestFile.tsv"] {
     get-tab-folder | get-tab-item "Test Cases" | click
+    wait 500
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
     	
     	//uncomment But Convert (gherkin) KW
