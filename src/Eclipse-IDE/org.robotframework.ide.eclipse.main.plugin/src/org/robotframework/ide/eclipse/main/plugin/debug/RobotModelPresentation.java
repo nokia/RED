@@ -16,6 +16,7 @@ import org.eclipse.debug.core.model.ILineBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.ui.IDebugEditorPresentation;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IInstructionPointerPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
@@ -44,7 +45,7 @@ import org.robotframework.red.graphics.ImagesManager;
  *
  */
 public class RobotModelPresentation extends LabelProvider
-        implements IDebugModelPresentation, IInstructionPointerPresentation {
+        implements IDebugModelPresentation, IDebugEditorPresentation, IInstructionPointerPresentation {
 
     public static final String RED_DEBUG_ERROR_SECONDARY_IP = "org.robotframework.red.debug.secondaryErrorIP";
 
@@ -192,5 +193,21 @@ public class RobotModelPresentation extends LabelProvider
             return message.isEmpty() ? message : "RED debugger: " + message;
         }
         return null;
+    }
+
+    @Override
+    public boolean addAnnotations(final IEditorPart editorPart, final IStackFrame frame) {
+        // before placing instruction pointer annotations etc for given frame we have to activate
+        // source page
+        if (editorPart instanceof RobotFormEditor) {
+            final RobotFormEditor editor = (RobotFormEditor) editorPart;
+            editor.activateSourcePage();
+        }
+        return false; // no annotation added; eclipse will add standard
+    }
+
+    @Override
+    public void removeAnnotations(final IEditorPart editorPart, final IThread thread) {
+        // nothing to do
     }
 }
