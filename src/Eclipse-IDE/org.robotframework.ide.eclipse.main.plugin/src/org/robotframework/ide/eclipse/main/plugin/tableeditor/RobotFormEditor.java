@@ -37,9 +37,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -92,8 +90,6 @@ public class RobotFormEditor extends FormEditor {
 
     private static IPartListener robotFormEditorPartListener;
 
-    private static IPerspectiveListener workbenchWindowPerspectiveListener;
-
     private final List<IEditorPart> parts = newArrayList();
 
     private RedClipboard clipboard;
@@ -128,8 +124,6 @@ public class RobotFormEditor extends FormEditor {
 
             initRobotFormEditorPartListener(site.getPage());
 
-            initWorkbenchWindowPerspectiveListener(site.getWorkbenchWindow());
-
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
         }
@@ -155,13 +149,6 @@ public class RobotFormEditor extends FormEditor {
         if (robotFormEditorPartListener == null) {
             robotFormEditorPartListener = new RobotFormEditorPartListener();
             page.addPartListener(robotFormEditorPartListener);
-        }
-    }
-
-    private void initWorkbenchWindowPerspectiveListener(final IWorkbenchWindow window) {
-        if (workbenchWindowPerspectiveListener == null) {
-            workbenchWindowPerspectiveListener = new RobotFormEditorPerspectiveListener();
-            window.addPerspectiveListener(workbenchWindowPerspectiveListener);
         }
     }
 
@@ -539,15 +526,6 @@ public class RobotFormEditor extends FormEditor {
             }
         }
         return null;
-    }
-
-    public static void activateSourcePageInActiveEditor(final IWorkbenchWindow window) {
-        if (window != null) {
-            final IEditorPart activeEditor = window.getActivePage().getActiveEditor();
-            if (activeEditor instanceof RobotFormEditor) {
-                ((RobotFormEditor) activeEditor).activateSourcePage();
-            }
-        }
     }
 
     private void checkRuntimeEnvironment(final RobotSuiteFile suiteFile) {
