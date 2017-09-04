@@ -1,0 +1,66 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<h2>Controlling execution</h2>
+	
+	<p>In both <b>RUN</b> and <b>DEBUG</b> modes no matter if locally or remotely launched tests it is possible to 
+	control basic aspects of execution: <code>suspend/resume</code>, <code>terminate</code> and 
+	<code>disconnect</code>	from running tests:
+	</p>
+	
+	<ul>
+		<li>once the tests are running switch to <a
+			class="command"
+			href="javascript:executeCommand('org.eclipse.ui.perspectives.showPerspective(org.eclipse.ui.perspectives.showPerspective.perspectiveId=org.eclipse.debug.ui.DebugPerspective)')">
+			Debug</a> perspective,
+		</li>
+		<li>select currently running launch in <b>Debug</b> view as depicted below,
+		<p><img src="images/ui_launch_selection.png"/></p>
+		</li>
+		<li>execution controlling buttons will be activated in main toolbar.
+		<p><img src="images/ui_control_execution.png"/></p>
+		</li>
+	</ul>
+	
+	<p>From left to right buttons are used to:
+	</p>
+	
+	<ul>
+		<li><b>resume</b> - only possible when currently paused; it orders <a href="red_agent.html">TestRunnerAgent</a>
+		to continue the execution,
+		<p/></li>
+		<li><b>suspend</b> - only possible when currently running; it orders the agent to suspend execution in nearest
+		possible point,
+		<p/></li>
+		<li><b>terminate</b> - it orders the agent to terminate. This behavior may be a little bit different in locally 
+		launched tests than in remote executions because RED has a handle to running process in local launches so it will be 
+		instantly killed however in remote execution it only asks agent to terminate, but it may not be done if 
+		for example the tests execution hanged inside some keyword.
+		<p/></li>
+		<li><b>disconnect</b> - it orders the agent to disconnect. Once agent disconnected it will not send any new
+		events from tests execution to RED which means that nothing new will be shown in <b>Execution</b> or 
+		<b>Message Log</b> views. When done in debug mode no breakpoints can be hit after that. The tests execution 
+		should however run till the end which means that <b>Console</b> view in local launches will still present
+		the output of the process (both <code>stdout</code> and <code>stderr</code> of that process).
+		</li> 
+	</ul>
+	<br/>
+	
+	<p>In <b>DEBUG</b> mode there are more aspects of execution which can be controlled (pausing on breakpoints,
+	stepping, changing variables values etc.). For more information proceed to <a href="debug.html">Debug</a> topic.
+	</p>
+	<br/>
+	
+	<dl class="note">
+	   <dt>Note</dt>
+	   <dd>It is possible to <b>terminate</b> also by using button inside <b>Console</b> view regardless of currently
+	   active perspective.
+	   </dd>
+	</dl>
+	<br/>
+</body>
+</html>
