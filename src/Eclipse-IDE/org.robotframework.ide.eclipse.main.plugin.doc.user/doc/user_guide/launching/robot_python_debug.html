@@ -19,7 +19,7 @@
 <h3>Environment Setup:</h3>
 <ul>
 <li>install PyDev to RED or Eclipse instance where RED is installed if not already installed.
-<li>set Python nature to Robot project to be debugged - right click on Project,from PyDev menu select set Python nature
+<li>set Python nature to Robot project to be debugged - right click on Project, from PyDev menu select set Python nature
 <li>set port for remote PyDev debugger: <i>Preferences -> PyDev -> Debug -> Port for remote debugger</i>
 <li>for convenience Remote debugger server activation can be changed from <i>Manual</i> to <i>Keep always on</i>: <i>Preferences -> PyDev -> Debug -> Remote debugger server activation</i>.
 <li>to use <code>runPyDevDebug.py</code> script logic, RED needs to pass parameters separated by space to external script, check <a href="launch_prefs.html">Launching preferences</a></ul>
@@ -36,8 +36,8 @@
 <h3>Debug configuration setup:</h3>
 <ul> 
 <li>open <a class="command" href="javascript:executeCommand('org.eclipse.debug.ui.commands.OpenDebugConfigurations')">Debug Configuration</a>,create new Robot Debug configuration</li>
-<li>in Robot tab, populate Project name,test suites to be debugged with all other relevant information</li>
-<li>in Executor tab, in Executable file provide path to Python interpreter ( for instance <code>c:\Python27\python.exe</code> on Windows or <code>/usr/bin/python</code> on Linux)</li>
+<li>in Robot tab, populate Project name, test suites to be debugged with all other relevant information</li>
+<li>in Executor tab, in Executable file provide path to Python interpreter (for instance <code>c:\Python27\python.exe</code> on Windows or <code>/usr/bin/python</code> on Linux)</li>
 <li>in Additional executable file arguments field provide path to <code>runPyDevDebug.py</code> </li>
 </ul>
 </p>
@@ -58,7 +58,7 @@
 <h3>Debug:</h3>
 <ul>
 <li>remember to place at least one breakpoint on executable line either in Robot test or Python library
-<li>before running custom Debug Configuration, PyDev Debug server needs to be started if the startup was not changed to Automatic in Environment Setup part. Switch to Debug perspective, from PyDev menu,select Start Debug Server
+<li>before running custom Debug Configuration, PyDev Debug server needs to be started if the startup was not changed to Automatic in Environment Setup part. Switch to Debug perspective, from PyDev menu, select Start Debug Server
 <li>run created Debug Configuration, RED should start the <code>runPyDevDebug.py</code> script which will take command line from RED and start Robot Framework debug run simultaneously being connected with Pydev Debugger. 
 <li>if breakpoint is reached, appropriated Debugger is used depending on the source from where the breakpoint was reached (either Robot testcase or Python library)
 
