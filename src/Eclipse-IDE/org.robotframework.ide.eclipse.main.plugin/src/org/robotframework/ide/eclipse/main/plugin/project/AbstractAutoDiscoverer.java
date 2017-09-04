@@ -61,6 +61,7 @@ public abstract class AbstractAutoDiscoverer {
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
         this.resources = resources;
+
         this.librariesSourcesCollector = librariesSourcesCollector;
         this.dryRunTargetsCollector = dryRunTargetsCollector;
     }
