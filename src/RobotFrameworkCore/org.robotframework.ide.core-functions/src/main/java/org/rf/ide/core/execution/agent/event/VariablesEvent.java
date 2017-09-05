@@ -18,15 +18,15 @@ import com.google.common.base.Objects;
 
 public final class VariablesEvent {
 
-    private final List<Map<Variable, VariableTypedValue>> variables;
-
-    private final String error;
-
     public static VariablesEvent from(final Map<String, Object> eventMap) {
         final Map<?, ?> arguments = (Map<?, ?>) ((List<?>) eventMap.get("variables")).get(0);
-        final List<Map<Variable, VariableTypedValue>> variables = extractVariableScopes(
-                (List<?>) arguments.get("var_scopes"));
-        return new VariablesEvent(variables, (String) arguments.get("error"));
+        final List<?> vars_scopes = (List<?>) arguments.get("var_scopes");
+        final String error = (String) arguments.get("error");
+
+        if (vars_scopes == null) {
+            throw new IllegalArgumentException("Variables events should have scopes provided");
+        }
+        return new VariablesEvent(extractVariableScopes(vars_scopes), error);
     }
 
     private static List<Map<Variable, VariableTypedValue>> extractVariableScopes(final List<?> arguments) {
@@ -67,6 +67,11 @@ public final class VariablesEvent {
             return new VariableTypedValue(type, value);
         }
     }
+
+
+    private final List<Map<Variable, VariableTypedValue>> variables;
+
+    private final String error;
 
     public VariablesEvent(final List<Map<Variable, VariableTypedValue>> variables, final String error) {
         this.variables = variables;

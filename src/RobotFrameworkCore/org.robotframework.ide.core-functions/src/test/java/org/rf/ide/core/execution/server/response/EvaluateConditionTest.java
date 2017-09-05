@@ -7,8 +7,15 @@ package org.rf.ide.core.execution.server.response;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
+import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
 public class EvaluateConditionTest {
 
@@ -20,5 +27,15 @@ public class EvaluateConditionTest {
                 .isEqualTo("{\"evaluate_condition\":[\"a\",\"b\"]}");
         assertThat(new EvaluateCondition(newArrayList("a", "b", "c")).toMessage())
                 .isEqualTo("{\"evaluate_condition\":[\"a\",\"b\",\"c\"]}");
+    }
+
+    @Test(expected = ResponseException.class)
+    public void mapperIOExceptionIsWrappedAsResponseException() throws Exception {
+        final ObjectMapper mapper = mock(ObjectMapper.class);
+        when(mapper.writeValueAsString(any(Object.class))).thenThrow(IOException.class);
+
+        final EvaluateCondition response = new EvaluateCondition(mapper, newArrayList("a", "b"));
+
+        response.toMessage();
     }
 }
