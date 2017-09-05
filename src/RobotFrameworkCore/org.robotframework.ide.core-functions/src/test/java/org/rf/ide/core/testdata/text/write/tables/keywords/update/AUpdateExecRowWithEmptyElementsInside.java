@@ -80,7 +80,7 @@ public abstract class AUpdateExecRowWithEmptyElementsInside {
         // verify
         final FilePosition endPositionUK = userKeyword.getEndPosition();
         assertThat(endPositionUK).isNotNull();
-        assertThat(endPositionUK.getOffset()).isEqualTo(111);
+        assertThat(endPositionUK.getOffset()).isEqualTo(113);
     }
 
     public String convert(final String fileName) {

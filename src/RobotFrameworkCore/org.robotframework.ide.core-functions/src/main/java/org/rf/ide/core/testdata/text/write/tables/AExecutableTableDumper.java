@@ -64,8 +64,6 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
         getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
 
-        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th, sorted.isEmpty());
-
         if (!sorted.isEmpty()) {
             final List<Section> execUnits = SectionType.filterByType(sections, sectionWithHeaderPos, getSectionType());
             final int lastIndexToDump = getDumperHelper().getLastSortedToDump(model, execUnits,
@@ -121,7 +119,6 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
                     elemDumper.dump(model, sections, sectionWithHeaderPos, th, sortedUnits, execElement, lines);
 
-                    getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit, execUnitIndex == lastIndexToDump);
                     last = execElement;
                 }
 
