@@ -14,6 +14,27 @@ import com.google.common.collect.ImmutableList;
 
 public final class SuiteStartedEvent {
 
+    public static SuiteStartedEvent from(final Map<String, Object> eventMap) {
+        final List<?> arguments = (List<?>) eventMap.get("start_suite");
+        final String name = (String) arguments.get(0);
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
+
+        final URI suiteFilePath = Events.toFileUri((String) attributes.get("source"));
+        final Boolean isDir = (Boolean) attributes.get("is_dir");
+        final List<?> childSuites = (List<?>) attributes.get("suites");
+        final List<?> childTests = (List<?>) attributes.get("tests");
+        final Integer totalTests = (Integer) attributes.get("totaltests");
+
+        if (isDir == null || childSuites == null || childTests == null || totalTests == null) {
+            throw new IllegalArgumentException("Suite started event should have path, directory/file flag, children "
+                    + "suites and tests as well as number of total tests");
+        }
+
+        return new SuiteStartedEvent(name, suiteFilePath, isDir, totalTests, Events.ensureListOfStrings(childSuites),
+                Events.ensureListOfStrings(childTests));
+    }
+
+
     private final String name;
 
     private final URI suiteFilePath;
@@ -25,20 +46,6 @@ public final class SuiteStartedEvent {
     private final List<String> childSuites;
 
     private final List<String> childTests;
-
-    public static SuiteStartedEvent from(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("start_suite");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-
-        final URI suiteFilePath = Events.toFileUri((String) attributes.get("source"));
-        final boolean isDir = (Boolean) attributes.get("is_dir");
-        final List<String> childSuites = Events.ensureListOfStrings((List<?>) attributes.get("suites"));
-        final List<String> childTests = Events.ensureListOfStrings((List<?>) attributes.get("tests"));
-        final int totalTests = (Integer) attributes.get("totaltests");
-
-        return new SuiteStartedEvent(name, suiteFilePath, isDir, totalTests, childSuites, childTests);
-    }
 
     public SuiteStartedEvent(final String name, final URI suiteFilePath, final boolean isDir, final int totalTests,
             final List<String> childSuites, final List<String> childTests) {

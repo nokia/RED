@@ -34,6 +34,8 @@ import org.rf.ide.core.execution.debug.contexts.TestCaseContext;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class StacktraceBuilder extends RobotDefaultAgentEventListener {
 
     private final Stacktrace stacktrace;
@@ -51,6 +53,11 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         this.stacktrace = stacktrace;
         this.locator = locator;
         this.breakpointSupplier = breakpointSupplier;
+    }
+
+    @VisibleForTesting
+    KeywordsTypesFixer getKeywordsTypesFixer() {
+        return keywordsTypesFixer;
     }
 
     @Override

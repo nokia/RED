@@ -16,6 +16,23 @@ import com.google.common.base.Objects;
 
 public final class VersionsEvent {
 
+    public static VersionsEvent from(final AgentClient client, final Map<String, Object> eventMap) {
+        final List<?> arguments = (List<?>) eventMap.get("version");
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
+        final String cmdLine = (String) attributes.get("cmd_line");
+        final String pythonVersion = (String) attributes.get("python");
+        final String robotVersion = (String) attributes.get("robot");
+        final Integer protocolVersion = (Integer) attributes.get("protocol");
+
+        if (cmdLine == null || pythonVersion == null || robotVersion == null || protocolVersion == null) {
+            throw new IllegalArgumentException(
+                    "Versions event should command line, versions of python, robot and protocol");
+        }
+        return new VersionsEvent(new VersionsEventResponder(client), cmdLine, pythonVersion, robotVersion,
+                protocolVersion);
+    }
+
+
     private final VersionsEventResponder responder;
 
     private final String cmdLine;
@@ -25,18 +42,6 @@ public final class VersionsEvent {
     private final String robotVersion;
 
     private final int protocolVersion;
-
-    public static VersionsEvent from(final AgentClient client, final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("version");
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(0);
-        final String cmdLine = (String) attributes.get("cmd_line");
-        final String pythonVersion = (String) attributes.get("python");
-        final String robotVersion = (String) attributes.get("robot");
-        final int protocolVersion = (Integer) attributes.get("protocol");
-
-        return new VersionsEvent(new VersionsEventResponder(client), cmdLine, pythonVersion, robotVersion,
-                protocolVersion);
-    }
 
     public VersionsEvent(final VersionsEventResponder responder, final String cmdLine, final String pythonVersion,
             final String robotVersion, final int protocolVersion) {

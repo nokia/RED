@@ -14,12 +14,6 @@ import org.rf.ide.core.execution.debug.RunningKeyword;
 
 public final class KeywordStartedEvent {
 
-    private final String name;
-
-    private final String keywordType;
-
-    private final String libraryName;
-
     public static KeywordStartedEvent fromPre(final Map<String, Object> eventMap) {
         return fromEventArguments((List<?>) eventMap.get("pre_start_keyword"));
     }
@@ -34,8 +28,19 @@ public final class KeywordStartedEvent {
         final String keywordType = (String) attributes.get("type");
         final String libraryName = (String) attributes.get("libname");
 
+        if (keywordName == null || keywordType == null || libraryName == null) {
+            throw new IllegalArgumentException(
+                    "Keyword started event should have name of keyword, its type and library name");
+        }
         return new KeywordStartedEvent(keywordName, keywordType, libraryName);
     }
+
+
+    private final String name;
+
+    private final String keywordType;
+
+    private final String libraryName;
 
     public KeywordStartedEvent(final String name, final String keywordType, final String libraryName) {
         this.name = name;

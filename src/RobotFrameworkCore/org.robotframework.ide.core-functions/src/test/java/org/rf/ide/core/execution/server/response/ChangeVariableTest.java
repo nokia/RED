@@ -7,8 +7,15 @@ package org.rf.ide.core.execution.server.response;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
+import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
 public class ChangeVariableTest {
@@ -23,5 +30,16 @@ public class ChangeVariableTest {
                 .isEqualTo("{\"change_variable\":{\"name\":\"a\",\"values\":[\"c\"],\"scope\":\"test_case\",\"level\":3}}");
         assertThat(new ChangeVariable("a", VariableScope.LOCAL, 4, newArrayList("d")).toMessage())
                 .isEqualTo("{\"change_variable\":{\"name\":\"a\",\"values\":[\"d\"],\"scope\":\"local\",\"level\":4}}");
+    }
+
+    @Test(expected = ResponseException.class)
+    public void mapperIOExceptionIsWrappedAsResponseException() throws Exception {
+        final ObjectMapper mapper = mock(ObjectMapper.class);
+        when(mapper.writeValueAsString(any(Object.class))).thenThrow(IOException.class);
+        
+        final ChangeVariable response = new ChangeVariable(mapper, "a", VariableScope.GLOBAL, 1, newArrayList("a"),
+                newArrayList("1"));
+        
+        response.toMessage();
     }
 }
