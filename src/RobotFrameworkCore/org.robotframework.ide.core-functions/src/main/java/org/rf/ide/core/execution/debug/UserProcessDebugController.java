@@ -21,6 +21,8 @@ import org.rf.ide.core.execution.server.response.EvaluateCondition;
 import org.rf.ide.core.execution.server.response.PauseExecution;
 import org.rf.ide.core.execution.server.response.ServerResponse;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class UserProcessDebugController extends UserProcessController {
 
     private final DebuggerPreferences preferences;
@@ -36,6 +38,21 @@ public class UserProcessDebugController extends UserProcessController {
         this.preferences = preferences;
     }
 
+    @VisibleForTesting
+    void setLastPausingPoint(final PausingPoint lastPausingPoint) {
+        this.lastPausingPoint = lastPausingPoint;
+    }
+
+    @VisibleForTesting
+    void setSuspensionData(final SuspensionData susupensionData) {
+        this.susupensionData = susupensionData;
+    }
+
+    @VisibleForTesting
+    SuspensionData getSuspensionData() {
+        return susupensionData;
+    }
+
     public void whenSuspended(final PauseReasonListener listener) {
         this.pauseListeners.add(listener);
     }
@@ -47,7 +64,8 @@ public class UserProcessDebugController extends UserProcessController {
     @Override
     public void conditionEvaluated(final ConditionEvaluatedEvent event) {
         if (!event.getResult().orElse(true)) {
-            // condition was evaluated to false (or there is no result), so there will be no suspension
+            // condition was evaluated to false so there will be no suspension; otherwise (true or error)
+            // execution will pause
             susupensionData = null;
         }
     }
@@ -89,15 +107,15 @@ public class UserProcessDebugController extends UserProcessController {
         if ((pausingPoint == PausingPoint.PRE_START_KEYWORD || pausingPoint == PausingPoint.START_KEYWORD)
                 && frames().map(StackFrame::getContext).anyMatch(StackFrameContext::isErroneous)
                 && !frames().anyMatch(StackFrame::isMarkedError)) {
-            
-            // we mark all the erroneous frames; once they will be popped from stack it may
-            // again suspend
-            frames().filter(frame -> frame.getContext().isErroneous()).forEach(
-                    frame -> frame.mark(StackFrameMarker.ERROR));
 
             // this may require user assistance, so has to be asked as the last condition after
             // those in previous if
             if (preferences.shouldPauseOnError()) {
+                // we mark all the erroneous frames; once they will be popped from stack it may
+                // again suspend
+                frames().filter(frame -> frame.getContext().isErroneous())
+                        .forEach(frame -> frame.mark(StackFrameMarker.ERROR));
+
                 final String error = frames()
                         .findFirst()
                         .map(StackFrame::getContext)
@@ -253,8 +271,7 @@ public class UserProcessDebugController extends UserProcessController {
         final ChangeVariable changeVarResponse = new ChangeVariable(variable.getName(), variable.getScope(),
                 frame.getLevel(), path, arguments);
         susupensionData = new SuspensionData(SuspendReason.VARIABLE_CHANGE, frame.getLevel());
-        manualUserResponse.offer(new ResponseWithCallback(changeVarResponse, () -> {
-        }));
+        manualUserResponse.offer(new ResponseWithCallback(changeVarResponse, () -> {}));
     }
 
     public static interface PauseReasonListener {
@@ -290,7 +307,8 @@ public class UserProcessDebugController extends UserProcessController {
         }
     }
     
-    private static class SuspensionData {
+    @VisibleForTesting
+    static class SuspensionData {
 
         public SuspendReason reason;
 
@@ -302,11 +320,13 @@ public class UserProcessDebugController extends UserProcessController {
         }
     }
 
-    private enum SuspendReason {
+    @VisibleForTesting
+    enum SuspendReason {
         USER_REQUEST, BREAKPOINT, STEPPING, VARIABLE_CHANGE, ERRONEOUS_STATE
     }
 
-    private enum SteppingMode {
+    @VisibleForTesting
+    enum SteppingMode {
         INTO, OVER, RETURN
     }
 }

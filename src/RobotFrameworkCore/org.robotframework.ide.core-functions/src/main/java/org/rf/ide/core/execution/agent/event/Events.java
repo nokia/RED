@@ -30,12 +30,12 @@ class Events {
         }
     }
 
-    static List<Map<String, Object>> ensureListOfOrderedMapOfStringsToObjects(final List<?> scopes) {
-        return scopes.stream().map(Map.class::cast).map(Events::ensureOrderedMapOfStringsToObjects).collect(toList());
-    }
-
     static List<String> ensureListOfStrings(final List<?> list) {
         return list.stream().map(String.class::cast).collect(Collectors.toList());
+    }
+
+    static List<Map<String, Object>> ensureListOfOrderedMapOfStringsToObjects(final List<?> list) {
+        return list.stream().map(Map.class::cast).map(Events::ensureOrderedMapOfStringsToObjects).collect(toList());
     }
 
     static Map<String, Object> ensureOrderedMapOfStringsToObjects(final Map<?, ?> map) {

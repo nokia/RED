@@ -12,14 +12,15 @@ import org.rf.ide.core.execution.server.response.ServerResponse.ResponseExceptio
 
 public final class AgentInitializingEvent {
 
+    public static AgentInitializingEvent from(final AgentClient client) {
+        return new AgentInitializingEvent(new AgentInitializingEventResponder(client));
+    }
+
+
     private final AgentInitializingEventResponder responder;
 
     public AgentInitializingEvent(final AgentInitializingEventResponder responder) {
         this.responder = responder;
-    }
-
-    public static AgentInitializingEvent from(final AgentClient client) {
-        return new AgentInitializingEvent(new AgentInitializingEventResponder(client));
     }
 
     public AgentInitializingEventResponder responder() {
@@ -34,7 +35,7 @@ public final class AgentInitializingEvent {
     @Override
     public int hashCode() {
         // because those object are in fact constant
-        return 31;
+        return AgentInitializingEvent.class.hashCode();
     }
 
     public static class AgentInitializingEventResponder {
