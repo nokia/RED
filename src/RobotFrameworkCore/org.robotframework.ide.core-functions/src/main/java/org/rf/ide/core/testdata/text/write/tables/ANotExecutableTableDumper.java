@@ -43,7 +43,6 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
         return getDumperHelper().getEmptyLineDumper();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
             final TableHeader<? extends ARobotSectionTable> th, final List<AModelElement<ARobotSectionTable>> sorted,
@@ -53,8 +52,6 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
         if (this.shouldDumpHashCommentAfterHeader) {
             getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
         }
-
-        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th, sorted.isEmpty());
 
         if (!sorted.isEmpty()) {
             final List<Section> settingSections = SectionType.filterByType(sections, sectionWithHeaderPos,
@@ -84,7 +81,6 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                     getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(setting, null, model, lines);
                 }
 
-                getEmptyDumperHelper().dumpEmptyLines(model, lines, setting, settingIndex == lastIndexToDump);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {
@@ -99,8 +95,8 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
     private void addLineSeparatorIfIsRequired(final RobotFile model, final List<RobotLine> lines) {
         if (!lines.isEmpty()) {
-            RobotLine lastLine = lines.get(lines.size() - 1);
-            IRobotLineElement endOfLine = lastLine.getEndOfLine();
+            final RobotLine lastLine = lines.get(lines.size() - 1);
+            final IRobotLineElement endOfLine = lastLine.getEndOfLine();
             if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                     || endOfLine.getTypes().contains(EndOfLineTypes.NON)
                     || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
