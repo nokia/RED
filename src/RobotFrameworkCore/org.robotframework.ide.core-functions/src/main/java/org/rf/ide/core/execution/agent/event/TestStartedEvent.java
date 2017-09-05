@@ -14,12 +14,6 @@ import com.google.common.base.Strings;
 
 public final class TestStartedEvent {
 
-    private final String name;
-
-    private final String longName;
-
-    private final String template;
-
     public static TestStartedEvent from(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("start_test");
         final String name = (String) arguments.get(0);
@@ -27,8 +21,18 @@ public final class TestStartedEvent {
         final String longName = (String) attributes.get("longname");
         final String template = (String) attributes.get("template");
 
+        if (longName == null) {
+            throw new IllegalArgumentException("Test started event should have longname provided");
+        }
         return new TestStartedEvent(name, longName, template);
     }
+
+
+    private final String name;
+
+    private final String longName;
+
+    private final String template;
 
     public TestStartedEvent(final String name, final String longName, final String template) {
         this.name = name;

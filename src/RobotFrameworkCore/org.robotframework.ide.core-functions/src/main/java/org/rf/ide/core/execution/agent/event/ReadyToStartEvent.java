@@ -11,14 +11,15 @@ import org.rf.ide.core.execution.server.response.StartExecution;
 
 public final class ReadyToStartEvent {
 
+    public static ReadyToStartEvent from(final AgentClient client) {
+        return new ReadyToStartEvent(new ReadyToStartEventResponder(client));
+    }
+
+
     private final ReadyToStartEventResponder responder;
 
     public ReadyToStartEvent(final ReadyToStartEventResponder responder) {
         this.responder = responder;
-    }
-
-    public static ReadyToStartEvent from(final AgentClient client) {
-        return new ReadyToStartEvent(new ReadyToStartEventResponder(client));
     }
 
     public ReadyToStartEventResponder responder() {
@@ -33,7 +34,7 @@ public final class ReadyToStartEvent {
     @Override
     public int hashCode() {
         // because those object are in fact constant
-        return 31;
+        return ReadyToStartEvent.class.hashCode();
     }
 
     public static class ReadyToStartEventResponder {

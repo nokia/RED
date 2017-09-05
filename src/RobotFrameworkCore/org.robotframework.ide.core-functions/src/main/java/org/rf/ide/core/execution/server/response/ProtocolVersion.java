@@ -9,11 +9,15 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.base.Objects;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 public final class ProtocolVersion implements ServerResponse {
+
+    private final ObjectMapper mapper;
 
     private final String error;
 
@@ -22,6 +26,12 @@ public final class ProtocolVersion implements ServerResponse {
     }
 
     public ProtocolVersion(final String error) {
+        this(ResponseObjectsMapper.OBJECT_MAPPER, error);
+    }
+
+    @VisibleForTesting
+    ProtocolVersion(final ObjectMapper mapper, final String error) {
+        this.mapper = mapper;
         this.error = error;
     }
 
@@ -33,23 +43,10 @@ public final class ProtocolVersion implements ServerResponse {
             arguments.put("error", Strings.nullToEmpty(error));
             final Map<String, Object> value = ImmutableMap.of("protocol_version", arguments);
 
-            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
+            return mapper.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize protocol version response arguments to json", e);
         }
     }
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj != null && obj.getClass() == ProtocolVersion.class) {
-            final ProtocolVersion that = (ProtocolVersion) obj;
-            return Objects.equal(this.error, that.error);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(error);
-    }
 }

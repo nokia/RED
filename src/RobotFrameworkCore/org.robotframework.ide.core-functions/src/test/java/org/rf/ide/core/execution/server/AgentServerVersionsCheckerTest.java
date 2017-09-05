@@ -6,6 +6,8 @@
 package org.rf.ide.core.execution.server;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -17,7 +19,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
+import org.rf.ide.core.execution.agent.event.VersionsEvent.VersionsEventResponder;
 import org.rf.ide.core.execution.server.response.ProtocolVersion;
+import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -33,11 +37,11 @@ public class AgentServerVersionsCheckerTest {
         final AgentServerVersionsChecker checker = new AgentServerVersionsChecker();
 
         final List<Object> attributes = newArrayList(
-                ImmutableMap.of("python", "", "robot", "", "protocol", getCurrentVersion()));
+                ImmutableMap.of("cmd_line", "cmd", "python", "", "robot", "", "protocol", getCurrentVersion()));
         final Map<String, Object> eventMap = ImmutableMap.of("version", attributes);
         checker.handleVersions(VersionsEvent.from(client, eventMap));
 
-        verify(client).send(new ProtocolVersion(null));
+        verify(client).send(any(ProtocolVersion.class));
     }
 
     @Test
@@ -53,11 +57,11 @@ public class AgentServerVersionsCheckerTest {
         final AgentServerVersionsChecker checker = new AgentServerVersionsChecker();
 
         final List<Object> attributes = newArrayList(
-                ImmutableMap.of("python", "", "robot", "", "protocol", getOlderVersion()));
+                ImmutableMap.of("cmd_line", "cmd", "python", "", "robot", "", "protocol", getOlderVersion()));
         final Map<String, Object> eventMap = ImmutableMap.of("version", attributes);
         checker.handleVersions(VersionsEvent.from(client, eventMap));
 
-        verify(client).send(new ProtocolVersion("error"));
+        verify(client).send(any(ProtocolVersion.class));
     }
 
     @Test
@@ -73,11 +77,23 @@ public class AgentServerVersionsCheckerTest {
         final AgentServerVersionsChecker checker = new AgentServerVersionsChecker();
 
         final List<Object> attributes = newArrayList(
-                ImmutableMap.of("python", "", "robot", "", "protocol", getNewerVersion()));
+                ImmutableMap.of("cmd_line", "cmd", "python", "", "robot", "", "protocol", getNewerVersion()));
         final Map<String, Object> eventMap = ImmutableMap.of("version", attributes);
         checker.handleVersions(VersionsEvent.from(client, eventMap));
 
-        verify(client).send(new ProtocolVersion("error"));
+        verify(client).send(any(ProtocolVersion.class));
+    }
+
+    @Test(expected = RobotAgentEventsListenerException.class)
+    public void exceptionIsThrown_whenVersionCheckerResponseToClient() {
+        final AgentServerVersionsChecker checker = new AgentServerVersionsChecker();
+
+        final VersionsEventResponder responder = mock(VersionsEventResponder.class);
+        doThrow(ResponseException.class).when(responder).versionsCorrect();
+
+        final VersionsEvent event = new VersionsEvent(responder, "cmd_line", "3.6", "3.0.2", getCurrentVersion());
+
+        checker.handleVersions(event);
     }
 
     private static int getOlderVersion() {

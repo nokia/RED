@@ -13,6 +13,22 @@ import org.rf.ide.core.execution.agent.Status;
 
 public final class SuiteEndedEvent {
 
+    public static SuiteEndedEvent from(final Map<String, Object> eventMap) {
+        final List<?> arguments = (List<?>) eventMap.get("end_suite");
+        final String name = (String) arguments.get(0);
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
+        final Integer elapsedTime = (Integer) attributes.get("elapsedtime");
+        final String errorMessage = (String) attributes.get("message");
+        final String suiteStatus = (String) attributes.get("status");
+
+        if (elapsedTime == null || errorMessage == null || suiteStatus == null) {
+            throw new IllegalArgumentException(
+                    "Suite ended event should have status, elapsed time and message attributes");
+        }
+        return new SuiteEndedEvent(name, elapsedTime, Status.valueOf(suiteStatus), errorMessage);
+    }
+
+
     private final String name;
 
     private final int elapsedTime;
@@ -20,17 +36,6 @@ public final class SuiteEndedEvent {
     private final Status suiteStatus;
 
     private final String errorMessage;
-
-    public static SuiteEndedEvent from(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("end_suite");
-        final String name = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final int elapsedTime = (Integer) attributes.get("elapsedtime");
-        final String errorMessage = (String) attributes.get("message");
-        final Status suiteStatus = Status.valueOf((String) attributes.get("status"));
-
-        return new SuiteEndedEvent(name, elapsedTime, suiteStatus, errorMessage);
-    }
 
     public SuiteEndedEvent(final String name, final int elapsedTime, final Status suiteStatus,
             final String errorMessage) {

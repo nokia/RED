@@ -10,12 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 
 public final class ChangeVariable implements ServerResponse {
+
+    private final ObjectMapper mapper;
 
     private final String variableName;
 
@@ -27,6 +31,7 @@ public final class ChangeVariable implements ServerResponse {
 
     private final List<String> arguments;
 
+
     public ChangeVariable(final String varName, final VariableScope scope, final int frameLevel,
             final List<String> arguments) {
         this(varName, scope, frameLevel, new ArrayList<>(), arguments);
@@ -34,6 +39,13 @@ public final class ChangeVariable implements ServerResponse {
 
     public ChangeVariable(final String varName, final VariableScope scope, final int frameLevel,
             final List<Object> path, final List<String> arguments) {
+        this(ResponseObjectsMapper.OBJECT_MAPPER, varName, scope, frameLevel, path, arguments);
+    }
+
+    @VisibleForTesting
+    ChangeVariable(final ObjectMapper mapper, final String varName, final VariableScope scope,
+            final int frameLevel, final List<Object> path, final List<String> arguments) {
+        this.mapper = mapper;
         this.variableName = varName;
         this.scope = scope;
         this.frameLevel = frameLevel;
@@ -54,7 +66,7 @@ public final class ChangeVariable implements ServerResponse {
             }
             final Map<String, Object> value = ImmutableMap.of("change_variable", argsBuilder.build());
 
-            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
+            return mapper.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize change variable response arguments to json", e);
         }

@@ -48,14 +48,6 @@ class RobotAgentEventDispatcher {
         this.eventsListeners = synchronizedList(newArrayList(eventsListeners));
     }
 
-    void addEventsListener(final RobotAgentEventListener listener) {
-        eventsListeners.add(listener);
-    }
-
-    void removeEventsListener(final RobotAgentEventListener listener) {
-        eventsListeners.remove(listener);
-    }
-
     void runEventsLoop(final BufferedReader eventReader) throws IOException, RobotAgentEventsListenerException {
         try {
             eventsLoop(eventReader);
@@ -76,6 +68,7 @@ class RobotAgentEventDispatcher {
             final Map<String, Object> eventMap = mapper.readValue(event, stringToObjectMapType);
             final String eventType = getEventType(eventMap);
             if (eventType == null) {
+                event = eventReader.readLine();
                 continue;
             }
 

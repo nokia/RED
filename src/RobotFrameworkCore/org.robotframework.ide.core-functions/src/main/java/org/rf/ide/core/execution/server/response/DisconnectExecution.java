@@ -10,9 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 public final class DisconnectExecution implements ServerResponseOnShouldContinue {
+
+    private final ObjectMapper mapper;
+
+    public DisconnectExecution() {
+        this(ResponseObjectsMapper.OBJECT_MAPPER);
+    }
+
+    @VisibleForTesting
+    DisconnectExecution(final ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public String toMessage() {
@@ -20,7 +34,7 @@ public final class DisconnectExecution implements ServerResponseOnShouldContinue
             final List<Object> arguments = new ArrayList<>();
             final Map<String, Object> value = ImmutableMap.of("disconnect", arguments);
 
-            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
+            return mapper.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize disconnect response arguments to json", e);
         }

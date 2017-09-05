@@ -7,6 +7,7 @@ package org.rf.ide.core.execution.server;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -63,6 +64,28 @@ public class RobotAgentEventDispatcherTest {
     }
 
     @Test
+    public void listenerIsNotifiedOnlyAboutFinishedProcessing_whenExceptionIsThrown() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+        doThrow(RuntimeException.class).when(listener).handleResumed();
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final String json = toJson(ImmutableMap.of("resumed", 0));
+
+        try {
+            dispatcher.runEventsLoop(readerFor(json));
+        } catch (final RuntimeException e) {
+            // that's expected
+        }
+
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleResumed();
+        verify(listener).eventsProcessingFinished();
+        verifyZeroInteractions(listener);
+    }
+
+    @Test
     public void listenerIsNotNotified_whenThereAreNoEvents() throws Exception {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
@@ -71,6 +94,20 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener).eventsProcessingFinished();
         verifyZeroInteractions(listener);
+    }
+
+    @Test
+    public void listenerIsNotNotified_whenThereIsOnlyNullEventRead() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        dispatcher.runEventsLoop(readerFor(toJson(null)));
+
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).eventsProcessingFinished();
+        verifyNoMoreInteractions(listener);
     }
 
     @Test
@@ -284,6 +321,25 @@ public class RobotAgentEventDispatcherTest {
     }
 
     @Test
+    public void listenerIsNotifiedAboutPreKeywordStartEvent() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("kwname", "kw", "type", "Keyword",
+                "libname", "lib", "vars_scopes",
+                newArrayList(ImmutableMap.of("a", newArrayList("t", 1, "global"), "b", newArrayList("t", 2, "suite"))));
+        final String json = toJson(ImmutableMap.of("pre_start_keyword", newArrayList("kw", attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleKeywordAboutToStart(new KeywordStartedEvent("kw", "Keyword", "lib"));
+        verify(listener).eventsProcessingFinished();
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
     public void listenerIsNotifiedAboutKeywordStartEvent() throws Exception {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
@@ -303,14 +359,31 @@ public class RobotAgentEventDispatcherTest {
     }
 
     @Test
+    public void listenerIsNotifiedAboutPreKeywordEndEvent() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("kwname", "kw", "type", "Setup");
+        final String json = toJson(ImmutableMap.of("pre_end_keyword", newArrayList("_", attributes)));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleKeywordAboutToEnd(new KeywordEndedEvent("kw", "Setup"));
+        verify(listener).eventsProcessingFinished();
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
     public void listenerIsNotifiedAboutKeywordEndEvent() throws Exception {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
 
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
-        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("type", "Setup");
-        final String json = toJson(ImmutableMap.of("end_keyword", newArrayList("kw", attributes)));
+        final Map<String, Object> attributes = ImmutableMap.<String, Object> of("kwname", "kw", "type", "Setup");
+        final String json = toJson(ImmutableMap.of("end_keyword", newArrayList("_", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
@@ -334,8 +407,7 @@ public class RobotAgentEventDispatcherTest {
 
         verify(listener, atLeast(1)).isHandlingEvents();
         verify(listener).handleVariables(new VariablesEvent(
-                newArrayList(ImmutableMap.of(
-                        new Variable("a", VariableScope.TEST_CASE), new VariableTypedValue("t", 1),
+                newArrayList(ImmutableMap.of(new Variable("a", VariableScope.TEST_CASE), new VariableTypedValue("t", 1),
                         new Variable("b", VariableScope.TEST_SUITE), new VariableTypedValue("t", 2))),
                 null));
         verify(listener).eventsProcessingFinished();
@@ -410,6 +482,22 @@ public class RobotAgentEventDispatcherTest {
     }
 
     @Test
+    public void listenerIsNotifiedAboutResumedEvent() throws Exception {
+        final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
+        when(listener.isHandlingEvents()).thenReturn(true);
+
+        final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
+
+        final String json = toJson(ImmutableMap.of("resumed", 0));
+        dispatcher.runEventsLoop(readerFor(json));
+
+        verify(listener, atLeast(1)).isHandlingEvents();
+        verify(listener).handleResumed();
+        verify(listener).eventsProcessingFinished();
+        verifyNoMoreInteractions(listener);
+    }
+
+    @Test
     public void listenerIsNotifiedAboutClosedEvent() throws Exception {
         final RobotAgentEventListener listener = mock(RobotAgentEventListener.class);
         when(listener.isHandlingEvents()).thenReturn(true);
@@ -466,7 +554,7 @@ public class RobotAgentEventDispatcherTest {
         final RobotAgentEventDispatcher dispatcher = new RobotAgentEventDispatcher(null, listener);
 
         final Object attributes = ImmutableMap.of("importer", "/importerPath", "source", "/sourcePath", "args",
-                newArrayList("arg1", "arg2"));
+                newArrayList("arg1", "arg2"), "originalname", "lib1");
         final String json = toJson(ImmutableMap.of("library_import", newArrayList("lib1", attributes)));
         dispatcher.runEventsLoop(readerFor(json));
 
@@ -490,8 +578,8 @@ public class RobotAgentEventDispatcherTest {
         dispatcher.runEventsLoop(readerFor(json));
 
         verify(listener, atLeast(1)).isHandlingEvents();
-        verify(listener).handleLibraryImport(new LibraryImportEvent("lib2", new URI("file:///importerPath"), new URI("file:///sourcePath"),
-                        newArrayList("arg1", "arg2")));
+        verify(listener).handleLibraryImport(new LibraryImportEvent("lib2", new URI("file:///importerPath"),
+                new URI("file:///sourcePath"), newArrayList("arg1", "arg2")));
         verify(listener).eventsProcessingFinished();
         verifyNoMoreInteractions(listener);
     }

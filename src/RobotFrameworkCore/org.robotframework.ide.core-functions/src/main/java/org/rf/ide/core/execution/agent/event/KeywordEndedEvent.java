@@ -11,10 +11,6 @@ import java.util.Objects;
 
 public final class KeywordEndedEvent {
 
-    private final String name;
-
-    private final String keywordType;
-
     public static KeywordEndedEvent fromPre(final Map<String, Object> eventMap) {
         return fromEventArguments((List<?>) eventMap.get("pre_end_keyword"));
     }
@@ -24,12 +20,21 @@ public final class KeywordEndedEvent {
     }
 
     private static KeywordEndedEvent fromEventArguments(final List<?> arguments) {
-        final String name = (String) arguments.get(0);
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
+        final String keywordName = (String) attributes.get("kwname");
         final String keywordType = (String) attributes.get("type");
 
-        return new KeywordEndedEvent(name, keywordType);
+        if (keywordName == null || keywordType == null) {
+            throw new IllegalArgumentException(
+                    "Keyword started event should have name of keyword and its type");
+        }
+        return new KeywordEndedEvent(keywordName, keywordType);
     }
+
+
+    private final String name;
+
+    private final String keywordType;
 
     public KeywordEndedEvent(final String name, final String keywordType) {
         this.name = name;

@@ -8,12 +8,28 @@ package org.rf.ide.core.execution.agent.event;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
-import com.google.common.base.Objects;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 public final class LibraryImportEvent {
+
+    public static LibraryImportEvent from(final Map<String, Object> eventMap) {
+        final List<?> arguments = (List<?>) eventMap.get("library_import");
+        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
+
+        final String originalName = (String) attributes.get("originalname");
+        final URI importer = Events.toFileUri((String) attributes.get("importer"));
+        final URI source = Events.toFileUri((String) attributes.get("source"));
+        final List<?> args = (List<?>) attributes.get("args");
+
+        if (originalName == null || args == null) {
+            throw new IllegalArgumentException("Library import event has to have original name and arguments provided");
+        }
+        return new LibraryImportEvent(originalName, importer, source, Events.ensureListOfStrings(args));
+    }
+
 
     private final String name;
 
@@ -22,19 +38,6 @@ public final class LibraryImportEvent {
     private final URI source;
 
     private final List<String> args;
-
-    public static LibraryImportEvent from(final Map<String, Object> eventMap) {
-        final List<?> arguments = (List<?>) eventMap.get("library_import");
-        final String libraryName = (String) arguments.get(0);
-        final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
-        final String originalName = (String) attributes.get("originalname");
-        final String name = Strings.isNullOrEmpty(originalName) ? libraryName : originalName;
-        final URI importer = Events.toFileUri((String) attributes.get("importer"));
-        final URI source = Events.toFileUri((String) attributes.get("source"));
-        final List<String> args = Events.ensureListOfStrings((List<?>) attributes.get("args"));
-
-        return new LibraryImportEvent(name, importer, source, args);
-    }
 
     public LibraryImportEvent(final String name, final URI importer, final URI source, final List<String> args) {
         this.name = name;
@@ -47,12 +50,12 @@ public final class LibraryImportEvent {
         return name;
     }
 
-    public URI getImporter() {
-        return importer;
+    public Optional<URI> getImporter() {
+        return Optional.ofNullable(importer);
     }
 
-    public URI getSource() {
-        return source;
+    public Optional<URI> getSource() {
+        return Optional.ofNullable(source);
     }
 
     public ImmutableList<String> getArguments() {
@@ -63,14 +66,14 @@ public final class LibraryImportEvent {
     public boolean equals(final Object obj) {
         if (obj != null && obj.getClass() == LibraryImportEvent.class) {
             final LibraryImportEvent that = (LibraryImportEvent) obj;
-            return this.name.equals(that.name) && this.importer.equals(that.importer) && this.source.equals(that.source)
-                    && this.args.equals(that.args);
+            return this.name.equals(that.name) && Objects.equals(this.importer, that.importer)
+                    && Objects.equals(this.source, that.source) && this.args.equals(that.args);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(name, importer, source, args);
+        return Objects.hash(name, importer, source, args);
     }
 }
