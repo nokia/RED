@@ -56,156 +56,156 @@ public class UserKeywordPositionCountTest {
     }
 
     @Test
-    public void given_EmptyUserKeyword_when_shouldReturnEndOf_2ndLine() {
+    public void given_EmptyUserKeyword_when_shouldReturnEndOf_3rdLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS.get("Empty");
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS.get("Empty");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(2);
-        assertThat(endPosition.getColumn()).isEqualTo(5);
-        assertThat(endPosition.getOffset()).isEqualTo(23);
+        assertThat(endPosition.getLine()).isEqualTo(3);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(25);
     }
 
     @Test
-    public void given_EmptyWithPipeAtBeginningUserKeyword_when_shouldReturnEndOf_4thLine() {
+    public void given_EmptyWithPipeAtBeginningUserKeyword_when_shouldReturnEndOf_5thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("EmptyWithPipeAtBeginning");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(4);
-        assertThat(endPosition.getColumn()).isEqualTo(26);
-        assertThat(endPosition.getOffset()).isEqualTo(53);
+        assertThat(endPosition.getLine()).isEqualTo(5);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(55);
     }
 
     @Test
-    public void given_EmptyWithPipeAtBeginningAndEndUserKeyword_when_shouldReturnEndOf_6thLine() {
+    public void given_EmptyWithPipeAtBeginningAndEndUserKeyword_when_shouldReturnEndOf_7thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("EmptyWithPipeAtBeginningAndEnd");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(6);
-        assertThat(endPosition.getColumn()).isEqualTo(34);
-        assertThat(endPosition.getOffset()).isEqualTo(91);
+        assertThat(endPosition.getLine()).isEqualTo(7);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(93);
     }
 
     @Test
-    public void given_EmptyWithPipeAtBeginningAndEndAndSpaceAfterUserKeyword_when_shouldReturnEndOf_8thLine() {
+    public void given_EmptyWithPipeAtBeginningAndEndAndSpaceAfterUserKeyword_when_shouldReturnEndOf_9thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("EmptyWithPipeAtBeginningAndEndAndSpaceAfter");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(8);
-        assertThat(endPosition.getColumn()).isEqualTo(48);
-        assertThat(endPosition.getOffset()).isEqualTo(143);
+        assertThat(endPosition.getLine()).isEqualTo(9);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(145);
     }
 
     @Test
-    public void given_EmptyWithPipeAtBeginningAndEndAndSpaceAfterAndTabsUserKeyword_when_shouldReturnEndOf_10thLine() {
+    public void given_EmptyWithPipeAtBeginningAndEndAndSpaceAfterAndTabsUserKeyword_when_shouldReturnEndOf_11thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("EmptyWithPipeAtBeginningAndEndAndSpaceAfterAndTabs");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(10);
-        assertThat(endPosition.getColumn()).isEqualTo(57);
-        assertThat(endPosition.getOffset()).isEqualTo(204);
+        assertThat(endPosition.getLine()).isEqualTo(11);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(206);
     }
 
     @Test
-    public void given_One_ExecRowOnly_WithSpacesUserKeyword_when_shouldReturnEndOf_13thLine() {
+    public void given_One_ExecRowOnly_WithSpacesUserKeyword_when_shouldReturnEndOf_14thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("One_ExecRowOnly_WithSpaces");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(13);
-        assertThat(endPosition.getColumn()).isEqualTo(9);
-        assertThat(endPosition.getOffset()).isEqualTo(249);
+        assertThat(endPosition.getLine()).isEqualTo(14);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(251);
     }
 
     @Test
-    public void given_One_ExecRowOnly_WithSpacesAndSpaceAsLastUserKeyword_when_shouldReturnEndOf_16thLine() {
+    public void given_One_ExecRowOnly_WithSpacesAndSpaceAsLastUserKeyword_when_shouldReturnEndOf_17thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("One_ExecRowOnly_WithSpacesAndSpaceAsLast");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(16);
-        assertThat(endPosition.getColumn()).isEqualTo(10);
-        assertThat(endPosition.getOffset()).isEqualTo(309);
+        assertThat(endPosition.getLine()).isEqualTo(17);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(311);
     }
 
     @Test
-    public void given_One_ExecRowOnly_WithSpacesAndSpaceAsLastAndTabUserKeyword_when_shouldReturnEndOf_19thLine() {
+    public void given_One_ExecRowOnly_WithSpacesAndSpaceAsLastAndTabUserKeyword_when_shouldReturnEndOf_20thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("One_ExecRowOnly_WithSpacesAndSpaceAsLastAndTab");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(19);
-        assertThat(endPosition.getColumn()).isEqualTo(12);
-        assertThat(endPosition.getOffset()).isEqualTo(377);
+        assertThat(endPosition.getLine()).isEqualTo(20);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(379);
     }
 
     @Test
-    public void given_One_ExecRowOnly_WithSpacesAndSpaceAsLastAndTabUserKeyword_when_shouldReturnEndOf_22ndLine() {
+    public void given_One_ExecRowOnly_WithSpacesAndSpaceAsLastAndTabUserKeyword_when_shouldReturnEndOf_23ndLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("One_ExecRowOnly_WithSpacesAndSpaceAsLastAndTab_Pipe");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
-        assertThat(endPosition.getLine()).isEqualTo(22);
-        assertThat(endPosition.getColumn()).isEqualTo(17);
-        assertThat(endPosition.getOffset()).isEqualTo(455);
+        assertThat(endPosition.getLine()).isEqualTo(23);
+        assertThat(endPosition.getColumn()).isEqualTo(0);
+        assertThat(endPosition.getOffset()).isEqualTo(457);
     }
 
     @Test
     public void given_Three_ExecsRowOnly_WithSpacesAndSpaceAsLastAndTab_PipeUserKeyword_when_shouldReturnEndOf_29thLine() {
         // prepare
-        IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
+        final IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("Three_ExecsRowOnly_WithSpacesAndSpaceAsLastAndTab_Pipe");
 
         // execute
-        FilePosition endPosition = exec.getHolder().getEndPosition();
+        final FilePosition endPosition = exec.getHolder().getEndPosition();
 
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
