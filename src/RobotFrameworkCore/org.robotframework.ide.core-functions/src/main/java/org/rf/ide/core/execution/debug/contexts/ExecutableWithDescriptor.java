@@ -92,21 +92,17 @@ class ExecutableWithDescriptor {
         }
     }
 
-    FileRegion getForVariablesRegion() {
+    List<RobotToken> getForVariables() {
         final ForLoopDeclarationRowDescriptor<?> descriptor = loopExecutable.getDescriptor();
-        final List<RobotToken> tokens = descriptor.getCreatedVariables()
-                .stream()
-                .map(VariableDeclaration::asToken)
-                .collect(toList());
+        return descriptor.getCreatedVariables().stream().map(VariableDeclaration::asToken).collect(toList());
+    }
+
+    FileRegion getForVariablesRegion() {
+        final List<RobotToken> tokens = getForVariables();
 
         final RobotToken minToken = Collections.min(tokens, RobotToken.byStartOffset());
         final RobotToken maxToken = Collections.max(tokens, RobotToken.byStartOffset());
 
         return new FileRegion(minToken.getFilePosition(), maxToken.getEndFilePosition());
-    }
-
-    List<RobotToken> getForVariables() {
-        final ForLoopDeclarationRowDescriptor<?> descriptor = loopExecutable.getDescriptor();
-        return descriptor.getCreatedVariables().stream().map(VariableDeclaration::asToken).collect(toList());
     }
 }

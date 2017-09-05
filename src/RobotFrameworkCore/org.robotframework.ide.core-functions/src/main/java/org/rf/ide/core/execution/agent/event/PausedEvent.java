@@ -12,11 +12,12 @@ import org.rf.ide.core.execution.server.response.ServerResponse;
 
 public final class PausedEvent {
 
-    private final PausedEventResponder responder;
-
     public static PausedEvent from(final AgentClient client) {
         return new PausedEvent(new PausedEventResponder(client));
     }
+
+
+    private final PausedEventResponder responder;
 
     public PausedEvent(final PausedEventResponder responder) {
         this.responder = responder;
@@ -34,14 +35,14 @@ public final class PausedEvent {
     @Override
     public int hashCode() {
         // because those object are in fact constant
-        return 31;
+        return PausedEvent.class.hashCode();
     }
 
     public static class PausedEventResponder {
 
         private final AgentClient client;
 
-        public PausedEventResponder(final AgentClient client) {
+        private PausedEventResponder(final AgentClient client) {
             this.client = client;
         }
 

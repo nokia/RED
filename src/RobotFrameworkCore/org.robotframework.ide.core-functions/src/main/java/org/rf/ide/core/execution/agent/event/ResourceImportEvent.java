@@ -13,18 +13,22 @@ import java.util.Optional;
 
 public final class ResourceImportEvent {
 
-    private final URI path;
-
-    private final URI importerPath;
-
     public static ResourceImportEvent from(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("resource_import");
         final Map<?, ?> attributes = (Map<?, ?>) arguments.get(1);
         final URI path = Events.toFileUri((String) attributes.get("source"));
         final URI importerPath = Events.toFileUri((String) attributes.get("importer"));
 
+        if (path == null) {
+            throw new IllegalArgumentException("Resource import event has to contain path to imported resource");
+        }
         return new ResourceImportEvent(path, importerPath);
     }
+
+
+    private final URI path;
+
+    private final URI importerPath;
 
     public ResourceImportEvent(final URI path, final URI importerPath) {
         this.path = path;
