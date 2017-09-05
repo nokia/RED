@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
@@ -64,6 +65,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         for (final AModelElement<UserKeyword> el : keyword.getAllElements()) {
             if (el instanceof RobotExecutableRow) {
                 getChildren().add(new RobotKeywordCall(this, el));
+            } else if (el instanceof RobotEmptyRow) {
+                getChildren().add(new RobotEmptyLine(this, el));
             } else {
                 getChildren().add(new RobotDefinitionSetting(this, el));
             }

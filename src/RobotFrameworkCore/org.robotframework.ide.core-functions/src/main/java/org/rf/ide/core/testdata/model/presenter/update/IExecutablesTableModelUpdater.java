@@ -12,6 +12,8 @@ public interface IExecutablesTableModelUpdater<T> {
     public AModelElement<?> createExecutableRow(final T executablesHolder, final int index, final String action,
             final String comment, final List<String> args);
 
+    public AModelElement<?> createEmptyLine(final T executablesHolder, final int index, final String name);
+
     /**
      * Inserts element into {@code executablesHolder} under given index. Usually the
      * {@code modelElement} is inserted,

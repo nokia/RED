@@ -173,5 +173,13 @@ public enum ModelType {
     /**
      * 
      */
-    USER_KEYWORD_EXECUTABLE_ROW;
+    USER_KEYWORD_EXECUTABLE_ROW,
+    /**
+     * 
+     */
+    TEST_CASE_EMPTY_LINE,
+    /**
+     * 
+     */
+    USER_KEYWORD_EMPTY_LINE;
 }

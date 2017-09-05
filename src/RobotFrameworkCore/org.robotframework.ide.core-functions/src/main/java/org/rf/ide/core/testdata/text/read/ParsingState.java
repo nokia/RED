@@ -266,6 +266,10 @@ public enum ParsingState {
     /**
      * 
      */
+    TEST_CASE_EMPTY_LINE(TableType.TEST_CASE, TEST_CASE_DECLARATION),
+    /**
+     * 
+     */
     TEST_CASE_INSIDE_ACTION(TableType.TEST_CASE, TEST_CASE_DECLARATION),
     /**
      * 
@@ -350,6 +354,10 @@ public enum ParsingState {
      * 
      */
     KEYWORD_DECLARATION(TableType.KEYWORD, KEYWORD_TABLE_INSIDE),
+    /**
+     * 
+     */
+    KEYWORD_EMPTY_LINE(TableType.KEYWORD, KEYWORD_DECLARATION),
     /**
      * 
      */

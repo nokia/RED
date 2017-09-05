@@ -107,8 +107,15 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
 
         final List<RobotToken> tokens = prepareTokens(currentElement);
         // dump as it is
-        if (canBeDumpedDirectly(lastToken, tokens)) {
-            final boolean wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
+        if (canBePossiblyDumpedDirectly(lastToken)) {
+        	boolean wasDumped = false;
+        	if(tokens.isEmpty()) {
+        		//dump EOL
+                wasDumped = getElementDumperHelper().dumpEOLAsItIs(getDumperHelper(), model, lastToken, lines);   
+        	} else if (canBeDumpedDirectly(lastToken, tokens)){
+        		//dump line tokens
+                wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);        		
+        	}
             if (wasDumped) {
                 return;
             }
@@ -264,10 +271,12 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
     }
 
     private boolean canBeDumpedDirectly(final IRobotLineElement lastToken, final List<RobotToken> tokens) {
+    	return !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent() && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens);
+    }
+    
+    private boolean canBePossiblyDumpedDirectly(final IRobotLineElement lastToken) {
         return !lastToken.isDirty() && (lastToken.getRaw().equals(lastToken.getText()))
-                && !lastToken.getFilePosition().isNotSet()
-                && !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent() && !tokens.isEmpty()
-                && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens);
+                && !lastToken.getFilePosition().isNotSet();
     }
 
     private List<RobotToken> prepareTokens(final AModelElement<ARobotSectionTable> currentElement) {

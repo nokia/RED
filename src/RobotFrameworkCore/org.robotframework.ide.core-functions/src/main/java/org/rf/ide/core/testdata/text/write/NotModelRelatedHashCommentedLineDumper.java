@@ -54,30 +54,10 @@ public class NotModelRelatedHashCommentedLineDumper {
 
     private void dumpCommentHashes(final RobotFile model, final List<RobotLine> lines, final int startLine,
             final List<RobotLine> oldContent, final int lastLineToDump, final RobotToken lastTokenInLines) {
-        // assumption that empties was dumped
-        boolean isLastEmpty = (lines.size() > 0) ? isEmpty(lines.get(lines.size() - 1)) : false;
         for (int lineIndex = startLine; lineIndex < lastLineToDump; lineIndex++) {
             final RobotLine robotLine = oldContent.get(lineIndex);
-            if (isLastEmpty && isEmpty(robotLine)) {
-                continue;
-            }
-            isLastEmpty = false;
             dumpHashLine(model, lines, robotLine);
         }
-    }
-
-    private boolean isEmpty(final RobotLine line) {
-        for (final IRobotLineElement rle : line.getLineElements()) {
-            if (rle instanceof RobotToken) {
-                if (rle.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
-                    continue;
-                }
-
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void dumpHashLine(final RobotFile model, final List<RobotLine> lines, final RobotLine robotLine) {
@@ -114,7 +94,10 @@ public class NotModelRelatedHashCommentedLineDumper {
             for (final IRobotLineElement rle : line.getLineElements()) {
                 if (rle instanceof RobotToken) {
                     if ((rle.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            || rle.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) && rle != lastTokenInLines) {
+                            || rle.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
+                            || (rle.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                                    && line.getLineElements().size() == 1))
+                            && rle != lastTokenInLines) {
                         lastHash = line.getLineNumber();
                     } else {
                         return lastHash;
