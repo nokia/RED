@@ -125,7 +125,7 @@ public class RobotArtifactsBuilder {
                         .causedBy(ProjectConfigurationProblem.CONFIG_FILE_MISSING);
                 reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
             }
-            return new RedEclipseProjectConfigReader().readConfiguration(robotProject);
+            return new RedEclipseProjectConfigReader().readConfiguration(robotProject.getProject());
         } catch (final CannotReadProjectConfigurationException e) {
             final RobotProblem problem = RobotProblem.causedBy(
                     ProjectConfigurationProblem.CONFIG_FILE_READING_PROBLEM)

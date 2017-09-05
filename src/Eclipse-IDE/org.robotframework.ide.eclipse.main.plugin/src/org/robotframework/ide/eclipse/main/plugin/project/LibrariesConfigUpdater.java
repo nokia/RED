@@ -32,7 +32,7 @@ public class LibrariesConfigUpdater {
         RobotProjectConfig config = robotProject.getOpenedProjectConfig();
         this.isConfigClosed = config == null;
         if (config == null) {
-            config = new RedEclipseProjectConfigReader().readConfiguration(robotProject);
+            config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
         }
         this.config = config;
         this.addedLibraries = new ArrayList<>();

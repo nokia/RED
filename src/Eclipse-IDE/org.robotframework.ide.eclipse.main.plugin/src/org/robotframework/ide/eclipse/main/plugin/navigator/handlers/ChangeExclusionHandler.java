@@ -95,7 +95,7 @@ abstract class ChangeExclusionHandler {
 
         final boolean inEditor = config != null;
         if (config == null) {
-            config = new RedEclipseProjectConfigReader().readConfiguration(robotProject);
+            config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
         }
 
         for (final IPath pathToChange : toChange) {

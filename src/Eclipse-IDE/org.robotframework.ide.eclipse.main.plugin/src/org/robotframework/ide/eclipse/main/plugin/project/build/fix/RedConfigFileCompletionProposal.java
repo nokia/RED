@@ -71,7 +71,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
 
             final boolean isEditorOpened = config != null;
             if (config == null) {
-                config = new RedEclipseProjectConfigReader().readConfiguration(robotProject);
+                config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
             }
 
             if (apply(externalFile, config)) {
