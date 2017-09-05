@@ -37,9 +37,6 @@ public class RedEclipseProjectConfigReader extends RobotProjectConfigReader {
     }
 
     public RobotProjectConfigWithLines readConfigurationWithLines(final IFile file) {
-        if (file == null || !file.exists()) {
-            throw new CannotReadProjectConfigurationException(MISSING_FILE_MESSAGE);
-        }
         try (InputStream stream = file.getContents()) {
             return readConfigurationWithLines(stream);
         } catch (final IOException | CoreException e) {

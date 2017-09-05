@@ -5,7 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,9 +26,11 @@ public class RedEclipseProjectConfigWriter extends RobotProjectConfigWriter {
 
     public void writeConfiguration(final RobotProjectConfig configuration, final IProject project) {
         try {
-            final InputStream source = writeConfiguration(configuration);
+            final StringWriter writer = new StringWriter(512);
+            writeConfiguration(configuration, writer);
 
             final IFile configFile = project.getFile(RobotProjectConfig.FILENAME);
+            final InputStream source = new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
             if (!configFile.exists()) {
                 configFile.create(source, true, null);
             } else {
