@@ -23,7 +23,9 @@ public class RobotProjectConfigWriter {
 
     public void writeConfiguration(final RobotProjectConfig configuration, final File projectDir) {
         try {
-            final InputStream source = writeConfiguration(configuration);
+            final StringWriter writer = new StringWriter(512);
+            writeConfiguration(configuration, writer);
+            final InputStream source = new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
 
             final File configFile = new File(projectDir, RobotProjectConfig.FILENAME);
             Files.copy(source, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -33,12 +35,6 @@ public class RobotProjectConfigWriter {
         }
     }
 
-    public InputStream writeConfiguration(final RobotProjectConfig configuration) {
-        final StringWriter writer = new StringWriter(512);
-        writeConfiguration(configuration, writer);
-        return new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
     public void writeConfiguration(final RobotProjectConfig configuration, final Writer writer) {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(RobotProjectConfig.class);
@@ -46,11 +42,7 @@ public class RobotProjectConfigWriter {
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(configuration, writer);
         } catch (final JAXBException e) {
-            if (e.getLinkedException() != null) {
-                throw new CannotWriteProjectConfigurationException(e.getLinkedException().getMessage(), e);
-            } else {
-                throw new CannotWriteProjectConfigurationException(e.getMessage(), e);
-            }
+            throw new CannotWriteProjectConfigurationException("Unable to write project configuration file");
         }
     }
 

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -46,7 +45,7 @@ public class RobotProjectConfigReader {
     }
 
     public RobotProjectConfig readConfiguration(final InputStream contents) {
-        return readConfiguration(new InputStreamReader(contents, StandardCharsets.UTF_8));
+        return readConfiguration(new InputStreamReader(contents));
     }
 
     public RobotProjectConfigWithLines readConfigurationWithLines(final File file) {
@@ -61,7 +60,7 @@ public class RobotProjectConfigReader {
     }
 
     public RobotProjectConfigWithLines readConfigurationWithLines(final InputStream contents) {
-        return readConfigurationWithLines(new InputStreamReader(contents, StandardCharsets.UTF_8));
+        return readConfigurationWithLines(new InputStreamReader(contents));
     }
 
     protected final RobotProjectConfig readConfiguration(final Reader reader) {
