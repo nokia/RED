@@ -56,9 +56,21 @@
        </topic>
        <topic href="doc/user_guide/launching/remote_launch.html" label="Remote launches">
        </topic>
-       <topic href="doc/user_guide/launching/debug.html" label="Debugging Robot">
+       <topic href="doc/user_guide/launching/exec_control.html" label="Controlling execution">
        </topic>
-       <topic href="doc/user_guide/launching/robot_python_debug.html" label="Debugging Robot&amp;Python with RED&amp;PyDev">
+       <topic href="doc/user_guide/launching/debug.html" label="Debugging Robot">
+          <topic href="doc/user_guide/launching/debug/ui_elements.html" label="User interface">
+          </topic>
+          <topic href="doc/user_guide/launching/debug/breakpoints.html" label="Breakpoints">
+          </topic>
+          <topic href="doc/user_guide/launching/debug/suspended_execution.html" label="Suspended execution">
+          </topic>
+          <topic href="doc/user_guide/launching/debug/variables.html" label="Changing variables">
+          </topic>
+          <topic href="doc/user_guide/launching/debug/preferences.html" label="Debugger preferences">
+          </topic>
+          <topic href="doc/user_guide/launching/debug/robot_python_debug.html" label="Debugging Robot &amp; Python with RED &amp; PyDev">
+          </topic>
        </topic>
        <topic href="doc/user_guide/launching/launch_prefs.html" label="Launching preferences">
        </topic>
