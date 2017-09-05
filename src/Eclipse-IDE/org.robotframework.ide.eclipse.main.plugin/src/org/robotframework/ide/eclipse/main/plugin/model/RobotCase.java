@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -49,6 +50,8 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         for (final AModelElement<TestCase> el : testCase.getAllElements()) {
             if (el instanceof RobotExecutableRow) {
                 getChildren().add(new RobotKeywordCall(this, el));
+            } else if (el instanceof RobotEmptyRow) {
+                getChildren().add(new RobotEmptyLine(this, el));
             } else {
                 getChildren().add(new RobotDefinitionSetting(this, el));
             }

@@ -81,8 +81,7 @@ public class ElementsUtility {
             lib = null;
 
             // FIXME: sth wrong - declaration of library not inside setting
-            // and
-            // was not catch by previous library declaration logic
+            // and was not catch by previous library declaration logic
         }
         return lib;
     }
@@ -171,8 +170,7 @@ public class ElementsUtility {
                             correct = newRobotToken;
                         } else {
                             // FIXME: info that nothing was found so token will
-                            // be
-                            // treat as UNKNOWN
+                            // be treat as UNKNOWN
                             final RobotToken newRobotToken = new RobotToken();
                             newRobotToken.setLineNumber(fp.getLine());
                             newRobotToken.setStartColumn(fp.getColumn());
@@ -477,7 +475,7 @@ public class ElementsUtility {
         boolean anyValuableToken = false;
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         for (final IRobotLineElement lineElem : lineElements) {
-            if (lineElem instanceof RobotToken) {
+            if (lineElem instanceof RobotToken && !lineElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                 anyValuableToken = true;
                 break;
             }

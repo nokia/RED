@@ -17,6 +17,7 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseDocumentationDumper;
+import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseEmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseExecutionRowDumper;
 import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseSetupDumper;
 import org.rf.ide.core.testdata.text.write.tables.testcases.TestCaseTagsDumper;
@@ -44,6 +45,7 @@ public class TestCasesSectionTableDumper extends AExecutableTableDumper {
         dumpers.add(new TestCaseTimeoutDumper(aDumpHelper));
         dumpers.add(new TestCaseUnknownSettingDumper(aDumpHelper));
         dumpers.add(new TestCaseExecutionRowDumper(aDumpHelper));
+        dumpers.add(new TestCaseEmptyLineDumper(aDumpHelper));
 
         return dumpers;
     }

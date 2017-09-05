@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -51,7 +52,11 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
 
-        newKeywordCall = parent.createKeywordCall(index, name, args, comment);
+        if (isEmptyContent(name, args, comment)) {
+            newKeywordCall = parent.createEmpty(index, name);
+        } else {
+            newKeywordCall = parent.createKeywordCall(index, name, args, comment);
+        }
         RedEventBroker.using(eventBroker)
             .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newKeywordCall)
             .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
@@ -60,5 +65,9 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new DeleteKeywordCallCommand(newArrayList(newKeywordCall)));
+    }
+
+    private static boolean isEmptyContent(final String name, final List<String> args, final String comment) {
+        return args.isEmpty() && comment.isEmpty() && Pattern.matches("^[\\s]*$", name);
     }
 }

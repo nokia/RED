@@ -212,7 +212,7 @@ public class TableElementDumperHelper {
             } else {
                 final Optional<Integer> elemPosInLine = lastLine.getElementPositionInLine(lastToken);
                 if (elemPosInLine.isPresent()) {
-                    elementPositionInLine = lastLine.getElementPositionInLine(lastToken).get() + 1;
+                    elementPositionInLine = elemPosInLine.get() + 1;
                 } else {
                     elementPositionInLine = -1;
                 }
@@ -298,6 +298,25 @@ public class TableElementDumperHelper {
         }
 
         return (dumps.size() > 0);
+    }
+    
+    public boolean dumpEOLAsItIs(final DumperHelper dumpHelper, final RobotFile model, final IRobotLineElement startToken, final List<RobotLine> lines) {
+    	
+        int offset = startToken.getFilePosition().getOffset();
+
+        final Optional<Integer> line = model.getRobotLineIndexBy(offset);
+        if (!line.isPresent()) {
+            return false;
+        }
+        final RobotLine lastLine = model.getFileContent().get(line.get());
+
+        final Optional<Integer> elemPosInLine = lastLine.getElementPositionInLine(startToken);
+        if (!elemPosInLine.isPresent()) {
+         	return false;
+        }
+
+        dumpHelper.getDumpLineUpdater().updateLine(model, lines, lastLine.getEndOfLine());
+        return true;
     }
 
     private boolean isAssigmentAfterCurrentToken(final IRobotLineElement prevToken,

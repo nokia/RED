@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -70,6 +71,15 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         getChildren().add(index, setting);
 
         return setting;
+    }
+
+    public RobotEmptyLine createEmpty(final int index, final String name) {
+        final RobotEmptyRow<?> robotEmptyRow = (RobotEmptyRow<?>) getModelUpdater().createEmptyLine(getLinkedElement(),
+                index, name);
+
+        final RobotEmptyLine emptyLine = new RobotEmptyLine(this, robotEmptyRow);
+        getChildren().add(index, emptyLine);
+        return emptyLine;
     }
 
     public abstract void removeUnitSettings(final RobotKeywordCall call);

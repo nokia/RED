@@ -50,6 +50,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
@@ -213,23 +214,21 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 line.setSeparatorType(separator.getProducedType());
                 RobotToken rt = null;
 
-                boolean wasPrettyAlign = false;
-                if (isPrettyAlignLineOnly(currentLineText)) {
-                    rt = new RobotToken();
-                    rt.setLineNumber(lineNumber);
-                    rt.setRaw(currentLineText);
-                    rt.setText(currentLineText);
-                    rt.setStartColumn(lastColumnProcessed);
-                    rt.setStartOffset(currentOffset);
-                    rt.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-                    currentOffset += rt.getRaw().length();
-                    line.addLineElement(rt);
-                    wasPrettyAlign = true;
-                }
 
                 final int textLength = currentLineText.length();
                 // check if is any data to process
-                if (textLength > 0 && !wasPrettyAlign) {
+                if (isPrettyAlignLineOnly(currentLineText)) {
+
+                    rt = processEmptyLine(line, processingState, parsingOutput,
+                            new FilePosition(lineNumber, lastColumnProcessed, currentOffset), currentLineText,
+                            robotFile.getName(), isNewLine);
+                    rt.setStartOffset(currentOffset);
+                    line.addLineElement(rt);
+
+                    currentOffset += textLength;
+                    lastColumnProcessed = textLength;
+
+                } else {
                     // consume all data
                     while (lastColumnProcessed < textLength) {
                         if (separator.hasNext()) {
@@ -238,8 +237,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                             final int startColumn = currentSeparator.getStartColumn();
                             final int remainingData = startColumn - lastColumnProcessed;
                             // {$a} | {$b} in this case we check if {$a} was
-                            // before
-                            // '|' pipe separator
+                            // before '|' pipe separator
                             if (remainingData > 0 || utility.shouldGiveEmptyToProcess(parsingOutput, separator,
                                     currentSeparator, line, processingState)) {
                                 final String rawText = text.substring(lastColumnProcessed, startColumn);
@@ -395,7 +393,9 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
     }
 
-    public abstract boolean isPrettyAlignLineOnly(final String currentLineText);
+    public boolean isPrettyAlignLineOnly(final String currentLineText) {
+        return RobotEmptyRow.isEmpty(currentLineText);
+    }
 
     @VisibleForTesting
     int handleCRLFcaseSplittedBetweenBuffers(final RobotFileOutput parsingOutput, final LineReader lineHolder,
@@ -518,7 +518,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             robotToken = alignUtility.applyPrettyAlignTokenIfIsValid(currentLine, processingState, robotFileOutput, fp,
                     text, fileName, robotToken);
 
-            useMapper = useMapper & !robotToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE);
+            useMapper = useMapper && !robotToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE);
 
             if (useMapper) {
                 robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput,
@@ -529,6 +529,24 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         utility.fixNotSetPositions(robotToken, fp);
 
         return robotToken;
+    }
+
+    @VisibleForTesting
+    protected RobotToken processEmptyLine(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final FilePosition fp, final String text, final String fileName,
+            final boolean isNewLine) {
+
+        RobotToken robotToken = new RobotToken();
+        robotToken.setFilePosition(fp);
+        robotToken.setText(text);
+        robotToken.setRaw(text);
+        robotToken.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+
+        robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput, fp,
+                text, robotToken);
+
+        return robotToken;
+
     }
 
     private boolean isCorrectTableHeader(final RobotToken robotToken) {

@@ -415,6 +415,9 @@ public enum RobotTokenType implements IRobotTokenType {
     TEST_CASE_ACTION_ARGUMENT(TableType.TEST_CASES),
     /**
      */
+    TEST_CASE_EMPTY_LINE(TableType.TEST_CASES),
+    /**
+     */
     KEYWORD_SETTING_UNKNOWN_DECLARATION(TableType.KEYWORDS, true),
     /**
      */
@@ -492,6 +495,9 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     KEYWORD_ACTION_ARGUMENT(TableType.KEYWORDS),
+    /**
+     */
+    KEYWORD_EMPTY_LINE(TableType.KEYWORDS),
     /**
      */
     FOR_TOKEN(
