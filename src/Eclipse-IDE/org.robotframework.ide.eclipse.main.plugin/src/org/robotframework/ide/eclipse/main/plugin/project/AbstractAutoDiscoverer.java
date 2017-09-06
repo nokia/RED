@@ -85,6 +85,10 @@ public abstract class AbstractAutoDiscoverer {
     void stopDiscovering() {
         if (serverJob != null) {
             serverJob.stopServer();
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            if (runtimeEnvironment != null) {
+                runtimeEnvironment.stopLibraryAutoDiscovering();
+            }
         }
     }
 

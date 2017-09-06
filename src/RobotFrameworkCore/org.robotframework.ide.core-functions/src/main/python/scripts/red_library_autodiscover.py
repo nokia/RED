@@ -5,6 +5,9 @@
 #
 
 
+RED_DRYRUN_PROCESSES = []
+
+
 def start_library_auto_discovering(port, suite_names, variable_mappings, data_source_paths):
     import os
     from robot.run import run
@@ -64,7 +67,13 @@ def start_library_auto_discovering_process(port, suite_names, variable_mappings,
 
     command.append(';'.join(python_paths + class_paths))
 
-    subprocess.Popen(command, stdin=subprocess.PIPE)
+    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
+
+
+def stop_library_auto_discovering_process():
+    for process in RED_DRYRUN_PROCESSES:
+        process.kill()
+    del RED_DRYRUN_PROCESSES[:]
 
 
 def _is_windows_platform():
