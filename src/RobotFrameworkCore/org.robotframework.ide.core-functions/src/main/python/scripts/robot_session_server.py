@@ -179,6 +179,14 @@ def start_library_auto_discovering(port, suite_names, variable_mappings, data_so
 @logresult
 @encode_result_or_exception
 @logargs
+def stop_library_auto_discovering():
+    import red_library_autodiscover
+    red_library_autodiscover.stop_library_auto_discovering_process()
+
+
+@logresult
+@encode_result_or_exception
+@logargs
 def create_libdoc(libname, python_paths, class_paths):
     def to_call():
         import red_libraries
@@ -280,6 +288,7 @@ if __name__ == '__main__':
     server.register_function(get_robot_version, 'getRobotVersion')
     server.register_function(is_virtualenv, 'isVirtualenv')
     server.register_function(start_library_auto_discovering, 'startLibraryAutoDiscovering')
+    server.register_function(stop_library_auto_discovering, 'stopLibraryAutoDiscovering')
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
 
