@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PmmBEH5zEeeUiMBqkyjlBQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/11/17 2:36 PM
+Save-Time: 9/6/17 2:50 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -116,6 +116,9 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		wait-for-remote-connection 
 		run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject"
 		
+		try -times 3 -delay 1000 -command{
+			get-window "Debugger error"
+		}
 		//suspend test always
 		with [get-window "Debugger error"] {
 		    get-button "Remember my decision" | check
@@ -129,16 +132,30 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		    get-item "${var from remote}" | get-property "values['Value']" | equals 9 | verify-true
 		}
 		with [get-view Variables | get-tree] {
-		    get-item "&{animals}" | get-property childCount | equals 1 | verify-true
+		    get-item "&{animals}" | get-property childCount | equals 2 | verify-true
+		    
+		    get-item "&{animals}" | get-property "values['Name']" | equals "&{animals}" | verify-true
+		    get-item "&{animals}" | get-property "values['Value']" | equals "DotDict[2]" | verify-true
+		    
 		    get-item "&{animals}/cat" | get-property "values['Name']" | equals cat | verify-true
 		    get-item "&{animals}/cat" | get-property "values['Value']" | equals 3 | verify-true
-		    get-item "@{newList}" | get-property childCount | equals 1 | verify-true
+		    
+		    get-item "&{animals}/tiger" | get-property "values['Name']" | equals tiger | verify-true
+    		get-item "&{animals}/tiger" | get-property "values['Value']" | equals 1 | verify-true
+    
+		    get-item "@{newList}" | get-property childCount | equals 3 | verify-true
 		    get-item "@{newList}" | get-property "values['Name']" | equals "@{newList}" | verify-true
 		    get-item "@{newList}" | get-property "values['Value']" | equals "list[3]" | verify-true
 		    get-item "@{newList}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 		    get-item "@{newList}/\\[0\\]" | get-property "values['Value']" | equals a1 | verify-true
-		    get-item "&{animals}" | get-property "values['Name']" | equals "&{animals}" | verify-true
-		    get-item "&{animals}" | get-property "values['Value']" | equals "DotDict[2]" | verify-true
+		   
+		    get-item "@{newList}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
+		    get-item "@{newList}/\\[1\\]" | get-property "values['Value']" | equals a2 | verify-true
+		    
+		    get-item "@{newList}/\\[2\\]" | get-property "values['Name']" | equals "[2]" | verify-true
+		    get-item "@{newList}/\\[2\\]" | get-property "values['Value']" | equals a3 | verify-true
+    
+		    
 		}
 		
 		check-error-in-editor  -line 6 -text "RED debugger: Unable to find executable call of 'BuiltIn.Log' keyword\n"
