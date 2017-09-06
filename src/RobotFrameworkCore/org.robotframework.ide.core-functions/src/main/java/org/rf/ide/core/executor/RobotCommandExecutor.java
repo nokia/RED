@@ -40,4 +40,6 @@ interface RobotCommandExecutor {
 
     void startLibraryAutoDiscovering(int port, List<String> suiteNames, List<String> dataSourcePaths,
             List<String> variableMappings, EnvironmentSearchPaths additionalPaths);
+
+    void stopLibraryAutoDiscovering();
 }
