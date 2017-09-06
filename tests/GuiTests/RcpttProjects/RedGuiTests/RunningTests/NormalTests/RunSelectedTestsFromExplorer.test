@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7wTjoPUsEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/22/17 6:10 PM
+Save-Time: 9/6/17 12:09 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "LaunchesTests/FirstFile.robot/Test Cases" "LaunchesTests/SecondTest.robot/Test Cases"
     get-menu Run | click
 }    
-wait 1000 
+wait-for-message-log -times 4 -delay 1000
 //check message log    
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 1\n"
     + ".* : INFO : 1\n"
@@ -47,6 +47,7 @@ with [get-view "Project Explorer" | get-tree] {
     get-menu Run | click
 }
 
+wait-for-message-log -times 4 -delay 1000
 //check Messgae log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 3\n"
     + ".* : INFO : 3\n"
@@ -90,6 +91,8 @@ with [get-view "Project Explorer" | get-tree] {
     select "LaunchesTests/tsv_test/FirstFile.tsv" "LaunchesTests/FirstFile.robot"
     get-menu "Run As/1 Robot Test" | click
 }
+
+wait-for-message-log -times 4 -delay 1000
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 1\n"
     + ".* : INFO : 1\n"
     + "Ending test: LaunchesTests.FirstFile.test 1\n\n"
@@ -109,6 +112,8 @@ with [get-view "Project Explorer" | get-tree] {
     select "LaunchesTests/tests/FirstFile.robot/Variables" "LaunchesTests/FirstFile.robot/Test Cases/test 1"
     get-menu Run | click
 }
+
+wait-for-message-log -times 4 -delay 1000
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.FirstFile.test 1\n"
     + ".* : INFO : 1\n"
     + "Ending test: LaunchesTests.FirstFile.test 1" | verify-true
@@ -162,6 +167,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "LaunchesTests/tests" "LaunchesTests/TestSuiteFolder"
     get-menu "Run As/1 Robot Test" | click
 }
+wait-for-message-log -times 4 -delay 1000
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.Tests.FirstFile.test 1\n"
     + ".* : INFO : 1a\n"
     + "Ending test: LaunchesTests.Tests.FirstFile.test 1\n\n"
@@ -178,6 +184,7 @@ with [get-view "Project Explorer" | get-tree] {
     select "LaunchesTests/tests" "LaunchesTests/tsv_test"
     get-menu "Run As/1 Robot Test" | click
 }
+wait-for-message-log -times 4 -delay 1000
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: LaunchesTests.Tests.FirstFile.test 1\n"
     + ".* : INFO : 1a\n"
     + "Ending test: LaunchesTests.Tests.FirstFile.test 1\n\n"
