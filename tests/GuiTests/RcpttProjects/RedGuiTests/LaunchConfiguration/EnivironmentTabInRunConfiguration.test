@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cufqoN2BEea53q6vmC55pw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 3:17 PM
+Save-Time: 9/6/17 1:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -90,6 +90,7 @@ with [get-window "Run Configurations"] {
     get-button Run | click
 }
 
+wait-for-message-log -times 3 -delay 1000
 //check if var was logged
 get-view "Message Log" | get-editbox | get-object |invoke getLine 1| matches  ".* : INFO : 23\n"
 get-view "Message Log" | get-editbox |get-property "getLineCount()" -raw | gt 3 | verify-true
@@ -109,6 +110,7 @@ with [get-window "Run Configurations"] {
     get-button Run | click
 }
 
+wait-for-message-log -times 3 -delay 1000
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
 	    + ".* : INFO : 23\n"
