@@ -5,6 +5,9 @@
 #
 
 
+RED_DRYRUN_PROCESSES = []
+
+
 def start_library_auto_discovering(port, suite_names, variable_mappings, data_source_paths):
     import os
     from robot.run import run
@@ -32,59 +35,45 @@ def start_library_auto_discovering(port, suite_names, variable_mappings, data_so
         os.chdir(current_dir)
 
 
-def start_library_auto_discovering_process(port, suite_names, variable_mappings, data_source_paths, python_paths,
-                                           class_paths):
+def start_library_auto_discovering_process(port, suite_names, variable_mappings, data_source_paths, python_paths=[],
+                                           class_paths=[]):
     import os
     import sys
     import platform
     import subprocess
 
     scripts_location_path = os.path.dirname(os.path.realpath(__file__))
-    listener_path = os.path.join(scripts_location_path, 'TestRunnerAgent.py')
-    prerunmodifier_path = os.path.join(scripts_location_path, 'SuiteVisitorImportProxy.py')
 
     command = [sys.executable]
 
-    if 'Jython' in platform.python_implementation():
+    if class_paths and 'Jython' in platform.python_implementation():
         path_separator = ';' if _is_windows_platform() else ':'
         command.append('-J-cp')
         command.append(path_separator.join(class_paths))
 
-    command.append('-m')
-    command.append('robot.run')
-    command.append('--listener')
-    command.append(listener_path + ':' + str(port))
-    command.append('--prerunmodifier')
-    command.append(prerunmodifier_path + ':' + ':'.join(suite_names))
-    command.append('--runemptysuite')
-    command.append('--dryrun')
-    command.append('--output')
-    command.append('NONE')
-    command.append('--report')
-    command.append('NONE')
-    command.append('--log')
-    command.append('NONE')
-    command.append('--console')
-    command.append('NONE')
+    command.append(os.path.join(scripts_location_path, 'red_library_autodiscover.py'))
 
-    if python_paths:
-        command.append('--pythonpath')
-        command.append(':'.join(python_paths + class_paths))
+    command.append(str(port))
 
-    for suite in suite_names:
-        command.append('--suite')
-        command.append(suite)
+    if suite_names:
+        command.append('-suitenames')
+        command.append(';'.join(suite_names))
 
-    for variable in variable_mappings:
-        command.append('--variable')
-        command.append(variable)
+    if variable_mappings:
+        command.append('-variables')
+        command.append(';'.join(variable_mappings))
 
-    command.extend(data_source_paths)
+    command.append(';'.join(data_source_paths))
 
-    if os.path.isdir(data_source_paths[0]):
-        subprocess.Popen(command, stdin=subprocess.PIPE, cwd=data_source_paths[0])
-    else:
-        subprocess.Popen(command, stdin=subprocess.PIPE)
+    command.append(';'.join(python_paths + class_paths))
+
+    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
+
+
+def stop_library_auto_discovering_process():
+    for process in RED_DRYRUN_PROCESSES:
+        process.kill()
+    del RED_DRYRUN_PROCESSES[:]
 
 
 def _is_windows_platform():

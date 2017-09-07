@@ -484,6 +484,14 @@ public class RobotRuntimeEnvironment {
         }
     }
 
+    public void stopLibraryAutoDiscovering() throws RobotEnvironmentException {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.stopLibraryAutoDiscovering();
+        }
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(location, version);
