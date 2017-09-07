@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1FqyIP1CEeS5jLC3g3M4Lw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/8/17 10:21 AM
+Save-Time: 9/7/17 5:53 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -45,7 +45,9 @@ get-editor "For200TestSuite.robot" | get-left-ruler | get-ruler-column Annotatio
 exec-with-options -disableJobWaiting -command {
 	get-view "Project Explorer" | get-tree | select "For200Project/For200TestSuite.robot" 
 	    | get-menu "Debug As/1 Robot Test" | click
-   	wait-for-thread -file "For200TestSuite.robot"
+	    
+   	wait-for-specified_line-in-first-thread -line 8 -nr_of_frames 5
+    wait-for-variables
    	   
 	repeat [val index] -times 5 -command{
 		
@@ -63,11 +65,9 @@ exec-with-options -disableJobWaiting -command {
 		//step over - will go to FOR KW - line 7
 		get-button "Step Over (F6)" | click
 	
-		try -times 10 -delay 300 -command{
-			get-view Debug | get-tree 
-			    | get-item "For200TestSuite.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
-			    | get-property childCount | equals 5 | verify-true
-		}
+		wait-for-specified_line-in-first-thread -line 7 -nr_of_frames 5
+		wait-for-variables
+		
 		check-debug-marker-on-ruler -line 7 -script_name "For200TestSuite.robot"	
 		
 		with [get-view Variables | get-tree] {
