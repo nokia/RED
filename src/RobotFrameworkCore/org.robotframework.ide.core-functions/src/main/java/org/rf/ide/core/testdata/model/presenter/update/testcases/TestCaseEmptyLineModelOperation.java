@@ -28,7 +28,7 @@ public class TestCaseEmptyLineModelOperation implements IExecutablesStepsHolderE
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final int index, final String actionName,
+    public AModelElement<TestCase> create(final TestCase testCase, final int index, final String actionName,
             final List<String> args, final String comment) {
         final RobotEmptyRow<TestCase> row = new RobotEmptyRow<>();
         row.setParent(testCase);

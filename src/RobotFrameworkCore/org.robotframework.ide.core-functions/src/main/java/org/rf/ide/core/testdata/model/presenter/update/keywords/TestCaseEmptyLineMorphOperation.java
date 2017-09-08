@@ -28,7 +28,7 @@ public class TestCaseEmptyLineMorphOperation implements IExecutablesStepsHolderE
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String actionName,
+    public AModelElement<UserKeyword> create(final UserKeyword userKeyword, final int index, final String actionName,
             final List<String> args, final String comment) {
         final RobotEmptyRow<UserKeyword> row = new RobotEmptyRow<>();
         row.setParent(userKeyword);

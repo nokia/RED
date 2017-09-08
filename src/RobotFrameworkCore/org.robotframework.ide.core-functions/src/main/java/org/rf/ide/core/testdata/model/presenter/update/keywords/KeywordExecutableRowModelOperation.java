@@ -24,7 +24,7 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String actionName,
+    public AModelElement<UserKeyword> create(final UserKeyword userKeyword, final int index, final String actionName,
             final List<String> args, final String comment) {
         final RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<>();
         row.setParent(userKeyword);
