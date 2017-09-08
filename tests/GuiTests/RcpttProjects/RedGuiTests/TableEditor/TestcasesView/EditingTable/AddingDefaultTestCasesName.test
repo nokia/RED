@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5zRY8GVSEeayWasF5RXANg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/14/16 6:14 PM
+Save-Time: 9/8/17 3:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -141,7 +141,7 @@ check-test_case-row -file "TestFile.robot" -row 16 -tc "...add new case"
 get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M1+s"
 
 //check if \ is added to new line
-check-test_case-row -file "TestFile.robot" -row 5 -tc "\\" 
+check-test_case-row -file "TestFile.robot" -row 5 -tc "" 
 
 // go left and change tag  - checking if after saving user can move focus
 with [get-editor "TestFile.robot"] {
@@ -160,7 +160,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "my test\n"
     + "case\n"
     + "    Log\n"
-    + "    \\\n"
+    + "    \n"
     + "case 1\n"
     + "    Catenate    1    2    3    4    #com\n"
     + "    New line\n"
