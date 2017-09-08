@@ -8,7 +8,6 @@ package org.rf.ide.core.testdata.model.table;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -45,7 +44,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public List<RobotToken> getComment() {
-        return Collections.unmodifiableList(new ArrayList<>());
+        return Collections.emptyList();
     }
 
     @Override
