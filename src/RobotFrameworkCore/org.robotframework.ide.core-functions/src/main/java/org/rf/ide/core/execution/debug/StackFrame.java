@@ -5,18 +5,26 @@
  */
 package org.rf.ide.core.execution.debug;
 
+import static com.google.common.collect.Sets.newLinkedHashSet;
+import static java.util.Collections.unmodifiableSet;
+
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.debug.StackFrameVariables.StackVariablesDelta;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
+import org.rf.ide.core.execution.debug.contexts.SetupTeardownContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 import org.rf.ide.core.testdata.model.FileRegion;
+
+import com.google.common.base.Preconditions;
 
 public class StackFrame {
 
@@ -32,22 +40,35 @@ public class StackFrame {
 
     private StackFrameVariables variables;
     private StackVariablesDelta lastDelta;
+
+    private final LinkedHashSet<URI> loadedResources;
     
     private final EnumSet<StackFrameMarker> markers;
 
+    StackFrame(final String name, final FrameCategory category, final int level, final StackFrameContext context,
+            final Set<URI> loadedResources) {
+        this(name, category, level, context, () -> null, loadedResources);
+    }
+
     StackFrame(final String name, final FrameCategory category, final int level, final StackFrameContext context) {
-        this(name, category, level, context, () -> null);
+        this(name, category, level, context, () -> null, new LinkedHashSet<>());
     }
 
     StackFrame(final String name, final FrameCategory category, final int level, final StackFrameContext context,
             final Supplier<URI> contextPathSupplier) {
+        this(name, category, level, context, contextPathSupplier, new LinkedHashSet<>());
+    }
+
+    private StackFrame(final String name, final FrameCategory category, final int level,
+            final StackFrameContext context, final Supplier<URI> contextPathSupplier, final Set<URI> loadedResources) {
         this.name = name;
         this.category = category;
         this.level = level;
         this.context = context;
-        this.originalErrorMessage = context.isErroneous() ? context.getErrorMessage().get() : "";
-        this.markers = EnumSet.noneOf(StackFrameMarker.class);
         this.contextPath = Optional.ofNullable(context.getAssociatedPath().orElseGet(contextPathSupplier));
+        this.originalErrorMessage = context.isErroneous() ? context.getErrorMessage().get() : "";
+        this.loadedResources = newLinkedHashSet(loadedResources);
+        this.markers = EnumSet.noneOf(StackFrameMarker.class);
     }
 
     public String getName() {
@@ -58,21 +79,41 @@ public class StackFrame {
         return level;
     }
 
+    Set<URI> getLoadedResources() {
+        return unmodifiableSet(loadedResources);
+    }
+
+    void addLoadedResource(final URI resourceUri) {
+        Preconditions.checkState(isSuiteContext());
+        loadedResources.add(resourceUri);
+    }
+
     public boolean hasCategory(final FrameCategory category) {
         return this.category == category;
     }
 
     public boolean isSuiteContext() {
-        return hasCategory(FrameCategory.SUITE) && context instanceof SuiteContext;
+        return hasCategory(FrameCategory.SUITE);
     }
 
     public boolean isSuiteDirectoryContext() {
-        return hasCategory(FrameCategory.SUITE) && context instanceof SuiteContext
-                && ((SuiteContext) context).isDirectory();
+        if (isSuiteContext()) {
+            if (context instanceof SuiteContext) {
+                return ((SuiteContext) context).isDirectory();
+
+            } else if (context instanceof SetupTeardownContext) {
+                // suite context may have been moved to setup/teardown context
+                final StackFrameContext prevContext = ((SetupTeardownContext) context).getPreviousContext();
+                if (prevContext instanceof SuiteContext) {
+                    return ((SuiteContext) prevContext).isDirectory();
+                }
+            }
+        }
+        return false;
     }
 
     public boolean isSuiteFileContext() {
-        return hasCategory(FrameCategory.SUITE) && !(isSuiteDirectoryContext());
+        return isSuiteContext() && !isSuiteDirectoryContext();
     }
 
     public boolean isTestContext() {
