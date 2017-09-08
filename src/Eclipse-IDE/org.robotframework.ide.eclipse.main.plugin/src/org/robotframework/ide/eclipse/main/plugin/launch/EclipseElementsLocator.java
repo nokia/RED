@@ -13,7 +13,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,13 +70,13 @@ public class EclipseElementsLocator implements ElementsLocator {
 
     private final IProject project;
 
-    private final LoadingCache<TypedUri, URI> pathsTranslationsCache = CacheBuilder.newBuilder()
+    private final LoadingCache<TypedUri, Optional<URI>> pathsTranslationsCache = CacheBuilder.newBuilder()
             .maximumSize(10000)
-            .build(new CacheLoader<TypedUri, URI>() {
+            .build(new CacheLoader<TypedUri, Optional<URI>>() {
 
                 @Override
-                public URI load(final TypedUri remoteUri) {
-                    return translate(remoteUri.uri, remoteUri.isDirectory);
+                public Optional<URI> load(final TypedUri remoteUri) {
+                    return Optional.ofNullable(translate(remoteUri.uri, remoteUri.isDirectory));
                 }
             });
 
@@ -101,8 +100,6 @@ public class EclipseElementsLocator implements ElementsLocator {
                     return keywordEntities.getPossibleKeywords(kwWithFile.keywordName, false);
                 }
             });
-
-    private final Map<IPath, AccessibleKeywordsEntities> keywords = new HashMap<>();
 
     public EclipseElementsLocator(final IProject project) {
         this.model = RedPlugin.getModelManager().getModel();
@@ -186,7 +183,7 @@ public class EclipseElementsLocator implements ElementsLocator {
         }
 
         final URI localUri = currentLocalSuitePath == null
-                ? pathsTranslationsCache.getUnchecked(new TypedUri(path, isDirectory))
+                ? pathsTranslationsCache.getUnchecked(new TypedUri(path, isDirectory)).orElse(null)
                 : resolve(currentLocalSuitePath, path);
 
         if (localUri == null) {
@@ -302,7 +299,8 @@ public class EclipseElementsLocator implements ElementsLocator {
         // no keyword found, but maybe it could be found in dynamically loaded resources set
         for (final URI dynResourceRemoteUri : loadedResources) {
             final URI dynamicResourceLocalUri = pathsTranslationsCache
-                    .getUnchecked(new TypedUri(dynResourceRemoteUri, false));
+                    .getUnchecked(new TypedUri(dynResourceRemoteUri, false))
+                    .orElse(null);
             if (dynamicResourceLocalUri != null) {
                 context = findKeywordContext(libOrResourceName, keywordName, dynamicResourceLocalUri);
                 if (context != null) {

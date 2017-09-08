@@ -10,6 +10,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseDocumentationModelOperation;
+import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseEmptyLineModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseExecutableRowModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseSetupModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTagsModelOperation;
@@ -19,6 +20,7 @@ import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTimeout
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseUnkownModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordArgumentsMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordDocumentationMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordEmptyLineMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordExecutableRowMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordReturnMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTagsMorphOperation;
@@ -34,14 +36,29 @@ import com.google.common.annotations.VisibleForTesting;
 public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<TestCase> {
 
     private static final List<IExecutablesStepsHolderElementOperation<TestCase>> ELEMENT_OPERATIONS = newArrayList(
-            new TestCaseExecutableRowModelOperation(), new TestCaseDocumentationModelOperation(),
+            new TestCaseEmptyLineModelOperation(), new TestCaseExecutableRowModelOperation(),
+            new TestCaseDocumentationModelOperation(),
             new TestCaseSetupModelOperation(), new TestCaseTagsModelOperation(), new TestCaseTeardownModelOperation(),
             new TestCaseTemplateModelOperation(), new TestCaseTimeoutModelOperation(),
-            new TestCaseUnkownModelOperation(), new UserKeywordExecutableRowMorphOperation(),
+            new TestCaseUnkownModelOperation(), new UserKeywordEmptyLineMorphOperation(),
+            new UserKeywordExecutableRowMorphOperation(),
             new UserKeywordTagsMorphOperation(), new UserKeywordDocumentationMorphOperation(),
             new UserKeywordTeardownMorphOperation(), new UserKeywordTimeoutMorphOperation(),
             new UserKeywordArgumentsMorphOperation(), new UserKeywordReturnMorphOperation(),
             new UserKeywordUnknownSettingMorphOperation());
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public AModelElement<?> createEmptyLine(final TestCase testCase, final int index, final String name) {
+        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
+                ModelType.TEST_CASE_EMPTY_LINE);
+        if (operationHandler == null || testCase == null) {
+            throw new IllegalArgumentException("Unable to create empty line. Operation handler is missing");
+        }
+        final AModelElement<?> row = operationHandler.create(testCase, index, name, null, null);
+        testCase.addElement((AModelElement<TestCase>) row, index);
+        return row;
+    }
 
     @Override
     public AModelElement<?> createSetting(final TestCase testCase, final int index, final String settingName,

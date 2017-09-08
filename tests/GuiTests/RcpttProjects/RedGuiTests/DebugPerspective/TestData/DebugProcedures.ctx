@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/11/17 1:58 PM
+Save-Time: 9/7/17 3:49 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -101,4 +101,9 @@ proc "wait-for-specified_line-in-first-thread" [val line] [val nr_of_frames] [va
 	}
 }
 
+proc "wait-for-variables"{
+	try -times 4 -delay 500 -command{
+			get-view Variables | get-tree | get-property itemCount | equals 0 | verify-false
+		}	
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

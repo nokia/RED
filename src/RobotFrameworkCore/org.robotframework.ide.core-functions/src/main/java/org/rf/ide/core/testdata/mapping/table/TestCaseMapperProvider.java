@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.mapping.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.mapping.testcases.TestCaseEmptyLineMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseNameMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseSetupKeywordArgumentMapper;
 import org.rf.ide.core.testdata.mapping.testcases.TestCaseSetupKeywordMapper;
@@ -48,6 +49,7 @@ public class TestCaseMapperProvider {
         MAPPERS.add(new TestCaseTimeoutMessageMapper());
         MAPPERS.add(new TestDocumentationMapper());
         MAPPERS.add(new TestDocumentationTextMapper());
+        MAPPERS.add(new TestCaseEmptyLineMapper());
     }
 
 

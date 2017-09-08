@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -29,7 +30,7 @@ class SetSimpleKeywordCallName extends EditorCommand {
 
     @Override
     public void execute() {
-        oldName = call.isExecutable() ? call.getName() : "[" + call.getName() + "]";
+        oldName = call.isExecutable() || call instanceof RobotEmptyLine ? call.getName() : "[" + call.getName() + "]";
 
         final AModelElement<?> linkedElement = call.getLinkedElement();
         linkedElement.getDeclaration().setText(newName);
