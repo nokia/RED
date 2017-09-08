@@ -1,0 +1,87 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: UTFVariableInVariableMapping
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _dHj6oJSLEeeFCv2BTQK5Bg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/8/17 2:17 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// set sth to .robot file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  9\n"
+    + "    log  10\n"
+    + "    \n"
+    + "test 2\n"
+    + "    log  7  \n"
+    + "    second kw  \n\n"
+    + "*** Keywords ***\n"
+    + "my keyword\n"
+    + "    Fail  \"Special filing kw\"\n"
+    + "    \n"
+    + "second kw\n"
+    + "    Should Be Equal    1    1\n"
+    + "    \n"
+    + "my kw with args\n"
+    + "    [Arguments]    ${x}\n"
+    + "    Fail  \"this will fail too\"    \n"
+    + "    \n"
+    + "this will pass\n"
+    + "    log  8" 
+// save it
+get-button "Save \((Ctrl|M1)\+S\)" | click
+// open red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" 
+    | get-menu "Open With/RED Project Editor" | click
+// go to Variables mappings and add variable with UTF-8 charset
+get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
+    | key-type Enter
+with [get-window "Add variable mapping"] {
+    with [get-editbox -after [get-label Name]] {
+        set-text "${var}"
+        key-type "M1+M3+e" "\\u0119"
+        set-text "${vaęr}"
+        key-type "M1+M3+e" "\\u0119"
+        key-type "M1+M3+a" "\\u0105"
+        set-text "${vaęąr}"
+        key-type "M1+M3+a" "\\u0105"
+    }
+    with [get-editbox -after [get-label Value]] {
+        click-text 1
+        key-type "M1+M3+z" "\\u017C"
+        set-text "valueż"
+        key-type "M1+M3+z" "\\u017C"
+        key-type "M1+M3+x" "\\u017A"
+        set-text "valueżź"
+        key-type "M1+M3+x" "\\u017A"
+        key-type "M1+M3+c" "\\u0107"
+        set-text "valueżźć"
+        key-type "M1+M3+c" "\\u0107"
+    }
+    get-button OK | click
+}
+// verify no Problems
+get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table | key-type "M1+s"
+get-view Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+// open red.xml
+get-editor "RobotProject/red.xml" | click
+get-editor "TestFile.robot" | click
+get-editor "RobotProject/red.xml" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+// verify no Problems
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+// verify Variables mappings section in red.xml
+with [get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table] {
+    get-item "${vaęąr}" | get-property "columns[0]" | equals "${vaęąr}" | verify-true
+    get-item "${vaęąr}" | get-property "columns[1]" | equals "valueżźć" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
