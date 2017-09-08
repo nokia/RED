@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1bJKAEglEeaRB_Xz0tiYpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/15/16 5:04 PM
+Save-Time: 9/8/17 5:03 PM
 Testcase-Type: ecl
 Verifications: _WcPksEqdEeaRB_Xz0tiYpg
 
@@ -26,35 +26,50 @@ get-view Outline | get-tree | get-item "file1.robot/Variables" | get-property se
 
 list  "Variables/a" "Variables/a1" "Variables/a2" "Variables/a3" "Variables/a4" "Variables/a5" "Variables/a5"| each [val element] {
 	get-editor "file1.robot" | get-text-viewer | key-type Down
-	get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected | equals true | verify-true
+	get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected  -raw |  equals true 
+		| assert-true -message [format "Element '%s' is not selected" $element ]
 }
 
 //cursor set in Test cases
-list  "Test Cases" "Test Cases/open" "Test Cases/open/log"  "Test Cases/open/78 items" "Test Cases/open/78 items"| each [val element] [val index] {
+list  "Test Cases" "Test Cases/open" "Test Cases/open/log"  "Test Cases/open/78 items" | each [val element] {
 	get-editor "file1.robot" | get-text-viewer | key-type Down
-	get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected |  equals true | verify-true
+	get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected -raw |  equals true 
+		| assert-true -message [format "Element '%s' is not selected" $element ]
 	
 }
 
+get-editor "file1.robot" | get-text-viewer | key-type Down
 
 //cursor set in Settings
 list  "Settings" "Settings" "Settings/Resource/${\\}" "Settings/Resource/${\\}" "Settings/Documentation" 
 		"Settings/Library/OperatingSystem" "Settings/Library/OperatingSystem" "Settings/Resource/no_file.robot" "Settings/Resource/no_file.robot"
-		"Settings/Test Timeout" "Settings/Test Timeout" "Settings/Test Timeout"
+		"Settings/Test Timeout" "Settings/Test Timeout"
 			| each [val element] [val index] {
 	get-editor "file1.robot" | get-text-viewer | key-type Down
 	get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected |  equals true | verify-true
 	
 }
 
-
+get-editor "file1.robot" | get-text-viewer | key-type Down
 //cursor set in Keywords
-list  "Keywords"  "Keywords/kw 1"  "Keywords/kw 1/Catenate"  "Keywords/kw 1/Catenate"  "Keywords/78 items" "Keywords/78 items/Convert To Bytes" "Keywords/78 items/log"
-			| each [val element] [val index] {
-	get-editor "file1.robot" | get-text-viewer | key-type Down
-	get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected |  equals true | verify-true
+list  "Keywords"  "Keywords/kw 1"  "Keywords/kw 1/Catenate"
+	| each [val element] [val index] {
+		get-editor "file1.robot" | get-text-viewer | key-type Down
+		get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected -raw
+	   		|  equals true | assert-true -message [format "Element '%s' is not selected" $element ]
 	
 }
+
+get-editor "file1.robot" | get-text-viewer | key-type Down
+
+list  "Keywords/78 items" "Keywords/78 items/Convert To Bytes" "Keywords/78 items/log"
+	| each [val element] [val index] {
+		get-editor "file1.robot" | get-text-viewer | key-type Down
+		get-view Outline | get-tree | get-item [format "file1.robot/%s" $element] | get-property selected -raw
+	   		|  equals true | assert-true -message [format "Element '%s' is not selected" $element ]
+	
+}
+
 
 //select var  $a2 and check tetx selction
 get-view Outline | get-tree | select "file1.robot/Variables/a2"
