@@ -53,22 +53,21 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             new TestCaseTemplateMorphOperation(), new TestCaseTimeoutMorphOperation(),
             new TestCaseUnknownSettingMorphOperation());
 
-    @SuppressWarnings("unchecked")
     @Override
-    public AModelElement<?> createEmptyLine(final UserKeyword userKeyword, final int index, final String name) {
+    public AModelElement<UserKeyword> createEmptyLine(final UserKeyword userKeyword, final int index, final String name) {
         final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
                 ModelType.USER_KEYWORD_EMPTY_LINE);
         if (operationHandler == null || userKeyword == null) {
             throw new IllegalArgumentException(
                     "Unable to create empty line. Operation handler is missing");
         }
-        final AModelElement<?> row = operationHandler.create(userKeyword, index, name, null, null);
-        userKeyword.addElement((AModelElement<UserKeyword>) row, index);
+        final AModelElement<UserKeyword> row = operationHandler.create(userKeyword, index, name, null, null);
+        userKeyword.addElement(row, index);
         return row;
     }
-    
+
     @Override
-    public AModelElement<?> createSetting(final UserKeyword userKeyword, final int index, final String settingName,
+    public AModelElement<UserKeyword> createSetting(final UserKeyword userKeyword, final int index, final String settingName,
             final String comment, final List<String> args) {
         final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(settingName);
         if (operationHandler == null || userKeyword == null) {
@@ -78,9 +77,8 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
         return operationHandler.create(userKeyword, index, settingName, args, comment);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public AModelElement<?> createExecutableRow(final UserKeyword userKeyword, final int index,
+    public AModelElement<UserKeyword> createExecutableRow(final UserKeyword userKeyword, final int index,
             final String action, final String comment, final List<String> args) {
         final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
                 ModelType.USER_KEYWORD_EXECUTABLE_ROW);
@@ -88,8 +86,8 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
             throw new IllegalArgumentException(
                     "Unable to create " + action + " executable row. Operation handler is missing");
         }
-        final AModelElement<?> row = operationHandler.create(userKeyword, index, action, args, comment);
-        userKeyword.addElement((AModelElement<UserKeyword>) row, index);
+        final AModelElement<UserKeyword> row = operationHandler.create(userKeyword, index, action, args, comment);
+        userKeyword.addElement(row, index);
         return row;
     }
 
