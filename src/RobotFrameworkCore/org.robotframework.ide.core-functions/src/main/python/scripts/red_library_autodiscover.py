@@ -9,10 +9,14 @@ RED_DRYRUN_PROCESSES = []
 
 
 def start_library_auto_discovering(port, suite_names, variable_mappings, data_source_paths):
+    import sys
     import os
     from robot.run import run
     from TestRunnerAgent import TestRunnerAgent
     from SuiteVisitorImportProxy import SuiteVisitorImportProxy
+
+    # current dir is needed in sys.path
+    sys.path.append('.')
 
     current_dir = os.getcwd()
 
@@ -37,37 +41,24 @@ def start_library_auto_discovering(port, suite_names, variable_mappings, data_so
 
 def start_library_auto_discovering_process(port, suite_names, variable_mappings, data_source_paths, python_paths=[],
                                            class_paths=[]):
-    import os
     import sys
-    import platform
+    import os
     import subprocess
 
-    scripts_location_path = os.path.dirname(os.path.realpath(__file__))
-
     command = [sys.executable]
-
-    if class_paths and 'Jython' in platform.python_implementation():
-        path_separator = ';' if _is_windows_platform() else ':'
-        command.append('-J-cp')
-        command.append(path_separator.join(class_paths))
-
-    command.append(os.path.join(scripts_location_path, 'red_library_autodiscover.py'))
-
+    command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'red_library_autodiscover.py'))
     command.append(str(port))
-
     if suite_names:
         command.append('-suitenames')
         command.append(';'.join(suite_names))
-
     if variable_mappings:
         command.append('-variables')
         command.append(';'.join(variable_mappings))
-
     command.append(';'.join(data_source_paths))
 
-    command.append(';'.join(python_paths + class_paths))
+    dryrun_env = _create_dryrun_environment(python_paths, class_paths)
 
-    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE))
+    RED_DRYRUN_PROCESSES.append(subprocess.Popen(command, stdin=subprocess.PIPE, env=dryrun_env))
 
 
 def stop_library_auto_discovering_process():
@@ -76,12 +67,37 @@ def stop_library_auto_discovering_process():
     del RED_DRYRUN_PROCESSES[:]
 
 
+def _create_dryrun_environment(python_paths, class_paths):
+    import os
+    import platform
+
+    env = os.environ.copy()
+
+    if python_paths:
+        _extend_env_path_variable(env, 'PYTHONPATH', python_paths)
+
+    if class_paths and 'Jython' in platform.python_implementation():
+        _extend_env_path_variable(env, 'PYTHONPATH', class_paths)
+        _extend_env_path_variable(env, 'CLASSPATH', class_paths)
+
+    return env
+
+
+def _extend_env_path_variable(env, variable_name, paths):
+    path_separator = ';' if _is_windows_platform() else ':'
+    if variable_name in env:
+        env[variable_name] = env[variable_name] + path_separator + path_separator.join(paths)
+    else:
+        env[variable_name] = path_separator.join(paths)
+
+
 def _is_windows_platform():
     import platform
     if 'Jython' in platform.python_implementation():
         import java.lang.System
         return 'win' in java.lang.System.getProperty('os.name').lower()
     return platform.system() == 'Windows'
+
 
 if __name__ == '__main__':
     import sys
