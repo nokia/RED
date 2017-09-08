@@ -6,13 +6,13 @@ import org.rf.ide.core.testdata.model.AModelElement;
 
 public interface IExecutablesTableModelUpdater<T> {
 
-    public AModelElement<?> createSetting(final T executablesHolder, final int index, final String settingName,
+    public AModelElement<T> createSetting(final T executablesHolder, final int index, final String settingName,
             final String comment, final List<String> args);
 
-    public AModelElement<?> createExecutableRow(final T executablesHolder, final int index, final String action,
+    public AModelElement<T> createExecutableRow(final T executablesHolder, final int index, final String action,
             final String comment, final List<String> args);
 
-    public AModelElement<?> createEmptyLine(final T executablesHolder, final int index, final String name);
+    public AModelElement<T> createEmptyLine(final T executablesHolder, final int index, final String name);
 
     /**
      * Inserts element into {@code executablesHolder} under given index. Usually the

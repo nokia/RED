@@ -13,7 +13,7 @@ public interface IExecutablesStepsHolderElementOperation<T extends IExecutableSt
 
     boolean isApplicable(IRobotTokenType elementType);
 
-    AModelElement<?> create(T executablesHolder, int index, String action, List<String> args, final String comment);
+    AModelElement<T> create(T executablesHolder, int index, String action, List<String> args, final String comment);
 
     AModelElement<?> insert(T executablesHolder, int index, AModelElement<?> modelElement);
 

@@ -47,21 +47,20 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             new UserKeywordArgumentsMorphOperation(), new UserKeywordReturnMorphOperation(),
             new UserKeywordUnknownSettingMorphOperation());
 
-    @SuppressWarnings("unchecked")
     @Override
-    public AModelElement<?> createEmptyLine(final TestCase testCase, final int index, final String name) {
+    public AModelElement<TestCase> createEmptyLine(final TestCase testCase, final int index, final String name) {
         final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
                 ModelType.TEST_CASE_EMPTY_LINE);
         if (operationHandler == null || testCase == null) {
             throw new IllegalArgumentException("Unable to create empty line. Operation handler is missing");
         }
-        final AModelElement<?> row = operationHandler.create(testCase, index, name, null, null);
-        testCase.addElement((AModelElement<TestCase>) row, index);
+        final AModelElement<TestCase> row = operationHandler.create(testCase, index, name, null, null);
+        testCase.addElement(row, index);
         return row;
     }
 
     @Override
-    public AModelElement<?> createSetting(final TestCase testCase, final int index, final String settingName,
+    public AModelElement<TestCase> createSetting(final TestCase testCase, final int index, final String settingName,
             final String comment, final List<String> args) {
         final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(settingName);
         if (operationHandler == null || testCase == null) {
@@ -72,8 +71,7 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public AModelElement<?> createExecutableRow(final TestCase testCase, final int index, final String action,
+    public AModelElement<TestCase> createExecutableRow(final TestCase testCase, final int index, final String action,
             final String comment, final List<String> args) {
         final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
                 ModelType.TEST_CASE_EXECUTABLE_ROW);
@@ -81,8 +79,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
             throw new IllegalArgumentException(
                     "Unable to create " + action + " executable row. Operation handler is missing");
         }
-        final AModelElement<?> row = operationHandler.create(testCase, index, action, args, comment);
-        testCase.addElement((AModelElement<TestCase>) row, index);
+        final AModelElement<TestCase> row = operationHandler.create(testCase, index, action, args, comment);
+        testCase.addElement(row, index);
         return row;
     }
 
