@@ -15,7 +15,7 @@ public abstract class ExecutablesStepsHolderMorphOperation<T extends IExecutable
     }
 
     @Override
-    public AModelElement<?> create(final T executablesHolder, final int index, final String action,
+    public AModelElement<T> create(final T executablesHolder, final int index, final String action,
             final List<String> args, final String comment) {
         throw new UnsupportedOperationException();
     }

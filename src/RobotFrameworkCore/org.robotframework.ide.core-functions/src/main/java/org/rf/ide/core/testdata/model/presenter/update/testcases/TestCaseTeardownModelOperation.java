@@ -29,7 +29,7 @@ public class TestCaseTeardownModelOperation implements IExecutablesStepsHolderEl
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+    public AModelElement<TestCase> create(final TestCase testCase, final int index, final String settingName,
             final List<String> args, final String comment) {
         final TestCaseTeardown teardown = testCase.newTeardown(index);
         teardown.getDeclaration().setText(settingName);

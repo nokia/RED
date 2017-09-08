@@ -29,7 +29,7 @@ public class KeywordTeardownModelOperation implements IExecutablesStepsHolderEle
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+    public AModelElement<UserKeyword> create(final UserKeyword userKeyword, final int index, final String settingName,
             final List<String> args, final String comment) {
         final KeywordTeardown keywordTeardown = userKeyword.newTeardown(index);
         keywordTeardown.getDeclaration().setText(settingName);

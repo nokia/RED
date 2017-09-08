@@ -29,7 +29,7 @@ public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderEle
     }
 
     @Override
-    public AModelElement<?> create(final TestCase testCase, final int index, final String settingName,
+    public AModelElement<TestCase> create(final TestCase testCase, final int index, final String settingName,
             final List<String> args, final String comment) {
         final TestCaseTimeout timeout = testCase.newTimeout(index);
         timeout.getDeclaration().setText(settingName);

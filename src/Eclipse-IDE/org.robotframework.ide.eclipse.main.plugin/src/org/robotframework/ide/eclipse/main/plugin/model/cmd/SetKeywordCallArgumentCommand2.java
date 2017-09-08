@@ -48,32 +48,28 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         // TODO : replace SetKeywordCallArgument with this implementation since this
         // one seems simpler
 
-        RobotKeywordCall keywordCall = this.keywordCall;
+        // convert keywordCall from RobotEmptyLine to simple RobotKeywordCall if needed
+    	RobotKeywordCall keywordCallToUpdate = keywordCall instanceof RobotEmptyLine ? changeEmptyToExecutable(keywordCall) : keywordCall;
 
-        if (keywordCall instanceof RobotEmptyLine) {
-            // convert keywordCall from RobotEmptyLine to simple RobotKeywordCall
-            keywordCall = changeEmptyToExecutable(keywordCall);
-        }
+        final List<String> oldArguments = keywordCallToUpdate.getArguments();
 
-        final List<String> oldArguments = keywordCall.getArguments();
-
-        final Optional<String> newName = prepareNewName(keywordCall);
-        final List<String> arguments = prepareArgumentsList(keywordCall.getArguments(), index, value);
+        final Optional<String> newName = prepareNewName(keywordCallToUpdate);
+        final List<String> arguments = prepareArgumentsList(keywordCallToUpdate.getArguments(), index, value);
 
         if (newName.isPresent()) {
-            final SetSimpleKeywordCallName changeNameCommand = new SetSimpleKeywordCallName(eventBroker, keywordCall,
+            final SetSimpleKeywordCallName changeNameCommand = new SetSimpleKeywordCallName(eventBroker, keywordCallToUpdate,
                     newName.get());
             changeNameCommand.execute();
 
             undoOperations.addAll(changeNameCommand.getUndoCommands());
         }
         if (!arguments.equals(oldArguments)) {
-            undoOperations.add(new SetSimpleKeywordCallArguments(eventBroker, keywordCall, oldArguments));
+            undoOperations.add(new SetSimpleKeywordCallArguments(eventBroker, keywordCallToUpdate, oldArguments));
 
-            updateModelElement(keywordCall, arguments);
-            keywordCall.resetStored();
+            updateModelElement(keywordCallToUpdate, arguments);
+            keywordCallToUpdate.resetStored();
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCallToUpdate);
         }
     }
 
