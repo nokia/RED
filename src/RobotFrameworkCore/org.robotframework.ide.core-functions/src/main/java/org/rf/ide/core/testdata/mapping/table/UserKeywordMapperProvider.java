@@ -12,6 +12,7 @@ import org.rf.ide.core.testdata.mapping.keywords.KeywordArgumentsMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordArgumentsValueMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordDocumentationMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordDocumentationTextMapper;
+import org.rf.ide.core.testdata.mapping.keywords.KeywordEmptyLineMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordReturnMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordReturnValueMapper;
 import org.rf.ide.core.testdata.mapping.keywords.KeywordTagsMapper;
@@ -45,6 +46,7 @@ public class UserKeywordMapperProvider {
         MAPPERS.add(new KeywordTimeoutMapper());
         MAPPERS.add(new KeywordTimeoutValueMapper());
         MAPPERS.add(new KeywordTimeoutMessageMapper());
+        MAPPERS.add(new KeywordEmptyLineMapper());
     }
 
 
