@@ -68,10 +68,9 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
         final URI suitePath = event.getPath();
         final boolean suiteIsDirectory = event.isDirectory();
 
-        final SuiteContext context = locator.findContextForSuite(suiteName, suitePath, suiteIsDirectory,
-                currentPath);
-        context.addLoadedResources(currentlyImportedResources);
-        stacktrace.push(new StackFrame(suiteName, FrameCategory.SUITE, stacktrace.size(), context));
+        final SuiteContext context = locator.findContextForSuite(suiteName, suitePath, suiteIsDirectory, currentPath);
+        stacktrace.push(
+                new StackFrame(suiteName, FrameCategory.SUITE, stacktrace.size(), context, currentlyImportedResources));
 
         currentlyImportedResources.clear();
     }
@@ -128,12 +127,12 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
             contextPathSupplier = () -> null;
 
         } else {
-            final SuiteContext suiteContext = (SuiteContext) stacktrace
+            final Set<URI> currentResources = stacktrace
                     .getFirstFrameSatisfying(StackFrame::isSuiteContext)
                     .get()
-                    .getContext();
+                    .getLoadedResources();
             final KeywordContext kwContext = locator.findContextForKeyword(libraryName, keywordName, currentSuitePath,
-                    suiteContext.getLoadedResources());
+                    currentResources);
             context = kwContext;
             category = FrameCategory.KEYWORD;
 
@@ -177,14 +176,10 @@ public class StacktraceBuilder extends RobotDefaultAgentEventListener {
     @Override
     public void handleResourceImport(final ResourceImportEvent event) {
         if (event.isDynamicallyImported()) {
-            final SuiteContext suiteContext = (SuiteContext) stacktrace
-                    .getFirstFrameSatisfying(StackFrame::isSuiteContext)
-                    .get()
-                    .getContext();
-            suiteContext.addLoadedResource(event.getPath());
+            stacktrace.getFirstFrameSatisfying(StackFrame::isSuiteContext).get().addLoadedResource(event.getPath());
         } else {
             // if resources is imported normally it is done prior to suite start
-            this.currentlyImportedResources.add(event.getPath());
+            currentlyImportedResources.add(event.getPath());
         }
     }
 
