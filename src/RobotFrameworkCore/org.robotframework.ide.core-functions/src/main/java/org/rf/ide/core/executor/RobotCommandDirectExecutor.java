@@ -312,6 +312,11 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         }
     }
 
+    @Override
+    public void stopLibraryAutoDiscovering() {
+        // nothing to do
+    }
+
     private List<String> createCommandLine(final File scriptFile, final String... lines) {
         return createCommandLine(scriptFile, new EnvironmentSearchPaths(), lines);
     }

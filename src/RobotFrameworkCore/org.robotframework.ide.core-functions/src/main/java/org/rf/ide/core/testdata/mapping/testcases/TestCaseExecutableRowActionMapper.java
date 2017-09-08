@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.RobotEmptyRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -76,16 +77,18 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
         boolean result = false;
         final ParsingState state = stateHelper.getCurrentStatus(processingState);
         if (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION) {
-            if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME,
-                    robotFileOutput.getFileModel(), currentLine, rt)) {
-                result = true;
-            } else if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME, robotFileOutput.getFileModel(),
-                    currentLine, rt)) {
-                if (text.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0))) {
-                    if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                        rt.getTypes().add(RobotTokenType.START_HASH_COMMENT);
-                    }
+            if (!RobotEmptyRow.isEmpty(text) || !currentLine.getLineElements().isEmpty()) {
+                if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_EXEC_ROW_ACTION_NAME,
+                        robotFileOutput.getFileModel(), currentLine, rt)) {
                     result = true;
+                } else if (posResolver.isCorrectPosition(PositionExpected.TEST_CASE_NAME,
+                        robotFileOutput.getFileModel(), currentLine, rt)) {
+                    if (text.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0))) {
+                        if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                            rt.getTypes().add(RobotTokenType.START_HASH_COMMENT);
+                        }
+                        result = true;
+                    }
                 }
             }
         }

@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordArgumentsDumper;
 import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordDocumentationDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordEmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordExecutionRowDumper;
 import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordReturnDumper;
 import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordTagsDumper;
@@ -44,6 +45,7 @@ public class KeywordsSectionTableDumper extends AExecutableTableDumper {
         dumpers.add(new KeywordTimeoutDumper(aDumpHelper));
         dumpers.add(new KeywordUnknownSettingDumper(aDumpHelper));
         dumpers.add(new KeywordExecutionRowDumper(aDumpHelper));
+        dumpers.add(new KeywordEmptyLineDumper(aDumpHelper));
 
         return dumpers;
     }
