@@ -165,7 +165,6 @@ public class ToggleCommentInTableHandlerTest {
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("t1")
-                .appendLine("  ")
                 .build();
         initVariables(model);
         handler.toggleCommentInTable(editor, selection);

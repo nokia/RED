@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -47,9 +48,16 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         // TODO : replace SetKeywordCallArgument with this implementation since this
         // one seems simpler
 
+        RobotKeywordCall keywordCall = this.keywordCall;
+
+        if (keywordCall instanceof RobotEmptyLine) {
+            // convert keywordCall from RobotEmptyLine to simple RobotKeywordCall
+            keywordCall = changeEmptyToExecutable(keywordCall);
+        }
+
         final List<String> oldArguments = keywordCall.getArguments();
 
-        final Optional<String> newName = prepareNewName();
+        final Optional<String> newName = prepareNewName(keywordCall);
         final List<String> arguments = prepareArgumentsList(keywordCall.getArguments(), index, value);
 
         if (newName.isPresent()) {
@@ -62,14 +70,14 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         if (!arguments.equals(oldArguments)) {
             undoOperations.add(new SetSimpleKeywordCallArguments(eventBroker, keywordCall, oldArguments));
 
-            updateModelElement(arguments);
+            updateModelElement(keywordCall, arguments);
             keywordCall.resetStored();
 
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }
     }
 
-    private Optional<String> prepareNewName() {
+    private Optional<String> prepareNewName(final RobotKeywordCall keywordCall) {
         if (index >= keywordCall.getArguments().size() && !(value == null || value.isEmpty())
                 && keywordCall.getName().isEmpty()) {
             return Optional.of("\\");
@@ -105,7 +113,7 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         return arguments;
     }
 
-    protected void updateModelElement(final List<String> arguments) {
+    protected static void updateModelElement(final RobotKeywordCall keywordCall, final List<String> arguments) {
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
         final IExecutablesTableModelUpdater<?> updater = parent.getModelUpdater();
         updater.setArguments(keywordCall.getLinkedElement(), arguments);
@@ -114,5 +122,12 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(undoOperations);
+    }
+
+    private RobotKeywordCall changeEmptyToExecutable(final RobotKeywordCall keywordCall) {
+        final ConvertEmptyToCall command = new ConvertEmptyToCall(eventBroker, (RobotEmptyLine) keywordCall, "");
+        command.execute();
+        undoOperations.addAll(command.getUndoCommands());
+        return command.getNewCall();
     }
 }
