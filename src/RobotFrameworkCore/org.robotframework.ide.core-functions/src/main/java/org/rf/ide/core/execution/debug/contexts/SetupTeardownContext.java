@@ -15,7 +15,7 @@ import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 
-class SetupTeardownContext extends DefaultContext {
+public class SetupTeardownContext extends DefaultContext {
 
     private final URI locationUri;
 
@@ -48,6 +48,10 @@ class SetupTeardownContext extends DefaultContext {
         this.errorMessage = errorMessage;
         this.previousContext = previousContext;
         this.breakpointSupplier = breakpointSupplier;
+    }
+
+    public StackFrameContext getPreviousContext() {
+        return previousContext;
     }
 
     @Override
