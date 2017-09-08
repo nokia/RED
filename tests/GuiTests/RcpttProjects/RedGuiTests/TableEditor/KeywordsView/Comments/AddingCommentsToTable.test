@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m9ukQKs4Eea8FqgKy4fLvA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/25/17 11:51 AM
+Save-Time: 9/8/17 3:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -292,8 +292,7 @@ with [get-editor "res.tsv"] {
 get-editor "res.tsv" | get-text-viewer | get-property text | equals "*** Keywords ***\n"
     + "kw\n"
     + "\tLog\t#wrong place\n"
-    + "\t#line1\tline2\tline3\tline 4\t#line 5\tline 6\n"
-    + "\t\\" | verify-true
+    + "\t#line1\tline2\tline3\tline 4\t#line 5\tline 6" | verify-true
     
 //add new line    
 with [get-editor "res.tsv"] {
@@ -329,8 +328,7 @@ get-editor "res.tsv" | get-text-viewer | get-property text | equals "*** Keyword
     + "kw\n"
     + "\tLog\t#wrong place\n"
     + "\t#line1\tline2\tline3\tline 4\t#line 5\tline 6\n"
-    + "\t#k1\t#k2\t#k3\t#k4\t#k5\t#k6\n"
-    + "\t\\" | verify-true
+    + "\t#k1\t#k2\t#k3\t#k4\t#k5\t#k6" | verify-true
     
     
 get-editor "res.tsv" | get-tab-folder | get-tab-item Keywords | click
@@ -339,7 +337,7 @@ check-keyword-row -file "res.tsv" -row 1 -kw "kw"
 check-keyword-row -file "res.tsv" -row 2 -kw "Log"  -c1 "#wrong place"
 check-keyword-row -file "res.tsv" -row 3 -kw "#line1" -c1 "line2" -c2 "line3" -c3 "line 4" -c4	"#line 5" -c5 "line 6"
 check-keyword-row -file "res.tsv" -row 4 -kw "#k1" -c1 "#k2"  -c2 "#k3" -c3 "#k4" -c4 "#k5" -c5 "#k6"
-check-keyword-row -file "res.tsv" -row 5 -kw "\\" 
+check-keyword-row -file "res.tsv" -row 5 -kw "\t" 
 check-keyword-row -file "res.tsv" -row 6 -kw "..." 
 
 
