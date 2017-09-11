@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _I3FgsGXzEeayWasF5RXANg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/28/17 4:24 PM
+Save-Time: 9/11/17 4:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -251,7 +251,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "*** Variables ***\n"
     + "${a1111}  4\n"
     + "@{myList}\t1  2  2\t\t\n"
-    + "&{list22}    key=value    \n"
+    + "&{list22}    key=value    \n\n"
     + "*** Keyword ***\n"
     + "no CA\n"
     + "    Call Method    Continue For Loop    &{SUITE_METADATA}    Log Many    ${a1111}    @{myList}\n"
