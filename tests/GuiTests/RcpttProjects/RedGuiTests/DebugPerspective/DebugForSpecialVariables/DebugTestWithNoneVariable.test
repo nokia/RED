@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _zDCd4LV4EeazMIT-6yPcSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/7/17 5:53 PM
+Save-Time: 9/11/17 6:18 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -32,6 +32,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	check-debug-marker-on-ruler -line 13 -script_name "test.robot"
 	
+	wait-for-variables
 	with [get-view Variables | get-tree] {
 	    get-item "${value}" | get-property "values['Name']" | equals "${value}" | verify-true
 	    get-item "${value}" | get-property "values['Value']" | equals None | verify-true
