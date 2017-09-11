@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qngh8HH3Eee3fMF6qScr4Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/6/17 12:11 PM
+Save-Time: 9/11/17 2:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,17 +34,17 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "test 1\n"
     + "    log\n"
-    + "    \n"
-    + "test 2    \n\n\n"
+    + "\n"
+    + "test 2    \n     \n\n"
     + "*** Keywords ***\n"
     + "my kw\n"
     + "    log  8\n"
-    + "    \n"
+    + "\n"
     + "*** Variables ***\n"
     + "${newScalar}     5"
     
     
-get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 4 5
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 6 5
 get-editor "TestFile.robot" | get-text-viewer | key-type "M3+g"
 
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
@@ -66,9 +66,10 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
         key-type Down
         key-type Enter 
-        wait 3000
+        wait 300
         key-type Enter
     }
+    
     get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M3+g"
 }
 //chrck 2 first items
@@ -167,6 +168,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    log\n"
     + "    [Teardown]    Catenate\n"
     + "test 2\n"
+    + "     \n\n"
     + "*** Keywords ***\n"
     + "my kw\n"
     + "    log  8\n"
@@ -177,15 +179,17 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "}" | verify-true
 
     
+
+
+
+
+
+
+//open Ca by pressing 9 - the restart is not required
 change_trigger-for-content-assist "9"
 
-
-
-
-
-//open Ca by pressing 9 - the restart isnot required
 with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 9 44
+    set-caret-pos 11 44
     key-type Enter
     type-text 9
 }
@@ -193,7 +197,7 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table
     | get-property "getItems().TableItem[0].getText()" | equals "[Arguments]" | verify-true
 
 
-//check tat label is old
+//check that label is old
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-label "Press M3+G to show Keywords proposals" 
     | get-property caption | equals "Press M3+G to show Keywords proposals" | verify-true
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "\\[Arguments\\]" 
@@ -207,7 +211,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 
 //open CA and chceck label
 with [get-editor "TestFile.robot" | get-text-viewer] {
-    set-caret-pos 10 5
+    set-caret-pos 12 5
     type-text 9
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-label "Press 9 to show Keywords proposals" 
@@ -249,11 +253,10 @@ get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index
     
 get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
 
+
+
+
 change_trigger-for-content-assist "P"
-
-
-
-
 
 //add kw Contiunue if loop
 with [get-editor "TestFile.robot"] {
@@ -302,6 +305,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    log\n"
     + "    [Teardown]    Catenate    Convert To Boolean    Continue For Loop    @{EMPTY}  Call Method    object    method_name    \n"
     + "test 2\n"
+    + "     \n\n"
     + "*** Keywords ***\n"
     + "my kw\n"
     + "    log  8\n"
