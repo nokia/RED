@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _ERiB0PnjEea7hL0QdGOb6w
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:54 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/11/17 3:04 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -72,7 +72,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Keywords | verify-true
-is-row-fully-selected -row 7 -table "User Keywords"
+is-row-fully-selected -row 8 -table "User Keywords"
 
 //go to Tc and go to kw in python file
 with [get-editor "TestFile.robot"] {
@@ -107,7 +107,7 @@ with [get-editor "TestFile.robot"] {
     click
     get-tab-folder | get-tab-item Keywords | click
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Up -times 7
+        key-type Up -times 8
         key-type Right
         key-type F3
     }
@@ -127,7 +127,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
     key-type Down
     key-type F3
 }
-is-row-fully-selected -row 7 -table "User Keywords"
+is-row-fully-selected -row 8 -table "User Keywords"
 
 
 //got to kw "Sum two valus" that is above
@@ -144,10 +144,10 @@ is-row-fully-selected -row 0 -table "User Keywords"
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type Right
     key-type Left
-    key-type Down -times 9
+    key-type Down -times 10
     key-type F3
 }
-is-row-fully-selected -row 4 -table "User Keywords" -file_name "res.robot"
+is-row-fully-selected -row 6 -table "User Keywords" -file_name "res.robot"
 
 //go to built-in kw when Given is set
 with [get-editor "res.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
