@@ -126,16 +126,16 @@ public class ExecutionView {
         GridDataFactory.fillDefaults().grab(true, false).indent(2, 8).applyTo(labelsComposite);
 
         testsCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(testsCounterLabel);
+        GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(testsCounterLabel);
         testsCounterLabel.setText("Tests: 0/0");
 
         passCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(passCounterLabel);
+        GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(passCounterLabel);
         passCounterLabel.setImage(ImagesManager.getImage(RedImages.getSuccessImage()));
         passCounterLabel.setText("Passed: 0");
 
         failCounterLabel = new CLabel(labelsComposite, SWT.NONE);
-        GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(failCounterLabel);
+        GridDataFactory.fillDefaults().grab(true, false).hint(100, SWT.DEFAULT).applyTo(failCounterLabel);
         failCounterLabel.setImage(ImagesManager.getImage(RedImages.getErrorImage()));
         failCounterLabel.setText("Failed: 0");
     }
