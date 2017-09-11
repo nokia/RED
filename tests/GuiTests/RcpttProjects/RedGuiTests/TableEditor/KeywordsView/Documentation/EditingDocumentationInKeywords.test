@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PIa6YFiWEeaKPZp2wD-8qw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/27/17 10:12 AM
+Save-Time: 9/11/17 3:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -170,6 +170,5 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    [Documentation]    triple dots ....\n"
     + "    Log  6\n"
     + "Keyword\n"
-    + "    [Documentation]    second doc bbcc\n"
-    + "    \\" | verify-true
+    + "    [Documentation]    second doc bbcc" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
