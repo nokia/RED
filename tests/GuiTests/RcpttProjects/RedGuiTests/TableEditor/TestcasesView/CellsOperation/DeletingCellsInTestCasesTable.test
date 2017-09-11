@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _CEmxMGhtEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/9/16 3:18 PM
+Save-Time: 9/11/17 4:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -59,7 +59,7 @@ with [get-editor "suite.tsv" | get-canvas -after [get-label "Test Cases"] -index
     key-type Del
     
     //remove Documentation (is now deleted)
-    key-type Down -times 3
+    key-type Down -times 5
     key-type Left -times 3
     key-type Del
     
@@ -76,26 +76,29 @@ with [get-editor "suite.tsv" | get-canvas -after [get-label "Test Cases"] -index
 
 check-test_case-row -file "suite.tsv" -row 1 -tc "\\"
 check-test_case-row -file "suite.tsv" -row 2 -tc "Catenate" -c1 "4" -c2 "5" -c3 "7" -c4 "8"
-check-test_case-row -file "suite.tsv" -row 3 -tc "..."
+check-test_case-row -file "suite.tsv" -row 3 -tc "\t\t\t\t"
+check-test_case-row -file "suite.tsv" -row 4 -tc "\t\t\t\t\t\t\t"
+check-test_case-row -file "suite.tsv" -row 5 -tc "..."
 
-check-test_case-row -file "suite.tsv" -row 4 -tc "test_2"
-check-test_case-row -file "suite.tsv" -row 5 -tc "second test"
-check-test_case-row -file "suite.tsv" -row 6 -tc "12"
-check-test_case-row -file "suite.tsv" -row 7 -tc "Should Be Empty" -c1 "item" -c2 "item2"
-check-test_case-row -file "suite.tsv" -row 8 -tc "..."
+check-test_case-row -file "suite.tsv" -row 6 -tc "test_2"
+check-test_case-row -file "suite.tsv" -row 7 -tc "second test"
+check-test_case-row -file "suite.tsv" -row 8 -tc "12"
+check-test_case-row -file "suite.tsv" -row 9 -tc "Should Be Empty" -c1 "item" -c2 "item2"
+check-test_case-row -file "suite.tsv" -row 10 -tc "..."
 
 
 get-editor "suite.tsv" | get-tab-folder | get-tab-item Source | click
 get-editor "suite.tsv" | get-text-viewer | get-property text | equals "*Settings*\t\t\t\t\t\t\t\n"
-    + "Test Timeout\t2 hours\t\t\t\t\t\t\n"
+    + "Test Timeout\t2 hours\t\t\t\t\t\t\n\n"
     + "*Test Cases*\t\t\t\t\t\t\t\n"
     + "\\\n"
     + "\tCatenate\t4\t5\t7\t8\n"
+    + "\t\t\t\t\n"
+    + "\t\t\t\t\t\t\t\n"
     + "test_2\n"
     + "\tsecond test\n"
     + "\t12\n"
     + "\tShould Be Empty\titem\titem2" | verify-true
-    
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
