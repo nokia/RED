@@ -83,7 +83,7 @@ public class MessageLogView {
         if (executor != null) {
             executor.shutdownNow();
         }
-        SwtThread.syncExec(() -> styledText.setText(""));
+        SwtThread.syncExec(() -> setMessage(""));
 
         // this launch may be currently running, so we have to synchronize in order
         // to get proper state of messages, as other threads may change it in the meantime
@@ -94,7 +94,6 @@ public class MessageLogView {
             if (launch.isTerminated()) {
                 // since the given launch is terminated it will not change anymore
                 SwtThread.syncExec(() -> setMessage(messagesStore.getMessage()));
-                setMessage(messagesStore.getMessage());
             } else {
                 executor = Executors.newScheduledThreadPool(1);
                 final Runnable command = () -> {
@@ -110,6 +109,9 @@ public class MessageLogView {
     }
 
     private void setMessage(final String message) {
+        if (styledText.isDisposed()) {
+            return;
+        }
         styledText.setRedraw(false);
         try {
             styledText.setText(message);
