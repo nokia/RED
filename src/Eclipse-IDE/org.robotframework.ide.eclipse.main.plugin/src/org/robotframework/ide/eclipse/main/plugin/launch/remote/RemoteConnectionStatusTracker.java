@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.event.VersionsEvent;
 import org.rf.ide.core.execution.server.AgentServerStatusListener;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 
 import com.google.common.base.Splitter;
@@ -83,8 +84,7 @@ class RemoteConnectionStatusTracker extends RobotDefaultAgentEventListener imple
         try {
             messagesQueue.put(message);
         } catch (final InterruptedException e) {
-            // FIXME : handle this stuff here
-            e.printStackTrace();
+            RedPlugin.logError("Interrupted when queuing messages for remote console", e);
         }
     }
 
@@ -92,8 +92,7 @@ class RemoteConnectionStatusTracker extends RobotDefaultAgentEventListener imple
         try {
             messagesQueue.put(POISON_PILL);
         } catch (final InterruptedException e) {
-            // FIXME : handle this stuff here
-            e.printStackTrace();
+            RedPlugin.logError("Interrupted when queuing messages for remote console", e);
         }
     }
 
@@ -114,9 +113,12 @@ class RemoteConnectionStatusTracker extends RobotDefaultAgentEventListener imple
                 redConsole.writeLine(msg);
                 msg = messagesQueue.take();
             }
-        } catch (final InterruptedException | IOException e) {
-            // FIXME : handle this stuff here
-            e.printStackTrace();
+        } catch (final IOException e) {
+            // this is fine - user disposed the console, so there is no place to write messages
+            return;
+
+        } catch (final InterruptedException e) {
+            RedPlugin.logError("Interrupted when writing remote messages to console", e);
         }
     }
 }

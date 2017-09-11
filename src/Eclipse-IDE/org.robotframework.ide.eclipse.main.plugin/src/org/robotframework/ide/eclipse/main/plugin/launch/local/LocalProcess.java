@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 import java.util.Map;
 
 import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.RuntimeProcess;
 import org.rf.ide.core.execution.debug.UserProcessController;
@@ -54,6 +55,14 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
     @Override
     public void setConnectedToTests(final boolean isConnected) {
         this.isConnectedToTests = isConnected;
+    }
+
+    @Override
+    public void terminate() throws DebugException {
+        if (isConnectedToTests) {
+            userProcessController.terminate(() -> {});
+        }
+        super.terminate();
     }
 
     @Override
