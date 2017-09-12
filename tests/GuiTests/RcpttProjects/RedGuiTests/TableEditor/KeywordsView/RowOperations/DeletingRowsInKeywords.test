@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UXk18F1vEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/21/17 12:03 PM
+Save-Time: 9/12/17 4:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,28 +24,33 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "   \n"
     + "kw-2\n"
     + "    Should Be Empty    item       \n"
-    + "   \n"
     + "kw3\n"
     + "    [Documentation]    doc\n"
     + "    a1\n"
     + "    a2\n"
+    + "    \n"
     + "    a3\n"
     + "       \n"
     + "kw4\n"
     + "    Set Log Level    5\n"
     + "    Catenate    a  3\n"
-    + "    \n"
+    + "    Should Be Equal    4    4    \n"
     + "kw5\n"
-    + "    \\" 
+    + "    \\"
     
     
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
 get-view Outline | get-tree | select "TestFile.robot/Keywords/kw1/log" | click
 wait 500
 
-//remove [return] from kw1
+//remove empty line from kw1
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-    key-type Down
+    key-type Down -times 2
+    get-menu "Row/Delete row" | click
+}
+
+//remove [return] from kw1 - focus is set on it
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     get-menu "Row/Delete row" | click
 }
 
@@ -54,6 +59,16 @@ get-view Outline | get-tree | select "TestFile.robot/Keywords/kw-2" | click
 wait 500
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+DEL"
 wait 1000
+
+
+//remove empty line after "a1" kw
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw3/a2" | click
+wait 500
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down
+    get-menu "Row/Delete row" | click
+}
+
 
 //remove "a1" kw
 get-view Outline | get-tree | select "TestFile.robot/Keywords/kw3" | click
@@ -64,7 +79,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
 }
 wait 1000
 
-//select "a1" and delte row using shortcut
+//select "a3" and delete row using shortcut
 get-view Outline | get-tree | select "TestFile.robot/Keywords/kw3/a3" | click
 wait 500
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+DEL"
@@ -76,7 +91,7 @@ wait 500
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+DEL"
 wait 1000
 
-//select empty line and set focus on second arg
+//select empty with "/" line and set focus on second arg
 get-view Outline | get-tree | select "TestFile.robot/Keywords/kw5" | click
 wait 500
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -92,10 +107,11 @@ check-keyword-row -file "TestFile.robot"  -row 3 -kw "..."
 check-keyword-row -file "TestFile.robot"  -row 4 -kw "kw3"
 check-keyword-row -file "TestFile.robot"  -row 5 -kw "[Documentation]" -c1 "doc"
 check-keyword-row -file "TestFile.robot"  -row 6 -kw "a2"
-check-keyword-row -file "TestFile.robot"  -row 7 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 7 -kw "       "
+check-keyword-row -file "TestFile.robot"  -row 8 -kw "..."
 
-check-keyword-row -file "TestFile.robot"  -row 8 -kw "kw5"
-check-keyword-row -file "TestFile.robot"  -row 9 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 9 -kw "kw5"
+check-keyword-row -file "TestFile.robot"  -row 10 -kw "..."
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
@@ -106,5 +122,6 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw3\n"
     + "    [Documentation]    doc\n"
     + "    a2\n"
+    + "       \n"
     + "kw5" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
