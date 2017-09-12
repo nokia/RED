@@ -299,9 +299,9 @@ public class TableElementDumperHelper {
 
         return (dumps.size() > 0);
     }
-    
+
     public boolean dumpEOLAsItIs(final DumperHelper dumpHelper, final RobotFile model, final IRobotLineElement startToken, final List<RobotLine> lines) {
-    	
+
         int offset = startToken.getFilePosition().getOffset();
 
         final Optional<Integer> line = model.getRobotLineIndexBy(offset);
@@ -312,7 +312,7 @@ public class TableElementDumperHelper {
 
         final Optional<Integer> elemPosInLine = lastLine.getElementPositionInLine(startToken);
         if (!elemPosInLine.isPresent()) {
-         	return false;
+            return false;
         }
 
         dumpHelper.getDumpLineUpdater().updateLine(model, lines, lastLine.getEndOfLine());

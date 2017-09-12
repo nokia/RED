@@ -108,14 +108,14 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         final List<RobotToken> tokens = prepareTokens(currentElement);
         // dump as it is
         if (canBePossiblyDumpedDirectly(lastToken)) {
-        	boolean wasDumped = false;
-        	if(tokens.isEmpty()) {
-        		//dump EOL
+            boolean wasDumped = false;
+            if(tokens.isEmpty()) {
+                //dump EOL
                 wasDumped = getElementDumperHelper().dumpEOLAsItIs(getDumperHelper(), model, lastToken, lines);   
-        	} else if (canBeDumpedDirectly(lastToken, tokens)){
-        		//dump line tokens
+            } else if (canBeDumpedDirectly(lastToken, tokens)){
+                //dump line tokens
                 wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);        		
-        	}
+            }
             if (wasDumped) {
                 return;
             }
