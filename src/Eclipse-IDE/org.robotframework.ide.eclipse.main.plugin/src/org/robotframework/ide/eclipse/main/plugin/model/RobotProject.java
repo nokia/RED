@@ -244,7 +244,7 @@ public class RobotProject extends RobotContainer {
         };
     }
 
-    private synchronized RobotProjectConfig readProjectConfigurationIfNeeded() {
+    private synchronized void readProjectConfigurationIfNeeded() {
         if (configuration == null) {
             try {
                 configuration = new RedEclipseProjectConfigReader().readConfiguration(getProject());
@@ -252,9 +252,13 @@ public class RobotProject extends RobotContainer {
                 // oh well...
             }
         }
-        return configuration;
     }
 
+    /**
+     * Returns the configuration model from red.xml
+     *
+     * @return configuration from red.xml or null if file does not exist
+     */
     public synchronized RobotProjectConfig getRobotProjectConfig() {
         readProjectConfigurationIfNeeded();
         return configuration;
@@ -263,7 +267,7 @@ public class RobotProject extends RobotContainer {
     /**
      * Returns the configuration model from opened editor.
      *
-     * @return opened configuration
+     * @return opened configuration or null if configuration is not opened in editor
      */
     public RobotProjectConfig getOpenedProjectConfig() {
         final RedProjectEditorInput redProjectInput = findEditorInputIfAlreadyOpened();
