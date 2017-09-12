@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
@@ -62,63 +63,56 @@ public class SetKeywordCallNameCommand extends EditorCommand {
     }
 
     private RobotKeywordCall getConvertedCall(final String nameToSet) {
-        final RobotKeywordCall actualCall;
+        final int index = keywordCall.getIndex();
+        final IRobotCodeHoldingElement parent = keywordCall.getParent();
         if (looksLikeSetting(nameToSet)) {
-            actualCall = changeToSetting(nameToSet);
+            changeToSetting(nameToSet);
         } else if (looksLikeEmpty(nameToSet) && keywordCall.getArguments().isEmpty()
                 && keywordCall.getComment().isEmpty()) {
-            actualCall = changeToEmpty(nameToSet);
+            changeToEmpty(nameToSet);
         } else {
-            actualCall = changeToCall(nameToSet);
+            changeToCall(nameToSet);
         }
-        return actualCall;
-    }
-
-    private RobotKeywordCall changeToCall(final String nameToSet) {
-        final RobotKeywordCall actualCall;
+        return parent.getChildren().get(index);
+    }    
+    
+    private void changeToCall(final String nameToSet) {
         if (keywordCall.isExecutable()) {
-            actualCall = changeName(nameToSet);
+            execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
         } else if (keywordCall instanceof RobotDefinitionSetting) {
-            actualCall = changeSettingToCall(nameToSet);
+            execute(new ConvertSettingToCall(eventBroker, (RobotDefinitionSetting) keywordCall, nameToSet));
         } else {
-            actualCall = changeEmptyToCall(nameToSet);
+            execute(new ConvertEmptyToCall(eventBroker, (RobotEmptyLine) keywordCall, nameToSet));
         }
-        return actualCall;
     }
-
-    private RobotKeywordCall changeToSetting(final String nameToSet) {
-        final RobotKeywordCall actualCall;
+    
+    private void changeToSetting(final String nameToSet) {
         if (keywordCall.isExecutable()) {
-            actualCall = changeCallToSetting(nameToSet);
+            execute(new ConvertCallToSetting(eventBroker, keywordCall, nameToSet));
         } else if (keywordCall instanceof RobotDefinitionSetting) {
             if (isDifferentSetting(nameToSet)) {
-                actualCall = changeBetweenSettings(nameToSet);
+                execute(new ConvertSettingToSetting(eventBroker, keywordCall, nameToSet));
             } else {
-                actualCall = changeName(nameToSet);
+                execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
             }
         } else {
-            actualCall = changeEmptyToSetting(nameToSet);
+            execute(new ConvertEmptyToSetting(eventBroker, (RobotEmptyLine) keywordCall, nameToSet));
         }
-        return actualCall;
     }
-
-    private RobotKeywordCall changeToEmpty(final String nameToSet) {
-        final RobotKeywordCall actualCall;
+    
+    private void changeToEmpty(final String nameToSet) {
         if (keywordCall.isExecutable()) {
-            actualCall = changeCallToEmpty(nameToSet);
+            execute(new ConvertCallToEmpty(eventBroker, keywordCall, nameToSet));
         } else if (keywordCall instanceof RobotDefinitionSetting) {
-            actualCall = changeSettingToEmpty(nameToSet);
+            execute(new ConvertSettingToEmpty(eventBroker, keywordCall, nameToSet));
         } else {
-            actualCall = changeName(nameToSet);
+            execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
         }
-        return actualCall;
     }
-
-    private RobotKeywordCall changeName(final String nameToSet) {
-        final EditorCommand command = new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet);
-        executedCommands.add(command);
+    
+    private void execute(final EditorCommand command) {
         command.execute();
-        return keywordCall;
+        executedCommands.add(command);
     }
 
     private String extractNameFromArguments(final List<String> arguments) {
@@ -135,101 +129,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         return name.startsWith("[") && name.endsWith("]");
     }
 
-    private RobotKeywordCall changeBetweenSettings(final String name) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-
-        final int index = keywordCall.getIndex();
-
-        final ConvertSettingToSetting convertCommand = new ConvertSettingToSetting(eventBroker, keywordCall, name);
-        convertCommand.execute();
-        executedCommands.add(convertCommand);
-
-        return parent.getChildren().get(index);
-    }
-
-    private RobotKeywordCall changeCallToSetting(final String settingName) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-
-        final int index = keywordCall.getIndex();
-
-        final ConvertCallToSetting convertCommand = new ConvertCallToSetting(eventBroker, keywordCall, settingName);
-        convertCommand.execute();
-
-        executedCommands.add(convertCommand);
-
-        return parent.getChildren().get(index);
-    }
-
-    private RobotKeywordCall changeCallToEmpty(final String emptyName) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-
-        final int index = keywordCall.getIndex();
-
-        final ConvertCallToEmpty convertCommand = new ConvertCallToEmpty(eventBroker, keywordCall, emptyName);
-        convertCommand.execute();
-
-        executedCommands.add(convertCommand);
-
-        return parent.getChildren().get(index);
-    }
-
-    private RobotKeywordCall changeSettingToEmpty(final String emptyName) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-
-        final int index = keywordCall.getIndex();
-
-        final ConvertSettingToEmpty convertCommand = new ConvertSettingToEmpty(eventBroker, keywordCall, emptyName);
-        convertCommand.execute();
-
-        executedCommands.add(convertCommand);
-
-        return parent.getChildren().get(index);
-    }
-
-    private RobotKeywordCall changeEmptyToSetting(final String settingName) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-
-        final int index = keywordCall.getIndex();
-
-        final ConvertEmptyToSetting convertCommand = new ConvertEmptyToSetting(eventBroker,
-                (RobotEmptyLine) keywordCall, settingName);
-        convertCommand.execute();
-
-        executedCommands.add(convertCommand);
-
-        return parent.getChildren().get(index);
-    }
-
-    private RobotKeywordCall changeSettingToCall(final String name) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-        final RobotDefinitionSetting setting = (RobotDefinitionSetting) keywordCall;
-
-        final int index = setting.getIndex();
-
-        final ConvertSettingToCall convertCommand = new ConvertSettingToCall(eventBroker, setting, name);
-        convertCommand.execute();
-
-        executedCommands.add(convertCommand);
-
-        return parent.getChildren().get(index);
-    }
-
     private boolean looksLikeEmpty(final String name) {
         return Pattern.matches("^[\\s]*$", name);
-    }
-
-    private RobotKeywordCall changeEmptyToCall(final String name) {
-        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-        final RobotEmptyLine empty = (RobotEmptyLine) keywordCall;
-
-        final int index = empty.getIndex();
-
-        final ConvertEmptyToCall convertCommand = new ConvertEmptyToCall(eventBroker, empty, name);
-        convertCommand.execute();
-
-        executedCommands.add(convertCommand);
-
-        return parent.getChildren().get(index);
     }
 
     private void removeFirstArgument(final RobotKeywordCall actualCall) {
