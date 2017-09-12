@@ -34,7 +34,7 @@ public class RobotProjectHolder {
 
     private final List<RobotFileOutput> readableProjectFiles = new ArrayList<>();
 
-    private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
+    private List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
 
     private Map<String, String> variableMappings = new HashMap<>();
 
@@ -50,19 +50,18 @@ public class RobotProjectHolder {
     }
 
     public void configure(final RobotProjectConfig configuration, final File projectLocation) {
-        if (this.currentConfiguration == configuration) {
-            return;
+        if (currentConfiguration != configuration || globalVariables.isEmpty() && variableMappings.isEmpty()) {
+            currentConfiguration = configuration;
+            initGlobalVariables();
+            initVariableMappings(projectLocation);
         }
-        this.currentConfiguration = configuration;
-        initGlobalVariables();
-        initVariableMappings(projectLocation);
     }
 
     @VisibleForTesting
     protected void initGlobalVariables() {
         final Map<String, Object> variables = robotRuntime == null ? new HashMap<>()
                 : robotRuntime.getGlobalVariables();
-        globalVariables.addAll(map(variables));
+        globalVariables = map(variables);
     }
 
     private void initVariableMappings(final File projectLocation) {
@@ -77,7 +76,7 @@ public class RobotProjectHolder {
         if (currentConfiguration != null) {
             knownVariables.putAll(VariableMappingsResolver.resolve(currentConfiguration.getVariableMappings()));
         }
-        this.variableMappings = knownVariables;
+        variableMappings = knownVariables;
     }
 
     public RobotRuntimeEnvironment getRobotRuntime() {
