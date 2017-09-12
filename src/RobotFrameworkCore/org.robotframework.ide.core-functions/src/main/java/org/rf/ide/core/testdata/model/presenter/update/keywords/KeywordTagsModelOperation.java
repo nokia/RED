@@ -28,7 +28,7 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final int index, final String settingName,
+    public AModelElement<UserKeyword> create(final UserKeyword userKeyword, final int index, final String settingName,
             final List<String> args, final String comment) {
         final KeywordTags keywordTags = userKeyword.newTags(index);
         keywordTags.getDeclaration().setText(settingName);
