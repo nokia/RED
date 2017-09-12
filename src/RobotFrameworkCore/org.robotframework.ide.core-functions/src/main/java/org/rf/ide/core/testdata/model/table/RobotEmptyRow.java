@@ -27,6 +27,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     public RobotEmptyRow() {
         empty = new RobotToken();
+        empty.setType(getRobotTokenType());
     }
 
     public boolean setEmptyToken(final RobotToken empty) {
@@ -94,7 +95,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public List<RobotToken> getElementTokens() {
-        empty.setType(RobotTokenType.EMPTY_CELL);
+        empty.setType(getRobotTokenType());
         return newArrayList(empty);
     }
 
@@ -107,6 +108,20 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     @Override
     public RobotToken getDeclaration() {
         return empty;
+    }
+
+    private RobotTokenType getRobotTokenType() {
+        RobotTokenType tokenType = RobotTokenType.UNKNOWN;
+        final T parent = getParent();
+        if (parent != null) {
+            final ModelType parentType = ((AModelElement<?>) parent).getModelType();
+            if (parentType == ModelType.TEST_CASE) {
+                tokenType = RobotTokenType.TEST_CASE_EMPTY_LINE;
+            } else if (parentType == ModelType.USER_KEYWORD) {
+                tokenType = RobotTokenType.KEYWORD_EMPTY_LINE;
+            }
+        }
+        return tokenType;
     }
 
     public static boolean isEmpty(final String text) {
