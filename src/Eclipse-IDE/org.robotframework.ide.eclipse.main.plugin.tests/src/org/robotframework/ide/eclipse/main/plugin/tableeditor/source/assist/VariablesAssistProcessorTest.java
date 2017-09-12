@@ -23,6 +23,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExecutionEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -66,6 +68,11 @@ public class VariablesAssistProcessorTest {
                 "  [Arguments]  ${x}  ${y}",
                 "  call  abc  def  ",
                 "*** Test Cases ***");
+
+        // skipping global variables
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.setExecutionEnvironment(ExecutionEnvironment.create("", null));
+        projectProvider.configure(config);
     }
 
     @AfterClass
@@ -400,7 +407,6 @@ public class VariablesAssistProcessorTest {
         final VariablesAssistProcessor processor = new VariablesAssistProcessor(createAssistant(model));
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, offset);
-
         assertThat(proposals).hasSize(2).haveExactly(2,
                 proposalWithImage(ImagesManager.getImage(RedImages.getRobotScalarVariableImage())));
 

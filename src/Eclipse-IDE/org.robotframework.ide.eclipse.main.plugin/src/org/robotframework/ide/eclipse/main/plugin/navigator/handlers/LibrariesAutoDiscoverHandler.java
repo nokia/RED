@@ -38,9 +38,7 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
 
             for (final IResource resource : selectedResources) {
                 if (resource.getType() == IResource.PROJECT) {
-                    final IProject project = (IProject) resource;
-                    final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-                    new LibrariesAutoDiscoverer(robotProject, new ArrayList<>()).start();
+                    startAutoDiscovering((IProject) resource, new ArrayList<>());
                     return;
 
                 } else if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER) {
@@ -54,9 +52,13 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
             }
 
             if (!resources.isEmpty()) {
-                final RobotProject robotProject = RedPlugin.getModelManager().createProject(suitesProject);
-                new LibrariesAutoDiscoverer(robotProject, resources).start();
+                startAutoDiscovering(suitesProject, resources);
             }
+        }
+
+        private void startAutoDiscovering(final IProject project, final List<IResource> resources) {
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+            new LibrariesAutoDiscoverer(robotProject, resources).start();
         }
     }
 }
