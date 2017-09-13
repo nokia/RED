@@ -18,6 +18,8 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExecutionEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -52,6 +54,11 @@ public class VariableProposalsProviderTest {
                 "*** Test Cases ***",
                 "case",
                 "  call");
+
+        // skipping global variables
+        final RobotProjectConfig config = RobotProjectConfig.create();
+        config.setExecutionEnvironment(ExecutionEnvironment.create("", null));
+        projectProvider.configure(config);
     }
 
     @Test(expected = IllegalStateException.class)
