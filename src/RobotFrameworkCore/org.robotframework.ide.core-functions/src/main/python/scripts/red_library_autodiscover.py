@@ -72,31 +72,26 @@ def _create_dryrun_environment(python_paths, class_paths):
     import platform
 
     env = os.environ.copy()
-
     if python_paths:
-        _extend_env_path_variable(env, 'PYTHONPATH', python_paths)
-
+        env['RED_DRYRUN_PYTHONPATH'] = ';'.join(python_paths)
     if class_paths and 'Jython' in platform.python_implementation():
-        _extend_env_path_variable(env, 'PYTHONPATH', class_paths)
-        _extend_env_path_variable(env, 'CLASSPATH', class_paths)
-
+        env['RED_DRYRUN_CLASSPATH'] = ';'.join(class_paths)
     return env
 
 
-def _extend_env_path_variable(env, variable_name, paths):
-    path_separator = ';' if _is_windows_platform() else ':'
-    if variable_name in env:
-        env[variable_name] = env[variable_name] + path_separator + path_separator.join(paths)
-    else:
-        env[variable_name] = path_separator.join(paths)
-
-
-def _is_windows_platform():
+def _extend_paths_from_dryrun_environment():
+    import sys
+    import os
     import platform
-    if 'Jython' in platform.python_implementation():
-        import java.lang.System
-        return 'win' in java.lang.System.getProperty('os.name').lower()
-    return platform.system() == 'Windows'
+    if ('RED_DRYRUN_PYTHONPATH' in os.environ):
+        sys.path.extend(os.environ['RED_DRYRUN_PYTHONPATH'].split(';'))
+    if ('RED_DRYRUN_CLASSPATH' in os.environ):
+        sys.path.extend(os.environ['RED_DRYRUN_CLASSPATH'].split(';'))
+        if 'Jython' in platform.python_implementation():
+            for class_path in os.environ['RED_DRYRUN_CLASSPATH'].split(';'):
+                from classpath_updater import ClassPathUpdater
+                cp_updater = ClassPathUpdater()
+                cp_updater.add_file(class_path)
 
 
 if __name__ == '__main__':
@@ -119,7 +114,10 @@ if __name__ == '__main__':
         args = args[2:]
 
     data_source_paths = args[0].split(';')
+
     if len(args) > 1:
         sys.path.extend(args[1].split(';'))
+    else:
+        _extend_paths_from_dryrun_environment()
 
     start_library_auto_discovering(port, suite_names, variable_mappings, data_source_paths)
