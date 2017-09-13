@@ -27,6 +27,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     public RobotEmptyRow() {
         empty = new RobotToken();
+        empty.setType(getRobotTokenType());
     }
 
     public boolean setEmptyToken(final RobotToken empty) {
@@ -74,17 +75,14 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public ModelType getModelType() {
-        ModelType modelType = ModelType.UNKNOWN;
-        final T parent = getParent();
-        if (parent != null) {
-            final ModelType parentType = ((AModelElement<?>) parent).getModelType();
-            if (parentType == ModelType.TEST_CASE) {
-                modelType = ModelType.TEST_CASE_EMPTY_LINE;
-            } else if (parentType == ModelType.USER_KEYWORD) {
-                modelType = ModelType.USER_KEYWORD_EMPTY_LINE;
-            }
+        final AModelElement<?> parent = (AModelElement<?>) getParent();
+        if (parent != null && parent.getModelType() == ModelType.TEST_CASE) {
+            return ModelType.TEST_CASE_EMPTY_LINE;
+        } else if (parent != null && parent.getModelType() == ModelType.USER_KEYWORD) {
+            return ModelType.USER_KEYWORD_EMPTY_LINE;
+        } else {
+            return ModelType.UNKNOWN;
         }
-        return modelType;
     }
 
     @Override
@@ -94,7 +92,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public List<RobotToken> getElementTokens() {
-        empty.setType(RobotTokenType.EMPTY_CELL);
+        empty.setType(getRobotTokenType());
         return newArrayList(empty);
     }
 
@@ -107,6 +105,17 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
     @Override
     public RobotToken getDeclaration() {
         return empty;
+    }
+
+    private RobotTokenType getRobotTokenType() {
+        final AModelElement<?> parent = (AModelElement<?>) getParent();
+        if (parent != null && parent.getModelType() == ModelType.TEST_CASE) {
+            return RobotTokenType.TEST_CASE_EMPTY_LINE;
+        } else if (parent != null && parent.getModelType() == ModelType.USER_KEYWORD) {
+            return RobotTokenType.KEYWORD_EMPTY_LINE;
+        } else {
+            return RobotTokenType.UNKNOWN;
+        }
     }
 
     public static boolean isEmpty(final String text) {
