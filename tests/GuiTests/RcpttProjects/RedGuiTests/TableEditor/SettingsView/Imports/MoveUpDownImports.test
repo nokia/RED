@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _C_3tUDyAEeaUDrMBSMf5Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/26/17 11:55 AM
+Save-Time: 9/13/17 4:00 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -60,7 +60,7 @@ generate-coordinates -setting Imports
 with [get-editor "TestFile.robot"] {
      with [get-section Imports] {
         with [get-canvas] {
-        	// 6. line up (Library My librery): Mylibrary selected
+        	// 6. line up (Library My library): Mylibrary selected
             mouse-press $x2 $y6 button3
             mouse-release $x2 $y6 button3 2097152
             get-menu "Row/Move up" | click
@@ -137,24 +137,32 @@ check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 9 -impor
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
     + "@{TAGS}    q  e\n"
+    + "\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  8\n"
+    + "    \n"
+    + "    \n"
     + "*** Settings ***\n"
     + "Resource    res3.robot\n"
     + "...  res2 \n"
     + "...  ${param}  #here is param\n"
+    + "\n"
     + "Library    Telnet\n"
     + "Library    XML   arg1  arg2  arg3  arg4          arg5    \n"
+    + "\n"
     + "Resource  folder/inside/res2.tsv\n"
     + "Library    MyLibrary    my1  \\  my2  \\\\  my3  \n"
     + "Library    ${LIBRARY}\n"
+    + "\n"
     + "Variables    libs/lib1.py  1    2    3    4\n"
+    + "    \n"
     + "Variables    libs/lib1.py\n"
     + "...  val1  #my value\n"
     + "...  val2\n"
     + "...  # no more vals\n"
-    + "Variables    ${a}/\\ folder/file.py" | verify-true
+    + "Variables    ${a}/\\ folder/file.py\n"
+    + "\n" | verify-true
     
 //go to Setting and move more times    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
@@ -194,24 +202,32 @@ wait 1000
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
     + "@{TAGS}    q  e\n"
+    + "\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  8\n"
+    + "    \n"
+    + "    \n"
     + "*** Settings ***\n"
     + "Resource    res3.robot\n"
     + "...  res2 \n"
     + "...  ${param}  #here is param\n"
+    + "\n"
     + "Library    Telnet\n"
     + "Library    ${LIBRARY}\n"
+    + "\n"
     + "Library    XML   arg1  arg2  arg3  arg4          arg5    \n"
+    + "\n"
     + "Resource  folder/inside/res2.tsv\n"
     + "Library    MyLibrary    my1  \\  my2  \\\\  my3  \n"
     + "Variables    libs/lib1.py  1    2    3    4\n"
+    + "    \n"
     + "Variables    libs/lib1.py\n"
     + "...  val1  #my value\n"
     + "...  val2\n"
     + "...  # no more vals\n"
-    + "Variables    ${a}/\\ folder/file.py" | verify-true
+    + "Variables    ${a}/\\ folder/file.py\n"
+    + "\n" | verify-true
     
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
