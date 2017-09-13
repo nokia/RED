@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _58w70DoTEeaMk_UgyvYHpA
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:55 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/12/17 3:38 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -104,8 +104,8 @@ get-editor "TestFile.robot" | restore
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Source | click
     with [get-text-viewer] {
-        set-caret-pos 23 21
-        select-range 23 21 7 1
+        set-caret-pos 33 21
+        select-range 33 21 7 1
         key-type BackSpace
         wait 500
     }
@@ -182,8 +182,8 @@ check-variable-row -file "tsv_file.tsv" -row 4 -var "${after keyword}"  -value "
 get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Source | click
 with [get-editor "tsv_file.tsv"] {
     with [get-text-viewer] {
-        set-caret-pos 5 10
-	    select-range 5 11 4 1
+        set-caret-pos 8 10
+	    select-range 8 11 7 1
 	    key-type BackSpace
         key-type "M1+s"
         wait 1000
