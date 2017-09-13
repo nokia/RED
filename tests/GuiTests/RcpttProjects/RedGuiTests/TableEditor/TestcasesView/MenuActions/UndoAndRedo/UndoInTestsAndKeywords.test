@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ccE6QJ0dEeaF69zyQwob4Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/21/17 3:22 PM
+Save-Time: 9/12/17 3:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -121,31 +121,32 @@ check-keyword-row -file "TestFile.robot"  -row 1 -kw "kw 1"
 check-keyword-row -file "TestFile.robot"  -row 2 -kw "Convert To Number" -c1 "text"
 check-keyword-row -file "TestFile.robot"  -row 3 -kw ": FOR" -c1 "${x}" -c2 "IN RANGE" -c3 12
 check-keyword-row -file "TestFile.robot"  -row 4 -kw "\\"  -c1 "log" -c2 12
-check-keyword-row -file "TestFile.robot"  -row 5 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 5 -kw ""
+check-keyword-row -file "TestFile.robot"  -row 6 -kw "..."
 
-check-keyword-row -file "TestFile.robot"  -row 6 -kw "second kw"
-check-keyword-row -file "TestFile.robot"  -row 7 -kw "kw 1"
-check-keyword-row -file "TestFile.robot"  -row 8 -kw "[Return]" -c1 4
-check-keyword-row -file "TestFile.robot"  -row 9 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 7 -kw "second kw"
+check-keyword-row -file "TestFile.robot"  -row 8 -kw "kw 1"
+check-keyword-row -file "TestFile.robot"  -row 9 -kw "[Return]" -c1 4
+check-keyword-row -file "TestFile.robot"  -row 10 -kw "..."
 
-check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
-check-keyword-row -file "TestFile.robot"  -row 11 -kw "Log" -c1 67
-check-keyword-row -file "TestFile.robot"  -row 12 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 11 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 12 -kw "Log" -c1 67
+check-keyword-row -file "TestFile.robot"  -row 13 -kw "..."
 
 //undo (value 67) in KW table
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
 
-check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
-check-keyword-row -file "TestFile.robot"  -row 11 -kw "Log"
-check-keyword-row -file "TestFile.robot"  -row 12 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 11 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 12 -kw "Log"
+check-keyword-row -file "TestFile.robot"  -row 13 -kw "..."
 
 
 //undo (Log) in KW table
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
 
-check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
-check-keyword-row -file "TestFile.robot"  -row 11 -kw ""
-check-keyword-row -file "TestFile.robot"  -row 12 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 11 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 12 -kw ""
+check-keyword-row -file "TestFile.robot"  -row 13 -kw "..."
 
 //undo adding new line
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
@@ -153,15 +154,16 @@ check-keyword-row -file "TestFile.robot"  -row 1 -kw "kw 1"
 check-keyword-row -file "TestFile.robot"  -row 2 -kw "Convert To Number" -c1 "text"
 check-keyword-row -file "TestFile.robot"  -row 3 -kw ": FOR" -c1 "${x}" -c2 "IN RANGE" -c3 12
 check-keyword-row -file "TestFile.robot"  -row 4 -kw "\\"  -c1 "log" -c2 12
-check-keyword-row -file "TestFile.robot"  -row 5 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 5 -kw ""
+check-keyword-row -file "TestFile.robot"  -row 6 -kw "..."
 
-check-keyword-row -file "TestFile.robot"  -row 6 -kw "second kw"
-check-keyword-row -file "TestFile.robot"  -row 7 -kw "kw 1"
-check-keyword-row -file "TestFile.robot"  -row 8 -kw "[Return]" -c1 4
-check-keyword-row -file "TestFile.robot"  -row 9 -kw "..."
+check-keyword-row -file "TestFile.robot"  -row 7 -kw "second kw"
+check-keyword-row -file "TestFile.robot"  -row 8 -kw "kw 1"
+check-keyword-row -file "TestFile.robot"  -row 9 -kw "[Return]" -c1 4
+check-keyword-row -file "TestFile.robot"  -row 10 -kw "..."
 
-check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
-check-keyword-row -file "TestFile.robot"  -row 11 -kw "..."
-
+check-keyword-row -file "TestFile.robot"  -row 11 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 12 -kw ""
+check-keyword-row -file "TestFile.robot"  -row 13 -kw "..."
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
