@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project;
+package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,6 +42,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.LibrariesConfigUpdater;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ILibraryClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
