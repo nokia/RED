@@ -12,27 +12,27 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 
 public class RobotEmptyLineTest {
-    
+
     @Test
     public void testEmptyLinesCreationFromCaseForTest() {
-        assertThat(createCallsFromCaseForTest().size()).isEqualTo(5);
+        assertThat(createCallsFromCaseForTest()).hasSize(5);
     }
-    
+
     @Test
     public void testEmptyLinesCreationFromKeywordForTest() {
-        assertThat(createCallsFromKeywordForTest().size()).isEqualTo(5);
+        assertThat(createCallsFromKeywordForTest()).hasSize(5);
     }
-    
+
     @Test
     public void testEmptyLinesCreationFromSettingsForTest() {
-        assertThat(createCallsFromSettingsForTest().size()).isEqualTo(0);
+        assertThat(createCallsFromSettingsForTest()).hasSize(0);
     }
-    
+
     @Test
     public void testEmptyLinesCreationFromVariablesForTest() {
-        assertThat(createCallsFromVariablesForTest().size()).isEqualTo(0);
+        assertThat(createCallsFromVariablesForTest()).hasSize(0);
     }
-    
+
     @Test
     public void testNameGettingForCaseCalls() {
         assertName(createCallsFromCaseForTest());
@@ -92,9 +92,7 @@ public class RobotEmptyLineTest {
     }
 
     private static void assertArguments(final List<RobotEmptyLine> list) {
-        for(final RobotEmptyLine el : list) {
-            assertThat(el.getArguments()).isEmpty();
-        }
+        assertThat(list).allSatisfy(el -> assertThat(el.getArguments()).isEmpty());
     }
 
     private static void assertName(final List<RobotEmptyLine> list) {
@@ -116,11 +114,9 @@ public class RobotEmptyLineTest {
             }
         }
     }
-    
+
     private static void assertComment(final List<RobotEmptyLine> list) {
-        for(final RobotEmptyLine el : list) {
-            assertThat(el.getCommentTokens()).isEmpty();            
-        }
+        assertThat(list).allSatisfy(el -> assertThat(el.getCommentTokens()).isEmpty());
     }
 
     @Test
@@ -131,7 +127,6 @@ public class RobotEmptyLineTest {
             final RobotEmptyLine callCopy = ModelElementsSerDe.copy(call);
 
             assertThat(callCopy).isNotSameAs(call).has(nullParent()).has(noFilePositions());
-
             assertThat(callCopy.getName()).isEqualTo(call.getName());
             assertThat(callCopy.getArguments()).isEqualTo(call.getArguments());
             assertThat(callCopy.getComment()).isEqualTo(call.getComment());
@@ -150,7 +145,7 @@ public class RobotEmptyLineTest {
                 .appendLine("  Log  arg  #comment")
                 .build();
         final RobotCasesSection section = model.findSection(RobotCasesSection.class).get();
-        return section.getChildren().get(0).getChildren().stream().filter(RobotEmptyLine.class::isInstance).map(RobotEmptyLine.class::cast).collect(Collectors.toList());
+        return getEmptyLinesFromSection(section);
     }
 
     private static List<RobotEmptyLine> createCallsFromKeywordForTest() {
@@ -165,9 +160,9 @@ public class RobotEmptyLineTest {
                 .appendLine("  Log  arg  #comment")
                 .build();
         final RobotKeywordsSection section = model.findSection(RobotKeywordsSection.class).get();
-        return section.getChildren().get(0).getChildren().stream().filter(RobotEmptyLine.class::isInstance).map(RobotEmptyLine.class::cast).collect(Collectors.toList());
+        return getEmptyLinesFromSection(section);
     }
-    
+
     private static List<RobotEmptyLine> createCallsFromSettingsForTest() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Metadata  sth")
@@ -180,9 +175,9 @@ public class RobotEmptyLineTest {
                 .appendLine("Default Tags  tag  #comment")
                 .build();
         final RobotSettingsSection section = model.findSection(RobotSettingsSection.class).get();
-        return section.getChildren().get(0).getChildren().stream().filter(RobotEmptyLine.class::isInstance).map(RobotEmptyLine.class::cast).collect(Collectors.toList());
+        return getEmptyLinesFromSection(section);
     }
-    
+
     private static List<RobotEmptyLine> createCallsFromVariablesForTest() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
                 .appendLine("${var}  12")
@@ -196,7 +191,16 @@ public class RobotEmptyLineTest {
                 .appendLine("&{dict}  key=value  #comment")
                 .build();
         final RobotVariablesSection section = model.findSection(RobotVariablesSection.class).get();
-        return section.getChildren().get(0).getChildren().stream().filter(RobotEmptyLine.class::isInstance).map(RobotEmptyLine.class::cast).collect(Collectors.toList());
+        return getEmptyLinesFromSection(section);
     }
 
+    private static List<RobotEmptyLine> getEmptyLinesFromSection(final RobotSuiteFileSection section) {
+        return section.getChildren()
+                .get(0)
+                .getChildren()
+                .stream()
+                .filter(RobotEmptyLine.class::isInstance)
+                .map(RobotEmptyLine.class::cast)
+                .collect(Collectors.toList());
+    }
 }
