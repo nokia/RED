@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _MuhksEH2EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/30/16 5:04 PM
+Save-Time: 9/13/17 2:39 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -126,8 +126,9 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "${var7}    7    #comment7\n"
     + "${var8}    8    #comment8\n"
     + "&{var9}    9=value9    key99=value99    var9    #comment9\n"
-    + "${var10}    10    #comment10\n"
+    + "${var10}    10    #comment10\n\n\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  7" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
