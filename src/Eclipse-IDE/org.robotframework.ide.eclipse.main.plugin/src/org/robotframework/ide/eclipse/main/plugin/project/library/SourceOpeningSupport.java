@@ -38,7 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.KeywordsAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.KeywordsAutoDiscoverer;
 
 /**
  * @author bembenek

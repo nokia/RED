@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project;
+package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -29,7 +29,7 @@ import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.AbstractAutoDiscoverer.IDryRunTargetsCollector;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.AbstractAutoDiscoverer.IDryRunTargetsCollector;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class AbstractAutoDiscovererTest {

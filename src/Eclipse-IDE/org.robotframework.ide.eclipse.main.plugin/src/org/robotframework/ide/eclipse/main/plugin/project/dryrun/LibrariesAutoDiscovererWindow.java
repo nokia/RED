@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project;
+package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static java.util.stream.Collectors.toList;
 
