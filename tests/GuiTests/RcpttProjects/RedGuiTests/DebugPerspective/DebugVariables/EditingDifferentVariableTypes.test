@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __AGDkGyEEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 1:37 PM
+Save-Time: 9/14/17 1:41 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -64,9 +64,9 @@ exec-with-options -disableJobWaiting -command {
 	
 	//change value in list @{c}
 	get-view Variables | get-tree |	get-item "@{c}" | expand
-	try -times 5 -delay 500 -command{
-		get-view Variables | get-tree | get-item "@{c}/\\[2\\]" | get-property "values['Value']" | equals z | verify-true
-	}
+	
+	wait-for-value-in-varaibles-view -item "@{c}/\\[2\\]"  -value "z"
+	wait 500
 	change-var-value  "@{c}/\\[1\\]" middle
 
 	//check if values are changed in list that contains list @{c}
