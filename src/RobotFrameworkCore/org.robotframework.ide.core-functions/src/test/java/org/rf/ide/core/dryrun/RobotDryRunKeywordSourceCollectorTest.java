@@ -9,6 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
+import org.rf.ide.core.execution.agent.LogLevel;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -18,9 +20,9 @@ public class RobotDryRunKeywordSourceCollectorTest {
     public void keywordSourcesAreCollectedFromMessages() throws Exception {
         final RobotDryRunKeywordSourceCollector kwSourceCollector = new RobotDryRunKeywordSourceCollector();
 
-        kwSourceCollector.collectFromMessageEvent(createKeywordMessage("kw1", "lib1", "lib1.py", 3, 5, 7));
-        kwSourceCollector.collectFromMessageEvent(createKeywordMessage("kw2", "lib1", "lib1.py", 5, 6, 4));
-        kwSourceCollector.collectFromMessageEvent(createKeywordMessage("other_kw", "lib2", "lib2.py", 2, 4, 6));
+        kwSourceCollector.collectFromMessageEvent(createKeywordMessageEvent("kw1", "lib1", "lib1.py", 3, 5, 7));
+        kwSourceCollector.collectFromMessageEvent(createKeywordMessageEvent("kw2", "lib1", "lib1.py", 5, 6, 4));
+        kwSourceCollector.collectFromMessageEvent(createKeywordMessageEvent("other_kw", "lib2", "lib2.py", 2, 4, 6));
 
         final RobotDryRunKeywordSource kw1 = new RobotDryRunKeywordSource();
         kw1.setName("kw1");
@@ -52,8 +54,8 @@ public class RobotDryRunKeywordSourceCollectorTest {
         assertCollectedKeywordSource(kwSourceCollector.getKeywordSources().get(2), kw3);
     }
 
-    private static String createKeywordMessage(final String name, final String libraryName, final String path,
-            final int line, final int offset, final int length) throws Exception {
+    private static MessageEvent createKeywordMessageEvent(final String name, final String libraryName,
+            final String path, final int line, final int offset, final int length) throws Exception {
         final Object kwAttributes = ImmutableMap.builder()
                 .put("filePath", path)
                 .put("length", length)
@@ -62,7 +64,8 @@ public class RobotDryRunKeywordSourceCollectorTest {
                 .put("name", name)
                 .put("offset", offset)
                 .build();
-        return new ObjectMapper().writeValueAsString((ImmutableMap.of("keyword", kwAttributes)));
+        final String message = new ObjectMapper().writeValueAsString((ImmutableMap.of("keyword", kwAttributes)));
+        return new MessageEvent(message, LogLevel.NONE, null);
     }
 
     private static void assertCollectedKeywordSource(final RobotDryRunKeywordSource actual,
