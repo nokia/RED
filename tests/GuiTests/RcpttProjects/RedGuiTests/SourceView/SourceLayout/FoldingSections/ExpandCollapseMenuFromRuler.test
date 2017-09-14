@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _V3RHMIpKEea71boqaFnZ5w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/11/16 1:39 PM
+Save-Time: 9/14/17 11:39 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -202,7 +202,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "*** Test Cases ***\n"
     + "last" | verify-true
     
-//set caret on empty line at the end of section    
+//set caret on empty line at the end of section - it will collapse only one test case not all *** Test Cases *** 
 with [get-editor "TestFile.robot" | get-text-viewer] {
 	//hover-text 34 1
     set-caret-pos 13 1
@@ -212,6 +212,25 @@ wait 500
 
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n\n"
     + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  12\n"
+    + " one spce before\n"
+    + "dots at the end\n"
+    + "\tlog\t5\n"
+    + "\t${d}=\tSet Variable    8\n"
+    + "\t...\n\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7\t\n"
+    + "    \n"
+    + "doc is here\n"
+    + "    [Documentation]    line 1\n"
+    + "    Catenate    a    4\n"
     + "    \n"
     + "*** Test Cases ***\n"
     + "last" | verify-true
@@ -224,7 +243,6 @@ get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*
     + "Suite Teardown    Catenate    1    2\n\n"
     + "*** Keywords ***\n"
     + "CheckThroughputRobot\n"
-    + "    \n"
     + "slashes in KW\n"
     + "    Catenate    7\n"
     + "    \\     Should Be Equal As Strings  ds    \\    \\    fsf\n"
@@ -265,10 +283,9 @@ get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*
 
 proc "check-collapsed-text"{
 	get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
-	    + "*** Keywords ***\n\n"
+	    + "*** Keywords ***\n"
 	    + "#here more kw: \n"
 	    + "*** Test cases ***" | verify-true
-		
 }
 
 proc "check-expanded-text"{
@@ -429,8 +446,8 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 //check if was collapsed
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n\n"
     + "*** Test Cases ***\n"
-    + "    \n"
-    + "*** Test Cases ***" | verify-true
+    + "*** Test Cases ***\n"
+    + "    \n" | verify-true
    
     
 ////-----------------------------------------------changes in file -------------------------------------------------------

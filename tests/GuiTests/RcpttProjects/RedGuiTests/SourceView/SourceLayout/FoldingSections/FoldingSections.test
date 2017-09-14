@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _COFiUJ2TEeW7B-b6O1LPeg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/23/16 10:06 AM
+Save-Time: 9/14/17 11:03 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -65,9 +65,7 @@ try -times 5 -delay 1000 -command{
 	    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
 	    + "*** Test Cases ***\n"
 	    + "CAPITAL LETTER\n"
-	    + "\t\n"
-	    + "\t\n"
-	    + "test1\n\n"
+	    + "test1\n"
 	    + "*** Keywords ***\n"
 	    + "REVERSE MY LIST\n"
 	    + "\t@{list_to_revert}=  Create List  1  2\n"

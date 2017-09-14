@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _p1t0sIlwEeaMF54F4EAT1Q
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:59 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/14/17 10:38 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -502,18 +502,9 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "test 1\n"
     + "    log  12\n"
     + " one spce before\n"
-    + "     Should Be Empty    item\n"
-    + "    Log Many    second line\n"
-    + "    \n"
-    + "    \n\n"
     + "dots at the end\n"
-    + "\tlog\t5\n"
-    + "\t${d}=\tSet Variable    8\n"
-    + "\t...\n\n"
     + "many line\n"
-    + "    \n"
     + "doc is here\n"
-    + "    \n"
     + "*** Test Cases ***\n"
     + "last" | verify-true
     
