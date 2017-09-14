@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-SZoMF_XEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/6/16 4:20 PM
+Save-Time: 9/14/17 1:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -46,18 +46,21 @@ get-editor "settings.robot" | get-text-viewer | get-property text | equals "*** 
     + "*** Settings ***\n"
     + "Resource    ${/}\n"
     + "Metadata    new\n"
+    + "\n"
     + "Metadata    data\n"
     + " *** Keyword ***\n"
     + "# Keyword\n"
     + "    # log  12\n"
     + "    # Should Be Equal    11    11\n"
+    + "    \n"
     + "# kw2\n"
     + "    # Catenate    1    2    3    4    5    6\n"
     + "    # Get Time\n"
     + "# # kw3\n"
     + "    # # log  45\n"
     + "    # # log  78\n"
-    + "    # # log  90" | verify-true
+    + "    # # log  90"
+    + "\n" | verify-true
     
 
     
@@ -96,7 +99,10 @@ with [get-editor "variables.robot" | get-text-viewer] {
         + "${ref}    /ref/ref/file.jpg    #image\n"
         + "${a}    ${a}\n"
         + "${B}\n"
+        + "\n"
+        + "\n"
         + "#ll\n"
+        + "\n"
         + "*** Test Cases ***\n"
         + "test\n"
         + "    log  7" | verify-true
@@ -126,20 +132,23 @@ with [get-editor "res.robot"] {
 }
 
 get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Library   OperatingSystem \n"
+    + "Library   OperatingSystem \n\n"
     + " *** Keyword ***\n"
     + "kw1\n"
     + "    [Documentation]    doc1    \n"
     + "    Import Resource    new path\n"
     + "    None Shall Pass    who\n"
     + "    Repeat Keyword    repeat    name    \n"
+    + "    \n"
     + "kw2\n"
     + "    [Arguments]    ${a}  ${b}\n"
     + "    [Tags]    new    \n"
     + "    Catenate    a  b  c\n"
+    + "    \n"
     + "# kw3\n"
     + "    # Log  4\n"
     + "    # log  5\n"
+    + "    \n"
     + "    # log  7" | verify-true
  
  
@@ -165,7 +174,7 @@ with [get-editor "comment_at_the_end.robot"] {
 //remove "keyword 1" 
 with [get-editor "comment_at_the_end.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 13 10
+        set-caret-pos 15 10
         key-type BackSpace -times 9
         key-type "M1+s"
         wait 500
@@ -189,6 +198,7 @@ get-editor "comment_at_the_end.robot" | get-text-viewer | get-property text | eq
     + "Keyword\n"
     + "    log  12\n"
     + "    Should Be Equal    11    11\n"
+    + "    \n"
     + "kw2\n"
     + "    Catenate    1    2    3    4    5    6\n"
     + "    Get Time\n"
@@ -196,7 +206,4 @@ get-editor "comment_at_the_end.robot" | get-text-viewer | get-property text | eq
     + "    # log  45\n"
     + "    # log  78\n"
     + "    # log  90" | verify-true
- 
-
-
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
