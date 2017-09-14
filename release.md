@@ -12,10 +12,10 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
 
 ## Notable updates
-- content assist can search for patterns inside propolsals (eg. searching for "og" will return "log" keyword)
-- content assist can return Keywords when searching for capital letters (eg. activating content assist and writting LM will return Log Many)
-- content assist now provides keywords from libs which are not included in TestSuite but avaliable in project (entry in Referenced libraries in red.xml)
-- debug is more aware which file it showing,this relates to cases when suite names are not unique witheen project. Debug also can check if debug run in robot is consistent to suite file being displayed.Covered in #111
+- content assist can search for patterns inside proposals (eg. searching for "og" will return "log" keyword)
+- content assist can return Keywords when searching for capital letters (eg. activating content assist and writing LM will return Log Many)
+- content assist now provides keywords from libs which are not included in TestSuite but available in project (entry in Referenced libraries in red.xml)
+- debug is more aware which file it showing,this relates to cases when suite names are not unique within project. Debug also can check if debug run in robot is consistent to suite file being displayed.Covered in #111
 - table editors should preserve empty lines and show duplicated sections. Still there is some work to do
 - variable mappings can use already mapped variables to resolve values.Item covered in #120 
 - more detailed progress bar for Automatically discover libraries from Robot Framework right-click menu
