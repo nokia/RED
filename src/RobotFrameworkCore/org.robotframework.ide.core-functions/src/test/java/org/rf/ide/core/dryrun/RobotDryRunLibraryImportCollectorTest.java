@@ -13,7 +13,9 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
+import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -54,7 +56,7 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of());
 
-        libImportCollector.collectFromFailMessageEvent(createFailMessage("lib"));
+        libImportCollector.collectFromFailMessageEvent(createFailMessageEvent("lib"));
 
         final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", null, null, Arrays.asList());
         lib.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
@@ -69,7 +71,7 @@ public class RobotDryRunLibraryImportCollectorTest {
         final RobotDryRunLibraryImportCollector libImportCollector = new RobotDryRunLibraryImportCollector(
                 ImmutableSet.of());
 
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib", "/suite.robot"));
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessageEvent("lib", "/suite.robot"));
 
         final RobotDryRunLibraryImport lib = new RobotDryRunLibraryImport("lib", null, new URI("file:///suite.robot"),
                 Arrays.asList());
@@ -108,11 +110,11 @@ public class RobotDryRunLibraryImportCollectorTest {
 
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib1", new URI("file:///suite1.robot"),
                 new URI("file:///lib1.py"), Arrays.asList()));
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib2", "/suite2.robot"));
-        libImportCollector.collectFromFailMessageEvent(createFailMessage("lib3"));
-        libImportCollector.collectFromFailMessageEvent(createFailMessage("lib4"));
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "/suite5.robot"));
-        libImportCollector.collectFromErrorMessageEvent(createErrorMessage("lib5", "/other.robot"));
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessageEvent("lib2", "/suite2.robot"));
+        libImportCollector.collectFromFailMessageEvent(createFailMessageEvent("lib3"));
+        libImportCollector.collectFromFailMessageEvent(createFailMessageEvent("lib4"));
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessageEvent("lib5", "/suite5.robot"));
+        libImportCollector.collectFromErrorMessageEvent(createErrorMessageEvent("lib5", "/other.robot"));
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib6", new URI("file:///suite6.robot"),
                 new URI("file:///lib6.py"), Arrays.asList()));
         libImportCollector.collectFromLibraryImportEvent(new LibraryImportEvent("lib6", new URI("file:///other.robot"),
@@ -153,13 +155,15 @@ public class RobotDryRunLibraryImportCollectorTest {
         assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(5), lib6, DryRunLibraryType.PYTHON);
     }
 
-    private static String createFailMessage(final String libName) {
-        return "{LIB_ERROR: " + libName + ", value: VALUE_START((Importing test library " + libName
+    private static MessageEvent createFailMessageEvent(final String libName) {
+        final String message = "{LIB_ERROR: " + libName + ", value: VALUE_START((Importing test library " + libName
                 + " failed))VALUE_END, lib_file_import:None}";
+        return new MessageEvent(message, LogLevel.FAIL, null);
     }
 
-    private static String createErrorMessage(final String libName, final String fileName) {
-        return "Error in file '" + fileName + "': Test library '" + libName + "' does not exist.";
+    private static MessageEvent createErrorMessageEvent(final String libName, final String fileName) {
+        final String message = "Error in file '" + fileName + "': Test library '" + libName + "' does not exist.";
+        return new MessageEvent(message, LogLevel.ERROR, null);
     }
 
     private static void assertCollectedLibraryImport(final RobotDryRunLibraryImport actual,

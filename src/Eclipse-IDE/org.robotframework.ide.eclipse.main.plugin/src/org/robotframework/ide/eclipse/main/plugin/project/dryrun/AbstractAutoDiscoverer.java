@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.dryrun.RobotDryRunAlwaysContinueEventListener;
+import org.rf.ide.core.dryrun.RobotDryRunSuiteCountEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.TestsMode;
 import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
@@ -97,8 +99,7 @@ public abstract class AbstractAutoDiscoverer {
 
     void startDiscovering(final IProgressMonitor monitor) throws CoreException, InterruptedException {
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
-        subMonitor.subTask("Preparing Robot dry run execution...");
-        subMonitor.setWorkRemaining(4);
+        subMonitor.setWorkRemaining(10);
 
         try {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
@@ -107,14 +108,13 @@ public abstract class AbstractAutoDiscoverer {
                         "There is no active runtime environment for project '" + robotProject.getName() + "'");
             }
 
+            subMonitor.subTask("Preparing Robot dry run execution...");
             collectLibrarySources(runtimeEnvironment);
-            subMonitor.worked(1);
-
             dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, resources);
             subMonitor.worked(1);
 
-            subMonitor.subTask("Connecting to Robot dry run process...");
             if (!subMonitor.isCanceled()) {
+                subMonitor.subTask("Connecting to Robot dry run process...");
                 executeDryRun(runtimeEnvironment, subMonitor);
             }
             subMonitor.worked(1);
@@ -146,13 +146,27 @@ public abstract class AbstractAutoDiscoverer {
 
     private AgentConnectionServerJob startDryRunServer(final String host, final int port, final int timeout,
             final SubMonitor subMonitor) throws InterruptedException {
-        final AgentServerTestsStarter testsStarter = new DryRunAgentServerTestsStarter(subMonitor);
+        final AgentServerTestsStarter testsStarter = new AgentServerTestsStarter(TestsMode.RUN) {
+
+            @Override
+            public void handleAgentInitializing(final AgentInitializingEvent event) {
+                super.handleAgentInitializing(event);
+                subMonitor.worked(1);
+                subMonitor.subTask("Starting Robot dry run execution...");
+            }
+        };
         final AgentConnectionServerJob serverJob = AgentConnectionServerJob.setupServerAt(host, port)
                 .withConnectionTimeout(timeout, TimeUnit.SECONDS)
                 .agentEventsListenedBy(new AgentServerVersionsChecker())
                 .agentEventsListenedBy(testsStarter)
-                .agentEventsListenedBy(createDryRunEventListener(
-                        suiteName -> subMonitor.subTask("Executing Robot dry run on suite: " + suiteName)))
+                .agentEventsListenedBy(new RobotDryRunAlwaysContinueEventListener())
+                .agentEventsListenedBy(new RobotDryRunSuiteCountEventListener(suiteCount -> {
+                    subMonitor.setWorkRemaining(suiteCount);
+                }))
+                .agentEventsListenedBy(createDryRunCollectorEventListener(suiteName -> {
+                    subMonitor.worked(1);
+                    subMonitor.subTask("Executing Robot dry run on suite: " + suiteName);
+                }))
                 .agentEventsListenedBy(new AgentServerKeepAlive())
                 .start()
                 .waitForServer();
@@ -162,24 +176,7 @@ public abstract class AbstractAutoDiscoverer {
         return serverJob;
     }
 
-    private static class DryRunAgentServerTestsStarter extends AgentServerTestsStarter {
-
-        private final SubMonitor subMonitor;
-
-        public DryRunAgentServerTestsStarter(final SubMonitor subMonitor) {
-            super(TestsMode.RUN);
-            this.subMonitor = subMonitor;
-        }
-
-        @Override
-        public void handleAgentInitializing(final AgentInitializingEvent event) {
-            super.handleAgentInitializing(event);
-            subMonitor.subTask("Executing Robot dry run...");
-        }
-
-    }
-
-    abstract RobotAgentEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler);
+    abstract RobotAgentEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler);
 
     private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port) {
         runtimeEnvironment.startLibraryAutoDiscovering(port, dryRunTargetsCollector.getSuiteNames(),

@@ -11,10 +11,7 @@ import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
-import org.rf.ide.core.execution.agent.event.ShouldContinueEvent;
 import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
-import org.rf.ide.core.execution.server.response.ContinueExecution;
-import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 
 public class RobotDryRunLibraryEventListener extends RobotDefaultAgentEventListener {
 
@@ -41,18 +38,9 @@ public class RobotDryRunLibraryEventListener extends RobotDefaultAgentEventListe
     @Override
     public void handleMessage(final MessageEvent event) {
         if (event.getLevel() == LogLevel.FAIL) {
-            dryRunLibraryImportCollector.collectFromFailMessageEvent(event.getMessage());
+            dryRunLibraryImportCollector.collectFromFailMessageEvent(event);
         } else if (event.getLevel() == LogLevel.ERROR) {
-            dryRunLibraryImportCollector.collectFromErrorMessageEvent(event.getMessage());
-        }
-    }
-
-    @Override
-    public void handleShouldContinue(final ShouldContinueEvent event) {
-        try {
-            event.responder().respond(new ContinueExecution());
-        } catch (final ResponseException e) {
-            throw new RobotAgentEventsListenerException("Unable to send response to client", e);
+            dryRunLibraryImportCollector.collectFromErrorMessageEvent(event);
         }
     }
 }

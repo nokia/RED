@@ -4,7 +4,6 @@
 # see license.txt file for details.
 #
 
-import time
 import threading
 import sys
 import json
@@ -49,6 +48,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
             suite.parent.tests.clear()
             suite.parent.keywords.clear()
         else:
+            # when first suite is visited all suites are counted and message is send to server
+            msg = json.dumps({'suite_count': self.__count_suites(suite)})
+            LOGGER.message(Message(message=msg, level='NONE'))
+
             if len(suite.tests) == 0 or suite.test_count == 0:
                 current_suite = RedTestSuiteBuilder().build(suite.source)
                 if len(self.f_suites) == 0:
@@ -72,6 +75,12 @@ class SuiteVisitorImportProxy(SuiteVisitor):
     def visit_message(self, msg):
         # message visiting skipped
         pass
+
+    def __count_suites(self, suite):
+        if suite.suites:
+            return 1 + sum(self.__count_suites(s) for s in suite.suites)
+        else:
+            return 1
 
     def __filter_by_name(self, suites):
         matched_suites = []
