@@ -89,7 +89,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    RobotDryRunLibraryEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler) {
+    RobotDryRunLibraryEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
         return new RobotDryRunLibraryEventListener(dryRunLibraryImportCollector, startSuiteHandler);
     }
 

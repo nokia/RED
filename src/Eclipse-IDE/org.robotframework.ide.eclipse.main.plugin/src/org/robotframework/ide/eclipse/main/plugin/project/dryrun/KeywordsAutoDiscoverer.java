@@ -41,7 +41,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    RobotDryRunKeywordEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler) {
+    RobotDryRunKeywordEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
         return new RobotDryRunKeywordEventListener(dryRunLKeywordSourceCollector, startSuiteHandler);
     }
 

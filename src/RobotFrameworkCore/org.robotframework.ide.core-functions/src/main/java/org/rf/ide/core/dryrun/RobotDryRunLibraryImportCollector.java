@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 
 import com.google.common.io.Files;
 
@@ -59,47 +60,45 @@ public class RobotDryRunLibraryImportCollector {
         resetCurrentLibraryImportWithFail();
     }
 
-    public void collectFromFailMessageEvent(final String message) {
-        if (message != null) {
-            final String libraryName = extractLibName(message);
-            if (!libraryName.isEmpty()) {
-                final String failReason = extractFailReason(message);
-                resetCurrentLibraryImportWithFail();
-                final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName);
-                final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
-                if (libIndex < 0) {
-                    dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-                    dryRunLibraryImport.setAdditionalInfo(failReason);
-                    importedLibraries.add(dryRunLibraryImport);
-                } else {
-                    importedLibraries.get(libIndex).setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-                    importedLibraries.get(libIndex).setAdditionalInfo(failReason);
-                }
-                currentLibraryImportWithFail = dryRunLibraryImport;
+    public void collectFromFailMessageEvent(final MessageEvent event) {
+        final String message = event.getMessage();
+        final String libraryName = extractLibName(message);
+        if (!libraryName.isEmpty()) {
+            final String failReason = extractFailReason(message);
+            resetCurrentLibraryImportWithFail();
+            final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName);
+            final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
+            if (libIndex < 0) {
+                dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+                dryRunLibraryImport.setAdditionalInfo(failReason);
+                importedLibraries.add(dryRunLibraryImport);
+            } else {
+                importedLibraries.get(libIndex).setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+                importedLibraries.get(libIndex).setAdditionalInfo(failReason);
             }
+            currentLibraryImportWithFail = dryRunLibraryImport;
         }
     }
 
-    public void collectFromErrorMessageEvent(final String message) {
-        if (message != null) {
-            final String nameStartTxt = "': Test library '";
-            final int nameStartIndex = message.lastIndexOf(nameStartTxt);
-            final int endIndex = message.lastIndexOf("' does not exist");
-            if (nameStartIndex > 0 && endIndex > nameStartIndex) {
-                final String libName = message.substring(nameStartIndex + nameStartTxt.length(), endIndex);
-                final URI importer = extractImporter(message, nameStartIndex);
-                final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libName);
-                final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
-                if (libIndex < 0) {
-                    dryRunLibraryImport.addImporterPath(importer);
-                    dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-                    dryRunLibraryImport.setAdditionalInfo(message);
-                    importedLibraries.add(dryRunLibraryImport);
-                } else {
-                    importedLibraries.get(libIndex).addImporterPath(importer);
-                    importedLibraries.get(libIndex).setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-                    importedLibraries.get(libIndex).setAdditionalInfo(message);
-                }
+    public void collectFromErrorMessageEvent(final MessageEvent event) {
+        final String message = event.getMessage();
+        final String nameStartTxt = "': Test library '";
+        final int nameStartIndex = message.lastIndexOf(nameStartTxt);
+        final int endIndex = message.lastIndexOf("' does not exist");
+        if (nameStartIndex > 0 && endIndex > nameStartIndex) {
+            final String libName = message.substring(nameStartIndex + nameStartTxt.length(), endIndex);
+            final URI importer = extractImporter(message, nameStartIndex);
+            final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libName);
+            final int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
+            if (libIndex < 0) {
+                dryRunLibraryImport.addImporterPath(importer);
+                dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+                dryRunLibraryImport.setAdditionalInfo(message);
+                importedLibraries.add(dryRunLibraryImport);
+            } else {
+                importedLibraries.get(libIndex).addImporterPath(importer);
+                importedLibraries.get(libIndex).setStatus(DryRunLibraryImportStatus.NOT_ADDED);
+                importedLibraries.get(libIndex).setAdditionalInfo(message);
             }
         }
     }
@@ -138,19 +137,16 @@ public class RobotDryRunLibraryImportCollector {
     }
 
     private String extractFailReason(final String message) {
-        if (message != null) {
-            final String failReason = message.replaceAll("\\\\n", "\n").replaceAll("\\\\'", "'");
-            final String startText = "VALUE_START";
-            final String endText = "VALUE_END";
-            final int beginIndex = failReason.indexOf(startText);
-            final int endIndex = failReason.lastIndexOf(endText);
-            if (beginIndex >= 0 && endIndex > 0) {
-                return failReason.substring(beginIndex + startText.length() + 1, endIndex - 1)
-                        .replace("<class 'robot.errors.DataError'>, DataError(", "");
-            }
-            return failReason;
+        final String failReason = message.replaceAll("\\\\n", "\n").replaceAll("\\\\'", "'");
+        final String startText = "VALUE_START";
+        final String endText = "VALUE_END";
+        final int beginIndex = failReason.indexOf(startText);
+        final int endIndex = failReason.lastIndexOf(endText);
+        if (beginIndex >= 0 && endIndex > 0) {
+            return failReason.substring(beginIndex + startText.length() + 1, endIndex - 1)
+                    .replace("<class 'robot.errors.DataError'>, DataError(", "");
         }
-        return "";
+        return failReason;
     }
 
     private void resetCurrentLibraryImportWithFail() {

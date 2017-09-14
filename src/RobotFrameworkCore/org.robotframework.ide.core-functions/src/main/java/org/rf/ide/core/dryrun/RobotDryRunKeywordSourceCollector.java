@@ -10,31 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.rf.ide.core.execution.agent.event.MessageEvent;
 
 /**
  * @author bembenek
  */
 public class RobotDryRunKeywordSourceCollector {
 
-    private static final String KEYWORD_KEY = "keyword";
+    private static final TypeReference<Map<String, RobotDryRunKeywordSource>> MESSAGE_TYPE = new TypeReference<Map<String, RobotDryRunKeywordSource>>() {
+    };
 
     private final List<RobotDryRunKeywordSource> keywordSources = new ArrayList<>();
 
-    private final ObjectMapper mapper = new ObjectMapper();
-
-    public void collectFromMessageEvent(final String message) {
-        try {
-            final Map<String, RobotDryRunKeywordSource> keywordEntry = mapper.readValue(message,
-                    new TypeReference<Map<String, RobotDryRunKeywordSource>>() {
-                    });
-            if (keywordEntry.containsKey(KEYWORD_KEY)) {
-                keywordSources.add(keywordEntry.get(KEYWORD_KEY));
-            }
-        } catch (final IOException e) {
-            e.printStackTrace();
-        }
+    public void collectFromMessageEvent(final MessageEvent event) throws IOException {
+        JsonMessageMapper.readValue(event, "keyword", MESSAGE_TYPE).ifPresent(keywordSources::add);
     }
 
     public List<RobotDryRunKeywordSource> getKeywordSources() {
