@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __AGDkGyEEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/18/17 5:01 PM
+Save-Time: 9/14/17 10:35 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -132,8 +132,9 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "${b}" | get-property "values['Value']" | equals 45 | verify-true
 	}
 	//check dict
+	get-view Variables | get-tree | get-item "&{dict}" | expand
+	wait-for-value-in-varaibles-view -item "&{dict}/last" -value 45
 	with [get-view Variables | get-tree] {
-		get-item "&{dict}" | expand
 	    get-item "&{dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
 	    get-item "&{dict}/fruit" | get-property "values['Value']" | equals " apple" | verify-true
 	    get-item "&{dict}/key" | get-property "values['Name']" | equals key | verify-true
@@ -141,8 +142,10 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "&{dict}/last" | get-property "values['Name']" | equals last | verify-true
 	    get-item "&{dict}/last" | get-property "values['Value']" | equals "45" | verify-true
 	}
-	with [get-view Variables | get-tree] {
-	 	get-item "@{list}" | expand
+	get-view Variables | get-tree | get-item "@{list}" | expand
+	wait-for-value-in-varaibles-view -item  "@{list}/\\[3\\]" -value 45
+	
+	with [get-view Variables | get-tree] {	
 	    get-item "@{list}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{list}/\\[0\\]" | get-property "values['Value']" | equals 66 | verify-true
 	    get-item "@{list}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
