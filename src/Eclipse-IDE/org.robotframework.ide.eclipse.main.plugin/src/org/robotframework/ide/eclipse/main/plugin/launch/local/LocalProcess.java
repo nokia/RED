@@ -118,7 +118,7 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
     @Override
     public void resumed() {
         isSuspended = false;
-        fireEvent(DebugEvent.RESUME);
+        fireEvent(DebugEvent.CHANGE);
     }
 
     @Override
@@ -140,12 +140,12 @@ public class LocalProcess extends RuntimeProcess implements IRobotProcess {
     @Override
     public void suspended() {
         isSuspended = true;
-        fireEvent(DebugEvent.SUSPEND);
+        fireEvent(DebugEvent.CHANGE);
     }
 
     @Override
     public String getLabel() {
-        return (isSuspended() ? "<supsended>" : "") + super.getLabel();
+        return (isSuspended() ? "<suspended>" : "") + super.getLabel();
     }
 
     private void fireEvent(final int kind) {
