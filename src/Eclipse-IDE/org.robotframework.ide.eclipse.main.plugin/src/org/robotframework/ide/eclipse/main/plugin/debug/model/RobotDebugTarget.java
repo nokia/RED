@@ -150,6 +150,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         getThread().resumed();
         getThread().fireResumeEvent(DebugEvent.CLIENT_REQUEST);
+        this.fireChangeEvent(DebugEvent.CHANGE);
     }
 
     void changeVariable(final StackFrame frame, final StackFrameVariable variable, final List<String> arguments) {

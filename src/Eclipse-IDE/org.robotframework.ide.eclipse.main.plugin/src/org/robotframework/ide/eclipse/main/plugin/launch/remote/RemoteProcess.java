@@ -91,7 +91,7 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
     @Override
     public void resumed() {
         isSuspended = false;
-        fireEvent(DebugEvent.RESUME);
+        fireEvent(DebugEvent.CHANGE);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
     @Override
     public void suspended() {
         isSuspended = true;
-        fireEvent(DebugEvent.SUSPEND);
+        fireEvent(DebugEvent.CHANGE);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class RemoteProcess implements IRobotProcess, IDisconnect {
 
     @Override
     public String getLabel() {
-        return (isSuspended() ? "<supsended>" : "") + label;
+        return (isSuspended() ? "<suspended>" : "") + label;
     }
 
     @Override
