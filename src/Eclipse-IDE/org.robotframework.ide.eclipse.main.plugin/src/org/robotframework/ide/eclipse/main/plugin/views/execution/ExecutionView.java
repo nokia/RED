@@ -220,6 +220,10 @@ public class ExecutionView {
     }
 
     private void resetView() {
+        if (executionViewer.getTree().isDisposed()) {
+            return;
+        }
+
         executionViewer.setInput(null);
         messageText.setText("");
 
@@ -233,6 +237,10 @@ public class ExecutionView {
     }
 
     private void refreshEverything(final ExecutionStatusStore elementsStore) {
+        if (executionViewer.getTree().isDisposed()) {
+            return;
+        }
+
         setProgress(elementsStore.getCurrentTest(), elementsStore.getPassedTests(), elementsStore.getFailedTests(),
                 elementsStore.getTotalTests());
 
