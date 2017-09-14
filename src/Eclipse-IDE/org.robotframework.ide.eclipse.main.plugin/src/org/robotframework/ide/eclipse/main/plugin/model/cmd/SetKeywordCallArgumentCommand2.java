@@ -48,8 +48,15 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         // TODO : replace SetKeywordCallArgument with this implementation since this
         // one seems simpler
 
+        // return if there is nothing to change and DO NOT convert RobotEmptyLine
+        if (keywordCall instanceof RobotEmptyLine && value == null) {
+            return;
+        }
+
         // convert keywordCall from RobotEmptyLine to simple RobotKeywordCall if needed
-    	RobotKeywordCall keywordCallToUpdate = keywordCall instanceof RobotEmptyLine ? changeEmptyToExecutable(keywordCall) : keywordCall;
+        final RobotKeywordCall keywordCallToUpdate = keywordCall instanceof RobotEmptyLine
+                ? changeEmptyToExecutable(keywordCall)
+                : keywordCall;
 
         final List<String> oldArguments = keywordCallToUpdate.getArguments();
 
@@ -57,8 +64,8 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         final List<String> arguments = prepareArgumentsList(keywordCallToUpdate.getArguments(), index, value);
 
         if (newName.isPresent()) {
-            final SetSimpleKeywordCallName changeNameCommand = new SetSimpleKeywordCallName(eventBroker, keywordCallToUpdate,
-                    newName.get());
+            final SetSimpleKeywordCallName changeNameCommand = new SetSimpleKeywordCallName(eventBroker,
+                    keywordCallToUpdate, newName.get());
             changeNameCommand.execute();
 
             undoOperations.addAll(changeNameCommand.getUndoCommands());
