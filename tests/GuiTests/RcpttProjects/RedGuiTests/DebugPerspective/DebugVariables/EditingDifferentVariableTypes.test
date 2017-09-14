@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __AGDkGyEEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 10:35 AM
+Save-Time: 9/14/17 1:37 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -213,9 +213,12 @@ exec-with-options -disableJobWaiting -command {
 	
 	//check 2 list (here is bug)
 	get-view Variables | get-tree | get-item "@{assigned}" | expand
-	try -times 4 -delay 500 -command{
-		get-view Variables | get-tree | get-item "@{assigned}/\\[3\\]" | get-property "values['Value']" | not-eq "" | verify-true
-	}
+
+	wait-for-value-in-varaibles-view -item "@{assigned}/\\[3\\]" -value "t1"
+	
+	get-view Variables | get-tree | get-item "@{assigned}/[0]" | expand
+	wait-for-value-in-varaibles-view -item "@{assigned}/\\[0\\]/\\[2\\]" -value "z"
+	
 	
 	with [get-view Variables | get-tree] {
 	    get-item "&{dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
@@ -224,6 +227,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "&{dict}/key" | get-property "values['Value']" | equals value | verify-true
 	    get-item "&{dict}/last" | get-property "values['Name']" | equals last | verify-true
 	    get-item "&{dict}/last" | get-property "values['Value']" | equals 45 | verify-true
+	    
 	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{assigned}/\\[0\\]/\\[0\\]" | get-property "values['Value']" | equals 1111 | verify-true
 	    get-item "@{assigned}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
@@ -232,6 +236,7 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "@{assigned}/\\[2\\]" | get-property "values['Value']" | equals a2 | verify-true
 	    get-item "@{assigned}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
 	    get-item "@{assigned}/\\[3\\]" | get-property "values['Value']" | equals t1 | verify-true
+	    
 	    get-item "@{c}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{c}/\\[0\\]" | get-property "values['Value']" | equals x | verify-true
 	    get-item "@{c}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
