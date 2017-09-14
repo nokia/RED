@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OPRvEF18EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/7/17 11:44 AM
+Save-Time: 9/13/17 4:05 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -73,25 +73,31 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw1\n"
     + "    log  1\n"
     + "    [return]  9\n"
+    + "   \n"
     + "kw-2\n"
     + "    Should Be Empty    item       \n"
+    + "   \n"
     + "kw3\n"
     + "    [Documentation]    doc\n"
     + "    a1\n"
     + "    a2\n"
     + "    a3\n"
+    + "       \n"
     + "kw- 4\n"
     + "    Should Be Empty    item\n"
+    + "       \n"
     + "kw- 3\n"
     + "    Should Be Empty    item\n"
+    + "       \n"
     + "kw4\n"
     + "    Set Log Level    5\n"
     + "    Catenate    a  3\n"
+    + "    \n"
     + "kw5\n"
     + "    \\" | verify-true
     
 //------------------------------------------------------------------------------------
-//bug RED-536 
+
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "*** Keywords ***\n"
     + "kw1\n"
@@ -129,94 +135,45 @@ get-view Outline | get-tree | select "TestFile.robot/Keywords/kw5" | click
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     get-menu "Row/Paste row" | click
     //go to Catenate and cut line when selction is on "a"
-    key-type Up -times 2
+    key-type Up -times 3
     key-type Right
     get-menu "Row/Cut row" | click
+    
+    
+    //go to kw5 and paste row
+    key-type Down -times 6
+    get-menu "Row/Paste row" | click
 }
 
-
-
-//cut empty line
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw5" |  click
+//cut empty line below a3 and try to paste 2 lines up
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw3/a3" | click
 wait 300
-with [get-editor "TestFile.robot"] {
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down -times 2
-        key-type Enter
-    }
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        get-menu "Row/Cut row" | click
-	}
-}
 
-//go to "..." and paste empty line
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | click
-wait 500
-with [get-editor "TestFile.robot"] {
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down -times 2
-        get-menu "Row/Paste row" | click
-        key-type Enter
-    }
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "this was empty line"
-        key-type "NUMPAD_ENTER" "\\u000D"
-    }
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Esc
-}
-
-
-//go to documentation and cut it
-with [get-editor "TestFile.robot"] {
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Up -times 7
-        key-type "M1+M2+x"
-    }
-}
-
-//paste as first line in kw4 (it will be added to Source at the end)
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | click
-wait 300
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type Down
-    key-type "M1+M2+v"
+    get-menu "Row/Cut row" | click
+    key-type Up
 }
 
-//blad tu jest doc powinen byc na koncu kw matki
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Row/Paste row" 
+    | get-property enablement | equals true | verify-true
 
 
-//bug created here: RED-536 
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "*** Keywords ***\n"
-    + "kw1\n"
-    + "    log  1\n"
-    + "    [return]  9\n"
-    + "kw3\n"
-    + "    a1\n"
-    + "    a2\n"
-    + "    a3\n"
-    + "kw4\n"
-    + "    [Documentation]    doc\n"
-    + "    Set Log Level    5\n"
-    + "    this was empty line\n"
-    + "kw-2\n"
-    + "    Should Be Empty    item\n"
-    + "kw5\n"
-    + "    \\" | verify-true
-    
-// one more verification of [Documentation] setting location
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-wait 300
+//go to documentation and cut it using shortcut
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw3"
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down
+    key-type "M1+M2+x"
+}
+
+//paste Doc between 2 kw
 get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | click
-wait 200
+wait 300
+
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down
-        key-type "M1+M2+x"
         key-type Down -times 2
         key-type "M1+M2+v"
-        key-type "M1+s"
     }
     get-tab-folder | get-tab-item Source | click
 }
@@ -225,18 +182,30 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw1\n"
     + "    log  1\n"
     + "    [return]  9\n"
+    + "   \n"
+    + "kw-2\n"
+    + "    Should Be Empty    item       \n"
+    + "   \n"
     + "kw3\n"
     + "    a1\n"
     + "    a2\n"
     + "    a3\n"
+    + "       \n"
     + "kw4\n"
     + "    Set Log Level    5\n"
-    + "    this was empty line\n"
     + "    [Documentation]    doc\n"
-    + "kw-2\n"
-    + "    Should Be Empty    item\n"
+    + "    Catenate    a  3\n"
+    + "    \n"
     + "kw5\n"
-    + "    \\" | verify-true
-    
-//to-do wklejanie 2x tego samego, wklejanie [set] do isniejacej i innego kw
+
+
+//dodanie testu z cut/paste pustych linii    
+//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+//    + "*** Keywords ***\n"
+//    + "kw1\n\n\n"
+//    + "kw2\n"
+//    + "    log  1\n"
+//    + "    log  2\n"
+//    + "    \n"
+//    + "    log  3" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
