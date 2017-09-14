@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/7/17 3:49 PM
+Save-Time: 9/14/17 10:24 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -105,5 +105,11 @@ proc "wait-for-variables"{
 	try -times 4 -delay 500 -command{
 			get-view Variables | get-tree | get-property itemCount | equals 0 | verify-false
 		}	
+}
+
+proc "wait-for-value-in-varaibles-view" [val item] [val value] {
+	try -times 4 -delay 500  -command{
+		get-view Variables | get-tree | get-item $item | get-property "values['Value']" | equals $value | verify-true
+	}
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
