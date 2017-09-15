@@ -65,7 +65,8 @@ public class AbstractAutoDiscovererTest {
         return new AbstractAutoDiscoverer(robotProject, resources, sourcesCollector, targetsCollector) {
 
             @Override
-            RobotDefaultAgentEventListener createDryRunEventListener(final Consumer<String> startSuiteHandler) {
+            RobotDefaultAgentEventListener createDryRunCollectorEventListener(
+                    final Consumer<String> startSuiteHandler) {
                 return new RobotDefaultAgentEventListener() {
                     // nothing to implement
                 };
