@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oetugJnLEeWXV_VOYkM3Sw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/11/17 10:03 AM
+Save-Time: 9/15/17 4:19 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -70,12 +70,15 @@ exec-with-options -disableJobWaiting -command {
 	//concat    
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 5 5
 	check-variable-in-info-window -value  "text7"
+	get-eclipse-window | key-type ESC
 	    
 	//step into   
 	get-button "Step Into (F5)" | click
+	wait 1000
 	
 	//x
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 10 12
+	wait 200
 	check-variable-in-info-window -value 6
 	
 	try -times 5 -delay 500 -command{
@@ -85,6 +88,7 @@ exec-with-options -disableJobWaiting -command {
 	    click
 	    wait 1000
 	    click
+	    wait 1000
 	}
 	get-editor "TestFile.robot" | get-text-viewer | hover-text 12 12
 	check-variable-in-info-window -value 10
