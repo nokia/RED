@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5GosELXwEeWiPpdsqt1XOg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 10:16 AM
+Save-Time: 9/15/17 3:11 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -77,6 +77,7 @@ exec-with-options -disableJobWaiting -command {
 	wait 500
 	get-editor "res_master.robot" | get-text-viewer | key-type F5
 }
+wait-for-console
 
 get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
 
