@@ -6,6 +6,7 @@
 package org.rf.ide.core.dryrun;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -14,8 +15,11 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import java.net.URI;
 import java.util.function.Consumer;
 
+import org.codehaus.jackson.map.JsonMappingException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -25,11 +29,14 @@ import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 
 public class RobotDryRunKeywordEventListenerTest {
 
-    @Mock
-    private Consumer<String> startSuiteHandler;
+    @Rule
+    public final ExpectedException thrown = ExpectedException.none();
 
     @Mock
     private RobotDryRunKeywordSourceCollector kwSourceCollector;
+
+    @Mock
+    private Consumer<String> startSuiteHandler;
 
     @Before
     public void setUp() {
@@ -50,13 +57,26 @@ public class RobotDryRunKeywordEventListenerTest {
     }
 
     @Test
+    public void keywordSourceEventMappingExceptionIsHandled() throws Exception {
+        thrown.expect(JsonMessageMapper.JsonMessageMapperException.class);
+        thrown.expectMessage("Problem with mapping keyword source message");
+        thrown.expectCause(isA(JsonMappingException.class));
+
+        final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(
+                new RobotDryRunKeywordSourceCollector(), startSuiteHandler);
+        listener.handleMessage(new MessageEvent("{\"keyword\":\"incorrect\"}", LogLevel.NONE, null));
+    }
+
+    @Test
     public void keywordMessageEventIsHandled() throws Exception {
         final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage(new MessageEvent("kw_message_789", LogLevel.NONE, null));
+        final MessageEvent event = new MessageEvent("kw_message_789", LogLevel.NONE, null);
 
-        verify(kwSourceCollector).collectFromMessageEvent("kw_message_789");
+        listener.handleMessage(event);
+
+        verify(kwSourceCollector).collectFromMessageEvent(event);
         verifyNoMoreInteractions(kwSourceCollector);
         verifyZeroInteractions(startSuiteHandler);
     }
@@ -82,15 +102,19 @@ public class RobotDryRunKeywordEventListenerTest {
         final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(kwSourceCollector,
                 startSuiteHandler);
 
-        listener.handleMessage(new MessageEvent("kw_2", LogLevel.NONE, null));
-        listener.handleMessage(new MessageEvent("kw_1", LogLevel.NONE, null));
-        listener.handleMessage(new MessageEvent("kw_3", LogLevel.NONE, null));
+        final MessageEvent event1 = new MessageEvent("kw_1", LogLevel.NONE, null);
+        final MessageEvent event2 = new MessageEvent("kw_2", LogLevel.NONE, null);
+        final MessageEvent event3 = new MessageEvent("kw_3", LogLevel.NONE, null);
+
+        listener.handleMessage(event1);
+        listener.handleMessage(event2);
+        listener.handleMessage(event3);
 
         final InOrder inOrder = inOrder(kwSourceCollector);
 
-        inOrder.verify(kwSourceCollector).collectFromMessageEvent("kw_2");
-        inOrder.verify(kwSourceCollector).collectFromMessageEvent("kw_1");
-        inOrder.verify(kwSourceCollector).collectFromMessageEvent("kw_3");
+        inOrder.verify(kwSourceCollector).collectFromMessageEvent(event1);
+        inOrder.verify(kwSourceCollector).collectFromMessageEvent(event2);
+        inOrder.verify(kwSourceCollector).collectFromMessageEvent(event3);
         verifyNoMoreInteractions(kwSourceCollector);
         verifyZeroInteractions(startSuiteHandler);
     }
