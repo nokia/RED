@@ -85,17 +85,15 @@ public class TestCaseContext extends DefaultContext {
     @Override
     public StackFrameContext moveTo(final RunningKeyword keyword, final RobotBreakpointSupplier breakpointSupplier) {
         if (keyword.isSetup()) {
-            return moveToTestSetup(keyword, breakpointSupplier);
-
+            return moveToTestSetupOrTeardown(keyword, breakpointSupplier);
         } else if (keyword.isTeardown()) {
-            throw new IllegalDebugContextStateException(
-                    "Teardown keyword cannot be called when test case is about to start");
+            return moveToTestSetupOrTeardown(keyword, breakpointSupplier);
         } else {
             return moveToExecutable(keyword, breakpointSupplier);
         }
     }
 
-    private StackFrameContext moveToTestSetup(final RunningKeyword keyword,
+    private StackFrameContext moveToTestSetupOrTeardown(final RunningKeyword keyword,
             final RobotBreakpointSupplier breakpointSupplier) {
 
         if (testCase == null && models.isEmpty()) {
