@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _N4oM8JlaEeeiPZudFQdj1w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 11:32 AM
+Save-Time: 9/15/17 11:46 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -143,7 +143,12 @@ exec-with-options -disableJobWaiting -command {
 	get-view Debug | get-tree 
 	    | select "projectB [Robot]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/[Suite] projectB"
 	get-button "Step Return (F7)" | click
-	wait-for-specified_line-in-first-thread -line 8 -nr_of_frames 3
+	
+	try -times 5 -delay 1000 -command{	    
+	   get-view Debug | get-tree 
+		    | get-item "projectB \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread/\\[Test\\] I create list \\[line: 8\\]" 
+		    | get-property caption | equals "[Test] I create list [line: 8]" | verify-true
+	}    
 	check-debug-marker-on-ruler -line 8 -script_name "test.robot"
 	
 	//finish test
