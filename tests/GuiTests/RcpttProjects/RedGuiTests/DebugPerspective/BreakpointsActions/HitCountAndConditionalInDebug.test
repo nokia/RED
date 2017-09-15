@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4qmyUPRNEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 4:55 PM
+Save-Time: 9/15/17 11:02 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -25,7 +25,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
     + "    my keyword\n"
     + "    my keyword\n"
     + "    \n"
-    + "    :FOR    ${x}   IN RANGE   1   55\n"
+    + "    :FOR    ${x}   IN RANGE   1   15\n"
     + "    \\    second kw\n"
     + "    \\    log  ${x}\n"
     + "*** Keywords ***\n\n"
@@ -50,7 +50,7 @@ get-view Breakpoints | get-tree | select "TestFile.robot [line: 19]"
 
 with [get-view Breakpoints] {
     get-button "Hit count:" | check
-    get-editbox | set-text 15
+    get-editbox | set-text 5
     get-button Conditional | check
 }
 
@@ -64,12 +64,12 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 8 5
 exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click -arrow
 	get-menu "Debug As/1 Robot Test" | click
-	wait-for-thread -file "TestFile.robot"
+	wait-for-thread -file "TestFile.robot" -times 15
 	
 	check-debug-marker-on-ruler -line 19 -script_name "TestFile.robot"
 	
 	get-view "Message Log" | get-editbox | get-property text 
-	    | contains "INFO : 14" | verify-true
+	    | contains "INFO : 4" | verify-true
 	get-button "Resume (F8)" | click
 }
 wait-for-console
@@ -85,19 +85,19 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 8 5
 exec-with-options -disableJobWaiting -command {
 	get-button "Debug.*" | click -arrow
 	get-menu "Debug As/1 Robot Test" | click
-	
-	wait 2000
-	try -times 5 -delay 1000 -command{
+
+	try -times 20 -delay 1000 -command{
 		get-window "Debugger Error" 
 		    | get-label "Error occurred when evaluating breakpoint condition. Keyword 'BuiltIn.Should Be Equal' expected 2 to 5 arguments, got 1." | get-property caption 
 		    | equals "Error occurred when evaluating breakpoint condition. Keyword 'BuiltIn.Should Be Equal' expected 2 to 5 arguments, got 1." | verify-true
 	}    
 	get-window "Debugger Error" | get-button OK | click
+	
 	get-button "Resume (F8)" | click
 }
 wait-for-console
 
-//set count thta will be never true
+//set count that will be never true
 with [get-view Breakpoints | get-editbox] {
     click-text 1
     set-text 99

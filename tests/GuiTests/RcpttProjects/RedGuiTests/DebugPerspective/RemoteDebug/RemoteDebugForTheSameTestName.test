@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wTBW0A4sEeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/8/17 3:32 PM
+Save-Time: 9/15/17 9:54 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -59,6 +59,8 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		get-window "Debugger error" | get-button Continue | click
 	}		
 }	
+wait-for-message-log
+
 //test should not be stopped on BP but should be run
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RemoteProject.TestFile.test 1\n"
     + ".* : INFO : 5\n"
