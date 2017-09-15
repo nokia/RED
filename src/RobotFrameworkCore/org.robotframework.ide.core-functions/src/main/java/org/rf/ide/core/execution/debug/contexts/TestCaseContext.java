@@ -84,9 +84,7 @@ public class TestCaseContext extends DefaultContext {
 
     @Override
     public StackFrameContext moveTo(final RunningKeyword keyword, final RobotBreakpointSupplier breakpointSupplier) {
-        if (keyword.isSetup()) {
-            return moveToTestSetupOrTeardown(keyword, breakpointSupplier);
-        } else if (keyword.isTeardown()) {
+        if (keyword.isSetup() || keyword.isTeardown()) {
             return moveToTestSetupOrTeardown(keyword, breakpointSupplier);
         } else {
             return moveToExecutable(keyword, breakpointSupplier);
