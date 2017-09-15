@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -25,6 +27,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
@@ -51,12 +54,14 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.TreeContentProvider;
@@ -107,11 +112,14 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private final List<RobotDryRunLibraryImport> importedLibraries;
 
+    private final RedClipboard clipboard;
+
     public LibrariesAutoDiscovererWindow(final Shell parent, final List<RobotDryRunLibraryImport> importedLibraries) {
         super(parent);
         setShellStyle(SWT.CLOSE | SWT.MODELESS | SWT.BORDER | SWT.TITLE | SWT.RESIZE);
         setBlockOnOpen(false);
         this.importedLibraries = importedLibraries;
+        this.clipboard = new RedClipboard(parent.getDisplay());
     }
 
     @Override
@@ -157,10 +165,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     private void createLibrariesViewer(final Composite mainComposite) {
         discoveredLibrariesViewer = new TreeViewer(mainComposite);
         discoveredLibrariesViewer.getTree().setHeaderVisible(false);
-        GridDataFactory.fillDefaults()
-                .grab(true, true)
-                .minSize(SWT.DEFAULT, 300)
-                .applyTo(discoveredLibrariesViewer.getTree());
+        GridDataFactory.fillDefaults().grab(true, true).minSize(SWT.DEFAULT, 300).applyTo(
+                discoveredLibrariesViewer.getTree());
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(discoveredLibrariesViewer.getTree());
 
         discoveredLibrariesViewer.setContentProvider(new DiscoveredLibrariesViewerContentProvider());
@@ -198,6 +204,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             public void keyReleased(final KeyEvent e) {
                 if (e.keyCode == SWT.F3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
                     handleFileOpeningEvent();
+                } else if (e.keyCode == 'c' && e.stateMask == SWT.CTRL) {
+                    handleLibraryCopyEvent();
                 }
             }
         });
@@ -207,9 +215,18 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
             @Override
             public void mouseDown(final MouseEvent e) {
-                if (e.button == 3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1
-                        && getOpenableFilePath().isPresent()) {
-                    menu.setVisible(true);
+                if (e.button == 3) {
+                    if (discoveredLibrariesViewer.getTree().getSelectionCount() == 1
+                            && getOpenableFilePath().isPresent()) {
+                        menu.setVisible(true);
+                        menu.getItem(0).setEnabled(false);
+                        menu.getItem(1).setEnabled(true);
+                    } else if (Stream.of(discoveredLibrariesViewer.getStructuredSelection().toArray())
+                            .anyMatch(element -> element instanceof RobotDryRunLibraryImport)) {
+                        menu.setVisible(true);
+                        menu.getItem(0).setEnabled(true);
+                        menu.getItem(1).setEnabled(false);
+                    }
                 }
             }
 
@@ -224,6 +241,19 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private Menu createContextMenu() {
         final Menu menu = new Menu(discoveredLibrariesViewer.getTree());
+
+        final MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
+        copyItem.setText("Copy");
+        copyItem.setImage(ImagesManager
+                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY)));
+        copyItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent event) {
+                handleLibraryCopyEvent();
+            }
+        });
+
         final MenuItem gotoItem = new MenuItem(menu, SWT.PUSH);
         gotoItem.setText("Go to File");
         gotoItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
@@ -234,7 +264,18 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 handleFileOpeningEvent();
             }
         });
+
         return menu;
+    }
+
+    private void handleLibraryCopyEvent() {
+        final String copied = Stream.of(discoveredLibrariesViewer.getStructuredSelection().toArray())
+                .filter(element -> element instanceof RobotDryRunLibraryImport)
+                .map(element -> ((RobotDryRunLibraryImport) element).getName())
+                .collect(Collectors.joining("\n"));
+        if (!copied.isEmpty()) {
+            clipboard.insertContent(copied);
+        }
     }
 
     private void handleFileOpeningEvent() {
@@ -249,7 +290,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     private Optional<String> getOpenableFilePath() {
-        final TreeSelection selection = (TreeSelection) discoveredLibrariesViewer.getSelection();
+        final ITreeSelection selection = discoveredLibrariesViewer.getStructuredSelection();
         if (selection != null && selection.getFirstElement() instanceof DryRunLibraryImportChildElement) {
             final DryRunLibraryImportChildElement childElement = (DryRunLibraryImportChildElement) selection
                     .getFirstElement();
