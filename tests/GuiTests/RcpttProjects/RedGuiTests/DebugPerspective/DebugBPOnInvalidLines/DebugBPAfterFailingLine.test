@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _EJvdYBEPEeWWSplrwZ3vkg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/28/17 11:16 AM
+Save-Time: 9/15/17 10:14 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -20,8 +20,68 @@ with [get-view "Project Explorer" | get-tree] {
     select ScriptWithResource | double-click
     select "ScriptWithResource/BigScript.robot" | double-click
 }
+
+get-editor "BigScript.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n"
+    + "Resource  my_keywords.robot\n"
+    + "Test Setup  my_setup\n"
+    + "Test Teardown  Join text\n\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
+    + "*** Test Cases ***\n\n"
+    + "failing test\n"
+    + "\t[TAGs]  NOT_WORKING\n"
+    + "\t#Thi test will fail\n"
+    + "   Log  lol\n"
+    + "   Should Be True   True\n"
+    + "   Should Be Empty  \"I am not empty haha!\"\n"
+    + "   Should Be True   True\n\n\n"
+    + "convert to lower case\n"
+    + "\t${small_letter} =   convert text   MONITOR\n"
+    + "\tShould Be Equal  ${small_letter}  monitor\n\n"
+    + "make dict\n"
+    + "\t${dict} = \tCreate Dictionary \tname \tvalue\n"
+    + "\t${values} = \tGet Dictionary Values \t${dict}\n"
+    + "\tSet To Dictionary \t${dict} \tnowy \tldlld\n"
+    + "\t\n"
+    + "\t\n"
+    + "*** Keywords ***\n\n"
+    + "Sum Two Values\n"
+    + "    [Arguments]    ${expression}    ${expected}\n"
+    + "    \n"
+    + "    Should Contain  text5  ${expected}\n"
+    + "    Should be equal   ${expression}    ${expected}\n"
+    + "    ${a}=    Set Variable    inna\n\n"
+    + "    Should Contain  text  x\n"
+    + "    \n"
+    + "    Log   ${expression}=6\n"
+    + "    \n"
+    + "convert text\n"
+    + "\t[Arguments]    ${text}\n"
+    + "\tLog  ${text}\n"
+    + "    ${text}=  Convert To Lowercase  ${text}\n"
+    + "  \t[Return]  ${text}\n\n"
+    + "REVERSE MY LIST\n"
+    + "\t@{list_to_revert}=  Create List  1  2\n"
+    + "\tReverse List  ${list_to_revert}\n"
+    + "\tLog  ${list_to_revert}\n\n"
+    + "My loop\n"
+    + "\t:FOR  ${i}  in range  2\n"
+    + "\t\\\t\n"
+    + "\t\\ \t${eval}=  Evaluate  ${i} +5\n"
+    + "\t\n"
+    + "\t\n"
+    + "my_setup\n"
+    + "\tLog  setup my\n"
+    + "\t\n"
+    + "KW for loop\n"
+    + "    Log  kw for loop"
+    
+get-button "Save \((Ctrl|M1)\+S\)" | click   
 //Select line after failing line
-get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 52
+get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 21
 
 //run test
 with [get-view "Project Explorer" | get-tree] {
