@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _YQTIILklEeWzhqlyblQz1g
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:51 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/15/17 3:07 PM
 Tags: Debug,Quick
 Testcase-Type: ecl
 
@@ -61,6 +61,7 @@ exec-with-options -disableJobWaiting -command {
     wait 1000   
     check-debug-marker-on-ruler -line 9 -script_name "RobotTest.robot"
     get-button "Step Into (F5)" | click
+    wait-for-specified_line-in-first-thread -line 10 -nr_of_frames 5
     
     //go to Log kw in test
     get-button "Step Into (F5)" | click
