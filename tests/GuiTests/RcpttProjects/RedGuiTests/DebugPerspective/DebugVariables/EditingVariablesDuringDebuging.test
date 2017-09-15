@@ -155,9 +155,9 @@ exec-with-options -disableJobWaiting -command {
 	
 	with [get-button "Step Into (F5)"] {
 	    click
-	    wait 500
+	    wait 1000
 	    click
-	    wait 500
+	    wait 1000
 	}
 	get-view Variables | maximize
 	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
