@@ -6,14 +6,14 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2Q6oEPOSEeaWpbE3jg39cA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 10:24 AM
+Save-Time: 9/15/17 10:59 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
-proc "wait-for-thread" [val file]{
-	try -times 8 -delay 1000 -command{
+proc "wait-for-thread" [val file] [val times 8]{
+	try -times $times -delay 1000 -command{
 		get-view Debug | get-tree | get-item 
 		    -path [format "%s \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" $file]  | get-property childCount -raw | gt 0 | verify-true
 
@@ -78,7 +78,7 @@ proc "wait-for-specific-nr-of-threads" [val nr_items_in_thread 3]{
 	
 }
 
-proc "wait-for-specified_line-in-first-thread" [val line] [val nr_of_frames] [val debug_type ""]{
+proc "wait-for-specified_line-in-first-thread" [val line] [val nr_of_frames] [val debug_type ""][val times 5]{
 	//set selector for remote/normal run
 	$debug_type|  switch [case "Remote" {
 		echo ".* \\[Robot Remote\\]/<suspended>Remote Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
@@ -87,7 +87,7 @@ proc "wait-for-specified_line-in-first-thread" [val line] [val nr_of_frames] [va
 	}] - default {
 		echo "Unknown item"
 	} | let [val selector -input] {
-			try -times 5 -delay 1000 -command{
+			try -times $times -delay 1000 -command{
 				get-view Debug | get-tree 
 				    | get-item $selector
 				    | get-property "getItems().TreeItem[0].getText()" | equals [format ".*\[line: %s\]" $line]| verify-true
