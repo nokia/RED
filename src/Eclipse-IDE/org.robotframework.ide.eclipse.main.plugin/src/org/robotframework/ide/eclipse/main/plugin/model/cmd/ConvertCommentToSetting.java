@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,7 +81,7 @@ public class ConvertCommentToSetting extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newArrayList(new ReplaceRobotKeywordCallCommand(eventBroker, settingCall, commentCall));
+        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, settingCall, commentCall));
     }
 
     private static boolean looksLikeComment(final String text) {

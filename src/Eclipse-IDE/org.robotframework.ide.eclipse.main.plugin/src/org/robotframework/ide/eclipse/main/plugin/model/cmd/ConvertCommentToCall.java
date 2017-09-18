@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -95,7 +93,7 @@ public class ConvertCommentToCall extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newArrayList(new ConvertCallToComment(eventBroker, commentCall, oldName));
+        return newUndoCommands(new ConvertCallToComment(eventBroker, commentCall, oldName));
     }
 
     private static boolean looksLikeComment(final String text) {
