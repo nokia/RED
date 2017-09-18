@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -49,7 +47,7 @@ public class ReplaceRobotKeywordCallCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newArrayList(new ReplaceRobotKeywordCallCommand(eventBroker, newCall, oldCall));
+        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, newCall, oldCall));
     }
 
 }
