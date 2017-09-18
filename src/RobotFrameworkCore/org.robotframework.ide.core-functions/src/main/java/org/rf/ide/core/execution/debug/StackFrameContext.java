@@ -54,11 +54,11 @@ public interface StackFrameContext {
     StackFrameContext moveTo(RunningKeyword keyword, RobotBreakpointSupplier breakpointSupplier);
 
     /**
-     * Translates current context into a context if current keyword would finish
+     * Provides previous context from which this one was translated.
      * 
-     * @return New context (may be this context)
+     * @return Previous context (may be this context)
      */
-    StackFrameContext moveOut();
+    StackFrameContext previousContext();
 
     /**
      * Gets line breakpoint associated with current context

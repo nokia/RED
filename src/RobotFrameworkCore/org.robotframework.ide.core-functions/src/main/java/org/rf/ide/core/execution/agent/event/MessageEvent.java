@@ -14,12 +14,6 @@ import com.google.common.base.Objects;
 
 public final class MessageEvent {
 
-    private final String message;
-
-    private final LogLevel level;
-
-    private final String timestamp;
-
     public static MessageEvent fromMessage(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("message");
         return from((Map<?, ?>) arguments.get(0));
@@ -33,10 +27,20 @@ public final class MessageEvent {
     private static MessageEvent from(final Map<?, ?> message) {
         final String msg = (String) message.get("message");
         final String timestamp = (String) message.get("timestamp");
-        final LogLevel level = LogLevel.valueOf(((String) message.get("level")).toUpperCase());
+        final String level = (String) message.get("level");
 
-        return new MessageEvent(msg, level, timestamp);
+        if (msg == null || timestamp == null || level == null) {
+            throw new IllegalArgumentException("Message event has to have the content, timestamp and level");
+        }
+        return new MessageEvent(msg, LogLevel.valueOf(level.toUpperCase()), timestamp);
     }
+
+
+    private final String message;
+
+    private final LogLevel level;
+
+    private final String timestamp;
 
     public MessageEvent(final String message, final LogLevel level, final String timestamp) {
         this.message = message;

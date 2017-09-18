@@ -20,7 +20,6 @@ import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.execution.debug.StackFrameVariables.StackVariablesDelta;
 import org.rf.ide.core.execution.debug.contexts.KeywordContext;
-import org.rf.ide.core.execution.debug.contexts.SetupTeardownContext;
 import org.rf.ide.core.execution.debug.contexts.SuiteContext;
 import org.rf.ide.core.testdata.model.FileRegion;
 
@@ -101,19 +100,25 @@ public class StackFrame {
             if (context instanceof SuiteContext) {
                 return ((SuiteContext) context).isDirectory();
 
-            } else if (context instanceof SetupTeardownContext) {
+            } else if (context.previousContext() instanceof SuiteContext) {
                 // suite context may have been moved to setup/teardown context
-                final StackFrameContext prevContext = ((SetupTeardownContext) context).getPreviousContext();
-                if (prevContext instanceof SuiteContext) {
-                    return ((SuiteContext) prevContext).isDirectory();
-                }
+                return ((SuiteContext) context.previousContext()).isDirectory();
             }
         }
         return false;
     }
 
     public boolean isSuiteFileContext() {
-        return isSuiteContext() && !isSuiteDirectoryContext();
+        if (isSuiteContext()) {
+            if (context instanceof SuiteContext) {
+                return !((SuiteContext) context).isDirectory();
+
+            } else if (context.previousContext() instanceof SuiteContext) {
+                // suite context may have been moved to setup/teardown context
+                return !((SuiteContext) context.previousContext()).isDirectory();
+            }
+        }
+        return false;
     }
 
     public boolean isTestContext() {
@@ -149,7 +154,8 @@ public class StackFrame {
     }
 
     public boolean isLibraryKeywordFrame() {
-        return context instanceof KeywordContext && ((KeywordContext) context).isLibraryKeywordContext();
+        return hasCategory(FrameCategory.KEYWORD) && context instanceof KeywordContext
+                && ((KeywordContext) context).isLibraryKeywordContext();
     }
 
     public boolean isErroneous() {
@@ -190,7 +196,7 @@ public class StackFrame {
     }
 
     void moveOutOfKeyword() {
-        this.context = context.moveOut();
+        this.context = context.previousContext();
     }
 
     void updateVariables(final Map<Variable, VariableTypedValue> vars) {

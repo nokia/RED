@@ -13,12 +13,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.rf.ide.core.execution.agent.event.Variable;
 import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 
 public class StackFrameVariables implements Iterable<StackFrameVariable> {
@@ -43,23 +43,18 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
 
     static StackFrameVariables newGlobalVariables(final Map<Variable, VariableTypedValue> variables) {
         // all globals are automatic variables at the very beginning of execution (no user globals exist yet)
-        return newVariables(variables, name -> GLOBAL_AUTOMATIC_VARIABLES.contains(name.toLowerCase()));
+        return newVariables(variables);
     }
 
-    static StackFrameVariables newSuiteVariables(final Map<Variable, VariableTypedValue> variables,
-            final StackFrameVariables globalVars) {
-        return newVariables(variables, name -> globalVars.contains(name) && globalVars.get(name).isAutomatic()
-                || SUITE_AUTOMATIC_VARIABLES.contains(name.toLowerCase()));
+    static StackFrameVariables newSuiteVariables(final Map<Variable, VariableTypedValue> variables) {
+        return newVariables(variables);
     }
 
-    static StackFrameVariables newTestVariables(final Map<Variable, VariableTypedValue> variables,
-            final StackFrameVariables suiteVars) {
-        return newVariables(variables, name -> suiteVars.contains(name) && suiteVars.get(name).isAutomatic()
-                || TEST_AUTOMATIC_VARIABLES.contains(name.toLowerCase()));
+    static StackFrameVariables newTestVariables(final Map<Variable, VariableTypedValue> variables) {
+        return newVariables(variables);
     }
 
-    private static StackFrameVariables newVariables(final Map<Variable, VariableTypedValue> variables,
-            final Predicate<String> isAutomaticPredicate) {
+    private static StackFrameVariables newVariables(final Map<Variable, VariableTypedValue> variables) {
         final LinkedHashMap<String, StackFrameVariable> vars = new LinkedHashMap<>();
 
         for (final Entry<Variable, VariableTypedValue> entry : variables.entrySet()) {
@@ -68,7 +63,7 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
             final String varType = entry.getValue().getType();
             final Object val = entry.getValue().getValue();
 
-            vars.put(varName, new StackFrameVariable(scope, isAutomaticPredicate.test(varName), varName, varType, val));
+            vars.put(varName, new StackFrameVariable(scope, isAutomatic(scope, varName), varName, varType, val));
         }
         return new StackFrameVariables(vars);
     }
@@ -84,20 +79,9 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
         return new StackFrameVariables(variables);
     }
 
-    private StackFrameVariables(final Map<String, StackFrameVariable> variables) {
+    @VisibleForTesting
+    StackFrameVariables(final Map<String, StackFrameVariable> variables) {
         this.variables = variables;
-    }
-
-    private boolean contains(final String varName) {
-        return variables.containsKey(varName);
-    }
-
-    private StackFrameVariable get(final String varName) {
-        return variables.get(varName);
-    }
-
-    void clear() {
-        variables.clear();
     }
 
     @Override
@@ -163,7 +147,9 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
     }
 
     private static boolean isAutomatic(final VariableScope scope, final String varName) {
-        if (scope == VariableScope.TEST_SUITE) {
+        if (scope == VariableScope.GLOBAL) {
+            return GLOBAL_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
+        } else if (scope == VariableScope.TEST_SUITE) {
             return SUITE_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
         } else if (scope == VariableScope.TEST_CASE) {
             return TEST_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
