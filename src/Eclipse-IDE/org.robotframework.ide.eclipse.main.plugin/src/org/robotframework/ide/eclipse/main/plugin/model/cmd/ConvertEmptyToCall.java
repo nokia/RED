@@ -47,7 +47,7 @@ public class ConvertEmptyToCall extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new ConvertCallToEmpty(eventBroker, newCall, empty.getName()));
+        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, newCall, empty));
     }
 
     public RobotKeywordCall getNewCall() {

@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -103,7 +101,7 @@ public class ConvertCallToComment extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newArrayList(new ConvertCommentToCall(eventBroker, keywordCall, oldName));
+        return newUndoCommands(new ConvertCommentToCall(eventBroker, keywordCall, oldName));
     }
 
 }

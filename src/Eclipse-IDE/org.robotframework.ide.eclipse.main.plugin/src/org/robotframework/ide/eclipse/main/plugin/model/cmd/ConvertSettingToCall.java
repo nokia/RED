@@ -46,6 +46,6 @@ public class ConvertSettingToCall extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new ConvertCallToSetting(eventBroker, newCall, "[" + setting.getName() + "]"));
+        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, newCall, setting));
     }
 }

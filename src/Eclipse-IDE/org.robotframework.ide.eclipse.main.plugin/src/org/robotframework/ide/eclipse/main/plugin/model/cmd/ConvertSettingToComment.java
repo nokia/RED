@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +50,8 @@ public class ConvertSettingToComment extends EditorCommand {
 
         final RobotExecutableRow<?> newLinked = new RobotExecutableRow<>();
         newLinked.getAction().setType(settingCall.getParent() instanceof RobotCase
-                ? RobotTokenType.TEST_CASE_ACTION_NAME : RobotTokenType.KEYWORD_ACTION_NAME);
+                ? RobotTokenType.TEST_CASE_ACTION_NAME
+                : RobotTokenType.KEYWORD_ACTION_NAME);
 
         final RobotToken first = tokens.get(0);
         first.setType(RobotTokenType.START_HASH_COMMENT);
@@ -81,7 +80,7 @@ public class ConvertSettingToComment extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newArrayList(new ReplaceRobotKeywordCallCommand(eventBroker, commentCall, settingCall));
+        return newUndoCommands(new ReplaceRobotKeywordCallCommand(eventBroker, commentCall, settingCall));
     }
 
 }
