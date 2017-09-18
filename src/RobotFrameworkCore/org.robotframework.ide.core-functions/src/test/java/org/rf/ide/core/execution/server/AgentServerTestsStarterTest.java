@@ -7,6 +7,7 @@ package org.rf.ide.core.execution.server;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -18,6 +19,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
 import org.rf.ide.core.execution.agent.TestsMode;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent;
+import org.rf.ide.core.execution.agent.event.AgentInitializingEvent.AgentInitializingEventResponder;
 import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 import org.rf.ide.core.execution.server.response.ServerResponse.ResponseException;
 import org.rf.ide.core.execution.server.response.StartExecution;
@@ -25,7 +28,7 @@ import org.rf.ide.core.execution.server.response.StartExecution;
 public class AgentServerTestsStarterTest {
 
     @Test
-    public void agentServerStarterNeverSendsStartResponseToClient_itIsNotAllowedAndInterrupted() throws Exception {
+    public void agentServerStarterNeverSendsStartResponseToClient_whenitIsNotAllowedAndInterrupted() throws Exception {
         final AtomicBoolean interruptedCaught = new AtomicBoolean(false);
 
         final AgentClient client = mock(AgentClient.class);
@@ -86,5 +89,41 @@ public class AgentServerTestsStarterTest {
         serverThread.join();
 
         verify(client).send(any(StartExecution.class));
+    }
+
+    @Test
+    public void agentServerStarterSendsRunMode_whenInformedAboutInitializationRequest() {
+        final AgentServerTestsStarter starter = new AgentServerTestsStarter(TestsMode.RUN);
+
+        final AgentInitializingEventResponder responder = mock(AgentInitializingEventResponder.class);
+        final AgentInitializingEvent event = new AgentInitializingEvent(responder);
+
+        starter.handleAgentInitializing(event);
+
+        verify(responder).initialize(TestsMode.RUN, true);
+    }
+
+    @Test
+    public void agentServerStarterSendsDebugMode_whenInformedAboutInitializationRequest() {
+        final AgentServerTestsStarter starter = new AgentServerTestsStarter(TestsMode.DEBUG);
+
+        final AgentInitializingEventResponder responder = mock(AgentInitializingEventResponder.class);
+        final AgentInitializingEvent event = new AgentInitializingEvent(responder);
+
+        starter.handleAgentInitializing(event);
+
+        verify(responder).initialize(TestsMode.DEBUG, true);
+    }
+
+    @Test(expected = RobotAgentEventsListenerException.class)
+    public void exceptionIsThrown_whenTestsStarterIsUnableToSendInitializationResponseToClient() {
+        final AgentServerTestsStarter starter = new AgentServerTestsStarter(TestsMode.RUN);
+
+        final AgentInitializingEventResponder responder = mock(AgentInitializingEventResponder.class);
+        doThrow(ResponseException.class).when(responder).initialize(any(TestsMode.class), anyBoolean());
+
+        final AgentInitializingEvent event = new AgentInitializingEvent(responder);
+
+        starter.handleAgentInitializing(event);
     }
 }
