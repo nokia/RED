@@ -15,11 +15,6 @@ import org.rf.ide.core.execution.server.response.ServerResponse.ResponseExceptio
 
 public final class ShouldContinueEvent {
 
-
-    private final ShouldContinueEventResponder responder;
-
-    private final PausingPoint pausingPoint;
-
     public static ShouldContinueEvent from(final AgentClient client, final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("should_continue");
         final Map<String, String> attributes = Events.ensureOrderedMapOfStringsToStrings((Map<?, ?>) arguments.get(0));
@@ -27,6 +22,11 @@ public final class ShouldContinueEvent {
 
         return new ShouldContinueEvent(new ShouldContinueEventResponder(client), pausingPoint);
     }
+
+
+    private final ShouldContinueEventResponder responder;
+
+    private final PausingPoint pausingPoint;
 
     public ShouldContinueEvent(final ShouldContinueEventResponder responder,
             final PausingPoint pausingPoint) {

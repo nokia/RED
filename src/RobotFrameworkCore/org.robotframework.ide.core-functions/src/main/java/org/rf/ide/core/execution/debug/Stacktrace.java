@@ -53,15 +53,15 @@ public class Stacktrace implements Iterable<StackFrame> {
                 .findFirst();
     }
 
-    StackFrame findParentFrame(final StackFrame frameToStepOver) {
+    StackFrame findParentFrame(final StackFrame frame) {
         StackFrame previous = null;
         final Iterator<StackFrame> iterator = frames.descendingIterator();
         while (iterator.hasNext()) {
-            final StackFrame frame = iterator.next();
-            if (frame == frameToStepOver) {
+            final StackFrame f = iterator.next();
+            if (f == frame) {
                 break;
             }
-            previous = frame;
+            previous = f;
         }
         return previous;
     }
@@ -106,9 +106,9 @@ public class Stacktrace implements Iterable<StackFrame> {
             if (frame.getVariables() == null) {
                 StackFrameVariables newFrameVariables;
                 if (frame.hasCategory(FrameCategory.SUITE)) {
-                    newFrameVariables = StackFrameVariables.newSuiteVariables(vars, parentVars);
+                    newFrameVariables = StackFrameVariables.newSuiteVariables(vars);
                 } else if (frame.hasCategory(FrameCategory.TEST)) {
-                    newFrameVariables = StackFrameVariables.newTestVariables(vars, parentVars);
+                    newFrameVariables = StackFrameVariables.newTestVariables(vars);
                 } else {
                     newFrameVariables = StackFrameVariables.newLocalVariables(parentVars,
                             frame.hasCategory(FrameCategory.FOR) || frame.hasCategory(FrameCategory.FOR_ITEM));

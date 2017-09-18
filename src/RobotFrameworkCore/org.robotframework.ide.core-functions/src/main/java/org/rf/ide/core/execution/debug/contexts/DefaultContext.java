@@ -36,7 +36,7 @@ abstract class DefaultContext implements StackFrameContext {
     }
 
     @Override
-    public StackFrameContext moveOut() {
+    public StackFrameContext previousContext() {
         return this;
     }
 
