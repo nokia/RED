@@ -34,18 +34,18 @@ public class RobotDryRunLibraryImportCollector {
     }
 
     public void collectFromLibraryImportEvent(final LibraryImportEvent event) {
-        if (event.getImporter() != null) {
+        if (event.getImporter().isPresent()) {
             RobotDryRunLibraryImport dryRunLibraryImport = null;
-            if (event.getSource() != null) {
+            if (event.getSource().isPresent()) {
                 if (currentLibraryImportWithFail != null
                         && event.getName().equals(currentLibraryImportWithFail.getName())) {
                     dryRunLibraryImport = currentLibraryImportWithFail;
                 } else {
-                    dryRunLibraryImport = new RobotDryRunLibraryImport(event.getName(), event.getSource(),
-                            event.getImporter(), event.getArguments());
+                    dryRunLibraryImport = new RobotDryRunLibraryImport(event.getName(), event.getSource().get(),
+                            event.getImporter().get(), event.getArguments());
                 }
             } else {
-                dryRunLibraryImport = new RobotDryRunLibraryImport(event.getName(), event.getImporter(),
+                dryRunLibraryImport = new RobotDryRunLibraryImport(event.getName(), event.getImporter().get(),
                         event.getArguments());
             }
             final int index = importedLibraries.indexOf(dryRunLibraryImport);
@@ -54,7 +54,7 @@ public class RobotDryRunLibraryImportCollector {
                     importedLibraries.add(dryRunLibraryImport);
                 }
             } else {
-                importedLibraries.get(index).addImporterPath(event.getImporter());
+                importedLibraries.get(index).addImporterPath(event.getImporter().get());
             }
         }
         resetCurrentLibraryImportWithFail();

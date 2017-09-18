@@ -10,9 +10,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 public final class StartExecution implements ServerResponse {
+
+    private final ObjectMapper mapper;
+
+    public StartExecution() {
+        this(ResponseObjectsMapper.OBJECT_MAPPER);
+    }
+
+    @VisibleForTesting
+    StartExecution(final ObjectMapper mapper) {
+        this.mapper = mapper;
+    }
 
     @Override
     public String toMessage() {
@@ -20,7 +34,7 @@ public final class StartExecution implements ServerResponse {
             final List<Object> arguments = new ArrayList<>();
             final Map<String, Object> value = ImmutableMap.of("do_start", arguments);
 
-            return ResponseObjectsMapper.OBJECT_MAPPER.writeValueAsString(value);
+            return mapper.writeValueAsString(value);
         } catch (final IOException e) {
             throw new ResponseException("Unable to serialize do_start response arguments to json", e);
         }

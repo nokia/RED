@@ -14,14 +14,15 @@ import com.google.common.base.Objects;
 
 public final class OutputFileEvent {
 
-    private final URI path;
-
     public static OutputFileEvent from(final Map<String, Object> eventMap) {
         final List<?> arguments = (List<?>) eventMap.get("output_file");
         final URI path = Events.toFileUri((String) arguments.get(0));
 
         return new OutputFileEvent(path);
     }
+
+
+    private final URI path;
 
     public OutputFileEvent(final URI path) {
         this.path = path;
