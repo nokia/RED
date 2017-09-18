@@ -13,19 +13,24 @@ import com.google.common.base.Objects;
 
 public final class ConditionEvaluatedEvent {
 
-    private final Boolean result;
-    private final String error;
-
     public static ConditionEvaluatedEvent from(final Map<String, Object> eventMap) {
-
         final List<?> arguments = (List<?>) eventMap.get("condition_result");
         final Map<String, Object> result = Events.ensureOrderedMapOfStringsToObjects((Map<?, ?>) arguments.get(0));
         final Boolean conditionResult = (Boolean) result.get("result");
         final String error = (String) result.get("error");
 
+        if (conditionResult == null && error == null) {
+            throw new IllegalArgumentException(
+                    "Condition event should either have evaluation result or exception message");
+        }
         return conditionResult != null ? new ConditionEvaluatedEvent(conditionResult)
                 : new ConditionEvaluatedEvent(error);
     }
+
+
+    private final Boolean result;
+
+    private final String error;
 
     public ConditionEvaluatedEvent(final String error) {
         this.result = null;
