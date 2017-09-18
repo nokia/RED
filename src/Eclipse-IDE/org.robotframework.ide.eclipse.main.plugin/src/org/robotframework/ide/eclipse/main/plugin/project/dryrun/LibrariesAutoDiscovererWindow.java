@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -146,18 +147,18 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     private Composite createMainComposite(final Composite parent) {
-
-        final Composite mainComposite = new Composite(parent, SWT.NONE);
-
-        GridLayoutFactory.fillDefaults().numColumns(1).margins(3, 3).applyTo(mainComposite);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(mainComposite);
-
-        final Label libsLabel = new Label(mainComposite, SWT.NONE);
+        final Label libsLabel = new Label(parent, SWT.NONE);
         libsLabel.setText("Discovered libraries (" + importedLibraries.size() + "):");
+
+        final SashForm mainComposite = new SashForm(parent, SWT.VERTICAL);
+        GridLayoutFactory.fillDefaults().applyTo(mainComposite);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(mainComposite);
 
         createLibrariesViewer(mainComposite);
 
         createDetailsComposite(mainComposite);
+
+        mainComposite.setWeights(new int[] { 5, 2 });
 
         return mainComposite;
     }
@@ -167,7 +168,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         discoveredLibrariesViewer.getTree().setHeaderVisible(false);
         GridDataFactory.fillDefaults().grab(true, true).minSize(SWT.DEFAULT, 300).applyTo(
                 discoveredLibrariesViewer.getTree());
-        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(discoveredLibrariesViewer.getTree());
+        GridLayoutFactory.fillDefaults().applyTo(discoveredLibrariesViewer.getTree());
 
         discoveredLibrariesViewer.setContentProvider(new DiscoveredLibrariesViewerContentProvider());
         discoveredLibrariesViewer.setLabelProvider(new DiscoveredLibrariesViewerLabelProvider());
@@ -312,7 +313,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private void createDetailsComposite(final Composite mainComposite) {
         final Composite detailsComposite = new Composite(mainComposite, SWT.NONE);
-        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(detailsComposite);
+        GridLayoutFactory.fillDefaults().applyTo(detailsComposite);
         GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 100).grab(true, false).applyTo(detailsComposite);
 
         detailsText = new StyledText(detailsComposite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.WRAP);
