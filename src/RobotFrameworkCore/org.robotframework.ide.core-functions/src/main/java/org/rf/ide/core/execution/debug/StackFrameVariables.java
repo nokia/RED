@@ -7,9 +7,10 @@ package org.rf.ide.core.execution.debug;
 
 import static com.google.common.collect.Sets.newHashSet;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -83,27 +84,29 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
     StackVariablesDelta update(final Map<Variable, VariableTypedValue> vars) {
         final StackVariablesDelta delta = computeDelta(vars);
 
-        for (final Variable removedVariable : delta.removedVariables.keySet()) {
-            delta.removedVariables.put(removedVariable, variables.get(removedVariable.getName()));
+        for (final Variable removedVariable : delta.removedVariables) {
             variables.remove(removedVariable.getName());
         }
-        for (final Variable unchangedVariable : delta.unchangedVariables.keySet()) {
-            delta.unchangedVariables.put(unchangedVariable, variables.get(unchangedVariable.getName()));
-        }
-        for (final Variable changedVariable : delta.changedVariables.keySet()) {
+        // nothing to do for unchanged variables
+        for (final Variable changedVariable : delta.changedVariables) {
             final StackFrameVariable var = variables.get(changedVariable.getName());
-            delta.changedVariables.put(changedVariable, var);
-            var.setScope(changedVariable.getScope());
-            var.setType(vars.get(changedVariable).getType());
-            var.setValue(vars.get(changedVariable).getValue());
+
+            final String name = changedVariable.getName();
+            final VariableScope scope = changedVariable.getScope();
+            final boolean isAutomatic = var.isAutomatic();
+            final String type = vars.get(changedVariable).getType();
+            final Object value = vars.get(changedVariable).getValue();
+
+            variables.put(name, new StackFrameVariable(scope, isAutomatic, name, type, value));
         }
-        for (final Variable addedVariable : delta.addedVariables.keySet()) {
+        for (final Variable addedVariable : delta.addedVariables) {
+            final String name = addedVariable.getName();
+            final VariableScope scope = addedVariable.getScope();
+            final boolean isAutomatic = isAutomatic(scope, name);
             final String type = vars.get(addedVariable).getType();
             final Object value = vars.get(addedVariable).getValue();
-            final VariableScope scope = addedVariable.getScope();
-            variables.put(addedVariable.getName(), new StackFrameVariable(scope,
-                    isAutomatic(scope, addedVariable.getName()), addedVariable.getName(), type, value));
-            delta.addedVariables.put(addedVariable, variables.get(addedVariable.getName()));
+
+            variables.put(name, new StackFrameVariable(scope, isAutomatic, name, type, value));
         }
         return delta;
     }
@@ -113,21 +116,21 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
 
         for (final Variable incomingVariable : vars.keySet()) {
             if (!variables.containsKey(incomingVariable.getName())) {
-                delta.addedVariables.put(incomingVariable, null);
+                delta.addedVariables.add(incomingVariable);
             } else {
                 // has same scope, type and value
                 if (Objects.equal(incomingVariable.getScope(), variables.get(incomingVariable.getName()).getScope()) &&
                         Objects.equal(vars.get(incomingVariable).getType(), variables.get(incomingVariable.getName()).getType()) &&
                         Objects.equal(vars.get(incomingVariable).getValue(), variables.get(incomingVariable.getName()).getValue())) {
-                    delta.unchangedVariables.put(incomingVariable, null);
+                    delta.unchangedVariables.add(incomingVariable);
                 } else {
-                    delta.changedVariables.put(incomingVariable, null);
+                    delta.changedVariables.add(incomingVariable);
                 }
             }
         }
         for (final String existingVar : variables.keySet()) {
             if (!vars.containsKey(new Variable(existingVar))) {
-                delta.removedVariables.put(new Variable(existingVar, variables.get(existingVar).getScope()), null);
+                delta.removedVariables.add(new Variable(existingVar, variables.get(existingVar).getScope()));
             }
         }
         return delta;
@@ -148,28 +151,28 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
 
     public static class StackVariablesDelta {
 
-        private final Map<Variable, StackFrameVariable> changedVariables = new HashMap<>();
+        private final Set<Variable> changedVariables = new HashSet<>();
 
-        private final Map<Variable, StackFrameVariable> unchangedVariables = new HashMap<>();
+        private final Set<Variable> unchangedVariables = new HashSet<>();
 
-        private final Map<Variable, StackFrameVariable> addedVariables = new LinkedHashMap<>(); // order has to be preserved
+        private final Set<Variable> addedVariables = new LinkedHashSet<>(); // order has to be preserved
 
-        private final Map<Variable, StackFrameVariable> removedVariables = new HashMap<>();
+        private final Set<Variable> removedVariables = new HashSet<>();
 
         public boolean isChanged(final String variableName) {
-            return changedVariables.containsKey(new Variable(variableName));
+            return changedVariables.contains(new Variable(variableName));
         }
 
         public boolean isUnchanged(final String variableName) {
-            return unchangedVariables.containsKey(new Variable(variableName));
+            return unchangedVariables.contains(new Variable(variableName));
         }
 
         public boolean isAdded(final String variableName) {
-            return addedVariables.containsKey(new Variable(variableName));
+            return addedVariables.contains(new Variable(variableName));
         }
 
         public boolean isRemoved(final String variableName) {
-            return removedVariables.containsKey(new Variable(variableName));
+            return removedVariables.contains(new Variable(variableName));
         }
     }
 }
