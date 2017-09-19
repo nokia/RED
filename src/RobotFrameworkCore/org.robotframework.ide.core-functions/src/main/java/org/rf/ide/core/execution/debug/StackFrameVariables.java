@@ -41,20 +41,7 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
 
     private final Map<String, StackFrameVariable> variables;
 
-    static StackFrameVariables newGlobalVariables(final Map<Variable, VariableTypedValue> variables) {
-        // all globals are automatic variables at the very beginning of execution (no user globals exist yet)
-        return newVariables(variables);
-    }
-
-    static StackFrameVariables newSuiteVariables(final Map<Variable, VariableTypedValue> variables) {
-        return newVariables(variables);
-    }
-
-    static StackFrameVariables newTestVariables(final Map<Variable, VariableTypedValue> variables) {
-        return newVariables(variables);
-    }
-
-    private static StackFrameVariables newVariables(final Map<Variable, VariableTypedValue> variables) {
+    static StackFrameVariables newNonLocalVariables(final Map<Variable, VariableTypedValue> variables) {
         final LinkedHashMap<String, StackFrameVariable> vars = new LinkedHashMap<>();
 
         for (final Entry<Variable, VariableTypedValue> entry : variables.entrySet()) {

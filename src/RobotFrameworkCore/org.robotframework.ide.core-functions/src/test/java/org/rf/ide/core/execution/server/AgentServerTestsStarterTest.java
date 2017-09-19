@@ -28,7 +28,7 @@ import org.rf.ide.core.execution.server.response.StartExecution;
 public class AgentServerTestsStarterTest {
 
     @Test
-    public void agentServerStarterNeverSendsStartResponseToClient_whenitIsNotAllowedAndInterrupted() throws Exception {
+    public void agentServerStarterNeverSendsStartResponseToClient_whenItIsNotAllowedAndInterrupted() throws Exception {
         final AtomicBoolean interruptedCaught = new AtomicBoolean(false);
 
         final AgentClient client = mock(AgentClient.class);

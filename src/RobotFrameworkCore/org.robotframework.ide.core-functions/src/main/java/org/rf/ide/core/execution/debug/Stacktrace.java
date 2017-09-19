@@ -94,7 +94,7 @@ public class Stacktrace implements Iterable<StackFrame> {
         final List<StackFrame> reversedFrames = reverse(stream().collect(toList()));
         final List<Map<Variable, VariableTypedValue>> reversedVariables = reverse(variables);
 
-        StackFrameVariables parentVars = StackFrameVariables.newGlobalVariables(reversedVariables.get(0));
+        StackFrameVariables parentVars = StackFrameVariables.newNonLocalVariables(reversedVariables.get(0));
         for (final StackFrame frame : reversedFrames) {
             final int index = frame.getLevel() + 1;
             // when there is a keyword starting there is not variables yet send from agent for its
@@ -106,9 +106,9 @@ public class Stacktrace implements Iterable<StackFrame> {
             if (frame.getVariables() == null) {
                 StackFrameVariables newFrameVariables;
                 if (frame.hasCategory(FrameCategory.SUITE)) {
-                    newFrameVariables = StackFrameVariables.newSuiteVariables(vars);
+                    newFrameVariables = StackFrameVariables.newNonLocalVariables(vars);
                 } else if (frame.hasCategory(FrameCategory.TEST)) {
-                    newFrameVariables = StackFrameVariables.newTestVariables(vars);
+                    newFrameVariables = StackFrameVariables.newNonLocalVariables(vars);
                 } else {
                     newFrameVariables = StackFrameVariables.newLocalVariables(parentVars,
                             frame.hasCategory(FrameCategory.FOR) || frame.hasCategory(FrameCategory.FOR_ITEM));

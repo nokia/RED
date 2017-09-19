@@ -472,20 +472,20 @@ public class StacktraceTest {
         originalSuiteVariables.put(new Variable("${global}", VariableScope.GLOBAL), new VariableTypedValue("int", 0));
         originalSuiteVariables.put(new Variable("${suite}", VariableScope.TEST_SUITE),
                 new VariableTypedValue("int", 1));
-        suiteFrame.setVariables(StackFrameVariables.newSuiteVariables(originalSuiteVariables));
+        suiteFrame.setVariables(StackFrameVariables.newNonLocalVariables(originalSuiteVariables));
 
         final Map<Variable, VariableTypedValue> originalTestVariables = new HashMap<>();
         originalTestVariables.put(new Variable("${global}", VariableScope.GLOBAL), new VariableTypedValue("int", 0));
         originalTestVariables.put(new Variable("${suite}", VariableScope.TEST_SUITE), new VariableTypedValue("int", 1));
         originalTestVariables.put(new Variable("${test}", VariableScope.TEST_CASE), new VariableTypedValue("int", 2));
-        testFrame.setVariables(StackFrameVariables.newTestVariables(originalTestVariables));
+        testFrame.setVariables(StackFrameVariables.newNonLocalVariables(originalTestVariables));
 
         final Map<Variable, VariableTypedValue> originalKwVariables = new HashMap<>();
         originalKwVariables.put(new Variable("${global}", VariableScope.GLOBAL), new VariableTypedValue("int", 0));
         originalKwVariables.put(new Variable("${suite}", VariableScope.TEST_SUITE), new VariableTypedValue("int", 1));
         originalKwVariables.put(new Variable("${test}", VariableScope.TEST_CASE), new VariableTypedValue("int", 2));
         originalKwVariables.put(new Variable("${local}", VariableScope.LOCAL), new VariableTypedValue("int", 3));
-        kwFrame.setVariables(StackFrameVariables.newTestVariables(originalKwVariables));
+        kwFrame.setVariables(StackFrameVariables.newNonLocalVariables(originalKwVariables));
 
         final Stacktrace stacktrace = new Stacktrace();
         stacktrace.push(suiteFrame);
