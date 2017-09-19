@@ -232,7 +232,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     public boolean equals(final Object obj) {
         if (obj instanceof RobotDebugVariable) {
             final RobotDebugVariable that = (RobotDebugVariable) obj;
-            return this.stackVariable == that.stackVariable && this.name.equals(that.name)
+            return Objects.equal(this.stackVariable, that.stackVariable) && this.name.equals(that.name)
                     && this.parent == that.parent;
         }
         return false;
