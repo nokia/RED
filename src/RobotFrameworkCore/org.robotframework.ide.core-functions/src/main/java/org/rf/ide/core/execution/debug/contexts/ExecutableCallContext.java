@@ -22,8 +22,6 @@ import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
-import com.google.common.base.Preconditions;
-
 public class ExecutableCallContext extends DefaultContext {
 
     private final List<RobotFile> models;
@@ -112,8 +110,6 @@ public class ExecutableCallContext extends DefaultContext {
 
     private StackFrameContext moveToKeywordTeardown(final UserKeyword keyword, final RunningKeyword runningKeyword,
             final RobotBreakpointSupplier breakpointSupplier) {
-
-        Preconditions.checkArgument(runningKeyword.isTeardown());
 
         final KeywordTeardown teardownSetting = keyword.getTeardowns().isEmpty() ? null : keyword.getTeardowns().get(0);
         if (teardownSetting != null) {
