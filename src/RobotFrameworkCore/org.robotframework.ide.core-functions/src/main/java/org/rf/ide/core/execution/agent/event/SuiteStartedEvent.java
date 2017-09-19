@@ -26,7 +26,7 @@ public final class SuiteStartedEvent {
         final Integer totalTests = (Integer) attributes.get("totaltests");
 
         if (isDir == null || childSuites == null || childTests == null || totalTests == null) {
-            throw new IllegalArgumentException("Suite started event should have path, directory/file flag, children "
+            throw new IllegalArgumentException("Suite started event should have directory/file flag, children "
                     + "suites and tests as well as number of total tests");
         }
 

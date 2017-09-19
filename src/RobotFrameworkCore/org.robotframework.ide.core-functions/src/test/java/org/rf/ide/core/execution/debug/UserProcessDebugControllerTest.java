@@ -538,7 +538,7 @@ public class UserProcessDebugControllerTest {
     }
 
     @Theory
-    public void noResponseIsReturned_whenSteppingIntoOmitingLibKeywordsButPausingPointIsAtEndKeyword(
+    public void noResponseIsReturned_whenSteppingIntoOmittingLibKeywordsButPausingPointIsAtEndKeyword(
             final PausingPoint pausingPoint) {
         assumeTrue(pausingPoint == PausingPoint.PRE_END_KEYWORD || pausingPoint == PausingPoint.END_KEYWORD);
 
@@ -561,7 +561,7 @@ public class UserProcessDebugControllerTest {
     }
 
     @Test
-    public void noResponseIsReturned_whenSteppingIntoOmitingLibKeywordsButPausingPointIsAtEndKeyword() {
+    public void noResponseIsReturned_whenSteppingIntoOmittingLibKeywordsButPausingPointIsAtEndKeyword() {
         final Runnable whenSent = mock(Runnable.class);
 
         final Stacktrace stack = new Stacktrace();
