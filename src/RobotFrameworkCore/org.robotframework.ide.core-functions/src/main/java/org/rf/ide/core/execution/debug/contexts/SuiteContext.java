@@ -94,13 +94,13 @@ public class SuiteContext extends DefaultContext {
                 // SuiteDirContext was found, but __init__ file does not
                 final String msg = ErrorMessages.errorOfSuitePrePostKwNotFoundBecauseOfMissingInit(keyword.isSetup());
                 final String errorMsg = String.format(msg, keyword.asCall(), suiteName,
-                        new File(getAssociatedPath().get()).getAbsolutePath());
+                        getAssociatedPath().map(File::new).map(File::getAbsolutePath).orElse("<unknown>"));
                 return new SetupTeardownContext(errorMsg, this);
             }
             final URI fileUri = fileModel.get().getParent().getProcessedFile().toURI();
 
             final SettingTable settingsTable = fileModel.get().getSettingTable();
-            if (settingsTable == null) {
+            if (!settingsTable.isPresent()) {
                 final String msg = ErrorMessages
                         .errorOfSuitePrePostKwNotFoundBecauseOfMissingSetting(keyword.isSetup());
                 final String errorMsg = String.format(msg, keyword.asCall());

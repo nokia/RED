@@ -36,14 +36,14 @@ class SetupTeardownContext extends DefaultContext {
         this(null, -1, errorMessage, previousContext, (uri, l) -> Optional.empty());
     }
 
-    SetupTeardownContext(final URI locationURI, final int line, final String errorMessage,
+    SetupTeardownContext(final URI locationUri, final int line, final String errorMessage,
             final StackFrameContext previousContext) {
-        this(locationURI, line, errorMessage, previousContext, (uri, l) -> Optional.empty());
+        this(locationUri, line, errorMessage, previousContext, (uri, l) -> Optional.empty());
     }
 
-    SetupTeardownContext(final URI locationURI, final int line, final String errorMessage,
+    SetupTeardownContext(final URI locationUri, final int line, final String errorMessage,
             final StackFrameContext previousContext, final RobotBreakpointSupplier breakpointSupplier) {
-        this.locationUri = locationURI;
+        this.locationUri = locationUri;
         this.line = line;
         this.errorMessage = errorMessage;
         this.previousContext = previousContext;
