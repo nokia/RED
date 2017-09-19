@@ -3,7 +3,7 @@ package org.rf.ide.core.execution.agent.event;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -60,18 +60,16 @@ public class SuiteStartedEventTest {
         allKeysCombinations.removeIf(s -> !s.contains("source"));
 
         for (final Set<String> combination : allKeysCombinations) {
-            try {
-                final Map<String, Object> attributes = new HashMap<>();
-                for (final String key : combination) {
-                    attributes.put(key, template.get(key));
-                }
-                final Map<String, Object> eventMap = ImmutableMap.of("start_suite", newArrayList("suite", attributes));
-                SuiteStartedEvent.from(eventMap);
-
-                fail();
-            } catch (final IllegalArgumentException e) {
-                // that's what we expect to have
+            final Map<String, Object> attributes = new HashMap<>();
+            for (final String key : combination) {
+                attributes.put(key, template.get(key));
             }
+            final Map<String, Object> eventMap = ImmutableMap.of("start_suite", newArrayList("suite", attributes));
+
+            assertThatIllegalArgumentException().isThrownBy(() -> SuiteStartedEvent.from(eventMap))
+                    .withMessage(
+                            "Suite started event should have directory/file flag, children suites and tests as well as number of total tests")
+                    .withNoCause();
         }
     }
 

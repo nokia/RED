@@ -3,7 +3,7 @@ package org.rf.ide.core.execution.agent.event;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,18 +59,16 @@ public class TestEndedEventTest {
         allKeysCombinations.remove(newHashSet("longname", "status", "elapsedtime", "message"));
 
         for (final Set<String> combination : allKeysCombinations) {
-            try {
-                final Map<String, Object> attributes = new HashMap<>();
-                for (final String key : combination) {
-                    attributes.put(key, template.get(key));
-                }
-                final Map<String, Object> eventMap = ImmutableMap.of("end_test", newArrayList("test", attributes));
-                TestEndedEvent.from(eventMap);
-
-                fail();
-            } catch (final IllegalArgumentException e) {
-                // that's what we expect to have
+            final Map<String, Object> attributes = new HashMap<>();
+            for (final String key : combination) {
+                attributes.put(key, template.get(key));
             }
+            final Map<String, Object> eventMap = ImmutableMap.of("end_test", newArrayList("test", attributes));
+
+            assertThatIllegalArgumentException().isThrownBy(() -> TestEndedEvent.from(eventMap))
+                    .withMessage(
+                            "Test ended event should have long name, status, elapsed time and message attributes")
+                    .withNoCause();
         }
     }
 

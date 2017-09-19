@@ -2,7 +2,7 @@ package org.rf.ide.core.execution.debug;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,7 +28,7 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 public class StackFrameTest {
 
     @Test
-    public void frameNameIsTakenFromContructor() {
+    public void frameNameIsTakenFromConstructor() {
         final StackFrameContext context = mock(StackFrameContext.class);
         final StackFrame frame1 = new StackFrame("frame1", FrameCategory.SUITE, 42, context);
         final StackFrame frame2 = new StackFrame("frame2", FrameCategory.SUITE, 42, context,
@@ -42,7 +42,7 @@ public class StackFrameTest {
     }
 
     @Test
-    public void frameCategoryIsTakenFromContructor() {
+    public void frameCategoryIsTakenFromConstructor() {
         final StackFrameContext context = mock(StackFrameContext.class);
         final StackFrame frame1 = new StackFrame("frame", FrameCategory.SUITE, 42, context);
         final StackFrame frame2 = new StackFrame("frame", FrameCategory.TEST, 42, context,
@@ -61,7 +61,7 @@ public class StackFrameTest {
     }
 
     @Test
-    public void frameLevelIsTakenFromContructor() {
+    public void frameLevelIsTakenFromConstructor() {
         final StackFrameContext context = mock(StackFrameContext.class);
         final StackFrame frame1 = new StackFrame("frame", FrameCategory.SUITE, 42, context);
         final StackFrame frame2 = new StackFrame("frame", FrameCategory.SUITE, 1729, context,
@@ -75,7 +75,7 @@ public class StackFrameTest {
     }
 
     @Test
-    public void contextIsTakenFromContructor() {
+    public void contextIsTakenFromConstructor() {
         final StackFrameContext context1 = mock(StackFrameContext.class);
         final StackFrameContext context2 = mock(StackFrameContext.class);
         final StackFrameContext context3 = mock(StackFrameContext.class);
@@ -92,7 +92,7 @@ public class StackFrameTest {
     }
 
     @Test
-    public void loadedResourcesAreCopiedFromContructor() {
+    public void loadedResourcesAreCopiedFromConstructor() {
         final StackFrameContext context = mock(StackFrameContext.class);
         final Set<URI> resources = newHashSet(URI.create("file:///res.robot"));
 
@@ -126,15 +126,11 @@ public class StackFrameTest {
         for (final FrameCategory category : EnumSet.of(FrameCategory.TEST, FrameCategory.KEYWORD, FrameCategory.FOR,
                 FrameCategory.FOR_ITEM)) {
 
-            try {
-                final StackFrame frame = new StackFrame("frame", category, 42, context);
-                frame.addLoadedResource(URI.create("file:///res.robot"));
+            final StackFrame frame = new StackFrame("frame", category, 42, context);
 
-                fail();
-
-            } catch (final IllegalStateException e) {
-                // this is expected, fail if it does not happen
-            }
+            assertThatIllegalStateException().isThrownBy(() -> frame.addLoadedResource(URI.create("file:///res.robot")))
+                    .withMessage("Cannot store resource in non-suite frame")
+                    .withNoCause();
         }
 
         final StackFrame frame = new StackFrame("frame", FrameCategory.SUITE, 42, context);
@@ -144,7 +140,7 @@ public class StackFrameTest {
     }
 
     @Test
-    public void thereIsNoContextPath_whenContextDoesNotHaveItAndSuplierDoesNotSupplyAnything() {
+    public void thereIsNoContextPath_whenContextDoesNotHaveItAndSupplierDoesNotSupplyAnything() {
         final StackFrameContext context = mock(StackFrameContext.class);
         when(context.getAssociatedPath()).thenReturn(Optional.empty());
 
@@ -449,7 +445,7 @@ public class StackFrameTest {
         vars.put(new Variable("var1", VariableScope.TEST_SUITE), new VariableTypedValue("int", 1));
         vars.put(new Variable("var2", VariableScope.TEST_SUITE), new VariableTypedValue("string", "xyz"));
 
-        final StackFrameVariables variables = StackFrameVariables.newSuiteVariables(vars);
+        final StackFrameVariables variables = StackFrameVariables.newNonLocalVariables(vars);
 
         final Map<Variable, VariableTypedValue> newVars = new HashMap<>();
         newVars.put(new Variable("var1", VariableScope.TEST_SUITE), new VariableTypedValue("int", 4));
