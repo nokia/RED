@@ -27,7 +27,7 @@ public class DefaultContextTest {
     }
 
     @Test
-    public void defulatContextReturnsItselfAsPreviousContext() {
+    public void defaultContextReturnsItselfAsPreviousContext() {
         final DefaultContext defaultContext = defaultContext();
         assertThat(defaultContext.previousContext()).isSameAs(defaultContext);
     }
