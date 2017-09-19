@@ -83,7 +83,7 @@ public class StackFrame {
     }
 
     void addLoadedResource(final URI resourceUri) {
-        Preconditions.checkState(isSuiteContext());
+        Preconditions.checkState(isSuiteContext(), "Cannot store resource in non-suite frame");
         loadedResources.add(resourceUri);
     }
 

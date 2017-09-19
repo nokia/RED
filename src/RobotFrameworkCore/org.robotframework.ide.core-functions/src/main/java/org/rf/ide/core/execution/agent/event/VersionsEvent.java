@@ -26,7 +26,7 @@ public final class VersionsEvent {
 
         if (cmdLine == null || pythonVersion == null || robotVersion == null || protocolVersion == null) {
             throw new IllegalArgumentException(
-                    "Versions event should command line, versions of python, robot and protocol");
+                    "Versions event should have command line, versions of python, robot and protocol");
         }
         return new VersionsEvent(new VersionsEventResponder(client), cmdLine, pythonVersion, robotVersion,
                 protocolVersion);

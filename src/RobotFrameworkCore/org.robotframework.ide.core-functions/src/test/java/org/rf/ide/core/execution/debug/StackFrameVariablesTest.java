@@ -23,7 +23,7 @@ public class StackFrameVariablesTest {
         globalVars.put(new Variable("${var2}", VariableScope.GLOBAL), new VariableTypedValue("string", "xyz"));
         globalVars.put(new Variable("${true}", VariableScope.GLOBAL), new VariableTypedValue("bool", true));
 
-        final Map<String, StackFrameVariable> variables = StackFrameVariables.newGlobalVariables(globalVars)
+        final Map<String, StackFrameVariable> variables = StackFrameVariables.newNonLocalVariables(globalVars)
                 .getVariables();
         assertThat(variables).containsOnlyKeys("${var1}", "${var2}", "${true}");
         assertThat(variables.get("${var1}").isAutomatic()).isFalse();
@@ -39,7 +39,7 @@ public class StackFrameVariablesTest {
         suiteVars.put(new Variable("${suite_var}", VariableScope.TEST_SUITE), new VariableTypedValue("string", "abc"));
         suiteVars.put(new Variable("${suite_name}", VariableScope.TEST_SUITE), new VariableTypedValue("int", 42));
 
-        final Map<String, StackFrameVariable> variables = StackFrameVariables.newSuiteVariables(suiteVars)
+        final Map<String, StackFrameVariable> variables = StackFrameVariables.newNonLocalVariables(suiteVars)
                 .getVariables();
         assertThat(variables).containsOnlyKeys("${var}", "${true}", "${suite_var}", "${suite_name}");
         assertThat(variables.get("${var}").isAutomatic()).isFalse();
@@ -58,7 +58,7 @@ public class StackFrameVariablesTest {
         testVars.put(new Variable("${test_var}", VariableScope.TEST_CASE), new VariableTypedValue("unicode", "xyz"));
         testVars.put(new Variable("${test_name}", VariableScope.TEST_CASE), new VariableTypedValue("double", 4.2));
 
-        final Map<String, StackFrameVariable> variables = StackFrameVariables.newTestVariables(testVars)
+        final Map<String, StackFrameVariable> variables = StackFrameVariables.newNonLocalVariables(testVars)
                 .getVariables();
         assertThat(variables).containsOnlyKeys("${var}", "${true}", "${suite_var}", "${suite_name}",
                 "${test_var}", "${test_name}");
@@ -82,7 +82,7 @@ public class StackFrameVariablesTest {
         testVars.put(new Variable("${local_var}", VariableScope.LOCAL), new VariableTypedValue("int", 55));
         testVars.put(new Variable("${keyword_status}", VariableScope.LOCAL), new VariableTypedValue("bool", false));
 
-        final StackFrameVariables parentVars = StackFrameVariables.newTestVariables(testVars);
+        final StackFrameVariables parentVars = StackFrameVariables.newNonLocalVariables(testVars);
 
         final Map<String, StackFrameVariable> variables = StackFrameVariables.newLocalVariables(parentVars, true)
                 .getVariables();
@@ -99,7 +99,7 @@ public class StackFrameVariablesTest {
     }
 
     @Test
-    public void localVariablesAreProperlyConstructed_whenOmitingLocals() {
+    public void localVariablesAreProperlyConstructed_whenOmittingLocals() {
         final Map<Variable, VariableTypedValue> testVars = new HashMap<>();
         testVars.put(new Variable("${var}", VariableScope.GLOBAL), new VariableTypedValue("int", 1));
         testVars.put(new Variable("${true}", VariableScope.GLOBAL), new VariableTypedValue("bool", true));
@@ -110,7 +110,7 @@ public class StackFrameVariablesTest {
         testVars.put(new Variable("${local_var}", VariableScope.LOCAL), new VariableTypedValue("int", 55));
         testVars.put(new Variable("${keyword_status}", VariableScope.LOCAL), new VariableTypedValue("bool", false));
 
-        final StackFrameVariables parentVars = StackFrameVariables.newTestVariables(testVars);
+        final StackFrameVariables parentVars = StackFrameVariables.newNonLocalVariables(testVars);
 
         final Map<String, StackFrameVariable> variables = StackFrameVariables.newLocalVariables(parentVars, false)
                 .getVariables();
