@@ -16,12 +16,9 @@ import org.rf.ide.core.testdata.model.FileRegion;
 
 public class KeywordUnknownContext extends KeywordContext {
 
-    private final URI locationUri;
-
     private final String errorMessage;
 
     public KeywordUnknownContext(final String errorMessage) {
-        this.locationUri = null;
         this.errorMessage = errorMessage;
     }
 
@@ -37,7 +34,7 @@ public class KeywordUnknownContext extends KeywordContext {
 
     @Override
     public Optional<URI> getAssociatedPath() {
-        return Optional.ofNullable(locationUri);
+        return Optional.empty();
     }
 
     @Override
@@ -48,6 +45,6 @@ public class KeywordUnknownContext extends KeywordContext {
     @Override
     public StackFrameContext moveTo(final RunningKeyword keyword, final RobotBreakpointSupplier breakpointSupplier) {
         final String errorMsg = String.format(ErrorMessages.executableCallNotFound, keyword.asCall());
-        return new ErroneousExecutableCallContext(locationUri, -1, errorMsg);
+        return new ErroneousExecutableCallContext(null, -1, errorMsg);
     }
 }

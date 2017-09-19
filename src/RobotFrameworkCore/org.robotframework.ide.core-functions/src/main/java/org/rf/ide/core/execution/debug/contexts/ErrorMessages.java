@@ -120,7 +120,7 @@ public class ErrorMessages {
 
 
     public static String errorOfSuiteNotFoundBecauseOfUnknownLocation(final boolean isDirectory) {
-        return isDirectory ? suiteNotFound_unknownLocalDir : suiteNotFound_unknownLocalDir;
+        return isDirectory ? suiteNotFound_unknownLocalDir : suiteNotFound_unknownLocalFile;
     }
 
     public static String errorOfSuiteNotFoundBecauseOfMissingLocation(final boolean isDirectory) {
@@ -149,27 +149,25 @@ public class ErrorMessages {
 
     static String errorOfLocalPrePostKwNotFoundBecauseOfDifferentCall(final boolean isSetup,
             final boolean isTest) {
-        if (isTest && isSetup) {
-            return testSetupKwNotFound_diffCall;
-        } else if (isTest && !isSetup) {
-            return testTeardownKwNotFound_diffCall;
-        } else if (!isTest && !isSetup) {
-            return keywordTeardownKwNotFound_diffCall;
+        if (isTest) {
+            return isSetup ? testSetupKwNotFound_diffCall : testTeardownKwNotFound_diffCall;
         } else {
-            throw new IllegalStateException("There is not setup for keywords!");
+            if (isSetup) {
+                throw new IllegalStateException("There is not setup for keywords!");
+            }
+            return keywordTeardownKwNotFound_diffCall;
         }
     }
 
     static String errorOfLocalPrePostKwNotFoundBecauseOfMissingSetting(final boolean isSetup,
             final boolean isTest) {
-        if (isTest && isSetup) {
-            return testSetupKwNotFound_missingSetting;
-        } else if (isTest && !isSetup) {
-            return testTeardownKwNotFound_missingSetting;
-        } else if (!isTest && !isSetup) {
-            return keywordTeardownKwNotFound_missingSetting;
+        if (isTest) {
+            return isSetup ? testSetupKwNotFound_missingSetting : testTeardownKwNotFound_missingSetting;
         } else {
-            throw new IllegalStateException("There is not setup for keywords!");
+            if (isSetup) {
+                throw new IllegalStateException("There is not setup for keywords!");
+            }
+            return keywordTeardownKwNotFound_missingSetting;
         }
     }
 }

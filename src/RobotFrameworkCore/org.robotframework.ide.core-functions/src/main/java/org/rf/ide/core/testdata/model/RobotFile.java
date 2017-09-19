@@ -136,15 +136,14 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
     private boolean includeTableSection(final RobotTokenType typeOfTable) {
-        final boolean wasAdded = false;
         final ARobotSectionTable sectionTable = getSectionTable(typeOfTable);
         if (sectionTable != null) {
             if (!sectionTable.isPresent()) {
                 sectionTable.addHeader(createHeader(typeOfTable));
+                return true;
             }
         }
-
-        return wasAdded;
+        return false;
     }
 
     @SuppressWarnings("rawtypes")
