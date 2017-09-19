@@ -14,6 +14,8 @@ import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class ForLoopContext extends DefaultContext {
 
     private final ExecutableWithDescriptor forLoopExecutable;
@@ -51,11 +53,13 @@ public class ForLoopContext extends DefaultContext {
                 "For loop can only be called when already context was moved to executable call");
     }
 
-    private ForLoopContext(final URI locationUri, final int line, final String errorMsg) {
+    @VisibleForTesting
+    ForLoopContext(final URI locationUri, final int line, final String errorMsg) {
         this(null, locationUri, line, errorMsg);
     }
 
-    private ForLoopContext(final ExecutableWithDescriptor forLoopExecutable, final URI locationUri, final int line,
+    @VisibleForTesting
+    ForLoopContext(final ExecutableWithDescriptor forLoopExecutable, final URI locationUri, final int line,
             final String errorMsg) {
         this.forLoopExecutable = forLoopExecutable;
         this.locationUri = locationUri;

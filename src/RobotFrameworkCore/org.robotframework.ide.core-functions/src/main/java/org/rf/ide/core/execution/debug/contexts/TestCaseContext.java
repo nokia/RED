@@ -95,8 +95,9 @@ public class TestCaseContext extends DefaultContext {
             final RobotBreakpointSupplier breakpointSupplier) {
 
         if (testCase == null && models.isEmpty()) {
-            final String errorMsg = String.format(ErrorMessages.executableCallNotFound, keyword.asCall());
-            return new ErroneousExecutableCallContext(locationUri, line, errorMsg);
+            final String errorMsg = String.format(ErrorMessages.errorOfLocalPrePostKwNotFound(keyword.isSetup()),
+                    keyword.asCall());
+            return new SetupTeardownContext(locationUri, line, errorMsg, this, breakpointSupplier);
 
         } else if (testCase == null && !models.isEmpty()) {
             return CommonContextsTransitions.moveToTestSetupOrTeardown(models, keyword, this, breakpointSupplier);
@@ -114,7 +115,7 @@ public class TestCaseContext extends DefaultContext {
             return new ErroneousExecutableCallContext(locationUri, line, errorMsg);
         } else {
             final List<? extends RobotExecutableRow<?>> rows = testCase.getExecutionContext();
-            final List<ExecutableWithDescriptor> elements = CommonContextsTransitions.compileExecutables(rows,
+            final List<ExecutableWithDescriptor> elements = ExecutablesCompiler.compileExecutables(rows,
                     template);
 
             if (elements.isEmpty()) {

@@ -56,7 +56,7 @@ public class KeywordOfUserContext extends KeywordContext {
                     "Setup or Teardown keyword cannot be called when user keyword is about to start");
         } else {
             final List<? extends RobotExecutableRow<?>> rows = keyword.getExecutionContext();
-            final List<ExecutableWithDescriptor> elements = CommonContextsTransitions.compileExecutables(rows, null);
+            final List<ExecutableWithDescriptor> elements = ExecutablesCompiler.compileExecutables(rows, null);
 
             if (elements.isEmpty()) {
                 final int line = keyword.getDeclaration().getLineNumber();
