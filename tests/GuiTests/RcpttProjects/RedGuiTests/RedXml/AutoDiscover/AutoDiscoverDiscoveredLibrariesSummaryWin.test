@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kceEYJ3bEeeXWuMXjZT9ng
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/20/17 3:06 PM
+Save-Time: 9/20/17 3:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -31,8 +31,8 @@ with [get-window "Discovering libraries summary"] {
     }
     with [get-editbox -after [get-label "Discovered libraries (2):"]] {
         get-property text | equals "Status: Added to project configuration\n"
-            + "Source: C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\multiply.py\n"
-            + "Importers: C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\lib_with_variable.robot" 
+            + "Source: *\\RobotProject\\multiply.py\n"
+            + "Importers: *\\RobotProject\\lib_with_variable.robot" 
             | verify-true
 //        get-property "getSize().x" | equals 562 | verify-true
 //        get-property "getSize().y" | equals 117 | verify-true
@@ -56,8 +56,8 @@ with [get-window "Discovering libraries summary"] {
     with [get-editbox -after [get-label "Discovered libraries (2):"]] {
         get-property text | equals "Status: Not added to project configuration\n"
             + "Source: Unknown\n"
-            + "Importers: C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\lib_with_variable.robot\n"
-            + "Additional info: Error in file 'C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\lib_with_variable.robot': Test library 'lib1.py' does not exist." 
+            + "Importers: *\\RobotProject\\lib_with_variable.robot\n"
+            + "Additional info: Error in file '*\\RobotProject\\lib_with_variable.robot': Test library 'lib1.py' does not exist." 
             | verify-true
 //        get-property "getSize().x" | equals 409 | verify-true
 //        get-property "getSize().y" | equals 214 | verify-true
@@ -71,8 +71,8 @@ with [get-window "Discovering libraries summary"] {
 with [get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (2):"]] {
     get-property text | equals "Status: Not added to project configuration\n"
         + "Source: Unknown\n"
-        + "Importers: C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\lib_with_variable.robot\n"
-        + "Additional info: Error in file 'C:\\Users\\bacikpol\\aut-Lastproduct-org.robotframework.red\\RobotProject\\lib_with_variable.robot': Test library 'lib1.py' does not exist." 
+        + "Importers: *\\RobotProject\\lib_with_variable.robot\n"
+        + "Additional info: Error in file '*\\RobotProject\\lib_with_variable.robot': Test library 'lib1.py' does not exist." 
         | verify-true
 //    get-property "getSize().x" | equals 706 | verify-true
 //    get-property "getSize().y" | equals 93 | verify-true
