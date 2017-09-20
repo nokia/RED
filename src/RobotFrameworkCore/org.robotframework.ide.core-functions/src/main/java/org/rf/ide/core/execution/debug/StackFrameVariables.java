@@ -51,7 +51,7 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
             final String varType = entry.getValue().getType();
             final Object val = entry.getValue().getValue();
 
-            vars.put(varName, new StackFrameVariable(scope, isAutomatic(scope, varName), varName, varType, val));
+            vars.put(varName, new StackFrameVariable(scope, isAutomatic(varName), varName, varType, val));
         }
         return new StackFrameVariables(vars);
     }
@@ -102,7 +102,7 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
         for (final Variable addedVariable : delta.addedVariables) {
             final String name = addedVariable.getName();
             final VariableScope scope = addedVariable.getScope();
-            final boolean isAutomatic = isAutomatic(scope, name);
+            final boolean isAutomatic = isAutomatic(name);
             final String type = vars.get(addedVariable).getType();
             final Object value = vars.get(addedVariable).getValue();
 
@@ -136,17 +136,11 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
         return delta;
     }
 
-    private static boolean isAutomatic(final VariableScope scope, final String varName) {
-        if (scope == VariableScope.GLOBAL) {
-            return GLOBAL_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
-        } else if (scope == VariableScope.TEST_SUITE) {
-            return SUITE_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
-        } else if (scope == VariableScope.TEST_CASE) {
-            return TEST_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
-        } else if (scope == VariableScope.LOCAL) {
-            return LOCAL_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
-        }
-        return false;
+    private static boolean isAutomatic(final String varName) {
+        return GLOBAL_AUTOMATIC_VARIABLES.contains(varName.toLowerCase())
+                || SUITE_AUTOMATIC_VARIABLES.contains(varName.toLowerCase())
+                || TEST_AUTOMATIC_VARIABLES.contains(varName.toLowerCase())
+                || LOCAL_AUTOMATIC_VARIABLES.contains(varName.toLowerCase());
     }
 
     public static class StackVariablesDelta {
