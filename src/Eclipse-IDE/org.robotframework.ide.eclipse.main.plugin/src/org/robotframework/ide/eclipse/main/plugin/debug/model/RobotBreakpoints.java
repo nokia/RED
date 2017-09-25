@@ -13,11 +13,23 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RobotBreakpoints {
+
+    private final IBreakpointManager breakpointManager;
+
+    public RobotBreakpoints() {
+        this(DebugPlugin.getDefault().getBreakpointManager());
+    }
+
+    @VisibleForTesting
+    RobotBreakpoints(final IBreakpointManager breakpointManager) {
+        this.breakpointManager = breakpointManager;
+    }
 
     public Optional<org.rf.ide.core.execution.debug.RobotLineBreakpoint> getBreakpointAtLine(final int lineNumber,
             final URI fileUri) {
-        final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
         if (!breakpointManager.isEnabled()) {
             return Optional.empty();
         }
@@ -40,8 +52,6 @@ public class RobotBreakpoints {
     }
 
     public void enableBreakpointsDisabledByHitCounter() {
-        final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
-
         for (final IBreakpoint breakpoint : breakpointManager.getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID)) {
             if (breakpoint instanceof RobotLineBreakpoint) {
                 final RobotLineBreakpoint lineBreakpoint = (RobotLineBreakpoint) breakpoint;

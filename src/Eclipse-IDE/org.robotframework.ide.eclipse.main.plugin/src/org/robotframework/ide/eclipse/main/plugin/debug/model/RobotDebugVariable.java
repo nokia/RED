@@ -11,6 +11,8 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
@@ -19,7 +21,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.execution.debug.StackFrameVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
@@ -79,7 +83,8 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         this.isArtificial = true;
     }
 
-    static RobotDebugVariable createAutomatic(final RobotStackFrame frame,
+    @VisibleForTesting
+    public static RobotDebugVariable createAutomatic(final RobotStackFrame frame,
             final List<RobotDebugVariable> automaticVars) {
         final RobotDebugValue automaticVarsValue = new RobotDebugValueOfDictionary(frame.getDebugTarget(), "", "",
                 automaticVars);
@@ -110,10 +115,24 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return value;
     }
 
+    private boolean isTopLevel() {
+        return !isArtificial && stackVariable != null;
+    }
+
+    @Override
+    public boolean supportsValueModification() {
+        return !isArtificial;
+    }
+
+    @Override
+    public boolean verifyValue(final String expression) {
+        return true;
+    }
+
     @Override
     public void setValue(final String expression) {
         final List<String> arguments = extractArguments(expression.replaceAll("\\\\", "\\\\\\\\"));
-        if (stackVariable != null) {
+        if (isTopLevel()) {
             changeVariable(arguments);
         } else {
             changeVariableInnerValue(arguments);
@@ -182,27 +201,18 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     }
 
     @Override
+    public boolean verifyValue(final IValue value) {
+        return false;
+    }
+
+    @Override
     public void setValue(final IValue newValue) throws DebugException {
-        value.setValue(newValue.getValueString());
+        throw new DebugException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, DebugException.NOT_SUPPORTED,
+                "Variables can be only edited using string expressions", null));
     }
 
     void setValueChanged(final boolean valueChanged) {
         this.valueChanged = valueChanged;
-    }
-
-    @Override
-    public boolean supportsValueModification() {
-        return !isArtificial;
-    }
-
-    @Override
-    public boolean verifyValue(final String expression) {
-        return true;
-    }
-
-    @Override
-    public boolean verifyValue(final IValue value) {
-        return true;
     }
 
     void visitAllVariables(final RobotDebugVariableVisitor visitor) {

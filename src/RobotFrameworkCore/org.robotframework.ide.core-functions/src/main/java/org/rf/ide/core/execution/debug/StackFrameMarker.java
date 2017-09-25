@@ -1,7 +1,7 @@
 package org.rf.ide.core.execution.debug;
 
 
-enum StackFrameMarker {
+public enum StackFrameMarker {
     ERROR,
     STEPPING
 }
