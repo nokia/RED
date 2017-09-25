@@ -59,7 +59,7 @@ public final class RunningKeyword {
         return keywordName;
     }
 
-    KeywordCallType getType() {
+    public KeywordCallType getType() {
         return callType;
     }
 

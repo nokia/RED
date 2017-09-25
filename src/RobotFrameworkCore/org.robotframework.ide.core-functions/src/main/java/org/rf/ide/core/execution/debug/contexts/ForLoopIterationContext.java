@@ -15,12 +15,14 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.rf.ide.core.execution.debug.KeywordCallType;
 import org.rf.ide.core.execution.debug.RobotBreakpointSupplier;
 import org.rf.ide.core.execution.debug.RunningKeyword;
 import org.rf.ide.core.execution.debug.StackFrameContext;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
+import com.google.common.annotations.VisibleForTesting;
 
 public class ForLoopIterationContext extends DefaultContext {
 
@@ -75,16 +77,19 @@ public class ForLoopIterationContext extends DefaultContext {
         return vars;
     }
 
-    private ForLoopIterationContext(final URI locationUri, final FileRegion region, final String errorMsg) {
+    @VisibleForTesting
+    ForLoopIterationContext(final URI locationUri, final FileRegion region, final String errorMsg) {
         this(null, locationUri, region, errorMsg);
     }
 
-    private ForLoopIterationContext(final ExecutableWithDescriptor forLoopExecutable, final URI locationUri,
+    @VisibleForTesting
+    ForLoopIterationContext(final ExecutableWithDescriptor forLoopExecutable, final URI locationUri,
             final FileRegion region) {
         this(forLoopExecutable, locationUri, region, null);
     }
 
-    private ForLoopIterationContext(final ExecutableWithDescriptor forLoopExecutable, final URI locationUri,
+    @VisibleForTesting
+    ForLoopIterationContext(final ExecutableWithDescriptor forLoopExecutable, final URI locationUri,
             final FileRegion region, final String errorMsg) {
         this.forLoopExecutable = forLoopExecutable;
         this.locationUri = locationUri;
@@ -114,6 +119,9 @@ public class ForLoopIterationContext extends DefaultContext {
 
     @Override
     public StackFrameContext moveTo(final RunningKeyword keyword, final RobotBreakpointSupplier breakpointSupplier) {
+        if (keyword.getType() != KeywordCallType.NORMAL_CALL) {
+            throw new IllegalDebugContextStateException("Only normal keyword can be called when executing loop");
+        }
         if (forLoopExecutable != null) {
             return CommonContextsTransitions.moveToExecutable(new ArrayList<>(), locationUri,
                     forLoopExecutable.getLoopExecutable().getInnerExecutables(), 0, keyword, breakpointSupplier);
