@@ -7,7 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
 public class RobotDebugValueOfScalar extends RobotDebugValue {
 
-    public static RobotDebugValue create(final RobotDebugVariable parent, final String type, final String value) {
+    public static RobotDebugValueOfScalar create(final RobotDebugVariable parent, final String type,
+            final String value) {
         return new RobotDebugValueOfScalar(parent.getDebugTarget(), type, value);
     }
 

@@ -308,7 +308,7 @@ public class UserProcessDebugController extends UserProcessController {
     }
     
     @VisibleForTesting
-    static class SuspensionData {
+    public static class SuspensionData {
 
         public SuspendReason reason;
 
@@ -321,12 +321,12 @@ public class UserProcessDebugController extends UserProcessController {
     }
 
     @VisibleForTesting
-    enum SuspendReason {
+    public enum SuspendReason {
         USER_REQUEST, BREAKPOINT, STEPPING, VARIABLE_CHANGE, ERRONEOUS_STATE
     }
 
     @VisibleForTesting
-    enum SteppingMode {
+    public enum SteppingMode {
         INTO, OVER, RETURN
     }
 }
