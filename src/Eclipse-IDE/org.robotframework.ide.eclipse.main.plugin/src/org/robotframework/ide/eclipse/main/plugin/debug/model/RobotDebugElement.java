@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
+import java.util.function.Consumer;
+
 import org.eclipse.core.runtime.PlatformObject;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -15,6 +17,8 @@ import org.eclipse.debug.core.model.IDisconnect;
 import org.eclipse.debug.core.model.ISuspendResume;
 import org.eclipse.debug.core.model.ITerminate;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RobotDebugElement extends PlatformObject
         implements IDebugElement, ITerminate, ISuspendResume, IDisconnect {
 
@@ -22,8 +26,20 @@ public class RobotDebugElement extends PlatformObject
 
     private final RobotDebugTarget target;
 
+    private final Consumer<DebugEvent> eventsNotifier;
+
     protected RobotDebugElement(final RobotDebugTarget target) {
+        this(target, RobotDebugElement::fireEvent);
+    }
+
+    @VisibleForTesting
+    RobotDebugElement(final RobotDebugTarget target, final Consumer<DebugEvent> eventsNotifier) {
         this.target = target;
+        this.eventsNotifier = eventsNotifier;
+    }
+
+    static void fireEvent(final DebugEvent event) {
+        DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
     }
 
     @Override
@@ -52,28 +68,24 @@ public class RobotDebugElement extends PlatformObject
         return super.getAdapter(adapter);
     }
 
-    protected final void fireCreationEvent() {
-        fireEvent(new DebugEvent(this, DebugEvent.CREATE));
+    public void fireCreationEvent() {
+        eventsNotifier.accept(new DebugEvent(this, DebugEvent.CREATE));
     }
 
-    protected final void fireResumeEvent(final int detail) {
-        fireEvent(new DebugEvent(this, DebugEvent.RESUME, detail));
+    public void fireResumeEvent(final int detail) {
+        eventsNotifier.accept(new DebugEvent(this, DebugEvent.RESUME, detail));
     }
 
-    public final void fireSuspendEvent(final int detail) {
-        fireEvent(new DebugEvent(this, DebugEvent.SUSPEND, detail));
+    public void fireSuspendEvent(final int detail) {
+        eventsNotifier.accept(new DebugEvent(this, DebugEvent.SUSPEND, detail));
     }
 
-    protected final void fireChangeEvent(final int detail) {
-        fireEvent(new DebugEvent(this, DebugEvent.CHANGE, detail));
+    public void fireChangeEvent(final int detail) {
+        eventsNotifier.accept(new DebugEvent(this, DebugEvent.CHANGE, detail));
     }
 
-    public final void fireTerminateEvent() {
-        fireEvent(new DebugEvent(this, DebugEvent.TERMINATE));
-    }
-
-    private void fireEvent(final DebugEvent event) {
-        DebugPlugin.getDefault().fireDebugEventSet(new DebugEvent[] { event });
+    public void fireTerminateEvent() {
+        eventsNotifier.accept(new DebugEvent(this, DebugEvent.TERMINATE));
     }
 
     @Override

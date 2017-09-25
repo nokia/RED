@@ -26,6 +26,10 @@ class SourceInLibraryEditorInput implements RedDebuggerAssistantEditorInput {
         this.element = element;
     }
 
+    SourceOfStackFrameInLibrary getElement() {
+        return element;
+    }
+
     @Override
     public boolean exists() {
         return false;

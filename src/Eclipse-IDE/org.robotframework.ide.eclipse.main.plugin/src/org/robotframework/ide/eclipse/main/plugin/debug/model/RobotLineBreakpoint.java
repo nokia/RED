@@ -92,6 +92,11 @@ public class RobotLineBreakpoint extends LineBreakpoint implements org.rf.ide.co
         super.setEnabled(enabled);
     }
 
+    @VisibleForTesting
+    void setDisabledDueToHitCounter(final boolean disabled) {
+        this.isDisabledDueToHitCounter = disabled;
+    }
+
     public boolean isHitCountEnabled() {
         final IMarker marker = getMarker();
         return marker == null ? false : marker.getAttribute(HIT_COUNT_ENABLED_ATTRIBUTE, false);

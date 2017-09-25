@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IRegisterGroup;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.rf.ide.core.execution.debug.StackFrame;
@@ -28,6 +27,7 @@ import org.rf.ide.core.execution.debug.UserProcessDebugController;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
 
 
@@ -40,12 +40,18 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     private final UserProcessDebugController userController;
 
 
-    RobotStackFrame(final RobotThread thread, final StackFrame frame,
+    @VisibleForTesting
+    public RobotStackFrame(final RobotThread thread, final StackFrame frame,
             final UserProcessDebugController userController) {
         super(thread.getDebugTarget());
         this.thread = thread;
         this.frame = frame;
         this.userController = userController;
+    }
+
+    @VisibleForTesting
+    StackFrame getFrame() {
+        return frame;
     }
 
     public Optional<URI> getPath() {
@@ -157,7 +163,7 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
 
     @Override
     public boolean hasVariables() {
-        return getThread().isSuspended();
+        return isSuspended();
     }
 
     @Override
@@ -214,6 +220,14 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
         }
     }
 
+    public List<? extends RobotDebugVariable> getAllVariables() {
+        final List<RobotDebugVariable> allVariables = new ArrayList<>();
+        for (final RobotDebugVariable var : getVariables()) {
+            var.visitAllVariables(v -> allVariables.add(v));
+        }
+        return allVariables;
+    }
+
     public void changeVariable(final StackFrameVariable stackVariable, final List<String> arguments) {
         getDebugTarget().changeVariable(frame, stackVariable, arguments);
     }
@@ -221,14 +235,6 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     public void changeVariableInnerValue(final StackFrameVariable variable, final List<Object> path,
             final List<String> arguments) {
         getDebugTarget().changeVariableInnerValue(frame, variable, path, arguments);
-    }
-
-    public List<? extends RobotDebugVariable> getAllVariables() {
-        final List<RobotDebugVariable> allVariables = new ArrayList<>();
-        for (final RobotDebugVariable var : getVariables()) {
-            var.visitAllVariables(v -> allVariables.add(v));
-        }
-        return allVariables;
     }
 
     @Override
@@ -252,12 +258,12 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     }
 
     @Override
-    public boolean hasRegisterGroups() throws DebugException {
+    public boolean hasRegisterGroups() {
         return false;
     }
 
     @Override
-    public IRegisterGroup[] getRegisterGroups() throws DebugException {
+    public IRegisterGroup[] getRegisterGroups() {
         return null;
     }
 

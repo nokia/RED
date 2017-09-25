@@ -26,11 +26,11 @@ public class Stacktrace implements Iterable<StackFrame> {
 
     private final Deque<StackFrame> frames = new ArrayDeque<>();
 
-    void push(final StackFrame frame) {
+    public void push(final StackFrame frame) {
         frames.push(frame);
     }
 
-    void pop() {
+    public void pop() {
         frames.pop();
     }
 
