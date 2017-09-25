@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.debug.model;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.debug.core.DebugEvent;
@@ -24,6 +25,8 @@ import org.rf.ide.core.execution.debug.UserProcessDebugController;
 import org.rf.ide.core.execution.debug.UserProcessDebugController.PauseReasonListener;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget {
 
     private final ILaunch launch;
@@ -40,7 +43,13 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     public RobotDebugTarget(final String name, final ILaunch launch, final Stacktrace stacktrace,
             final UserProcessDebugController userController) {
-        super(null);
+        this(name, launch, stacktrace, userController, RobotDebugElement::fireEvent);
+    }
+
+    @VisibleForTesting
+    RobotDebugTarget(final String name, final ILaunch launch, final Stacktrace stacktrace,
+            final UserProcessDebugController userController, final Consumer<DebugEvent> eventsNotifier) {
+        super(null, eventsNotifier);
         this.name = name;
         this.launch = launch;
         this.stacktrace = stacktrace;
@@ -49,7 +58,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     public void connected() {
-        this.singleThread = new RobotThread(this, stacktrace, userController);
+        setThread(new RobotThread(this, stacktrace, userController));
     }
 
     @Override
@@ -73,6 +82,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     public RobotThread getThread() {
         return singleThread;
+    }
+
+    @VisibleForTesting
+    void setThread(final RobotThread thread) {
+        this.singleThread = thread;
     }
 
     @Override
@@ -150,7 +164,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
         getThread().resumed();
         getThread().fireResumeEvent(DebugEvent.CLIENT_REQUEST);
-        this.fireChangeEvent(DebugEvent.CHANGE);
+
+        fireChangeEvent(DebugEvent.CONTENT);
     }
 
     void changeVariable(final StackFrame frame, final StackFrameVariable variable, final List<String> arguments) {
@@ -203,7 +218,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         return null;
     }
 
-    private class ExecutionPauseReasonsListener implements PauseReasonListener {
+    @VisibleForTesting
+    class ExecutionPauseReasonsListener implements PauseReasonListener {
 
         @Override
         public void pausedOnBreakpoint(final RobotLineBreakpoint breakpoint) {

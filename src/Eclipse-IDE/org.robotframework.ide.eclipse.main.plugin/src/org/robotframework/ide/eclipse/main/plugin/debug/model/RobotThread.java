@@ -67,7 +67,7 @@ public class RobotThread extends RobotDebugElement implements IThread {
         breakpoints.add(breakpoint);
     }
 
-    void resumed() {
+    public void resumed() {
         breakpoints.clear();
     }
 
