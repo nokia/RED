@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _72sQgG-KEeas5uogJbgGYA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/10/17 2:44 PM
+Save-Time: 9/26/17 1:14 PM
 Tags: notTestable
 Testcase-Type: ecl
 
@@ -47,8 +47,8 @@ wait 200
 
 //got to tc name
 with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-    key-type Right
-    key-type Left
+    key-type Down
+    key-type Up
 }
 //check if doc is shown
 get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
@@ -96,8 +96,8 @@ get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test 2/kw_fr
 wait 200
 
 with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-    key-type Right
-    key-type Left
+    key-type Up
+    key-type Down
 }
 
 //this kw from resource has no doc: kw_from_res_with_no_doc
@@ -126,7 +126,7 @@ get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -in
 get-view "Documentation View" | get-editbox | get-property text | equals "" | verify-true
 
 //kw_with_no_doc
-get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up -times 2
+get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Up -times 3
 get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_with_no_doc\n"
     + "Source: User defined (/RobotProject/checking_doc.robot)\n"
     + "Arguments: [d]\n\n"
@@ -154,7 +154,10 @@ get-view "Documentation View" | get-editbox | get-property text | equals "test1\
 
 //go to log KW    
 get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test 3/Log"
-
+with [get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Up
+    key-type Down
+}
 
 get-view "Documentation View" | get-editbox | get-property text | contains "Name: Log\n"
     + "Source: Library (BuiltIn)\n"
@@ -177,7 +180,10 @@ get-editor "checking_doc.robot" | get-tab-folder | get-tab-item Keywords | click
 //select kw from other file
 get-view Outline | get-tree | select "checking_doc.robot/Keywords/kw1_with_imported_kw/kw_from_res" | click
 wait 200
-
+with [get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Up
+    key-type Down
+}
 //kw_from_res
 get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw_from_res\n"
     + "Source: User defined (/RobotProject/res.robot)\n"
@@ -205,7 +211,9 @@ get-view "Documentation View" | get-editbox | get-property text | equals "kw_wit
     
 //kw name with no doc    
 get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 3
-get-view "Documentation View" | get-editbox | get-property text | equals "" | verify-true  
+get-view "Documentation View" | get-editbox | get-property text | equals "kw_with_doc_and_arg\n"
+    + "checking_doc.robot\n\n"
+    + "Second main kw" | verify-true 
 
 //==================================== Show in Doc View ==========================================================================
 // Show in Doc - KW
