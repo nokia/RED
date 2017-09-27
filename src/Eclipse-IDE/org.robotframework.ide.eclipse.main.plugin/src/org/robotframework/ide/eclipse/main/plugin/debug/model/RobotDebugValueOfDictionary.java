@@ -17,7 +17,7 @@ import org.rf.ide.core.execution.agent.event.VariableTypedValue;
 
 public class RobotDebugValueOfDictionary extends RobotDebugValue {
 
-    public static RobotDebugValue create(final RobotDebugVariable parent, final String type,
+    public static RobotDebugValueOfDictionary create(final RobotDebugVariable parent, final String type,
             final Map<?, ?> map) {
         final List<RobotDebugVariable> nestedVariables = new ArrayList<>();
         for (final Entry<?, ?> entry : map.entrySet()) {

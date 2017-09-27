@@ -20,6 +20,10 @@ class SourceNotFoundEditorInput implements RedDebuggerAssistantEditorInput {
         this.element = element;
     }
 
+    public SourceOfStackFrameNotFound getElement() {
+        return element;
+    }
+
     @Override
     public boolean exists() {
         return false;
@@ -47,19 +51,19 @@ class SourceNotFoundEditorInput implements RedDebuggerAssistantEditorInput {
 
     @Override
     public String getTitle() {
-        final String msg = element.getInstructionPointerText();
+        final String msg = element.instructionPointerText;
         return msg.contains("\n") ? msg.substring(0, msg.indexOf('\n')) : msg;
     }
 
     @Override
     public String getDetailedInformation() {
-        final String msg = element.getInstructionPointerText();
+        final String msg = element.instructionPointerText;
         return msg.contains("\n") ? msg.substring(msg.indexOf('\n') + 1, msg.length()) : "";
     }
 
     @Override
     public String getName() {
-        return element.getFrameName();
+        return element.frameName;
     }
 
     @Override
@@ -69,7 +73,7 @@ class SourceNotFoundEditorInput implements RedDebuggerAssistantEditorInput {
 
     @Override
     public String getToolTipText() {
-        return element.getFrameName();
+        return element.frameName;
     }
 
     @Override
@@ -86,14 +90,6 @@ class SourceNotFoundEditorInput implements RedDebuggerAssistantEditorInput {
         SourceOfStackFrameNotFound(final String frameName, final String instructionPointerText) {
             this.frameName = frameName;
             this.instructionPointerText = instructionPointerText;
-        }
-
-        String getFrameName() {
-            return frameName;
-        }
-
-        String getInstructionPointerText() {
-            return instructionPointerText;
         }
     }
 }
