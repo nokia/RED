@@ -42,7 +42,7 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
 
     private final Map<String, StackFrameVariable> variables;
 
-    static StackFrameVariables newNonLocalVariables(final Map<Variable, VariableTypedValue> variables) {
+    public static StackFrameVariables newNonLocalVariables(final Map<Variable, VariableTypedValue> variables) {
         final LinkedHashMap<String, StackFrameVariable> vars = new LinkedHashMap<>();
 
         for (final Entry<Variable, VariableTypedValue> entry : variables.entrySet()) {
@@ -56,7 +56,8 @@ public class StackFrameVariables implements Iterable<StackFrameVariable> {
         return new StackFrameVariables(vars);
     }
 
-    static StackFrameVariables newLocalVariables(final StackFrameVariables parentVars, final boolean preserveLocals) {
+    public static StackFrameVariables newLocalVariables(final StackFrameVariables parentVars,
+            final boolean preserveLocals) {
         final LinkedHashMap<String, StackFrameVariable> variables = new LinkedHashMap<>();
         for (final StackFrameVariable variable : parentVars) {
             if (preserveLocals || variable.getScope() != VariableScope.LOCAL) {

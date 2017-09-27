@@ -191,4 +191,49 @@ public class RobotLineBreakpointTest {
         bp6.setCondition("condition");
         assertThat(bp6.getLabel()).isEqualTo("suite.robot [line: 3] [hit count: 42] [conditional]");
     }
+
+    @Test
+    public void hitCountIsAlwaysSatisfied_whenHitCountIsDisabled() throws Exception {
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        breakpoint.setHitCountEnabled(false);
+
+        for (int i = 0; i < 20; i++) {
+            assertThat(breakpoint.evaluateHitCount()).isTrue();
+        }
+    }
+
+    @Test
+    public void hitCountIsSatisfied_whenItIsBeingHitForTheGivenTime() throws Exception {
+        final RobotLineBreakpoint breakpoint = new RobotLineBreakpoint(file, 3);
+        breakpoint.setHitCountEnabled(true);
+        breakpoint.setHitCount(10);
+
+        for (int i = 0; i < 9; i++) {
+            assertThat(breakpoint.evaluateHitCount()).isFalse();
+            assertThat(breakpoint.isEnabled()).isTrue();
+        }
+        assertThat(breakpoint.evaluateHitCount()).isTrue();
+        assertThat(breakpoint.isEnabled()).isFalse();
+    }
+
+    @Test
+    public void breakpointDisabledBySatisfiedCountAreReenabled() throws Exception {
+        final RobotLineBreakpoint breakpoint1 = new RobotLineBreakpoint(file, 2);
+        breakpoint1.setHitCountEnabled(true);
+        breakpoint1.setHitCount(10);
+        final RobotLineBreakpoint breakpoint2 = new RobotLineBreakpoint(file, 3);
+        breakpoint2.setEnabled(false);
+
+        for (int i = 0; i < 10; i++) {
+            breakpoint1.evaluateHitCount();
+        }
+        assertThat(breakpoint1.isEnabled()).isFalse();
+        assertThat(breakpoint2.isEnabled()).isFalse();
+
+        breakpoint1.enableIfDisabledByHitCounter();
+        breakpoint2.enableIfDisabledByHitCounter();
+
+        assertThat(breakpoint1.isEnabled()).isTrue();
+        assertThat(breakpoint2.isEnabled()).isFalse();
+    }
 }
