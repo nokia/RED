@@ -7,6 +7,7 @@
 import threading
 import sys
 import json
+import types
 import inspect
 import re
 
@@ -125,7 +126,6 @@ class RedImporter(object):
             self.lock.release()
 
     def _wrap(self, func, args, kwargs):
-        import types
         if isinstance(func, types.MethodType):
             if func.__name__ == 'import_library':
                 return self._handle_lib_import(func, args, kwargs)
