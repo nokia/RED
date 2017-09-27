@@ -51,6 +51,8 @@ import copy
 import json
 import time
 import traceback
+import platform
+import re
 from collections import OrderedDict
 try:
     from collections.abc import Mapping
@@ -527,7 +529,6 @@ class TestRunnerAgent:
 
     def library_import(self, name, attributes):
         # equals org.python.core.ClasspathPyImporter.PYCLASSPATH_PREFIX
-        import platform
         if 'Jython' in platform.python_implementation():
             import org.python.core.imp as jimp
             if attributes['source']:
@@ -543,7 +544,6 @@ class TestRunnerAgent:
 
             source_uri_txt = attributes['source']
             if source_uri_txt and 'file:/' in source_uri_txt:
-                import re
                 from java.io import File as File
                 from java.net import URL as URL
                 filePath = re.split('.*(?=file[:])', source_uri_txt)
