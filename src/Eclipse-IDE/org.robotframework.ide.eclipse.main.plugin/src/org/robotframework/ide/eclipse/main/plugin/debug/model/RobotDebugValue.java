@@ -17,9 +17,9 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugVariable
  */
 public abstract class RobotDebugValue extends RobotDebugElement implements IValue {
 
-    private String type;
+    private final String type;
 
-    private String value;
+    private final String value;
     
     protected RobotDebugValue(final RobotDebugTarget target, final String type, final String value) {
         super(target);
@@ -46,17 +46,9 @@ public abstract class RobotDebugValue extends RobotDebugElement implements IValu
         return type;
     }
 
-    protected final void setType(final String type) {
-        this.type = type;
-    }
-
     @Override
     public String getValueString() {
         return value;
-    }
-
-    void setValue(final String value) {
-        this.value = value;
     }
 
     public abstract String getDetailedValue();
