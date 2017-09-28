@@ -6159,4 +6159,39 @@
             </command>
          </menuContribution>
       </extension>
+      <extension
+            point="org.eclipse.ui.commands">
+         <command
+               categoryId="org.robotframework.ide.eclipse.robotCommands"
+               id="org.robotframework.red.view.debug.variables.sort"
+               name="Always display sorted variables">
+            <state
+                  class="org.eclipse.jface.commands.ToggleState"
+                  id="org.robotframework.red.view.debug.variables.sort.state">
+            </state>
+         </command>
+      </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.debug.AlwaysDisplaySortedVariablesHandler"
+               commandId="org.robotframework.red.view.debug.variables.sort">
+         </handler>
+      </extension>
+      <extension
+            name="Variables View menus"
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="false"
+               locationURI="menu:org.eclipse.debug.ui.VariableView?after=additions">
+            <menu
+                  label="Robot">
+               <command
+                     commandId="org.robotframework.red.view.debug.variables.sort"
+                     label="Always display sorted variables"
+                     style="toggle">
+               </command>
+            </menu>
+         </menuContribution>
+      </extension>
 </plugin>

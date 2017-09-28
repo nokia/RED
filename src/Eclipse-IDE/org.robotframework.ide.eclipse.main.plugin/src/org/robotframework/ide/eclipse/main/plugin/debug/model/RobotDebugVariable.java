@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.debug.model;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,14 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
     private final StackFrameVariable stackVariable;
 
     private final boolean isArtificial;
+
+    static Comparator<RobotDebugVariable> sorter() {
+        return (var1, var2) -> extractVariableName(var1.name).compareToIgnoreCase(extractVariableName(var2.name));
+    }
+
+    private static String extractVariableName(final String name) {
+        return name.matches("^[$@&%]\\{.+\\}$") ? name.substring(2, name.length() - 1) : name;
+    }
 
     public RobotDebugVariable(final RobotStackFrame frame, final StackFrameVariable stackVariable) {
         super(frame.getDebugTarget());
