@@ -54,15 +54,15 @@ public class ProjectProvider implements TestRule {
     /**
      * Configures the project to have robot nature. Use wisely since this adds builder
      * to the project, so in some situations project building/validation can start.
-     * 
+     *
      * @throws CoreException
      */
     public void addRobotNature() throws CoreException {
-        RobotProjectNature.addRobotNature(project, null);
+        RobotProjectNature.addRobotNature(project, null, () -> true);
     }
 
     public void removeRobotNature() throws CoreException {
-        RobotProjectNature.removeRobotNature(project, null, true);
+        RobotProjectNature.removeRobotNature(project, null, () -> true);
     }
 
     public void configure() throws IOException, CoreException {
@@ -70,12 +70,12 @@ public class ProjectProvider implements TestRule {
     }
 
     public void configure(final RobotProjectConfig config) throws IOException, CoreException {
-        createFile(Path.fromPortableString("red.xml"), "");
+        createFile(Path.fromPortableString(RobotProjectConfig.FILENAME), "");
         new RedEclipseProjectConfigWriter().writeConfiguration(config, project);
     }
 
     public void deconfigure() throws CoreException {
-        project.findMember("red.xml").delete(true, null);
+        project.findMember(RobotProjectConfig.FILENAME).delete(true, null);
     }
 
     @Override
