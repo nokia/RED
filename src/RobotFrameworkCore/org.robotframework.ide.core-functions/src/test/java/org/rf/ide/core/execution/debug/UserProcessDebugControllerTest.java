@@ -337,7 +337,7 @@ public class UserProcessDebugControllerTest {
     }
 
     @Test
-    public void noResponseIsReturned_whenThereIsAnErroneousFrameButPauseOnErrorIsDisabled() {
+    public void noResponseIsReturned_whenThereIsAnErroneousFrameButPauseOnErrorIsDisabledAndFrameGetsMarked() {
         final Stacktrace stack = new Stacktrace();
         stack.push(new StackFrame("Suite", FrameCategory.SUITE, 0, context()));
         stack.push(new StackFrame("Test", FrameCategory.TEST, 1, context()));
@@ -349,7 +349,7 @@ public class UserProcessDebugControllerTest {
         final Optional<ServerResponse> response = controller.takeCurrentResponse(PausingPoint.START_KEYWORD);
 
         assertThat(response).isEmpty();
-        assertThat(stack.stream().filter(StackFrame::isErroneous)).allMatch(not(StackFrame::isMarkedError));
+        assertThat(stack.stream().filter(StackFrame::isErroneous)).allMatch(StackFrame::isMarkedError);
         assertThat(controller.getSuspensionData()).isNull();
     }
 
