@@ -33,48 +33,46 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
 
     private boolean isValid = false;
 
-	@Override
-	public void init(final IWorkbench workbench,
-			final IStructuredSelection currentSelection) {
-		super.init(workbench, currentSelection);
-		setNeedsProgressMonitor(true);
-		setWindowTitle("New Robot project");
-	}
+    @Override
+    public void init(final IWorkbench workbench, final IStructuredSelection currentSelection) {
+        super.init(workbench, currentSelection);
+        setNeedsProgressMonitor(true);
+        setWindowTitle("New Robot project");
+    }
 
-	@Override
-	public void addPages() {
-		super.addPages();
+    @Override
+    public void addPages() {
+        super.addPages();
         mainPage = new WizardNewProjectCreationPage("New Robot Project");
         mainPage.setWizard(this);
         mainPage.setTitle("Robot Project");
         mainPage.setDescription("Create new Robot project");
 
         this.addPage(mainPage);
-	}
+    }
 
-	@Override
-	public boolean performFinish() {
+    @Override
+    public boolean performFinish() {
         validatePage();
         if (isValid) {
             selectAndReveal(createNewProject());
             return true;
         }
-            return false;
+        return false;
     }
 
     protected boolean validatePage() {
         isValid = true;
-        String name=mainPage.getProjectHandle().getName();
-        IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-        for (IProject pro : projects) {
+        final String name = mainPage.getProjectHandle().getName();
+        final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
+        for (final IProject pro : projects) {
             if (name.equalsIgnoreCase(pro.getName())) {
                 MessageDialog.openError(getShell(), "Error", String.format("Project \"%s\" already exists!", name));
                 isValid = false;
             }
         }
         return isValid;
-	}
-
+    }
 
     private IResource createNewProject() {
         final IProject newProjectHandle = mainPage.getProjectHandle();
@@ -98,6 +96,7 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
         return newProjectHandle;
     }
 
+    @SuppressWarnings("serial")
     private static class ProjectCreatingException extends RuntimeException {
 
         public ProjectCreatingException(final String msg, final Exception cause) {
@@ -121,13 +120,13 @@ public class NewRobotProjectWizard extends BasicNewResourceWizard {
             final CreateProjectOperation operation = new CreateProjectOperation(description,
                     "Creating new Robot project");
             try {
-                PlatformUI.getWorkbench().getOperationSupport().getOperationHistory()
-                        .execute(operation, monitor, WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
+                PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(operation, monitor,
+                        WorkspaceUndoUtil.getUIInfoAdapter(getShell()));
 
-                RobotProjectNature.addRobotNature(newProjectHandle, monitor);
-			} catch (final ExecutionException | CoreException e) {
+                RobotProjectNature.addRobotNature(newProjectHandle, monitor, () -> true);
+            } catch (final ExecutionException | CoreException e) {
                 throw new InvocationTargetException(e);
             }
         }
-	}
+    }
 }
