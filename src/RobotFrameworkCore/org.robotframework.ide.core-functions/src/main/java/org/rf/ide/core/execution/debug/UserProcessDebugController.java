@@ -108,13 +108,14 @@ public class UserProcessDebugController extends UserProcessController {
                 && frames().map(StackFrame::getContext).anyMatch(StackFrameContext::isErroneous)
                 && !frames().anyMatch(StackFrame::isMarkedError)) {
 
+            // we mark all the erroneous frames; once they will be popped from stack it may
+            // again suspend
+            frames().filter(frame -> frame.getContext().isErroneous())
+                    .forEach(frame -> frame.mark(StackFrameMarker.ERROR));
+
             // this may require user assistance, so has to be asked as the last condition after
             // those in previous if
             if (preferences.shouldPauseOnError()) {
-                // we mark all the erroneous frames; once they will be popped from stack it may
-                // again suspend
-                frames().filter(frame -> frame.getContext().isErroneous())
-                        .forEach(frame -> frame.mark(StackFrameMarker.ERROR));
 
                 final String error = frames()
                         .findFirst()
