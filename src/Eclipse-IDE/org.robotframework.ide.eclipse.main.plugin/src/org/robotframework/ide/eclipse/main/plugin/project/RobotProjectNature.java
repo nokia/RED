@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -32,7 +33,8 @@ public class RobotProjectNature implements IProjectNature {
 
 	private IProject project;
 
-    public static void addRobotNature(final IProject project, final IProgressMonitor monitor) throws CoreException {
+    public static void addRobotNature(final IProject project, final IProgressMonitor monitor,
+            final BooleanSupplier shouldReplaceConfig) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
         final List<String> natures = newArrayList(desc.getNatureIds());
@@ -40,10 +42,15 @@ public class RobotProjectNature implements IProjectNature {
         desc.setNatureIds(natures.toArray(new String[0]));
 
         project.setDescription(desc, monitor);
+
+        final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
+        if (!cfgFile.exists() || shouldReplaceConfig.getAsBoolean()) {
+            new RedEclipseProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
+        }
     }
 
     public static void removeRobotNature(final IProject project, final IProgressMonitor monitor,
-            final boolean removeRedXml) throws CoreException {
+            final BooleanSupplier shouldRemoveConfig) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
         final List<String> natures = newArrayList(desc.getNatureIds());
@@ -53,7 +60,7 @@ public class RobotProjectNature implements IProjectNature {
         project.setDescription(desc, monitor);
 
         final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
-        if (removeRedXml && cfgFile.exists()) {
+        if (cfgFile.exists() && shouldRemoveConfig.getAsBoolean()) {
             cfgFile.delete(true, null);
         }
     }
@@ -82,7 +89,6 @@ public class RobotProjectNature implements IProjectNature {
 	@Override
 	public void configure() throws CoreException {
         addToBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        new RedEclipseProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
 	}
 
 	@Override
