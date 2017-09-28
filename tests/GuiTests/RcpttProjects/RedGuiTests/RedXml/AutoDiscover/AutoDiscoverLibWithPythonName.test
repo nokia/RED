@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-Bu-sJ0oEeeRmMnJfp9igw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/28/17 1:25 PM
+Save-Time: 9/28/17 2:25 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,16 +27,28 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
 // verify Discovering libraries summary content
 try -times 20 -delay 500 -command {
 	with [get-window "Discovering libraries summary" | get-control Any -index 1] {
-	    get-property "getChildren().Control[0].getText()" | equals "Discovered libraries (184):" | verify-true
-	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().length" | equals 184 | verify-true
-	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[0].getText()" 
-	        | equals abcatexit | verify-true
-	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[162].getText()" 
-	        | equals zipfile | verify-true
-	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[163].getText()" | equals Al 
-	        | verify-true
-	    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[183].getText()" | equals zlib 
-	        | verify-true
+		if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+		    get-property "getChildren().Control[0].getText()" | equals "Discovered libraries (184):" | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().length" | equals 184 | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[0].getText()" 
+		        | equals abcatexit | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[162].getText()" 
+		        | equals zipfile | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[163].getText()" | equals Al 
+		        | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[183].getText()" | equals zlib 
+		        | verify-true
+		}-else{
+			get-property "getChildren().Control[0].getText()" | equals "Discovered libraries (184):" | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().length" | equals 184 | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[0].getText()" 
+		        | equals abcatexit | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[162].getText()" 
+		        | equals uu | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[163].getText()" | equals Al 
+		        | verify-true
+		    get-property "getChildren().Control[1].getChildren().Control[0].getItems().TreeItem[183].getText()" | equals zlib 
+		        | verify-true
 	}
 }
 // close Discovering libraries summary
