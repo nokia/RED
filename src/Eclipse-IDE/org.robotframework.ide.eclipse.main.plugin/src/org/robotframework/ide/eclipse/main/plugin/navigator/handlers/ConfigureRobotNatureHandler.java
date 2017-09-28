@@ -11,6 +11,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ConfigureRobotNatureHandler.E4ConfigureRobotNatureHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -33,18 +34,31 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
 
             for (final IProject project : projects) {
                 if ("enable".equalsIgnoreCase(enablement)) {
-                    RobotProjectNature.addRobotNature(project, new NullProgressMonitor());
+                    RobotProjectNature.addRobotNature(project, new NullProgressMonitor(),
+                            () -> shouldRedXmlBeReplaced(project.getName()));
                 } else if ("disable".equalsIgnoreCase(enablement)) {
                     RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(),
-                            shouldRedXmlBeRemoved(project.getName()));
+                            () -> shouldRedXmlBeRemoved(project.getName()));
                 }
             }
         }
 
         private static boolean shouldRedXmlBeRemoved(final String projectName) {
             return MessageDialog.openQuestion(Display.getCurrent().getActiveShell(),
-                    "Confirm configuration file removal", "You have deconfigured the project '" + projectName
-                            + "' as a Robot project. Do you want to remove project configuration file 'red.xml' too?");
+                    "Confirm configuration file removal",
+                    String.format(
+                            "You have deconfigured the project '%s' as a Robot project.\n"
+                                    + "Do you want to remove project configuration file '%s' too?",
+                            projectName, RobotProjectConfig.FILENAME));
+        }
+
+        private static boolean shouldRedXmlBeReplaced(final String projectName) {
+            return MessageDialog.openQuestion(Display.getCurrent().getActiveShell(),
+                    "Confirm configuration file replacement",
+                    String.format(
+                            "You have configured the project '%s' as a Robot project.\n"
+                                    + "Do you want to replace project configuration file '%s' too?",
+                            projectName, RobotProjectConfig.FILENAME));
         }
     }
 }
