@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VCN3MCu6EeW667Afdo4DcA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/28/17 2:37 PM
+Save-Time: 9/28/17 2:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,7 +18,7 @@ get-view "Project Explorer" | get-tree | select "OnlyRobotSuiteFile/SimpleLoggin
 // verify if there is no red.xml
 with [get-view "Project Explorer" | get-tree] {
     get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-        | equals "Robot Standard libraries [Robot Framework 3.0.2 (Python 2.7.13 on win32)]" | verify-true
+        | equals "Robot Standard libraries .*" | verify-true
     get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals "SimpleLoggingTestCase.robot" 
         | verify-true
 }
