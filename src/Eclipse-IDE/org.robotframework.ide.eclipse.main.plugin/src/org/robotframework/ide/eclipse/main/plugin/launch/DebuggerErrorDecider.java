@@ -35,7 +35,7 @@ public class DebuggerErrorDecider implements Supplier<Boolean> {
                     final MessageDialogWithToggle dialog = new MessageDialogWithToggle(
                             RedPlugin.getDefault().getWorkbench().getModalDialogShellProvider().getShell(),
                             "Debugger error", null,
-                            "RED debugger have entered into an erronous state.\n\nDo you want the debugger to suspend the execution now?",
+                            "RED debugger have entered into an erroneous state.\n\nDo you want the debugger to suspend the execution now?",
                             MessageDialog.QUESTION, new String[] { "Suspend", "Continue" }, 0, "Remember my decision",
                             false);
 

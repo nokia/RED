@@ -34,7 +34,7 @@ public class DebuggerPreferencePage extends FieldEditorPreferencePage implements
         final Composite parent = getFieldEditorParent();
 
         createLibKeywordOmitEditor(parent);
-        createErronousStateBehaviourEditor(parent);
+        createErroneousStateBehaviourEditor(parent);
     }
 
     private void createLibKeywordOmitEditor(final Composite parent) {
@@ -45,7 +45,7 @@ public class DebuggerPreferencePage extends FieldEditorPreferencePage implements
         GridDataFactory.fillDefaults().indent(10, 10).applyTo(button);
     }
 
-    private void createErronousStateBehaviourEditor(final Composite parent) {
+    private void createErroneousStateBehaviourEditor(final Composite parent) {
         final String[][] labelAndValues = new String[][] { new String[] { "Always", "always" },
                 new String[] { "Never", "never" }, new String[] { "Prompt", "prompt" } };
         final RadioGroupFieldEditor suspendOnErrorEditor = new RadioGroupFieldEditor(

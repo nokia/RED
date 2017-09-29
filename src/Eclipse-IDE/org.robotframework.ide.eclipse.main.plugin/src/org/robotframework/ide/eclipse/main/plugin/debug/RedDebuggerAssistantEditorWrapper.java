@@ -24,6 +24,10 @@ public class RedDebuggerAssistantEditorWrapper extends DIEditorPart<RedDebuggerA
 
     public static final String ID = "org.robotframework.red.debug.assistance.editor";
 
+    public RedDebuggerAssistantEditorWrapper() {
+        super(RedDebuggerAssistantEditor.class);
+    }
+
     @Override
     public void setInput(final IEditorInput input) {
         setPartName(input.getName());
@@ -38,10 +42,6 @@ public class RedDebuggerAssistantEditorWrapper extends DIEditorPart<RedDebuggerA
             throw new IllegalStateException("Source Not Found Editor can only have "
                     + RedDebuggerAssistantEditorInput.class.getSimpleName() + " input");
         }
-    }
-
-    public RedDebuggerAssistantEditorWrapper() {
-        super(RedDebuggerAssistantEditor.class);
     }
 
     public static class RedDebuggerAssistantEditor {
