@@ -43,6 +43,7 @@ import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
 
 /**
@@ -54,8 +55,10 @@ public class BreakpointDetailPane implements IDetailPane3 {
     static final String NAME = "Robot line breakpoint details";
     static final String DESCRIPTION = "Displays details of Robot line breakpoints";
 
-    private static final String OLD_CONDITIONS_ID = ID + ".old_conditions";
+    static final String OLD_CONDITIONS_ID = ID + ".old_conditions";
     private static final int OLD_CONDITIONS_LIMIT = 10;
+
+    private final IDialogSettings dialogSettings;
 
     private final ListenerList<IPropertyListener> listenersList = new ListenerList<>();
 
@@ -74,6 +77,16 @@ public class BreakpointDetailPane implements IDetailPane3 {
 
     private RedContentProposalAdapter proposalsAdapter;
 
+
+    public BreakpointDetailPane() {
+        this(RedPlugin.getDefault().getDialogSettings());
+    }
+
+    @VisibleForTesting
+    BreakpointDetailPane(final IDialogSettings dialogSettings) {
+        this.dialogSettings = dialogSettings;
+    }
+
     @Override
     public void init(final IWorkbenchPartSite partSite) {
         isDirty = false;
@@ -83,7 +96,6 @@ public class BreakpointDetailPane implements IDetailPane3 {
     }
 
     private Collection<String> getPreviouslyUsedConditions() {
-        final IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
         final IDialogSettings section = dialogSettings.getSection(ID);
         if (section == null) {
             return new ArrayList<>();
@@ -199,17 +211,17 @@ public class BreakpointDetailPane implements IDetailPane3 {
         isInitializingValues = false;
     }
 
-    private void deactivateContentAssistant() {
-        if (proposalsAdapter != null) {
-            proposalsAdapter.uninstall();
-        }
-    }
-
     private void activateContentAssistant() {
         final RobotSuiteFile currentModel = RedPlugin.getModelManager()
                 .createSuiteFile((IFile) currentBreakpoint.getMarker().getResource());
         final KeywordProposalsProvider keywordsProvider = new KeywordProposalsProvider(() -> currentModel);
         proposalsAdapter = RedContentProposalAdapter.install(conditionCombo, keywordsProvider);
+    }
+
+    private void deactivateContentAssistant() {
+        if (proposalsAdapter != null) {
+            proposalsAdapter.uninstall();
+        }
     }
 
     @Override
@@ -279,10 +291,9 @@ public class BreakpointDetailPane implements IDetailPane3 {
         conditionCombo.setText(text);
         conditionCombo.setSelection(new Point(text.length(), text.length()));
 
-        final IDialogSettings settings = RedPlugin.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(ID);
+        IDialogSettings section = dialogSettings.getSection(ID);
         if (section == null) {
-            section = settings.addNewSection(ID);
+            section = dialogSettings.addNewSection(ID);
         }
         section.put(OLD_CONDITIONS_ID, oldConditions);
     }
@@ -322,11 +333,11 @@ public class BreakpointDetailPane implements IDetailPane3 {
         listenersList.remove(listener);
     }
 
-    private void setDirty(final boolean dirty) {
+    @VisibleForTesting
+    void setDirty(final boolean dirty) {
         this.isDirty = dirty;
-        final Object[] listeners = listenersList.getListeners();
-        for (int i = 0; i < listeners.length; i++) {
-            ((IPropertyListener) listeners[i]).propertyChanged(this, PROP_DIRTY);
+        for (final IPropertyListener listener : listenersList) {
+            listener.propertyChanged(this, PROP_DIRTY);
         }
     }
 }
