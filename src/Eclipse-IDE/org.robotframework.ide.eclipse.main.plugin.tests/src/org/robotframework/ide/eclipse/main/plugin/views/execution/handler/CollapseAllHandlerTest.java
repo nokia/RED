@@ -16,8 +16,9 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionViewWrapper;
 import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.CollapseAllHandler.E4CollapseAllHandler;
-import org.robotframework.ide.eclipse.main.plugin.views.execution.handler.TestViewer.Node;
 import org.robotframework.red.junit.ShellProvider;
+import org.robotframework.red.viewers.TestViewer;
+import org.robotframework.red.viewers.TestViewer.Node;
 
 @SuppressWarnings("restriction")
 public class CollapseAllHandlerTest {
