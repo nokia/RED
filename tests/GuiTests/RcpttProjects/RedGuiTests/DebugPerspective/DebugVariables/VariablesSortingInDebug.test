@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oRj6sKTuEeeq2ZEMU2MC3Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/29/17 2:40 PM
+Save-Time: 9/29/17 2:49 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -52,6 +52,8 @@ exec-with-options -disableJobWaiting -command {
 
 	get-view "Project Explorer" | get-tree | select "MediumRobotTest/OnlyVariables.robot" | get-menu "Debug As/1 Robot Test" 
 	    | click
+	wait-for-specified_line-in-first-thread -line 39 -nr_of_frames 3
+	
 	get-view Variables | maximize
     wait-for-automatic-vars
     get-view Variables | get-tree | get-item "Automatic Variables" | expand
