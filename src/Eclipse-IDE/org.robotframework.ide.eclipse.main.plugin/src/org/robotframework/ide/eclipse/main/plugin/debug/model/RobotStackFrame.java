@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.model.IRegisterGroup;
@@ -26,6 +27,7 @@ import org.rf.ide.core.execution.debug.StackFrameVariables.StackVariablesDelta;
 import org.rf.ide.core.execution.debug.UserProcessDebugController;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
+import org.robotframework.ide.eclipse.main.plugin.debug.AlwaysDisplaySortedVariablesHandler;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
@@ -176,15 +178,23 @@ public class RobotStackFrame extends RobotDebugElement implements IStackFrame {
     }
 
     Map<String, RobotDebugVariable> createVariables(final StackFrameVariables variables) {
-        final List<RobotDebugVariable> nonAutomaticVariables = Streams.stream(variables)
-                .filter(not(StackFrameVariable::isAutomatic))
-                .map(var -> new RobotDebugVariable(this, var))
-                .collect(toList());
+        final boolean isSortingEnabled = AlwaysDisplaySortedVariablesHandler.isSortingEnabled();
 
-        final List<RobotDebugVariable> automaticVars = Streams.stream(variables)
+        Stream<RobotDebugVariable> nonAutomaticVarsStream = Streams.stream(variables)
+                .filter(not(StackFrameVariable::isAutomatic))
+                .map(var -> new RobotDebugVariable(this, var));
+        if (isSortingEnabled) {
+            nonAutomaticVarsStream = nonAutomaticVarsStream.sorted(RobotDebugVariable.sorter());
+        }
+        final List<RobotDebugVariable> nonAutomaticVariables = nonAutomaticVarsStream.collect(toList());
+
+        Stream<RobotDebugVariable> automaticVarsStream = Streams.stream(variables)
                 .filter(StackFrameVariable::isAutomatic)
-                .map(var -> new RobotDebugVariable(this, var))
-                .collect(toList());
+                .map(var -> new RobotDebugVariable(this, var));
+        if (isSortingEnabled) {
+            automaticVarsStream = automaticVarsStream.sorted(RobotDebugVariable.sorter());
+        }
+        final List<RobotDebugVariable> automaticVars = automaticVarsStream.collect(toList());
 
         final Map<String, RobotDebugVariable> vars = new LinkedHashMap<>();
         for (final RobotDebugVariable var : nonAutomaticVariables) {
