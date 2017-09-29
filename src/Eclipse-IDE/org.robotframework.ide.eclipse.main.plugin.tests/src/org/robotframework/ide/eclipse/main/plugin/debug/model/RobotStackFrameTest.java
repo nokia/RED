@@ -16,7 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.core.commands.Command;
 import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.jface.commands.PersistentState;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.rf.ide.core.execution.agent.event.Variable;
@@ -30,6 +34,7 @@ import org.rf.ide.core.execution.debug.UserProcessDebugController;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
+import org.robotframework.ide.eclipse.main.plugin.debug.AlwaysDisplaySortedVariablesHandler;
 import org.robotframework.ide.eclipse.main.plugin.launch.IRobotProcess;
 
 public class RobotStackFrameTest {
@@ -678,6 +683,41 @@ public class RobotStackFrameTest {
     }
 
     @Test
+    public void variablesForFrameAreProvidedSorted_whenSortingIsEnabled() {
+        final PersistentState state = provideSortingState();
+        state.setValue(true);
+
+        final Map<Variable, VariableTypedValue> variables = new LinkedHashMap<>();
+        variables.put(new Variable("var", VariableScope.GLOBAL), new VariableTypedValue("str", "abc"));
+        variables.put(new Variable("list", VariableScope.TEST_SUITE), new VariableTypedValue("list", newArrayList()));
+        variables.put(new Variable("@{test_tags}", VariableScope.GLOBAL), new VariableTypedValue("list", newArrayList()));
+        variables.put(new Variable("${false}", VariableScope.GLOBAL), new VariableTypedValue("bool", true));
+
+        final StackFrameVariables vars = StackFrameVariables.newNonLocalVariables(variables);
+
+        final Stacktrace stacktrace = new Stacktrace();
+        final StackFrame frame = mock(StackFrame.class);
+        when(frame.getVariables()).thenReturn(vars);
+        stacktrace.push(frame);
+
+        final RobotThread thread = new RobotThread(mock(RobotDebugTarget.class), stacktrace,
+                mock(UserProcessDebugController.class));
+        final RobotStackFrame stackFrame = new RobotStackFrame(thread, frame, mock(UserProcessDebugController.class));
+
+        final RobotDebugVariable[] robotVariables = stackFrame.getVariables();
+        assertThat(robotVariables).hasSize(3);
+
+        assertThat(robotVariables[0].getName()).isEqualTo("list");
+        assertThat(robotVariables[1].getName()).isEqualTo("var");
+        assertThat(robotVariables[2].getName()).isEqualTo(RobotDebugVariable.AUTOMATIC_NAME);
+        final RobotDebugVariable[] innerAutomaticVars = robotVariables[2].getValue().getVariables();
+        assertThat(innerAutomaticVars[0].getName()).isEqualTo("${false}");
+        assertThat(innerAutomaticVars[1].getName()).isEqualTo("@{test_tags}");
+
+        state.setValue(false);
+    }
+
+    @Test
     public void variablesForFrameAreProvidedWithMarkedChanges_whenThereIsADeltaInFrame() {
         final Map<Variable, VariableTypedValue> variables = new LinkedHashMap<>();
         variables.put(new Variable("var", VariableScope.GLOBAL), new VariableTypedValue("str", "abc"));
@@ -747,5 +787,11 @@ public class RobotStackFrameTest {
         stackFrame.changeVariableInnerValue(variable, path, args);
 
         verify(controller).changeVariableInnerValue(frame, variable, path, args);
+    }
+
+    private static PersistentState provideSortingState() {
+        final ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+        final Command command = commandService.getCommand(AlwaysDisplaySortedVariablesHandler.COMMAND_ID);
+        return (PersistentState) command.getState(AlwaysDisplaySortedVariablesHandler.COMMAND_STATE_ID);
     }
 }
