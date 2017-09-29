@@ -7,6 +7,7 @@ import javax.inject.Named;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.commands.PersistentState;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
@@ -54,7 +55,14 @@ public class AlwaysDisplaySortedVariablesHandler extends DIParameterizedHandler<
             final boolean currentValue = (boolean) commandState.getValue();
             commandState.setValue(!currentValue);
 
-            variablesView.getViewer().refresh();
+
+            final TreeViewer viewer = (TreeViewer) variablesView.getViewer();
+            try {
+                viewer.getTree().setRedraw(false);
+                viewer.setInput(viewer.getInput());
+            } finally {
+                viewer.getTree().setRedraw(true);
+            }
         }
     }
 }
