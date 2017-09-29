@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _uuVDgK_-EeaOOtfbYFWVRw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/29/17 4:05 PM
+Save-Time: 9/29/17 4:12 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -173,7 +173,7 @@ wait-for-discover-window
 get-window "Discovering libraries summary" | get-button OK | click
 
 // 2 new errors from uncommented file
-wait-for-errors -amount 5 -times 4 -delay 500 
+wait-for-errors -amount 5 -times 4 -delay 1000 
 get-view Problems | get-tree | get-item "Errors \\(5 items\\)" | get-property childCount | equals 5 | verify-true
 
 //revalid 2 files from 2 different projects
