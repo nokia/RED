@@ -8,13 +8,16 @@ import static org.mockito.Mockito.when;
 import org.eclipse.core.commands.Command;
 import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jface.commands.PersistentState;
-import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.menus.UIElement;
 import org.junit.After;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.debug.AlwaysDisplaySortedVariablesHandler.E4AlwaysDisplayVariablesSortedHandler;
+import org.robotframework.red.viewers.TestViewer;
 
 public class AlwaysDisplaySortedVariablesHandlerTest {
 
@@ -68,12 +71,14 @@ public class AlwaysDisplaySortedVariablesHandlerTest {
 
     @Test
     public void handlerEnableSorting_whenSortingIsCurrentlyDisabled() {
-        final E4AlwaysDisplayVariablesSortedHandler handler = new E4AlwaysDisplayVariablesSortedHandler();
-
-        final Viewer viewer = mock(Viewer.class);
+        final Shell shell = new Shell(Display.getDefault());
+        shell.open();
+        final TreeViewer viewer = TestViewer.createEmpty(shell);
 
         final IDebugView view = mock(IDebugView.class);
         when(view.getViewer()).thenReturn(viewer);
+
+        final E4AlwaysDisplayVariablesSortedHandler handler = new E4AlwaysDisplayVariablesSortedHandler();
 
         final PersistentState state = provideSortingState();
         state.setValue(false);
@@ -82,17 +87,21 @@ public class AlwaysDisplaySortedVariablesHandlerTest {
         handler.displayVariablesSorted(state, view);
         assertThat(state.getValue()).isEqualTo(true);
         assertThat(state.shouldPersist()).isTrue();
-        verify(viewer).refresh();
+
+        shell.close();
+        shell.dispose();
     }
 
     @Test
     public void handlerDisablesSorting_whenSortingIsCurrentlyEnabled() {
-        final E4AlwaysDisplayVariablesSortedHandler handler = new E4AlwaysDisplayVariablesSortedHandler();
-
-        final Viewer viewer = mock(Viewer.class);
+        final Shell shell = new Shell(Display.getDefault());
+        shell.open();
+        final TreeViewer viewer = TestViewer.createEmpty(shell);
 
         final IDebugView view = mock(IDebugView.class);
         when(view.getViewer()).thenReturn(viewer);
+
+        final E4AlwaysDisplayVariablesSortedHandler handler = new E4AlwaysDisplayVariablesSortedHandler();
 
         final PersistentState state = provideSortingState();
         state.setValue(true);
@@ -101,7 +110,9 @@ public class AlwaysDisplaySortedVariablesHandlerTest {
         handler.displayVariablesSorted(state, view);
         assertThat(state.getValue()).isEqualTo(false);
         assertThat(state.shouldPersist()).isTrue();
-        verify(viewer).refresh();
+
+        shell.close();
+        shell.dispose();
     }
 
     private static PersistentState provideSortingState() {
