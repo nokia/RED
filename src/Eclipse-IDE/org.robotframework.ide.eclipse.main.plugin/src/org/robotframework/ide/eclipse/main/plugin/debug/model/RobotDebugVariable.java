@@ -124,13 +124,17 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
         return value;
     }
 
+    public boolean isArtificial() {
+        return isArtificial;
+    }
+
     private boolean isTopLevel() {
-        return !isArtificial && stackVariable != null;
+        return !isArtificial() && stackVariable != null;
     }
 
     @Override
     public boolean supportsValueModification() {
-        return !isArtificial;
+        return !isArtificial();
     }
 
     @Override
