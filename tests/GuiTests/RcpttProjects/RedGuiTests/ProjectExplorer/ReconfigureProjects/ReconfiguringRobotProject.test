@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _nNd2gEd5EeaRB_Xz0tiYpg
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 11:04 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/29/17 2:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -78,4 +78,41 @@ with [get-window "(Available Customizations)|(Filters and Customization)"] {
     }
     get-button OK | click
 }   
+
+get-view "Project Explorer" | click
+get-editor "red.xml" | close
+// Deconfigure
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Deconfigure as Robot project" 
+    | click
+// verify if Confirm configuration file removal windows apears
+get-window "Confirm configuration file removal" 
+    | get-label "You have deconfigured the project 'RobotProject' as a Robot project.Do you want to remove project configuration file 'red.xml' too?" 
+    | get-property caption | equals "You have deconfigured the project 'RobotProject' as a Robot project.\n"
+    + "Do you want to remove project configuration file 'red.xml' too?" | verify-true
+get-window "Confirm configuration file removal" | get-button No | click
+// Configure
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Configure as Robot project" 
+    | click
+// verify if Confirm configuration file replacement windows apears
+get-window "Confirm configuration file replacement" 
+    | get-label "You have configured the project 'RobotProject' as a Robot project.Do you want to replace project configuration file 'red.xml' too?" 
+    | get-property caption | equals "You have configured the project 'RobotProject' as a Robot project.\n"
+    + "Do you want to replace project configuration file 'red.xml' too?" | verify-true
+get-window "Confirm configuration file replacement" | get-button Yes | click
+// verify red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
