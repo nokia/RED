@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _viztsKEGEea9Cvae3yWo1A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 5:37 PM
+Save-Time: 9/29/17 3:55 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -113,7 +113,7 @@ check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
 
 //undo: line 2 will be removed
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
-
+wait 1000
 check-test_case-row -file "TestFile.robot" -row 1 -tc "test 1" 
 check-test_case-row -file "TestFile.robot" -row 2 -tc "line 1"
 check-test_case-row -file "TestFile.robot" -row 3 -tc ""
