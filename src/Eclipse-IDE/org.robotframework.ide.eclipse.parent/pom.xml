@@ -12,7 +12,6 @@
         <profile>
             <id>luna-profile</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
                 <property>
                     <name>eclipse.version</name>
                     <value>luna</value>
@@ -58,6 +57,7 @@
         <profile>
             <id>neon-profile</id>
             <activation>
+                <activeByDefault>true</activeByDefault>
                 <property>
                     <name>eclipse.version</name>
                     <value>neon</value>
@@ -102,7 +102,7 @@
     <properties>
         <tycho-version>0.24.0</tycho-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eclipse.version>luna</eclipse.version>
+        <eclipse.version>neon</eclipse.version>
     </properties>
     <reporting>
         <plugins>
