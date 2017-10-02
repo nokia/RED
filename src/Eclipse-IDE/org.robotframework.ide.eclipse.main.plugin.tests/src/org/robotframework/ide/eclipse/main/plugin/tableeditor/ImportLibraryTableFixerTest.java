@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class ImportLibraryTableFixerTest {
 
     @After
     public void after() {
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
+        Editors.closeAll();
     }
 
     @Test

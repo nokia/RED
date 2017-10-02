@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -15,6 +16,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Link;
@@ -88,15 +90,23 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
     }
 
     private void createGeneralSettingsGroup(final Composite parent) {
-        final Composite internalComposite = new Composite(parent, SWT.NONE);
-        GridDataFactory.fillDefaults().indent(0, 10).grab(true, false).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(internalComposite);
+        final Group generalGroup = new Group(parent, SWT.NONE);
+        generalGroup.setText("General");
+        GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).span(2, 1).applyTo(generalGroup);
+        GridLayoutFactory.fillDefaults().applyTo(generalGroup);
+
+        final BooleanFieldEditor parentDirectoryInTabEditor = new BooleanFieldEditor(
+                RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, "Add parent directory name to editor tab", generalGroup);
+        addField(parentDirectoryInTabEditor);
+        final Button parentDirectoryInTabCheckbox = (Button) parentDirectoryInTabEditor
+                .getDescriptionControl(generalGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).span(2, 1).applyTo(parentDirectoryInTabCheckbox);
 
         final ComboBoxFieldEditor elementsOpeningStrategyEditor = new ComboBoxFieldEditor(
                 RedPreferences.FILE_ELEMENTS_OPEN_MODE, "Prefer opening file elements from Project Explorer in",
                 "File elements (like e.g. test case) will be opened in page chosen here unless last time editor "
                         + "was closed with different active page",
-                5, createElementsOpenModeLabelsAndValues(), internalComposite);
+                5, createElementsOpenModeLabelsAndValues(), generalGroup);
         addField(elementsOpeningStrategyEditor);
     }
 
@@ -128,7 +138,6 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                 createCellCommitLabelsAndValues(),
                 tablesGroup);
         addField(behaviorOnCellCommitEditor);
-        
     }
 
     private String[][] createCellCommitLabelsAndValues() {

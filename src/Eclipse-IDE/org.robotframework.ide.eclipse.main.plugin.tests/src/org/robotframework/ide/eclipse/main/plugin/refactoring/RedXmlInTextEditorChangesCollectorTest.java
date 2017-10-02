@@ -10,12 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -52,7 +50,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
 
     @After
     public void afterTest() {
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
+        Editors.closeAll();
     }
 
     @Test
@@ -60,7 +58,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
         final IFile redXmlFile = projectProvider.getFile(new Path("red.xml"));
 
         final RedXmlInTextEditorChangesCollector collector = new RedXmlInTextEditorChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/a"), Optional.<IPath> empty());
+                new Path(PROJECT_NAME + "/a"), Optional.empty());
         final Optional<Change> change = collector.collect();
 
         assertThat(change.isPresent()).isFalse();
@@ -72,7 +70,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
         Editors.openInProjectEditor(redXmlFile);
 
         final RedXmlInTextEditorChangesCollector collector = new RedXmlInTextEditorChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/a"), Optional.<IPath> empty());
+                new Path(PROJECT_NAME + "/a"), Optional.empty());
         final Optional<Change> change = collector.collect();
 
         assertThat(change.isPresent()).isFalse();
@@ -84,7 +82,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
         Editors.openInTextEditor(redXmlFile);
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/x"), Optional.<IPath> empty());
+                new Path(PROJECT_NAME + "/x"), Optional.empty());
 
         assertThat(collector.collect().isPresent()).isFalse();
     }
@@ -95,7 +93,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
         Editors.openInTextEditor(redXmlFile);
 
         final RedXmlInFileChangesCollector collector = new RedXmlInFileChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/x"), Optional.<IPath> of(new Path(PROJECT_NAME + "/renamed")));
+                new Path(PROJECT_NAME + "/x"), Optional.of(new Path(PROJECT_NAME + "/renamed")));
         final Optional<Change> change = collector.collect();
 
         assertThat(change.isPresent()).isFalse();
@@ -108,7 +106,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
         final IEditorPart editor = Editors.openInTextEditor(redXmlFile);
 
         final RedXmlInTextEditorChangesCollector collector = new RedXmlInTextEditorChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/a"), Optional.<IPath> empty());
+                new Path(PROJECT_NAME + "/a"), Optional.empty());
         final Optional<Change> change = collector.collect();
 
         assertThat(change.isPresent()).isTrue();
@@ -134,7 +132,7 @@ public class RedXmlInTextEditorChangesCollectorTest {
         final IEditorPart editor = Editors.openInTextEditor(redXmlFile);
 
         final RedXmlInTextEditorChangesCollector collector = new RedXmlInTextEditorChangesCollector(redXmlFile,
-                new Path(PROJECT_NAME + "/a"), Optional.<IPath> of(new Path(PROJECT_NAME + "/moved")));
+                new Path(PROJECT_NAME + "/a"), Optional.of(new Path(PROJECT_NAME + "/moved")));
         final Optional<Change> change = collector.collect();
 
         assertThat(change.isPresent()).isTrue();

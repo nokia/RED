@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -53,7 +52,7 @@ public class RedXmlInProjectEditorChangesCollectorTest {
 
     @After
     public void afterTest() {
-        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
+        Editors.closeAll();
     }
 
     @Test
