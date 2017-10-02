@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _s-ctEA4_EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/17 11:35 AM
+Save-Time: 10/2/17 10:04 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -45,8 +45,8 @@ proc "run-remote-test-in-background" [val path] [val project_name] [val IP ""] [
 
 proc "check-debug-error-for-wrong-state"{
 	get-window "Debugger error" 
-	    | get-label "RED debugger have entered into an erronous state.Do you want the debugger to suspend the execution now?" 
-	    | get-property caption | equals "RED debugger have entered into an erronous state.\n\n"
+	    | get-label "RED debugger have entered into an erroneous state.Do you want the debugger to suspend the execution now?" 
+	    | get-property caption | equals "RED debugger have entered into an erroneous state.\n\n"
 	    + "Do you want the debugger to suspend the execution now?" | verify-true
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
