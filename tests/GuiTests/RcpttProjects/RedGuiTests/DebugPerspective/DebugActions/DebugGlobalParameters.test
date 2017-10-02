@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _3-pdQBtFEeWSh6BKjAxDIw
-Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/11/17 10:33 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/2/17 2:21 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -105,7 +105,7 @@ exec-with-options -disableJobWaiting -command {
 		        | verify-true
 		}
 		//seperated to click
-		get-view Variables | get-tree | select "Automatic Variables/${True}"
+		get-view Variables | get-tree | select "Automatic Variables/${\\/}" | key-type PageDown
 		wait 1000
 			with [get-view Variables | get-tree] {			  
 			    get-item -path "Automatic Variables" | get-property "getItems().TreeItem[10].getText()" 
