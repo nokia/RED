@@ -44,4 +44,8 @@ public class Editors {
     public static boolean isAnyEditorOpened() {
         return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences().length > 0;
     }
+
+    public static void closeAll() {
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeAllEditors(false);
+    }
 }
