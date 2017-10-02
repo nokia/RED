@@ -35,6 +35,7 @@ public class RedPreferences {
     public static final String ACTIVE_RUNTIME = "activeRuntime";
     public static final String ACTIVE_RUNTIME_EXEC = "red.activeRuntimeExec";
 
+    public static final String PARENT_DIRECTORY_NAME_IN_TAB = "red.editor.general.parendDirectoryNameInTab";
     public static final String FILE_ELEMENTS_OPEN_MODE = "red.editor.general.fileElementOpenMode";
     public static final String SEPARATOR_MODE = "separatorMode";
     public static final String SEPARATOR_TO_USE = "separatorToUse";
@@ -111,6 +112,10 @@ public class RedPreferences {
             }
         }
         return store.getString(preference);
+    }
+
+    public boolean isParentDirectoryNameInTabEnabled() {
+        return store.getBoolean(PARENT_DIRECTORY_NAME_IN_TAB);
     }
 
     public ElementOpenMode getElementOpenMode() {

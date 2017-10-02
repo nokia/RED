@@ -67,6 +67,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     }
 
     private void initializeEditorPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB, false);
         preferences.put(RedPreferences.FILE_ELEMENTS_OPEN_MODE, ElementOpenMode.OPEN_IN_SOURCE.name());
         preferences.put(RedPreferences.SEPARATOR_MODE, SeparatorsMode.FILE_TYPE_DEPENDENT.name());
         preferences.put(RedPreferences.SEPARATOR_TO_USE, "ssss");
