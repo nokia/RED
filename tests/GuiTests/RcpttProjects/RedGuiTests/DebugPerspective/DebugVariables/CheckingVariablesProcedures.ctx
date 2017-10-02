@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _MyJrwGxlEeeps9cepQRw2Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/16/17 2:08 PM
+Save-Time: 10/2/17 4:58 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -100,8 +100,8 @@ proc "check-automatic-var-values" [val project] [val prev_test_msg ""] [val prev
 			
 	with [get-view Variables | get-tree] {
 		
-	    get-item "Automatic Variables/${\\/}" | get-property "values['Value']" | equals "\\\\\\\\" | verify-true
-	    get-item "Automatic Variables/${:}" | get-property "values['Value']" | equals ";" | verify-true
+	    get-item "Automatic Variables/${\\/}" | get-property "values['Value']" | equals [get-by-os  -win  "\\\\\\\\" -linux "/"] | verify-true
+	    get-item "Automatic Variables/${:}" | get-property "values['Value']" | equals [get-by-os  -win ";" -linux ":"] | verify-true
 	    get-item "Automatic Variables/${DEBUG_FILE}" | get-property "values['Value']" | equals NONE | verify-true
 	    
 		//execdir
@@ -147,7 +147,7 @@ proc "check-automatic-var-values" [val project] [val prev_test_msg ""] [val prev
 	
 
 	    get-item "Automatic Variables/${True}" | get-property "values['Value']" | equals True | verify-true
-	    get-item "Automatic Variables/${\\n}" | get-property "values['Value']" | equals [get-by-os -win "\\\\r\\\\n" -linux "\\n"] | verify-true
+	    get-item "Automatic Variables/${\\n}" | get-property "values['Value']" | equals [get-by-os -win "\\\\r\\\\n" -linux "\\\\n"] | verify-true
 	    get-item "Automatic Variables/${null}" | get-property "values['Value']" | equals None | verify-true
 	    get-item "Automatic Variables/&{SUITE_METADATA}" | get-property "values['Value']" | equals "NormalizedDict[0]" 
 	        | verify-true
@@ -199,7 +199,16 @@ proc "check-list-and-dicts"{
 	with [get-view Variables | get-tree] {
 	    get-item "@{list from res}" | get-property "values['Name']" | equals "@{list from res}" | verify-true
 	    get-item "@{list from res}" | get-property "values['Value']" | equals "list[4]" | verify-true
-	    
+	}
+	
+	with [get-view Variables | get-tree] {
+//	    select "${this is test var}" | key-type PageDown
+	    get-item "@{list from res}" | click
+	}
+	get-view Variables | get-tree | get-item "@{list from res}" | expand
+	wait 1500
+	get-view Variables | get-tree | select "Automatic Variables"
+	with [get-view Variables | get-tree] {	    
 	    get-item "@{list from res}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{list from res}/\\[0\\]" | get-property "values['Value']" | equals ab1 | verify-true
 	    get-item "@{list from res}/\\[1\\]" | get-property "values['Name']" | equals "[1]" | verify-true
