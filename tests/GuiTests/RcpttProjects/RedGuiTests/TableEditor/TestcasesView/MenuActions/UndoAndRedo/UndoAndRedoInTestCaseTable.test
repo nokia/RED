@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _R8h0QJxDEeaF69zyQwob4Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/19/17 9:39 AM
+Save-Time: 10/2/17 12:33 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -86,6 +86,8 @@ check-test_case-row -file "TestFile.robot" -row 11 -tc "..."
 
 //undo new TC
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
+// maximize 
+get-editor "TestFile.robot" | maximize
 
 //check entire table
 check-test_case-row -file "TestFile.robot" -row 1 -tc "case" 
@@ -120,6 +122,8 @@ check-test_case-row -file "TestFile.robot" -row 11 -tc ""
 
 //redo
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+y"
+// maximize 
+get-editor "TestFile.robot" | maximize
 
 //check entire table
 check-test_case-row -file "TestFile.robot" -row 1 -tc "case" 
