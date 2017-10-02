@@ -155,8 +155,11 @@ public class RobotFormEditor extends FormEditor {
     @Override
     protected void setInput(final IEditorInput input) {
         if (input instanceof FileEditorInput) {
-            isEditable = !((FileEditorInput) input).getFile().isReadOnly();
-            setPartName(input.getName());
+            final IFile file = ((FileEditorInput) input).getFile();
+            isEditable = !file.isReadOnly();
+            setPartName(RedPlugin.getDefault().getPreferences().isParentDirectoryNameInTabEnabled()
+                    ? file.getParent().getName() + "/" + input.getName()
+                    : input.getName());
         } else {
             final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {

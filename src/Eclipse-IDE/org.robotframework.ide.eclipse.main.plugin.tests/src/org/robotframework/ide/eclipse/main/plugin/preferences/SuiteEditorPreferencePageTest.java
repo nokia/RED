@@ -42,6 +42,7 @@ public class SuiteEditorPreferencePageTest {
         final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
 
         assertThat(transform(editors, FieldEditor::getPreferenceName)).containsOnly(
+                RedPreferences.PARENT_DIRECTORY_NAME_IN_TAB,
                 RedPreferences.FILE_ELEMENTS_OPEN_MODE,
                 RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS,
                 RedPreferences.BEHAVIOR_ON_CELL_COMMIT,
