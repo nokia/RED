@@ -14,7 +14,10 @@
     <profile>
         <id>luna-profile</id>
         <activation>
-            <activeByDefault>true</activeByDefault>
+            <property>
+                <name>eclipse.version</name>
+                <value>luna</value>
+            </property>
         </activation>
         <properties>
             <target-file-name>luna.target</target-file-name>
@@ -35,6 +38,7 @@
     <profile>
         <id>neon-profile</id>
         <activation>
+            <activeByDefault>true</activeByDefault>
             <property>
                 <name>eclipse.version</name>
                 <value>neon</value>
