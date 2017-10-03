@@ -137,7 +137,7 @@ public abstract class RobotContainer implements RobotElement {
 
     private boolean isChanged(final IResourceDelta elementDelta) {
         return elementDelta != null && elementDelta.getKind() == IResourceDelta.CHANGED
-                && !((elementDelta.getFlags() & IResourceDelta.MARKERS) == IResourceDelta.MARKERS);
+         && elementDelta.getFlags() != IResourceDelta.MARKERS;
     }
 
     private boolean isRemoved(final IResourceDelta elementDelta) {
