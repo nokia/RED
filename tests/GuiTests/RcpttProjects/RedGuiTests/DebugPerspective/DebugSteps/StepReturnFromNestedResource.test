@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _SdNGkIMLEeW3Y6KfPyHe6A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/11/17 6:19 PM
+Save-Time: 10/3/17 3:08 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -104,7 +104,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//return to main script
 	get-button "Step Return (F7)" | click
-	wait-for-specified_line-in-first-thread -line 6 -nr_of_frames 4
+	wait-for-specific-nr-of-threads 4
 
 	check-debug-marker-on-ruler -line 6 -script_name "TestWithNestedResources.robot" 
 	
