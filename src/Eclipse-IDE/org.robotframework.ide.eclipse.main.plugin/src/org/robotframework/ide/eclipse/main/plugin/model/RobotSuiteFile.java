@@ -181,8 +181,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     public synchronized void dispose() {
         if (fileOutput != null) {
-            // this is required because we want to reparse file output when user did some changes
-            // to the model, but those changes were discarded (editor wasn't saved)
+            // this is required because we want to reparse file output when user did some
+            // changes to the model, but those changes were discarded (editor wasn't saved)
             fileOutput.setLastModificationEpochTime(System.currentTimeMillis());
         }
         contentTypeId = null;
@@ -237,9 +237,9 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
-        if ((delta.getFlags() & IResourceDelta.MARKERS) != IResourceDelta.MARKERS) {
-            refreshOnFileChange();
-        }
+         if (delta.getFlags() != IResourceDelta.MARKERS) {
+             refreshOnFileChange();
+         }
         return new ArrayList<>();
     }
 
@@ -354,7 +354,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     @Override
     public List<RobotSuiteFileSection> getChildren() {
-        return sections == null ? Lists.<RobotSuiteFileSection> newArrayList() : sections;
+        return sections == null ? Lists.<RobotSuiteFileSection>newArrayList() : sections;
     }
 
     public boolean isEditable() {

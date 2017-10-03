@@ -46,10 +46,12 @@ public class VariableExtractor {
     }
 
     public MappingResult extract(final RobotToken token, final String fileName) {
-        return extract(token.getFilePosition(), token.getText().toString(), fileName);
+        return extract(token.getFilePosition(), token.getText(), fileName);
     }
 
     private static class VariableExtractionException extends RuntimeException {
+
+        private static final long serialVersionUID = -8666114255629013896L;
 
         public VariableExtractionException(final String message, final Throwable cause) {
             super(message, cause);
