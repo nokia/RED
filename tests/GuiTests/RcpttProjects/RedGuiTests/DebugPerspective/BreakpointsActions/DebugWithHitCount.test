@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _R0nm0PKlEeadkqPlInmy5w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 3:04 PM
+Save-Time: 10/3/17 11:56 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -24,7 +24,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
     + "    my keyword\n"
     + "    my keyword\n"
     + "    \n"
-    + "    :FOR    ${x}   IN RANGE   1   55\n"
+    + "    :FOR    ${x}   IN RANGE   1   12\n"
     + "    \\    second kw\n"
     + "    \\    log  ${x}\n"
     + "*** Keywords ***\n\n"
@@ -54,11 +54,11 @@ with [get-view Breakpoints] {
 }
 get-button "Save (M1+S)" | click
 
-//for line 19 set "15"
+//for line 19 set "6"
 with [get-view Breakpoints] {
     get-tree | select "TestFile.robot [line: 19]"
     get-button "Hit count:" | check
-    get-editbox | set-text 15
+    get-editbox | set-text 6
 }
 get-button "Save (M1+S)" | click
 
@@ -78,24 +78,27 @@ exec-with-options -disableJobWaiting -command {
 	
 	//resume - test should be stopped when value will be 15
 	get-button "Resume (F8)" | click
-	wait-for-thread -file "TestFile.robot" -times 15
+	wait-for-specified_line-in-first-thread -line 19 -nr_of_frames 6
 	check-debug-marker-on-ruler -line 19 -script_name "TestFile.robot"
+	
+	//check if 5 is in message log
+	get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 10 | verify-true
 	get-view "Message Log" | get-editbox | get-property text 
-	    | contains " : INFO : 14" | verify-true
+	    | contains " : INFO : 5" | verify-true
 	    
-	//set now value "36" durint test    
+	//set now value "2" durint test (now new value is set, counter is not addded)
 	with [get-view Breakpoints | get-editbox] {
-	    set-text 36
+	    set-text 2
 	    key-type "M1+s"
 	}
-	//reume test - test should be stopped on 36 hit
+	//reume test - test should be stopped on 7 hit
 	get-button "Resume (F8)" | click
-	wait-for-thread -file "TestFile.robot" -times 20
+	wait-for-thread -file "TestFile.robot" -times 5
 	check-debug-marker-on-ruler -line 19 -script_name "TestFile.robot"
 
 	with [get-view "Message Log" | get-editbox] {
-	    get-property "getLineCount()" | equals 55 | verify-true
-	    get-property text |contains " : INFO : 50" | verify-true
+	    get-property "getLineCount()" | equals 12 | verify-true
+	    get-property text |contains ": INFO : 7\n" | verify-true
 	}
 	//resume to end test
 	get-button "Resume (F8)" | click
@@ -107,7 +110,7 @@ get-view Breakpoints | get-button "Hit count:" | uncheck
 get-button "Save (M1+S)" | click
 
 //check that value is disabled but visible 
-get-view Breakpoints | get-editbox | get-property text | equals "36" | verify-true
+get-view Breakpoints | get-editbox | get-property text | equals "2" | verify-true
 get-view Breakpoints | get-editbox | get-property "isEnabled()" | equals false | verify-true
 
 
@@ -121,7 +124,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//resume - test will be stopped on second kw
 	get-button "Resume (F8)" | click
-	wait 100
+	wait-for-specified_line-in-first-thread -line 19 -nr_of_frames 6
 	check-debug-marker-on-ruler -line 19 -script_name "TestFile.robot"
 	
 	get-view "Message Log" | get-editbox | get-property text 
@@ -129,6 +132,7 @@ exec-with-options -disableJobWaiting -command {
 	    + ".* : INFO : 8\n"
 	    + ".* : INFO : 8\n"
 	    + ".* : INFO : 8" | verify-true
+	    
 	get-button "Resume (F8)" | click
 	wait 500
 	//new print will be added - no skipp to 36 line
@@ -181,5 +185,29 @@ get-view "Message Log" | get-editbox | get-property text
     
     
 //check correct/incorrect values - TODO    
+    
+    
+proc "set-incorrect-value-and-check-error" [val val]{
+
+	with [get-view Breakpoints | get-editbox] {
+	    click-text 1
+	    set-text $val
+	    key-type "M1+s"
+	}
+	get-window "Invalid value" 
+	    | get-label [format "Value '%s' is invalid - '1' will be used instead.Reason:Hit count has to be a number greater than zero and less than 2^31" $val]
+	    | get-property caption | equals [format "Value '%s' is invalid '1' will be used instead.\n\n"
+	    + "Reason:\n"
+	    + "Hit count has to be a number greater than zero and less than 2^31" $val] | verify-true
+	get-window "Invalid value" | get-button OK | click
+	get-view Breakpoints | get-editbox | get-property text | equals 1 | verify-true
+
+
+} 
+
+set-incorrect-value-and-check-error 0   
+set-incorrect-value-and-check-error "-4632"
+set-incorrect-value-and-check-error "pony"
+ 
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z2XpsP28EeaFC_dPBuoMWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 2:18 PM
+Save-Time: 10/3/17 11:05 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -88,11 +88,11 @@ exec-with-options -disableJobWaiting -command {
 	change-value -var_name "${example}" -value "var form arg"
 	
 	// go to line that prints this var
-	with [get-button "Step Into (F5)"] {
-	    click
-	    wait 1000
-	    click
-	}
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread 10 3   
+	
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread 11 3 
 	//change value of simple variable
 	
 	change-value -var_name "${a}" -value "1  2 "
@@ -141,12 +141,12 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "@{my list}/\\[3\\]" | get-property "values['Value']" | equals "here is string" | verify-true
 	}
 
-	with [get-button "Step Into (F5)"] {
-	    click
-	    wait 1000
-	    click
-	    wait 1000
-	}
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread 13 3   
+	
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread 14 3 
+	
 	get-view Variables | maximize
 	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
 	wait 200
@@ -155,12 +155,12 @@ exec-with-options -disableJobWaiting -command {
 	change-value -var_name "&{browsers}/chrome" -value ""
 	get-view Variables | restore
 	
-	with [get-button "Step Into (F5)"] {
-	    click
-	    wait 1000
-	    click
-	    wait 1000
-	}
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread 15 3   
+	
+	get-button "Step Into (F5)" | click
+	wait-for-specified_line-in-first-thread 16 3
+	
 	get-view Variables | maximize
 	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
 	//change vlaue of creted var in test
