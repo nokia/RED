@@ -1,3 +1,62 @@
+RED 0.8.0 - 2017/10/04
+Bugs
+
+    [RED-536] - Pasted row with [doc] setting is set in wrong place in source
+    [RED-687] - Debug does not stop in correct file when keywords with same names defined
+    [RED-791] - Remote debug is lost when there are suites with same names in project
+    [RED-769] - Wrong error is shown after uncomment KW set after variable in table view
+    [RED-798] - New empty rows in Test Cases table after deleting and saving are restored
+    [RED-819] - Uncomment problem with [Teardown] in Test Cases table
+    [RED-822] - Undo is executed only one time when setting is comment and uncomment many times
+    [RED-845] - Autodiscovery recognizes wrong relative path
+    [RED-873] - Wrong file displayed when stopping on a breakpoint set in a file with duplicated name
+    [RED-877] - Too many class name combinations are found during adding python library to red.xml
+    [RED-880] - Unknown variables are not reported for Set Test Variable but reported for Suite/Global
+    [RED-882] - [GitHub #118] use preference for content assistant trigger
+    [RED-895] - [GitHub #122] red.xml charsets issues
+    [RED-898] - [GitHub #128] better handle projects without red.xml
+    [RED-901] - Disconnect from XML-RPC server while lib autodiscovering in big repo
+    [RED-912] - in RED 0.8.0 pre parameters in dryrun subprocess may be too long and fail autodiscovery on windows
+    [RED-917] - autodiscovery fails (dryrun) when custom libs has the same name as python - eg . abc.py or random.py
+    [RED-932] - [GitHub #138] do not override existing red.xml file
+
+Enhancement
+
+    [RED-719] - [GitHub #84] References menu in source view
+    [RED-803] - [GitHub #95] Empty lines get removed when test case is edited from TestCases tab
+    [RED-861] - allow to use Keywords from libs from generated libsec in content assist when lib is not imported
+    [RED-862] - Remote debugger tasks for RED-791 and RED-687
+    [RED-883] - Content assits - change item filtering
+    [RED-892] - [GitHub #120] variable mapping could use already mapped vars in consecutive entries
+    [RED-909] - Discovered libraries summary - make error pane resizable + add horizontal scroll
+    [RED-910] - add parent directory to filename in editor tab as preference.
+    [RED-911] - autodiscovery summary - allow to copy list of libs in summary
+    [RED-925] - Autodiscover progress bar improvements
+    [RED-929] - Add ability to sort displayed variables according to their name or value.
+
+Task
+
+    [RED-867] - [GitHub #114] - Add help content for Content Assist -> Auto activation triggers
+    [RED-881] - Check RED + Oxygen
+
+Sub-task
+
+    [RED-737] - Unable to change value inside nested list/dictionaries
+    [RED-738] - When variable is updated during updated the state of memory is inconsistent
+    [RED-848] - Github #111 In Debug Variable Panel difference between Robot Dict and Python Dict not visible.
+    [RED-875] - With RF 2.9 keywords started under setup/teardown are wrongly reported
+    [RED-879] - Present variables during debugging in a consistent way
+    [RED-885] - Check performance of debugger
+    [RED-886] - Provide JUnits for new classes in debugger area
+    [RED-887] - Update user guide regarding debugger
+    [RED-888] - Add debugger pause on errors
+    [RED-889] - Update stackframe presentations
+    [RED-890] - Make it possible to omit libraries keywords when debugging
+    [RED-903] - Improve performance of Execution and Message Log views
+    [RED-904] - Debugger should find keywords coming from dynamically loaded resources
+    [RED-908] - Fix all the tests-related glitches and problems with debugger
+
+
 RED 0.7.9 - 2017/06/29
 ** Bug
     [RED-496] - Order is changed in source after converting setting in table view
