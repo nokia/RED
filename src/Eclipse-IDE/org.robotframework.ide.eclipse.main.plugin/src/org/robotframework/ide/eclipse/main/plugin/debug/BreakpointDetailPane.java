@@ -304,9 +304,9 @@ public class BreakpointDetailPane implements IDetailPane3 {
             return parsed;
         } else {
             SwtThread.asyncExec(() -> ErrorDialog.openError(hitCountTxt.getShell(), "Invalid value",
-                    "Value '" + hitCountText + "' is invalid - '1' will be used instead.",
+                    "Value '" + hitCountText + "' is invalid: '1' will be used instead.",
                     new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "Hit count has to be a number greater than zero and " + "less than 2^31")));
+                            "Hit count has to be a number greater than zero and less than 2^31")));
             hitCountTxt.setText("1");
             return 1;
         }
