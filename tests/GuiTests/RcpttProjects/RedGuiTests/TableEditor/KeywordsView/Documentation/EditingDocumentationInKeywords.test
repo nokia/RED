@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PIa6YFiWEeaKPZp2wD-8qw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/11/17 3:59 PM
+Save-Time: 10/4/17 4:14 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -156,12 +156,23 @@ with [get-editor "TestFile.robot"] {
 		key-type Enter
     }
 }
+//======================================================================================
+//temp solution - without addin somemting to cell nezt test have menu disabled
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        set-text log
+    }
+}
+
+//======================================================================================
+//ok
 //check Doc view
 get-view "Documentation View" | get-editbox | get-property text | equals "Keyword\n"
     + "TestFile.robot\n\n"
     + "second doc bbcc" | verify-true
 
-//check if new letters were added to second line    
+//======================================================================================
+//temp solution - without addin somemting to cell next test have menu disabled
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "*** Setting ***\n"
@@ -170,5 +181,21 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    [Documentation]    triple dots ....\n"
     + "    Log  6\n"
     + "Keyword\n"
-    + "    [Documentation]    second doc bbcc" | verify-true
+    + "    [Documentation]    second doc bbcc\n"
+    + "    log" | verify-true    
+ 
+//====================================================================================== 
+//this will be when Log will be removed    
+    
+////check if new letters were added to second line    
+//get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+//    + "*** Setting ***\n"
+//    + "*** Keyword ***\n"
+//    + "test1\n"
+//    + "    [Documentation]    triple dots ....\n"
+//    + "    Log  6\n"
+//    + "Keyword\n"
+//    + "    [Documentation]    second doc bbcc" | verify-true
+        
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
