@@ -1,3 +1,42 @@
+# RED - Robot Editor v0.8.0
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+
+## Notable updates
+- content assist can search for patterns inside proposals (eg. searching for "og" will return "log" keyword)
+- content assist can return Keywords when searching for capital letters (eg. activating content assist and writing LM will return Log Many)
+- content assist now provides keywords from libs which are not included in TestSuite but available in project (entry in Referenced libraries in red.xml)
+- debug is more aware which file it showing,this relates to cases when suite names are not unique within project. Debug also can check if debug run in robot is consistent to suite file being displayed.Covered in #111
+- table editors should preserve empty lines and show duplicated sections. Still there is some work to do though.
+- variable mappings can use already mapped variables to resolve values.Item covered in #120 
+- more detailed progress bar for Automatically discover libraries from Robot Framework right-click menu
+- top level entries (libraries) in library discovery summary report is now copy-able.This allows to copy libs names and install missing libraries to Robot
+- filenames in tabs above editor can be prepanded with parent folder.Useful if filenames are not uniques in Project. Enabled by preference
+- when setting Robot nature to Project, red.xml is not overwritten by default - proper user action is proposed
+
+
+## GitHub issues updates
+- #84 - references menu in source view - added view to source editor
+- #95 - empty lines get removed when test case is edited from TestCases tab - empty lines should not be removed when changing from table to source editor
+- #111 - In Debug Variable Panel difference between Robot Dict and Python Dict not visible - implemented
+- #114 - add help content for Content Assist -> Auto activation triggers - added to Help
+- #118 - use preference for content assistant trigger - now Content Assist trigger key (CTRL+space) is no longer hardcoded,it can be defined in preferences
+- #120 - variable mapping could use already mapped vars in consecutive entries - implemented
+- #122 - red.xml charsets issues - encoding of red.xml is no in UTF-8
+- #128 - better handle projects without red.xml - for now,projects without red.xml can use Robot and system variables. Handling built-in libs will be done later. 
+- #138 - do not override existing red.xml file
+    
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.7.9
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
