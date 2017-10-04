@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5-cpQLVWEeazMIT-6yPcSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/27/17 1:26 PM
+Save-Time: 10/4/17 2:16 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -15,10 +15,6 @@ Testcase-Type: ecl
 Content-Type: text/ecl
 Entry-Name: .content
 
-//this is workaround to reload variables when test is run again
-get-view "Project Explorer" | get-tree | select Revalidate | select Revalidate 
-    | get-menu "Robot Framework/Reset Robot Environment" | click
-    
 get-view "Project Explorer" | get-tree | select "Revalidate/TestFile.robot" | double-click    
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 3 27
@@ -26,10 +22,6 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
-//try -times 4 -delay 1000 -command{
-//	//check that is no problems
-//	get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
-//}
 wait-for-zero-items -times 4 -delay 1000
 
 
