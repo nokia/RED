@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5zRY8GVSEeayWasF5RXANg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/17 11:33 AM
+Save-Time: 10/4/17 5:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -141,8 +141,8 @@ check-test_case-row -file "TestFile.robot" -row 16 -tc "...add new case"
 get-eclipse-window | key-type "M1+s"
 //get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M1+s"
 
-//check if \ is added to new line
-check-test_case-row -file "TestFile.robot" -row 5 -tc "" 
+//check if no \ is added to new line
+check-test_case-row -file "TestFile.robot" -row 5 -tc "    " 
 
 // go left and change tag  - checking if after saving user can move focus
 with [get-editor "TestFile.robot"] {
