@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _YldesLhHEeWCL6HwBALbRw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/8/16 3:19 PM
+Save-Time: 10/4/17 12:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,12 +17,6 @@ Entry-Name: .content
 //github issue added: RED gives validation error for variables file #63
 
 // check if variable file with input arguments are handled correctly
-
-//this is workaround to run test again - variables must be restarted
-with [get-view "Project Explorer" | get-tree] {
-    select VarProject | get-menu "Robot Framework/Reset Robot Environment" | click
-}
-
 
 get-view "Project Explorer" | get-tree | select "VarProject/DynamicVariables.robot" | double-click
 
