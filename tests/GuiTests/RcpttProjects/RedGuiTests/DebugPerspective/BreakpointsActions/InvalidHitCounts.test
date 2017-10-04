@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _JakZoB39EeehL98jfxP8Sw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/17 11:12 AM
+Save-Time: 10/4/17 11:25 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -17,7 +17,7 @@ Entry-Name: .content
 proc "chek-hit-count-error" [val count]{
 	get-window "Invalid value" 
 	    | get-label "Value.*" 
-	    | get-property caption | equals [format "Value '%s' is invalid. '1' will be used instead.\n\n"
+	    | get-property caption | equals [format "Value '%s' is invalid: '1' will be used instead.\n\n"
 	    + "Reason:\n"
 	    + "Hit count has to be a number greater than zero and less than 2^31" $count ]| verify-true
 	get-window "Invalid value" | get-button OK | click	 
