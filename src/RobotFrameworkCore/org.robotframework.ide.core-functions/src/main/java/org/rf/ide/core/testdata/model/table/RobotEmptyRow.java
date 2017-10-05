@@ -16,6 +16,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -74,14 +75,13 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public ModelType getModelType() {
-        final AModelElement<?> parent = (AModelElement<?>) getParent();
-        if (parent != null && parent.getModelType() == ModelType.TEST_CASE) {
+        final List<IRobotTokenType> types = getDeclaration().getTypes();
+        if (types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL)) {
             return ModelType.TEST_CASE_EMPTY_LINE;
-        } else if (parent != null && parent.getModelType() == ModelType.USER_KEYWORD) {
+        } else if (types.contains(RobotTokenType.KEYWORD_EMPTY_CELL)) {
             return ModelType.USER_KEYWORD_EMPTY_LINE;
-        } else {
-            return ModelType.UNKNOWN;
         }
+        return ModelType.UNKNOWN;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public List<RobotToken> getElementTokens() {
-        empty.setType(RobotTokenType.EMPTY_CELL);
+        empty.setType(getRobotTokenType());
         return newArrayList(empty);
     }
 
@@ -108,6 +108,16 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     public static boolean isEmpty(final String text) {
         return Pattern.matches("^[\\s]*$", text);
+    }
+
+    private RobotTokenType getRobotTokenType() {
+        final AModelElement<?> parent = (AModelElement<?>) getParent();
+        if (parent != null && parent.getModelType() == ModelType.TEST_CASE) {
+            return RobotTokenType.TEST_CASE_EMPTY_CELL;
+        } else if (parent != null && parent.getModelType() == ModelType.USER_KEYWORD) {
+            return RobotTokenType.KEYWORD_EMPTY_CELL;
+        }
+        return RobotTokenType.UNKNOWN;
     }
 
 }
