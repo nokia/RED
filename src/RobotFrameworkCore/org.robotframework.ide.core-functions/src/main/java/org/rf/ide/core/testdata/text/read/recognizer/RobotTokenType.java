@@ -21,11 +21,6 @@ public enum RobotTokenType implements IRobotTokenType {
     UNKNOWN(TableType.NOT_STRICTLY_BELONGS),
     /**
      */
-    EMPTY_CELL(
-            TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
-    /**
-     */
     VARIABLE_USAGE(TableType.NOT_STRICTLY_BELONGS),
     /**
      */
@@ -331,6 +326,11 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create().availableFrom("2.9").build()),
     /**
      */
+    TEST_CASE_EMPTY_CELL(
+            TableType.NOT_STRICTLY_BELONGS,
+            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
+    /**
+     */
     TEST_CASE_SETTING_UNKNOWN_DECLARATION(TableType.TEST_CASES, true),
     /**
      */
@@ -416,6 +416,11 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     TEST_CASE_EMPTY_LINE(TableType.TEST_CASES),
+    /**
+     */
+    KEYWORD_EMPTY_CELL(
+            TableType.NOT_STRICTLY_BELONGS,
+            VersionAvailabilityInfoBuilder.create().addRepresentation(" \\ ").build()),
     /**
      */
     KEYWORD_SETTING_UNKNOWN_DECLARATION(TableType.KEYWORDS, true),
@@ -516,8 +521,8 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     FOR_CONTINUE_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()),
-    FOR_CONTINUE_ARTIFICIAL_TOKEN(TableType.NOT_STRICTLY_BELONGS);
+            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()), FOR_CONTINUE_ARTIFICIAL_TOKEN(
+                    TableType.NOT_STRICTLY_BELONGS);
 
     private final List<String> text = new ArrayList<>(0);
 
@@ -560,11 +565,7 @@ public enum RobotTokenType implements IRobotTokenType {
     }
 
     private enum TableType {
-        NOT_STRICTLY_BELONGS,
-        SETTINGS,
-        VARIABLES,
-        TEST_CASES,
-        KEYWORDS;
+        NOT_STRICTLY_BELONGS, SETTINGS, VARIABLES, TEST_CASES, KEYWORDS;
     }
 
     public static boolean isTableHeader(final IRobotTokenType type) {

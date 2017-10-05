@@ -11,13 +11,13 @@ import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
-
 
 public class RedClipboard {
 
@@ -53,7 +53,8 @@ public class RedClipboard {
     public PositionCoordinateSerializer[] getPositionsCoordinates() {
         final Object probablyPositions = clipboard.getContents(PositionCoordinateTransfer.getInstance());
         return probablyPositions instanceof PositionCoordinateSerializer[]
-                ? (PositionCoordinateSerializer[]) probablyPositions : null;
+                ? (PositionCoordinateSerializer[]) probablyPositions
+                : null;
     }
 
     public boolean hasVariables() {
@@ -128,7 +129,8 @@ public class RedClipboard {
     protected final boolean hasKeywordCallsOnly(final RobotKeywordCall[] content) {
         if (content != null) {
             for (final Object item : content) {
-                if (item.getClass() != RobotKeywordCall.class && item.getClass() != RobotDefinitionSetting.class) {
+                if (item.getClass() != RobotKeywordCall.class && item.getClass() != RobotDefinitionSetting.class
+                        && item.getClass() != RobotEmptyLine.class) {
                     return false;
                 }
             }
