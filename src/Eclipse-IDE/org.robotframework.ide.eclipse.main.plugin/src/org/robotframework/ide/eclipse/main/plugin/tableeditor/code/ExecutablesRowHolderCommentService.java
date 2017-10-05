@@ -22,11 +22,13 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertCallToComment;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertCommentToCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertCommentToSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertEmptyToCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertSettingToComment;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand2;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
@@ -90,13 +92,24 @@ public class ExecutablesRowHolderCommentService {
 
             final List<RobotToken> commentToken = new ArrayList<>(0);
 
-            final List<RobotToken> execRowView = execRowView(call);
-            final RobotKeywordCall callToUse = call;
+            RobotKeywordCall callToUse = call;
             final int startColumn = column;
+
+            if (callToUse instanceof RobotEmptyLine) {
+                final int index = callToUse.getIndex();
+                final EditorCommand convertToComment = new ConvertEmptyToCall(eventBroker, (RobotEmptyLine) callToUse,
+                        "\\");
+                convertToComment.execute();
+                executedCommands.add(convertToComment);
+                callToUse = callToUse.getParent().getChildren().get(index);
+            }
+
+            final List<RobotToken> execRowView = execRowView(callToUse);
+
             if (column == 0) {
-                final EditorCommand convertToComment = call.isExecutable()
-                        ? new ConvertCallToComment(eventBroker, call, value)
-                        : new ConvertSettingToComment(eventBroker, call, value);
+                final EditorCommand convertToComment = callToUse.isExecutable()
+                        ? new ConvertCallToComment(eventBroker, callToUse, value)
+                        : new ConvertSettingToComment(eventBroker, callToUse, value);
                 convertToComment.execute();
                 executedCommands.add(convertToComment);
                 return;
@@ -138,15 +151,15 @@ public class ExecutablesRowHolderCommentService {
                     newComment);
             commentUpdate.execute();
             executedCommands.add(commentUpdate);
-            call.resetStored();
+            callToUse.resetStored();
         }
 
         private void fillMissingColumns(final RobotKeywordCall callToUse, final List<RobotToken> execRowView) {
             final int columnsInView = execRowView.size() - 1;
             for (int i = columnsInView; i < column; i++) {
                 if (i == 0 && (execRowView.size() == 0 || execRowView.get(0).getText().isEmpty())) {
-                    final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,
-                            "\\");
+                    final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker,
+                            callToUse, "\\");
                     changeTmpName.execute();
                     executedCommands.add(changeTmpName);
                 } else if (column - 1 == i && execRowView.size() - 1 < i) {
