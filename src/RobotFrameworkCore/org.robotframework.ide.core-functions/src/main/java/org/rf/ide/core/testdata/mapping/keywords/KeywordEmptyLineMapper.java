@@ -37,7 +37,7 @@ public class KeywordEmptyLineMapper implements IParsingMapper {
         final UserKeyword keyword = keywordFinder.findOrCreateNearestKeyword(currentLine, processingState,
                 robotFileOutput, rt, fp);
         final List<IRobotTokenType> types = rt.getTypes();
-        types.add(0, RobotTokenType.EMPTY_CELL);
+        types.add(0, RobotTokenType.KEYWORD_EMPTY_CELL);
         types.remove(RobotTokenType.UNKNOWN);
 
         final RobotEmptyRow<UserKeyword> emptyLine = new RobotEmptyRow<UserKeyword>();
