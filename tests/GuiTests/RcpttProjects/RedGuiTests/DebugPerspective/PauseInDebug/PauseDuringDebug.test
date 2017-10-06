@@ -1,0 +1,98 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2Q6oEPOSEeaWpbE3jg39cA,_d8aMACuvEeW667Afdo4DcA,_OCxtEBRGEeWWV9IuysVI_A,_jcbUQGu1Eeeps9cepQRw2Q
+Element-Name: PauseDuringDebug
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _epiEsKp5EeegMO_FS_X-9A
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/6/17 1:15 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "kk3\n"
+    + "\t  log  1  \n"
+    + "\t  log   9\n"
+    + "\t  petla\n"
+    + "\t  \n"
+    + "*** Keywords ***\n"
+    + "petla\n"
+    + "    :FOR    ${x}  IN RANGE    2000\n"
+    + "    \\    log  ${x}" 
+    
+//save file and add BP    
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type "M1+s"
+    get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 4
+}
+
+exec-with-options -disableJobWaiting -command {
+//run test in debug
+	get-view "Project Explorer" | get-tree
+	    | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
+	wait-for-specified_line-in-first-thread -line 4 -nr_of_frames 3
+	
+	//resume to go into keyword with loop
+	get-button "Resume (F8)" | click
+	wait 500
+	
+	//check if 3 buttons are enabled
+	get-button Suspend | get-property enablement | equals true | verify-true
+	get-button "Terminate (M1+F2)" | get-property enablement | equals true | verify-true
+	get-button Disconnect | get-property enablement | equals true | verify-true
+	
+	wait 2000
+	get-button Suspend | click
+	
+	wait 500
+	
+	//check if buttons are now enabled
+	get-button "Resume (F8)" | get-property enablement | equals true | verify-true
+	get-button Suspend | get-property enablement | equals false | verify-true
+	get-button "Terminate (M1+F2)" | get-property enablement | equals true | verify-true
+	get-button Disconnect | get-property enablement | equals true | verify-true
+	get-button "Step Into (F5)" | get-property enablement | equals true | verify-true
+	get-button "Step Over (F6)" | get-property enablement | equals true | verify-true
+	
+			
+	get-view "Message Log" | get-editbox | get-property "getLineCount()" -raw | let [val line_count -input]{	
+		wait 1000
+		//compare if ther is no new line in message log - test is realy paused
+		get-view "Message Log" | get-editbox | get-property "getLineCount()" -raw | eq $line_count | verify-true
+	}		
+	get-button "Step Return (F7)" | get-property enablement | equals true | verify-true
+	
+	get-view Debug | get-tree 
+	    | get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:.*/Tests execution thread" 
+	    | get-property childCount | equals 5 | verify-true
+	get-button "Step Into (F5)" | click
+	wait 1000	    
+	get-button "Terminate (M1+F2)" | click    
+}	
+
+
+//bug - pause test when there is no BP
+
+//with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+//    click-ruler -line 4
+//    double-click-ruler 4
+//}
+//
+//exec-with-options -disableJobWaiting -command {
+//	get-button "Debug.*" | click -arrow
+//	get-menu "1 TestFile.robot" | click
+//	
+//	
+//	wait 2000
+//	get-button Suspend | click
+//	
+//	wait 500
+//}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
