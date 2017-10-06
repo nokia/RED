@@ -103,7 +103,6 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public RobotToken getDeclaration() {
-        empty.setType(getRobotTokenType());
         return empty;
     }
 
