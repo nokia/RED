@@ -37,7 +37,7 @@ public class TestCaseEmptyLineMapper implements IParsingMapper {
         final TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, processingState,
                 robotFileOutput, rt, fp);
         final List<IRobotTokenType> types = rt.getTypes();
-        types.add(0, RobotTokenType.EMPTY_CELL);
+        types.add(0, RobotTokenType.TEST_CASE_EMPTY_CELL);
         types.remove(RobotTokenType.UNKNOWN);
 
         final RobotEmptyRow<TestCase> emptyLine = new RobotEmptyRow<TestCase>();
