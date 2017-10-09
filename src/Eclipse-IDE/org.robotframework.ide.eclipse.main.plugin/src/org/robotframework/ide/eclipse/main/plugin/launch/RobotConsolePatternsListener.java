@@ -8,6 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -23,6 +26,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.eclipse.ui.console.IHyperlink;
 import org.eclipse.ui.console.IPatternMatchListener;
 import org.eclipse.ui.console.PatternMatchEvent;
@@ -32,7 +37,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-
 
 /**
  * @author Michal Anglart
@@ -62,18 +66,34 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
         try {
             final String matchedLine = console.getDocument().get(event.getOffset(), event.getLength());
             final PathWithOffset pathWithOffset = getPath(matchedLine);
-            final File file = new File(pathWithOffset.path);
+            final URI uri = getURI(pathWithOffset.path);
 
-            if (file.exists() && file.isFile()) {
-                final int offset = event.getOffset() + pathWithOffset.offsetInLine;
-                final int length = pathWithOffset.path.length();
+            final int offset = event.getOffset() + pathWithOffset.offsetInLine;
+            final int length = pathWithOffset.path.length();
 
+            if (isValidUri(uri)) {
+                console.addHyperlink(new ExecutionWebsiteHyperlink(uri), offset, length);
+            } else {
+                final File file = new File(pathWithOffset.path);
                 console.addHyperlink(new ExecutionArtifactsHyperlink(robotProject.getProject(), file), offset, length);
             }
-
         } catch (final BadLocationException e) {
             // fine, no hyperlinks then
         }
+    }
+
+    private static URI getURI(final String path) {
+        try {
+            return new URI(path);
+        } catch (final URISyntaxException e) {
+            // fine, no link here
+        }
+        return null;
+    }
+
+    private static boolean isValidUri(final URI uri) {
+        final String scheme = uri == null ? null : uri.getScheme();
+        return scheme != null && (scheme.equals("http") || scheme.equals("https"));
     }
 
     private PathWithOffset getPath(final String matchedLine) {
@@ -145,9 +165,9 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
         public void linkActivated() {
             final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 
-            if (!file.exists()) { // it could have been deleted in the meantime
+            if (!file.isFile() || !file.exists()) { // it could have been deleted in the meantime
                 final IStatus status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                        "The file " + file.getAbsolutePath() + " does not exist in the file system anymore.");
+                        "The file " + file.getAbsolutePath() + " does not exist in the file system.");
                 ErrorDialog.openError(workbenchWindow.getShell(), "Missing file", "File does not exist", status);
                 return;
             }
@@ -200,6 +220,40 @@ public class RobotConsolePatternsListener implements IPatternMatchListener {
         private void refreshFile(final IFile wsFile) throws CoreException {
             if (!wsFile.isSynchronized(IResource.DEPTH_ZERO)) {
                 wsFile.refreshLocal(IResource.DEPTH_ZERO, null);
+            }
+        }
+    }
+
+    private static final class ExecutionWebsiteHyperlink implements IHyperlink {
+
+        private final URI link;
+
+        private ExecutionWebsiteHyperlink(final URI link) {
+            this.link = link;
+        }
+
+        @Override
+        public void linkExited() {
+            // nothing to do
+        }
+
+        @Override
+        public void linkEntered() {
+            // nothing to do
+        }
+
+        @Override
+        public void linkActivated() {
+
+            final IWorkbenchBrowserSupport support = PlatformUI.getWorkbench().getBrowserSupport();
+            try {
+                final IWebBrowser browser = support.createBrowser("default");
+                browser.openURL(link.toURL());
+            } catch (PartInitException | MalformedURLException e) {
+                final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                final String message = "Unable to open link: " + link.toString();
+                ErrorDialog.openError(workbenchWindow.getShell(), "Error opening link", message,
+                        new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
             }
         }
     }
