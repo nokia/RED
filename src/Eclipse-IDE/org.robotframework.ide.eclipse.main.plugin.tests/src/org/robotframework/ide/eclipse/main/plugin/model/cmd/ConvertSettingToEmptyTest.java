@@ -57,7 +57,7 @@ public class ConvertSettingToEmptyTest {
         final RobotKeywordCall result = testCase.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.UNKNOWN);
+                .containsExactly(RobotTokenType.TEST_CASE_EMPTY_CELL);
         assertThat(result.getName()).isEmpty();
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEmpty();
@@ -89,7 +89,7 @@ public class ConvertSettingToEmptyTest {
         final RobotKeywordCall result = keyword.getChildren().get(0);
         assertThat(result).isExactlyInstanceOf(RobotEmptyLine.class);
         assertThat(result.getLinkedElement().getDeclaration().getTypes())
-                .containsExactly(RobotTokenType.UNKNOWN);
+                .containsExactly(RobotTokenType.KEYWORD_EMPTY_CELL);
         assertThat(result.getName()).isEmpty();
         assertThat(result.getArguments()).isEmpty();
         assertThat(result.getComment()).isEmpty();
@@ -99,7 +99,7 @@ public class ConvertSettingToEmptyTest {
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
                 eq(ImmutableMap
-                .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
+                        .of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA, result)));
         verifyNoMoreInteractions(eventBroker);
     }
 }
