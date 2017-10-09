@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dEBUwBtDEeWSh6BKjAxDIw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/3/17 3:29 PM
+Save-Time: 10/9/17 10:37 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -23,7 +23,7 @@ get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.ro
 //get-editor "BigScript.robot" | get-text-viewer | set-caret-pos 1 1
 
 get-menu "Run/Debug" | click
-wait-for-console
+wait-for-console -times 10 -delay 2000 
 
 
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/Tests/SecondInsideTest.robot" | double-click
