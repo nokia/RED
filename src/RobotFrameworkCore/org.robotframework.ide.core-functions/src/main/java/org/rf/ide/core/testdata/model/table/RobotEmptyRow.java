@@ -30,10 +30,17 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
         empty = new RobotToken();
     }
 
+    @Override
+    public void setParent(T parent) {
+        super.setParent(parent);
+        fixMissingType();
+    }
+
     public boolean setEmptyToken(final RobotToken empty) {
         final boolean isEmpty = isEmpty(empty.getText());
         if (isEmpty) {
             this.empty = empty;
+            fixMissingType();
         }
         return isEmpty;
     }
@@ -75,7 +82,7 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public ModelType getModelType() {
-        final List<IRobotTokenType> types = getDeclaration().getTypes();
+        final List<IRobotTokenType> types = empty.getTypes();
         if (types.contains(RobotTokenType.TEST_CASE_EMPTY_CELL)) {
             return ModelType.TEST_CASE_EMPTY_LINE;
         } else if (types.contains(RobotTokenType.KEYWORD_EMPTY_CELL)) {
@@ -91,7 +98,6 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public List<RobotToken> getElementTokens() {
-        empty.setType(getRobotTokenType());
         return newArrayList(empty);
     }
 
@@ -103,12 +109,15 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
 
     @Override
     public RobotToken getDeclaration() {
-        empty.setType(getRobotTokenType());
         return empty;
     }
 
     public static boolean isEmpty(final String text) {
         return Pattern.matches("^[\\s]*$", text);
+    }
+
+    private void fixMissingType() {
+        empty.setType(getRobotTokenType());
     }
 
     private RobotTokenType getRobotTokenType() {
