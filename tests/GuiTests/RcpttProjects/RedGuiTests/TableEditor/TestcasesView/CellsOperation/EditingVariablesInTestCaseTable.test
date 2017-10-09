@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ryzO4GuUEeaVB7Q9BJdfQg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/9/16 1:35 PM
+Save-Time: 10/6/17 3:19 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -114,4 +114,23 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    ${new ITEM} =  Convert To Integer    1  \n"
     + "    ${b}  Convert To Hex    2    \n"
     + "    ${again c} =  Convert To Boolean   3" | verify-true
+    
+    
+//checking if no error is shown for commenting variable with "=" - bug RED-769
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/equals/Convert To Integer" | click
+wait 500
+
+//coment and uncomment
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type "M1+/"
+    wait 1000
+    key-type "M1+/"
+    wait 1000
+    key-type "M1+s"
+}    
+
+
+set-list-with-markers-and-comapare -file "TestFile.robot" -table "Test Cases"  -ref_list [list 2] -type "ERROR"
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
