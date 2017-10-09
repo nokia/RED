@@ -1,0 +1,61 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ParentDictToTabNamePreference
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _WCTlcKzEEeerJuxw_RtBfQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/9/17 11:44 AM
+Testcase-Type: ecl
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+RED-537
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open .robot files
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestSuiteFolder" | double-click
+    select "RobotProject/TestSuiteFolder/__init__.robot" | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+// verify tab names when preference is by default unchecked
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "__init__.robot" | verify-true
+    get-property "pages[1]" | equals "TestFile.robot" | verify-true
+    get-property activePage | equals "TestFile.robot" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+// check Add parent directory name to editor tab in Preferences
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor"
+    get-group General | get-button "Add parent directory name to editor tab" | check
+    get-button OK | click
+}
+// close all tabs
+get-editor "__init__.robot" | click
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | click
+get-editor "__init__.robot" | close
+// open .robot files again
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/TestSuiteFolder/__init__.robot" | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+// verify tab names when preference is checked
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestSuiteFolder/__init__.robot" | verify-true
+    get-property "pages[1]" | equals "RobotProject/TestFile.robot" | verify-true
+    get-property activePage | equals "RobotProject/TestFile.robot" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
