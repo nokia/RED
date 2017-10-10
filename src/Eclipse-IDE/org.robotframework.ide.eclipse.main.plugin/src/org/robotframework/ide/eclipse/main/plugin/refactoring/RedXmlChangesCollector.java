@@ -20,15 +20,15 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
  */
 class RedXmlChangesCollector {
 
-    Optional<Change> collect(final IResource refactoredResource, final Optional<IPath> pathAfterRefactoring) {
+    Optional<Change> collect(final IResource refactoredResource, final Optional<IPath> afterRefactorPath) {
         final RobotProject project = RedPlugin.getModelManager().createProject(refactoredResource.getProject());
         final IFile redXmlFile = project.getConfigurationFile();
         final IPath pathBeforeRefactoring = refactoredResource.getFullPath();
 
         final Optional<Change> changesInProjectEditor = new RedXmlInProjectEditorChangesCollector(redXmlFile,
-                pathBeforeRefactoring, pathAfterRefactoring).collect();
+                pathBeforeRefactoring, afterRefactorPath).collect();
         final Optional<Change> changesInTextEditor = new RedXmlInTextEditorChangesCollector(redXmlFile,
-                pathBeforeRefactoring, pathAfterRefactoring).collect();
+                pathBeforeRefactoring, afterRefactorPath).collect();
 
         if (changesInProjectEditor.isPresent() && changesInTextEditor.isPresent()) {
             final CompositeChange compositeChange = new CompositeChange("Change in both editors",
@@ -40,7 +40,7 @@ class RedXmlChangesCollector {
         } else if (changesInTextEditor.isPresent()) {
             return changesInTextEditor;
         } else {
-            return new RedXmlInFileChangesCollector(redXmlFile, pathBeforeRefactoring, pathAfterRefactoring).collect();
+            return new RedXmlInFileChangesCollector(redXmlFile, pathBeforeRefactoring, afterRefactorPath).collect();
         }
     }
 }
