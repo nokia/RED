@@ -81,38 +81,38 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     @VisibleForTesting
     void validate(final IProgressMonitor monitor, final RobotProjectConfigWithLines config) throws CoreException {
         final RobotProjectConfig model = config.getConfigurationModel();
-        final Map<Object, ProblemPosition> linesMapping = config.getLinesMapping();
 
         if (model.hasCurrentVersion()) {
             for (final RemoteLocation location : model.getRemoteLocations()) {
-                validateRemoteLocation(monitor, location, linesMapping);
+                validateRemoteLocation(monitor, location, config);
             }
             int index = 0;
             for (final ReferencedLibrary library : model.getLibraries()) {
-                validateReferencedLibrary(monitor, library, index, linesMapping);
+                validateReferencedLibrary(monitor, library, index, config);
                 index++;
             }
             for (final SearchPath path : model.getPythonPath()) {
-                validateSearchPath(monitor, path, model, linesMapping);
+                validateSearchPath(monitor, path, config);
             }
             for (final SearchPath path : model.getClassPath()) {
-                validateSearchPath(monitor, path, model, linesMapping);
+                validateSearchPath(monitor, path, config);
             }
             for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
-                validateReferencedVariableFile(monitor, variableFile, linesMapping);
+                validateReferencedVariableFile(monitor, variableFile, config);
             }
             for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
-                validateExcludedPath(monitor, excludedPath, model.getExcludedPath(), linesMapping);
+                validateExcludedPath(monitor, excludedPath, model.getExcludedPath(), config);
             }
         } else {
             final RobotProblem invalidVersionProblem = RobotProblem.causedBy(ConfigFileProblem.INVALID_VERSION)
                     .formatMessageWith(model.getVersion().getVersion(), RobotProjectConfig.CURRENT_VERSION);
-            reporter.handleProblem(invalidVersionProblem, configFile, linesMapping.get(model.getVersion()));
+            final ProblemPosition position = new ProblemPosition(config.getLineFor(model.getVersion()));
+            reporter.handleProblem(invalidVersionProblem, configFile, position);
         }
     }
 
     private void validateRemoteLocation(final IProgressMonitor monitor, final RemoteLocation location,
-            final Map<Object, ProblemPosition> linesMapping)
+            final RobotProjectConfigWithLines config)
             throws CoreException {
         if (monitor.isCanceled()) {
             return;
@@ -125,7 +125,8 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         } catch (final IOException | IllegalArgumentException ex) {
             final RobotProblem unreachableHostProblem = RobotProblem.causedBy(ConfigFileProblem.UNREACHABLE_HOST)
                     .formatMessageWith(uriAddress);
-            reporter.handleProblem(unreachableHostProblem, configFile, linesMapping.get(location));
+            final ProblemPosition position = new ProblemPosition(config.getLineFor(location));
+            reporter.handleProblem(unreachableHostProblem, configFile, position);
         } finally {
             try {
                 s.close();
@@ -136,13 +137,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateReferencedLibrary(final IProgressMonitor monitor, final ReferencedLibrary library,
-            final int index, final Map<Object, ProblemPosition> linesMapping) {
+            final int index, final RobotProjectConfigWithLines config) {
         if (monitor.isCanceled()) {
             return;
         }
         final LibraryType libType = library.provideType();
         final IPath libraryPath = Path.fromPortableString(library.getPath());
-        final ProblemPosition position = linesMapping.get(library);
+        final ProblemPosition position = new ProblemPosition(config.getLineFor(library));
 
         final Map<String, Object> additional = ImmutableMap.of(ConfigFileProblem.LIBRARY_INDEX, index);
         List<RobotProblem> libProblems;
@@ -227,28 +228,28 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateSearchPath(final IProgressMonitor monitor, final SearchPath searchPath,
-            final RobotProjectConfig config, final Map<Object, ProblemPosition> linesMapping) {
+            final RobotProjectConfigWithLines config) {
         if (monitor.isCanceled()) {
             return;
         }
+        final ProblemPosition position = new ProblemPosition(config.getLineFor(searchPath));
         try {
-            final File location = new RedEclipseProjectConfig(config).toAbsolutePath(searchPath,
+            final File location = new RedEclipseProjectConfig(config.getConfigurationModel()).toAbsolutePath(searchPath,
                     configFile.getProject());
             if (!location.exists()) {
                 final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
                         .formatMessageWith(location.toString());
-                reporter.handleProblem(problem, configFile, linesMapping.get(searchPath));
+                reporter.handleProblem(problem, configFile, position);
             }
         } catch (final PathResolvingException e) {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)
                     .formatMessageWith(searchPath.getLocation());
-            reporter.handleProblem(problem, configFile, linesMapping.get(searchPath));
+            reporter.handleProblem(problem, configFile, position);
         }
     }
 
     private void validateReferencedVariableFile(final IProgressMonitor monitor,
-            final ReferencedVariableFile variableFile,
-            final Map<Object, ProblemPosition> linesMapping) {
+            final ReferencedVariableFile variableFile, final RobotProjectConfigWithLines config) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -257,12 +258,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final List<RobotProblem> pathProblems = validatePath(libraryPath,
                 ConfigFileProblem.MISSING_VARIABLE_FILE);
         for (final RobotProblem pathProblem : pathProblems) {
-            reporter.handleProblem(pathProblem, configFile, linesMapping.get(variableFile));
+            final ProblemPosition position = new ProblemPosition(config.getLineFor(variableFile));
+            reporter.handleProblem(pathProblem, configFile, position);
         }
     }
 
     private void validateExcludedPath(final IProgressMonitor monitor, final ExcludedFolderPath excludedPath,
-            final List<ExcludedFolderPath> allExcluded, final Map<Object, ProblemPosition> linesMapping) {
+            final List<ExcludedFolderPath> allExcluded, final RobotProjectConfigWithLines config) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -272,7 +274,8 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         if (!project.exists(asExcludedPath)) {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_EXCLUDED_FOLDER)
                     .formatMessageWith(projectPath.append(asExcludedPath));
-            reporter.handleProblem(problem, configFile, linesMapping.get(excludedPath));
+            final ProblemPosition position = new ProblemPosition(config.getLineFor(excludedPath));
+            reporter.handleProblem(problem, configFile, position);
         }
 
         for (final ExcludedFolderPath otherPath : allExcluded) {
@@ -281,7 +284,8 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
                 if (otherAsPath.isPrefixOf(asExcludedPath)) {
                     final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.USELESS_FOLDER_EXCLUSION)
                             .formatMessageWith(projectPath.append(asExcludedPath), projectPath.append(otherAsPath));
-                    reporter.handleProblem(problem, configFile, linesMapping.get(excludedPath));
+                    final ProblemPosition position = new ProblemPosition(config.getLineFor(excludedPath));
+                    reporter.handleProblem(problem, configFile, position);
                 }
             }
         }

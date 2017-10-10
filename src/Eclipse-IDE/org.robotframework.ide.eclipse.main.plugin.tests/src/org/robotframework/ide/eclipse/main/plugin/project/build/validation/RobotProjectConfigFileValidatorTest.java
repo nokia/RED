@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -27,6 +28,7 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
@@ -60,8 +62,9 @@ public class RobotProjectConfigFileValidatorTest {
     @Test
     public void whenConfigIsNewlyCreated_itHasNoValidationIssues() throws Exception {
         final RobotProjectConfig config = RobotProjectConfig.create();
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
@@ -73,8 +76,9 @@ public class RobotProjectConfigFileValidatorTest {
         // remove this test after red.xml version change
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.setVersion("1.0");
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
@@ -85,9 +89,11 @@ public class RobotProjectConfigFileValidatorTest {
     public void whenConfigHasIncompatibleVersionFormat_InvalidVersionProblemIsReported() throws Exception {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.setVersion("invalid");
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(config.getVersion(), new ProblemPosition(3));
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(config.getVersion(), new FilePosition(3, 0));
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
@@ -102,10 +108,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addRemoteLocation(remoteLocation);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(remoteLocation, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(remoteLocation, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
 
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
@@ -123,10 +130,11 @@ public class RobotProjectConfigFileValidatorTest {
             final RobotProjectConfig config = RobotProjectConfig.create();
             config.addRemoteLocation(remoteLocation);
 
-            final Map<Object, ProblemPosition> locations = new HashMap<>();
-            locations.put(remoteLocation, new ProblemPosition(42));
+            final Map<Object, FilePosition> locations = new HashMap<>();
+            locations.put(remoteLocation, new FilePosition(42, 0));
 
-            final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+            final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                    new TreeSet<>(), locations);
             validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
             assertThat(reporter.getReportedProblems()).isEmpty();
@@ -144,10 +152,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addClassPath(searchPath);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(searchPath, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -164,10 +173,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addClassPath(searchPath);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(searchPath, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems())
@@ -183,10 +193,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addPythonPath(searchPath);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(searchPath, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -199,10 +210,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addPythonPath(searchPath);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(searchPath, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(searchPath, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems())
@@ -219,10 +231,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(variableFile, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(variableFile, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -238,10 +251,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(variableFile, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(variableFile, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems())
@@ -259,10 +273,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(variableFile, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(variableFile, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems())
@@ -281,10 +296,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addReferencedVariableFile(variableFile);
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(variableFile, new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(variableFile, new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems()).containsOnly(
@@ -299,10 +315,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("does/not/exist");
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(config.getExcludedPath().get(0), new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(config.getExcludedPath().get(0), new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems())
@@ -316,10 +333,11 @@ public class RobotProjectConfigFileValidatorTest {
         final RobotProjectConfig config = RobotProjectConfig.create();
         config.addExcludedPath("directory");
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(config.getExcludedPath().get(0), new ProblemPosition(42));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(config.getExcludedPath().get(0), new FilePosition(42, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems()).isEmpty();
@@ -337,11 +355,12 @@ public class RobotProjectConfigFileValidatorTest {
         config.addExcludedPath("directory/nested");
         config.addExcludedPath("directory/nested/1/2");
 
-        final Map<Object, ProblemPosition> locations = new HashMap<>();
-        locations.put(config.getExcludedPath().get(0), new ProblemPosition(42));
-        locations.put(config.getExcludedPath().get(1), new ProblemPosition(43));
+        final Map<Object, FilePosition> locations = new HashMap<>();
+        locations.put(config.getExcludedPath().get(0), new FilePosition(42, 0));
+        locations.put(config.getExcludedPath().get(1), new FilePosition(43, 0));
 
-        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config, locations);
+        final RobotProjectConfigWithLines linesAugmentedConfig = new RobotProjectConfigWithLines(config,
+                new TreeSet<>(), locations);
         validator.validate(new NullProgressMonitor(), linesAugmentedConfig);
 
         assertThat(reporter.getReportedProblems())

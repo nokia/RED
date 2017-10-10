@@ -53,13 +53,6 @@ public class ChangesTest {
     }
 
     @Test
-    public void xmlCharactersAreEscapedInGivenPath() {
-        assertThat(Changes.escapeXmlCharacters(path("/a/b/c"))).isEqualTo(path("/a/b/c"));
-        assertThat(Changes.escapeXmlCharacters(path("/a/b/c/file.txt"))).isEqualTo(path("/a/b/c/file.txt"));
-        assertThat(Changes.escapeXmlCharacters(path("/path<&>/dir"))).isEqualTo(path("/path&lt;&amp;&gt;/dir"));
-    }
-
-    @Test
     public void affectedPathIsProperlyTransformed() {
         assertThat(Changes.transformAffectedPath(path("a/b/c"), path("a/b/d"), path("x/y/z")))
                 .isEqualTo(Optional.empty());

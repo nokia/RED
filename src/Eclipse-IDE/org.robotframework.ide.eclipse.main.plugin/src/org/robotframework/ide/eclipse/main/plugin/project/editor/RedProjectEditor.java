@@ -137,13 +137,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
             @Override
             public void whenFileWasRemoved() {
-                SwtThread.syncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        getSite().getPage().closeEditor(RedProjectEditor.this, false);
-                    }
-                });
+                SwtThread.syncExec(() -> getSite().getPage().closeEditor(RedProjectEditor.this, true));
             }
 
             @Override
@@ -326,13 +320,9 @@ public class RedProjectEditor extends MultiPageEditorPart {
         }
         super.dispose();
 
-        SwtThread.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
-                manager.update(RobotValidationExcludedDecorator.ID);
-            }
+        SwtThread.asyncExec(() -> {
+            final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
+            manager.update(RobotValidationExcludedDecorator.ID);
         });
     }
 

@@ -16,45 +16,42 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 /**
  * @author Jakub Szkatula
  */
-class LibraryPathAddChange extends Change {
+class LibraryModifyChange extends Change {
 
     private final IFile redXmlFile;
 
-    private final ReferencedLibrary librariesPathToAdd;
+    private final ReferencedLibrary library;
 
-    private final RobotProjectConfig config;
+    private final ReferencedLibrary newLibrary;
 
     private final IEventBroker eventBroker;
 
-    LibraryPathAddChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ReferencedLibrary excludedPathToRemove) {
-        this(redXmlFile, config, excludedPathToRemove,
-                PlatformUI.getWorkbench().getService(IEventBroker.class));
+    LibraryModifyChange(final IFile redXmlFile, final ReferencedLibrary library, final ReferencedLibrary newLibrary) {
+        this(redXmlFile, library, newLibrary, PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
-    LibraryPathAddChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ReferencedLibrary excludedPathToAdd, final IEventBroker eventBroker) {
+    LibraryModifyChange(final IFile redXmlFile, final ReferencedLibrary library, final ReferencedLibrary newLibrary,
+            final IEventBroker eventBroker) {
         this.redXmlFile = redXmlFile;
-        this.config = config;
-        this.librariesPathToAdd = excludedPathToAdd;
+        this.library = library;
+        this.newLibrary = newLibrary;
         this.eventBroker = eventBroker;
     }
 
     @Override
     public String getName() {
-        return "The path '" + librariesPathToAdd.getPath() + "' will be added";
+        return "The library '" + library.getName() + "' (" + library.getPath() + ") will be changed to '"
+                + newLibrary.getName() + "' (" + newLibrary.getPath() + ")";
     }
 
     @Override
@@ -69,20 +66,24 @@ class LibraryPathAddChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        config.getLibraries().add(librariesPathToAdd);
-        
+        final ReferencedLibrary oldLibrary = ReferencedLibrary.create(library.provideType(), library.getName(),
+                library.getPath());
+
+        library.setName(newLibrary.getName());
+        library.setPath(newLibrary.getPath());
+
         final List<ReferencedLibrary> changedPaths = new ArrayList<>();
-        changedPaths.add(librariesPathToAdd);
-        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                redXmlFile, changedPaths);
+        changedPaths.add(library);
+        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(redXmlFile,
+                changedPaths);
 
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
 
-        return new LibraryPathRemoveChange(redXmlFile, config, librariesPathToAdd);
+        return new LibraryModifyChange(redXmlFile, library, oldLibrary);
     }
 
     @Override
     public Object getModifiedElement() {
-        return librariesPathToAdd;
+        return library;
     }
 }
