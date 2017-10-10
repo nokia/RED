@@ -116,15 +116,23 @@ public class ProjectProvider implements TestRule {
     }
 
     public IFile createFile(final IPath filePath, final String... lines) throws IOException, CoreException {
-        final IFile file = project.getFile(filePath);
         try (InputStream source = new ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
-            if (file.exists()) {
-                file.setContents(source, true, false, null);
-            } else {
-                file.create(source, true, null);
-            }
-            project.refreshLocal(IResource.DEPTH_INFINITE, null);
+            return createFile(filePath, source);
         }
+    }
+
+    public IFile createFile(final String filePath, final InputStream fileSource) throws IOException, CoreException {
+        return createFile(Path.fromPortableString(filePath), fileSource);
+    }
+
+    public IFile createFile(final IPath filePath, final InputStream fileSource) throws IOException, CoreException {
+        final IFile file = project.getFile(filePath);
+        if (file.exists()) {
+            file.setContents(fileSource, true, false, null);
+        } else {
+            file.create(fileSource, true, null);
+        }
+        project.refreshLocal(IResource.DEPTH_INFINITE, null);
         return file;
     }
 

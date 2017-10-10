@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
@@ -35,18 +34,18 @@ class ExcludedPathModifyChange extends Change {
 
     private final ExcludedFolderPath excludedPath;
 
-    private final IPath newPath;
+    private final ExcludedFolderPath newPath;
 
     private final IEventBroker eventBroker;
 
-    ExcludedPathModifyChange(final IFile redXmlFile, final ExcludedFolderPath excludedPath, final IPath newPath) {
-        this(redXmlFile, excludedPath, newPath,
-                (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+    ExcludedPathModifyChange(final IFile redXmlFile, final ExcludedFolderPath excludedPath,
+            final ExcludedFolderPath newPath) {
+        this(redXmlFile, excludedPath, newPath, PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
-    ExcludedPathModifyChange(final IFile redXmlFile, final ExcludedFolderPath excludedPath, final IPath newPath,
-            final IEventBroker eventBroker) {
+    ExcludedPathModifyChange(final IFile redXmlFile, final ExcludedFolderPath excludedPath,
+            final ExcludedFolderPath newPath, final IEventBroker eventBroker) {
         this.redXmlFile = redXmlFile;
         this.excludedPath = excludedPath;
         this.newPath = newPath;
@@ -55,7 +54,7 @@ class ExcludedPathModifyChange extends Change {
 
     @Override
     public String getName() {
-        return "The path '" + excludedPath.getPath() + "' will change to '" + newPath.toPortableString() + "'";
+        return "The path '" + excludedPath.getPath() + "' will change to '" + newPath.getPath() + "'";
     }
 
     @Override
@@ -70,8 +69,8 @@ class ExcludedPathModifyChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        final IPath oldPath = Path.fromPortableString(excludedPath.getPath());
-        excludedPath.setPath(newPath.toPortableString());
+        final ExcludedFolderPath oldFolderPath = ExcludedFolderPath.create(excludedPath.getPath());
+        excludedPath.setPath(newPath.getPath());
 
         final Collection<IPath> changedPaths = new ArrayList<>();
         final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
@@ -79,7 +78,7 @@ class ExcludedPathModifyChange extends Change {
 
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
 
-        return new ExcludedPathModifyChange(redXmlFile, excludedPath, oldPath);
+        return new ExcludedPathModifyChange(redXmlFile, excludedPath, oldFolderPath);
     }
 
     @Override

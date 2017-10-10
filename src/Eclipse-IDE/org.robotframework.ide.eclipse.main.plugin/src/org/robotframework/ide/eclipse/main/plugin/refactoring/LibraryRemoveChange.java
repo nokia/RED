@@ -10,51 +10,49 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 /**
  * @author Jakub Szkatula
  */
-class LibraryPathModifyChange extends Change {
+class LibraryRemoveChange extends Change {
 
     private final IFile redXmlFile;
 
-    private final ReferencedLibrary libraryPath;
+    private final ReferencedLibrary libraryToRemove;
 
-    private final IPath newPath;
+    private final RobotProjectConfig config;
 
     private final IEventBroker eventBroker;
 
-    LibraryPathModifyChange(final IFile redXmlFile, final ReferencedLibrary lib, final IPath newPath) {
-        this(redXmlFile, lib, newPath,
-                PlatformUI.getWorkbench().getService(IEventBroker.class));
+    LibraryRemoveChange(final IFile redXmlFile, final RobotProjectConfig config,
+            final ReferencedLibrary libraryToRemove) {
+        this(redXmlFile, config, libraryToRemove, PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
-    LibraryPathModifyChange(final IFile redXmlFile, final ReferencedLibrary excludedPath, final IPath newPath,
-            final IEventBroker eventBroker) {
+    LibraryRemoveChange(final IFile redXmlFile, final RobotProjectConfig config,
+            final ReferencedLibrary libraryToRemove, final IEventBroker eventBroker) {
         this.redXmlFile = redXmlFile;
-        this.libraryPath = excludedPath;
-        this.newPath = newPath;
+        this.config = config;
+        this.libraryToRemove = libraryToRemove;
         this.eventBroker = eventBroker;
     }
 
     @Override
     public String getName() {
-        return "The path '" + libraryPath.getPath() + "' will change to '" + newPath.toPortableString() + "'";
+        return "The library '" + libraryToRemove.getName() + "' (" + libraryToRemove.getPath() + ") will be removed";
     }
 
     @Override
@@ -69,21 +67,20 @@ class LibraryPathModifyChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        final IPath oldPath = Path.fromPortableString(libraryPath.getPath());
-        libraryPath.setPath(newPath.toPortableString());
+        config.getLibraries().remove(libraryToRemove);
 
         final List<ReferencedLibrary> changedPaths = new ArrayList<>();
-        changedPaths.add(libraryPath);
-        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                redXmlFile, changedPaths);
+        changedPaths.add(libraryToRemove);
+        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(redXmlFile,
+                changedPaths);
 
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
 
-        return new LibraryPathModifyChange(redXmlFile, libraryPath, oldPath);
+        return new LibraryAddChange(redXmlFile, config, libraryToRemove);
     }
 
     @Override
     public Object getModifiedElement() {
-        return libraryPath;
+        return libraryToRemove;
     }
 }

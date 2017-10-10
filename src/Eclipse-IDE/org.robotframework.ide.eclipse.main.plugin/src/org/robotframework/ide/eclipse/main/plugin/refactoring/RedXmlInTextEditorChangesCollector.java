@@ -5,8 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
-import java.util.List;
+import java.io.ByteArrayInputStream;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -21,11 +22,21 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.rf.ide.core.testdata.model.FileRegion;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.refactoring.RedXmlInFileChangesCollector.TextBasedChangesProcessor;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
+
+import com.google.common.base.Charsets;
+
+import ca.odell.glazedlists.FunctionList.Function;
 
 /**
  * @author Michal Anglart
@@ -62,7 +73,7 @@ class RedXmlInTextEditorChangesCollector {
                 final IEditorPart editor = findEditor(input);
 
                 if (editor instanceof ITextEditor) {
-                    final TextEditor ed = ((TextEditor) editor);
+                    final ITextEditor ed = ((ITextEditor) editor);
                     return ed.getDocumentProvider().getDocument(input);
                 }
                 return null;
@@ -80,28 +91,37 @@ class RedXmlInTextEditorChangesCollector {
     }
 
     private Optional<Change> collectChanges(final IDocument document) {
-        final RedXmlEditsCollector redXmlEdits = new RedXmlEditsCollector(pathBeforeRefactoring, pathAfterRefactoring);
-        final List<TextEdit> validationExcluded = redXmlEdits
-                .collectEditsInExcludedPaths(redXmlFile.getProject().getName(), document);
-        final List<TextEdit> libraryMoved = redXmlEdits.collectEditsInMovedLibraries(redXmlFile.getProject().getName(),
-                document);
+        final RobotProjectConfigWithLines configWithLines = new RedEclipseProjectConfigReader()
+                .readConfigurationWithLines(new ByteArrayInputStream(document.get().getBytes(Charsets.UTF_8)));
+        final RobotProjectConfig config = configWithLines.getConfigurationModel();
+        final Function<FileRegion, FileRegion> regionMapper = r -> TextOperations.getAffectedRegion(r, document);
 
-        final MultiTextEdit multiTextEdit = new MultiTextEdit();
-        for (final TextEdit edit : validationExcluded) {
-            multiTextEdit.addChild(edit);
-        }
-        for (final TextEdit edit : libraryMoved) {
-            multiTextEdit.addChild(edit);
-        }
+        final TextBasedChangesProcessor<ExcludedFolderPath> pathsProcessor = new TextBasedChangesProcessor<>(
+                configWithLines, regionMapper);
+        new ExcludedPathsChangesDetector(pathBeforeRefactoring, pathAfterRefactoring, config).detect(pathsProcessor);
 
-        if (multiTextEdit.hasChildren()) {
+        final TextBasedChangesProcessor<ReferencedLibrary> libsProcessor = new TextBasedChangesProcessor<>(
+                configWithLines, regionMapper);
+        new LibrariesChangesDetector(pathBeforeRefactoring, pathAfterRefactoring, config).detect(libsProcessor);
+
+        if (Stream.of(pathsProcessor, libsProcessor).anyMatch(TextBasedChangesProcessor::hasEditsCollected)) {
+            final TextEdit[] excludedPathsEdits = pathsProcessor.getEdits();
+            final TextEdit[] librariesEdits = libsProcessor.getEdits();
+
+            final MultiTextEdit multiTextEdit = new MultiTextEdit();
+            multiTextEdit.addChildren(excludedPathsEdits);
+            multiTextEdit.addChildren(librariesEdits);
+
             final DocumentChange docChange = new DocumentChange(
                     redXmlFile.getName() + " - " + redXmlFile.getParent().getFullPath().toString(), document);
             docChange.setEdit(multiTextEdit);
-            docChange.addTextEditGroup(new TextEditGroup("Change paths excluded from validation",
-                    validationExcluded.toArray(new TextEdit[0])));
-            docChange.addTextEditGroup(
-                    new TextEditGroup("Change paths of referenced libraries", libraryMoved.toArray(new TextEdit[0])));
+            if (excludedPathsEdits.length > 0) {
+                docChange.addTextEditGroup(
+                        new TextEditGroup("Change paths excluded from validation", excludedPathsEdits));
+            }
+            if (librariesEdits.length > 0) {
+                docChange.addTextEditGroup(new TextEditGroup("Change referenced libraries", librariesEdits));
+            }
             return Optional.of(docChange);
         } else {
             return Optional.empty();

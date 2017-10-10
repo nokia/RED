@@ -15,7 +15,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
-import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
@@ -65,8 +64,8 @@ public class RedProjectEditorInput {
 
     public List<RedXmlProblem> getProblemsFor(final Object modelPart) {
         if (file.isPresent()) {
-            final ProblemPosition xmlLocation = projectConfiguration.getLinesMapping().get(modelPart);
-            if (xmlLocation == null) {
+            final int xmlLine = projectConfiguration.getLineFor(modelPart);
+            if (xmlLine == -1) {
                 return new ArrayList<>();
             }
             final IFile redXmlFile = file.get();
@@ -75,7 +74,7 @@ public class RedProjectEditorInput {
 
                 final List<RedXmlProblem> problems = new ArrayList<>();
                 for (final IMarker marker : markers) {
-                    if (marker.getAttribute(IMarker.LINE_NUMBER, -1) == xmlLocation.getLine()) {
+                    if (marker.getAttribute(IMarker.LINE_NUMBER, -1) == xmlLine) {
                         final Severity severity = Severity.fromMarkerSeverity(marker.getAttribute(IMarker.SEVERITY, -1));
                         problems.add(new RedXmlProblem(severity, marker.getAttribute(IMarker.MESSAGE, "")));
                     }

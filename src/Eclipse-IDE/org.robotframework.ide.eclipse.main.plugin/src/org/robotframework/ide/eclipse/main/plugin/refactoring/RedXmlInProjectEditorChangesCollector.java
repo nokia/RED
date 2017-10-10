@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ui.IEditorPart;
@@ -48,12 +47,7 @@ class RedXmlInProjectEditorChangesCollector {
         if (currentlyEditedConfig == null) {
             return Optional.empty();
         }
-        final CompositeChange change = new CompositeChange(
-                redXmlFile.getName() + " - " + redXmlFile.getParent().getFullPath().toString());
-
-        change.add(collectChangesInExcludedPaths(currentlyEditedConfig));
-        change.add(collectChangesInReferencedLibraries(currentlyEditedConfig));
-        return Optional.of(Changes.normalizeCompositeChange(change));
+        return collectChanges(currentlyEditedConfig);
     }
 
     private RobotProjectConfig getConfigUnderEdit(final IFile redXmlFile) {
@@ -80,54 +74,60 @@ class RedXmlInProjectEditorChangesCollector {
         return editors.length > 0 ? editors[0].getEditor(true) : null;
     }
 
-    private Change collectChangesInExcludedPaths(final RobotProjectConfig config) {
+    private Optional<Change> collectChanges(final RobotProjectConfig currentlyEditedConfig) {
         final CompositeChange change = new CompositeChange(
+                redXmlFile.getName() + " - " + redXmlFile.getParent().getFullPath().toString());
+
+        final CompositeChange excludedPathsChanges = new CompositeChange(
                 "'" + redXmlFile.getFullPath() + "': paths excluded from validation");
+        new ExcludedPathsChangesDetector(pathBeforeRefactoring, pathAfterRefactoring, currentlyEditedConfig)
+                .detect(new OpenedConfigExcludedPathsProcessor(excludedPathsChanges));
+        change.add(Changes.normalizeCompositeChange(excludedPathsChanges));
 
-        for (final ExcludedFolderPath excluded : config.getExcludedPath()) {
+        final CompositeChange librariesPathsChanges = new CompositeChange(
+                "'" + redXmlFile.getFullPath() + "': referenced libraries");
+        new LibrariesChangesDetector(pathBeforeRefactoring, pathAfterRefactoring, currentlyEditedConfig)
+                .detect(new OpenedConfigReferencedLibrariesPathsProcessor(librariesPathsChanges));
+        change.add(Changes.normalizeCompositeChange(librariesPathsChanges));
 
-            final IPath potentiallyAffectedPath = Path.fromPortableString(excluded.getPath());
-            final IPath adjustedPathBeforeRefactoring = Changes
-                    .escapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
-            if (pathAfterRefactoring.isPresent()) {
-                final IPath adjustedPathAfterRefactoring = Changes
-                        .escapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
-
-                final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
-                        adjustedPathAfterRefactoring, potentiallyAffectedPath);
-                if (transformedPath.isPresent()) {
-                    change.add(new ExcludedPathModifyChange(redXmlFile, excluded, transformedPath.get()));
-                }
-            } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
-                change.add(new ExcludedPathRemoveChange(redXmlFile, config, excluded));
-            }
-        }
-        return Changes.normalizeCompositeChange(change);
+        return Optional.of(Changes.normalizeCompositeChange(change));
     }
 
-    private Change collectChangesInReferencedLibraries(final RobotProjectConfig config) {
-        final CompositeChange change = new CompositeChange(
-                "'" + redXmlFile.getFullPath() + "': referenced libriaries paths");
+    private class OpenedConfigExcludedPathsProcessor implements RedXmlChangesProcessor<ExcludedFolderPath> {
 
-        for (final ReferencedLibrary lib : config.getLibraries()) {
+        private final CompositeChange compositeChange;
 
-            final IPath potentiallyAffectedPath = Path.fromPortableString(lib.getPath());
-            final IPath adjustedPathBeforeRefactoring = Changes
-                    .escapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
-            if (pathAfterRefactoring.isPresent()) {
-                final IPath adjustedPathAfterRefactoring = Changes
-                        .escapeXmlCharacters(pathAfterRefactoring.get().removeFirstSegments(1));
-
-                final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
-                        adjustedPathAfterRefactoring, potentiallyAffectedPath);
-                if (transformedPath.isPresent()) {
-                    change.add(new LibraryPathModifyChange(redXmlFile, lib, transformedPath.get()));
-                }
-            } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
-                change.add(new LibraryPathRemoveChange(redXmlFile, config, lib));
-            }
+        public OpenedConfigExcludedPathsProcessor(final CompositeChange compositeChange) {
+            this.compositeChange = compositeChange;
         }
-        return Changes.normalizeCompositeChange(change);
+
+        @Override
+        public void pathModified(final ExcludedFolderPath excludedPath, final ExcludedFolderPath newPath) {
+            compositeChange.add(new ExcludedPathModifyChange(redXmlFile, excludedPath, newPath));
+        }
+
+        @Override
+        public void pathRemoved(final RobotProjectConfig config, final ExcludedFolderPath pathToRemove) {
+            compositeChange.add(new ExcludedPathRemoveChange(redXmlFile, config, pathToRemove));
+        }
     }
 
+    private class OpenedConfigReferencedLibrariesPathsProcessor implements RedXmlChangesProcessor<ReferencedLibrary> {
+
+        private final CompositeChange compositeChange;
+
+        public OpenedConfigReferencedLibrariesPathsProcessor(final CompositeChange compositeChange) {
+            this.compositeChange = compositeChange;
+        }
+
+        @Override
+        public void pathModified(final ReferencedLibrary library, final ReferencedLibrary newLibrary) {
+            compositeChange.add(new LibraryModifyChange(redXmlFile, library, newLibrary));
+        }
+
+        @Override
+        public void pathRemoved(final RobotProjectConfig config, final ReferencedLibrary library) {
+            compositeChange.add(new LibraryRemoveChange(redXmlFile, config, library));
+        }
+    }
 }

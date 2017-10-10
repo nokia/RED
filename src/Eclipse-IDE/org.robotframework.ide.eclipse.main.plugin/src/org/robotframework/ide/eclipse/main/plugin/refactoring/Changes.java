@@ -8,12 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.NullChange;
-
-import com.google.common.xml.XmlEscapers;
 
 /**
  * @author Michal Anglart
@@ -35,10 +32,6 @@ class Changes {
             }
         }
         return change.getChildren().length > 0 ? change : new NullChange();
-    }
-
-    static IPath escapeXmlCharacters(final IPath path) {
-        return Path.fromPortableString(XmlEscapers.xmlContentEscaper().escape(path.toPortableString()));
     }
 
     /**

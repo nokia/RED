@@ -23,38 +23,35 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEven
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 /**
  * @author Jakub Szkatula
  */
-class LibraryPathRemoveChange extends Change {
+class LibraryAddChange extends Change {
 
     private final IFile redXmlFile;
 
-    private final ReferencedLibrary libraryPathToRemove;
+    private final ReferencedLibrary libraryToAdd;
 
     private final RobotProjectConfig config;
 
     private final IEventBroker eventBroker;
 
-    LibraryPathRemoveChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ReferencedLibrary lib) {
-        this(redXmlFile, config, lib,
-                PlatformUI.getWorkbench().getService(IEventBroker.class));
+    LibraryAddChange(final IFile redXmlFile, final RobotProjectConfig config, final ReferencedLibrary libraryToAdd) {
+        this(redXmlFile, config, libraryToAdd, PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
-    LibraryPathRemoveChange(final IFile redXmlFile, final RobotProjectConfig config,
-            final ReferencedLibrary excludedPathToRemove, final IEventBroker eventBroker) {
+    LibraryAddChange(final IFile redXmlFile, final RobotProjectConfig config, final ReferencedLibrary libraryToAdd,
+            final IEventBroker eventBroker) {
         this.redXmlFile = redXmlFile;
         this.config = config;
-        this.libraryPathToRemove = excludedPathToRemove;
+        this.libraryToAdd = libraryToAdd;
         this.eventBroker = eventBroker;
     }
 
     @Override
     public String getName() {
-        return "The path '" + libraryPathToRemove.getPath() + "' will be removed";
+        return "The library '" + libraryToAdd.getName() + "' (" + libraryToAdd.getPath() + ") will be added";
     }
 
     @Override
@@ -69,20 +66,20 @@ class LibraryPathRemoveChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        config.getLibraries().remove(libraryPathToRemove);
-        
-        final List<ReferencedLibrary>  changedPaths = new ArrayList<>();
-        changedPaths.add(libraryPathToRemove);
-        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                redXmlFile, changedPaths);
+        config.getLibraries().add(libraryToAdd);
+
+        final List<ReferencedLibrary> changedPaths = new ArrayList<>();
+        changedPaths.add(libraryToAdd);
+        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(redXmlFile,
+                changedPaths);
 
         eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
 
-        return new LibraryPathAddChange(redXmlFile, config, libraryPathToRemove);
+        return new LibraryRemoveChange(redXmlFile, config, libraryToAdd);
     }
 
     @Override
     public Object getModifiedElement() {
-        return libraryPathToRemove;
+        return libraryToAdd;
     }
 }
