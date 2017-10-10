@@ -11,6 +11,8 @@ import java.io.Serializable;
 import org.rf.ide.core.testdata.model.table.ECompareResult;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 
+import com.google.common.base.Objects;
+
 public class FilePosition implements Serializable {
 
     private static final long serialVersionUID = 5481992321406778250L;
@@ -22,6 +24,10 @@ public class FilePosition implements Serializable {
     private final int column;
 
     private final int offset;
+
+    public FilePosition(final int line, final int column) {
+        this(line, column, NOT_SET);
+    }
 
     public FilePosition(final int line, final int column, final int offset) {
         this.line = line;
@@ -126,29 +132,15 @@ public class FilePosition implements Serializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + column;
-        result = prime * result + line;
-        result = prime * result + offset;
-        return result;
+        return Objects.hashCode(column, line, offset);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        FilePosition other = (FilePosition) obj;
-        if (column != other.column)
-            return false;
-        if (line != other.line)
-            return false;
-        if (offset != other.offset)
-            return false;
-        return true;
+    public boolean equals(final Object obj) {
+        if (obj != null && obj.getClass() == getClass()) {
+            final FilePosition that = (FilePosition) obj;
+            return this.line == that.line && this.column == that.column && this.offset == that.offset;
+        }
+        return false;
     }
 }

@@ -37,9 +37,10 @@ public class ExcludedPathModifyChangeTest {
     @Test
     public void checkChangeName() {
         final ExcludedFolderPath excludedPathToModify = ExcludedFolderPath.create("a/b/c");
+        final ExcludedFolderPath modifiedPath = ExcludedFolderPath.create("d/e/f/b/c");
 
         final ExcludedPathModifyChange change = new ExcludedPathModifyChange(
-                projectProvider.getFile(new Path("red.xml")), excludedPathToModify, new Path("d/e/f/b/c"));
+                projectProvider.getFile(new Path("red.xml")), excludedPathToModify, modifiedPath);
 
         assertThat(change.getName()).isEqualTo("The path 'a/b/c' will change to 'd/e/f/b/c'");
         assertThat(change.getModifiedElement()).isSameAs(excludedPathToModify);
@@ -51,10 +52,11 @@ public class ExcludedPathModifyChangeTest {
         config.addExcludedPath("a/b/c");
 
         final ExcludedFolderPath excludedPathToModify = config.getExcludedPath().get(0);
+        final ExcludedFolderPath modifiedPath = ExcludedFolderPath.create("d/e/f/b/c");
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final ExcludedPathModifyChange change = new ExcludedPathModifyChange(
-                projectProvider.getFile(new Path("red.xml")), excludedPathToModify, new Path("d/e/f/b/c"), eventBroker);
+                projectProvider.getFile(new Path("red.xml")), excludedPathToModify, modifiedPath, eventBroker);
 
         change.initializeValidationData(null);
         assertThat(change.isValid(null).isOK()).isTrue();
