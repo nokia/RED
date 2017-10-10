@@ -5,16 +5,29 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.rf.ide.core.project.RobotProjectConfigWriter;
+import org.rf.ide.core.testdata.model.FileRegion;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+
+import ca.odell.glazedlists.FunctionList.Function;
 
 /**
  * @author Michal Anglart
@@ -35,31 +48,92 @@ class RedXmlInFileChangesCollector {
     }
 
     Optional<Change> collect() {
-        final RedXmlEditsCollector redXmlEdits = new RedXmlEditsCollector(pathBeforeRefactoring, pathAfterRefactoring);
-        final List<TextEdit> validationExcluded = redXmlEdits
-                .collectEditsInExcludedPaths(redXmlFile.getProject().getName(), redXmlFile);
-        final List<TextEdit> libraryMoved = redXmlEdits.collectEditsInMovedLibraries(redXmlFile.getProject().getName(),
-                redXmlFile);
+        final RobotProjectConfigWithLines configWithLines = new RedEclipseProjectConfigReader()
+                .readConfigurationWithLines(redXmlFile);
+        final RobotProjectConfig config = configWithLines.getConfigurationModel();
+        final Function<FileRegion, FileRegion> regionMapper = r -> TextOperations.getAffectedRegion(r, redXmlFile);
 
-        final MultiTextEdit multiTextEdit = new MultiTextEdit();
-        for (final TextEdit edit : validationExcluded) {
-            multiTextEdit.addChild(edit);
-        }
-        for (final TextEdit edit : libraryMoved) {
-            multiTextEdit.addChild(edit);
-        }
+        final TextBasedChangesProcessor<ExcludedFolderPath> pathsProcessor = new TextBasedChangesProcessor<>(
+                configWithLines, regionMapper);
+        new ExcludedPathsChangesDetector(pathBeforeRefactoring, pathAfterRefactoring, config).detect(pathsProcessor);
 
-        if (multiTextEdit.hasChildren()) {
+        final TextBasedChangesProcessor<ReferencedLibrary> libsProcessor = new TextBasedChangesProcessor<>(
+                configWithLines, regionMapper);
+        new LibrariesChangesDetector(pathBeforeRefactoring, pathAfterRefactoring, config).detect(libsProcessor);
+
+        if (Stream.of(pathsProcessor, libsProcessor).anyMatch(TextBasedChangesProcessor::hasEditsCollected)) {
+            final TextEdit[] excludedPathsEdits = pathsProcessor.getEdits();
+            final TextEdit[] librariesEdits = libsProcessor.getEdits();
+
+            final MultiTextEdit multiTextEdit = new MultiTextEdit();
+            multiTextEdit.addChildren(excludedPathsEdits);
+            multiTextEdit.addChildren(librariesEdits);
+
             final TextFileChange fileChange = new TextFileChange(
-                    "'" + redXmlFile.getFullPath() + "': paths mentioned in red.xml", redXmlFile);
+                    redXmlFile.getName() + " - " + redXmlFile.getParent().getFullPath().toString(), redXmlFile);
             fileChange.setEdit(multiTextEdit);
-            fileChange.addTextEditGroup(new TextEditGroup("Change paths excluded from validation",
-                    validationExcluded.toArray(new TextEdit[0])));
-            fileChange.addTextEditGroup(
-                    new TextEditGroup("Change paths in referenced libraries", libraryMoved.toArray(new TextEdit[0])));
+            if (excludedPathsEdits.length > 0) {
+                fileChange.addTextEditGroup(
+                        new TextEditGroup("Change paths excluded from validation", excludedPathsEdits));
+            }
+            if (librariesEdits.length > 0) {
+                fileChange.addTextEditGroup(new TextEditGroup("Change referenced libraries", librariesEdits));
+            }
             return Optional.of(fileChange);
         } else {
             return Optional.empty();
+        }
+    }
+
+    static class TextBasedChangesProcessor<T> implements RedXmlChangesProcessor<T> {
+
+        private final RobotProjectConfigWithLines config;
+
+        private final List<TextEdit> edits;
+
+        private final Function<FileRegion, FileRegion> affectedRegionMapper;
+
+        public TextBasedChangesProcessor(final RobotProjectConfigWithLines config,
+                final Function<FileRegion, FileRegion> affectedRegionMapper) {
+            this.config = config;
+            this.edits = new ArrayList<>();
+            this.affectedRegionMapper = affectedRegionMapper;
+        }
+
+        boolean hasEditsCollected() {
+            return !edits.isEmpty();
+        }
+
+        TextEdit[] getEdits() {
+            return edits.toArray(new TextEdit[0]);
+        }
+
+        @Override
+        public void pathModified(final Object affectedConfigModelPart, final Object newConfigModelPart) {
+            final FileRegion fileRegion = config.getRegionFor(affectedConfigModelPart);
+
+            if (fileRegion != null) {
+                final FileRegion affectedRegion = affectedRegionMapper.evaluate(fileRegion);
+
+                final int startOffset = affectedRegion.getStart().getOffset();
+                final int endOffset = affectedRegion.getEnd().getOffset();
+                final String text = new RobotProjectConfigWriter().writeFragment(newConfigModelPart);
+                edits.add(new ReplaceEdit(startOffset, endOffset - startOffset + 1, text));
+            }
+        }
+
+        @Override
+        public void pathRemoved(final RobotProjectConfig configuration,
+                final Object affectedConfigModelPart) {
+            final FileRegion fileRegion = config.getRegionFor(affectedConfigModelPart);
+
+            if (fileRegion != null) {
+                final FileRegion affectedRegion = affectedRegionMapper.evaluate(fileRegion);
+
+                final int startOffset = affectedRegion.getStart().getOffset();
+                final int endOffset = affectedRegion.getEnd().getOffset();
+                edits.add(new DeleteEdit(startOffset, endOffset - startOffset + 1));
+            }
         }
     }
 }
