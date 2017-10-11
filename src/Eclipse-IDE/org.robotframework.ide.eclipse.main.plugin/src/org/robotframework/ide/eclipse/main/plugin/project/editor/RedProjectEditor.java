@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
@@ -136,8 +137,20 @@ public class RedProjectEditor extends MultiPageEditorPart {
         resourceListener = new RedXmlFileChangeListener(project, new OnRedConfigFileChange() {
 
             @Override
+            public void whenFileWasMoved(final IPath movedToPath) {
+                final IFile movedFile = (IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(movedToPath);
+                final IEditorInput input = new FileEditorInput(movedFile);
+
+                setPartName(movedFile.getProject().getName() + "/" + input.getName());
+                editorInput = new RedProjectEditorInput(Optional.of(movedFile), !movedFile.isReadOnly(),
+                        editorInput.getProjectConfig());
+
+                RedProjectEditor.super.setInput(input);
+            }
+
+            @Override
             public void whenFileWasRemoved() {
-                SwtThread.syncExec(() -> getSite().getPage().closeEditor(RedProjectEditor.this, true));
+                SwtThread.syncExec(() -> getSite().getPage().closeEditor(RedProjectEditor.this, false));
             }
 
             @Override

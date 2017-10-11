@@ -43,7 +43,7 @@ public class LibraryModifyChangeTest {
     }
 
     @Test
-    public void libraryIsModified_whenChangeIsPerfomed() throws Exception {
+    public void libraryIsModified_whenChangeIsPerformed() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ReferencedLibrary libraryToModify = ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b");
         config.addReferencedLibrary(libraryToModify);
