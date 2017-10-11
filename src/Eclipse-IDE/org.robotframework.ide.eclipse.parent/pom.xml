@@ -28,7 +28,7 @@
                 </repository>
                 <repository>
                     <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
+                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
                     <layout>p2</layout>
                 </repository>
             </repositories>
@@ -49,7 +49,7 @@
                 </repository>
                 <repository>
                     <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
+                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
                     <layout>p2</layout>
                 </repository>
             </repositories>
@@ -71,7 +71,7 @@
                 </repository>
                 <repository>
                     <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
+                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
                     <layout>p2</layout>
                 </repository>
             </repositories>
@@ -92,7 +92,7 @@
                 </repository>
                 <repository>
                     <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
+                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
                     <layout>p2</layout>
                 </repository>
             </repositories>
