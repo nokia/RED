@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.project.RobotProjectConfig;
 
 class RedXmlFileChangeListener implements IResourceChangeListener {
@@ -37,7 +38,10 @@ class RedXmlFileChangeListener implements IResourceChangeListener {
                             return false;
                         }
                         if (delta.getResource().equals(project.getFile(RobotProjectConfig.FILENAME))) {
-                            if (delta.getKind() == IResourceDelta.REMOVED) {
+                            if (delta.getKind() == IResourceDelta.REMOVED
+                                    && (delta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
+                                performOnChange.whenFileWasMoved(delta.getMovedToPath());
+                            } else if (delta.getKind() == IResourceDelta.REMOVED) {
                                 performOnChange.whenFileWasRemoved();
                             } else {
                                 performOnChange.whenFileChanged();
@@ -56,6 +60,8 @@ class RedXmlFileChangeListener implements IResourceChangeListener {
     interface OnRedConfigFileChange {
 
         void whenFileChanged();
+
+        void whenFileWasMoved(IPath movedToPath);
 
         void whenFileWasRemoved();
     }

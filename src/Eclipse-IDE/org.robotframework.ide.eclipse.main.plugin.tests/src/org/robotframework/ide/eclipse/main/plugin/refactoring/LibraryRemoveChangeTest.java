@@ -44,7 +44,7 @@ public class LibraryRemoveChangeTest {
     }
 
     @Test
-    public void libraryIsRemoved_whenChangeIsPerfomed() throws Exception {
+    public void libraryIsRemoved_whenChangeIsPerformed() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
         final ReferencedLibrary libraryToRemove = ReferencedLibrary.create(LibraryType.PYTHON, "c", "a/b");
         config.addReferencedLibrary(libraryToRemove);

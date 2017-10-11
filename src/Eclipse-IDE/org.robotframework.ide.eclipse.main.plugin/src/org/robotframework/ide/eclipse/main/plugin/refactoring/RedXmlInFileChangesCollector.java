@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -26,8 +27,6 @@ import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLi
 import org.rf.ide.core.project.RobotProjectConfigWriter;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
-
-import ca.odell.glazedlists.FunctionList.Function;
 
 /**
  * @author Michal Anglart
@@ -113,7 +112,7 @@ class RedXmlInFileChangesCollector {
             final FileRegion fileRegion = config.getRegionFor(affectedConfigModelPart);
 
             if (fileRegion != null) {
-                final FileRegion affectedRegion = affectedRegionMapper.evaluate(fileRegion);
+                final FileRegion affectedRegion = affectedRegionMapper.apply(fileRegion);
 
                 final int startOffset = affectedRegion.getStart().getOffset();
                 final int endOffset = affectedRegion.getEnd().getOffset();
@@ -128,7 +127,7 @@ class RedXmlInFileChangesCollector {
             final FileRegion fileRegion = config.getRegionFor(affectedConfigModelPart);
 
             if (fileRegion != null) {
-                final FileRegion affectedRegion = affectedRegionMapper.evaluate(fileRegion);
+                final FileRegion affectedRegion = affectedRegionMapper.apply(fileRegion);
 
                 final int startOffset = affectedRegion.getStart().getOffset();
                 final int endOffset = affectedRegion.getEnd().getOffset();
