@@ -38,7 +38,6 @@
     <profile>
         <id>neon-profile</id>
         <activation>
-            <activeByDefault>true</activeByDefault>
             <property>
                 <name>eclipse.version</name>
                 <value>neon</value>
@@ -51,6 +50,7 @@
     <profile>
         <id>oxygen-profile</id>
         <activation>
+            <activeByDefault>true</activeByDefault>
             <property>
                 <name>eclipse.version</name>
                 <value>oxygen</value>
