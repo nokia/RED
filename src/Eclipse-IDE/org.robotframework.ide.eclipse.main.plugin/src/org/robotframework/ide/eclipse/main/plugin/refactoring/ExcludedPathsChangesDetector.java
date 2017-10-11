@@ -26,7 +26,11 @@ class ExcludedPathsChangesDetector {
         for (final ExcludedFolderPath excluded : config.getExcludedPath()) {
             final IPath potentiallyAffectedPath = Path.fromPortableString(excluded.getPath());
             final IPath adjustedPathBeforeRefactoring = beforeRefactorPath.removeFirstSegments(1);
-            if (!adjustedPathBeforeRefactoring.isEmpty() && afterRefactorPath.isPresent()) {
+
+            if (adjustedPathBeforeRefactoring.isEmpty()) {
+                return;
+            }
+            if (afterRefactorPath.isPresent()) {
                 final IPath adjustedPathAfterRefactoring = afterRefactorPath.get().removeFirstSegments(1);
 
                 final Optional<IPath> transformedPath = Changes.transformAffectedPath(adjustedPathBeforeRefactoring,
@@ -35,8 +39,7 @@ class ExcludedPathsChangesDetector {
                     processor.pathModified(excluded,
                             ExcludedFolderPath.create(transformedPath.get().toPortableString()));
                 }
-            } else if (!adjustedPathBeforeRefactoring.isEmpty()
-                    && adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
+            } else if (adjustedPathBeforeRefactoring.isPrefixOf(potentiallyAffectedPath)) {
                 processor.pathRemoved(config, excluded);
             }
         }
