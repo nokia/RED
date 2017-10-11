@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tCfYkMLdEeat3OoBX2X2jQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/31/17 9:51 AM
+Save-Time: 10/11/17 12:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -24,7 +24,6 @@ with [get-editor "checking_var.tsv" | get-text-viewer] {
     key-type "M1+SPACE"
     key-type Down
     wait 200
-    key-type Down
     key-type Enter
     key-type "M1+SPACE" -times 2
 }
