@@ -59,6 +59,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     public void connected() {
         setThread(new RobotThread(this, stacktrace, userController));
+        fireChangeEvent(DebugEvent.STATE);
     }
 
     @Override
