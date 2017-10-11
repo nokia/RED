@@ -128,8 +128,10 @@ public class RobotProjectConfigReader {
                 if (previous != null) {
                     position = new FilePosition(previous.getLineNumber(), previous.getColumnNumber() - 1);
                 } else {
-                    // first element, so positioning in line after header line
-                    position = new FilePosition(2, 0);
+                    // first element, so positioning from current location
+                    final Location location = xmlReader.getLocation();
+                    final int tagLength = xmlReader.getLocalName().length() + 2;
+                    position = new FilePosition(location.getLineNumber(), location.getColumnNumber() - tagLength);
                 }
                 positionsStack.push(position);
 

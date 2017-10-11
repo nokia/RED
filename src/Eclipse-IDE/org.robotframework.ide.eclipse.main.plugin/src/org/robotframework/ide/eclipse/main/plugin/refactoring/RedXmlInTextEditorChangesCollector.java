@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -35,8 +36,6 @@ import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
 import com.google.common.base.Charsets;
-
-import ca.odell.glazedlists.FunctionList.Function;
 
 /**
  * @author Michal Anglart

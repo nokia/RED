@@ -45,6 +45,10 @@ public class RedProjectEditorInput {
         }
     }
 
+    RobotProjectConfigWithLines getProjectConfig() {
+        return projectConfiguration;
+    }
+
     public RobotProjectConfig getProjectConfiguration() {
         return projectConfiguration.getConfigurationModel();
     }
