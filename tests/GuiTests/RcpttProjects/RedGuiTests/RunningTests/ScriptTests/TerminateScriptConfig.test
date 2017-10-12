@@ -7,13 +7,15 @@ Element-Version: 3.0
 External-Reference: 
 Id: __nYI4Bh4Eee93KAG-tW51Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/11/17 1:51 PM
+Save-Time: 10/11/17 4:04 PM
 Tags: notTestable
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+//port is different in script and run config to pause test during connecting
 
 export-agent-to-folder -folder $RED_workspace_path
 
@@ -34,7 +36,7 @@ with [get-editor "script_.*" | get-text-viewer] {
 }
 
 
-//add path to test to the project
+//add path to test in the project
 get-menu "Run/Run Configurations..." | click
 with [get-window "Run Configurations"] {
     get-tab-folder | get-tab-item Executor | click
@@ -63,9 +65,10 @@ exec-with-options -disableJobWaiting -command {
 with [get-view Console | get-text-viewer] {
     get-property text 
         | equals [format"Command: .*\n"
-        + "Suite Executor: Robot Framework .*"] | verify-true
+        +  "Suite Executor: <unknown>"] | verify-true
     get-property "getLineCount()" | equals 3 | verify-true
 }
+get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
 
 
 //terminate robot test
@@ -88,20 +91,20 @@ with [get-window "Run Configurations"] {
     get-button Close | click
 }
 
-//run test and terminate whne robot test will be running
+//run test and terminate when robot test will be running
 exec-with-options -disableJobWaiting -command {
 	get-button "Run.*" | click
 	try -times 4 -delay 500 -command{
 		get-view Console | get-text-viewer | get-property text  
 		    | contains "==============================================================================\n"
 		    	+ "test" | verify-true
-	}-catch{
-		get-view Console | get-button Terminate | click
 	}
 	with [get-view Console] {
 	    click
 	    get-button Terminate | click
 	}
 }
+
+get-view Console | get-button Terminate | get-property enablement | equals false | verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
