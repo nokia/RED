@@ -25,6 +25,8 @@ import org.rf.ide.core.execution.agent.event.VersionsEvent;
 
 public interface RobotAgentEventListener {
 
+    void eventsProcessingAboutToStart();
+
     boolean isHandlingEvents();
 
     void handleAgentInitializing(AgentInitializingEvent event);

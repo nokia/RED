@@ -45,6 +45,11 @@ public class ExecutionMessagesTracker extends RobotDefaultAgentEventListener {
     }
 
     @Override
+    public void eventsProcessingAboutToStart() {
+        testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class, ExecutionMessagesStore::open);
+    }
+
+    @Override
     public void eventsProcessingFinished() {
         testsLaunchContext.performOnExecutionData(ExecutionMessagesStore.class, ExecutionMessagesStore::close);
     }
