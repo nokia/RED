@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Y5c34CjREeeF0_hmqEfhuQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/28/17 12:23 PM
-Tags: notTestable
+Save-Time: 10/12/17 10:30 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -77,4 +76,66 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
     + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
-------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--    
+// rename with open red.xml
+get-view "Project Explorer" | get-tree | select RobotProjectNewName | get-menu "Rename..." | click
+with [get-window "Rename Resource"] {
+    get-editbox -after [get-label "New name:"] | set-text RobotProjectNewNameNew
+    // simply verifying of Rename Previev
+    get-button "Preview >" | click
+}
+with [get-window "Rename Resource"] {
+    with [get-tree] {
+        get-property "getItems().TreeItem[0].getText()" | equals "red.xml - /RobotProjectNewName" | verify-true
+        get-property "getItems().TreeItem[1].getText()" 
+            | equals "Rename 'RobotProjectNewName' to 'RobotProjectNewNameNew'" | verify-true
+    }
+    get-text-viewer | get-property text | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+        + "<projectConfiguration>\n"
+        + "    <configVersion>1.0</configVersion>\n"
+        + "    <relativeTo>WORKSPACE</relativeTo>\n"
+        + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewName\"/>\n"
+        + "    <pythonpath/>\n"
+        + "    <classpath/>\n"
+        + "    <excludedForValidation/>\n"
+        + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+        + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+        + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+        + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+        + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+        + "</projectConfiguration>" | verify-true
+    get-text-viewer -after [get-label "Refactored Source"] -index 1 | get-property text 
+        | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+        + "<projectConfiguration>\n"
+        + "    <configVersion>1.0</configVersion>\n"
+        + "    <relativeTo>WORKSPACE</relativeTo>\n"
+        + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProjectNewNameNew\"/>\n"
+        + "    <pythonpath/>\n"
+        + "    <classpath/>\n"
+        + "    <excludedForValidation/>\n"
+        + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+        + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+        + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+        + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+        + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+        + "</projectConfiguration>" | verify-true
+}
+get-window "Rename Resource" | get-tree | select "Rename 'RobotProjectNewName' to 'RobotProjectNewNameNew'"
+get-window "Rename Resource" | get-label "No preview available" | get-property caption | equals "No preview available" 
+    | verify-true
+with [get-window "Rename Resource"] {
+    get-button "< Back" | click
+    get-button OK | click
+}
+// verify one Problmem before save changed red.xml
+get-view Problems | click
+get-view Problems | get-label "1 error, 0 warnings, 0 others" | get-property caption 
+    | equals "1 error, 0 warnings, 0 others" | verify-true
+// save red.xml
+get-eclipse-window | key-type "M1+s"
+wait 300
+// verify no Problmems after save changed red.xml
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProjectNewNameNew/Robot Referenced libraries/here_is_class RobotProjectNewNameNew \\(0\\)" 
+    | get-property caption | equals "here_is_class RobotProjectNewNameNew (0)" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
