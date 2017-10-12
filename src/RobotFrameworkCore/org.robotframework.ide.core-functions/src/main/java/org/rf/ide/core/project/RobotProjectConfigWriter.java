@@ -52,7 +52,7 @@ public class RobotProjectConfigWriter {
                     ImmutableMap.of(Marshaller.JAXB_FORMATTED_OUTPUT, true, Marshaller.JAXB_FRAGMENT, true));
             final ByteArrayInputStream stream = new ByteArrayInputStream(
                     writer.toString().getBytes(StandardCharsets.UTF_8));
-            return CharStreams.toString(new InputStreamReader(stream));
+            return CharStreams.toString(new InputStreamReader(stream, StandardCharsets.UTF_8));
         } catch (final IOException e) {
             throw new CannotWriteProjectConfigurationException(
                     "Unable to write fragment of configuration for element of type '"
