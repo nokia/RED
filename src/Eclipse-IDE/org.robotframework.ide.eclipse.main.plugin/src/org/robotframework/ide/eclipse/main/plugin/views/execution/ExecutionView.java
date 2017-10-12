@@ -194,6 +194,11 @@ public class ExecutionView {
     private void setInput(final RobotTestsLaunch launch) {
         if (executor != null) {
             executor.shutdownNow();
+            try {
+                executor.awaitTermination(30, TimeUnit.SECONDS);
+            } catch (final InterruptedException e) {
+                // ok we've tried waiting for shutdown
+            }
         }
         SwtThread.syncExec(this::resetView);
 
@@ -389,9 +394,7 @@ public class ExecutionView {
                         // fine, let's wait more
                     }
                 }
-                SwtThread.asyncExec(() -> {
-                    setInput(launch);
-                });
+                SwtThread.asyncExec(() -> setInput(launch));
 
             }, 0, TimeUnit.SECONDS);
             executor.shutdown();
