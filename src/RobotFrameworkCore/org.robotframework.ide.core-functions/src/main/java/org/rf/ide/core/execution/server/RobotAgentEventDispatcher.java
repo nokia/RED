@@ -50,6 +50,9 @@ class RobotAgentEventDispatcher {
 
     void runEventsLoop(final BufferedReader eventReader) throws IOException, RobotAgentEventsListenerException {
         try {
+            for (final RobotAgentEventListener listener : eventsListeners) {
+                listener.eventsProcessingAboutToStart();
+            }
             eventsLoop(eventReader);
         } finally {
             for (final RobotAgentEventListener listener : eventsListeners) {
