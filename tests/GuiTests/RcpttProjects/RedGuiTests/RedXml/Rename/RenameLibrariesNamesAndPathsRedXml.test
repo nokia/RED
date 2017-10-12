@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m_PqIB6aEeeW-PmLWrUUww
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/28/17 12:24 PM
-Tags: notTestable
+Save-Time: 10/12/17 10:30 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -125,7 +124,7 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
     + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
-// cory library to second project
+// copy library to second project
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/only_function.py" | get-menu Copy | click
     select RobotProjectTwo | get-menu Paste | click
@@ -142,4 +141,65 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
         | equals "only_function RobotProject (1)" | verify-true
 }
+// rename Suite with UTF-8 chars
+get-view "Project Explorer" | get-tree | select "RobotProject/Script.robot" | get-menu "Rename..." | click
+with [get-window "Rename Resource"] {
+    with [get-editbox -after [get-label "New name:"]] {
+        click-text 1 7
+        key-type "M1+M3+a" "\\u0105"
+        set-text "Scriptą.robot"
+        key-type "M1+M3+z" "\\u017C"
+        set-text "Scriptąż.robot"
+        key-type "M1+M3+c" "\\u0107"
+        set-text "Scriptążć.robot"
+        key-type "M1+M3+e" "\\u0119"
+        set-text "Scriptążćę.robot"
+    }
+    get-button OK | click
+}
+// verify if red.xml is not changed
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+// rename some other file
+get-view "Project Explorer" | get-tree | select "RobotProject/empty_file" | select "RobotProject/empty_file" 
+    | get-menu "Rename..." | click
+with [get-window "Rename Resource"] {
+    get-editbox -after [get-label "New name:"] | set-text "empty_file_changed"
+    get-button OK | click
+}
+// verify if red.xml is not changed
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classNewName\" path=\"RobotProject/folder\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+get-editor "red.xml" | click
+get-view "Project Explorer" | click
+get-editor "red.xml" | close
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
