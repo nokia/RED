@@ -70,6 +70,7 @@ public class ExecutionViewTest {
 
         final RobotTestsLaunch launch1 = executionService.testExecutionStarting(null);
         final ExecutionStatusStore store1 = new ExecutionStatusStore();
+        store1.open();
         launch1.getExecutionData(ExecutionStatusStore.class, () -> store1);
         store1.suiteStarted("suite", new URI("file:///suite"), 2, new ArrayList<>(), newArrayList("t1", "t2"));
         store1.testStarted();
@@ -81,6 +82,7 @@ public class ExecutionViewTest {
 
         final RobotTestsLaunch launch2 = executionService.testExecutionStarting(null);
         final ExecutionStatusStore store2 = new ExecutionStatusStore();
+        store2.open();
         launch2.getExecutionData(ExecutionStatusStore.class, () -> store2);
         store2.suiteStarted("suite2", new URI("file:///suite2"), 2, new ArrayList<>(), newArrayList("tx", "ty"));
         store2.testStarted();

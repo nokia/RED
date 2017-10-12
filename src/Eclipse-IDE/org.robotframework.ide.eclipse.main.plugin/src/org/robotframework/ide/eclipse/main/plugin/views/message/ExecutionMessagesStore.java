@@ -13,7 +13,7 @@ class ExecutionMessagesStore implements IDisposable {
 
     private final StringBuilder message = new StringBuilder();
 
-    private boolean isOpen = true;
+    private boolean isOpen = false;
     private boolean isDirty = false;
 
     void append(final String msg) {
@@ -30,6 +30,10 @@ class ExecutionMessagesStore implements IDisposable {
 
     boolean isOpen() {
         return isOpen;
+    }
+
+    void open() {
+        this.isOpen = true;
     }
 
     void close() {

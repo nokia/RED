@@ -60,6 +60,11 @@ public class ExecutionStatusTracker extends RobotDefaultAgentEventListener {
     }
 
     @Override
+    public void eventsProcessingAboutToStart() {
+        testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class, ExecutionStatusStore::open);
+    }
+
+    @Override
     public void eventsProcessingFinished() {
         testsLaunchContext.performOnExecutionData(ExecutionStatusStore.class, ExecutionStatusStore::close);
     }

@@ -21,6 +21,8 @@ public class ExecutionMessagesStoreTest {
     @Test
     public void storeProperlySavesMessages_whenTheyAreAppended() {
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
+        store.open();
+
         store.append("msg1");
         store.append("msg2");
         store.append("msg3");
@@ -31,6 +33,8 @@ public class ExecutionMessagesStoreTest {
     @Test
     public void storeRemovesMessages_whenDisposed() {
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
+        store.open();
+
         store.append("msg1");
         store.dispose();
         
@@ -38,8 +42,10 @@ public class ExecutionMessagesStoreTest {
     }
 
     @Test
-    public void storeGetsFirsty_whenMessageIsAppended() {
+    public void storeGetsDirty_whenMessageIsAppended() {
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
+        store.open();
+
         store.append("msg1");
         assertThat(store.checkDirtyAndReset()).isTrue();
         assertThat(store.checkDirtyAndReset()).isFalse();
