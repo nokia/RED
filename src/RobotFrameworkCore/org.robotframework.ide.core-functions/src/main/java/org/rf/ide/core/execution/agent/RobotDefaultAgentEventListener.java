@@ -26,6 +26,11 @@ import org.rf.ide.core.execution.agent.event.VersionsEvent;
 public abstract class RobotDefaultAgentEventListener implements RobotAgentEventListener {
 
     @Override
+    public void eventsProcessingAboutToStart() {
+        // implement in subclasses
+    }
+
+    @Override
     public boolean isHandlingEvents() {
         return false;
     }

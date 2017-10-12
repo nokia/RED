@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 
 public class ExecutionStatusStore implements IDisposable {
 
-    private boolean isOpen = true;
+    private boolean isOpen = false;
     private boolean isDisposed = false;
     private boolean isDirty = false;
 
@@ -165,6 +165,10 @@ public class ExecutionStatusStore implements IDisposable {
 
     boolean isOpen() {
         return isOpen;
+    }
+
+    void open() {
+        isOpen = true;
     }
 
     void close() {
