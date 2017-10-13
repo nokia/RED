@@ -36,6 +36,7 @@ public class ExecutionStatusStoreTest {
     public void whenSuiteStartsAndStoreIsFreshlyCreated_rootIsEstablishedWithChildrenAndTotalTestsCounter()
             throws Exception {
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
 
         store.suiteStarted("suite", new URI("file:///suite"), 42, newArrayList("s1", "s2"), new ArrayList<>());
 
@@ -57,6 +58,7 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenSuiteStartsAndStoreIsFreshlyCreated_theStoreGetsDirty() throws Exception {
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
 
         store.suiteStarted("suite", new URI("file:///suite"), 42, newArrayList("s1", "s2"), new ArrayList<>());
         assertThat(store.checkDirtyAndReset()).isTrue();
@@ -70,6 +72,7 @@ public class ExecutionStatusStoreTest {
         root.addChildren(newArrayList(current));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setExecutionTree(root);
         store.setCurrent(current);
 
@@ -97,6 +100,7 @@ public class ExecutionStatusStoreTest {
         root.addChildren(newArrayList(current));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setExecutionTree(root);
         store.setCurrent(current);
 
@@ -110,6 +114,7 @@ public class ExecutionStatusStoreTest {
         final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(100, Status.PASS, "");
@@ -126,6 +131,7 @@ public class ExecutionStatusStoreTest {
         final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.SUITE, "suite");
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(100, Status.PASS, "");
@@ -141,6 +147,7 @@ public class ExecutionStatusStoreTest {
         parent.addChildren(newArrayList(previous, current));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(100, Status.PASS, "");
@@ -162,6 +169,7 @@ public class ExecutionStatusStoreTest {
         parent.addChildren(newArrayList(previous, current));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(100, Status.PASS, "");
@@ -177,6 +185,7 @@ public class ExecutionStatusStoreTest {
         parent.addChildren(newArrayList(current, next));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(100, Status.FAIL, "error");
@@ -196,6 +205,7 @@ public class ExecutionStatusStoreTest {
         parent.addChildren(newArrayList(current, next));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(100, Status.PASS, "");
@@ -208,6 +218,7 @@ public class ExecutionStatusStoreTest {
         final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.TEST, "test");
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.testStarted();
@@ -221,6 +232,7 @@ public class ExecutionStatusStoreTest {
         final ExecutionTreeNode current = new ExecutionTreeNode(null, ElementKind.TEST, "test");
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.testStarted();
@@ -236,6 +248,7 @@ public class ExecutionStatusStoreTest {
         parent.addChildren(newArrayList(previous, current));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(42, Status.PASS, "");
@@ -256,6 +269,7 @@ public class ExecutionStatusStoreTest {
         parent.addChildren(newArrayList(current, next));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(42, Status.FAIL, "");
@@ -276,6 +290,7 @@ public class ExecutionStatusStoreTest {
         parent.addChildren(newArrayList(current, next));
 
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setCurrent(current);
 
         store.elementEnded(42, Status.FAIL, "");
@@ -286,6 +301,7 @@ public class ExecutionStatusStoreTest {
     @Test
     public void whenOutputFileIsGenerated_itIsStored() throws Exception {
         final ExecutionStatusStore store = new ExecutionStatusStore();
+        store.open();
         store.setOutputFilePath(new URI("file:///output.xml"));
 
         assertThat(store.getOutputFilePath()).isEqualTo(new URI("file:///output.xml"));

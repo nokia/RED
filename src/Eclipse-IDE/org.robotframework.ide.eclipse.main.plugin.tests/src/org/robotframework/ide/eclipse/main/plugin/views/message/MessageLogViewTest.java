@@ -35,6 +35,7 @@ public class MessageLogViewTest {
 
         final RobotTestsLaunch launch1 = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store1 = new ExecutionMessagesStore();
+        store1.open();
         launch1.getExecutionData(ExecutionMessagesStore.class, () -> store1);
         store1.append("message1\n");
         store1.append("message2\n");
@@ -42,6 +43,7 @@ public class MessageLogViewTest {
 
         final RobotTestsLaunch launch2 = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store2 = new ExecutionMessagesStore();
+        store2.open();
         launch2.getExecutionData(ExecutionMessagesStore.class, () -> store2);
         store2.append("message3\n");
         store2.append("message4\n");
@@ -61,6 +63,7 @@ public class MessageLogViewTest {
 
         final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store = new ExecutionMessagesStore();
+        store.open();
         launch.getExecutionData(ExecutionMessagesStore.class, () -> store);
         store.append("message1\n");
         store.append("message2\n");
@@ -86,6 +89,7 @@ public class MessageLogViewTest {
 
         final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
         final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class).get();
+        store.open();
         store.append("message1\n");
         store.append("message2\n");
 

@@ -50,6 +50,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
+        tracker.eventsProcessingAboutToStart();
         tracker.handleTestStarted(new TestStartedEvent("tc", "test_case", null));
 
         assertThat(store.getMessage()).isEqualTo("Starting test: test_case\n");
@@ -74,6 +75,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
+        tracker.eventsProcessingAboutToStart();
         tracker.handleTestEnded(new TestEndedEvent("tc", "test_case", 100, Status.PASS, ""));
 
         assertThat(store.getMessage()).isEqualTo("Ending test: test_case\n\n");
@@ -98,6 +100,7 @@ public class ExecutionMessagesTrackerTest {
                 ExecutionMessagesStore::new);
 
         final ExecutionMessagesTracker tracker = new ExecutionMessagesTracker(launchContext);
+        tracker.eventsProcessingAboutToStart();
         tracker.handleLogMessage(new MessageEvent("msg", LogLevel.INFO, "stamp"));
 
         assertThat(store.getMessage()).isEqualTo("stamp : INFO : msg\n");
