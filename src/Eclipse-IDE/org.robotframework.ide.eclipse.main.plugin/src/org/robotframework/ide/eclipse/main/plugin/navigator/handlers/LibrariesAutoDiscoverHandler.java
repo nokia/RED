@@ -6,12 +6,17 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -33,32 +38,45 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
         public void addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-            final List<IResource> resources = new ArrayList<>();
-            IProject suitesProject = null;
+            final Set<IResource> resources = new HashSet<>();
+            // we just want to autodiscover for only one project
+            final IProject suitesProject = selectedResources.isEmpty() ? null : selectedResources.get(0).getProject();
 
             for (final IResource resource : selectedResources) {
-                if (resource.getType() == IResource.PROJECT) {
-                    startAutoDiscovering((IProject) resource, new ArrayList<>());
-                    return;
-
-                } else if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER) {
-                    if (suitesProject == null) {
-                        suitesProject = resource.getProject();
-                    }
-                    if (resource.getProject().equals(suitesProject)) {
+                if (resource.getProject().equals(suitesProject)) {
+                    if (resource.getType() == IResource.PROJECT) {
+                        startAutoDiscovering((IProject) resource, new ArrayList<>());
+                        return;
+                    } else if (resource.getType() == IResource.FILE) {
                         resources.add(resource);
+                    } else if (resource.getType() == IResource.FOLDER) {
+                        addResourcesFromFolder((IFolder) resource, resources);
                     }
                 }
             }
 
             if (!resources.isEmpty()) {
-                startAutoDiscovering(suitesProject, resources);
+                startAutoDiscovering(suitesProject, resources.stream().collect(Collectors.toList()));
             }
         }
 
         private void startAutoDiscovering(final IProject project, final List<IResource> resources) {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
             new LibrariesAutoDiscoverer(robotProject, resources).start();
+        }
+
+        private void addResourcesFromFolder(final IFolder folder, final Set<IResource> resources) {
+            try {
+                for (final IResource resource : folder.members()) {
+                    if (resource.getType() == IResource.FILE) {
+                        resources.add(resource);
+                    } else if (resource.getType() == IResource.FOLDER) {
+                        addResourcesFromFolder((IFolder) resource, resources);
+                    }
+                }
+            } catch (final CoreException e) {
+                // nothing to autodiscover
+            }
         }
     }
 }
