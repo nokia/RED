@@ -1,0 +1,117 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _t9mOYJ3DEeWVv_UItyy1RQ
+Element-Name: UTFDisplayingInRedXml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _aMwA4K8aEeeYaeRQ_X32Jg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/13/17 9:29 AM
+Tags: notTestable
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// create second project
+get-view "Project Explorer" | get-tree | select RobotProject | double-click
+get-menu "File/New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text RobotProjectTwo
+    get-button Finish | click
+}
+// add libraries to red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/here_is_class.py" 
+    | get-menu "Robot Framework/Add Library to red.xml" | click
+get-window "Select library class" | get-table | select "here_is_class" | click -default
+get-view "Project Explorer" | get-tree | select "RobotProject/only_function.py" 
+    | get-menu "Robot Framework/Add Library to red.xml" | click
+// verify if libraries are in Robot Referenced libraries
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/here_is_class RobotProject \\(0\\)" | get-property caption 
+        | equals "here_is_class RobotProject (0)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" | get-property caption 
+        | equals "only_function RobotProject (1)" | verify-true
+}
+// verify red.xml if name of libraries are correct
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" 
+    | get-menu "Open With/Text Editor" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_class\" path=\"RobotProject\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+// close red.xml
+get-view "Project Explorer" | click
+get-editor "red.xml" | close
+// rename lib with UTF chars
+get-view "Project Explorer" | get-tree | select "RobotProject/here_is_class.py" | get-menu "Rename..." | click
+with [get-window "Rename Resource"] {
+    with [get-editbox -after [get-label "New name:"]] {
+        click-text 1 14
+        key-type "M1+M3+a" "\\u0105"
+        set-text "here_is_classą.py"
+        key-type "M1+M3+e" "\\u0119"
+        set-text "here_is_classąę.py"
+        key-type "M1+M3+z" "\\u017C"
+        set-text "here_is_classąęż.py"
+        key-type "M1+M3+x" "\\u017A"
+        set-text "here_is_classąężź.py"
+        key-type "M1+M3+c" "\\u0107"
+        set-text "here_is_classąężźć.py"
+    }
+    get-button OK | click
+}
+// rename project mail with UTF chars
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/red.xml" | double-click
+    select RobotProject | get-menu "Rename..." | click
+}
+with [get-window "Rename Resource"] {
+    with [get-editbox -after [get-label "New name:"]] {
+        set-text "RobotProject_"
+        key-type "M1+M3+l" "\\u0142"
+        set-text "RobotProject_ł"
+        key-type "M1+M3+l" "\\u0142"
+        key-type "M1+M3+o" "\\u00F3"
+        set-text "RobotProject_łó"
+        key-type "M1+M3+o" "\\u00F3"
+    }
+    get-button OK | click
+}
+// save red.xml
+with [get-editor "red.xml" | get-text-viewer] {
+    set-caret-pos 15 24
+    key-type "M1+s"
+}
+// verify red.xml
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"here_is_classąężźć\" path=\"RobotProject_łó\"/>\n"
+    + "    <referencedLibrary type=\"PYTHON\" name=\"only_function\" path=\"RobotProject_łó\"/>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>false</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
