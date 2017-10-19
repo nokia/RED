@@ -1,0 +1,49 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _s-ctEA4_EeePcNCRX_abWA,_d8aMACuvEeW667Afdo4DcA,_ThULYA4_EeePcNCRX_abWA,_WHccsLTeEeeDouIrSYj3aA
+Element-Name: TerminateRemoteScript
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _CX4zwLTcEeeDouIrSYj3aA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/19/17 5:37 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+let [val remote_project_path  [format "%s/RemoteLongTest" $user_folder] ]{ 
+	export-agent-to-folder -folder $remote_project_path
+    
+    //run test twice to check port
+	repeat -times 2 -command{
+		run-remote-test-in-background -path $remote_project_path -project_name "RemoteProject" 
+		
+		exec-with-options -disableJobWaiting -command {
+			get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Run As/2 Robot Remote Test" | click
+			wait 2000
+			
+			with [get-view Console] {
+			    click
+			    get-button Terminate | click 
+			}
+		}		
+		
+		//test didn't go to last test nr 7
+		get-view "Message Log" | get-editbox | get-property text | contains "Ending test: RemoteProject.TestFile.test 7"
+		 | verify-false
+		 
+		 with [get-view Console] {
+		 
+		 	//terminate is disabled
+		    get-button Terminate | get-property enablement | equals false | verify-true
+		    
+		    //test was ended
+		    get-text-viewer | get-property text 
+		        | contains "tests finished on client machine" | verify-true
+		}
+	}	
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
