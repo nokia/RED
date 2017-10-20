@@ -1317,6 +1317,16 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.runRfLint"
+          name="Run RfLint analysis">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.clearRfLintMarkers"
+          name="Clear RfLint problems">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.revalidateSelection"
           name="Revalidate selection">
     </command>
@@ -1604,7 +1614,120 @@
 	          </iterate>
 	       </with>
 	    </enabledWhen>
-	 </handler>
+	 </handler>	  
+     <handler
+            class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RunRfLintHandler"
+            commandId="org.robotframework.red.runRfLint">
+        <activeWhen>
+            <with
+                  variable="selection">
+               <and>
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <adapt
+                           type="org.eclipse.core.resources.IResource">
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </and>
+            </with>
+        </activeWhen>
+        <enabledWhen>
+            <with
+                  variable="selection">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <or>
+                     <adapt
+                           type="org.eclipse.core.resources.IFile">
+                        <or>
+                           <test
+                                 property="org.eclipse.core.resources.name"
+                                 value="*.robot">
+                           </test>
+                           <test
+                                 property="org.eclipse.core.resources.name"
+                                 value="*.txt">
+                           </test>
+                           <test
+                                 property="org.eclipse.core.resources.name"
+                                 value="*.tsv">
+                           </test>
+                        </or>
+                     </adapt>
+                     <adapt
+                           type="org.eclipse.core.resources.IFolder">
+                     </adapt>
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                     </adapt>
+                  </or>
+               </iterate>
+            </with>
+         </enabledWhen>
+     </handler>
+     <handler
+           class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RfLintMarkersClearHandler"
+           commandId="org.robotframework.red.clearRfLintMarkers">
+        <activeWhen>
+           <with
+                 variable="selection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <adapt
+                       type="org.eclipse.core.resources.IResource">
+                    <test
+                          property="org.eclipse.core.resources.projectNature"
+                          value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                    </test>
+                 </adapt>
+              </iterate>
+           </with>
+        </activeWhen>
+        <enabledWhen>
+           <with
+                 variable="selection">
+              <iterate
+                    ifEmpty="false"
+                    operator="or">
+                 <or>
+                    <adapt
+                          type="org.eclipse.core.resources.IFile">
+                       <or>
+                          <test
+                                property="org.eclipse.core.resources.name"
+                                value="*.robot">
+                          </test>
+                          <test
+                                property="org.eclipse.core.resources.name"
+                                value="*.txt">
+                          </test>
+                          <test
+                                property="org.eclipse.core.resources.name"
+                                value="*.tsv">
+                          </test>
+                       </or>
+                    </adapt>
+                    <adapt
+                          type="org.eclipse.core.resources.IFolder">
+                    </adapt>
+                    <adapt
+                          type="org.eclipse.core.resources.IProject">
+                    </adapt>
+                 </or>
+              </iterate>
+           </with>
+        </enabledWhen>
+     </handler>
 	
  </extension>
  <extension
@@ -3399,6 +3522,20 @@
           <command
                 commandId="org.robotframework.red.revalidateSelection"
                 label="Revalidate"
+                style="push">
+          </command>
+          <separator
+                name="rflint"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.red.runRfLint"
+                label="Run RfLint analysis"
+                style="push">
+          </command>
+          <command
+                commandId="org.robotframework.red.clearRfLintMarkers"
+                label="Clean RfLint problems"
                 style="push">
           </command>
           <separator
@@ -5606,6 +5743,17 @@
    <extension
          id="robotProblem"
          name="Robot Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+   </extension>
+   <extension
+         id="rfLintProblem"
+         name="RfLint Problem"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">
