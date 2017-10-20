@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _46WUAFTXEea8WJ7bbC6OBw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/21/17 11:09 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 2:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -134,7 +134,7 @@ proc "check-submenu-for-kw" [val row_enabled true] [val is_move_enabled true] [v
 	        
 	}
 	//chec tooltip
-	if [$is_product | eq true]{
+	if [and [$is_product] [$is_eclipse_oxygen |not ]]{
 		
 		get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Table/Expand All"
 		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -219,9 +219,10 @@ proc "check-menu-for-kw"{
 	    get-property "getMenu().getItems().MenuItem[15].getText()" | equals "References" | verify-true
 	}
 	
-	if [$is_product | eq true]{
+	if [and [$is_product] [$is_eclipse_oxygen | not ]]{
 		check-tooltip
-	}		
+	}	
+	
 }	
 	
 
@@ -263,7 +264,7 @@ proc "check-menu-for-buton" {
 	    
 	}  
 	
-	if [$is_product | eq true]{
+	if [and [$is_product] [$is_eclipse_oxygen | not ]]{
 		check-tooltip -is_button true
 	}	
 }

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _U-Q_oH6PEeeu6rJQMxkPvw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/1/17 2:30 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 2:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -266,7 +266,11 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     key-type "M1+1"
     key-type Enter
 }
-get-editor "ProjectWithResource/red.xml" | get-section "Referenced libraries" | get-editbox | key-type "M1+s"
+if [$is_eclipse_oxygen | equals False]{
+	get-editor "ProjectWithResource/red.xml" | get-section "Referenced libraries" | get-editbox | key-type "M1+s"
+}-else{	
+	get-editor "ProjectWithResource/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+}	
 get-editor "TestSuite.robot" | click
 get-editor "ProjectWithResource/red.xml" | close
 with [get-editor "TestSuite.robot" | get-text-viewer] {
