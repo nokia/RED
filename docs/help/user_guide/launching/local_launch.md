@@ -68,7 +68,7 @@ scripting](local_launch_scripting.md) topic in this guide.
 At this tab environment variables can be specified for robot tests process.
 There are 3 possibilities:
 
-  * no variable is specified (**default**) - the robot process will be launched with variables inherited from running RED/eclipse instance,
+  * no variable is specified ( **default** ) - the robot process will be launched with variables inherited from running RED/eclipse instance,
   * variable(s) specified, in append mode - the robot process will be launched with variables inherited from running RED/eclipse, but with specified variables appended,
   * variable(s) specified, in replace mode - the robot process will only get those variables which are defined in table.
 

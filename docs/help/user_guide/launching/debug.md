@@ -1,41 +1,50 @@
 ## Debugging Robot
 
-Debug functionality is unique way of checking what is happening during
-TestCase and TestSuite execution. It works similar as debug functionality in
-most of programming languages - it allows to track execution of program for
-checking unwanted behavior either on TestCase side or in tested software.
-
-It is important to note that Debug functionality works only with text editor
-(debug actions can be set only there) therefore it is crucial to active it
-before switching to Debug perspective.
-
-Try to not make changes in script in Debug mode as Eclipse have a problem with
-following changes respectful to Breakpoints.
+Debug functionality is unique way of checking what is happening during tests
+execution. It works similar as debug functionality in most of programming
+languages - it allows to track execution of a program for checking unwanted
+behavior either on tests side or in tested software.
 
 Note
 
-    Step-into works only for Robot written Keywords. If you wish to step-into Python Keywords, check [Debug Robot and Python scripts](robot_python_debug.md) help content. 
+    Avoid making changes in scripts/suites when debugging as you may encounter problems with finding proper code elements to suspend on. 
+
+Note
+
+    Step-into works only for Robot written Keywords. If you wish to step-into Python Keywords, check [Debug Robot and Python scripts](debug/robot_python_debug.md) help content. 
 
 ### Basics
 
-In order to work with Debug, save the file beforehand. If you made any changes
-in Table editors, close and reopen file so changes will be visible in Source
-tab. Activate Source page and change to Debug perspective:
+In order to work with debugger please save any unsaved files beforehand.
+Debugging is done inside **Debug** perspective however you don't need to
+activate it as by default RED will ask if you want to activate it once the
+tests execution suspends. The same is true for editors: debugger will open an
+editor with currently executing file when suspended.
 
-![](images/debug_1.png)
+Execution may be suspended due to couple of reasons:
 
-Debug perspective looks as follows:
+  * **user requested suspend** \- this is done by pressing **Suspend** button as described in [Controlling execution topic](exec_control.md), 
 
-![](images/debug_2.png)
+  * **breakpoint hit** \- whenever [breakpoint](debug/breakpoints.md) (a place in code) defined by the user have been hit, 
+
+  * **erroneous state suspension** \- debugger may go into erroneous state. This may happen when running tests locally (for example when test uses unknown keyword) however it is more probable in remote execution when local code does not exactly match remote code. By default RED will ask if execution should suspend but this behavior is configurable in [preferences](debug/preferences.md), 
+
+  * **end of step** \- when suspended due to one of reasons above user may ask debugger to perform a step (e.g. step over current keyword call), such step will result in another suspension just after current instruction. 
+
+For more information about suspending execution and working with it please
+refer to [ Suspended execution](debug/suspended_execution.md) topic.
+
+### Starting debugging session
 
 #### Place breakpoint in RobotFramework executable code
 
-First thing with working with Debug is to place at least one breakpoint. This
-allows RED to pause Debug execution and activate Stepping options. To place
-breakpoint in Source view click on line in script and under right click menu
-choose Add breakpoint. You can also add breakpoint directly by clicking on
-line number in Source editor view. When successful, blue ball icon will appear
-next to it, new breakpoint entry will be visible in Breakpoint lists.
+First thing when working with debugger is to place at least one breakpoint.
+This allows RED to pause the execution and activate stepping options. You may
+add breakpoint inside the editor at **Source** page either by double clicking
+on left-side ruler, choosing **Toggle breakpoint** option from context menu of
+this ruler or by hitting  Ctrl+Shift+B shortcut (this will add breakpoint for
+the line in which the caret is located). When successful, blue ball icon will
+appear next to it and new breakpoint entry will be visible in Breakpoint view.
 
 #### Start Debug
 
@@ -44,58 +53,13 @@ debug mode. For example by clicking on "green bug" icon at the top toolbar:
 
 ![](images/debug_3.png)
 
-#### Limiting TestCases to be debugged
+#### Limiting test cases to be debugged
 
-Limit works just like TestCase limitation in Robot perspective. In order to
-limit which TC will be executed in Debug, open [ Run -> Debug
+You may edit the launch configuration in order to limit test cases which
+should be executed in your debug session. Open [ Run -> Debug
 Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenDebugConfigurations'\))
 dialog and choose which cases should be executed:
 
-![](images/debug_4.png)
-
-### Working with Debug
-
-#### Breakpoints and execution stepping
-
-Breakpoints are essential items, each pause execution and allows to initiate
-Debug actions. When breakpoint line is activated during execution, following
-icons are active:
-
-![](images/debug_5.png)
-
-moving from left to right:
-
-  * **Skip All Breakpoints** \- allow to continue execution onwards without stopping on defined breakpoints
-  * **Resume** \- resumes test execution
-  * **Pause**
-  * **Stop**
-  * **Disconnect**
-  * **Step Into** \- F5 \- each F5 key press will execute active line and move to next one. If active line consists Keyword or embedded TestCase, test executor will jump into item and execute it line by line. To exit from executing inherited items use Step Return (F7)
-  * **Step Over** \- F6 \- each F6 key press will execute active line and move to next one. If keyword exists in current line, keyword result will be returned without going into Keyword content
-  * **Step Return** \- F7 \- allows to return to main TestCase execution from embedded TestCase or Keyword if Step Into was used before
-
-List of breakpoints can be seen in upper right side of the Debug perspective
-in **Breakpoints** view:
-
-![](images/debug_breakpoints.png)
-
-  * each breakpoint can be enabled/disabled
-  * each breakpoint can be removed
-  * for each breakpoint, action condition can be set: 
-    * Hit count: breakpoint pause execution only after selected number of previous hits. Useful to activate breakpoint inside a loop statement on certain iteration
-    * Conditional: expression when pass will activate breakpoint. Expression should be in RobotFramework syntax, for instance: `Should be Equal ${variable} 10`
-
-#### Variables watch
-
-Variables can be watched and changed during TestCase Debug. All actions
-related to variables are accessible in **Variables** view which is shared with
-Breakpoints list. Variables are only shown during TestCase execution.
-
-![](images/debug_variables.png)
-
-At the top of the list, TestCase variables are displayed followed by RF
-environmental variables. Each variable can be changed during test run during
-breakpoint event. When variable is changed, it is indicated by distinct colour
-in the list.
+![](images/debug_4.png)  
 
 [Return to Help index](http://nokia.github.io/RED/help/)
