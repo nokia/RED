@@ -46,5 +46,3 @@ Installation instructions can be found [here](https://github.com/nokia/RED/blob/
 
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/validation.gif "Validation")
 
-
-
