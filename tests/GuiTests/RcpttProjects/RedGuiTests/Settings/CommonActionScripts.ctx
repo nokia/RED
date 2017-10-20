@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/5/17 1:25 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 3:11 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -95,6 +95,12 @@ global [val user_folder [get-java-property "user.home"]]
 
 global [val sys_sep [os-specific "\\" "/"]]
 
+if [$is_eclipse_oxygen]{
+	global [val doc_editbox_selector "-after [get-label \"Provide test suite documentation and general settings\"]"]
+}-else{
+	global [val doc_editbox_selector "index 1"]
+}
+
 //--------------------------------------------------------------------------------------------
 
 //concatenate strings in list with regex to check MEssage Log view (for short log)
@@ -155,14 +161,14 @@ proc "wait-for-zero-items"[val times] [val delay]{
 	}
 }
 
-proc "wait-for-console" [val times 10] [val delay 1000]{
+proc "wait-for-console" [val times 4] [val delay 1000]{
 	try -times $times -delay $delay -command{
 		get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
 	}
 }
 
 
-proc "wait-for-message-log" [val times 10] [val delay 1000]{
+proc "wait-for-message-log" [val times 4] [val delay 1000]{
 	try -times $times -delay $delay -command{
 		get-view "Message Log" | get-editbox | get-property text | equals "" | verify-false
 

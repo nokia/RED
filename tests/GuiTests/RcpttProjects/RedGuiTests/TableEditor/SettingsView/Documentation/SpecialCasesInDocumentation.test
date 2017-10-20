@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _FOu6MDSAEeat08T3d_ERug
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/8/16 2:42 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 3:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,31 +19,31 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
     get-link "Section is not yet defined, do you want to create it?" | click
-    with [get-section General | get-editbox -index 1] {
-        click
-        set-focus
-        type-text a
-        key-type Enter
-        type-text " "
-        key-type Enter
-        type-text b
-        key-type Enter
-        type-text "c\\ "
-        key-type "M1+s"
+    with [get-section General | get-editbox $doc_editbox_selector] {
+	        click
+	        set-focus
+	        type-text a
+	        key-type Enter
+	        type-text " "
+	        key-type Enter
+	        type-text b
+	        key-type Enter
+	        type-text "c\\ "
+	        key-type "M1+s"
     }
 }
 
 //check text in box (the space after "c" is not visible by rcppp because focus is missing during validation)
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "a\n \nb\n"
+get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector | get-property text | equals "a\n \nb\n"
     + "c\\" | verify-true
 
 //set focus on red.xml    
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml"
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "a\n \nb\n"
+get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector | get-property text | equals "a\n \nb\n"
     + "c\\" | verify-true
 
 // set text to see that space is visibe 
-with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
+with [get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector] {
 	//this is workaround to click on window
 	click
 	set-focus
@@ -53,11 +53,11 @@ with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] 
     type-text after
 }
 //check text
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "a\n \nb\n"
+get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector | get-property text | equals "a\n \nb\n"
     + "c\\ after" | verify-true
     
 //add 3 enters and save    
-with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
+with [get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector] {
 	click
 	set-focus
 	set-text-offset 0 0
@@ -67,11 +67,11 @@ with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] 
 }
 
 //check text (enters are not visible during validation)
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "a\n \nb\n"
+get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector | get-property text | equals "a\n \nb\n"
     + "c\\ after" | verify-true
     
 //but add new char    
-with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
+with [get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector] {
 	click
 	set-focus
 	set-text-offset 0 0
@@ -81,11 +81,11 @@ with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] 
 }
 
 //check tha those new line are in text box
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "a\n \nb\n"
+get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector | get-property text | equals "a\n \nb\n"
     + "c\\ after\n\n\n"
     + "d" | verify-true
   
-//get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "a\n \nb\n"
+//get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector | get-property text | equals "a\n \nb\n"
 //    + "c\\ after\n\n"
 //    + "d" | verify-true
       
@@ -106,7 +106,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 //add new chars and check where is caret after saving
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox $doc_editbox_selector] {
     	click
     	set-focus
     	set-text-offset 0 0
@@ -115,7 +115,7 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+s"
     }
 }
-with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
+with [get-editor "TestFile.robot" | get-section General | get-editbox $doc_editbox_selector] {
     get-property "caretPosition.line" | equals 7 | verify-true
     get-property "caretPosition.column" | equals 6 | verify-true
 }    
