@@ -287,6 +287,14 @@ public class RedPreferences {
         public RGB getRgb() {
             return color;
         }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == this) return true;
+            if (!(obj instanceof ColoringPreference)) return false;
+            ColoringPreference pref = (ColoringPreference)obj;
+            return pref.color.equals(this.color) && pref.fontStyle == this.fontStyle;
+        }
     }
 
     public enum SeparatorsMode {
