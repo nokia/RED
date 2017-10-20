@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _thSjIFmPEea7jMRO_K8Wdw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/12/16 11:21 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 3:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,7 @@ with [get-editor "TestFile.robot"] {
     get-link "Section is not yet defined, do you want to create it?" | click
     
     //add new lines at the end
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
         set-text-offset 0 0
         type-text a
         key-type "NUMPAD_ENTER" "\\u000D"
@@ -50,7 +50,7 @@ get-editor "TestFile.robot" | close
 //open and check if empty lines are visbile in doc view
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 with [get-editor "TestFile.robot"] {
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
     	//add new char
         set-text-offset 0 4
         key-type Down
@@ -70,7 +70,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 //remove empty last line and empty lines    
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
         set-text-offset 1 4
         key-type BackSpace -times 3
     }
