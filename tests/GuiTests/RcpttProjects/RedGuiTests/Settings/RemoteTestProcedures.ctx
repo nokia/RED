@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _s-ctEA4_EeePcNCRX_abWA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/2/17 10:04 AM
+Save-Time: 10/19/17 5:38 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -33,10 +33,16 @@ proc "run-remote-test" [val path] [val project_name "TestFile"] [val test "TestF
 	}
 }
 
+// path - path where is Agent
+// project_name - this is remote project name
+// IP - IP of remote connection
+// port - port
+// path to remote project is $path+$project name, so Agent must be in project
 proc "run-remote-test-in-background" [val path] [val project_name] [val IP ""] [val timeout ""]{
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-//		log [concat "python.exe\"" " -m " "robot.run" " --listener " [concat "\"" $path "\\TestRunnerAgent.py" $IP ":43981" $timeout "\""]   " -s " [concat $project_name ".TestFile "]  [concat "\"" $path "\\" $project_name "\""]]
-			exec-process  "cmd.exe"  "/c" "start" "\"\""  "\"python.exe\"" "-m" "robot.run" "--listener" [concat "\"" $path "\\TestRunnerAgent.py" $IP ":43981" $timeout "\""]   "-s" [concat $project_name ".TestFile"]  [concat "\"" $path "\\" $project_name "\""] -timeout 3 
+//		    log [concat "python.exe\"" " -m " "robot.run" " --listener " [concat "\"" $path "\\TestRunnerAgent.py" $IP ":43981" $timeout "\""]   " -s " [concat $project_name ".TestFile "]  [concat "\"" $path "\\" $project_name "\""]]
+			exec-process  "cmd.exe"  "/c" "start" "\"\""  "\"python.exe\"" "-m" "robot.run" "--listener" 
+			[concat "\"" $path "\\TestRunnerAgent.py" $IP ":43981" $timeout "\""]   "-s" [concat $project_name ".TestFile"]  [concat "\"" $path "\\" $project_name "\""] -timeout 3 
 	}-else{
 			exec-process  "gnome-terminal" "-e" [format "python -m robot.run --listener %s/TestRunnerAgent.py%s:43981%s -s %s.TestFile %s/%s" $path $IP $timeout $project_name $path $project_name]
 			wait 2000
@@ -49,4 +55,5 @@ proc "check-debug-error-for-wrong-state"{
 	    | get-property caption | equals "RED debugger have entered into an erroneous state.\n\n"
 	    + "Do you want the debugger to suspend the execution now?" | verify-true
 }
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
