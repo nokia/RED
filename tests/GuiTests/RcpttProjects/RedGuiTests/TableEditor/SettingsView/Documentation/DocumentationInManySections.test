@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _E0anoDR-Eeat08T3d_ERug
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/27/17 2:16 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 4:19 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -20,7 +20,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 
 //check Doc in Settings view
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "doc1\n"
+get-editor "TestFile.robot" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "doc1\n"
     + "doc2\n"
     + "doc3\n"
     + "doc4\n"
@@ -29,7 +29,7 @@ get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-p
     
 //add new line at the end     
 with [get-editor "TestFile.robot"] {
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
         set-text-offset 4 5
         key-type "NUMPAD_ENTER" "\\u000D"
         type-text "new line"
@@ -63,7 +63,7 @@ with [get-editor "TestFile.robot"] {
     }
     //go to Setting view and at in the second line
     get-tab-folder | get-tab-item Settings | click
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
         set-text-offset 4 0
         key-type Enter
         type-text "second line"
@@ -113,7 +113,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Setting ***\n"
     
 //go to Settings    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "doc1\n"
+get-editor "TestFile.robot" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "doc1\n"
     + "doc2\n"
     + "doc3\n"
     + "doc4\n"
@@ -146,10 +146,10 @@ with [get-editor "tsv_file.tsv"] {
 
 //check Settings view
 get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Settings | click
-get-editor "tsv_file.tsv" | get-section General | get-editbox -index 1 | click
+get-editor "tsv_file.tsv" | get-section General | get-editbox [$doc_editbox_selector] | click
 
 try -times 8 -delay 1000 -command{
-	get-editor "tsv_file.tsv" | get-section General | get-editbox -index 1 | get-property text | equals "Robot ver4\n"
+	get-editor "tsv_file.tsv" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "Robot ver4\n"
 	    + "second" | verify-true
 }	
 
@@ -167,6 +167,6 @@ with [get-editor "tsv_file.tsv"] {
 }
 
 try -times 8 -delay 1000 -command{
-	get-editor "tsv_file.tsv" | get-section General | get-editbox -index 1 | get-property text | equals second | verify-true
+	get-editor "tsv_file.tsv" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals second | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

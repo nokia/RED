@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _PmmBEH5zEeeUiMBqkyjlBQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 11:06 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 4:13 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -97,7 +97,7 @@ with [get-window Preferences] {
     get-tree | select "Robot Framework/Launching/Default Launch Configurations"
     get-group "Listener tab" | get-editbox -after [get-label "Server connection timeout [s]:"] | set-text 15
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 //change test content - now there part of test is different
 get-view "Project Explorer" | get-tree | select "RemoteProject/TestFile.robot" | double-click
@@ -205,7 +205,7 @@ let [val remote_project_path  [format "%s/Remote" $user_folder] ]{
 		    | equals "The keyword BuiltIn.Log is not a User Keyword but is written in external library. RED debugger alone is not able to debug both Robot and python code however it is possible to setup cooperation with other debugger (PyDev for example).\r\n"
 		    + "For more information on setting up Robot and Python debugging sessions please refer to RED user guide in help system.\r\n"
 		    + "\r\n"
-		    + " Click here to try opening source of this keyword.\r\n"
+		    + "Click here to try opening source of this keyword.\r\n"
 		    + "\r\n"
 		    + "Note: if you don't want to see this page you can configure debugger in Preferences so that it will never suspend inside library keywords when stepping.\r\n" 
 		    | verify-true

@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Z2XpsP28EeaFC_dPBuoMWQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/3/17 11:05 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 4:11 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -102,6 +102,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//check if list has chanaged fisr value (because parm $a was changed)
 	get-view Variables | get-tree | get-item "@{has list and variable}" | expand-all
+	wait-for-value-in-varaibles-view -item "@{has list and variable}/\\[4\\]" -value "here is string"
 	with [get-view Variables | get-tree] {
 	    get-item "@{has list and variable}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{has list and variable}/\\[0\\]" | get-property "values['Value']" | equals "text with space" 
@@ -127,7 +128,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	//change value in simple list (last value is param)
 	get-view Variables | get-tree | get-item "@{my list}" | expand-all
-	wait 200
+	wait-for-value-in-varaibles-view -item "@{my list}/\\[3\\]" -value "here is string"
 	change-value -var_name "@{my list}/\\[0\\]" -value "first item"
 	wait 500
 	with [get-view Variables | get-tree] {

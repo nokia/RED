@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _YgoMMDSBEeat08T3d_ERug
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/13/17 1:19 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 3:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,12 +18,12 @@ Entry-Name: .content
 get-view "Project Explorer" | get-tree | select "RobotProject/res.tsv" | double-click
 with [get-editor "res.tsv"] {
     get-tab-folder | get-tab-item Settings | click
-    get-section General | get-editbox -index 1 | set-text-selection -offset 5 -startLine 2 -endLine 0 -endOffset 0
+    get-section General | get-editbox [$doc_editbox_selector] | set-text-selection -offset 5 -startLine 2 -endLine 0 -endOffset 0
     get-button "Delete Settings section" | click
 }
 wait 1000
 //check if selected text was removed
-get-editor "res.tsv" | get-section General | get-editbox -index 1 | get-property text | equals "" | verify-true
+get-editor "res.tsv" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "" | verify-true
 get-button "Save \((Ctrl|M1)\+S\)" | click
 
 //go to Source and check
@@ -39,7 +39,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | do
 //remove content by backspace
 get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Settings | click
 with [get-editor "tsv_file.tsv"] {
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
     	click
     	set-focus
     	set-text-offset 0 0
@@ -68,7 +68,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 //remove one item from one section and one item from second section
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
     	click
     	set-focus
     	set-text-offset 0 0
@@ -116,7 +116,7 @@ with [get-editor "TestFile.robot"] {
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
 
 try -times 7 -delay 1000 -command{
-	get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "doc1\n"
+	get-editor "TestFile.robot" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "doc1\n"
 	    + "doc2\n"
 	    + "doc3\n"
 	    + "doc4\n"
@@ -126,7 +126,7 @@ try -times 7 -delay 1000 -command{
     
 with [get-editor "TestFile.robot"] {       
     //remove all items from second section
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
     	click
     	set-focus
         set-text-selection -offset 4 -startLine 5 -endLine 3 -endOffset 0
@@ -162,7 +162,7 @@ with [get-editor "TestFile.robot"] {
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
 
 try -times 7 -delay 1000 -command{
-	get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "doc1\n"
+	get-editor "TestFile.robot" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "doc1\n"
 	    + "doc2\n"
 	    + "doc3\n"
 	    + "doc4\n"
@@ -171,7 +171,7 @@ try -times 7 -delay 1000 -command{
 }     
 with [get-editor "TestFile.robot"] {
     //remove first line
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
     	click
     	set-focus
     	set-text-offset 0 0
@@ -215,11 +215,11 @@ with [get-editor "TestFile.robot"] {
 }
 try -times 4 -delay 1000 -command{
 	//check thate Doc is empty in view
-	get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "" | verify-true
+	get-editor "TestFile.robot" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "" | verify-true
 }
 //add new word
 with [get-editor "TestFile.robot"] {
-    with [get-section General | get-editbox -index 1] {
+    with [get-section General | get-editbox [$doc_editbox_selector]] {
     	click
     	set-focus
         set-text-offset 0 0
@@ -252,7 +252,7 @@ with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
 }
 try -times 6 -delay 1000 -command{
-	get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "" | verify-true
+	get-editor "TestFile.robot" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "" | verify-true
 }
 
 
