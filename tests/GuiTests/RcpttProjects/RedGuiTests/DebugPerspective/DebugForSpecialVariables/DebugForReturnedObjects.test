@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _uTxjELYgEeazMIT-6yPcSw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 2:53 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 5:21 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -79,10 +79,8 @@ exec-with-options -disableJobWaiting -command {
 	
 	get-view Variables | get-tree | get-item ".*" -index 0 | expand-all
 	try -delay 500 -times 5 -command{
-		with [get-view Variables | get-tree] {
-		    get-item "&{map}/<lib_returns_obj.A object at .*>" | get-property "values['Name']" 
-		        | equals "<lib_returns_obj.A object at .*>" | verify-true
-		}	        
+		get-view Variables | get-tree | get-item -path "&{map}/key2" | get-property "values['Value']" 
+    		| not-eq "" | verify-true        
 	}
 	with [get-view Variables | get-tree] {
 	    get-item "&{map}/<lib_returns_obj.A object at .*>" | get-property "values['Name']" 
