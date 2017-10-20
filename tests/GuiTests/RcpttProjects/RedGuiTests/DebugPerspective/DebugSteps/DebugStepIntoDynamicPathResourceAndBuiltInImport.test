@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _5GosELXwEeWiPpdsqt1XOg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 3:11 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 5:16 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -48,15 +48,7 @@ exec-with-options -disableJobWaiting -command {
 get-button Robot | click
 get-view "Project Explorer" | get-tree | select "DebugResourceImport/RobotViaParameters.robot" | double-click
 
-
-with [get-editor "RobotViaParameters.robot" | get-left-ruler] {
-    with [get-ruler-column AnnotationColumn] {
-        hover-ruler -line 7
-        click-ruler -line 7 -button Right
-    }
-    get-menu "Toggle Breakpoint" | click
-}    
-
+get-editor "RobotViaParameters.robot" | get-left-ruler | get-ruler-column AnnotationColumn | double-click-ruler 7
 	    
 exec-with-options -disableJobWaiting -command {	    
 	get-editor "RobotViaParameters.robot" |  key-type F11
