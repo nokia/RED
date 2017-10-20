@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _4qmyUPRNEeaWpbE3jg39cA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 11:02 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 5:23 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -72,7 +72,7 @@ exec-with-options -disableJobWaiting -command {
 	    | contains "INFO : 4" | verify-true
 	get-button "Resume (F8)" | click
 }
-wait-for-console
+wait-for-console -times 10 -delay 1000
 	
 //add incorrect conditional
 with [get-view Breakpoints] {
@@ -95,7 +95,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	get-button "Resume (F8)" | click
 }
-wait-for-console
+wait-for-console -times 10 -delay 1000
 
 //set count that will be never true
 with [get-view Breakpoints | get-editbox] {
@@ -108,8 +108,8 @@ with [get-view Breakpoints | get-editbox] {
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 12 17
 get-button "Debug.*" | click -arrow
 get-menu "Debug As/1 Robot Test" | click
-wait-for-console
 
+wait-for-console -times 10 -delay 1000
 get-view "Message Log" | get-editbox | get-property text 
     | contains "Ending test: RobotProject.TestFile.Continue Example" | verify-true
 	
