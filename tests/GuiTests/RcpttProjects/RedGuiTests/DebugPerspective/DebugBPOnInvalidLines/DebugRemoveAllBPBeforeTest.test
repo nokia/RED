@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _SLjU0BEbEeWWSplrwZ3vkg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 12:27 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 3:59 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -43,7 +43,7 @@ get-view Breakpoints | get-tree | get-property itemCount | equals 0 | verify-tru
 get-button "Open Perspective" | click
 with [get-window "Open Perspective"] {
     get-table | select "Robot( \\(default\\))?"
-    get-button OK | click
+    get-button $Open_Perspective_button | click
 }
 
 //get-menu "Window/Perspective/Open Perspective/Other..." | click

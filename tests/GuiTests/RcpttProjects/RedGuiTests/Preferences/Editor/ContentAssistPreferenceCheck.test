@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Nu4IgJQdEeWNpL9oeriwCw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/17 2:42 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 3:48 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -80,7 +80,7 @@ with [get-window Preferences] {
     get-tree | select "Robot Framework/Editor/Content Assist"
     get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | check
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
 // write new keyword with content assist
@@ -130,7 +130,7 @@ get-preferences-menu | click
 with [get-window Preferences] {
     get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | uncheck
     get-button Apply | click
-    get-button OK | click
+    get-button $Apply_and_OK_in_preference | click
 }
 
 //set caret after "Ca" - Catenate will fit too
