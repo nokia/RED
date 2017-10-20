@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _RBRS8DlIEeaMk_UgyvYHpA
-Runtime-Version: 2.1.0.201603192319
-Save-Time: 8/25/17 7:54 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 5:43 PM
 Tags: Quick
 Testcase-Type: ecl
 
@@ -19,17 +19,10 @@ Entry-Name: .content
 //open file
 get-view "Project Explorer" | get-tree | select "SettingsProject/Script.robot" | double-click
 get-editor "Script.robot" | get-tab-folder | get-tab-item Settings | click
-get-editor "Script.robot" | get-section General | get-editbox -index 1 | get-property text 
+get-editor "Script.robot" | get-section General | get-editbox [$doc_editbox_selector]| get-property text 
     | equals "${a} @{b} &{c} - special characters !@#$%^&*()_+<>?:{}[]\n"
     + "\tNew line\n"
     + "Escaped tab: '\\t'with tab. Here: '\t'" | verify-true
-
-//this is for Oxygen    
-//get-editor "Script.robot" | get-section General | get-editbox 
-//    -after [get-label "Provide test suite documentation and general settings"] | get-property text 
-//    | equals "${a} @{b} &{c} - special characters !@#$%^&*()_+<>?:{}[]\n"
-//    + "\tNew line\n"
-//    + "Escaped tab: '\\t'with tab. Here: '\t'" | verify-true
     
 //make full screen
 with [get-editor "Script.robot"] {
@@ -114,7 +107,7 @@ check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 6 -import "Lib
 
 get-view "Project Explorer" | get-tree | select "SettingsProject/res.robot" | double-click
 get-editor "res.robot" | get-tab-folder | get-tab-item Settings | click
-get-editor "res.robot" | get-section General | get-editbox -index 1 | get-property text | equals "" | verify-true
+get-editor "res.robot" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "" | verify-true
 with [get-editor "res.robot"] {
     with [get-section General] {
         click
@@ -128,7 +121,7 @@ get-view "Project Explorer" | get-tree | select "SettingsProject/res3.tsv" | dou
 get-editor "res3.tsv" | get-tab-folder | get-tab-item Settings | click
 wait 1000
 
-get-editor "res3.tsv" | get-section General | get-editbox -index 1 | get-property text | equals "Resoure doc\n"
+get-editor "res3.tsv" | get-section General | get-editbox [$doc_editbox_selector] | get-property text | equals "Resoure doc\n"
     + "with 2 lines..." | verify-true
 
 check-imports-row-for-default-or_11_columns -file "res3.tsv" -row 1 -import "Library" -name "OperatingSystem" 
