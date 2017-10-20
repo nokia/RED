@@ -399,6 +399,15 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
         }
     }
 
+    @Override
+    public void runRfLint(final String host, final int port, final File filepath) {
+        try {
+            callRpcFunction("runRfLint", host, port, filepath.getAbsolutePath());
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+        }
+    }
+
     private Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
         final Object rpcResult = client.execute(functionName, arguments);
         return resultOrException(rpcResult);

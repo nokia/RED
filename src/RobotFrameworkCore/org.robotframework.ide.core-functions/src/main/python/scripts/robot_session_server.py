@@ -183,6 +183,28 @@ def stop_library_auto_discovering():
     import red_library_autodiscover
     red_library_autodiscover.stop_library_auto_discovering_process()
 
+    
+@logresult
+@encode_result_or_exception
+@logargs
+def run_rf_lint(host, port, filepath):
+    import subprocess
+    import os
+    
+    try:
+        import rflint
+        import rflint_integration
+    except Exception as e:
+        raise RuntimeError('There is no rflint module installed for ' + sys.executable + ' interpreter')
+
+    command = [sys.executable]
+    command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rflint_integration.py'))
+    command.append(host)
+    command.append(str(port))
+    command.extend(['-r', filepath])
+
+    subprocess.Popen(command, stdin=subprocess.PIPE)
+
 
 @logresult
 @encode_result_or_exception
@@ -289,6 +311,7 @@ if __name__ == '__main__':
     server.register_function(is_virtualenv, 'isVirtualenv')
     server.register_function(start_library_auto_discovering, 'startLibraryAutoDiscovering')
     server.register_function(stop_library_auto_discovering, 'stopLibraryAutoDiscovering')
+    server.register_function(run_rf_lint, "runRfLint")
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
 
