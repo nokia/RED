@@ -35,8 +35,10 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -63,6 +65,8 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     private Button boldButton;
 
     private Button italicButton;
+
+    private Combo presetColors;
 
     private ListViewer viewer;
 
@@ -112,9 +116,11 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         italicButton.setEnabled(false);
         italicButton.addSelectionListener(new FontStyleButtonSelectionListener(SWT.ITALIC));
 
-        final Label label = new Label(parent, SWT.NONE);
-        label.setText("Preview:");
-        GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+        preparePresetsCombo(parentForSingleSettings);
+
+        final Label previewLabel = new Label(parent, SWT.NONE);
+        previewLabel.setText("Preview:");
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(previewLabel);
 
         previewText = new StyledText(parent, SWT.BORDER);
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(previewText);
@@ -125,6 +131,45 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         new Label(parent, SWT.NONE);
 
         refreshPreview();
+    }
+
+    private void preparePresetsCombo(final Composite parent) {
+        final Group presetsGroup = new Group(parent, SWT.NONE);
+        GridDataFactory.fillDefaults().indent(0, 20).grab(true, false).span(2, 1).applyTo(presetsGroup);
+        GridLayoutFactory.fillDefaults().applyTo(presetsGroup);
+        final Label predefinedLabel = new Label(presetsGroup, SWT.NONE);
+        predefinedLabel.setText("Use predefined syntax coloring:");
+        GridDataFactory.fillDefaults().span(2, 1).applyTo(predefinedLabel);
+
+        presetColors = new Combo(presetsGroup, SWT.READ_ONLY);
+        presetColors.add("default");
+        presetColors.add("heliophobia");
+        presetColors.add("custom");
+        presetColors.addSelectionListener(new PresetSelectionListener());
+        setPresetLabel();
+
+    }
+
+    private void setPresetLabel() {
+        boolean possiblePreset = true;
+        for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
+            if (!currentPreferences.get(category).equals(category.getDefault())) {
+                possiblePreset = false;
+                break;
+            }
+        }
+        if (possiblePreset) {
+            presetColors.select(0);
+            return;
+        }
+
+        for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
+            if (!currentPreferences.get(category).equals(category.getDark())) {
+                presetColors.select(2);
+                return;
+            }
+        }
+        presetColors.select(1);
     }
 
     private void refreshPreview() {
@@ -242,6 +287,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
             currentPreferences.put(category, category.getDefault());
         }
         refreshPreview();
+        presetColors.select(0);
         super.performDefaults();
     }
 
@@ -313,6 +359,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
                         new ColoringPreference(newColor, currentPreference.getFontStyle()));
 
                 refreshPreview();
+                setPresetLabel();
             } else {
                 throw new IllegalStateException("This button should be disabled when there is no category selected!");
             }
@@ -339,9 +386,36 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
                         new ColoringPreference(currentPreference.getRgb(), currentPreference.getFontStyle() ^ style));
 
                 refreshPreview();
+                setPresetLabel();
             } else {
                 throw new IllegalStateException("This button should be disabled when there is no category selected!");
             }
         }
+    }
+
+    private class PresetSelectionListener extends SelectionAdapter {
+
+        @Override
+        public void widgetSelected(final SelectionEvent e) {
+            // set preset preferences
+            final int selectedId = presetColors.getSelectionIndex();
+            if (selectedId == 0) {
+                setLightPreset();
+            } else if (selectedId == 1) {
+                setDarkPreset();
+            }
+            refreshPreview();
+        }
+
+        private void setLightPreset() {
+            performDefaults(); // light is default
+        }
+
+        private void setDarkPreset() {
+            for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
+                currentPreferences.put(category, category.getDark());
+            }
+        }
+
     }
 }
