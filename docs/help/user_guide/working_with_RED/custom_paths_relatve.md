@@ -21,6 +21,7 @@ By default, relative paths are resolved around Project scope although in some
 scenarios like storing Robot testsuites in one project and libraries in other,
 there is a need to change relativeness regards to Workspace.  
 This can be changed in red.xml under Referenced Libraries -> Path part.  
-**Note that relativeness setting is used together with class/python path and libraries only.**
+**Note that relativeness setting is used together with class/python path and
+libraries only.**
 
 [Return to Help index](http://nokia.github.io/RED/help/)
