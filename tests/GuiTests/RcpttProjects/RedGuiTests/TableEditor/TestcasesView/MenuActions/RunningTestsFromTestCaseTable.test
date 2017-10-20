@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _8TAF0G6JEeaFMpJxhF5ZTQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/1/17 11:40 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 2:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -47,7 +47,7 @@ get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 
     | click
 
 //check message log to see if test was run    
-wait-for-console
+wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
     + "Ending test: RobotProject.TestFile.test 1\n\n"
     + "Starting test: RobotProject.TestFile.TEST_1\n"
@@ -65,7 +65,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     get-menu "Run test: 'my test 2'" | click
 }
 //check message log
-wait-for-console
+wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.my test 2\n"
     + ".* : FAIL : \"this wil fail\"\n"
     + ".* : INFO : 12\n"
@@ -77,7 +77,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     get-menu "Run test: 'Use my kw'" | click
 }    
 //check message log 
-wait-for-console  
+wait-for-message-log  
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.Use my kw\n"
     + ".* : INFO : 0\n"
     + ".* : INFO : 1\n"
@@ -95,7 +95,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     key-type Right
     get-menu "Run test: 'TEST_1'" | click
 }
-wait-for-console
+wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
     + "Ending test: RobotProject.TestFile.test 1\n\n"
     + "Starting test: RobotProject.TestFile.TEST_1\n"
@@ -112,7 +112,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     key-type Right
     key-type "M3+r"
 }
-wait-for-console
+wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.my test 2\n"
     + ".* : FAIL : \"this wil fail\"\n"
     + ".* : INFO : 12\n"
@@ -127,7 +127,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     key-type Left
     key-type "M3+r"
 }
-wait-for-message-log -times 4 -delay 5000
+wait-for-message-log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.Use my kw\n"
     + ".* : INFO : 0\n"
     + ".* : INFO : 1\n"
