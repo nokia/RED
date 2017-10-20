@@ -9,7 +9,7 @@ Launch configuration has to be created to launch Robot tests. This can be done
 either manually or automatically e.g. when launching tests from **Project
 Explorer** or from **Suite Editor**.
 
-  * **Launch Configuration dialog** \- open launch configurations dialog (via [ Run -> Run Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\)) or [ Run -> Debug Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenDebugConfigurations'\)) menu) and create new configuration under _Robot_ or _Robot Remote_ element. For detailed description of both configurations and their possible attributes read [Local launches](local_launch.md) or [Remote launches](remote_launch.md) topic. After creating the configuration it can be launched manually by clicking **Run**/**Debug** button. 
+  * **Launch Configuration dialog** \- open launch configurations dialog (via [ Run -> Run Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenRunConfigurations'\)) or [ Run -> Debug Configurations...](javascript:executeCommand\('org.eclipse.debug.ui.commands.OpenDebugConfigurations'\)) menu) and create new configuration under _Robot_ or _Robot Remote_ element. For detailed description of both configurations and their possible attributes read [Local launches](local_launch.md) or [Remote launches](remote_launch.md) topic. After creating the configuration it can be launched manually by clicking **Run** / **Debug** button. 
 
 ![](images/ui_run_configs.png)
 
@@ -33,10 +33,11 @@ Explorer** or from **Suite Editor**.
 
 Console view is standard view provided by eclipse platform. RED is using in to
 display output of the tests launch. In case of locally launched tests it
-displays standard output and standard error (_stdout_ and _stderr_) of process
-which runs the test. It also contains a header in which command line call and
-Robot version is shown. Remotely launched tests do not send those streams to
-RED, so in this case only messages about remote server status are displayed.
+displays standard output and standard error ( _stdout_ and _stderr_ ) of
+process which runs the test. It also contains a header in which command line
+call and Robot version is shown. Remotely launched tests do not send those
+streams to RED, so in this case only messages about remote server status are
+displayed.
 
 ![](images/ui_console_view.png)
 

@@ -6,7 +6,7 @@ You can add python files too with variables or library schema.
 
 ### Robot Perspective
 
-All RED activities are performed within 2 perspectives: _Robot_, _Debug_.
+All RED activities are performed within 2 perspectives: _Robot_ , _Debug_.
 Former one is used to construct and execute tests, later one is for debugging
 test-cases. To start working with RED, you should activate Robot perspective
 first.
@@ -18,16 +18,22 @@ first.
 
 ### Workspace & project
 
-**Workspace** stores all global Eclipse & Red preferences. If it not set previously, Eclipse will show dialog to set path. User can always switch workspaces, and if necessary, perform projects import from locations outside of current workspace. Switching Workspace is done by menu action: _File -> Switch Workspace ..._
+**Workspace** stores all global Eclipse  & Red preferences. If it not set
+previously, Eclipse will show dialog to set path. User can always switch
+workspaces, and if necessary, perform projects import from locations outside
+of current workspace. Switching Workspace is done by menu action: _File ->
+Switch Workspace ..._
 
-**Project** is an equivalent to folder in OS, it stores files and settings relevant to a group of files. In order to work with RED, **Robot Project** has to be created.  
+**Project** is an equivalent to folder in OS, it stores files and settings
+relevant to a group of files. In order to work with RED, **Robot Project** has
+to be created.  
 Creating new Project can be done by:
 
-  * _File->New-> Robot Project _(item can be found also under selection _New -> Project .. -> Robot Framework -> Robot Project _)
+  * _File->New-> Robot Project_ (item can be found also under selection _New -> Project .. -> Robot Framework -> Robot Project_ )
   * Right click menu on Project Explorer with selection as above
 
 If you wish to import anything into Workspace (i.e. already existing Project)
-or into Project (existing test cases), menu _Import ... _will open up wizard.
+or into Project (existing test cases), menu _Import ..._ will open up wizard.
 Upon creating Project, you should have see similar structure in Project
 Explorer tree, which will also indicate that RobotFramework is visible to
 Eclipse. ![](create_run/simple_project_1.png)
@@ -52,11 +58,11 @@ CTRL+SPACE keys to activate hints for robot keywords an variables.
 
 To run TestSuite, _Run_ button needs to be selected or right-click menu on
 file in Source view. The same action is in right-click menu on file in Project
-Explorer  ![](create_run/toolbar-1.png)
+Explorer. ![](create_run/toolbar-1.png)
 
 #### Limiting test cases to be run
 
-To limit list of test cases to be run, open _Run Configurations ..._,  
+To limit list of test cases to be run, open _Run Configurations ..._ ,  
 ![](create_run/run_1.png) In Robot part you can specify which test cases
 should be run by using either tags or include/exclude list of test cases in
 active project.  ![](create_run/run_configurations.png) To run single test

@@ -1,8 +1,8 @@
 ## Launching Tests
 
-With RED it is possible to launch Robot Framework tests in 2 modes (**run** or
-**debug**) in conjunction with 2 types of configurations: (**local** or
-**remote**). Furthermore local configuration can be launched directly using
+With RED it is possible to launch Robot Framework tests in 2 modes ( **run**
+or **debug** ) in conjunction with 2 types of configurations: ( **local** or
+**remote** ). Furthermore local configuration can be launched directly using
 python interpreter or with script (e.g batch or bash) provided by user.
 
 The debug mode is different from run mode in only aspect: it allows to stop
@@ -28,7 +28,7 @@ is executing script with [RED agent](launching/red_agent.md) or not).
 Table below summarizes which RED features are working when running different
 configuration in different modes
 
-Configuration &amp; mode | Console view | Message log view | Execution view |
+Configuration & mode | Console view | Message log view | Execution view |
 Debugging  
 ---|---|---|---|---  
 Local run |  |  |  |  

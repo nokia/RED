@@ -4,7 +4,7 @@
 
 In order to provide validation and keyword assistance of external libraries
 (any library not bundled with RobotFramework), external library **needs** to
-be included in ** red.xml ** file in the Referenced libraries part.  
+be included in **red.xml** file in the Referenced libraries part.  
 There are few ways to include library into red.xml
 
 ### Library autodiscovery
@@ -75,7 +75,7 @@ framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc>
 During library import, RED is generating LibDoc from given python file using
 local python interpreter. Under the hood RED is executing following command to
 RobotFramework to get list of Keywords from give library:  
-_python -m robot.libdoc &amp;ltPATH;_TO_LIBNAME&gt; &amp;ltOPTIONS;&gt;_  
+_python -m robot.libdoc &ltPATH;_TO_LIBNAME> &ltOPTIONS;>_  
 Whenever RED encounters problem, it will be shown as popup window from Python
 execution:  
   
@@ -84,14 +84,14 @@ execution:
 This indicates that some of the dependencies are missing on your local machine
 which may affect testcase execution. To verify you can try to execute libdoc
 in console:  
-_python -m robot.libdoc &amp;ltPATH;_TO_LIBNAME&gt; list _
+_python -m robot.libdoc &ltPATH;_TO_LIBNAME> list _
 
 ### Reloading libraries after change
 
 Whenever external library is changed (for instance new keyword is added),
 libdoc needs to be regenerated to provide changes on content assist and
 validation in RED. This can be done by right click on project name and
-selecting _Robot Framework -&gt; Reset Robot Enviroment_.  
+selecting _Robot Framework - > Reset Robot Enviroment_.  
 For reloading selected libdoc, right click on library from Project Explorer
 and use _Reload action_.
 

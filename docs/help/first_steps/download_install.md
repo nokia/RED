@@ -1,4 +1,4 @@
-## Download &amp; install
+## Download & install
 
 ### Get Java
 
@@ -18,17 +18,17 @@ RED can be downloaded from
 with zip extension while Product is RED bundled together with Eclipse
 platform.
 
-### Get Python &amp; RobotFramework
+### Get Python & RobotFramework
 
-In order to use full spectrum of RED features, Python &amp; RobotFramework
-should be installed with respectful dependencies.  
+In order to use full spectrum of RED features, Python & RobotFramework should
+be installed with respectful dependencies.  
 Python official site: [python.org](http://www.python.org)  
 RobotFramework official site: [robotframework.org](http://robotframework.org/)  
 We recommend to install Python packages using pip.  
 
 Note
 
-    In some cases like using portable Python&amp;RF, there may be a need to run Eclipse and pybot with administrative privileges.
+    In some cases like using portable Python&RF, there may be a need to run Eclipse and pybot with administrative privileges.
 
 ### Install RED into Eclipse
 
