@@ -11,7 +11,7 @@ resources etc.
 ### Validation execution
 
 Validation mechanism is executed any time when edited file is changed with
-slight delay while **Build Automatic ** option is selected from Project. Whole
+slight delay while **Build Automatic** option is selected from Project. Whole
 project validation can be manually started using option **Project -> Clean**.  
 
 The file which currently edited within Suite Editor is constantly validated in
@@ -25,7 +25,7 @@ Validation problems severity level settings are covered under topic
 Validation scope is covered under topic [Limiting validation
 scope](validation/scope.md)
 
-Validation as command line tool (without GUI,headless) is covered under topic
+Validation as command line tool (without GUI, headless) is covered under topic
 [Running validation in command line](validation/headless.md)
 
 [Return to Help index](http://nokia.github.io/RED/help/)

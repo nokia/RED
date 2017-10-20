@@ -10,16 +10,16 @@ PyDev editor, use right-click menu **Open With Python Editor**.
 
 We recommend to install PyDev from Eclipse Marketplace:
 
-  * Open Eclipse Marketplace: **Help -&gt; Eclipse Marketplace**,
+  * Open Eclipse Marketplace: **Help - > Eclipse Marketplace**,
   * in Find field enter PyDev and proceed with installation instructions,
   * when prompted, restart Eclipse/RED Product,
-  * check PyDev preferences for python interpreters under **Windows -&gt; Preferences -&gt; PyDev**.
+  * check PyDev preferences for python interpreters under **Windows - > Preferences -> PyDev**.
 
-### Debugging tests with RED &amp; PyDev
+### Debugging tests with RED & PyDev
 
 It is possible to debug the tests together with python code using RED and
-PyDev. For detailed description please visit [Robot &amp; Python
-debugging](../launching/robot_python_debug.md) topic.
+PyDev. For detailed description please visit [Robot & Python
+debugging](../launching/debug/robot_python_debug.md) topic.
 
 ### PyLint installation
 
@@ -32,8 +32,8 @@ _pip install pylint_
   * restart Eclipse/RED Product,
   * enable PyLint,
   * enable redirecting PyLint output to console,
-  * provide proper PyLint executable paths in PyDev preferences: **Windows -&gt; Preferences -&gt; PyDev -&gt; PyLint**, 
-  * sometimes it is necessary to set folder with sources for PyDev in Project properties: right click on **Project -> PyDev -> Set as Source Folder (add to PYTHONPATH)**, 
+  * provide proper PyLint executable paths in PyDev preferences: **Windows - > Preferences -> PyDev -> PyLint**, 
+  * sometimes it is necessary to set folder with sources for PyDev in Project properties: right click on **Project -> PyDev -> Set as Source Folder (add to PYTHONPATH)** , 
   * restart Eclipse/RED Product.
 
 [Return to Help index](http://nokia.github.io/RED/help/)

@@ -84,7 +84,7 @@ as depicted on images below.
 
 Note
 
-    Instead of specifying script at **Executor** tab manually it is possible to define default value of executor script path in Preferences (at _[ Window-&gt;Preferences-&gt;Robot Framework-&gt;Default Launch Configurations ](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))_ set **Executable file** to desired executable). Now every time new launch configuration is created it will use given executable by default. 
+    Instead of specifying script at **Executor** tab manually it is possible to define default value of executor script path in Preferences (at _[Window->Preferences->Robot Framework->Default Launch Configurations ](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))_ set **Executable file** to desired executable). Now every time new launch configuration is created it will use given executable by default. 
 
 ### Gradle scripts running Standalone JAR distribution
 

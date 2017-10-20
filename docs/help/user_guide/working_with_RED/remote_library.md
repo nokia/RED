@@ -29,7 +29,7 @@ simple remote protocol on top of an XML-RPC channel.
 #### Settings in Referenced Libraries in red.xml
 
 In order to use Keywords from Remote Library together with validation and code
-assistance,information about Remote Library address needs to be included in
+assistance, information about Remote Library address needs to be included in
 red.xml under Referenced Libraries tab.
 
   
@@ -37,8 +37,8 @@ red.xml under Referenced Libraries tab.
 ![](remote_library/remote_library_settings.png)  
   
 
-Note that IP,Port and name library served by remote library server may differ.
-Please follow usage details of your Remote Library
+Note that IP, Port and name library served by remote library server may
+differ. Please follow usage details of your Remote Library.
 
 #### Settings in TestSuite
 

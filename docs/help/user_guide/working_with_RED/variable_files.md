@@ -2,8 +2,9 @@
 
 RobotFramework allows to use python variable files in Robot Test Suites in two
 distinctive ways.  
-**Direct usage** is done by using python file declaration in Settings section as follows:  
-_variables &amp;ltpath;_to_python_var_file&gt;_  
+**Direct usage** is done by using python file declaration in Settings section
+as follows:  
+_variables &ltpath;_to_python_var_file>_  
   
 Variable file content will be visible across Test Suite.  
 **Global usage** is a way to use common variable file across any Test Suite.  
