@@ -11,34 +11,12 @@ changed if needed.
 ![](general/tab_behaviour.png)  
   
 
-### Content assistance - mode of working & preference
-
-Content assistance is a functionality provided by Eclipse platform extended to
-understand Robot data model.  
-It is invoked by pressing CTRL+SPACE key short-cut. It has multiple modes
-which are cycled by CTRL+SPACE, next mode type is visible at the bottom of
-assist window.  
-  
-![](general/content-assist-modes.gif)  
-  
-
-#### Content assistance preferences
-
-Behavior of content assist can be changed in Robot Framework preferences
-(Window -> Preferences).  
-Proposed items can be put into testcase by either by insert or override.  
-It can also be configured if library/resource prefix should ba always used
-when accepting content proposal.  
-  
-![](general/content_pref.png)  
-  
-
 ### Validating & revalidating whole project/workspace
 
 Validation of test case is triggered by any user actions, it is also done
-during files&amp;project; imports.  
-Whenever there is a change in multiple files (for instance find&amp;replace;)
-or big file import/deletion, it is good to force revalidation of project.  
+during files&project; imports.  
+Whenever there is a change in multiple files (for instance find&replace;) or
+big file import/deletion, it is good to force revalidation of project.  
 It is done accessing option Project -> Clean ...  
   
 ![](general/gen_1.png)  
@@ -55,7 +33,7 @@ not configurable.**
 In near future we will provide a way to include custom rule sets for code
 formatting and check style.  
 It is invoked by clicking in text editor in issuing right click action Format
-source  
+source.  
   
   
 ![](general/gen_5.png)  
