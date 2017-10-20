@@ -39,7 +39,7 @@ class LibdocGenerationTests(unittest.TestCase):
 
         create_libdoc("lib", python_paths, class_paths)
 
-        self.assertListEqual(old_sys_path, sorted(sys.path))
+        self.assertEqual(old_sys_path, sorted(sys.path))
 
 
 class ClassesRetrievingTests(unittest.TestCase):
@@ -60,4 +60,4 @@ class ClassesRetrievingTests(unittest.TestCase):
  
         get_classes_from_module(os.path.join(parent_path, 'res_test_robot_session_server', 'a', 'LibClass.py'), None, python_paths, class_paths)
  
-        self.assertListEqual(old_sys_path, sorted(sys.path))
+        self.assertEqual(old_sys_path, sorted(sys.path))

@@ -2,10 +2,24 @@ import unittest
 import os
 
 from red_variables import get_variables
+from red_variables import get_global_variables
 from robot.errors import DataError
 
 
-class ClassesRetrievingTests(unittest.TestCase):
+class VariablesRetrievingTests(unittest.TestCase):
+    def test_if_global_variables_are_returned(self):
+        result = get_global_variables()
+
+        self.assertEqual(set(result.keys()),
+                         set(['${/}', '${:}', '${CURDIR}', '${DEBUG_FILE}', '${EMPTY}', '${EXECDIR}', '${False}',
+                              '${KEYWORD_MESSAGE}', '${KEYWORD_STATUS}', '${LOG_FILE}', '${LOG_LEVEL}', '${None}',
+                              '${OUTPUT_DIR}', '${OUTPUT_FILE}', '${PREV_TEST_MESSAGE}', '${PREV_TEST_NAME}',
+                              '${PREV_TEST_STATUS}', '${REPORT_FILE}', '${SPACE}', '${SUITE_DOCUMENTATION}',
+                              '${SUITE_MESSAGE}', '${SUITE_NAME}', '${SUITE_SOURCE}', '${SUITE_STATUS}',
+                              '${SUMMARY_FILE}', '${TEMPDIR}', '${TEST_DOCUMENTATION}', '${TEST_MESSAGE}',
+                              '${TEST_NAME}', '${TEST_STATUS}', '${True}', '${\\n}', '${null}', '&{EMPTY}',
+                              '&{SUITE_METADATA}', '@{EMPTY}', '@{TEST_TAGS}']))
+
     def test_if_empty_result_is_returned_for_empty_file(self):
         parent_path = os.path.dirname(os.path.realpath(__file__))
         vars_location = os.path.join(parent_path, 'res_test_red_variables', 'empty.py')
