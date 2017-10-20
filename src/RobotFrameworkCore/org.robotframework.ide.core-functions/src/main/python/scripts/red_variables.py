@@ -64,7 +64,7 @@ def get_global_variables():
         glob_variables['${REPORT_FILE}'] = ''
         glob_variables['${LOG_FILE}'] = ''
 
-    data = {_wrap_variable_if_needed(key) : value for key, value in glob_variables.items()}
+    data = dict((_wrap_variable_if_needed(key), value) for key, value in glob_variables.items())
 
     for k in global_variables:
         if not k in data:
@@ -115,7 +115,7 @@ def _get_variables_from_file(path, arguments):
 
 
 def _extract_dot_dict(dict):
-    return {_escape_unicode(k) : _escape_unicode(v) for k, v in dict.items()}
+    return dict((_escape_unicode(k), _escape_unicode(v)) for k, v in dict.items())
 
 
 def _escape_unicode(data):
@@ -158,7 +158,6 @@ def _escape_unicode(data):
       return _escape_unicode('None')
     else:
       return _escape_unicode(str(data))
-    return data
 
 
 if __name__ == '__main__':

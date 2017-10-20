@@ -292,7 +292,7 @@ if __name__ == '__main__':
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
 
-    red_checking_thread = Thread(target=__shutdown_server_when_parent_process_becomes_unavailable, args={server})
+    red_checking_thread = Thread(target=__shutdown_server_when_parent_process_becomes_unavailable, args=(server,))
     red_checking_thread.setDaemon(True)
     red_checking_thread.start()
 

@@ -16,15 +16,15 @@ injected into tests execution.
 
 ### Obtaining agent script
 
-You can always obtain agent script from RED within Preferences dialog (at _[
-Window-&gt;Preferences-&gt;Robot Framework-&gt;Default Launch Configurations
-](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))_,
-use **Export Client Script** button). Additionally the file may be saved
+You can always obtain agent script from RED within Preferences dialog (at
+_[Window->Preferences->Robot Framework->Default Launch Configurations
+](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch.default\)'\))_
+, use **Export Client Script** button). Additionally the file may be saved
 straight from launch configuration dialog.
 
 Warning
 
-    Agent script is a subject of changes, so it may happen that script exported from RED version `x` is not able to work properly with RED version `y` and vice versa. From version `0.7.6` onwards both script and RED are checking and handling this when establishing connection, so you will be notified. **Important**: script taken from RED older than `0.7.6` will not work with newer RED and vice-versa without notifying you (possibly even hanging infinitely). 
+    Agent script is a subject of changes, so it may happen that script exported from RED version `x` is not able to work properly with RED version `y` and vice versa. From version `0.7.6` onwards both script and RED are checking and handling this when establishing connection, so you will be notified. **Important** : script taken from RED older than `0.7.6` will not work with newer RED and vice-versa without notifying you (possibly even hanging infinitely). 
 
 ### Taking agent into Robot Tests execution
 
@@ -37,8 +37,8 @@ follows:
 _other_arguments_ `
 
 Agent script can take up to 3 arguments which are added to script path after
-colon (**:**) separator, the arguments themselves are also separated with a
-colon (**:**). The arguments are:
+colon ( **:** ) separator, the arguments themselves are also separated with a
+colon ( **:** ). The arguments are:
 
   * **HOST** \- IP number of a server to which agent should connect and send execution data, 
   * **PORT** \- port number of a server, 
@@ -58,7 +58,7 @@ _other_arguments_ `
 
 in this case `HOST=192.168.0.5`, `PORT=54321` and `TIMEOUT=30`
 
-  * When script is used with three parameters it all of them has to be defined (in **HOST**, **PORT**, **TIMEOUT** order): 
+  * When script is used with three parameters it all of them has to be defined (in **HOST** , **PORT** , **TIMEOUT** order): 
 
 ` _robot_ --listener /path/to/script/TestRunnerAgent.py:192.168.0.7:12321:60
 _other_arguments_ `

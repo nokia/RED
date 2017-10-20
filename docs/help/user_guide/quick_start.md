@@ -11,15 +11,15 @@ and select
 
 ### Create Robot Project
 
-All projects with Robot Framework files should be kept in project-type
-(_nature_) Robot, as this allows RED to activate RED specific features on
+All projects with Robot Framework files should be kept in project-type (
+_nature_ ) Robot, as this allows RED to activate RED specific features on
 Robot files. Select from top menu bar:  
 [File -> New -> Other -> Robot Framework -> Robot
 Project](javascript:executeCommand\('org.eclipse.ui.newWizard\(newWizardId=org.robotframework.ide.eclipse.wizards.newRobotProject\)'\))
 
 ### Import Robot files into project
 
-Import Robot files by drag&amp;drop to created project, alternatively you can
+Import Robot files by drag&drop to created project, alternatively you can
 import folders by right click on project and selecting  
 [Import -> General -> File
 System](javascript:executeCommand\('org.eclipse.ui.file.import\(importWizardId=org.eclipse.ui.wizards.import.FileSystem\)'\))
