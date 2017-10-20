@@ -10,7 +10,8 @@ recommended to least:
   
 ![](importing/import_1.png)  
   
-**Such import action will copy selected files to project folder under workspace path.** Note that under Advanced options are unchecked.   
+**Such import action will copy selected files to project folder under
+workspace path.** Note that under Advanced options are unchecked.  
   
 ![](importing/import_2.png)  
   
@@ -20,7 +21,7 @@ recommended to least:
   
 ![](importing/import_4.png)  
   
-**Selected project will be copied to workspace.**   
+**Selected project will be copied to workspace.**  
   
 ![](importing/import_3.png)  
   

@@ -26,8 +26,8 @@ offset of error and underline will be observed.
 ![](images/unicode.png)
 
 This can be fixed by selecting proper file encoding in Preferences (at
-_[Window-&gt;Preferences-&gt;General-&gt;Workspace](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Workspace\)'\))_
-change **Text file encoding** to UTF-8)
+_[Window->Preferences->General->Workspace](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.ui.preferencePages.Workspace\)'\))_
+change **Text file encoding** to UTF-8).
 
   * ### GTK3 issues under Linux
 
@@ -44,8 +44,8 @@ check and change - if necessary - to GTK2.
 
 #### Verifying current GTK version used
 
-GTK version can be checked in Eclipse under **Help-&gt;Installation
-Details-&gt;Configuration**, search for `org.eclipse.swt.internal.gtk.version`
+GTK version can be checked in Eclipse under **Help- >Installation
+Details->Configuration**, search for `org.eclipse.swt.internal.gtk.version`
 entry.
 
 #### Setting GTK2 system wide
@@ -65,7 +65,7 @@ or RED:
 #### Setting GTK2 in eclipse.ini/RED.ini
 
 GTK2 usage can be forced for eclipse/RED instance. In order to do it simply
-add following 2 lines to **eclipse.ini**/**RED.ini** file before `-vmargs`
+add following 2 lines to **eclipse.ini** / **RED.ini** file before `-vmargs`
 section:
 
 \--launcher.GTK_version 2  

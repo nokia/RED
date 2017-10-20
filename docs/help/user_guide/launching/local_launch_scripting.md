@@ -2,8 +2,7 @@
 
 The **Robot** launch configurations may be called through some user-defined
 executable/script. This may be useful when integrating tests launches from RED
-with other tools like PyDev for Robot &amp; Python debugging, Maven, Gradle,
-etc.
+with other tools like PyDev for Robot  & Python debugging, Maven, Gradle, etc.
 
 The general idea is that the command line call which RED executes for
 launching is wrapped with a call to user defined executable. For example RED

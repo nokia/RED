@@ -22,7 +22,10 @@ When successful, path will be recognized and validation will take place.
   
 ![](variable_mapping/variable_mapping_7.png)  
   
-**Mind that Variable Mapping maps value to already existing variable.** If you wish to create variable and assign value outside of testcases (for instance as environmental global variables), create variable python file and import it into red.xml under Variable Files.   
+**Mind that Variable Mapping maps value to already existing variable.** If you
+wish to create variable and assign value outside of testcases (for instance as
+environmental global variables), create variable python file and import it
+into red.xml under Variable Files.  
   
   
 
