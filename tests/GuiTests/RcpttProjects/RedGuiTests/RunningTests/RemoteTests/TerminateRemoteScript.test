@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _CX4zwLTcEeeDouIrSYj3aA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/19/17 5:37 PM
+Save-Time: 10/19/17 5:45 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -30,10 +30,7 @@ let [val remote_project_path  [format "%s/RemoteLongTest" $user_folder] ]{
 			    get-button Terminate | click 
 			}
 		}		
-		
-		//test didn't go to last test nr 7
-		get-view "Message Log" | get-editbox | get-property text | contains "Ending test: RemoteProject.TestFile.test 7"
-		 | verify-false
+		wait-for-console 
 		 
 		 with [get-view Console] {
 		 
@@ -44,6 +41,9 @@ let [val remote_project_path  [format "%s/RemoteLongTest" $user_folder] ]{
 		    get-text-viewer | get-property text 
 		        | contains "tests finished on client machine" | verify-true
 		}
+		//test didn't go to last test nr 7
+		get-view "Message Log" | get-editbox | get-property text | contains "Ending test: RemoteProject.TestFile.test 7"
+		 | verify-false
 	}	
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
