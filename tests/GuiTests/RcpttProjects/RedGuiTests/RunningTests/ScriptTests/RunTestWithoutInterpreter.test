@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _E3JM0D-eEeejtMr_2XCc8w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/30/17 11:00 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 4:30 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -29,7 +29,7 @@ repeat  -times [get-window Preferences | get-table | get-property itemCount -raw
 	    get-button Remove | click
 	}
 }
-get-window Preferences | get-button OK | click
+get-window Preferences | get-button $Apply_and_OK_in_preference | click
 get-window Preferences | get-window "Rebuild required" | get-button OK | click
 // change script content
 //get-view "Project Explorer" | get-tree | select "ScriptProject/scripts/script_win.bat" 
