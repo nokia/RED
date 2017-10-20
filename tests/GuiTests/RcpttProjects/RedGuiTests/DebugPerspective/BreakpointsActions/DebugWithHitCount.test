@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _R0nm0PKlEeadkqPlInmy5w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/17 11:00 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 5:24 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -104,7 +104,8 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Resume (F8)" | click
 }	
 
-wait-for-console	
+wait-for-console -times 10 -delay 1000
+ 
 //uncheck hit count for line 19	
 get-view Breakpoints | get-button "Hit count:" | uncheck
 get-button "Save (M1+S)" | click
@@ -178,7 +179,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 4 17
 
 get-button "Debug.*" | click
 
-wait-for-console
+wait-for-console -times 10 -delay 1000
 //check that test was not stopped
 get-view "Message Log" | get-editbox | get-property text 
     | contains  "Ending test: RobotProject.TestFile.Continue Example" | verify-true
