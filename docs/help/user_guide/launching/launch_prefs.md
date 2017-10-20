@@ -3,7 +3,7 @@
 ### General launching preferences
 
 General preferences used when launching Robot tests can be found at [
-Window-&gt;Preferences-&gt;Robot Framework-&gt;Launching
+Window->Preferences->Robot Framework->Launching
 ](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch\)'\))
 preference page. Following settings can be changed:
 
@@ -12,8 +12,8 @@ preference page. Following settings can be changed:
 
 ### Default launch configurations
 
-All arguments which are set at [ Window-&gt;Preferences-&gt;Robot
-Framework-&gt;Launching-&gt;Default Launch Configurations
+All arguments which are set at [ Window->Preferences->Robot
+Framework->Launching->Default Launch Configurations
 ](javascript:executeCommand\('org.eclipse.ui.window.preferences\(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.launch\)'\))
 preference page will be used by RED when new launch configuration is
 automatically created. This may happen for example when launching suites from
@@ -23,10 +23,10 @@ is automatically creating launch configurations).
 
 ### Default behavior of Run/Debug actions
 
-Run and Debug actions,depending on preferences, can use previously used or
+Run and Debug actions, depending on preferences, can use previously used or
 created launch configuration or create a new one. Standard behaviour can be
 change in
-[Window-&gt;Preferences-&gt;Run/Debug&gt;Launching](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage\)"\))
-under Launch Operation
+[Window->Preferences->Run/Debug>Launching](javascript:executeCommand\("org.eclipse.ui.window.preferences\(preferencePageId=org.eclipse.debug.ui.LaunchingPreferencePage\)"\))
+under Launch Operation.
 
 [Return to Help index](http://nokia.github.io/RED/help/)

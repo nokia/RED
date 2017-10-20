@@ -6,8 +6,8 @@
 
 ![](images/maven_3_basic.png)
 
-  * In Classpath tab switch on _Custom classpath _ and set _Main class:_ to org.python.util.jython.   
-In _Edit item_: put robotframework*.jar and press Accept button.  
+  * In Classpath tab switch on _Custom classpath_ and set _Main class:_ to org.python.util.jython.   
+In _Edit item_ : put robotframework*.jar and press Accept button.  
 Repeat this to add %RF_JAR% variable.
 
 ![](images/maven_4_classpath.jpg)
@@ -48,10 +48,10 @@ that you can integrate jython.exe with RED.
 
 To integrate jython.exe with RED:
 
-  1. put _jython.exe_ file to bin directory. It can be anywhere, but parent folder must be named as bin - i.e. _C:\bin\ _
+  1. put _jython.exe_ file to bin directory. It can be anywhere, but parent folder must be named as bin - i.e. _C:\bin\_
   2. It is easier to copy robotframework*.jar to this bin directory instead of set RF_JAR environment variable
   3. run _eclipse.exe_ or _RED.exe_ depends on which RED version you are using 
-  4. go to _Window -&gt; Preferences -&gt; Robot Framework -&gt; Installed frameworks _preference 
+  4. go to _Window - > Preferences -> Robot Framework -> Installed frameworks _preference 
   5. click _Add..._ button and select bin directory from 1. 
   6. if everything is ok, information about Robot Framework version should be visible
   7. when you will create RED project or execute Clean\Build, you should see in Robot Standard libraries standard libraries like i.e. BultIn with information about keywords, which they contains.

@@ -17,13 +17,13 @@ Additionally it can be configured that Enter will finish cell edit and cursor
 will stay on current cell.  
 Setting can found under **Window -> Preference -> Robot Framework -> Editor**
 in section Tables  
-**Hint:** by pressing Shift+Enter, cursor will move backwards. 
+**Hint:** by pressing Shift+Enter, cursor will move backwards.
 
 ### Default number of columns in Test Cases/Keywords editors
 
 To make Table editors tidy, RED creates predefined numbers of columns.  
 If you need to change it, this can be done by: **Window -> Preference -> Robot
-Framework -> Editor **in section Tables.
+Framework -> Editor** in section Tables.
 
 ### Changing default type in Add new Variable
 
@@ -37,9 +37,9 @@ list and dictionary.
 
 ### Table preferences
 
-All table related preferences (cell text folding,number of columns,default
+All table related preferences (cell text folding, number of columns, default
 behaviors) can be configured in **Window -> Preference -> Robot Framework ->
-Editor **  
+Editor**  
   
 ![](table_general/table_preferences.png)  
   

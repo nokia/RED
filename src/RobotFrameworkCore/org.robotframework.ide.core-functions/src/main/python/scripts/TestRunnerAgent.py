@@ -53,7 +53,10 @@ import time
 import traceback
 import platform
 import re
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 try:
     from collections.abc import Mapping
 except:
