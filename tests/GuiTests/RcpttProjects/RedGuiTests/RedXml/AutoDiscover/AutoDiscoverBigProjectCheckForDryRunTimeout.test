@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lEI40IM2EeeFDdSfdHFusQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 1:49 PM
+Save-Time: 10/23/17 5:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,29 +22,43 @@ with [get-window "Show View"] {
 }
 get-view Progress | get-control Any -index 5 | get-property "getChildren().Control[0].getText()" 
     | equals "No operations to display at this time." | verify-true
+    
 // run autodiscovery
 get-view "Project Explorer" | get-tree | select AutoDiscoveryBigProjectDryRun30sTimeout 
     | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
-try -times 10 -delay 500 -command{
-	get-window "Discovering libraries" | get-button "Run in Background" | click
+    
+    
+//try -times 10 -delay 500 -command{
+//	get-window "Discovering libraries" | get-button "Run in Background" | click
+//}
+
+//open progress view
+get-menu -path "Window/Show View/Other..." | click
+with [get-window "Show View"] {
+    get-editbox | set-text progr
+    get-tree | select "General/Progress" | double-click
 }
-// check Progress bar
-with [get-view Progress | get-control Any -index 4] {
-    get-property "getChildren().getClassName()" | equals "org.eclipse.swt.widgets.Control[]" | verify-true
-    get-property "isVisible()" | equals true | verify-true
+
+//run test
+get-view "Project Explorer" | get-tree | select AutoDiscoveryBigProjectDryRun30sTimeout | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+  
+//check if  dry run was started   
+try -times 4 -delay 1000 -command{    
+	with [get-view Progress] {
+	    get-link "Starting Robot dry run execution..." | get-property caption 
+	        | equals "Starting Robot dry run execution..." | verify-true	        
+	 }
+}	        
+try -times 10 -delay 1500 -command{          
+	with [get-view Progress] {
+	    get-link "Executing Robot dry run on suite: .*" | get-property caption 
+	        | equals "Executing Robot dry run on suite: .*" | verify-true
+	}
 }
-with [get-view Progress] {
-    get-link "Starting Robot dry run execution..." | get-property caption 
-        | equals "Starting Robot dry run execution..." | verify-true
-    try -times 300 -delay 1000 -command{
-    	get-link "Executing Robot dry run on suite: .*" | get-property caption 
-        	| equals "Executing Robot dry run on suite: .*" | verify-true
-    }
-}
-get-view Progress | get-control Any -after [get-label "Discovering libraries"] -index 2 | get-property "isVisible()" 
-    | equals true | verify-true
+
 // close Discovering libraries summary with OK
-try -times 300 -delay 1000 -command{
+try -times 10 -delay 1000 -command{
 	get-window "Discovering libraries summary" | get-button OK | click
 }
 // verify if lib was added
