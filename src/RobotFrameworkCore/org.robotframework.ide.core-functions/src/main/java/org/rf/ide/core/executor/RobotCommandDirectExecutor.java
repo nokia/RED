@@ -317,6 +317,24 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         // nothing to do
     }
 
+    @Override
+    public void runRfLint(final String host, final int port, final File filepath) {
+        try {
+            final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
+
+            final List<String> cmdLine = createCommandLine(scriptFile);
+            
+            cmdLine.add(host);
+            cmdLine.add(Integer.toString(port));
+            cmdLine.add("-r");
+            cmdLine.add(filepath.getAbsolutePath());
+
+            RobotRuntimeEnvironment.runExternalProcess(cmdLine, line -> {});
+        } catch (final IOException | NumberFormatException e) {
+            throw new RobotEnvironmentException("Unable to start RfLint");
+        }
+    }
+
     private List<String> createCommandLine(final File scriptFile, final String... lines) {
         return createCommandLine(scriptFile, new EnvironmentSearchPaths(), lines);
     }

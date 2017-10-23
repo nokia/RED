@@ -450,6 +450,14 @@ public class RobotRuntimeEnvironment {
         return new LinkedHashMap<>();
     }
 
+    public void runRfLint(final String host, final int port, final File filepath) {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.runRfLint(host, port, filepath);
+        }
+    }
+
     public boolean isVirtualenv() {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()

@@ -42,4 +42,6 @@ interface RobotCommandExecutor {
             List<String> variableMappings, EnvironmentSearchPaths additionalPaths);
 
     void stopLibraryAutoDiscovering();
+
+    void runRfLint(final String host, final int port, final File filepath);
 }

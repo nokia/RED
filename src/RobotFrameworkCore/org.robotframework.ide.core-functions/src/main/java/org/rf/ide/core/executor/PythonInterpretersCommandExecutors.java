@@ -45,6 +45,7 @@ class PythonInterpretersCommandExecutors {
             RobotRuntimeEnvironment.copyScriptFile("red_modules.py");
             RobotRuntimeEnvironment.copyScriptFile("red_variables.py");
             RobotRuntimeEnvironment.copyScriptFile("red_virtualenv_check.py");
+            RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
             RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
             RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
         } catch (final IOException e) {
