@@ -172,6 +172,19 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         presetColors.select(1);
     }
 
+    private void setButtons() {
+        final Optional<SyntaxHighlightingCategory> selected = Selections.getOptionalFirstElement(
+                (IStructuredSelection) viewer.getSelection(), SyntaxHighlightingCategory.class);
+        if (selected.isPresent()) {
+            final SyntaxHighlightingCategory selectedCategory = selected.get();
+            final ColoringPreference currentPreference = currentPreferences.get(selectedCategory);
+
+            colorSelector.setColorValue(currentPreference.getRgb());
+            boldButton.setSelection((currentPreference.getFontStyle() & SWT.BOLD) != 0);
+            italicButton.setSelection((currentPreference.getFontStyle() & SWT.ITALIC) != 0);
+        }
+    }
+
     private void refreshPreview() {
         final List<StyleRange> ranges = newArrayList(Iterables.concat(getSectionHeaderRanges(), getCommentsRanges(),
                 getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges(),
@@ -288,6 +301,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         }
         refreshPreview();
         presetColors.select(0);
+        setButtons();
         super.performDefaults();
     }
 
@@ -404,6 +418,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
             } else if (selectedId == 1) {
                 setDarkPreset();
             }
+            setButtons();
             refreshPreview();
         }
 
