@@ -13,7 +13,10 @@ import java.util.EnumSet;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 
@@ -60,6 +63,14 @@ public class RedPreferencesTest {
         final RedPreferences preferences = new RedPreferences(store);
 
         assertThat(preferences.getElementOpenMode()).isEqualTo(ElementOpenMode.OPEN_IN_TABLES);
+    }
+
+    @Test
+    public void equalsColoringPreferences_areEquals() {
+        final ColoringPreference pref1 = new ColoringPreference(new RGB(1, 2, 3), SWT.NONE);
+        final ColoringPreference pref2 = new ColoringPreference(new RGB(1, 2, 3), SWT.NONE);
+
+        assertThat(pref1).isEqualTo(pref2);
     }
 
     private static <T extends Iterable<?>> Condition<T> containingElementOnlyWhen(final Object element,
