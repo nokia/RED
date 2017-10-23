@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: __AGDkGyEEeeps9cepQRw2Q
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/3/17 2:58 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/23/17 6:40 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -61,7 +61,9 @@ exec-with-options -disableJobWaiting -command {
 	wait-for-thread -file "TestFile.robot"
 	
 	get-view Variables | maximize
+	
 	//change value for variable
+	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
 	change-var-value "${a}"  999
 	
 	//change value in list @{c}
@@ -128,6 +130,7 @@ exec-with-options -disableJobWaiting -command {
 	}
 	
 	//check variables after step over
+	get-view Variables | get-tree | get-item  "${a}"| select-item
 	with [get-view Variables | get-tree] {
 	    get-item "${a}" | get-property "values['Name']" | equals "${a}" | verify-true
 	    get-item "${a}" | get-property "values['Value']" | equals 999 | verify-true
@@ -169,6 +172,7 @@ exec-with-options -disableJobWaiting -command {
 	// ---------------------------------------------------- wrong values ----------------------------------------------------
 	
 	//assigne non-existing param
+	get-view Variables | get-button "Collapse All (M1+M2+Numpad_Divide)" | click
 	change-var-value "${b}" "${new}"
 
 	get-window "Debugger Error" | get-label "Unable to change value of variable ${b}. Variable '${new}' not found." 
@@ -205,7 +209,12 @@ exec-with-options -disableJobWaiting -command {
 	//change param to list
 	change-var-value "${a}" "${c}"
 	with [get-view Variables | get-tree] {
-	    get-item "${b}" | get-property "values['Value']" | equals "" | verify-true
+		get-item "${b}" | get-property "values['Value']" | equals "" | verify-true
+		get-item "@{a}" | expand
+	}
+		
+		wait-for-value-in-varaibles-view -item "@{a}/\\[2\\]" -value z
+	with [get-view Variables | get-tree] {		
 	    get-item "@{a}" | get-property "values['Name']" | equals "@{a}" | verify-true
 	    get-item "@{a}" | get-property "values['Value']" | equals "list[3]" | verify-true
 	    get-item "@{a}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
@@ -224,12 +233,12 @@ exec-with-options -disableJobWaiting -command {
 	get-view Variables | get-tree | get-item "@{assigned}/[0]" | expand
 	wait-for-value-in-varaibles-view -item "@{assigned}/\\[0\\]/\\[2\\]" -value "z"
 	
-
-with [get-view Variables | get-tree] {
-	get-item   "${b}" | select-item
-}
+	wait 1000
+	get-view Variables | get-tree | get-item "@{assigned}" | collapse
+	get-view Variables | get-tree | get-item "&{dict}" | expand
+	wait 500
 	with [get-view Variables | get-tree] {
-	    get-item "&{dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
+	    get-item -path "&{dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
 	    get-item "&{dict}/fruit" | get-property "values['Value']" | equals " apple" | verify-true
 	    get-item "&{dict}/key" | get-property "values['Name']" | equals key | verify-true
 	    get-item "&{dict}/key" | get-property "values['Value']" | equals value | verify-true
