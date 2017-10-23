@@ -5,8 +5,8 @@ Element-Name: CheckingVariablesProcedures
 Element-Type: context
 Element-Version: 2.0
 Id: _MyJrwGxlEeeps9cepQRw2Q
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/2/17 4:58 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/20/17 5:50 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -208,6 +208,8 @@ proc "check-list-and-dicts"{
 	get-view Variables | get-tree | get-item "@{list from res}" | expand
 	wait 1500
 	get-view Variables | get-tree | select "Automatic Variables"
+	
+	
 	with [get-view Variables | get-tree] {	    
 	    get-item "@{list from res}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{list from res}/\\[0\\]" | get-property "values['Value']" | equals ab1 | verify-true
@@ -218,6 +220,8 @@ proc "check-list-and-dicts"{
 	    get-item "@{list from res}/\\[3\\]" | get-property "values['Name']" | equals "[3]" | verify-true
 	    get-item "@{list from res}/\\[3\\]" | get-property "values['Value']" | equals ab4 | verify-true
 	}
+	get-view Variables | get-tree | get-item "@{main list}" | expand
+	wait-for-last-item-to-be-visible
 	
 	with [get-view Variables | get-tree] {
 	    get-item "@{main list}" | get-property "values['Name']" | equals "@{main list}" | verify-true

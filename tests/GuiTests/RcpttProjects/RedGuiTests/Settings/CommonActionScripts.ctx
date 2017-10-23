@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 3:11 PM
+Save-Time: 10/23/17 4:08 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -98,7 +98,7 @@ global [val sys_sep [os-specific "\\" "/"]]
 if [$is_eclipse_oxygen]{
 	global [val doc_editbox_selector "-after [get-label \"Provide test suite documentation and general settings\"]"]
 }-else{
-	global [val doc_editbox_selector "index 1"]
+	global [val doc_editbox_selector "-index 1"]
 }
 
 //--------------------------------------------------------------------------------------------
