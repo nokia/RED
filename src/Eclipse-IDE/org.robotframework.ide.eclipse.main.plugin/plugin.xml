@@ -536,6 +536,18 @@
     </shortcut>
  </extension>
  <extension
+       point="org.eclipse.ui.console.consolePageParticipants">
+    <consolePageParticipant
+          class="org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleParticipant"
+          id="org.robotframework.red.RobotTestsConsoleParticipant">
+       <enablement>
+          <instanceof
+                value="org.eclipse.debug.ui.console.IConsole">
+          </instanceof>
+       </enablement>
+    </consolePageParticipant>
+ </extension>
+ <extension
        point="org.eclipse.ui.navigator.viewer">
     <viewerContentBinding
           viewerId="org.eclipse.ui.navigator.ProjectExplorer">
