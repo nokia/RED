@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Nm22AO38EeaEfJH5Ahap2w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/18/17 4:26 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/25/17 3:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -183,9 +183,10 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
 exec-with-options -disableJobWaiting -command {  
 	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
 	    | get-menu "Debug As/1 Robot Test" | click
-	wait 500    
-	get-window "Errors in Workspace" | get-button Proceed | click
-	try -times 3 -delay 500 -command{
+	try -times 4 -delay 500 -command{   
+		get-window "Errors in Workspace" | get-button Proceed | click
+	}
+	try -times 4 -delay 500 -command{
 		get-window "Debugger error" | get-button Continue | click
 	}
 }	
