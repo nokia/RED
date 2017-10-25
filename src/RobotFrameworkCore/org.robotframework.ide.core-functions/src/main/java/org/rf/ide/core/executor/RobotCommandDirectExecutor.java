@@ -330,7 +330,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             cmdLine.add(Integer.toString(port));
             for (final RfLintRule rule : rules) {
                 if (rule.hasChangedSeverity()) {
-                    cmdLine.add(severitySwitch(rule.getSeverity()));
+                    cmdLine.add("-" + rule.getSeverity().severitySwitch());
                     cmdLine.add(rule.getRuleName());
                 }
                 if (rule.hasConfigurationArguments()) {
