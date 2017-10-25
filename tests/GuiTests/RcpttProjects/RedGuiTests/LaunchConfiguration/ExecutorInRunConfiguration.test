@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _QcX10PsxEeW7_PzjO98BIw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/8/17 11:28 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/25/17 3:09 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -85,7 +85,7 @@ get-window "Run Configurations" | get-editbox -after [get-label "Create, manage,
 //run test    
 get-window "Run Configurations" | get-button Run | click
 wait 3000
-wait-for-console -times 8 -delay 1000
+wait-for-console -times 15 -delay 1000
 
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: SecondProject.SingleTest.test1\n"
     + ".* : INFO : 12\n"
@@ -150,7 +150,7 @@ get-editor "SecondProject/red.xml" | get-section "Robot framework" | get-table
 	    get-button Run | click
 	}
 	wait 3000
-	wait-for-console -times 8 -delay 1000
+	wait-for-console -times 15 -delay 1000
 	get-view Console | get-label ".*" -index 0 
 	    | get-property caption | equals [format "<terminated> SingleTest.tsv [Robot] %s%s" $jython_path [os-specific "\jython.exe" "/jython"]] | verify-true 
 }    
