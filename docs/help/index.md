@@ -47,6 +47,7 @@
       * [PyDev and PyLint](/user_guide/tools_integration/red_pylint.md)
       * [Robot Framework Maven plugin](/user_guide/tools_integration/maven.md)
       * [Running tests using Gradle](/user_guide/tools_integration/gradle.md)
+      * [Robot Framework Lint](/user_guide/tools_integration/rflint.md)
     * [RED key shortcuts cheatsheet](/user_guide/keys.md)
     * [Known issues and problems](/user_guide/known_issues.md)
 
