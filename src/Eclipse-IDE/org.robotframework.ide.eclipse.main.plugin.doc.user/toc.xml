@@ -86,6 +86,8 @@
        </topic>
        <topic href="doc/user_guide/tools_integration/gradle.html" label="Running tests using Gradle">
        </topic>
+       <topic href="doc/user_guide/tools_integration/rflint.html" label="Robot Framework Lint">
+       </topic>
     </topic>
     <topic href="doc/user_guide/keys.html" label="RED key shortcuts cheatsheet">
     </topic>

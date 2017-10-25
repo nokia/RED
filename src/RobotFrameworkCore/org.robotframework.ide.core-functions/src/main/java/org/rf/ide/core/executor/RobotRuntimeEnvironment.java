@@ -28,6 +28,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.rf.ide.core.rflint.RfLintRule;
+
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
 public class RobotRuntimeEnvironment {
 
@@ -450,11 +452,12 @@ public class RobotRuntimeEnvironment {
         return new LinkedHashMap<>();
     }
 
-    public void runRfLint(final String host, final int port, final File filepath) {
+    public void runRfLint(final String host, final int port, final File filepath, final List<RfLintRule> rules,
+            final List<String> rulesFiles) {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.runRfLint(host, port, filepath);
+            executor.runRfLint(host, port, filepath, rules, rulesFiles);
         }
     }
 

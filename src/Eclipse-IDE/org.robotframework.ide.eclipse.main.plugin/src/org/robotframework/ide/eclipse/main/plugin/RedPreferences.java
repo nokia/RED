@@ -7,8 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -16,11 +19,14 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.service.prefs.BackingStoreException;
+import org.rf.ide.core.rflint.RfLintRule;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.red.graphics.ColorsManager;
+
+import com.google.common.base.Splitter;
 
 public class RedPreferences {
 
@@ -81,6 +87,11 @@ public class RedPreferences {
 
     public static final String DEBUGGER_SUSPEND_ON_ERROR = "red.launch.debug.suspsendOnError";
     public static final String DEBUGGER_OMIT_LIB_KEYWORDS = "red.launch.debug.omitLibraryKeywords";
+    
+    public static final String RFLINT_RULES_CONFIG_NAMES = "red.validation.rflint.rulesConfig.names";
+    public static final String RFLINT_RULES_CONFIG_SEVERITIES = "red.validation.rflint.rulesConfig.severities";
+    public static final String RFLINT_RULES_CONFIG_ARGS = "red.validation.rflint.rulesConfig.arguments";
+    public static final String RFLINT_RULES_FILES = "red.validation.rflint.rulesFiles";
 
     public String getActiveRuntime() {
         return store.getString(ACTIVE_RUNTIME);
@@ -265,6 +276,34 @@ public class RedPreferences {
         return Severity.valueOf(store.getString(category.getId()));
     }
 
+    public List<String> getRfLintRulesFiles() {
+        final String allRulesFiles = store.getString(RFLINT_RULES_FILES);
+        if (allRulesFiles.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        return Splitter.on(';').splitToList(allRulesFiles);
+    }
+
+    public List<RfLintRule> getRfLintRules() {
+        final String allRulesNames = store.getString(RFLINT_RULES_CONFIG_NAMES);
+        final String allRulesSeverities = store.getString(RFLINT_RULES_CONFIG_SEVERITIES);
+        final String allRulesArgs = store.getString(RFLINT_RULES_CONFIG_ARGS);
+
+        if (allRulesNames.trim().isEmpty() && allRulesSeverities.trim().isEmpty() && allRulesArgs.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        final List<String> names = Splitter.on(';').splitToList(allRulesNames);
+        final List<String> severities = Splitter.on(';').splitToList(allRulesSeverities);
+        final List<String> args = Splitter.on(';').splitToList(allRulesArgs);
+
+        final List<RfLintRule> rules = new ArrayList<>();
+        final int limit = Stream.of(names.size(), severities.size(), args.size()).min(Integer::compare).get();
+        for (int i = 0; i < limit; i++) {
+            rules.add(new RfLintRule(names.get(i), severities.get(i), args.get(i)));
+        }
+        return rules;
+    }
+
     public static class ColoringPreference {
 
         private final RGB color;
@@ -289,10 +328,14 @@ public class RedPreferences {
         }
         
         @Override
-        public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (!(obj instanceof ColoringPreference)) return false;
-            ColoringPreference pref = (ColoringPreference)obj;
+        public boolean equals(final Object obj) {
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof ColoringPreference)) {
+                return false;
+            }
+            final ColoringPreference pref = (ColoringPreference)obj;
             return pref.color.equals(this.color) && pref.fontStyle == this.fontStyle;
         }
     }

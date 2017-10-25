@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.rf.ide.core.rflint.RfLintRule;
+
 /**
  * @author Michal Anglart
  */
@@ -43,5 +45,6 @@ interface RobotCommandExecutor {
 
     void stopLibraryAutoDiscovering();
 
-    void runRfLint(final String host, final int port, final File filepath);
+    void runRfLint(final String host, final int port, final File filepath, List<RfLintRule> rules,
+            List<String> rulesFiles);
 }
