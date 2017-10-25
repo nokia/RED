@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __AGDkGyEEeeps9cepQRw2Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/17 6:40 PM
+Save-Time: 10/25/17 11:45 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -236,6 +236,7 @@ exec-with-options -disableJobWaiting -command {
 	wait 1000
 	get-view Variables | get-tree | get-item "@{assigned}" | collapse
 	get-view Variables | get-tree | get-item "&{dict}" | expand
+	get-view Variables | get-tree | get-item "@{c}" | expand
 	wait 500
 	with [get-view Variables | get-tree] {
 	    get-item -path "&{dict}/fruit" | get-property "values['Name']" | equals fruit | verify-true
