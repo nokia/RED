@@ -1,0 +1,65 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+	<h2>Robot Framework Lint analysis</h2>
+
+	<p>Starting with RED 0.8.1 it is possible to run <a target="_blank" class="external" 
+		href="http://github.com/boakley/robotframework-lint/">Robot Framework Lint</a> 
+	analysis tool. Of course one have to have it installed in the python installation
+	used by the project.
+	</p>
+	
+	<h3>Running RfLint</h3>
+	<p>RfLint can be run on selected file or folder (or whole project) in <b>Project Explorer</b> view. In order
+	to start analysis open context menu for selected resource and choose <b>Robot Framework -> Run RfLint analysis</b>.
+	</p>
+	<img src="images/rflint_run.png"/>
+	
+	
+	<p>The analysis should start and its progress is visible in <b>Progress</b> view. At any time you can abort running
+	validation:
+	</p>
+	<img src="images/rflint_progress.png"/>
+	
+	<p>Analysis performed from RED is reporting all the findings as <b>Problem markers</b> of a separate type called
+	<b>RfLint Problem</b>. This is a different type than those reported by standard RED <a href="../validation.html">
+	validation</a> mechanism (they have <b>Robot Problem</b> type). Overall this means that the findings are visible
+	in <b>Problems</b> view and are also visible in editors. 
+	</p>
+	<img src="images/rflint_problems.png"/>
+	
+	<p>In order to remove problems simply choose <b>Robot Framework -> Clean RfLint problems</b> from context menu
+	of selected resource.
+	</p>
+	
+	<h3>Configuration</h3>
+	
+	<p>It is possible to configure RfLint behavior in Preferences (
+		<i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.rflint)')">
+		Window-&gt;Preferences-&gt;Robot Framework-&gt;Errors/Warnings-&gt;RfLint validation</a></i>)
+	</p>
+	<img src="images/rflint_prefs.png"/>
+	
+	<ul>
+		<li>rule <b>severity</b> - rule of a given name can have severity specified: <b>default</b> means severity is 
+		unchanged, <b>Error</b> and <b>Warning</b> changes severity to one of those levels, while <b>Ignore</b> will
+		silence the rule,
+		<p/>
+		</li>
+		<li>rule <b>configuration</b> - as described in <a target="_blank" class="external" href="http://github.com/boakley/robotframework-lint/wiki/How-to-write-custom-rules">RfLint Wiki</a>
+		some rules can be configured. This can be done on preference page. Simply write arguments for given rule. 
+		If there are multiple arguments then they should be separated with colon (:) character,
+		<p/>
+		</li>
+		<li><b>additional rules files</b> - add python files containing custom RfLint rules so that they will 
+		be also used for analysis.
+		<p/>
+		</li>
+	</ul>
+	
+</body>
+</html>
