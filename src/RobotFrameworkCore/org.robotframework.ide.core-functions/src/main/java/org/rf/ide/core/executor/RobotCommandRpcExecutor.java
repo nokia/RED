@@ -408,7 +408,7 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             final List<String> additionalArgs = new ArrayList<>();
             for (final RfLintRule rule : rules) {
                 if (rule.hasChangedSeverity()) {
-                    additionalArgs.add(RobotCommandDirectExecutor.severitySwitch(rule.getSeverity()));
+                    additionalArgs.add("-" + rule.getSeverity().severitySwitch());
                     additionalArgs.add(rule.getRuleName());
                 }
                 if (rule.hasConfigurationArguments()) {
