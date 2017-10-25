@@ -5692,6 +5692,12 @@
             name="Errors/Warnings">
       </page>
       <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.validation"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.RfLintValidationPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.rflint"
+            name="RfLint validation">
+      </page>
+      <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.SuiteEditorPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor"

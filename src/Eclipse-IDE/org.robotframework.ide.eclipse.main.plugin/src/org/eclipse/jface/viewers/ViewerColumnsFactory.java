@@ -88,6 +88,11 @@ public class ViewerColumnsFactory {
         return this;
     }
 
+    public ViewerColumnsFactory editingEnabled() {
+        this.shouldAddEditingSupport = true;
+        return this;
+    }
+
     public ViewerColumnsFactory editingSupportedBy(final EditingSupport editingSupport) {
         this.editingSupport = editingSupport;
         return this;

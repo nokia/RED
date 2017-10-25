@@ -46,6 +46,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeAutodiscoveringPreferences(preferences);
         initializeProblemSeverityPreferences(preferences);
         initializeDefaultLaunchConfigurationPreferences(preferences);
+        initializeRfLintPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -123,6 +124,13 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
                 AgentConnectionServer.DEFAULT_CONNECTION_TIMEOUT);
         preferences.put(RedPreferences.DEBUGGER_SUSPEND_ON_ERROR, IssuesStrategy.PROMPT.name().toLowerCase());
         preferences.putBoolean(RedPreferences.DEBUGGER_OMIT_LIB_KEYWORDS, false);
+    }
+
+    private void initializeRfLintPreferences(final IEclipsePreferences preferences) {
+        preferences.put(RedPreferences.RFLINT_RULES_FILES, "");
+        preferences.put(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "");
+        preferences.put(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
+        preferences.put(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
     }
 
     static String getFontStyleIdentifierFor(final SyntaxHighlightingCategory category) {
