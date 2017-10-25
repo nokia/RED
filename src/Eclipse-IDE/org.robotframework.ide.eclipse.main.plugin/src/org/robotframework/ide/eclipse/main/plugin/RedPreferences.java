@@ -20,6 +20,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.service.prefs.BackingStoreException;
 import org.rf.ide.core.rflint.RfLintRule;
+import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
@@ -299,7 +300,7 @@ public class RedPreferences {
         final List<RfLintRule> rules = new ArrayList<>();
         final int limit = Stream.of(names.size(), severities.size(), args.size()).min(Integer::compare).get();
         for (int i = 0; i < limit; i++) {
-            rules.add(new RfLintRule(names.get(i), severities.get(i), args.get(i)));
+            rules.add(new RfLintRule(names.get(i), RfLintViolationSeverity.valueOf(severities.get(i)), args.get(i)));
         }
         return rules;
     }
