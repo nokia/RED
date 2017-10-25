@@ -21,6 +21,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentDetailedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.rflint.RfLintRule;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
@@ -318,7 +319,8 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void runRfLint(final String host, final int port, final File filepath) {
+    public void runRfLint(final String host, final int port, final File filepath, final List<RfLintRule> rules,
+            final List<String> rulesFiles) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
 
@@ -326,6 +328,20 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             
             cmdLine.add(host);
             cmdLine.add(Integer.toString(port));
+            for (final RfLintRule rule : rules) {
+                if (rule.hasChangedSeverity()) {
+                    cmdLine.add(severitySwitch(rule.getSeverity()));
+                    cmdLine.add(rule.getRuleName());
+                }
+                if (rule.hasConfigurationArguments()) {
+                    cmdLine.add("-c");
+                    cmdLine.add(rule.getRuleName() + ":" + rule.getConfiguration());
+                }
+            }
+            for (final String path : rulesFiles) {
+                cmdLine.add("-R");
+                cmdLine.add(path);
+            }
             cmdLine.add("-r");
             cmdLine.add(filepath.getAbsolutePath());
 
@@ -333,6 +349,18 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         } catch (final IOException | NumberFormatException e) {
             throw new RobotEnvironmentException("Unable to start RfLint");
         }
+    }
+
+    static String severitySwitch(final String severity) {
+        switch (severity.toLowerCase()) {
+            case "error":
+                return "-e";
+            case "warning":
+                return "-w";
+            case "ignore":
+                return "-i";
+        }
+        throw new IllegalStateException();
     }
 
     private List<String> createCommandLine(final File scriptFile, final String... lines) {

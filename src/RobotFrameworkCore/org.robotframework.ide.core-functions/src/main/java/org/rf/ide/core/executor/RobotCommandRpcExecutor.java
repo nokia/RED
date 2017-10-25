@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.apache.xmlrpc.serializer.TypeSerializerImpl;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
+import org.rf.ide.core.rflint.RfLintRule;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -400,9 +402,26 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void runRfLint(final String host, final int port, final File filepath) {
+    public void runRfLint(final String host, final int port, final File filepath, final List<RfLintRule> rules,
+            final List<String> rulesFiles) {
         try {
-            callRpcFunction("runRfLint", host, port, filepath.getAbsolutePath());
+            final List<String> additionalArgs = new ArrayList<>();
+            for (final RfLintRule rule : rules) {
+                if (rule.hasChangedSeverity()) {
+                    additionalArgs.add(RobotCommandDirectExecutor.severitySwitch(rule.getSeverity()));
+                    additionalArgs.add(rule.getRuleName());
+                }
+                if (rule.hasConfigurationArguments()) {
+                    additionalArgs.add("-c");
+                    additionalArgs.add(rule.getRuleName() + ":" + rule.getConfiguration());
+                }
+            }
+            for (final String path : rulesFiles) {
+                additionalArgs.add("-R");
+                additionalArgs.add(path);
+            }
+            callRpcFunction("runRfLint", host, port, filepath.getAbsolutePath(), additionalArgs);
+
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
