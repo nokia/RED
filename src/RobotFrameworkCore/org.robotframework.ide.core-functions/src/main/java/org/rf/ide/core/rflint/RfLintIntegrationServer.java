@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -53,9 +54,14 @@ public class RfLintIntegrationServer {
     private boolean stopped;
 
     public RfLintIntegrationServer(final Consumer<Exception> onServerException) {
+        this(30, TimeUnit.SECONDS, onServerException);
+    }
+
+    public RfLintIntegrationServer(final int timeout, final TimeUnit timoutUnit,
+            final Consumer<Exception> onServerException) {
         this.host = "127.0.0.1";
         this.port = findFreePort();
-        this.timeoutInMillis = 30_000;
+        this.timeoutInMillis = (int) TimeUnit.MILLISECONDS.convert(timeout, timoutUnit);
         this.onServerException = onServerException;
     }
 
@@ -69,12 +75,11 @@ public class RfLintIntegrationServer {
 
     public void start(final RfLintClientEventsListener... eventsListeners) throws IOException {
         try {
-            serverSetupSemaphore.release();
-
             serverSocket = new ServerSocket(port, 50, InetAddress.getByName(host));
             serverSocket.setReuseAddress(true);
             serverSocket.setSoTimeout(timeoutInMillis);
 
+            serverSetupSemaphore.release();
             try (Socket clientSocket = serverSocket.accept()) {
                 this.clientSocket = clientSocket;
                 final BufferedReader eventsReader = new BufferedReader(

@@ -5,7 +5,8 @@ public enum RfLintViolationSeverity {
     ERROR,
     WARNING,
     IGNORE,
-    OTHER;
+    OTHER,
+    DEFAULT;
 
     public static RfLintViolationSeverity from(final String severity) {
         if ("E".equals(severity)) {
@@ -17,4 +18,18 @@ public enum RfLintViolationSeverity {
         }
         return OTHER;
     }
+
+    public String severitySwitch() {
+        switch (this) {
+            case ERROR:
+                return "e";
+            case WARNING:
+                return "w";
+            case IGNORE:
+                return "i";
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
 }

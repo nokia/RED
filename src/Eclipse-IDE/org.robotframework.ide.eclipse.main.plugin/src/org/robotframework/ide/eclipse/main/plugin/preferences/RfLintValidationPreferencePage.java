@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -12,7 +13,6 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -54,6 +54,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.rf.ide.core.rflint.RfLintRule;
+import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -115,7 +116,7 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
         viewer.getTable().setHeaderVisible(true);
 
         final Supplier<RfLintRule> newRulesSupplier = () -> {
-            final RfLintRule newRule = new RfLintRule("Rule", "default", "");
+            final RfLintRule newRule = new RfLintRule("Rule", RfLintViolationSeverity.DEFAULT, "");
             rules.add(newRule);
             return newRule;
         };
@@ -244,7 +245,10 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
     public boolean performOk() {
         final String allRulesFiles = rulesFiles.stream().map(RulesFile::getPath).collect(joining(";"));
         final String allRulesNames = rules.stream().map(RfLintRule::getRuleName).collect(joining(";"));
-        final String allRulesSeverities = rules.stream().map(RfLintRule::getSeverity).collect(joining(";"));
+        final String allRulesSeverities = rules.stream()
+                .map(RfLintRule::getSeverity)
+                .map(RfLintViolationSeverity::name)
+                .collect(joining(";"));
         final String allRulesArgs = rules.stream().map(RfLintRule::getConfiguration).collect(joining(";"));
 
         getPreferenceStore().putValue(RedPreferences.RFLINT_RULES_FILES, allRulesFiles);
@@ -361,13 +365,17 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
 
     private static class RuleSeverityLabelProvider extends RedCommonLabelProvider {
 
+        static final BiMap<RfLintViolationSeverity, String> SEVERITIES_LABELS = ImmutableBiMap
+                .of(RfLintViolationSeverity.DEFAULT, "default", RfLintViolationSeverity.ERROR, "Error",
+                        RfLintViolationSeverity.WARNING, "Warning", RfLintViolationSeverity.IGNORE, "Ignore");
+
         @Override
         public StyledString getStyledText(final Object element) {
             if (element instanceof RfLintRule) {
                 final RfLintRule rule = (RfLintRule) element;
                 final Styler styler = rule.isDead() ? Stylers.withForeground(200, 200, 200)
                         : Stylers.Common.EMPTY_STYLER;
-                return new StyledString(rule.getSeverity(), styler);
+                return new StyledString(SEVERITIES_LABELS.get(rule.getSeverity()), styler);
             }
             return new StyledString();
         }
@@ -375,8 +383,8 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
 
     private static class RuleSeverityEditingSupport extends ElementsAddingEditingSupport {
 
-        private final BiMap<Integer, String> indexSeverityAssociation = ImmutableBiMap.of(0, "default", 1, "Error", 2,
-                "Warning", 3, "Ignore");
+        private final List<RfLintViolationSeverity> indexes = newArrayList(RfLintViolationSeverity.DEFAULT,
+                RfLintViolationSeverity.ERROR, RfLintViolationSeverity.WARNING, RfLintViolationSeverity.IGNORE);
 
         public RuleSeverityEditingSupport(final ColumnViewer viewer, final Supplier<?> creator) {
             super(viewer, 0, creator);
@@ -386,7 +394,7 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
         protected CellEditor getCellEditor(final Object element) {
             if (element instanceof RfLintRule) {
                 return new ComboBoxCellEditor((Composite) getViewer().getControl(),
-                        indexSeverityAssociation.values().toArray(new String[0]));
+                        RuleSeverityLabelProvider.SEVERITIES_LABELS.values().toArray(new String[0]));
             }
             return super.getCellEditor(element);
         }
@@ -394,7 +402,8 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
         @Override
         protected Object getValue(final Object element) {
             if (element instanceof RfLintRule) {
-                return indexSeverityAssociation.inverse().get(((RfLintRule) element).getSeverity());
+                final RfLintRule rule = (RfLintRule) element;
+                return indexes.indexOf(rule.getSeverity());
             }
             return "";
         }
@@ -402,8 +411,9 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
         @Override
         protected void setValue(final Object element, final Object value) {
             if (element instanceof RfLintRule) {
-                ((RfLintRule) element).setSeverity(Optional.ofNullable(indexSeverityAssociation.get(value))
-                        .orElse(indexSeverityAssociation.get(0)));
+                final int index = (int) value;
+                final RfLintRule rule = (RfLintRule) element;
+                rule.setSeverity(index == -1 ? RfLintViolationSeverity.DEFAULT : indexes.get(index));
                 getViewer().refresh(element);
             } else {
                 super.setValue(element, value);

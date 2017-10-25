@@ -4,11 +4,11 @@ public class RfLintRule {
 
     private String ruleName;
 
-    private String severity;
+    private RfLintViolationSeverity severity;
 
     private String configuration;
 
-    public RfLintRule(final String ruleName, final String severity, final String configuration) {
+    public RfLintRule(final String ruleName, final RfLintViolationSeverity severity, final String configuration) {
         this.ruleName = ruleName;
         this.severity = severity;
         this.configuration = configuration;
@@ -22,11 +22,11 @@ public class RfLintRule {
         this.ruleName = ruleName;
     }
 
-    public String getSeverity() {
+    public RfLintViolationSeverity getSeverity() {
         return severity;
     }
 
-    public void setSeverity(final String severity) {
+    public void setSeverity(final RfLintViolationSeverity severity) {
         this.severity = severity;
     }
 
@@ -39,11 +39,11 @@ public class RfLintRule {
     }
 
     public boolean isDead() {
-        return "default".equals(severity.toLowerCase()) && configuration.trim().isEmpty();
+        return !hasChangedSeverity() && !hasConfigurationArguments();
     }
 
     public boolean hasChangedSeverity() {
-        return !"default".equals(severity.toLowerCase());
+        return severity != RfLintViolationSeverity.DEFAULT;
     }
 
     public boolean hasConfigurationArguments() {
