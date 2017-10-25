@@ -1,0 +1,65 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _bICqoLjBEeeOxNC18TLHTA
+Element-Name: DarkThemeFontPreferences
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _4pCVQLi_EeeOxNC18TLHTA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 10/25/17 11:27 AM
+Testcase-Type: ecl
+Verifications: _XXNZILjIEeeOxNC18TLHTA,_UFjbILjIEeeOxNC18TLHTA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open preference and go to syntax coloring
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+}
+
+//check if by default is "default" value
+get-window Preferences | get-group "" | get-combo -after [get-label "Use predefined syntax coloring:"] 
+    | get-property selection | equals default | verify-true
+    
+//change comment font to bold    
+with [get-window Preferences] {
+    get-list | select Comments
+    get-button Bold | check
+}
+
+//check if coloring was changed to custom
+get-window Preferences | get-group "" | get-combo -after [get-label "Use predefined syntax coloring:"] 
+    | get-property selection | equals custom | verify-true
+    
+//change font color for KW/TC    
+get-window Preferences | get-list | select "Keyword\\/Test Cases definition headers"
+set-dialog-result Color "128,128,0"
+with [get-window Preferences] {
+    get-button -after [get-label "Syntax Coloring"] -index 3 | click
+    get-button "Apply and Close" | click
+}
+
+//open file to see if color was change to cutom values
+with [get-view "Project Explorer" | get-tree] {
+    select DarkThemeProject | double-click
+    select "DarkThemeProject/second_file.tsv" | double-click
+}
+
+
+//go to Preference and change to heliophobia
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group "" | get-combo -after [get-label "Use predefined syntax coloring:"] | select heliophobia
+    get-button "Apply and Close" | click
+}
+
+//open other file
+get-view "Project Explorer" | get-tree | select "DarkThemeProject/TestFile.robot" | double-click
+
+//varify colors inverification
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
