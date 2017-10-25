@@ -4,6 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Named;
 
@@ -20,8 +21,10 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.rflint.RfLintClientEventsListener;
 import org.rf.ide.core.rflint.RfLintIntegrationServer;
+import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RunRfLintHandler.E4RunRfLintHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
@@ -53,7 +56,11 @@ public class RunRfLintHandler extends DIParameterizedHandler<E4RunRfLintHandler>
                 showErrorDialog(e);
             }
             try {
-                env.runRfLint(server.getHost(), server.getPort(), filepath);
+                final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+                final List<RfLintRule> rules = preferences.getRfLintRules();
+                final List<String> rulesFiles = preferences.getRfLintRulesFiles();
+
+                env.runRfLint(server.getHost(), server.getPort(), filepath, rules, rulesFiles);
             } catch (final RobotEnvironmentException e) {
                 killServer(server);
                 showErrorDialog(e);

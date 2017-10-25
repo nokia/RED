@@ -187,7 +187,7 @@ def stop_library_auto_discovering():
 @logresult
 @encode_result_or_exception
 @logargs
-def run_rf_lint(host, port, filepath):
+def run_rf_lint(host, port, filepath, additional_arguments):
     import subprocess
     import os
     
@@ -201,6 +201,7 @@ def run_rf_lint(host, port, filepath):
     command.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'rflint_integration.py'))
     command.append(host)
     command.append(str(port))
+    command.extend(additional_arguments)
     command.extend(['-r', filepath])
 
     subprocess.Popen(command, stdin=subprocess.PIPE)
