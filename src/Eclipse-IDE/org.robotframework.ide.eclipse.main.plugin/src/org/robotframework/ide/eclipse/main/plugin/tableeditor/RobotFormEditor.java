@@ -116,10 +116,6 @@ public class RobotFormEditor extends FormEditor {
 
             prepareEclipseContext();
 
-            validationListener.init();
-            ResourcesPlugin.getWorkspace().addResourceChangeListener(validationListener,
-                    IResourceChangeEvent.POST_CHANGE);
-
             site.getService(ICommandService.class).addExecutionListener(saveLibDiscoveryTrigger);
 
             initRobotFormEditorPartListener(site.getPage());
@@ -191,9 +187,15 @@ public class RobotFormEditor extends FormEditor {
             addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
 
             activateProperPage();
+            initializeMarkersSupportForTables();
         } catch (final Exception e) {
             throw new RobotEditorOpeningException("Unable to initialize Suite editor", e);
         }
+    }
+
+    private void initializeMarkersSupportForTables() {
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(validationListener, IResourceChangeEvent.POST_CHANGE);
+        validationListener.init();
     }
 
     private void activateProperPage() {
