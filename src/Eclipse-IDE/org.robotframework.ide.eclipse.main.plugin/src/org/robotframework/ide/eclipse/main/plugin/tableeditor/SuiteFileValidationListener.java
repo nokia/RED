@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RfLintProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
@@ -59,8 +60,12 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
             return;
         }
         try {
-            final IMarker[] initialMarkers = suiteModel.getFile().findMarkers(RobotProblem.TYPE_ID, true, 1);
-            for (final IMarker marker : initialMarkers) {
+            final IMarker[] initialRobotMarkers = suiteModel.getFile().findMarkers(RobotProblem.TYPE_ID, true, 1);
+            for (final IMarker marker : initialRobotMarkers) {
+                markers.put(marker.getId(), marker);
+            }
+            final IMarker[] initialRfLintMarkers = suiteModel.getFile().findMarkers(RfLintProblem.TYPE_ID, true, 1);
+            for (final IMarker marker : initialRfLintMarkers) {
                 markers.put(marker.getId(), marker);
             }
             eventBroker.post(RobotModelEvents.MARKERS_CACHE_RELOADED, suiteModel);
@@ -98,7 +103,8 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
             if (markers.containsKey(delta.getId()) && delta.getKind() == IResourceDelta.REMOVED) {
                 markers.remove(delta.getId());
             } else if (delta.getKind() != IResourceDelta.REMOVED && delta.getMarker().exists()
-                    && delta.getMarker().isSubtypeOf(RobotProblem.TYPE_ID)) {
+                    && (delta.getMarker().isSubtypeOf(RobotProblem.TYPE_ID)
+                            || delta.getMarker().isSubtypeOf(RfLintProblem.TYPE_ID))) {
                 markers.put(delta.getId(), delta.getMarker());
             }
         }
@@ -192,9 +198,10 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
                 }
                 final Range<Integer> tokenRange = getTokenRange(token);
                 final Range<Integer> markerRange = getMarkerRange(marker);
+                final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -2);
                 
-                if ((markerRange != null && tokenRange.isConnected(markerRange))) {
-
+                if ((markerRange != null && tokenRange.isConnected(markerRange))
+                        || (markerRange == null && token.getFilePosition().getLine() == markerLine)) {
                     alreadyVisitedMarkers.add(marker);
                     final boolean shallContinue = visitor.visit(marker);
                     if (!shallContinue) {
