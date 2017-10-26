@@ -328,6 +328,10 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             
             cmdLine.add(host);
             cmdLine.add(Integer.toString(port));
+            for (final String path : rulesFiles) {
+                cmdLine.add("-R");
+                cmdLine.add(path);
+            }
             for (final RfLintRule rule : rules) {
                 if (rule.hasChangedSeverity()) {
                     cmdLine.add("-" + rule.getSeverity().severitySwitch());
@@ -337,10 +341,6 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                     cmdLine.add("-c");
                     cmdLine.add(rule.getRuleName() + ":" + rule.getConfiguration());
                 }
-            }
-            for (final String path : rulesFiles) {
-                cmdLine.add("-R");
-                cmdLine.add(path);
             }
             cmdLine.add("-r");
             cmdLine.add(filepath.getAbsolutePath());

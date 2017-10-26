@@ -406,6 +406,10 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
             final List<String> rulesFiles) {
         try {
             final List<String> additionalArgs = new ArrayList<>();
+            for (final String path : rulesFiles) {
+                additionalArgs.add("-R");
+                additionalArgs.add(path);
+            }
             for (final RfLintRule rule : rules) {
                 if (rule.hasChangedSeverity()) {
                     additionalArgs.add("-" + rule.getSeverity().severitySwitch());
@@ -415,10 +419,6 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
                     additionalArgs.add("-c");
                     additionalArgs.add(rule.getRuleName() + ":" + rule.getConfiguration());
                 }
-            }
-            for (final String path : rulesFiles) {
-                additionalArgs.add("-R");
-                additionalArgs.add(path);
             }
             callRpcFunction("runRfLint", host, port, filepath.getAbsolutePath(), additionalArgs);
 
