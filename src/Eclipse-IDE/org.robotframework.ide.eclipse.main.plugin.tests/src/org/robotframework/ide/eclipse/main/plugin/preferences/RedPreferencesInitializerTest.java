@@ -113,4 +113,22 @@ public class RedPreferencesInitializerTest {
         verify(preferences).putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
         verify(preferences).putBoolean(RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED, false);
     }
+
+    @Test
+    public void byDefaultThereAreNoAdditionalRfRulesFiles() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).put(RedPreferences.RFLINT_RULES_FILES, "");
+    }
+
+    @Test
+    public void byDefaultNoRfLintRuleIsConfigured() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        verify(preferences).put(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "");
+        verify(preferences).put(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
+        verify(preferences).put(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
+    }
 }

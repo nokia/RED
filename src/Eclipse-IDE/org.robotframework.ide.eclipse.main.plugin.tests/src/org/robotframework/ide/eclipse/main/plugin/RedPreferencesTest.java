@@ -10,12 +10,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.junit.Test;
+import org.rf.ide.core.rflint.RfLintRule;
+import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.FoldableElements;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
@@ -63,6 +66,56 @@ public class RedPreferencesTest {
         final RedPreferences preferences = new RedPreferences(store);
 
         assertThat(preferences.getElementOpenMode()).isEqualTo(ElementOpenMode.OPEN_IN_TABLES);
+    }
+
+    @Test
+    public void rfLintRulesFilesAreTakenFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.RFLINT_RULES_FILES)).thenReturn("");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getRfLintRulesFiles()).isEmpty();
+    }
+
+    @Test
+    public void rfLintRulesFilesAreTakenFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.RFLINT_RULES_FILES))
+                .thenReturn("/path/to/firstfile.py;/path/to/sndfile.py");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getRfLintRulesFiles()).containsExactly("/path/to/firstfile.py", "/path/to/sndfile.py");
+    }
+
+    @Test
+    public void rfLintRulesConfigIsTakenFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_NAMES)).thenReturn("");
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES)).thenReturn("");
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_ARGS)).thenReturn("");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getRfLintRules()).isEmpty();
+    }
+
+    @Test
+    public void rfLintRulesConfigIsTakenFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_NAMES)).thenReturn("Rule1;Rule2");
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES)).thenReturn("DEFAULT;ERROR");
+        when(store.getString(RedPreferences.RFLINT_RULES_CONFIG_ARGS)).thenReturn("80;");
+
+        final RedPreferences preferences = new RedPreferences(store);
+        final List<RfLintRule> rules = preferences.getRfLintRules();
+        assertThat(rules).hasSize(2);
+
+        assertThat(rules.get(0).getRuleName()).isEqualTo("Rule1");
+        assertThat(rules.get(0).getSeverity()).isEqualTo(RfLintViolationSeverity.DEFAULT);
+        assertThat(rules.get(0).getConfiguration()).isEqualTo("80");
+
+        assertThat(rules.get(1).getRuleName()).isEqualTo("Rule2");
+        assertThat(rules.get(1).getSeverity()).isEqualTo(RfLintViolationSeverity.ERROR);
+        assertThat(rules.get(1).getConfiguration()).isEmpty();
     }
 
     @Test
