@@ -198,6 +198,7 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
                 }
                 final Range<Integer> tokenRange = getTokenRange(token);
                 final Range<Integer> markerRange = getMarkerRange(marker);
+                // -2 because when token is newly created it may have -1 as line number
                 final int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -2);
                 
                 if ((markerRange != null && tokenRange.isConnected(markerRange))
