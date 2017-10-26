@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5wbGUP_mEeWRL4nRKA71zA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/16/17 2:19 PM
+Save-Time: 10/26/17 9:41 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -116,9 +116,6 @@ get-view "Project Explorer" | get-tree | select RobotProject
 get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" 
     | get-property enablement | equals true | verify-true
 
-
-
-
 //autodiscover on suite with no libs
 get-view "Project Explorer" | get-tree | select "RobotProject/other_tests/no_lib.robot" 
     | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
@@ -130,5 +127,61 @@ with [get-window "Discovering libraries summary"] {
 }
 get-window "Discovering libraries summary" | get-button OK | click
 
+// remove referenced libraries from red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    key-type "M1+a"
+    key-type Del
+    key-type "M1+s"
+}
+get-view "Project Explorer" | click
+get-editor "RobotProject/red.xml" | close
 
+// run autodiscovery on resource folder
+get-view "Project Explorer" | get-tree | select "RobotProject/resources" 
+    | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
+ 
+// verify if res1 is added
+get-window "Discovering libraries summary" | get-tree | get-item res1 | get-property caption | equals res1 | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource \\(1\\)" 
+    | get-property caption | equals "res1 RobotProject/libs/for_resource (1)" | verify-true
+    
+// remove referenced libraries from red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "res1 - RobotProject\\/libs\\/for_resource" | key-type Del
+    key-type "M1+s"
+}
+get-view "Project Explorer" | click
+get-editor "RobotProject/red.xml" | close
+
+// run autodiscovery on RobotProject
+get-view "Project Explorer" | get-tree | select RobotProject 
+    | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
+get-window "Discovering libraries summary" | get-button OK | click
+
+// verify if res1 is added
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource \\(1\\)" 
+    | get-property caption | equals "res1 RobotProject/libs/for_resource (1)" | verify-true
+    
+// remove referenced libraries from red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "multiply - RobotProject" "many_classes - RobotProject\\/libs\\/subfolder" "divide - RobotProject\\/libs\\/t" "res1 - RobotProject\\/libs\\/for_resource" "add - RobotProject\\/libs" "lib_with_args - RobotProject\\/libs" "discover_lib - RobotProject\\/Tests_wit_lib"
+    key-type Del
+    key-type "M1+s"
+}
+get-view "Project Explorer" | click
+get-editor "RobotProject/red.xml" | close
+// run autodiscovery on resource.robot
+get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" 
+    | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
+get-window "Discovering libraries summary" | get-button OK | click
+// verify if res1 is added
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/res1 RobotProject\\/libs\\/for_resource \\(1\\)" 
+    | get-property caption | equals "res1 RobotProject/libs/for_resource (1)" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
