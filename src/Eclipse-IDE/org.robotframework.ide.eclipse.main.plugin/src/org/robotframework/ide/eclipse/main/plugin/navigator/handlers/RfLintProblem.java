@@ -12,9 +12,9 @@ import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 
-class RfLintProblem {
+public class RfLintProblem {
 
-    private static final String TYPE_ID = RedPlugin.PLUGIN_ID + ".rfLintProblem";
+    public static final String TYPE_ID = RedPlugin.PLUGIN_ID + ".rfLintProblem";
 
     private final String ruleName;
 
