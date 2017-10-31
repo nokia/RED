@@ -342,6 +342,13 @@ public enum KeywordsProblem implements IProblemCause {
 
             return fixers;
         }
+    },
+    VARIABLE_AS_KEYWORD_NAME {
+
+        @Override
+        public String getProblemDescription() {
+            return "Variable '%s' is given as a keyword name";
+        }
     };
 
     @Override
