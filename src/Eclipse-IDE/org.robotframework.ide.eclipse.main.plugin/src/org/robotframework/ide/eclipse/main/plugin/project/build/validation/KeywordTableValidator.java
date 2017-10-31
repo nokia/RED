@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,6 +55,8 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
 
+    private final static Pattern VARIABLE_ONLY_PATTERN = Pattern.compile("^([$|&|@]\\{[^{}]+\\})+$");
+
     KeywordTableValidator(final FileValidationContext validationContext,
             final Optional<RobotKeywordsSection> keywordSection, final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
@@ -79,6 +83,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         reportSettingsProblems(keywords);
         reportKeywordUsageProblems(keywords);
         reportUnknownVariables(keywords);
+        reportVariableAsKeywordName(keywords);
     }
 
     private void validateByExternal(final RobotKeywordsSection section, final IProgressMonitor monitor)
@@ -269,6 +274,24 @@ class KeywordTableValidator implements ModelUnitValidator {
             final RobotToken timeoutToken = keywordTimeout.getTimeout();
             if (timeoutToken != null) {
                 TestCaseTableValidator.validateTimeoutSetting(validationContext, reporter, variables, timeoutToken);
+            }
+        }
+    }
+
+    private void reportVariableAsKeywordName(final List<UserKeyword> keywords) {
+
+        for (final UserKeyword keyword : keywords) {
+            final RobotToken keywordName = keyword.getKeywordName();
+            final String name = keywordName.getText();
+
+            final Matcher variablesOnlyMatcher = VARIABLE_ONLY_PATTERN.matcher(name);
+
+            if (variablesOnlyMatcher.matches()) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME)
+                        .formatMessageWith(name);
+
+                final Map<String, Object> arguments = ImmutableMap.of(AdditionalMarkerAttributes.NAME, name);
+                reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
             }
         }
     }
