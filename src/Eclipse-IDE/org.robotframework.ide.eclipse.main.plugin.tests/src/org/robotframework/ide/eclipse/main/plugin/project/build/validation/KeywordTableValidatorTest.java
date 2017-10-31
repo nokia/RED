@@ -341,6 +341,69 @@ public class KeywordTableValidatorTest {
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
+    @Test
+    public void keywordNamesWithVariablesOnlyAreReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("${var1}")
+                .appendLine("    log	11")
+                .appendLine("@{var2}")
+                .appendLine("    log	22")
+                .appendLine("&{var3}")
+                .appendLine("    log	33")
+                .appendLine("${var4}${var5}")
+                .appendLine("    log    44")
+                .build();
+
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "log",
+                new Path("/res.robot"), "var");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("log",
+                newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
+
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(4);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
+                        new ProblemPosition(2, Range.closed(17, 24))),
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
+                        new ProblemPosition(4, Range.closed(36, 43))),
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
+                        new ProblemPosition(6, Range.closed(55, 62))),
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
+                        new ProblemPosition(8, Range.closed(74, 88))));
+    }
+
+    @Test
+    public void keywordNamesWithEmbeddedVariablesAreNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("${var1}_part")
+                .appendLine("    log  11")
+                .appendLine("part_${var2}")
+                .appendLine("    log  22")
+                .appendLine("${var3}_part_${var4}")
+                .appendLine("    log  33")
+                .build();
+
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "log",
+                new Path("/res.robot"), "var");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("log",
+                newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
+
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+    }
+
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
             final String name, final IPath exposingPath, final String... args) {
         return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
