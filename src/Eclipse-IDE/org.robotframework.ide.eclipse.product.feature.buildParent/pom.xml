@@ -10,24 +10,6 @@
   <artifactId>org.robotframework.ide.eclipse.product.feature.buildParent</artifactId>
   <packaging>pom</packaging>
   
-  <reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.5</version>
-				<configuration>
-					<rulesets>
-						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
-					</rulesets>
-					<linkXref>true</linkXref>
-					<sourceEncoding>utf-8</sourceEncoding>
-					<minimumTokens>100</minimumTokens>
-					<targetJdk>${jdk.version}</targetJdk>
-				</configuration>
-			</plugin>
-		</plugins>
-  </reporting>
   <modules>
   	<module>../org.robotframework.ide.eclipse.product.plugin</module>
   	<module>../org.robotframework.ide.eclipse.product.feature</module>
