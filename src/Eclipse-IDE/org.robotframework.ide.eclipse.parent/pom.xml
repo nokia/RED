@@ -1,111 +1,110 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.robotframework.ide.eclipse</groupId>
-    <artifactId>org.robotframework.ide.eclipse.parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>RobotFramework Eclipse IDE Maven Parent Project</name>
-    
-    
-    <profiles>
-        <profile>
-            <id>luna-profile</id>
-            <activation>
-                <property>
-                    <name>eclipse.version</name>
-                    <value>luna</value>
-                </property>
-            </activation>
-            <properties>
-                <tycho-version>0.22.0</tycho-version>
-            </properties>
-            <repositories>
-                <repository>
-                    <id>eclipse-luna</id>
-                    <url>http://download.eclipse.org/releases/luna/</url>
-                    <layout>p2</layout>
-                </repository>
-                <repository>
-                    <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
-                    <layout>p2</layout>
-                </repository>
-            </repositories>
-        </profile>
-        <profile>
-            <id>mars-profile</id>
-            <activation>
-                <property>
-                    <name>eclipse.version</name>
-                    <value>mars</value>
-                </property>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>eclipse-mars</id>
-                    <url>http://download.eclipse.org/releases/mars/</url>
-                    <layout>p2</layout>
-                </repository>
-                <repository>
-                    <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
-                    <layout>p2</layout>
-                </repository>
-            </repositories>
-        </profile>
-        <profile>
-            <id>neon-profile</id>
-            <activation>
-                <property>
-                    <name>eclipse.version</name>
-                    <value>neon</value>
-                </property>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>eclipse-neon</id>
-                    <url>http://download.eclipse.org/releases/neon/ </url>
-                    <layout>p2</layout>
-                </repository>
-                <repository>
-                    <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
-                    <layout>p2</layout>
-                </repository>
-            </repositories>
-        </profile>
-        <profile>
-            <id>oxygen-profile</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>eclipse.version</name>
-                    <value>oxygen</value>
-                </property>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>eclipse-oxygen</id>
-                    <url>http://download.eclipse.org/releases/oxygen/ </url>
-                    <layout>p2</layout>
-                </repository>
-                <repository>
-                    <id>nattable</id>
-                    <url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
-                    <layout>p2</layout>
-                </repository>
-            </repositories>
-        </profile>
-    </profiles>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.robotframework.ide.eclipse</groupId>
+	<artifactId>org.robotframework.ide.eclipse.parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>RobotFramework Eclipse IDE Maven Parent Project</name>
 
-    <properties>
-        <tycho-version>0.24.0</tycho-version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eclipse.version>oxygen</eclipse.version>
+	<profiles>
+		<profile>
+			<id>luna-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>luna</value>
+				</property>
+			</activation>
+			<properties>
+				<tycho-version>0.22.0</tycho-version>
+			</properties>
+			<repositories>
+				<repository>
+					<id>eclipse-luna</id>
+					<url>http://download.eclipse.org/releases/luna/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>nattable</id>
+					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<layout>p2</layout>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<id>mars-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>mars</value>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>eclipse-mars</id>
+					<url>http://download.eclipse.org/releases/mars/</url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>nattable</id>
+					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<layout>p2</layout>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<id>neon-profile</id>
+			<activation>
+				<property>
+					<name>eclipse.version</name>
+					<value>neon</value>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>eclipse-neon</id>
+					<url>http://download.eclipse.org/releases/neon/ </url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>nattable</id>
+					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<layout>p2</layout>
+				</repository>
+			</repositories>
+		</profile>
+		<profile>
+			<id>oxygen-profile</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>eclipse.version</name>
+					<value>oxygen</value>
+				</property>
+			</activation>
+			<repositories>
+				<repository>
+					<id>eclipse-oxygen</id>
+					<url>http://download.eclipse.org/releases/oxygen/ </url>
+					<layout>p2</layout>
+				</repository>
+				<repository>
+					<id>nattable</id>
+					<url>http://download.eclipse.org/nattable/releases/1.5.0/repository/</url>
+					<layout>p2</layout>
+				</repository>
+			</repositories>
+		</profile>
+	</profiles>
+
+	<properties>
+		<tycho-version>0.24.0</tycho-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<eclipse.version>oxygen</eclipse.version>
 		<jdk.version>1.8</jdk.version>
 		<pmd.file>../../PMD/pegasus-pmd.xml</pmd.file>
-    </properties>
+	</properties>
 
 	<reporting>
 		<plugins>
@@ -117,23 +116,23 @@
 					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.5</version>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>2.5</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.13</version>
 				<inherited>true</inherited>
-		        <reportSets>
-			    	<reportSet>
-			        	<reports>
-			              <report>report-only</report>
-			            </reports>
-			        </reportSet>
-		        </reportSets>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report-only</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -163,11 +162,11 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>2.17</version>
 			</plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>3.1.0-RC6</version>
-            </plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>3.1.0-RC6</version>
+			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -176,119 +175,119 @@
 		</plugins>
 	</reporting>
 
-    <modules>
-        <module>../org.robotframework.ide.eclipse.target-platform</module>
-    </modules>
-    <build>
-        <plugins>        
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.10</version>
-            <executions>
-              <execution>
-                <id>copy</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>copy</goal>
-                </goals>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>        
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>target-platform-configuration</artifactId>
-                <version>${tycho-version}</version>
-                <configuration>
-                    <pomDependencies>consider</pomDependencies>
-                    <resolver>p2</resolver>
-                    <target>
-                        <artifact>
-                            <groupId>org.robotframework.ide.eclipse</groupId>
-                            <artifactId>org.robotframework.ide.eclipse.target-platform</artifactId>
-                            <version>1.0.0-SNAPSHOT</version>
-                            <classifier>${eclipse.version}</classifier>
-                        </artifact>
-                    </target>
-                    <ignoreTychoRepositories>true</ignoreTychoRepositories>
-                    <environments>
-                        <environment>
-                            <os>linux</os>
-                            <ws>gtk</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                        <environment>
-                            <os>win32</os>
-                            <ws>win32</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                        <environment>
-                            <os>macosx</os>
-                            <ws>cocoa</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                    </environments>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-maven-plugin</artifactId>
-                <version>${tycho-version}</version>
-                <extensions>true</extensions>
-            </plugin>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.6.201602180812</version>
-                <executions>
-                    <!-- The Executions required by unit tests are omitted. -->
-                    <!-- Prepares the property pointing to the JaCoCo runtime agent which 
-                        is passed as VM argument when Maven the Failsafe plugin is executed. -->
-                    <execution>
-                        <id>pre-integration-test</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Sets the path to the file which contains the execution data. -->
-                            <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
-                            <!-- Sets the name of the property containing the settings for JaCoCo 
-                                runtime agent. -->
-                            <propertyName>failsafeArgLine</propertyName>
-                        </configuration>
-                    </execution>
-                    <!-- Ensures that the code coverage report for integration tests after 
-                        integration tests have been run. -->
-                    <execution>
-                        <id>post-integration-test</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>report</goal>
-                        </goals>
-                        <configuration>
-                            <!-- Sets the path to the file which contains the execution data. -->
-                            <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
-                            <!-- Sets the output directory for the code coverage report. -->
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.1</version>
-                    <configuration>
-                        <arguments>-Pjdk17</arguments>
-                    </configuration>
-                </plugin>                
-            </plugins>
-        </pluginManagement>
-    </build>
+	<modules>
+		<module>../org.robotframework.ide.eclipse.target-platform</module>
+	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<id>copy</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<pomDependencies>consider</pomDependencies>
+					<resolver>p2</resolver>
+					<target>
+						<artifact>
+							<groupId>org.robotframework.ide.eclipse</groupId>
+							<artifactId>org.robotframework.ide.eclipse.target-platform</artifactId>
+							<version>1.0.0-SNAPSHOT</version>
+							<classifier>${eclipse.version}</classifier>
+						</artifact>
+					</target>
+					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.6.201602180812</version>
+				<executions>
+					<!-- The Executions required by unit tests are omitted. -->
+					<!-- Prepares the property pointing to the JaCoCo runtime agent which 
+						is passed as VM argument when Maven the Failsafe plugin is executed. -->
+					<execution>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
+							<!-- Sets the name of the property containing the settings for JaCoCo 
+								runtime agent. -->
+							<propertyName>failsafeArgLine</propertyName>
+						</configuration>
+					</execution>
+					<!-- Ensures that the code coverage report for integration tests after 
+						integration tests have been run. -->
+					<execution>
+						<id>post-integration-test</id>
+						<phase>post-integration-test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
+							<!-- Sets the output directory for the code coverage report. -->
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.1</version>
+					<configuration>
+						<arguments>-Pjdk17</arguments>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>    
