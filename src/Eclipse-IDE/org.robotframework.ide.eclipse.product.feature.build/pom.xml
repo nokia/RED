@@ -9,24 +9,6 @@
         
   <artifactId>org.robotframework.ide.eclipse.product.feature.build</artifactId>
   <packaging>eclipse-repository</packaging>
-  	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.5</version>
-				<configuration>
-					<rulesets>
-						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
-					</rulesets>
-					<linkXref>false</linkXref>
-					<sourceEncoding>utf-8</sourceEncoding>
-					<minimumTokens>100</minimumTokens>
-					<targetJdk>${jdk.version}</targetJdk>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
 
 	<build>
 		<plugins>
