@@ -103,37 +103,79 @@
         <tycho-version>0.24.0</tycho-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <eclipse.version>oxygen</eclipse.version>
+		<jdk.version>1.8</jdk.version>
+		<pmd.file>../../PMD/pegasus-pmd.xml</pmd.file>
     </properties>
-    <reporting>
-        <plugins>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.5</version>
-                <configuration>
-                    <rulesets>
-                        <ruleset>../../PMD/pegasus-pmd.xml</ruleset>
-                    </rulesets>
-                    <linkXref>false</linkXref>
-                    <sourceEncoding>utf-8</sourceEncoding>
-                    <includeTests>false</includeTests>
-                    <minimumTokens>100</minimumTokens>
-                    <targetJdk>${jdk.version}</targetJdk>
-                </configuration>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.5</version>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.13</version>
+				<inherited>true</inherited>
+		        <reportSets>
+			    	<reportSet>
+			        	<reports>
+			              <report>report-only</report>
+			            </reports>
+			        </reportSet>
+		        </reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.8</version>
+				<configuration>
+					<linkXref>true</linkXref>
+					<sourceEncoding>utf-8</sourceEncoding>
+					<minimumTokens>100</minimumTokens>
+					<targetJdk>${jdk.version}</targetJdk>
+					<excludes>
+						<exclude>target/generated-sources/**/*.java</exclude>
+						<exclude>**/*Bean.java</exclude>
+						<exclude>**/generated/*.java</exclude>
+						<exclude>**/generated/*.java</exclude>
+					</excludes>
+					<excludeRoots>
+						<excludeRoot>target/generated-sources/stubs</excludeRoot>
+					</excludeRoots>
+					<rulesets>
+						<ruleset>${pmd.file}</ruleset>
+					</rulesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.17</version>
+			</plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.3</version>
-                <configuration>
-                    <xmlOutput>true</xmlOutput>
-                    <includeFilterFile>../../findbugs/findbugs-setting.xml</includeFilterFile>
-                    <encoding>UTF-8</encoding>
-                    <onlyAnalyze>org.rf.*,org.robotframework.*</onlyAnalyze>
-                </configuration>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>3.1.0-RC6</version>
             </plugin>
-        </plugins>
-    </reporting>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.6.201602180812</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
     <modules>
         <module>../org.robotframework.ide.eclipse.target-platform</module>
     </modules>
@@ -236,32 +278,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <configuration>
-                    <effort>Max</effort>
-                    <xmlOutput>true</xmlOutput>
-                    <findbugsXmlOutputDirectory>${project.build.directory}/findbugs</findbugsXmlOutputDirectory>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.google.code.findbugs</groupId>
-                        <artifactId>annotations</artifactId>
-                        <version>2.0.1</version>
-                        <scope>provided</scope>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>analyze-compile</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin-->
         </plugins>
         <pluginManagement>
             <plugins>
@@ -271,28 +287,8 @@
                     <configuration>
                         <arguments>-Pjdk17</arguments>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.3</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.9</version>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
                 </plugin>                
             </plugins>
         </pluginManagement>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-    </dependencies>
 </project>    
