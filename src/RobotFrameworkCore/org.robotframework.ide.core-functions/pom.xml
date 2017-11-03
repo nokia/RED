@@ -28,23 +28,23 @@
 					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
 			</plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jxr-plugin</artifactId>
-                <version>2.5</version>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>2.5</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
 				<version>2.13</version>
 				<inherited>true</inherited>
-		        <reportSets>
-			    	<reportSet>
-			        	<reports>
-			              <report>report-only</report>
-			            </reports>
-			        </reportSet>
-		        </reportSets>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report-only</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -74,11 +74,11 @@
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>2.17</version>
 			</plugin>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>3.1.0-RC6</version>
-            </plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>3.1.0-RC6</version>
+			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
@@ -152,13 +152,13 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.1</version>
-		       <dependencies>
-		            <dependency>
-		                <groupId>org.codehaus.plexus</groupId>
-		                <artifactId>plexus-utils</artifactId>
-		                <version>3.0.24</version>
-		            </dependency>
-		        </dependencies>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-utils</artifactId>
+						<version>3.0.24</version>
+					</dependency>
+				</dependencies>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
@@ -208,93 +208,93 @@
 					<skipTests>${skip.unit.tests}</skipTests>
 				</configuration>
 			</plugin>
-	      	<plugin>
-	        	<artifactId>maven-resources-plugin</artifactId>
-	        	<version>3.0.2</version>
-	    	    <executions>
-		          	<execution>
-			            <id>copy-resources</id>
-		            	<phase>generate-test-resources</phase>
-		            	<goals>
-		              		<goal>copy-resources</goal>
-		            	</goals>
-		            	<configuration>
-		              		<outputDirectory>${basedir}/target/pyunit</outputDirectory>
-			              	<resources>
-			                	<resource>
-			                  		<directory>${basedir}/src/main/python</directory>
-			                	</resource>
-			                	<resource>
-			                  		<directory>${basedir}/src/test/python</directory>
-			                	</resource>
-			              	</resources>              
-		            	</configuration>            
-          			</execution>
-        		</executions>
-	      	</plugin>
 			<plugin>
-			  	<groupId>org.codehaus.mojo</groupId>
-			  	<artifactId>exec-maven-plugin</artifactId>
-			  	<version>1.5.0</version>
-			  	<executions>
-			   		<execution>
-			    		<configuration>
-			     			<executable>python</executable>
-			     			<workingDirectory>${basedir}/target/pyunit</workingDirectory>
-			     			<arguments>
-			      				<argument>-m</argument>
-			      				<argument>unittest_red</argument>
-			      				<argument>discover</argument>
-			      				<argument>${basedir}/target/pyunit/scripts</argument>
-			     			</arguments>
-			     			<environmentVariables/>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>generate-test-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/pyunit</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/python</directory>
+								</resource>
+								<resource>
+									<directory>${basedir}/src/test/python</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.5.0</version>
+				<executions>
+					<execution>
+						<configuration>
+							<executable>python</executable>
+							<workingDirectory>${basedir}/target/pyunit</workingDirectory>
+							<arguments>
+								<argument>-m</argument>
+								<argument>unittest_red</argument>
+								<argument>discover</argument>
+								<argument>${basedir}/target/pyunit/scripts</argument>
+							</arguments>
+							<environmentVariables />
 							<skip>${skip.py.unit.tests}</skip>
-			    		</configuration>
-			    		<id>python-test</id>
-			    		<phase>test</phase>
-			    		<goals>
-			     			<goal>exec</goal>
-			    		</goals>
-			   		</execution>
-			   		<execution>
-			    		<configuration>
-			     			<executable>python3</executable>
-			     			<workingDirectory>${basedir}/target/pyunit</workingDirectory>
-			     			<arguments>
-			      				<argument>-m</argument>
-			      				<argument>unittest_red</argument>
-			      				<argument>discover</argument>
-			      				<argument>${basedir}/target/pyunit/scripts</argument>
-			     			</arguments>
-			     			<environmentVariables/>
+						</configuration>
+						<id>python-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+					<execution>
+						<configuration>
+							<executable>python3</executable>
+							<workingDirectory>${basedir}/target/pyunit</workingDirectory>
+							<arguments>
+								<argument>-m</argument>
+								<argument>unittest_red</argument>
+								<argument>discover</argument>
+								<argument>${basedir}/target/pyunit/scripts</argument>
+							</arguments>
+							<environmentVariables />
 							<skip>${skip.py3.unit.tests}</skip>
-			    		</configuration>
-			    		<id>python3-test</id>
-			    		<phase>test</phase>
-			    		<goals>
-			     			<goal>exec</goal>
-			    		</goals>
-			   		</execution>
-			   		<execution>
-			    		<configuration>
-			     			<executable>jython</executable>
-			     			<workingDirectory>${basedir}/target/pyunit</workingDirectory>
-			     			<arguments>
-			      				<argument>-m</argument>
-			      				<argument>unittest_red</argument>
-			      				<argument>discover</argument>
-			      				<argument>${basedir}/target/pyunit/scripts</argument>
-			     			</arguments>
-			     			<environmentVariables/>
+						</configuration>
+						<id>python3-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+					<execution>
+						<configuration>
+							<executable>jython</executable>
+							<workingDirectory>${basedir}/target/pyunit</workingDirectory>
+							<arguments>
+								<argument>-m</argument>
+								<argument>unittest_red</argument>
+								<argument>discover</argument>
+								<argument>${basedir}/target/pyunit/scripts</argument>
+							</arguments>
+							<environmentVariables />
 							<skip>${skip.jy.unit.tests}</skip>
-			    		</configuration>
-			    		<id>jython-test</id>
-			    		<phase>test</phase>
-			    		<goals>
-			     			<goal>exec</goal>
-			    		</goals>
-			   		</execution>
-			  	</executions>
+						</configuration>
+						<id>jython-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.jacoco</groupId>
@@ -445,6 +445,6 @@
 			<groupId>net.java.dev.jna</groupId>
 			<artifactId>jna-platform</artifactId>
 			<version>4.2.2</version>
-		</dependency>				
+		</dependency>
 	</dependencies>
 </project>
