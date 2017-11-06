@@ -37,7 +37,7 @@ public class CommonVariableHelper {
     public void extractVariableAssignmentPart(final RobotLine line, final Stack<ParsingState> state) {
         if (stateHelper.getCurrentStatus(state) != ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE) {
             final List<IRobotLineElement> lineElements = line.getLineElements();
-            boolean wasNotVariableElement = false;
+            final boolean wasNotVariableElement = false;
             for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {
                 final IRobotLineElement element = lineElements.get(elementIndex);
                 if (element instanceof RobotToken) {
@@ -90,7 +90,7 @@ public class CommonVariableHelper {
                 isVar = false;
                 final String text = token.getText().toString();
                 if (text != null) {
-                    String trimmed = text.trim();
+                    final String trimmed = text.trim();
 
                     final VariableType varType = VariableType.getTypeByChar(trimmed.charAt(0));
                     isVar = (varType != VariableType.INVALID);
@@ -101,7 +101,7 @@ public class CommonVariableHelper {
         return isVar;
     }
 
-    private RobotToken extractAssignmentPart(final FilePosition startPossition, final String text) {
+    private RobotToken extractAssignmentPart(final FilePosition startPosition, final String text) {
         final RobotToken assignToken = new RobotToken();
 
         final Matcher matcher = NAME.matcher(text);
@@ -110,9 +110,9 @@ public class CommonVariableHelper {
             final String assignmentText = text.substring(assignPart);
             final Matcher assignMatcher = ASSIGN.matcher(assignmentText);
             if (assignMatcher.find()) {
-                assignToken.setLineNumber(startPossition.getLine());
-                assignToken.setStartColumn(startPossition.getColumn() + assignPart);
-                assignToken.setStartOffset(startPossition.getOffset() + assignPart);
+                assignToken.setLineNumber(startPosition.getLine());
+                assignToken.setStartColumn(startPosition.getColumn() + assignPart);
+                assignToken.setStartOffset(startPosition.getOffset() + assignPart);
                 assignToken.setText(assignmentText);
                 assignToken.setRaw(assignmentText);
                 assignToken.setType(RobotTokenType.ASSIGNMENT);
@@ -141,7 +141,7 @@ public class CommonVariableHelper {
         final StringBuilder replaced = new StringBuilder();
 
         boolean wasWhitespace = false;
-        final char cText[] = text.toCharArray();
+        final char[] cText = text.toCharArray();
         for (final char c : cText) {
             char toUse = c;
             if (c == '\t') {
