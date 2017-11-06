@@ -13,8 +13,10 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class FontsManager {
-    private static final Map<FontDescriptor, Font> FONTS_TABLE = new HashMap<FontDescriptor, Font>(10);
+    private static final Map<FontDescriptor, Font> FONTS_TABLE = new HashMap<>(10);
 
     private FontsManager() {
         // nothing to do
@@ -52,6 +54,11 @@ public class FontsManager {
         for (final Font font : FONTS_TABLE.values()) {
             font.dispose();
         }
+        FONTS_TABLE.clear();
+    }
+
+    @VisibleForTesting
+    static void clearFonts() {
         FONTS_TABLE.clear();
     }
 }
