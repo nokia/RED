@@ -85,8 +85,8 @@ public class PrettyAlignSpaceUtility {
                 prettyLeftAlign.setLineNumber(rt.getLineNumber());
                 prettyLeftAlign.setStartColumn(rt.getStartColumn());
 
-                int lastBeginSpaceIndex = lastSpaceIndexLeft(correctedString);
-                int numberOfSpacesLeft = lastBeginSpaceIndex + 1;
+                final int lastBeginSpaceIndex = lastSpaceIndexLeft(correctedString);
+                final int numberOfSpacesLeft = lastBeginSpaceIndex + 1;
                 prettyLeftAlign.setRaw(String.format("%" + numberOfSpacesLeft + "s", " "));
                 prettyLeftAlign.setText(String.format("%" + numberOfSpacesLeft + "s", " "));
                 prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
@@ -102,8 +102,8 @@ public class PrettyAlignSpaceUtility {
             if (correctedString.endsWith(" ")) {
                 final int theLongestTextLength = correctedString.length();
 
-                int lastEndSpaceIndex = lastSpaceIndexRight(correctedString);
-                int numberOfSpacesRight = theLongestTextLength - lastEndSpaceIndex;
+                final int lastEndSpaceIndex = lastSpaceIndexRight(correctedString);
+                final int numberOfSpacesRight = theLongestTextLength - lastEndSpaceIndex;
                 final RobotToken prettyRightAlign = new RobotToken();
                 prettyRightAlign.setStartOffset(rt.getStartOffset() + correctedString.length() - numberOfSpacesRight);
                 prettyRightAlign.setLineNumber(rt.getLineNumber());
@@ -149,10 +149,10 @@ public class PrettyAlignSpaceUtility {
     private int lastSpaceIndexLeft(final String text) {
         int index = -1;
         if (text != null && !text.isEmpty()) {
-            char chars[] = text.toCharArray();
-            int length = chars.length;
+            final char[] chars = text.toCharArray();
+            final int length = chars.length;
             for (int charIndex = 0; charIndex < length; charIndex++) {
-                char c = chars[charIndex];
+                final char c = chars[charIndex];
                 if (c == ' ') {
                     index = charIndex;
                 } else {
@@ -167,10 +167,10 @@ public class PrettyAlignSpaceUtility {
     private int lastSpaceIndexRight(final String text) {
         int index = -1;
         if (text != null && !text.isEmpty()) {
-            char chars[] = text.toCharArray();
-            int length = chars.length;
+            final char[] chars = text.toCharArray();
+            final int length = chars.length;
             for (int charIndex = length - 1; charIndex >= 0; charIndex--) {
-                char c = chars[charIndex];
+                final char c = chars[charIndex];
                 if (c == ' ') {
                     index = charIndex;
                 } else {
