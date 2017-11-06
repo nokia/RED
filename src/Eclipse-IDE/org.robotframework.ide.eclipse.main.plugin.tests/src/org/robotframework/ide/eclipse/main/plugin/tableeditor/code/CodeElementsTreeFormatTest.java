@@ -272,7 +272,7 @@ public class CodeElementsTreeFormatTest {
 
         @Override
         public int hashCode() {
-            return pathElements.hashCode();
+            return Arrays.hashCode(pathElements);
         }
     }
 
