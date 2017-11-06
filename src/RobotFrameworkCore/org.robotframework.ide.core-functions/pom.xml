@@ -82,7 +82,7 @@
 				<artifactId>spotbugs-maven-plugin</artifactId>
 				<version>3.1.0-RC6</version>
 				<configuration>
-					<onlyAnalyze>org.rf.*,org.robotframework.*</onlyAnalyze>
+					<onlyAnalyze>org.rf.-,org.robotframework.-</onlyAnalyze>
 				</configuration>
 			</plugin>
 			<plugin>
