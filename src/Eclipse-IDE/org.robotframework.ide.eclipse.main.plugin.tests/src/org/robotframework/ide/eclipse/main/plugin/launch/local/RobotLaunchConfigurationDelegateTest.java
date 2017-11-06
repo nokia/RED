@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch.local;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -23,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
@@ -422,6 +424,16 @@ public class RobotLaunchConfigurationDelegateTest {
 
     @Test()
     public void coreExceptionIsThrown_whenNotExistingInterpreterIsUsedAndPathToExecutableIsNotSet() throws Exception {
+        boolean thereIsNoPypy;
+        try {
+            RobotRuntimeEnvironment.getVersion(SuiteExecutor.PyPy);
+
+            thereIsNoPypy = false;
+        } catch (final RobotEnvironmentException e) {
+            thereIsNoPypy = true;
+        }
+        assumeTrue(thereIsNoPypy);
+
         thrown.expect(CoreException.class);
         thrown.expectMessage(
                 "There is no " + SuiteExecutor.PyPy.name() + " interpreter in system PATH environment variable");
