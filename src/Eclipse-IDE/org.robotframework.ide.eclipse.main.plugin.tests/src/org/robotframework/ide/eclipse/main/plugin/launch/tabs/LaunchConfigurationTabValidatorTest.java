@@ -169,7 +169,7 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void whenPortIsNotCorrect_fatalExceptionIsThrown() throws CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Server port 'xyz' must be an Integer between 1 and 65,535");
+        thrown.expectMessage(String.format("Server port 'xyz' must be an Integer between 1 and %,d", 65_535));
 
         final RemoteRobotLaunchConfiguration launchConfig = createRemoteRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setAgentConnectionPortValue("xyz");
@@ -179,7 +179,7 @@ public class LaunchConfigurationTabValidatorTest {
     @Test
     public void whenTimeoutIsNotCorrect_fatalExceptionIsThrown() throws CoreException {
         thrown.expect(LaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Connection timeout 'xyz' must be an Integer between 1 and 3,600");
+        thrown.expectMessage(String.format("Connection timeout 'xyz' must be an Integer between 1 and %,d", 3_600));
 
         final RemoteRobotLaunchConfiguration launchConfig = createRemoteRobotLaunchConfiguration(PROJECT_NAME);
         launchConfig.setAgentConnectionTimeoutValue("xyz");
