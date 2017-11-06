@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-UsioKUBEeazyPh6f3_hNQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/17/17 10:12 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/6/17 12:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,18 +21,20 @@ proc "check-default-errors"{
 
 
 	with [get-view Problems | get-tree] {
-	    get-item "Errors \\(5 items\\)" | get-property childCount | equals 5 | verify-true
-	    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	    get-item "Errors \\(6 items\\)" | get-property childCount | equals 6 | verify-true
+	    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
 	        | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
-	    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
 	        | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
-	    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+	    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
 	        | equals "Invalid variable definition '${wrong'. Unable to recognize variable type" | verify-true
-	    get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+	    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
         	| equals "Invalid variable syntax '78'" | verify-true
-    	get-item "Errors \\(5 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+    	get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
         	| equals "Resource import '/home/folder/res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
         	| verify-true
+       get-item -path "Errors \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+    		| equals "Variable '${var}' is given as a keyword name" | verify-true	
 	 
 	        
 	    get-item "Warnings \\(9 items\\)" | get-property childCount | equals 9 | verify-true
@@ -75,7 +77,7 @@ get-window Clean | get-button $OK_Clean_button | click
 
 //check if one warning was moved to errors
 with [get-view Problems | get-tree] {
-    get-item "Errors \\(6 items\\)/Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
+    get-item "Errors \\(7 items\\)/Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
         | get-property caption 
         | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
         | verify-true
@@ -97,20 +99,23 @@ get-window Clean | get-button $OK_Clean_button | click
 
 
 with [get-view Problems | get-tree] {
-	get-item "Errors \\(6 items\\)" | get-property childCount | equals 6 | verify-true
-    
-    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+    get-item -path "Errors \\(7 items\\)" | get-property "getItems().TreeItem[0].getText()" 
         | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
-    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+    get-item -path "Errors \\(7 items\\)" | get-property "getItems().TreeItem[1].getText()" 
         | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
-    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
-        | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." | verify-true
-    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
-        | equals "Invalid variable definition '${wrong'. Unable to recognize variable type" | verify-true 
-    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
-        | equals "Invalid variable syntax '78'" | verify-true      
-    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
-        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" | verify-true
+    get-item -path "Errors \\(7 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
+        | verify-true
+    get-item -path "Errors \\(7 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Invalid variable definition '${wrong'. Unable to recognize variable type" | verify-true
+    get-item -path "Errors \\(7 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "Invalid variable syntax '78'" | verify-true
+    get-item -path "Errors \\(7 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
+        | verify-true
+    get-item -path "Errors \\(7 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+        | equals "Variable '${var}' is given as a keyword name" | verify-true
+
 
         
     get-item "Warnings \\(5 items\\)" | get-property childCount | equals 5 | verify-true
