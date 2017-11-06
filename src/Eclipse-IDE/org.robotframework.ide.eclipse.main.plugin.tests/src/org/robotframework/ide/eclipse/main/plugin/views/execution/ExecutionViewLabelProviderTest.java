@@ -35,7 +35,7 @@ public class ExecutionViewLabelProviderTest {
         node.setElapsedTime(1234);
 
         final StyledString label = labelProvider.getStyledText(node);
-        assertThat(label.getString()).isEqualTo("Suite (1.234 s)");
+        assertThat(label.getString()).isEqualTo(String.format("Suite (%.3f s)", 1.234));
         final StyleRange[] ranges = label.getStyleRanges();
         
         assertThat(ranges).hasSize(1);

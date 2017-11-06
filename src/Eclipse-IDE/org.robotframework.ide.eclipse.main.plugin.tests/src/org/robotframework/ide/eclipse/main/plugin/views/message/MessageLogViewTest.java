@@ -39,6 +39,7 @@ public class MessageLogViewTest {
         launch1.getExecutionData(ExecutionMessagesStore.class, () -> store1);
         store1.append("message1\n");
         store1.append("message2\n");
+        store1.close();
         executionService.testExecutionEnded(launch1);
 
         final RobotTestsLaunch launch2 = executionService.testExecutionStarting(null);
@@ -47,6 +48,7 @@ public class MessageLogViewTest {
         launch2.getExecutionData(ExecutionMessagesStore.class, () -> store2);
         store2.append("message3\n");
         store2.append("message4\n");
+        store2.close();
         executionService.testExecutionEnded(launch2);
 
         final MessageLogView view = new MessageLogView(executionService);
@@ -58,7 +60,7 @@ public class MessageLogViewTest {
     }
 
     @Test
-    public void messageLogViewIsCleared_whenItIsOpenedAndNewLaunchIsStarting() {
+    public void messageLogViewIsCleared_whenItIsOpenedAndNewLaunchIsStarting() throws InterruptedException {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
@@ -67,36 +69,41 @@ public class MessageLogViewTest {
         launch.getExecutionData(ExecutionMessagesStore.class, () -> store);
         store.append("message1\n");
         store.append("message2\n");
+        store.close();
+        executionService.testExecutionEnded(launch);
 
+        // open view after first execution has ended
         final MessageLogView view = new MessageLogView(executionService);
         view.postConstruct(shellProvider.getShell());
 
         execAllAwaitingMessages();
         assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
 
-        executionService.testExecutionStarting(null);
+        final Thread secondExecutionThread = new Thread(() -> {
+            executionService.testExecutionStarting(null);
+        });
+        secondExecutionThread.start();
 
-        execAllAwaitingMessages();
-        assertThat(view.getTextControl().getText()).isEmpty();
+        waitForViewToContain(view, "");
     }
 
     @Test
-    public void messageLogViewIsUpdated_whenMessagesAreAppendedDuringExecution() {
+    public void messageLogViewIsUpdated_whenMessagesAreAppendedDuringExecution() throws Exception {
         final RobotTestExecutionService executionService = new RobotTestExecutionService();
 
         final MessageLogView view = new MessageLogView(executionService);
         view.postConstruct(shellProvider.getShell());
 
-        final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
-        final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class).get();
-        store.open();
-        store.append("message1\n");
-        store.append("message2\n");
+        final Thread executionThread = new Thread(() -> {
+            final RobotTestsLaunch launch = executionService.testExecutionStarting(null);
+            final ExecutionMessagesStore store = launch.getExecutionData(ExecutionMessagesStore.class).get();
+            store.open();
+            store.append("message1\n");
+            store.append("message2\n");
+        });
+        executionThread.start();
 
-        execAllAwaitingMessages();
-
-        assertThat(view.getTextControl().getText()).isEqualTo("message1\nmessage2\n");
-
+        waitForViewToContain(view, "message1\nmessage2\n");
     }
 
     @Test
@@ -132,6 +139,23 @@ public class MessageLogViewTest {
         view.toggleWordsWrapping();
 
         assertThat(view.getTextControl().getWordWrap()).isFalse();
+    }
+
+    private void waitForViewToContain(final MessageLogView view, final String expectedText)
+            throws InterruptedException {
+        final int timeoutInMs = 5000;
+        final int sleepTimeInMs = 200;
+
+        int trial = 0;
+        while (trial < timeoutInMs / sleepTimeInMs) {
+            if (view.getTextControl().getText().equals(expectedText)) {
+                return;
+            }
+            trial++;
+            Thread.sleep(sleepTimeInMs);
+            execAllAwaitingMessages();
+        }
+        assertThat(view.getTextControl().getText()).isEqualTo(expectedText);
     }
 
     private void execAllAwaitingMessages() {
