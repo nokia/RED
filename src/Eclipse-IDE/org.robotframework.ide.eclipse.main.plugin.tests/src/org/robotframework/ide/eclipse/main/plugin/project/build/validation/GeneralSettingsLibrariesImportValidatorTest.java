@@ -573,9 +573,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     private FileValidationContext prepareContext(final RobotSuiteFile suiteFile,
             final Map<ReferencedLibrary, LibrarySpecification> refLibs) {
         final Map<String, LibrarySpecification> specsByName = new HashMap<>();
-        for (final ReferencedLibrary refLib : refLibs.keySet()) {
-            specsByName.put(refLib.getName(), refLibs.get(refLib));
-        }
+        refLibs.forEach((refLib, libSpec) -> specsByName.put(refLib.getName(), libSpec));
 
         final ValidationContext parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
                 SuiteExecutor.Python, specsByName, refLibs);
