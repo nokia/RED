@@ -83,7 +83,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenPortIsEmpty_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Server port '' must be an Integer between 1 and 65,535");
+        thrown.expectMessage(String.format("Server port '' must be an Integer between 1 and %,d", 65_535));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("");
@@ -93,7 +93,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenPortIsNotANumber_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Server port 'abc' must be an Integer between 1 and 65,535");
+        thrown.expectMessage(String.format("Server port 'abc' must be an Integer between 1 and %,d", 65_535));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("abc");
@@ -103,7 +103,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenPortIsBelowRange_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Server port '0' must be an Integer between 1 and 65,535");
+        thrown.expectMessage(String.format("Server port '0' must be an Integer between 1 and %,d", 65_535));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("0");
@@ -113,7 +113,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenPortIsAboveRange_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Server port '65536' must be an Integer between 1 and 65,535");
+        thrown.expectMessage(String.format("Server port '65536' must be an Integer between 1 and %,d", 65_535));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionPortValue("65536");
@@ -123,7 +123,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsEmpty_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '' must be an Integer between 1 and 3,600");
+        thrown.expectMessage(String.format("Connection timeout '' must be an Integer between 1 and %,d", 3_600));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("");
@@ -133,7 +133,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsNotANumber_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout 'abc' must be an Integer between 1 and 3,600");
+        thrown.expectMessage(String.format("Connection timeout 'abc' must be an Integer between 1 and %,d", 3_600));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("abc");
@@ -143,7 +143,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsBelowRange_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '0' must be an Integer between 1 and 3,600");
+        thrown.expectMessage(String.format("Connection timeout '0' must be an Integer between 1 and %,d", 3_600));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("0");
@@ -153,7 +153,7 @@ public class RemoteRobotLaunchConfigurationTest {
     @Test
     public void whenTimeoutIsAboveRange_coreExceptionIsThrown() throws CoreException {
         thrown.expect(CoreException.class);
-        thrown.expectMessage("Connection timeout '3601' must be an Integer between 1 and 3,600");
+        thrown.expectMessage(String.format("Connection timeout '3601' must be an Integer between 1 and %,d", 3_600));
 
         final RemoteRobotLaunchConfiguration robotConfig = getDefaultRemoteRobotLaunchConfiguration();
         robotConfig.setAgentConnectionTimeoutValue("3601");
