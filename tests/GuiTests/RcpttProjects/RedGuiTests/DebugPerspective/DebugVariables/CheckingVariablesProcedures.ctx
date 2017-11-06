@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _MyJrwGxlEeeps9cepQRw2Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 5:50 PM
+Save-Time: 11/6/17 5:31 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -240,7 +240,7 @@ proc "check-list-and-dicts"{
 
     
 proc "wait-for-last-item-to-be-visible"{
-	try -times 3 -delay 500 -command{
+	try -times 4 -delay 500 -command{
 		get-view Variables | get-tree | get-item "@{main list}/\\[3\\]" | get-property "values['Value']" | equals 99 
    		 | verify-true
 	}

@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _R0nm0PKlEeadkqPlInmy5w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 5:24 PM
+Save-Time: 11/6/17 4:06 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -69,11 +69,12 @@ exec-with-options -disableJobWaiting -command {
 	wait-for-thread  -file "TestFile.robot"
 	
 	//check that 2 previouse "8" were printed
-	get-view "Message Log" | get-editbox | get-property text 
-	    | equals "Starting test: RobotProject.TestFile.Continue Example\n"
-	    + ".* : INFO : 8\n"
-	    + ".* : INFO : 8" | verify-true
-	    
+	try -times 4 -delay 500 -command{
+		get-view "Message Log" | get-editbox | get-property text 
+		    | equals "Starting test: RobotProject.TestFile.Continue Example\n"
+		    + ".* : INFO : 8\n"
+		    + ".* : INFO : 8" | verify-true
+	}    
 	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	
 	//resume - test should be stopped when value will be 15
