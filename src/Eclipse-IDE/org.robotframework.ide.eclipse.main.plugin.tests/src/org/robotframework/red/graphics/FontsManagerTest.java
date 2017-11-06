@@ -17,12 +17,12 @@ public class FontsManagerTest {
 
     @Before
     public void beforeTest() {
-        FontsManager.disposeFonts();
+        FontsManager.clearFonts();
     }
 
     @After
     public void afterTest() {
-        FontsManager.disposeFonts();
+        FontsManager.clearFonts();
     }
 
     @Test
