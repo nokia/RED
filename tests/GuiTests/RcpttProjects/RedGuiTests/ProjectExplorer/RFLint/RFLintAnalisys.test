@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _Q0pU0LpZEee_RrklJFm4zA
+Contexts: _Q0pU0LpZEee_RrklJFm4zA,_VzYJ0KEAEea9Cvae3yWo1A
 Element-Name: RFLintAnalisys
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _bwoQULpQEee_RrklJFm4zA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/6/17 11:49 AM
+Save-Time: 11/6/17 2:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -38,6 +38,16 @@ check-warnings-for-one-test
 //run analisys on folder
 get-view "Project Explorer" | get-tree | select "project_a/a1/a2" | get-menu 
     -path "Robot Framework/Run RfLint analysis" | click
+
+get-view "Project Explorer" | get-tree | select "project_a/a1/a2/test1.robot" | double-click
+get-editor "test1.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+set-list-with-markers-and-comapare -file "test1.robot" -table "Test Cases"  -ref_list [list 1 2] -type "ERROR"
+
+get-editor "test1.robot" | get-tab-folder | get-tab-item "Keywords" | click
+set-list-with-markers-and-comapare -file "test1.robot" -table "User Keywords"  -ref_list [list 1 7] -type "ERROR"
+set-list-with-markers-and-comapare -file "test1.robot" -table "User Keywords"  -ref_list [list 4] -type "WARNING"
+get-editor "test1.robot" | close
+
     
 //check errors    
 with [get-view Problems | get-tree] {

@@ -1,0 +1,97 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: PauseTest
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _xIMjIMMJEeex6qGARmUVfA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/6/17 5:01 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/TestFile.robot" | double-click
+}
+
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  7\n"
+    + "    sleep  4s\n"
+    + "    log   9\n\n"
+    + "test 2\n"
+    + "    log  this is test 2"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+
+//pause after sleep command
+
+exec-with-options -disableJobWaiting -command{
+	repeat [val index] -times 2 -command {
+		//run test    
+		get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" | click
+		
+		//wait for starting test
+		try -times 4 -delay 1000 -command{
+			get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+			    + ".* : INFO : 7\n" | verify-true
+		}
+		//check icons
+		with [get-view Console] {
+		    get-button "Suspend tests" | get-property enablement | equals true | verify-true
+		    get-button "Resume tests" | get-property enablement | equals false | verify-true
+		    get-button Terminate | get-property enablement | equals true | verify-true
+		}
+		
+		//suspend test
+		with [get-view Console] {
+		    get-button "Suspend tests" | click
+		}    
+		//check if sleep command was run but test was suspend on next command    
+		try -times 5 -delay 1000 -command{
+			get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+			    + ".* : INFO : 7\n"
+			    + ".*: INFO : Slept 4 seconds" | verify-true
+		}	 
+	
+		with [get-view Console] {
+		    get-button "Suspend tests" | get-property enablement | equals false | verify-true
+		    get-button "Resume tests" | get-property enablement | equals true | verify-true
+		    get-button Terminate | get-property enablement | equals true | verify-true
+		}
+		
+		//check if test is still suspended
+		wait 1000
+		try -times 4 -delay 1000 -command{
+			get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+			    + ".* : INFO : 7\n"
+			    + ".*: INFO : Slept 4 seconds" | verify-true
+		}
+		
+		if [$index | eq 0]{
+			//resume
+			get-view Console | get-button "Resume tests"  | click	
+			get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+		    + ".* : INFO : 7\n"
+		    + ".* : INFO : Slept 4 seconds\n"
+		    + ".* : INFO : 9\n"
+		    + "Ending test: RobotProject.TestFile.test 1\n\n"
+		    + "Starting test: RobotProject.TestFile.test 2\n"
+		    + ".* : INFO : this is test 2\n"
+		    + "Ending test: RobotProject.TestFile.test 2" | verify-true
+		}-else{
+			get-view Console | get-button Terminate | click
+			get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test 1\n"
+			    + ".* : INFO : 7\n"
+			    + ".*: INFO : Slept 4 seconds" | verify-true
+		}  
+	}
+}	
+	
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
