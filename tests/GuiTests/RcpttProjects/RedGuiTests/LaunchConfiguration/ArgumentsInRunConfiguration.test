@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _acbKcATKEeeYtJSRkZkJgQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 3/20/17 10:06 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/7/17 2:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -47,16 +47,9 @@ with [get-window "Run Configurations"] {
     }
     get-button Apply | click
     get-button Run | click
+    wait-for-console
 }
-
-
-
-
-
-
-try -times 5 -delay 1000 -command{
-	get-view Console | get-text-viewer | get-property "getCharCount()" -raw | gt 0 | verify-true
-}	
+	
 get-view Console | get-text-viewer | get-property text 
     | equals "Command: .* -d -O -t -W ignore -m robot.run --listener .*TestRunnerAgent.py:\d{1,6} --argumentfile .*\.arg .*SecondProject\n"
     + "Suite Executor: Robot Framework .*\n"
