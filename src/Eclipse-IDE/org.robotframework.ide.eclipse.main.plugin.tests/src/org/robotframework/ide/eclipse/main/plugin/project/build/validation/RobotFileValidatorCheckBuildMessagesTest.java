@@ -118,11 +118,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
-        assertThat(reportedProblems).containsOnlyElementsOf(Arrays
-                .asList(new Problem[] {
-                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
-                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
-                                new ProblemPosition(0, Range.closed(0, 0))) }));
+        assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(new Problem[] {
+                new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
+                new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -185,9 +183,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
-        assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(
-                new Problem[] { new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE,
-                        new ProblemPosition(0, Range.closed(0, 0))) }));
+        assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(new Problem[] {
+                new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -221,9 +218,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
-        assertThat(reportedProblems).containsOnlyElementsOf(Arrays
-                .asList(new Problem[] { new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
-                        new ProblemPosition(0, Range.closed(0, 0))) }));
+        assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(new Problem[] {
+                new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -291,11 +287,10 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(3);
-        assertThat(reportedProblems).containsOnlyElementsOf(Arrays
-                .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
-                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
-                                new ProblemPosition(0, Range.closed(0, 0))) }));
+        assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(new Problem[] {
+                new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
+                new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))),
+                new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -361,10 +356,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
-        assertThat(reportedProblems).containsOnlyElementsOf(Arrays
-                .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE,
-                                new ProblemPosition(0, Range.closed(0, 0))) }));
+        assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(new Problem[] {
+                new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
+                new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -399,10 +393,9 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
-        assertThat(reportedProblems).containsOnlyElementsOf(Arrays
-                .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
-                        new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE,
-                                new ProblemPosition(0, Range.closed(0, 0))) }));
+        assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(new Problem[] {
+                new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
+                new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(0, Range.closed(0, 0))) }));
     }
 
     @Test
@@ -492,7 +485,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         return new ValidationContext(robotProject, logger);
     }
 
-    private class MockRobotFileValidator extends RobotFileValidator {
+    private static class MockRobotFileValidator extends RobotFileValidator {
 
         public MockRobotFileValidator(final ValidationContext context, final IFile file,
                 final ProblemsReportingStrategy reporter) {
