@@ -13,6 +13,38 @@
     	<relativePath>${project.basedir}/../org.robotframework.ide.eclipse.parent/pom.xml</relativePath>
   	</parent>
 
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>3.8</version>
+				<configuration>
+					<targetJdk>${jdk.version}</targetJdk>
+					<rulesets>
+						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
+					</rulesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.17</version>
+				<configuration>
+					<configLocation>../../Checkstyle/checkstyle-configuration.xml</configLocation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>3.1.0-RC7</version>
+				<configuration>
+					<onlyAnalyze>org.rf.-,org.robotframework.-</onlyAnalyze>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
 	<build>
 		<plugins>
 			<plugin>

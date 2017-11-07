@@ -47,10 +47,12 @@ class SuiteSourceInsertLineContinuationStrategy implements IAutoEditStrategy {
         final String commandLineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, command.offset)
                 .trim()
                 .toLowerCase();
-        if (isForLoop(commandLineContent))
+        if (isForLoop(commandLineContent)) {
             return Optional.of("\\");
-        if (isDocumentation(commandLineContent))
+        }
+        if (isDocumentation(commandLineContent)) {
             return Optional.of("...");
+        }
         return Optional.empty();
     }
 
