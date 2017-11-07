@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
@@ -572,8 +573,8 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     private FileValidationContext prepareContext(final RobotSuiteFile suiteFile,
             final Map<ReferencedLibrary, LibrarySpecification> refLibs) {
-        final Map<String, LibrarySpecification> specsByName = new HashMap<>();
-        refLibs.forEach((refLib, libSpec) -> specsByName.put(refLib.getName(), libSpec));
+        final Map<String, LibrarySpecification> specsByName = refLibs.entrySet().stream().collect(
+                Collectors.toMap(e -> e.getKey().getName(), e -> e.getValue()));
 
         final ValidationContext parentContext = new ValidationContext(model, RobotVersion.from("0.0"),
                 SuiteExecutor.Python, specsByName, refLibs);
