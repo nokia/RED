@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _E3JM0D-eEeejtMr_2XCc8w
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 4:30 PM
+Save-Time: 11/7/17 2:49 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -86,15 +86,31 @@ with [get-window "Run Configurations"] {
 // verify if there is no interpreter in Project Explorer and Console
 get-view "Project Explorer" | get-tree | get-item "ScriptProject/Robot Standard libraries \\[???\\]" 
     | get-property caption | equals "Robot Standard libraries [???]" | verify-true
-get-view Console | get-text-viewer | get-property text | equals "Argument: (python.exe|python)\n"
-    + "Argument: -m\n"
-    + "Argument: robot.run\n"
-    + "Argument: --listener\n"
-    + "Argument: .*\n"
-    + "Argument: --argumentfile\n"
-    + "Argument: .*\n"
-    + "Argument: .*\n"
-    + "end\n"
-    + "Command: .* (python.exe|python) -m robot.run --listener .* --argumentfile .* .*\n"
-    + "Suite Executor: <unknown>" | verify-true
+    
+try -command{
+	get-view Console | get-text-viewer | get-property text | equals "Argument: (python.exe|python)\n"
+	    + "Argument: -m\n"
+	    + "Argument: robot.run\n"
+	    + "Argument: --listener\n"
+	    + "Argument: .*\n"
+	    + "Argument: --argumentfile\n"
+	    + "Argument: .*\n"
+	    + "Argument: .*\n"
+	    + "end\n"
+	    + "Command: .* (python.exe|python) -m robot.run --listener .* --argumentfile .* .*\n"
+	    + "Suite Executor: <unknown>" | verify-true
+}-catch{
+	get-view Console | get-text-viewer | get-property text | equals "Command: .* (python.exe|python) -m robot.run --listener .* --argumentfile .* .*\n"
+	    + "Suite Executor: <unknown>"
+	    + "Argument: (python.exe|python)\n"
+	    + "Argument: -m\n"
+	    + "Argument: robot.run\n"
+	    + "Argument: --listener\n"
+	    + "Argument: .*\n"
+	    + "Argument: --argumentfile\n"
+	    + "Argument: .*\n"
+	    + "Argument: .*\n"
+	    + "end\n"  | verify-true
+}
+    	    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
