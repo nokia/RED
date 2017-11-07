@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _iiMbgJ2WEeWVv_UItyy1RQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/26/17 3:05 PM
+Save-Time: 11/7/17 4:26 PM
 Tags: Debug,Quick
 Testcase-Type: ecl
 
@@ -196,7 +196,11 @@ exec-with-options -disableJobWaiting -command {
 	//line 20
 	get-button "Step Into (F5)" | click
 	wait-for-specified_line-in-first-thread -line 20 -nr_of_frames 8
-	wait 500
+	try -times 4 -delay 500 -command{
+		get-view Debug | get-tree
+			| get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
+	        	| get-property "getItems().TreeItem[6].getText()" | equals "[Test] loop in keyword [line: 8]" | verify-true
+	}
 	check-debug-marker-on-ruler -line 20 -script_name "TestFile.robot"
 	with [get-view Debug | get-tree] {
 	    get-item "TestFile.robot \\[Robot\\]/<suspended>Robot Test at 127.0.0.1:\d{1,5}/Tests execution thread" 
@@ -222,7 +226,7 @@ exec-with-options -disableJobWaiting -command {
 		
 	with [get-button "Resume (F8)"] {
 	    click
-	    wait 1000
 	}
+	wait-for-console -times 6 -delay 1000
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
