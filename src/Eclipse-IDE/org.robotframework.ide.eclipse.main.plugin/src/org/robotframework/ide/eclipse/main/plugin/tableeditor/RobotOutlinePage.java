@@ -73,7 +73,7 @@ class RobotOutlinePage extends ContentOutlinePage {
 
     private Job modelQueryJob;
 
-    public RobotOutlinePage(final RobotFormEditor editor, final RobotSuiteFile suiteModel) {
+    RobotOutlinePage(final RobotFormEditor editor, final RobotSuiteFile suiteModel) {
         this.editor = editor;
         this.suiteModel = suiteModel;
     }
@@ -113,7 +113,7 @@ class RobotOutlinePage extends ContentOutlinePage {
         final MenuManager menuManager = new MenuManager("Outline popup", "RobotOutlinePage.popup");
         final Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
         getTreeViewer().getControl().setMenu(menu);
-        getSite().registerContextMenu ("RobotOutlinePage.popup", menuManager, getTreeViewer());
+        getSite().registerContextMenu("RobotOutlinePage.popup", menuManager, getTreeViewer());
         Viewers.boundViewerWithContext(getTreeViewer(), getSite(), CONTEXT_ID);
     }
 
@@ -249,7 +249,7 @@ class RobotOutlinePage extends ContentOutlinePage {
 
         private final StyledText editorSourceWidget;
 
-        public LinkWithEditorAction(final ISelectionProvider editorSelectionProvider,
+        LinkWithEditorAction(final ISelectionProvider editorSelectionProvider,
                 final StyledText editorSourceWidget) {
             super("Link with Editor", IAction.AS_CHECK_BOX);
             setImageDescriptor(RedImages.getLinkImage());
@@ -274,7 +274,7 @@ class RobotOutlinePage extends ContentOutlinePage {
 
         private final NavigatorLabelProvider labelProvider;
 
-        public SortOutlineAction(final NavigatorLabelProvider labelProvider) {
+        SortOutlineAction(final NavigatorLabelProvider labelProvider) {
             super("Sort", IAction.AS_CHECK_BOX);
             setImageDescriptor(RedImages.getSortImage());
             this.labelProvider = labelProvider;
