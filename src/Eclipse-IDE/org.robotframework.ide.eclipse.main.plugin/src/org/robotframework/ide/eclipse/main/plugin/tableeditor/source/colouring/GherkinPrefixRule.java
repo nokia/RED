@@ -19,8 +19,9 @@ public class GherkinPrefixRule extends ExecutableRowCallRule {
         if (offsetInToken == 0 && shouldBeColored(token, analyzedTokens)) {
             final String textAfterPrefix = GherkinStyleSupport.getTextAfterGherkinPrefixesIfExists(token.getText());
             final int prefixLength = token.getText().length() - textAfterPrefix.length();
-            if (prefixLength > 0)
+            if (prefixLength > 0) {
                 return Optional.of(new PositionedTextToken(textToken, token.getStartOffset(), prefixLength));
+            }
         }
         return Optional.empty();
     }
