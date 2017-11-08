@@ -30,8 +30,6 @@ import org.robotframework.red.nattable.edit.DetailCellEditorEntriesControlsSwitc
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry.DetailEditorListener;
 import org.robotframework.red.nattable.edit.DetailEntriesCollection.DetailWithEntry;
 
-import com.google.common.base.Function;
-
 /**
  * @author Michal Anglart
  *
@@ -241,7 +239,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
                     editSupport.moveLeft(entries.getSelectedDetails());
                     refresh();
 
-                    entries.selectEntries(transform(indexes, precedessor()));
+                    entries.selectEntries(transform(indexes, n -> n - 1));
                 }
             } else if (e.keyCode == SWT.END && e.stateMask == 0) {
                 entries.selectOnlyLastEntry();
@@ -268,7 +266,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
                     editSupport.moveRight(entries.getSelectedDetails());
                     refresh();
 
-                    entries.selectEntries(transform(indexes, successor()));
+                    entries.selectEntries(transform(indexes, n -> n + 1));
                 }
             } else if (e.keyCode == SWT.PAGE_DOWN && e.stateMask == 0) {
                 entries.selectOnlyNextEntryJumping(entry);
@@ -296,25 +294,5 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
                 entries.selectAll();
             }
         }
-    }
-
-    private static Function<Integer, Integer> successor() {
-        return new Function<Integer, Integer>() {
-
-            @Override
-            public Integer apply(final Integer number) {
-                return number + 1;
-            }
-        };
-    }
-
-    private static Function<Integer, Integer> precedessor() {
-        return new Function<Integer, Integer>() {
-
-            @Override
-            public Integer apply(final Integer number) {
-                return number - 1;
-            }
-        };
     }
 }
