@@ -23,7 +23,7 @@ import org.robotframework.red.graphics.ColorsManager;
  */
 public class UnderlinedCellBackgroundPainter extends BackgroundPainter {
 
-    private static final int LINE_WIDTH = 2;
+    private static final int LINE_WIDTH = 1;
 
     private final Side side;
 

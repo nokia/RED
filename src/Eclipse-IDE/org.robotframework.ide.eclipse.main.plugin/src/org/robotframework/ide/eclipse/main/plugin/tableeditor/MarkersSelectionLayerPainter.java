@@ -4,18 +4,18 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
+import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
-public class MarkersSelectionLayerPainter extends SelectionLayerPainter {
+public class MarkersSelectionLayerPainter extends GridLineCellLayerPainter {
 
-    public MarkersSelectionLayerPainter() {
-        super(ColorsManager.getColor(250, 250, 250));
+    public MarkersSelectionLayerPainter(final Color gridColor) {
+        super(gridColor);
     }
 
     @Override
