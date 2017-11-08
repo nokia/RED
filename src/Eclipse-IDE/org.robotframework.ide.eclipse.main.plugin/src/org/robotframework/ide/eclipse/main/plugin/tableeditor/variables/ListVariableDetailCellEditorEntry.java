@@ -8,10 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
@@ -62,17 +59,8 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
         textEdit = new Text(this, SWT.BORDER);
         textEdit.setText(text);
         textEdit.setSelection(text.length());
-        textEdit.addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusLost(final FocusEvent e) {
-                commitEdit();
-            }
-        });
-        textEdit.addTraverseListener(new TraverseListener() {
-
-            @Override
-            public void keyTraversed(final TraverseEvent e) {
+        textEdit.addFocusListener(FocusListener.focusLostAdapter(e -> commitEdit()));
+        textEdit.addTraverseListener(e -> {
                 if (assistSupport.areContentProposalsShown()) {
                     return;
                 }
@@ -81,7 +69,6 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
                 } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
                     commitEdit();
                 }
-            }
         });
         validationJobScheduler.armRevalidationOn(textEdit);
         final AssistantContext context = new NatTableAssistantContext(column, row);
