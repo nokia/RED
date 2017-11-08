@@ -173,14 +173,11 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         Sections.switchGridCellGrabbingOnExpansion(importSettingsSection);
         Sections.installMaximazingPossibility(importSettingsSection);
 
-        setupNatTable(importSettingsSection);
-
+        final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
+        setupNatTable(importSettingsSection, theme);
     }
 
-    private void setupNatTable(final Composite parent) {
-
-        final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
-
+    private void setupNatTable(final Composite parent, final TableTheme theme) {
         final ConfigRegistry configRegistry = new ConfigRegistry();
 
         final RedNattableDataProvidersFactory dataProvidersFactory = new RedNattableDataProvidersFactory();
@@ -205,7 +202,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         final ViewportLayer bodyViewportLayer = factory.createViewportLayer(bodySelectionLayer);
 
         // column header layers
-        final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider,
+        final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider, theme,
                 new SettingsDynamicTableColumnHeaderLabelAccumulator(dataProvider));
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
@@ -215,12 +212,12 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
-                rowHeaderDataProvider, new MarkersSelectionLayerPainter(),
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(theme.getHeadersGridBorderColor()),
                 new MarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
-                rowHeaderDataProvider, rowHeaderLayer);
+                rowHeaderDataProvider, rowHeaderLayer, theme);
 
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
@@ -258,7 +255,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
                 new RedNatGridLayerPainter(table, theme.getGridBorderColor(), theme.getHeadersBackground(),
-                        theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
+                        theme.getHeadersUnderlineColor(), 1, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
         
