@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
+import java.util.stream.Stream;
+
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
@@ -24,23 +26,23 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.InactiveCellPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.nattable.painter.InactiveCellPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
 class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
 
-    private final Font font;
+    private final TableTheme theme;
 
     private final boolean isEditable;
 
     private final boolean wrapCellContent;
 
     CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable, final boolean wrapCellContent) {
-        this.font = theme.getFont();
+        this.theme = theme;
         this.isEditable = isEditable;
         this.wrapCellContent = wrapCellContent;
     }
@@ -52,24 +54,14 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
         final Style caseStyle = createStyle(preferences, SyntaxHighlightingCategory.DEFINITION);
         final Style settingStyle = createStyle(preferences, SyntaxHighlightingCategory.SETTING);
         
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,
-                CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.HOVER,
-                CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT,
-                CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT_HOVER,
-                CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
-        
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,
-                CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT,
-                CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
-        
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.NORMAL,
-                CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.SELECT,
-                CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
+        Stream.of(DisplayMode.NORMAL, DisplayMode.HOVER, DisplayMode.SELECT, DisplayMode.SELECT_HOVER).forEach(mode -> {
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, mode,
+                    CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, mode,
+                    CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, mode,
+                    CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
+        });
 
         final ImageDescriptor caseImage = isEditable ? RedImages.getTestCaseImage()
                 : RedImages.getGrayedImage(RedImages.getTestCaseImage());
@@ -86,14 +78,15 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, templatedCaseCellPainter,
                 DisplayMode.NORMAL, CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
         
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new InactiveCellPainter(),
-                DisplayMode.NORMAL, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
+                new InactiveCellPainter(theme.getBodyInactiveCellBackground()), DisplayMode.NORMAL,
+                TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
     }
 
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
         final Style style = new Style();
         final ColoringPreference syntaxColoring = preferences.getSyntaxColoring(category);
-        style.setAttributeValue(CellStyleAttributes.FONT, getFont(font, syntaxColoring.getFontStyle()));
+        style.setAttributeValue(CellStyleAttributes.FONT, getFont(theme.getFont(), syntaxColoring.getFontStyle()));
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, syntaxColoring.getColor());
         return style;
     }

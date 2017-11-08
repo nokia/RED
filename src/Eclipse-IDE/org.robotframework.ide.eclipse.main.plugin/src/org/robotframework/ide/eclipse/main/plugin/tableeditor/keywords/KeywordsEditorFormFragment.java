@@ -211,7 +211,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         final ViewportLayer bodyViewportLayer = factory.createViewportLayer(treeLayer);
 
         // column header layers
-        final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
+        final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider, theme);
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
 
@@ -223,12 +223,12 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
-                rowHeaderDataProvider, new MarkersSelectionLayerPainter(),
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(theme.getHeadersGridBorderColor()),
                 new MarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
-                rowHeaderDataProvider, rowHeaderLayer);
+                rowHeaderDataProvider, rowHeaderLayer, theme);
 
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
@@ -262,7 +262,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
                 new RedNatGridLayerPainter(table, theme.getGridBorderColor(), theme.getHeadersBackground(),
-                        theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
+                        theme.getHeadersUnderlineColor(), 1, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
 
