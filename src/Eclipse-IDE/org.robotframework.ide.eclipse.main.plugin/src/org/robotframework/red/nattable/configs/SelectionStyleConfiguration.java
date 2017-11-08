@@ -28,12 +28,11 @@ public class SelectionStyleConfiguration extends DefaultSelectionStyleConfigurat
         selectedHeaderFont = FontsManager.getFont(FontDescriptor.createFrom(fontInUse));
         selectedHeaderBorderStyle = new BorderStyle(0, ColorsManager.getColor(SWT.COLOR_DARK_GRAY),
                 LineStyleEnum.SOLID);
-        selectedHeaderBgColor = theme.getHighlightedHeadersBackground();
+        selectedHeaderBgColor = theme.getHeadersHighlightedBackground();
         selectedHeaderFgColor = theme.getBodyForeground();
         anchorBgColor = theme.getBodyAnchoredCellBackground();
-        anchorFgColor = theme.getBodyForeground();
-        anchorBorderStyle = new BorderStyle(0, ColorsManager.getColor(SWT.COLOR_DARK_GRAY), LineStyleEnum.SOLID);
-        anchorGridBorderStyle = new BorderStyle(0, ColorsManager.getColor(SWT.COLOR_DARK_GRAY), LineStyleEnum.SOLID);
+        anchorFgColor = null;
+        anchorBorderStyle = new BorderStyle(1, theme.getGridSelectionBorderColor(), LineStyleEnum.SOLID);
+        anchorGridBorderStyle = new BorderStyle(1, theme.getGridSelectionBorderColor(), LineStyleEnum.SOLID);
     }
-
 }
