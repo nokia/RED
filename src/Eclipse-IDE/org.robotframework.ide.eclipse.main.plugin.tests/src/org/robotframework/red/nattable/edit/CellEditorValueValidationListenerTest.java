@@ -42,7 +42,7 @@ public class CellEditorValueValidationListenerTest {
 
     private CellEditorValueValidationJobScheduler<Object> validationJobScheduler;
 
-    private CellEditorValueValidationJobScheduler<Object>.CellEditorValueValidationListener<Object> cellValidationListener;
+    private CellEditorValueValidationJobScheduler<Object>.CellEditorValueValidationListener cellValidationListener;
 
     @Test
     public void givenIJobChangeEventWithStatusSuccess_andJob_withLockAndErrorMsgBothProperties_whenCallMethodNotifyAboutJobChangeState_thenShouldBeNormalExecution()
@@ -101,7 +101,7 @@ public class CellEditorValueValidationListenerTest {
         when(control.getBounds()).thenReturn(new Rectangle(0, 0, 0, 0));
         when(control.toControl(any(Point.class))).thenReturn(new Point(0, 0));
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(null);
-        this.cellValidationListener = validationJobScheduler.new CellEditorValueValidationListener<>(control);
+        this.cellValidationListener = validationJobScheduler.new CellEditorValueValidationListener(control);
     }
 
     private static class MockJob extends Job {

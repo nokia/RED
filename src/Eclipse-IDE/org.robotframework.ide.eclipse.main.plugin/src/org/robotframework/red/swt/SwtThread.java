@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import org.eclipse.swt.widgets.Display;
 
@@ -57,6 +58,16 @@ public class SwtThread {
     }
 
     public abstract static class Evaluation<T> implements Runnable {
+
+        public static <T> Evaluation<T> of(final Supplier<T> resultsSupplier) {
+            return new Evaluation<T>() {
+
+                @Override
+                public T runCalculation() {
+                    return resultsSupplier.get();
+                }
+            };
+        }
 
         private T result = null;
 
