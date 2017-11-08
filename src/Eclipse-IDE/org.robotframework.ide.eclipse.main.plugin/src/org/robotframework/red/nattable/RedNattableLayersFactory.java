@@ -27,6 +27,7 @@ import org.eclipse.nebula.widgets.nattable.layer.IUniqueIndexLayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.AggregateConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.painter.layer.GridLineCellLayerPainter;
 import org.eclipse.nebula.widgets.nattable.painter.layer.ILayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
@@ -40,7 +41,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.nattable.configs.RedTableEditBindingsConfiguration;
 import org.robotframework.red.nattable.configs.SelectionLayerConfiguration;
 import org.robotframework.red.nattable.configs.TreeLayerConfiguration;
@@ -102,36 +102,15 @@ public class RedNattableLayersFactory {
         return treeLayer;
     }
 
-    public ColumnHeaderLayer createColumnHeaderLayer(final SelectionLayer selectionLayer,
-            final IUniqueIndexLayer viewportLayer, final IDataProvider columnHeaderDataProvider) {
-        final DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
-        columnHeaderDataLayer.setDefaultRowHeight(ROW_HEIGHT);
-        return new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer, selectionLayer, false);
-    }
-
-    public <T> SortHeaderLayer<T> createSortingColumnHeaderLayer(final SelectionLayer selectionLayer,
-            final IUniqueIndexLayer viewportLayer, final IDataProvider columnHeaderDataProvider,
-            final SortedList<T> sortedList, final IConfigRegistry configRegistry,
-            final IColumnPropertyAccessor<T> accessor) {
-
-        final DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
-        columnHeaderDataLayer.setDefaultRowHeight(ROW_HEIGHT);
-        columnHeaderDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
-
-        final ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, viewportLayer,
-                selectionLayer, false);
-
-        return new SortHeaderLayer<>(columnHeaderLayer,
-                new GlazedListsSortModel<>(sortedList, accessor, configRegistry, columnHeaderDataLayer));
-    }
-
-    public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider) {
-        return createColumnHeaderDataLayer(columnHeaderDataProvider, new ColumnLabelAccumulator());
+    public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider,
+            final TableTheme tableTheme) {
+        return createColumnHeaderDataLayer(columnHeaderDataProvider, tableTheme, new ColumnLabelAccumulator());
     }
 
     public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider,
-            final IConfigLabelAccumulator configLabelAccumulator) {
+            final TableTheme tableTheme, final IConfigLabelAccumulator configLabelAccumulator) {
         final DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
+        columnHeaderDataLayer.setLayerPainter(new GridLineCellLayerPainter(tableTheme.getHeadersGridBorderColor()));
         columnHeaderDataLayer.setDefaultRowHeight(ROW_HEIGHT);
         columnHeaderDataLayer.setConfigLabelAccumulator(configLabelAccumulator);
         return columnHeaderDataLayer;
@@ -155,12 +134,6 @@ public class RedNattableLayersFactory {
     }
 
     public RowHeaderLayer createRowsHeaderLayer(final SelectionLayer selectionLayer,
-            final IUniqueIndexLayer viewportLayer, final IDataProvider rowHeaderDataProvider) {
-        return createRowsHeaderLayer(selectionLayer, viewportLayer, rowHeaderDataProvider,
-                new SelectionLayerPainter(ColorsManager.getColor(250, 250, 250)));
-    }
-
-    public RowHeaderLayer createRowsHeaderLayer(final SelectionLayer selectionLayer,
             final IUniqueIndexLayer viewportLayer, final IDataProvider rowHeaderDataProvider,
             final ILayerPainter painter, final IConfigLabelAccumulator... accumulators) {
         final DataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
@@ -171,10 +144,11 @@ public class RedNattableLayersFactory {
     }
 
     public CornerLayer createCornerLayer(final IDataProvider columnHeaderDataProvider, final ILayer columnHeaderLayer,
-            final IDataProvider rowHeaderDataProvider, final ILayer rowHeaderLayer) {
-        final DataLayer columnHeaderDataLayer = new DataLayer(
+            final IDataProvider rowHeaderDataProvider, final ILayer rowHeaderLayer, final TableTheme tableTheme) {
+        final DataLayer cornerDataLayer = new DataLayer(
                 new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider));
-        return new CornerLayer(columnHeaderDataLayer, rowHeaderLayer, columnHeaderLayer);
+        cornerDataLayer.setLayerPainter(new GridLineCellLayerPainter(tableTheme.getHeadersGridBorderColor()));
+        return new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
     }
 
     public GridLayer createGridLayer(final ILayer viewportLayer, final ILayer columnHeaderLayer,

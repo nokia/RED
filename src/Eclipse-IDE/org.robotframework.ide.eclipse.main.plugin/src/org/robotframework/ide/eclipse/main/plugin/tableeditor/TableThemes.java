@@ -40,11 +40,13 @@ public class TableThemes {
 
         public Font getFont();
         public Color getGridBorderColor();
+        public Color getGridSelectionBorderColor();
 
+        public Color getHeadersGridBorderColor();
         public Color getHeadersBackground();
         public Color getHeadersForeground();
         public Color getHeadersUnderlineColor();
-        public Color getHighlightedHeadersBackground();
+        public Color getHeadersHighlightedBackground();
 
         public Color getBodyBackgroundOddRowBackground();
         public Color getBodyBackgroundEvenRowBackground();
@@ -55,7 +57,7 @@ public class TableThemes {
         public Color getBodySelectedCellBackground();
         public Color getBodyHoveredSelectedCellBackground();
         public Color getBodyAnchoredCellBackground();
-
+        public Color getBodyInactiveCellBackground();
     }
 
     private static class DarkTheme implements TableTheme {
@@ -67,7 +69,17 @@ public class TableThemes {
 
         @Override
         public Color getGridBorderColor() {
-            return ColorsManager.getColor(SWT.COLOR_BLACK);
+            return ColorsManager.getColor(60, 60, 60);
+        }
+
+        @Override
+        public Color getGridSelectionBorderColor() {
+            return ColorsManager.getColor(127, 100, 0);
+        }
+
+        @Override
+        public Color getHeadersGridBorderColor() {
+            return ColorsManager.getColor(50, 52, 55);
         }
 
         @Override
@@ -82,11 +94,11 @@ public class TableThemes {
 
         @Override
         public Color getHeadersUnderlineColor() {
-            return ColorsManager.getColor(SWT.COLOR_BLACK);
+            return ColorsManager.getColor(127, 100, 0);
         }
 
         @Override
-        public Color getHighlightedHeadersBackground() {
+        public Color getHeadersHighlightedBackground() {
             return ColorsManager.getColor(44, 47, 50);
         }
 
@@ -97,7 +109,7 @@ public class TableThemes {
 
         @Override
         public Color getBodyBackgroundEvenRowBackground() {
-            return ColorsManager.getColor(61, 65, 68);
+            return ColorsManager.getColor(58, 62, 66);
         }
 
         @Override
@@ -127,7 +139,12 @@ public class TableThemes {
 
         @Override
         public Color getBodyAnchoredCellBackground() {
-            return ColorsManager.getColor(40, 40, 40);
+            return ColorsManager.getColor(50, 50, 50);
+        }
+
+        @Override
+        public Color getBodyInactiveCellBackground() {
+            return ColorsManager.getColor(30, 30, 30);
         }
     }
 
@@ -144,6 +161,16 @@ public class TableThemes {
         }
 
         @Override
+        public Color getGridSelectionBorderColor() {
+            return ColorsManager.getColor(128, 128, 128);
+        }
+
+        @Override
+        public Color getHeadersGridBorderColor() {
+            return ColorsManager.getColor(210, 210, 210);
+        }
+
+        @Override
         public Color getHeadersBackground() {
             return ColorsManager.getColor(250, 250, 250);
         }
@@ -155,11 +182,11 @@ public class TableThemes {
 
         @Override
         public Color getHeadersUnderlineColor() {
-            return ColorsManager.getColor(220, 220, 220);
+            return ColorsManager.getColor(240, 240, 240);
         }
 
         @Override
-        public Color getHighlightedHeadersBackground() {
+        public Color getHeadersHighlightedBackground() {
             return ColorsManager.getColor(240, 240, 240);
         }
 
@@ -201,6 +228,11 @@ public class TableThemes {
         @Override
         public Color getBodyAnchoredCellBackground() {
             return RedTheme.getHiglihtedRowColor();
+        }
+
+        @Override
+        public Color getBodyInactiveCellBackground() {
+            return ColorsManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
         }
     }
 }
