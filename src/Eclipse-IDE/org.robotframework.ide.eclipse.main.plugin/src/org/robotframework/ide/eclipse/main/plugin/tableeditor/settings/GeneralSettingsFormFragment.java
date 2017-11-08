@@ -599,7 +599,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
                 new RedNatGridLayerPainter(table, theme.getGridBorderColor(), theme.getHeadersBackground(),
-                        theme.getHeadersUnderlineColor(), 1, RedNattableLayersFactory.ROW_HEIGHT));
+                        theme.getHeadersUnderlineColor(), RedNattableLayersFactory.GRID_BORDER_WIDTH,
+                        RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
 
