@@ -251,6 +251,44 @@ public class VariablesTableValidatorTest {
 
     }
 
+    @Test
+    public void variableWithoutAssignmentIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
+                .appendLine("${var1}")
+                .appendLine("@{var2}=")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final VariablesTableValidator validator = new VariablesTableValidator(context,
+                file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT,
+                        new ProblemPosition(2, Range.closed(18, 25))),
+                new Problem(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT,
+                        new ProblemPosition(3, Range.closed(26, 33))));
+
+    }
+
+    @Test
+    public void variableWithAssignmentIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
+                .appendLine("${var1}=    variable1")
+                .appendLine("@{var2}=    1    2    3    4")
+                .appendLine("&{var3}=    d1=1    d2=2    d3=3    d4=4")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final VariablesTableValidator validator = new VariablesTableValidator(context,
+                file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
+        validator.validate(null);
+
+        assertThat(reporter.wasProblemReported()).isFalse();
+
+    }
+
     private static VersionDependentValidators createVersionDependentValidators(
             final VersionDependentModelUnitValidator... validators) {
         return new VersionDependentValidators() {
