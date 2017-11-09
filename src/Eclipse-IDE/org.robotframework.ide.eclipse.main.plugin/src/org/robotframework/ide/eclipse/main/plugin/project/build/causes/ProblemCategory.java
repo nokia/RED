@@ -155,6 +155,10 @@ public enum ProblemCategory {
             ProblemCategoryType.CODE_STYLE,
             "Invalid time format",
             "Occurs when time is not formatted correctly. Use number, time string or timer string."),
+    VARIABLE_WITHOUT_ASSIGNMENT(
+            ProblemCategoryType.CODE_STYLE,
+            "Variable declared without assignment",
+            "Occurs when variable is declared without assignment in Variables section."),
     ABSOLUTE_PATH(
             ProblemCategoryType.IMPORT,
             "Absolute path used",
