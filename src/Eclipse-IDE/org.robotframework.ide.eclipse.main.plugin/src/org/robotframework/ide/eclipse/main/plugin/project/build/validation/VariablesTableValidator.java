@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -73,6 +74,7 @@ class VariablesTableValidator implements ModelUnitValidator {
         reportDuplicatedVariables(variableTable);
         reportDictionaryValuesWithInvalidSyntax(variableTable);
         reportUnknownVariablesInValues(variableTable);
+        reportVariableDeclarationWithoutAssignment(variableTable);
     }
 
     private void reportVersionSpecificProblems(final VariableTable variableTable, final IProgressMonitor monitor)
@@ -190,6 +192,22 @@ class VariablesTableValidator implements ModelUnitValidator {
 
         for (final AVariable variableDef : variableTable.getVariables()) {
             unknownVarsValidator.reportUnknownVars(variableDef.getValueTokens(), variables);
+        }
+    }
+
+    private void reportVariableDeclarationWithoutAssignment(final VariableTable variableTable) {
+
+        for (final AVariable variable : variableTable.getVariables()) {
+            final List<RobotToken> valueTokens = variable.getValueTokens();
+
+            if (valueTokens.isEmpty()) {
+                final RobotProblem problem = RobotProblem
+                        .causedBy(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT)
+                        .formatMessageWith(variable.getName());
+                final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
+                        variable.getName());
+                reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
+            }
         }
     }
 }
