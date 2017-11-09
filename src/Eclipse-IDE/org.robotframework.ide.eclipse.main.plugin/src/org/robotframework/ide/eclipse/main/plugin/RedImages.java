@@ -111,10 +111,6 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/variable_dict.png");
     }
 
-    public static ImageDescriptor getDictionaryMappingImage() {
-        return RedPlugin.getImageDescriptor("resources/variable_dict_mapping.png");
-    }
-
     public static ImageDescriptor getRobotSettingImage() {
         return RedPlugin.getImageDescriptor("resources/gear.png");
     }
