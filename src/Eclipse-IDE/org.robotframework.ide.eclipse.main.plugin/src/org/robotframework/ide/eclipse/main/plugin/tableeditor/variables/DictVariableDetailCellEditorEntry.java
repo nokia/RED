@@ -8,17 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.TraverseEvent;
-import org.eclipse.swt.events.TraverseListener;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
@@ -58,35 +54,31 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
     public void openForEditing() {
         super.openForEditing();
 
-        textEdit = new Text(this, SWT.BORDER);
+        textEdit = new Text(this, SWT.NONE);
         final String toEdit = keyText + (valueText.isEmpty() ? "" : "=" + valueText);
         textEdit.setText(toEdit);
         textEdit.setSelection(textEdit.getText().length());
-        textEdit.addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusLost(final FocusEvent e) {
+        textEdit.addFocusListener(FocusListener.focusLostAdapter(e -> commitEdit()));
+        textEdit.addTraverseListener(e -> {
+            if (assistSupport.areContentProposalsShown()) {
+                return;
+            }
+            if (e.keyCode == SWT.ESC) {
+                cancelEdit();
+            } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
                 commitEdit();
             }
         });
-        textEdit.addTraverseListener(new TraverseListener() {
-
-            @Override
-            public void keyTraversed(final TraverseEvent e) {
-                if (assistSupport.areContentProposalsShown()) {
-                    return;
-                }
-                if (e.keyCode == SWT.ESC) {
-                    cancelEdit();
-                } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
-                    commitEdit();
-                }
-            }
+        textEdit.addPaintListener(e -> {
+            e.gc.drawLine(0, 0, e.width, 0);
+            e.gc.drawLine(e.width - 1, 0, e.width - 1, e.height);
+            e.gc.drawLine(e.width - 1, e.height - 1, 0, e.height - 1);
+            e.gc.drawLine(0, e.height - 1, 0, 0);
         });
         validationJobScheduler.armRevalidationOn(textEdit);
         final AssistantContext context = new NatTableAssistantContext(column, row);
         assistSupport.install(textEdit, context);
-        GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).applyTo(textEdit);
+        GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).hint(SWT.DEFAULT, 20).applyTo(textEdit);
         layout();
 
         select(true);
@@ -120,11 +112,17 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
 
         @Override
         protected void paintForeground(final int width, final int height, final GC bufferGC) {
+            final Color fgColor = bufferGC.getForeground();
+            final int lineWidth = bufferGC.getLineWidth();
+
+            if (isHovered()) {
+                bufferGC.setForeground(
+                        ColorsManager.getColor(ColorsManager.blend(fgColor.getRGB(), hoverColor.getRGB())));
+            }
             final int mid = width / 2;
+            final int spacingAroundLine = LINE_WIDTH;
 
-            final int spacingAroundImage = 8;
-
-            final int keyLimit = mid - 2 * 4 - spacingAroundImage;
+            final int keyLimit = mid - 2 * 4 - spacingAroundLine;
             final int keyX = 4;
             if (bufferGC.textExtent(keyText).x < keyLimit) {
                 bufferGC.drawText(keyText, keyX, 4);
@@ -135,17 +133,16 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
                         keyX, 4);
             }
 
-            if (isHovered()) {
-                bufferGC.drawImage(ImagesManager.getImage(RedImages.getDictionaryMappingImage()),
-                        mid - spacingAroundImage, 4);
-            } else {
-                bufferGC.drawImage(
-                        ImagesManager.getImage(RedImages.getGrayedImage(RedImages.getDictionaryMappingImage())),
-                        mid - spacingAroundImage, 4);
+            if (!isEditorOpened()) {
+                final Color fgColor2 = bufferGC.getForeground();
+                bufferGC.setForeground(ColorsManager.getColor(220, 220, 220));
+                bufferGC.setLineWidth(LINE_WIDTH * 2);
+                bufferGC.drawLine(mid - LINE_WIDTH, 0, mid - LINE_WIDTH, height);
+                bufferGC.setForeground(fgColor2);
             }
 
-            final int valueLimit = mid - HOVER_BLOCK_WIDTH - 4 - spacingAroundImage;
-            final int valueX = mid + spacingAroundImage + 4;
+            final int valueLimit = mid - HOVER_BLOCK_WIDTH - 4 - spacingAroundLine;
+            final int valueX = mid + spacingAroundLine + 4;
             if (bufferGC.textExtent(valueText).x < valueLimit) {
                 bufferGC.drawText(valueText, valueX, 4);
             } else {
@@ -155,6 +152,8 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
                         LabelsMeasurer.cutTextToRender(bufferGC, valueText, valueLimit - suffixLength) + suffix, valueX,
                         4);
             }
+            bufferGC.setForeground(fgColor);
+            bufferGC.setLineWidth(lineWidth);
         }
     }
 }

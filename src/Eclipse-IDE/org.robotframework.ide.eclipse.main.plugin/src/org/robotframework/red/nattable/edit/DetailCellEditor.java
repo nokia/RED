@@ -18,6 +18,7 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -97,7 +98,9 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
                 assistSupport, validationJobScheduler);
         composite.setBackground(parent.getBackground());
 
-        composite.getText().setForeground(this.cellStyle.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR));
+        ((GridData) composite.getText().getLayoutData()).heightHint = this.layerCell.getBounds().height;
+        composite.setColors(composite.getBackground(),
+                this.cellStyle.getAttributeValue(CellStyleAttributes.FOREGROUND_COLOR));
         composite.getText().setFont(this.cellStyle.getAttributeValue(CellStyleAttributes.FONT));
         composite.getText().setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
@@ -141,7 +144,6 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         });
         composite.setVisible(true);
         validationJobScheduler.armRevalidationOn(composite.getText());
-
         return composite;
     }
 

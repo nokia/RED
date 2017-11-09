@@ -10,17 +10,13 @@ import java.util.List;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.robotframework.red.nattable.edit.DetailCellEditorDialog.DialogContentCreator;
-import org.robotframework.red.nattable.edit.DetailCellEditorEntriesComposite.EntriesChangeListener;
-import org.robotframework.red.nattable.edit.DetailCellEditorEntriesComposite.MainControlChooser;
 
 /**
  * @author Michal Anglart
@@ -34,7 +30,7 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
 
     private final AssistanceSupport assistSupport;
 
-    private final MainControlChooser mainControlChooseCallback;
+    private final Runnable mainControlChooseCallback;
 
     private Mode mode = Mode.INLINED;
 
@@ -45,7 +41,7 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
 
     DetailCellEditorEntriesControlsSwitcher(final DetailCellEditorComposite<D> parent,
             final DetailCellEditorEditingSupport<D> editSupport, final AssistanceSupport assistSupport,
-            final MainControlChooser mainControlChooseCallback) {
+            final Runnable mainControlChooseCallback) {
         this.parent = parent;
         this.editSupport = editSupport;
         this.assistSupport = assistSupport;
@@ -53,13 +49,10 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
     }
 
     DetailCellEditorEntriesComposite<D> createEntriesPanel() {
-        panel = new DetailCellEditorEntriesComposite<>(parent, editSupport, assistSupport,
-                mode, new DetailCellEditorEntriesComposite.EntriesChangeListener<D>() {
-                    @Override
-                    public void entriesChanged(final List<DetailCellEditorEntry<D>> entries) {
-                        for (final Control entry : entries) {
-                            installControlListeners(entry);
-                        }
+        panel = new DetailCellEditorEntriesComposite<>(parent, editSupport, assistSupport, mode,
+                entries -> {
+                    for (final Control entry : entries) {
+                        installControlListeners(entry);
                     }
                 }, mainControlChooseCallback);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(panel);
@@ -79,12 +72,7 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
     }
 
     private void installControlListeners(final Control child) {
-        child.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseDown(final MouseEvent e) {
-                switchToWindowingMode();
-            }
-        });
+        child.addMouseListener(MouseListener.mouseDownAdapter(e -> switchToWindowingMode()));
     }
 
     private void switchToWindowingMode() {
@@ -100,6 +88,8 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
         final List<Integer> selection = panel.getEntries().getSelectedIndexes();
 
         final Point panelSize = panel.getSize();
+        final Color bgColor = panel.getBgColor();
+        final Color fgColor = panel.getFgColor();
         panel.dispose();
 
         parent.setSize(panelSize.x, 21);
@@ -110,15 +100,11 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
                 final int column = panel.getColumn();
                 final int row = panel.getRow();
                 panel = new DetailCellEditorEntriesComposite<>(parent, editSupport, assistSupport, Mode.WINDOWED,
-                        new EntriesChangeListener<D>(), mainControlChooseCallback);
+                        entries -> { }, mainControlChooseCallback);
                 panel.setColumn(column);
                 panel.setRow(row);
-                panel.addDisposeListener(new DisposeListener() {
-                    @Override
-                    public void widgetDisposed(final DisposeEvent e) {
-                        switchToInlineMode();
-                    }
-                });
+                panel.setColors(bgColor, fgColor);
+                panel.addDisposeListener(e -> switchToInlineMode());
                 return panel;
             }
         };
@@ -137,10 +123,14 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
         }
         mode = Mode.INLINED;
 
+        final Color bgColor = panel.getBgColor();
+        final Color fgColor = panel.getFgColor();
+
         dialog.close();
         dialog = null;
 
         panel = createEntriesPanel();
+        panel.setColors(bgColor, fgColor);
         panel.refresh();
 
         final Point realSize = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -183,6 +173,10 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
 
     void setPanelInput(final int column, final int row) {
         panel.setInput(column, row);
+    }
+
+    void setColors(final Color background, final Color foreground) {
+        panel.setColors(background, foreground);
     }
 
     enum Mode {

@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class ColorsManager {
-    private static final Map<RGB, Color> COLOR_TABLE = new HashMap<RGB, Color>(10);
+    private static final Map<RGB, Color> COLOR_TABLE = new HashMap<>(10);
 
     private ColorsManager() {
         // nothing to do
@@ -109,5 +109,13 @@ public class ColorsManager {
             color.dispose();
         }
         COLOR_TABLE.clear();
+    }
+
+    public static RGB blend(final RGB val1, final RGB val2) {
+        return new RGB(blend(val1.red, val2.red), blend(val1.green, val2.green), blend(val1.blue, val2.blue));
+    }
+
+    private static int blend(final int a, final int b) {
+        return (a + b) / 2;
     }
 }
