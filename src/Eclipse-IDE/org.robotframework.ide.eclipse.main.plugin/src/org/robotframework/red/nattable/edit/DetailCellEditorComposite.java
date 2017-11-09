@@ -8,14 +8,10 @@ package org.robotframework.red.nattable.edit;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
-import org.robotframework.red.nattable.edit.DetailCellEditorEntriesComposite.MainControlChooser;
 
 /**
  * @author Michal Anglart
@@ -42,49 +38,38 @@ class DetailCellEditorComposite<D> extends Composite {
         this.validationScheduler = validationScheduler;
 
         setBackground(parent.getBackground());
-        GridLayoutFactory.fillDefaults().applyTo(this);
+        setForeground(parent.getForeground());
+        GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(this);
 
-        this.switcher = new DetailCellEditorEntriesControlsSwitcher<>(this, editSupport, assistSupport,
-                new MainControlChooser() {
-            @Override
-            public void focusMainControl() {
-                text.setFocus();
-            }
-        });
         this.text = createText();
+        this.switcher = new DetailCellEditorEntriesControlsSwitcher<>(this, editSupport, assistSupport,
+                () -> text.setFocus());
         this.switcher.createEntriesPanel();
     }
 
     private Text createText() {
         final Text text = new Text(this, SWT.SINGLE);
-        text.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(final KeyEvent e) {
-                if (assistSupport.areContentProposalsShown()) {
-                    return;
-                }
-                if (e.keyCode == SWT.ARROW_DOWN) {
-
-                    switcher.selectFirstEntry();
-                } else if ((e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) && e.stateMask == 0
-                        && !text.getText().isEmpty()
-                        && validationScheduler.canCloseCellEditor()) {
-                    editSupport.addNewDetailElement(text.getText());
-
-                    text.setText("");
-                    switcher.refreshEntriesPanel();
-                }
+        text.addKeyListener(KeyListener.keyPressedAdapter(e -> {
+            if (assistSupport.areContentProposalsShown()) {
+                return;
             }
-        });
-        text.addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(final PaintEvent e) {
-                if (text.getText().isEmpty() && !text.isFocusControl()) {
-                    final Color current = e.gc.getForeground();
-                    e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_GRAY));
-                    e.gc.drawString("new entry", 3, 1);
-                    e.gc.setForeground(current);
-                }
+            if (e.keyCode == SWT.ARROW_DOWN) {
+
+                switcher.selectFirstEntry();
+            } else if ((e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) && e.stateMask == 0
+                    && !text.getText().isEmpty() && validationScheduler.canCloseCellEditor()) {
+                editSupport.addNewDetailElement(text.getText());
+
+                text.setText("");
+                switcher.refreshEntriesPanel();
+            }
+        }));
+        text.addPaintListener(e -> {
+            if (text.getText().isEmpty() && !text.isFocusControl()) {
+                final Color current = e.gc.getForeground();
+                e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_GRAY));
+                e.gc.drawString("new entry", 3, 1);
+                e.gc.setForeground(current);
             }
         });
         GridDataFactory.fillDefaults().grab(true, false).applyTo(text);
@@ -97,5 +82,12 @@ class DetailCellEditorComposite<D> extends Composite {
 
     void setInput(final int column, final int row) {
         switcher.setPanelInput(column, row);
+    }
+
+    void setColors(final Color background, final Color foreground) {
+        text.setBackground(background);
+        text.setForeground(foreground);
+
+        switcher.setColors(background, foreground);
     }
 }

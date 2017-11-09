@@ -56,7 +56,7 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
     public void openForEditing() {
         super.openForEditing();
 
-        textEdit = new Text(this, SWT.BORDER);
+        textEdit = new Text(this, SWT.NONE);
         textEdit.setText(text);
         textEdit.setSelection(text.length());
         textEdit.addFocusListener(FocusListener.focusLostAdapter(e -> commitEdit()));
@@ -70,10 +70,20 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
                     commitEdit();
                 }
         });
+        textEdit.addPaintListener(e -> {
+            e.gc.drawLine(0, 0, e.width, 0);
+            e.gc.drawLine(e.width - 1, 0, e.width - 1, e.height);
+            e.gc.drawLine(e.width - 1, e.height - 1, 0, e.height - 1);
+            e.gc.drawLine(0, e.height - 1, 0, 0);
+        });
         validationJobScheduler.armRevalidationOn(textEdit);
         final AssistantContext context = new NatTableAssistantContext(column, row);
         assistSupport.install(textEdit, context);
-        GridDataFactory.fillDefaults().grab(true, false).indent(calculateControlIndent(), 2).applyTo(textEdit);
+        GridDataFactory.fillDefaults()
+                .grab(true, false)
+                .indent(calculateControlIndent(), 2)
+                .hint(SWT.DEFAULT, 20)
+                .applyTo(textEdit);
         layout();
 
         select(true);
@@ -122,23 +132,24 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
 
         @Override
         protected void paintForeground(final int width, final int height, final GC bufferGC) {
-            int x = 3;
-
             final Color fgColor = bufferGC.getForeground();
+            final int lineWidth = bufferGC.getLineWidth();
+
             if (isHovered()) {
-                bufferGC.setForeground(ColorsManager.getColor(120, 180, 170));
-            } else {
-                bufferGC.setForeground(ColorsManager.getColor(210, 210, 210));
+                bufferGC.setForeground(
+                        ColorsManager.getColor(ColorsManager.blend(fgColor.getRGB(), hoverColor.getRGB())));
             }
+
+            int x = 3;
             bufferGC.drawText(indexText, x, 4);
+            x += bufferGC.textExtent(indexText).x + SPACING_AROUND_LINE;
 
-            final int indexLabelWidth = bufferGC.textExtent(indexText).x;
-            x += indexLabelWidth + SPACING_AROUND_LINE;
-
+            final Color fgColor2 = bufferGC.getForeground();
+            bufferGC.setForeground(ColorsManager.getColor(220, 220, 220));
             bufferGC.setLineWidth(LINE_WIDTH);
             bufferGC.drawLine(x, 0, x, height);
+            bufferGC.setForeground(fgColor2);
 
-            bufferGC.setForeground(fgColor);
             x += SPACING_AROUND_LINE + LINE_WIDTH;
 
             final int limit = width - 10 - x;
@@ -151,6 +162,8 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
                 final int suffixLength = bufferGC.textExtent(suffix).x;
                 bufferGC.drawText(LabelsMeasurer.cutTextToRender(bufferGC, text, limit - suffixLength) + suffix, x, 4);
             }
+            bufferGC.setForeground(fgColor);
+            bufferGC.setLineWidth(lineWidth);
         }
     }
 }
