@@ -13,7 +13,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.robotframework.red.graphics.ColorsManager;
 
 
 /**
@@ -47,7 +46,6 @@ public class DetailCellEditorDialog extends PopupDialog {
 
     @Override
     protected Control createContents(final Composite parent) {
-        parent.setBackground(ColorsManager.getColor(SWT.COLOR_WHITE));
         parent.setLayout(new FillLayout(SWT.VERTICAL));
         return createDialogArea(parent);
     }

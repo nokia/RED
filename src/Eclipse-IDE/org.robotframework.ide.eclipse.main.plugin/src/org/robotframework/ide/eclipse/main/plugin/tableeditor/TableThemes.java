@@ -124,22 +124,22 @@ public class TableThemes {
 
         @Override
         public Color getBodyHoveredCellBackground() {
-            return ColorsManager.getColor(40, 40, 40);
+            return ColorsManager.getColor(128, 100, 45);
         }
 
         @Override
         public Color getBodyHoveredSelectedCellBackground() {
-            return ColorsManager.getColor(30, 30, 30);
+            return ColorsManager.getColor(128, 100, 45);
         }
 
         @Override
         public Color getBodySelectedCellBackground() {
-            return ColorsManager.getColor(50, 50, 50);
+            return ColorsManager.getColor(90, 80, 32);
         }
 
         @Override
         public Color getBodyAnchoredCellBackground() {
-            return ColorsManager.getColor(50, 50, 50);
+            return ColorsManager.getColor(90, 80, 32);
         }
 
         @Override
