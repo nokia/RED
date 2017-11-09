@@ -13,21 +13,14 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntriesControlsSwitcher.Mode;
-import org.robotframework.red.nattable.edit.DetailCellEditorEntry.DetailEditorListener;
 import org.robotframework.red.nattable.edit.DetailEntriesCollection.DetailWithEntry;
 
 /**
@@ -43,7 +36,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
     private int column;
     private int row;
 
-    private final MainControlChooser mainControlChooseCallback;
+    private final Runnable mainControlChooseCallback;
 
     private final Mode mode;
 
@@ -51,10 +44,13 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
     private final DetailEntriesCollection<D> entries = new DetailEntriesCollection<>();
     private final EntriesChangeListener<D> entriesChangesListener;
 
+    private Color bgColor;
+    private Color fgColor;
+
     public DetailCellEditorEntriesComposite(final Composite parent, final DetailCellEditorEditingSupport<D> editSupport,
             final AssistanceSupport assistSupport,
             final Mode mode, final EntriesChangeListener<D> entriesChangesListener,
-            final MainControlChooser mainControlChooseCallback) {
+            final Runnable mainControlChooseCallback) {
         super(parent, SWT.NONE);
         this.editSupport = editSupport;
         this.assistSupport = assistSupport;
@@ -63,16 +59,20 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
         this.mode = mode;
 
         setBackground(getParent().getBackground());
+        setForeground(getParent().getForeground());
         if (mode == Mode.INLINED) {
-            addPaintListener(new PaintListener() {
+            addPaintListener(e -> {
+                final Color oldForeground = e.gc.getForeground();
 
-                @Override
-                public void paintControl(final PaintEvent e) {
-                    e.gc.drawLine(0, 0, e.width, 0);
-                    e.gc.drawLine(e.width - 1, 0, e.width - 1, e.height - 1);
-                    e.gc.drawLine(e.width - 1, e.height - 1, 0, e.height - 1);
-                    e.gc.drawLine(0, e.height - 1, 0, 0);
+                if (fgColor != null) {
+                    e.gc.setForeground(fgColor);
                 }
+                e.gc.drawLine(0, 0, e.width, 0);
+                e.gc.drawLine(e.width - 1, 0, e.width - 1, e.height - 1);
+                e.gc.drawLine(e.width - 1, e.height - 1, 0, e.height - 1);
+                e.gc.drawLine(0, e.height - 1, 0, 0);
+
+                e.gc.setForeground(oldForeground);
             });
             GridLayoutFactory.fillDefaults().spacing(1, 1).extendedMargins(1, 1, 1, 1).applyTo(this);
         } else {
@@ -87,32 +87,29 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
         return entries;
     }
 
+    Color getBgColor() {
+        return bgColor;
+    }
+
+    Color getFgColor() {
+        return fgColor;
+    }
+
     private void createEntriesComposite() {
         final ScrolledComposite scrolledComposite = new ScrolledComposite(this, SWT.V_SCROLL);
         scrolledComposite.setBackground(getParent().getBackground());
         scrolledComposite.setShowFocusedControl(true);
         scrolledComposite.setExpandHorizontal(true);
-        final SelectionAdapter scrollingRefresher = new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                entries.redrawEntries();
-            }
-        };
+        final SelectionListener scrollingRefresher = SelectionListener
+                .widgetSelectedAdapter(e -> entries.redrawEntries());
         scrolledComposite.getVerticalBar().addSelectionListener(scrollingRefresher);
-        scrolledComposite.getVerticalBar().addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                scrolledComposite.getVerticalBar().removeSelectionListener(scrollingRefresher);
-            }
-        });
+        scrolledComposite.getVerticalBar().addDisposeListener(
+                e -> scrolledComposite.getVerticalBar().removeSelectionListener(scrollingRefresher));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(scrolledComposite);
 
         entriesComposite = new Composite(scrolledComposite, SWT.NONE);
         scrolledComposite.setContent(entriesComposite);
-        entriesComposite.setBackground(ColorsManager.getColor(230, 230, 230));
-        GridLayoutFactory.fillDefaults().spacing(1, 1).applyTo(entriesComposite);
+        GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(entriesComposite);
         entriesComposite.setSize(entriesComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
@@ -121,26 +118,19 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
             final DetailCellEditorEntry<D> entry = editSupport.createDetailEntry(entriesComposite, column, row, detail,
                     assistSupport);
             GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 25).grab(true, false).applyTo(entry);
-            entry.setBackground(getParent().getBackground());
+            entry.setBackground(bgColor);
+            entry.setForeground(fgColor);
             entry.addKeyListener(new EntryKeyPressListener(entry));
-            entry.addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseUp(final MouseEvent e) {
-                    if (entry.isSelected() && mode == Mode.WINDOWED) {
-                        entries.openEntryForEdit(entry);
-                    } else {
-                        entry.select(e.stateMask == 0 || e.stateMask != SWT.CTRL);
-                    }
+            entry.addMouseListener(MouseListener.mouseUpAdapter(e -> {
+                if (entry.isSelected() && mode == Mode.WINDOWED) {
+                    entries.openEntryForEdit(entry);
+                } else {
+                    entry.select(e.stateMask == 0 || e.stateMask != SWT.CTRL);
                 }
-            });
-            entry.setEditorListener(new DetailEditorListener() {
-
-                @Override
-                public void editorApplied(final String value) {
-                    editSupport.setNewValue(detail, value);
-                    entry.update(detail);
-                }
+            }));
+            entry.setEditorListener(value -> {
+                editSupport.setNewValue(detail, value);
+                entry.update(detail);
             });
 
             entries.add(new DetailWithEntry<>(detail, entry));
@@ -158,6 +148,17 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
         label.setBackground(getBackground());
         label.setText("Edit details");
         GridDataFactory.fillDefaults().align(SWT.RIGHT, SWT.BOTTOM).grab(true, false).applyTo(label);
+    }
+
+    void setColors(final Color background, final Color foreground) {
+        this.bgColor = background;
+        this.fgColor = foreground;
+
+        setBackground(background);
+        entriesComposite.setBackground(fgColor);
+        entriesComposite.getParent().setBackground(bgColor);
+
+        setForeground(foreground);
     }
 
     void setInput(final int column, final int row) {
@@ -194,16 +195,10 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
         }
     }
 
-    static class EntriesChangeListener<D> {
+    @FunctionalInterface
+    static interface EntriesChangeListener<D> {
 
-        void entriesChanged(final List<DetailCellEditorEntry<D>> entries) {
-            // override if needed
-        }
-    }
-
-    static interface MainControlChooser {
-
-        void focusMainControl();
+        void entriesChanged(final List<DetailCellEditorEntry<D>> entries);
     }
 
     private class EntryKeyPressListener extends KeyAdapter {
@@ -227,7 +222,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
                     entries.selectOnlyPreviousEntry(entry);
                 } else {
                     entry.deselect();
-                    mainControlChooseCallback.focusMainControl();
+                    mainControlChooseCallback.run();
                 }
             } else if (e.keyCode == SWT.ARROW_UP && e.stateMask == SWT.SHIFT) {
                 entries.selectPreviousEntry(entry);
@@ -276,7 +271,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
 
             } else if (e.keyCode == SWT.ESC) {
                 entries.deselectAll();
-                mainControlChooseCallback.focusMainControl();
+                mainControlChooseCallback.run();
 
             } else if (e.keyCode == SWT.DEL) {
                 final int index = entries.getEntryIndex(entry);

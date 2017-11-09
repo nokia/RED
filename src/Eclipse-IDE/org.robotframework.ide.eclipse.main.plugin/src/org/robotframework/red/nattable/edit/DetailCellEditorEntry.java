@@ -5,6 +5,8 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import java.util.function.Consumer;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -16,6 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.robotframework.red.graphics.ColorsManager;
 
 /**
  * @author Michal Anglart
@@ -30,14 +33,14 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
     protected final int column;
     protected final int row;
 
-    private final Color hoverColor;
-    private final Color selectionColor;
+    protected final Color hoverColor;
+    protected final Color selectionColor;
 
     private boolean hovered = false;
     private boolean selected = false;
     private boolean underEdit = false;
 
-    private DetailEditorListener editorListener;
+    private Consumer<String> editorListener;
 
     protected CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
@@ -50,7 +53,6 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
         this.selectionColor = selectionColor;
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(getValidator());
 
-        setBackground(null);
         addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(final MouseEvent e) {
@@ -75,7 +77,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
     protected abstract CellEditorValueValidator<String> getValidator();
 
-    public void setEditorListener(final DetailEditorListener listener) {
+    public void setEditorListener(final Consumer<String> listener) {
         editorListener = listener;
     }
 
@@ -144,7 +146,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
         if (validationJobScheduler.canCloseCellEditor()) {
             final String newValue = getNewValue();
             closeEditing();
-            editorListener.editorApplied(newValue);
+            editorListener.accept(newValue);
         }
     }
 
@@ -160,18 +162,21 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
     public abstract void update(final D detail);
 
-    public static interface DetailEditorListener {
-        void editorApplied(String value);
-    }
-
     protected abstract class EntryControlPainter implements PaintListener {
 
         @Override
         public void paintControl(final PaintEvent e) {
             final Image bufferImage = new Image(e.display, e.width, e.height);
             final GC bufferGC = new GC(bufferImage);
-            
+            bufferGC.setBackground(e.gc.getBackground());
+            bufferGC.setForeground(e.gc.getForeground());
+
             paintBackground(e.width, e.height, bufferGC);
+            if (e.height == ((Control) e.widget).getSize().y
+                    || ((Control) e.widget).getBounds().y < ((Control) e.widget).getSize().y) {
+                // either the control is fully visible or it is not but is not the first entry
+                paintHorizontalLine(e.width, e.height, bufferGC);
+            }
             paintForeground(e.width, e.height, bufferGC);
 
             e.gc.drawImage(bufferImage, 0, 0);
@@ -182,6 +187,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
         private void paintBackground(final int width, final int height, final GC bufferGC) {
             Color bgColorInUse = bufferGC.getBackground();
+            bufferGC.fillRectangle(0, 0, width, height);
 
             if (isSelected() && selectionColor != null) {
                 bgColorInUse = selectionColor;
@@ -195,7 +201,16 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
             }
         }
 
-        protected abstract void paintForeground(int width, int height, final GC bufferGC);
+        private void paintHorizontalLine(final int width, final int height, final GC bufferGC) {
+            final Color originalFg = bufferGC.getForeground();
+
+            bufferGC.setForeground(ColorsManager.getColor(220, 220, 220));
+            bufferGC.drawLine(0, height - 1, width, height - 1);
+
+            bufferGC.setForeground(originalFg);
+        }
+
+        protected abstract void paintForeground(final int width, final int height, final GC bufferGC);
     }
 
 }
