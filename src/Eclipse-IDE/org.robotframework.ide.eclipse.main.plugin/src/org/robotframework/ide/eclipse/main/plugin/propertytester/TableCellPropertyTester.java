@@ -52,6 +52,12 @@ public class TableCellPropertyTester extends PropertyTester {
                 return false;
             }
             return selectionLayerAccessor.getSelectedPositions().length == expected;
+        } else if ("isSelectedColumnWithIndex".equals(property)) {
+            final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
+            if (selectionLayerAccessor == null) {
+                return false;
+            }
+            return selectionLayerAccessor.isSelectedColumnWithIndex(expected);
         }
         return false;
     }

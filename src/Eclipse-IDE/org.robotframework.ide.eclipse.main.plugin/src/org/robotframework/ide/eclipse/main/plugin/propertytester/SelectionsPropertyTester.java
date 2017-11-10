@@ -13,9 +13,16 @@ import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
 import org.robotframework.red.viewers.Selections;
@@ -25,10 +32,17 @@ import com.google.common.base.Preconditions;
 
 public class SelectionsPropertyTester extends PropertyTester {
 
-    @VisibleForTesting static final String ALL_ELEMENTS_HAVE_SAME_TYPE = "allElementsHaveSameType";
+    @VisibleForTesting
+    static final String ALL_ELEMENTS_HAVE_SAME_TYPE = "allElementsHaveSameType";
 
     @VisibleForTesting
     static final String SELECTED_ACTUAL_FILE = "selectedActualFile";
+
+    @VisibleForTesting
+    static final String KEYWORD_CALL_BUT_NOT_DOCUMENTATION = "keywordCallButNotDocumentation";
+
+    @VisibleForTesting
+    static final String METADATA_SELECTED = "isMetadataSelected";
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -48,8 +62,29 @@ public class SelectionsPropertyTester extends PropertyTester {
             return allElementsHaveSameType(selection) == expected;
         } else if (SELECTED_ACTUAL_FILE.equals(property)) {
             return isSelectedActualProjectMember(selection) == expected;
+        } else if (KEYWORD_CALL_BUT_NOT_DOCUMENTATION.equals(property)) {
+            return isKeywordCallButNotDocumentation(selection) == expected;
+        } else if (METADATA_SELECTED.equals(property)) {
+            return isMetadataSelected(selection) == expected;
         }
         return false;
+    }
+
+    private static boolean isKeywordCallButNotDocumentation(IStructuredSelection selection) {
+        final Object selected = selection.getFirstElement();
+        if (selected == null || !(selected instanceof RobotKeywordCall)) {
+            return false;
+        }
+        final AModelElement<?> element = ((RobotKeywordCall) selected).getLinkedElement();
+        return !(element instanceof TestDocumentation) && !(element instanceof KeywordDocumentation);
+    }
+
+    private static boolean isMetadataSelected(IStructuredSelection selection) {
+        final Object selected = selection.getFirstElement();
+        if (selected == null || !(selected instanceof RobotSetting)) {
+            return false;
+        }
+        return SettingsGroup.METADATA.equals(((RobotSetting) selected).getGroup());
     }
 
     private static boolean isSelectedActualProjectMember(final IStructuredSelection selection) {

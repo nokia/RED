@@ -65,7 +65,7 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
         }
         return arguments;
     }
-    
+
     @Override
     public boolean shouldAddCommentMark() {
         final RobotToken declaration = getLinkedElement().getDeclaration();
@@ -98,5 +98,20 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
     public boolean isTeardown() {
         final ModelType modelType = getLinkedElement().getModelType();
         return modelType == ModelType.TEST_CASE_TEARDOWN || modelType == ModelType.USER_KEYWORD_TEARDOWN;
+    }
+
+    @Override
+    public RobotKeywordCall insertCellAt(int position, String newValue) {
+        if (position > 0) {
+            return super.insertCellAt(position, newValue);
+        }
+        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) getParent();
+        final int index = getIndex();
+        parent.removeChild(this);
+        final List<String> args = getArguments();
+        args.add(0, super.getName());
+        final RobotKeywordCall resultCall = parent.createKeywordCall(index, "", args, getComment());
+        resultCall.resetStored();
+        return resultCall;
     }
 }

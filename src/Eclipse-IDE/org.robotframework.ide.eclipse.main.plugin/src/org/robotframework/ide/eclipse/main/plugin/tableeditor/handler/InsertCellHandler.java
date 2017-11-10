@@ -10,6 +10,8 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertCellCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertCellHandler.E4InsertCellHandler;
@@ -29,6 +31,12 @@ public class InsertCellHandler extends DIParameterizedHandler<E4InsertCellHandle
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
 
+            final RobotKeywordCall call = (RobotKeywordCall) selection.getFirstElement();
+            final int column = editor.getSelectionLayerAccessor().getSelectedPositions()[0].getColumnPosition();
+
+            if (column < call.getLinkedElement().getElementTokens().size()) {
+                commandsStack.execute(new InsertCellCommand(call, column, null));
+            }
         }
     }
 }
