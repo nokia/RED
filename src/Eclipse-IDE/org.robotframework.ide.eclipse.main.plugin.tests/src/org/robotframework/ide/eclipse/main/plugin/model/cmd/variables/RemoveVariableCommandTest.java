@@ -23,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveVariableCommand;
 
 public class RemoveVariableCommandTest {
 
@@ -35,7 +34,7 @@ public class RemoveVariableCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new RemoveVariableCommand(new ArrayList<RobotVariable>()))
                 .execute();
-        
+
         verifyZeroInteractions(eventBroker);
     }
 
@@ -57,7 +56,7 @@ public class RemoveVariableCommandTest {
         assertThat(variablesSection.findChild("list")).isNotNull();
         assertThat(variablesSection.findChild("dict")).isNull();
         assertThat(variablesSection.findChild("invalid}")).isNotNull();
-        
+
         final VariableTable varTable = variablesSection.getLinkedElement();
         assertThat(varTable.getVariables()).hasSize(3);
 

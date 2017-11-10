@@ -19,7 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarValueCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
 public class SetScalarValueCommandTest {
@@ -61,7 +60,7 @@ public class SetScalarValueCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new SetScalarValueCommand(variable, "100"));
         command.execute();
-        
+
         assertThat(variable.getValue()).isEqualTo("100");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }

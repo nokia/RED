@@ -19,7 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateFreshVariableCommand;
 
 public class CreateFreshVariableCommandTest {
 
@@ -50,9 +49,9 @@ public class CreateFreshVariableCommandTest {
 
         for (int i = 0; i < 3; i++) {
             ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshVariableCommand(variablesSection, VariableType.SCALAR))
-                .execute();
+                    .inWhich(eventBroker)
+                    .isInjectedInto(new CreateFreshVariableCommand(variablesSection, VariableType.SCALAR))
+                    .execute();
         }
 
         assertThat(variablesSection.getChildren()).hasSize(8);
