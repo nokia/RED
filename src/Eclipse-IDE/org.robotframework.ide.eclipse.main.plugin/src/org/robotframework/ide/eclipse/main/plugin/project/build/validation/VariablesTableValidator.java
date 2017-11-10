@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.mapping.variables.CommonVariableHelper;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -198,15 +199,20 @@ class VariablesTableValidator implements ModelUnitValidator {
     private void reportVariableDeclarationWithoutAssignment(final VariableTable variableTable) {
 
         for (final AVariable variable : variableTable.getVariables()) {
-            final List<RobotToken> valueTokens = variable.getValueTokens();
+            final RobotToken variableToken = variable.getDeclaration();
+            final CommonVariableHelper varHelper = new CommonVariableHelper();
 
-            if (valueTokens.isEmpty()) {
-                final RobotProblem problem = RobotProblem
-                        .causedBy(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT)
-                        .formatMessageWith(variable.getName());
-                final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
-                        variable.getName());
-                reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
+            if (varHelper.isVariable(variableToken)) {
+                final List<RobotToken> valueTokens = variable.getValueTokens();
+
+                if (valueTokens.isEmpty()) {
+                    final RobotProblem problem = RobotProblem
+                            .causedBy(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT)
+                            .formatMessageWith(variable.getName());
+                    final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
+                            variable.getName());
+                    reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
+                }
             }
         }
     }

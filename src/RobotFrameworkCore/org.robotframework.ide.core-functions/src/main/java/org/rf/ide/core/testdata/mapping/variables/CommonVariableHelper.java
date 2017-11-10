@@ -77,7 +77,7 @@ public class CommonVariableHelper {
                 final String text = token.getText().toString();
                 if (text != null && !text.isEmpty()) {
                     final VariableType varType = VariableType.getTypeByTokenType(type);
-                    if (varType != null) {
+                    if (varType != null && text.length() > 3) {
                         isVar = (text.startsWith(varType.getIdentificator()));
                     } else {
                         isVar = false;

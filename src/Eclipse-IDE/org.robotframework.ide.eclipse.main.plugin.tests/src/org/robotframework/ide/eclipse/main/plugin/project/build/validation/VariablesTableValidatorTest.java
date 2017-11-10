@@ -289,6 +289,22 @@ public class VariablesTableValidatorTest {
 
     }
 
+    @Test
+    public void variableWithoutNameAndCommentedVariableAreNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
+                .appendLine("@{}")
+                .appendLine("# &{var3}=    d1=1")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final VariablesTableValidator validator = new VariablesTableValidator(context,
+                file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
+        validator.validate(null);
+
+        assertThat(reporter.wasProblemReported()).isFalse();
+
+    }
+
     private static VersionDependentValidators createVersionDependentValidators(
             final VersionDependentModelUnitValidator... validators) {
         return new VersionDependentValidators() {
