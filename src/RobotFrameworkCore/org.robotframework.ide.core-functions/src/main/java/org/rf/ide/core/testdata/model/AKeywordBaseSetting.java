@@ -61,7 +61,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
     }
 
     public void addArgument(final String argument) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(argument);
 
         addArgument(rt);
@@ -87,7 +87,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
 
     @Override
     public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
@@ -172,6 +172,23 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
     @Override
     public boolean removeElementToken(int index) {
         return super.removeElementFromList(arguments, index);
+    }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position == 1) { // new keyword name
+            fixForTheType(keywordName, getArgumentType());
+            arguments.add(0, keywordName.copyWithoutPosition());
+            setKeywordName(tokenToInsert);
+        } else if (position - 2 <= arguments.size()) { // new argument
+            fixForTheType(tokenToInsert, getArgumentType());
+            arguments.add(position - 2, tokenToInsert);
+        } else if (position - 2 - arguments.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 2 - arguments.size(), tokenToInsert);
+        }
     }
 
     public abstract IRobotTokenType getKeywordNameType();

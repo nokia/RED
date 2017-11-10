@@ -78,8 +78,12 @@ public class TestDocumentation extends AModelElement<TestCase>
 
     @Override
     public void addCommentPart(final RobotToken rt) {
+        addCommentPart(comment.size(), rt);
+    }
+
+    private void addCommentPart(final int index, final RobotToken rt) {
         fixComment(getComment(), rt);
-        this.comment.add(rt);
+        this.comment.add(index, rt);
     }
 
     @Override

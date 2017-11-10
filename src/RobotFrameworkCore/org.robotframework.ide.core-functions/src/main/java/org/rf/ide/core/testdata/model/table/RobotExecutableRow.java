@@ -290,6 +290,25 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         return super.removeElementFromList(arguments, index);
     }
 
+    @Override
+    public void insertValueAt(final String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position == 0) { // new action
+            if (action.isNotEmpty()) { // in case of artificial comment action token
+                arguments.add(0, action);
+            } else if (value.isEmpty()) {
+                tokenToInsert.setText("/");
+            }
+            action = tokenToInsert;
+        } else if (position - 1 <= arguments.size()) { // new argument
+            arguments.add(position - 1, tokenToInsert);
+        } else if (position - 1 - arguments.size() <= comments.size()) { // new comment part
+            comments.add(position - 1 - arguments.size(), tokenToInsert);
+        }
+        fixMissingTypes();
+    }
+
     public <P> RobotExecutableRow<P> copy() {
         final RobotExecutableRow<P> execRow = new RobotExecutableRow<>();
         execRow.setAction(getAction().copyWithoutPosition());
