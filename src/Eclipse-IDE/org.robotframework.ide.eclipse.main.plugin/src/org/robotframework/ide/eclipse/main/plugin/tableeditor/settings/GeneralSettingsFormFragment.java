@@ -148,6 +148,7 @@ import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConf
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
+import org.robotframework.services.event.Events;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Range;
@@ -317,9 +318,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     } else if (e.character == X_KEY) {
                         documentation.cut();
                     } else if (e.character == Z_KEY) {
-                        updateDocumentationWithPositionPresave(getDocumentation(getSection(), hasEditDocRepresentation.get()));
+                        updateDocumentationWithPositionPresave(
+                                getDocumentation(getSection(), hasEditDocRepresentation.get()));
                     } else if (e.character == Y_KEY) {
-                        updateDocumentationWithPositionPresave(getDocumentation(getSection(), hasEditDocRepresentation.get()));
+                        updateDocumentationWithPositionPresave(
+                                getDocumentation(getSection(), hasEditDocRepresentation.get()));
                     }
                 } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
                     updateDocumentationWithPositionPresave(documentation.getText().replaceAll("\\t", "\\\\t"));
@@ -791,9 +794,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     protected void waitForDocumentationChangeJob() {
-        // user could just typed something into documentation box, so the job was scheduled, we need
-        // to wait for it to
-        // end in order to proceed with saving
+        // user could just typed something into documentation box, so the job was
+        // scheduled, we need to wait for it to end in order to proceed with saving
         try {
             if (isDocumentationModified.get() || (!documentation.getText().equals(getDocumentation(getSection(), true))
                     && !documentation.getText().equals(getDocumentation(getSection(), false)))) {
@@ -871,6 +873,32 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     @Inject
     @Optional
+    private void whenKeywordCallIsConverted(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final org.osgi.service.event.Event event) {
+
+        final RobotSettingsSection settingsSection = Events.get(event, IEventBroker.DATA, RobotSettingsSection.class);
+        final RobotSetting setting = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotSetting.class);
+
+        if (settingsSection != null && settingsSection.getSuiteFile() == fileModel
+                && RobotSetting.SettingsGroup.NO_GROUP.equals(setting.getGroup())) {
+            sortModel.clear();
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+        }
+    }
+
+    private Runnable tableInputIsReplaced() {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                refreshTable();
+                setDirty();
+            }
+        };
+    }
+
+    @Inject
+    @Optional
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
@@ -889,7 +917,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
-                    ? (RobotSuiteFile) change.getElement() : null;
+                    ? (RobotSuiteFile) change.getElement()
+                    : null;
             if (suite == fileModel) {
                 refreshEverything();
             }
@@ -932,9 +961,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             final Entry<?, ?> entry = (Entry<?, ?>) rowObject;
             return entry.getValue() instanceof RobotFileInternalElement
                     ? java.util.Optional.of((RobotFileInternalElement) entry.getValue())
-                    : java.util.Optional.<RobotFileInternalElement> empty();
+                    : java.util.Optional.<RobotFileInternalElement>empty();
         }
-        return java.util.Optional.<RobotFileInternalElement> empty();
+        return java.util.Optional.<RobotFileInternalElement>empty();
     }
 
     private class GeneralSettingsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {

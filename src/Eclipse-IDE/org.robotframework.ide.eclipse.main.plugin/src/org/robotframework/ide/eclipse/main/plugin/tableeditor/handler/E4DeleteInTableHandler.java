@@ -37,7 +37,7 @@ public abstract class E4DeleteInTableHandler {
             Collections.reverse(detailsDeletingCommands); // deleting must be started from the
                                                           // biggest column index
 
-            final EditorCommand parentCommand = new EmptyCommand(); 
+            final EditorCommand parentCommand = new EmptyCommand();
             for (final EditorCommand command : detailsDeletingCommands) {
                 command.setParent(parentCommand);
                 commandsStack.execute(command);

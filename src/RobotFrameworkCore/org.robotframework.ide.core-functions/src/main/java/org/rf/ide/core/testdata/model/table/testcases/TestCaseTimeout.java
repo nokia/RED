@@ -133,4 +133,21 @@ public class TestCaseTimeout extends AModelElement<TestCase> implements IComment
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(message, index);
     }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position == 1) { // new timeout
+            fixForTheType(timeout, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE, true);
+            message.add(0, timeout);
+            setTimeout(tokenToInsert);
+        } else if (position - 2 <= message.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE, true);
+            message.add(position - 2, tokenToInsert);
+        } else if (position - 2 - message.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 2 - message.size(), tokenToInsert);
+        }
+    }
 }

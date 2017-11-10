@@ -10,6 +10,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -327,7 +328,7 @@ public class RedPreferences {
         public RGB getRgb() {
             return color;
         }
-        
+
         @Override
         public boolean equals(final Object obj) {
             if (obj == this) {
@@ -336,8 +337,13 @@ public class RedPreferences {
             if (!(obj instanceof ColoringPreference)) {
                 return false;
             }
-            final ColoringPreference pref = (ColoringPreference)obj;
+            final ColoringPreference pref = (ColoringPreference) obj;
             return pref.color.equals(this.color) && pref.fontStyle == this.fontStyle;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(color, fontStyle);
         }
     }
 

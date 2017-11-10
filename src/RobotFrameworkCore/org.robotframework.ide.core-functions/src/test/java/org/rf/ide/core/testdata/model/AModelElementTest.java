@@ -23,7 +23,7 @@ public class AModelElementTest {
         final RobotToken tok1 = token("c1");
 
         // execute
-        AModelElementFake fake = new AModelElementFake();
+        final AModelElementFake fake = new AModelElementFake();
         final RobotToken returned = fake.updateOrCreate(null, tok1, RobotTokenType.ASSIGNMENT);
 
         // verify
@@ -42,7 +42,7 @@ public class AModelElementTest {
         final RobotToken toSet = token("tok2_update");
 
         // execute
-        AModelElementFake fake = new AModelElementFake();
+        final AModelElementFake fake = new AModelElementFake();
         fake.updateOrCreateTokenInside(toks, 1, toSet, null);
 
         // verify
@@ -62,7 +62,7 @@ public class AModelElementTest {
         final RobotToken toSet = token("tok3");
 
         // execute
-        AModelElementFake fake = new AModelElementFake();
+        final AModelElementFake fake = new AModelElementFake();
         fake.updateOrCreateTokenInside(toks, 2, toSet, null);
 
         // verify
@@ -79,7 +79,7 @@ public class AModelElementTest {
         final RobotToken toSet = token("tok3");
 
         // execute
-        AModelElementFake fake = new AModelElementFake();
+        final AModelElementFake fake = new AModelElementFake();
         fake.updateOrCreateTokenInside(toks, 2, toSet, null);
 
         // verify
@@ -124,7 +124,7 @@ public class AModelElementTest {
     }
 
     private RobotToken token(final String text) {
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setText(text);
 
         return tok;
