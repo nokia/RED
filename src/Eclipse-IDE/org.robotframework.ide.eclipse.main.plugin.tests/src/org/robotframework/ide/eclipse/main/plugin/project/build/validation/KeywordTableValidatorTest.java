@@ -345,15 +345,14 @@ public class KeywordTableValidatorTest {
     public void keywordNamesWithVariablesOnlyAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("${var1}")
-                .appendLine("    log	11")
+                .appendLine("    log  11")
                 .appendLine("@{var2}")
-                .appendLine("    log	22")
+                .appendLine("    log  22")
                 .appendLine("&{var3}")
-                .appendLine("    log	33")
+                .appendLine("    log  33")
                 .appendLine("${var4}${var5}")
-                .appendLine("    log    44")
+                .appendLine("    log  44")
                 .build();
-
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "log",
                 new Path("/res.robot"), "var");
@@ -365,17 +364,12 @@ public class KeywordTableValidatorTest {
                 file.findSection(RobotKeywordsSection.class), reporter);
         validator.validate(null);
 
-
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(4);
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
-                        new ProblemPosition(2, Range.closed(17, 24))),
-                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
-                        new ProblemPosition(4, Range.closed(36, 43))),
-                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
-                        new ProblemPosition(6, Range.closed(55, 62))),
-                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME,
-                        new ProblemPosition(8, Range.closed(74, 88))));
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME, new ProblemPosition(2, Range.closed(17, 24))),
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME, new ProblemPosition(4, Range.closed(37, 44))),
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME, new ProblemPosition(6, Range.closed(57, 64))),
+                new Problem(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME, new ProblemPosition(8, Range.closed(77, 91))));
     }
 
     @Test
@@ -389,7 +383,6 @@ public class KeywordTableValidatorTest {
                 .appendLine("    log  33")
                 .build();
 
-
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "log",
                 new Path("/res.robot"), "var");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("log",
@@ -399,7 +392,6 @@ public class KeywordTableValidatorTest {
         final KeywordTableValidator validator = new KeywordTableValidator(context,
                 file.findSection(RobotKeywordsSection.class), reporter);
         validator.validate(null);
-
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }

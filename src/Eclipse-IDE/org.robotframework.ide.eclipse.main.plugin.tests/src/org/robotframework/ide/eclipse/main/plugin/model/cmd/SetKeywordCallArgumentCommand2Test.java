@@ -157,13 +157,13 @@ public class SetKeywordCallArgumentCommand2Test {
             final RobotKeywordCall call, final int index) {
         final List<String> arguments = call.getArguments();
         assumeTrue(index >= arguments.size());
-        
+
         final List<String> expectedArgs = newArrayList(Collections.nCopies(index + 1, "\\"));
-        for (int i = 0; i < arguments.size() ; i++) {
+        for (int i = 0; i < arguments.size(); i++) {
             expectedArgs.set(i, arguments.get(i));
         }
         expectedArgs.set(index, "new_arg");
-        
+
         checkArgumentsChangesProperly(call, "new_arg", index, expectedArgs);
     }
 

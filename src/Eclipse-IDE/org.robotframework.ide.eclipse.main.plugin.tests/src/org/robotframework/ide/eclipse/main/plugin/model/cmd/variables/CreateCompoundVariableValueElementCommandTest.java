@@ -19,7 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateCompoundVariableValueElementCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
 public class CreateCompoundVariableValueElementCommandTest {
@@ -42,7 +41,7 @@ public class CreateCompoundVariableValueElementCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new CreateCompoundVariableValueElementCommand(variable, "3"));
         command.execute();
-        
+
         assertThat(variable.getValue()).isEqualTo("[0, 1, 2, 3]");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
@@ -62,7 +61,7 @@ public class CreateCompoundVariableValueElementCommandTest {
     }
 
     @Test
-    public void newElementIsAddedToDictionarytAndEventBrokerSendsEventAboutIt() {
+    public void newElementIsAddedToDictionaryAndEventBrokerSendsEventAboutIt() {
         final RobotVariable variable = createVariables().get(3);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);

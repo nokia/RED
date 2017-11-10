@@ -20,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetListVariableValueElementCommand;
 
 public class SetListVariableValueElementCommandTest {
 
@@ -35,7 +34,7 @@ public class SetListVariableValueElementCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new SetListVariableValueElementCommand(variable, oldElement, "1"));
         command.execute();
-        
+
         assertThat(variable.getValue()).isEqualTo("[1, 2, 3]");
         verifyZeroInteractions(eventBroker);
     }
