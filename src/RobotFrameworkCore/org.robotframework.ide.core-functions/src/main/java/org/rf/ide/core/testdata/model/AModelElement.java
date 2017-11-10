@@ -102,6 +102,10 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         }
     }
 
+    public void insertValueAt(final String value, final int position) {
+        throw new UnsupportedOperationException("Operation not supported for " + this.getClass().getName() + " type");
+    }
+
     protected void updateOrCreateTokenInside(final List<RobotToken> toModify, final int index, final String value) {
         updateOrCreateTokenInside(toModify, index, value, null);
     }

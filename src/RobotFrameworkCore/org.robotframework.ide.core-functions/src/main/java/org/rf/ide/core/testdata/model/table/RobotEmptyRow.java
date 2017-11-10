@@ -112,6 +112,11 @@ public class RobotEmptyRow<T> extends AModelElement<T> implements ICommentHolder
         return empty;
     }
 
+    @Override
+    public void insertValueAt(String value, int position) {
+        // do nothing
+    }
+
     public static boolean isEmpty(final String text) {
         return Pattern.matches("^[\\s]*$", text);
     }

@@ -134,6 +134,23 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
         return super.removeElementFromList(message, index);
     }
 
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position == 1) { // new timeout
+            fixForTheType(timeout, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, true);
+            message.add(0, timeout);
+            setTimeout(tokenToInsert);
+        } else if (position - 2 <= message.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, true);
+            message.add(position - 2, tokenToInsert);
+        } else if (position - 2 - message.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 2 - message.size(), tokenToInsert);
+        }
+    }
+
     public KeywordTimeout copy() {
         final KeywordTimeout keywordTimeout = new KeywordTimeout(this.getDeclaration().copyWithoutPosition());
         keywordTimeout.setTimeout(this.getTimeout().copyWithoutPosition());

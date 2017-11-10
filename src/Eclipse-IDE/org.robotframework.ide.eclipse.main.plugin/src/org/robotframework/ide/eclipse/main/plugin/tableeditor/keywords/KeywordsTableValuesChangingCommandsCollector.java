@@ -44,7 +44,7 @@ public class KeywordsTableValuesChangingCommandsCollector {
             }
         } else {
             final List<? extends EditorCommand> callCommands = new KeywordCallsTableValuesChangingCommandsCollector()
-                    .collect(element, value, column, numberOfColumns);
+                    .collect(element, value, column);
             commands.addAll(callCommands);
         }
         return commands;

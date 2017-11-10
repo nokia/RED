@@ -20,18 +20,16 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.KeywordCallsT
  */
 public class CasesTableValuesChangingCommandsCollector {
 
-    public List<? extends EditorCommand> collectForRemoval(final RobotElement element, final int column,
-            final int numberOfColumns) {
-        return collect(element, null, column, numberOfColumns);
+    public List<? extends EditorCommand> collectForRemoval(final RobotElement element, final int column) {
+        return collect(element, null, column);
     }
 
     public List<? extends EditorCommand> collectForChange(final RobotElement element, final String newValue,
-            final int column, final int numberOfColumns) {
-        return collect(element, newValue, column, numberOfColumns);
+            final int column) {
+        return collect(element, newValue, column);
     }
 
-    private List<? extends EditorCommand> collect(final RobotElement element, final String value, final int column,
-            final int numberOfColumns) {
+    private List<? extends EditorCommand> collect(final RobotElement element, final String value, final int column) {
         final List<EditorCommand> commands = new ArrayList<>();
 
         if (element instanceof RobotCase) {
@@ -41,7 +39,7 @@ public class CasesTableValuesChangingCommandsCollector {
             }
         } else {
             final List<? extends EditorCommand> callCommands = new KeywordCallsTableValuesChangingCommandsCollector()
-                    .collect(element, value, column, numberOfColumns);
+                    .collect(element, value, column);
             commands.addAll(callCommands);
         }
         return commands;
