@@ -298,4 +298,10 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.getArguments();
         this.getComment();
     }
+
+    public RobotKeywordCall insertCellAt(int position, String newValue) {
+        linkedElement.insertValueAt(newValue, position);
+        resetStored();
+        return this;
+    }
 }

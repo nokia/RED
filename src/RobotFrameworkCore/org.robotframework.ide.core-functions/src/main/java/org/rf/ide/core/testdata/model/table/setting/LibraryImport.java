@@ -120,4 +120,16 @@ public class LibraryImport extends AImported {
 
         return false;
     }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position - 2 <= arguments.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.SETTING_LIBRARY_ARGUMENT, true);
+            arguments.add(position - 2, tokenToInsert);
+        } else if (position - 2 - arguments.size() <= getComment().size()) { // new comment part
+            addCommentPartAt(position - 2 - arguments.size(), tokenToInsert);
+        }
+    }
 }

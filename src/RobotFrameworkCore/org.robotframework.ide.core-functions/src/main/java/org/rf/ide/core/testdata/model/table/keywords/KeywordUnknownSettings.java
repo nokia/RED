@@ -119,4 +119,17 @@ public class KeywordUnknownSettings extends AModelElement<UserKeyword> implement
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
     }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position - 1 <= arguments.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS, true);
+            arguments.add(position - 1, tokenToInsert);
+        } else if (position - 1 - arguments.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 1 - arguments.size(), tokenToInsert);
+        }
+    }
 }

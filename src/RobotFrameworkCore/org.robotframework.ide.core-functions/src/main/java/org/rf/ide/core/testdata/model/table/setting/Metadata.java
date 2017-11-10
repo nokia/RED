@@ -48,7 +48,7 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
     }
 
     public void addValue(final String value) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(value);
 
         addValue(rt);
@@ -84,7 +84,7 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
 
     @Override
     public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }

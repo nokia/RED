@@ -21,7 +21,7 @@ public class DeleteInCasesTableHandler extends DIParameterizedHandler<E4DeleteIn
         protected EditorCommand getCommandForSelectedElement(final RobotElement selectedElement, final int columnIndex,
                 final int tableColumnCount) {
             final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
-                    .collectForRemoval(selectedElement, columnIndex, tableColumnCount);
+                    .collectForRemoval(selectedElement, columnIndex);
             return commands.isEmpty() ? null : commands.get(0);
         }
     }
