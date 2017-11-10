@@ -15,8 +15,6 @@ import org.eclipse.nebula.widgets.nattable.config.NullComparator;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableColumnHeaderLabelAccumulator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableSortingConfiguration;
 
 public class SettingsDynamicTableSortingConfigurationTest {
 

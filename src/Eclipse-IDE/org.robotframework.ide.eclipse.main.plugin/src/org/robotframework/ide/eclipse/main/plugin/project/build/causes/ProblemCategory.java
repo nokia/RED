@@ -25,7 +25,7 @@ public enum ProblemCategory {
             "Project configuration file (" + RobotProjectConfig.FILENAME + ") cannot be read",
             "Occurs when project has no " + RobotProjectConfig.FILENAME
                     + " configuration file or it cannot be read.\n"
-                    + "Either there is a problem accessing the file or its structure is broken.\n" ) {
+                    + "Either there is a problem accessing the file or its structure is broken.\n") {
 
         @Override
         public Severity getDefaultSeverity() {

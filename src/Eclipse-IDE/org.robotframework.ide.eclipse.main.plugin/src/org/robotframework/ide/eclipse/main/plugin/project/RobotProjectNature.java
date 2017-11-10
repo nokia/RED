@@ -31,7 +31,7 @@ public class RobotProjectNature implements IProjectNature {
 
     private static final String SUITE_INIT_FILE = "__init__";
 
-	private IProject project;
+    private IProject project;
 
     public static void addRobotNature(final IProject project, final IProgressMonitor monitor,
             final BooleanSupplier shouldReplaceConfig) throws CoreException {
@@ -86,25 +86,25 @@ public class RobotProjectNature implements IProjectNature {
         }
     }
 
-	@Override
-	public void configure() throws CoreException {
+    @Override
+    public void configure() throws CoreException {
         addToBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-	}
-
-	@Override
-	public void deconfigure() throws CoreException {
-        removeFromBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-	}
+    }
 
     @Override
-	public IProject getProject() {
-		return project;
-	}
+    public void deconfigure() throws CoreException {
+        removeFromBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
+    }
 
-	@Override
-	public void setProject(final IProject project) {
-		this.project = project;
-	}
+    @Override
+    public IProject getProject() {
+        return project;
+    }
+
+    @Override
+    public void setProject(final IProject project) {
+        this.project = project;
+    }
 
     private void addToBuildSpec(final IProject project, final String builderId) throws CoreException {
         if (project == null) {

@@ -18,7 +18,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.InsertVariablesCommand;
 
 public class InsertVariablesCommandTest {
 
@@ -58,12 +57,11 @@ public class InsertVariablesCommandTest {
         final RobotVariablesSection variablesSection = createVariables();
 
         final RobotVariable[] variablesToInsert = createVariablesToInsert();
-        
+
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
                 .isInjectedInto(new InsertVariablesCommand(variablesSection, 3, variablesToInsert))
                 .execute();
-
 
         assertThat(variablesSection.getChildren()).hasSize(7);
 

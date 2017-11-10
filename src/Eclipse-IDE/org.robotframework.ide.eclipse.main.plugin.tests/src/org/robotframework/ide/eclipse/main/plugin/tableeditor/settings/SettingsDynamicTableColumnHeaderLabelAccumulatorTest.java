@@ -10,8 +10,6 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingsDataProvider;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsDynamicTableColumnHeaderLabelAccumulator;
 
 public class SettingsDynamicTableColumnHeaderLabelAccumulatorTest {
 
@@ -22,7 +20,7 @@ public class SettingsDynamicTableColumnHeaderLabelAccumulatorTest {
         final SettingsDynamicTableColumnHeaderLabelAccumulator accumulator = new SettingsDynamicTableColumnHeaderLabelAccumulator(
                 dataProvider);
 
-        int columnCount = dataProvider.getColumnCount();
+        final int columnCount = dataProvider.getColumnCount();
 
         for (int i = 0; i < columnCount - 2; i++) {
             assertThat(labelStackAt(accumulator, i, 0)).contains(ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + i);

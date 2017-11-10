@@ -109,12 +109,12 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         // dump as it is
         if (canBePossiblyDumpedDirectly(lastToken)) {
             boolean wasDumped = false;
-            if(tokens.isEmpty()) {
-                //dump EOL
-                wasDumped = getElementDumperHelper().dumpEOLAsItIs(getDumperHelper(), model, lastToken, lines);   
-            } else if (canBeDumpedDirectly(lastToken, tokens)){
-                //dump line tokens
-                wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);        		
+            if (tokens.isEmpty()) {
+                // dump EOL
+                wasDumped = getElementDumperHelper().dumpEOLAsItIs(getDumperHelper(), model, lastToken, lines);
+            } else if (canBeDumpedDirectly(lastToken, tokens)) {
+                // dump line tokens
+                wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
             }
             if (wasDumped) {
                 return;
@@ -153,7 +153,8 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             if (!tokElem.getFilePosition().isNotSet()) {
                 currentLineTok = null;
                 if (fileOffset >= 0) {
-                    final Optional<Integer> lineIndex = model.getRobotLineIndexBy(tokElem.getFilePosition().getOffset());
+                    final Optional<Integer> lineIndex = model
+                            .getRobotLineIndexBy(tokElem.getFilePosition().getOffset());
                     if (lineIndex.isPresent()) {
                         currentLineTok = model.getFileContent().get(lineIndex.get());
                     }
@@ -186,8 +187,8 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         }
     }
 
-    private void addLineContinueLast(final RobotFile model, final List<RobotLine> lines, final IRobotLineElement lastToken,
-            final List<RobotToken> tokens, final int tokenId) {
+    private void addLineContinueLast(final RobotFile model, final List<RobotLine> lines,
+            final IRobotLineElement lastToken, final List<RobotToken> tokens, final int tokenId) {
         final Separator sepNew = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(tokenId + 1));
         if (sepNew.getTypes().contains(SeparatorType.PIPE)) {
             getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sepNew);
@@ -249,8 +250,9 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         }
     }
 
-    private void breakForLineContinueIfIsMeet(final RobotFile model, final List<RobotLine> lines, final RobotLine currentLine,
-            final IRobotLineElement lastToken, final List<RobotToken> tokens, final List<Integer> lineEndPos) {
+    private void breakForLineContinueIfIsMeet(final RobotFile model, final List<RobotLine> lines,
+            final RobotLine currentLine, final IRobotLineElement lastToken, final List<RobotToken> tokens,
+            final List<Integer> lineEndPos) {
         if (tokens.size() > 1 && lineEndPos.contains(0)) {
             if (currentLine != null) {
                 getDumperHelper().getDumpLineUpdater().updateLine(model, lines, currentLine.getEndOfLine());
@@ -271,9 +273,10 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
     }
 
     private boolean canBeDumpedDirectly(final IRobotLineElement lastToken, final List<RobotToken> tokens) {
-    	return !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent() && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens);
+        return !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent()
+                && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens);
     }
-    
+
     private boolean canBePossiblyDumpedDirectly(final IRobotLineElement lastToken) {
         return !lastToken.isDirty() && (lastToken.getRaw().equals(lastToken.getText()))
                 && !lastToken.getFilePosition().isNotSet();
@@ -308,8 +311,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
                 final IRobotLineElement nextElem = lineElements.get(index);
                 final List<IRobotTokenType> types = nextElem.getTypes();
-                if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
-                        || types.contains(RobotTokenType.ASSIGNMENT)) {
+                if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE) || types.contains(RobotTokenType.ASSIGNMENT)) {
                     getDumperHelper().getDumpLineUpdater().updateLine(model, lines, nextElem);
                     lastTokenToReturn = nextElem;
                 } else {

@@ -68,27 +68,27 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
         return groupingElements.get(group);
     }
 
-	@Override
-	public void dispose() {
+    @Override
+    public void dispose() {
         final IEclipseContext activeContext = getContext().getActiveLeaf();
         ContextInjectionFactory.uninject(this, activeContext);
-	}
-
-    private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
-	@Override
-	public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+    private IEclipseContext getContext() {
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+    }
+
+    @Override
+    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
         this.viewer = (TreeViewer) viewer;
-	}
+    }
 
-	@Override
-	public Object[] getElements(final Object inputElement) {
+    @Override
+    public Object[] getElements(final Object inputElement) {
         return new Object[] { ((Object[]) inputElement)[0] };
-	}
+    }
 
-	@Override
+    @Override
     public Object[] getChildren(final Object parentElement) {
         if (parentElement instanceof RobotSettingsSection) {
             final List<? extends RobotElement> children = ((RobotElement) parentElement).getChildren();
@@ -101,10 +101,10 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
         }
         return new Object[0];
     }
-	
+
     private List<RobotElement> groupedChildren(final List<? extends RobotElement> children) {
         groupingElements.clear();
-        
+
         final List<RobotElement> grouped = new ArrayList<>(children);
         final Multimap<SettingsGroup, RobotSetting> removedElements = LinkedHashMultimap.create();
 
@@ -119,13 +119,14 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
             }
         }
         for (final SettingsGroup key : removedElements.keySet()) {
-            final ArtificialGroupingRobotElement groupingElement = new ArtificialGroupingRobotElement(key, new ArrayList<>(removedElements.get(key)));
+            final ArtificialGroupingRobotElement groupingElement = new ArtificialGroupingRobotElement(key,
+                    new ArrayList<>(removedElements.get(key)));
             grouped.add(groupingElement);
             groupingElements.put(key, groupingElement);
         }
         return grouped;
     }
-    
+
     private List<RobotElement> filteredRobotKeywordCalls(final List<? extends RobotElement> children) {
         return newArrayList(Iterables.filter(children, new Predicate<RobotElement>() {
 
@@ -145,20 +146,20 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
     }
 
     @Override
-	public Object getParent(final Object element) {
+    public Object getParent(final Object element) {
         if (element instanceof RobotElement) {
             return ((RobotElement) element).getParent();
         }
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean hasChildren(final Object element) {
+    @Override
+    public boolean hasChildren(final Object element) {
         if (element instanceof RobotElement) {
             return !((RobotElement) element).getChildren().isEmpty();
         }
         return true;
-	}
+    }
 
     @Inject
     @Optional

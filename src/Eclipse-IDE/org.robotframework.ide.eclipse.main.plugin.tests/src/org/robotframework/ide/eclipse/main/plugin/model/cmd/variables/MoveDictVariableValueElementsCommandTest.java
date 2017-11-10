@@ -25,7 +25,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveDirection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.MoveDictVariableValueElementsCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
 public class MoveDictVariableValueElementsCommandTest {
@@ -67,7 +66,8 @@ public class MoveDictVariableValueElementsCommandTest {
     public void exceptionIsThrown_whenTryingToMoveElementsInsideInvalid() {
         final RobotVariable variable = createVariables().get(4);
 
-        final ArrayList<DictionaryKeyValuePair> elements = newArrayList(new DictionaryKeyValuePair(new RobotToken(), new RobotToken(), new RobotToken()));
+        final ArrayList<DictionaryKeyValuePair> elements = newArrayList(
+                new DictionaryKeyValuePair(new RobotToken(), new RobotToken(), new RobotToken()));
         final MoveDictVariableValueElementsCommand command = new MoveDictVariableValueElementsCommand(variable,
                 elements, MoveDirection.UP);
         command.execute();
@@ -81,8 +81,9 @@ public class MoveDictVariableValueElementsCommandTest {
                 ((DictionaryVariable) variable.getLinkedElement()).getItems().subList(1, 3));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final MoveDictVariableValueElementsCommand command = ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(
-                new MoveDictVariableValueElementsCommand(variable, elements, MoveDirection.UP));
+        final MoveDictVariableValueElementsCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new MoveDictVariableValueElementsCommand(variable, elements, MoveDirection.UP));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("{b = 2, c = 3, a = 1, d = 4}");

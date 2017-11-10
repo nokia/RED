@@ -9,7 +9,8 @@ import org.eclipse.e4.tools.compat.parts.DIViewPart;
 
 @SuppressWarnings("restriction")
 public class ExecutionViewWrapper extends DIViewPart<ExecutionView> {
-	public ExecutionViewWrapper() {
-		super(ExecutionView.class);
-	}
+
+    public ExecutionViewWrapper() {
+        super(ExecutionView.class);
+    }
 }
