@@ -187,8 +187,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
             path.add(0, newArrayList(typeIdentifierOf(current.parent), extractIndexOrKey(current.name)));
             current = current.parent;
         }
-        throw new IllegalStateException(
-                "Every non-artificial IVariable has to have real variable in some predecessor");
+        throw new IllegalStateException("Every non-artificial IVariable has to have real variable in some predecessor");
     }
 
     private static String typeIdentifierOf(final RobotDebugVariable variable) {
@@ -208,7 +207,7 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     private static Object extractIndexOrKey(final String name) {
         if (name.startsWith("[") && name.endsWith("]")) {
-            return Integer.valueOf( name.substring(1, name.length() - 1));
+            return Integer.valueOf(name.substring(1, name.length() - 1));
         }
         return name;
     }

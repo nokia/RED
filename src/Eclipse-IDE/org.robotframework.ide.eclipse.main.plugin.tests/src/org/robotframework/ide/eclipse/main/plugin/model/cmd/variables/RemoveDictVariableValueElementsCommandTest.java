@@ -25,7 +25,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveDictVariableValueElementsCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
@@ -79,11 +78,11 @@ public class RemoveDictVariableValueElementsCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new RemoveDictVariableValueElementsCommand(variable, elements));
         command.execute();
-        
+
         assertThat(variable.getValue()).isEqualTo("{a = 1, d = 4}");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
-    
+
     @Test
     public void dictionaryEntryAreRemovedAndReturnToPreviousState() {
         final RobotVariable variable = createVariables().get(3);
@@ -96,34 +95,34 @@ public class RemoveDictVariableValueElementsCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new RemoveDictVariableValueElementsCommand(variable, elements));
         command.execute();
-        
+
         assertThat(variable.getValue()).isEqualTo("{a = 1, d = 4}");
-        
+
         List<EditorCommand> undoCommands = command.getUndoCommands();
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
-        
+
         assertThat(variable.getValue()).isEqualTo("{a = 1, b = 2, c = 3, d = 4}");
-        
+
         final List<EditorCommand> redoCommands = new ArrayList<>();
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             redoCommands.addAll(0, undoCommand.getUndoCommands());
         }
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             redoCommand.execute();
         }
-        
+
         assertThat(variable.getValue()).isEqualTo("{a = 1, d = 4}");
-        
+
         undoCommands = new ArrayList<>();
-        for (EditorCommand redoCommand : redoCommands) {
+        for (final EditorCommand redoCommand : redoCommands) {
             undoCommands.addAll(0, redoCommand.getUndoCommands());
         }
-        for (EditorCommand undoCommand : undoCommands) {
+        for (final EditorCommand undoCommand : undoCommands) {
             undoCommand.execute();
         }
-        
+
         assertThat(variable.getValue()).isEqualTo("{a = 1, b = 2, c = 3, d = 4}");
     }
 

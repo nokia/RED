@@ -16,47 +16,47 @@ import org.robotframework.red.graphics.ImagesManager;
 
 public class NavigatorLabelProvider extends ColumnLabelProvider {
 
-	@Override
-	public void addListener(final ILabelProviderListener listener) {
+    @Override
+    public void addListener(final ILabelProviderListener listener) {
         // nothing to do
-	}
+    }
 
     @Override
     public void removeListener(final ILabelProviderListener listener) {
         // nothing to do
     }
 
-	@Override
-	public void dispose() {
+    @Override
+    public void dispose() {
         // nothing to do
-	}
+    }
 
-	@Override
-	public boolean isLabelProperty(final Object element, final String property) {
-		return false;
-	}
+    @Override
+    public boolean isLabelProperty(final Object element, final String property) {
+        return false;
+    }
 
-	@Override
-	public Image getImage(final Object element) {
+    @Override
+    public Image getImage(final Object element) {
         if (element instanceof RobotElement) {
             final ImageDescriptor image = ((RobotElement) element).getImage();
             return image == null ? null : ImagesManager.getImage(image);
         }
         return null;
-	}
+    }
 
-	@Override
-	public String getText(final Object element) {
+    @Override
+    public String getText(final Object element) {
         if (element instanceof RobotSetting) {
             final RobotSetting groupedElement = (RobotSetting) element;
-            return groupedElement.getGroup().getName() == null ? groupedElement.getName() : groupedElement
-                    .getNameInGroup();
+            return groupedElement.getGroup().getName() == null ? groupedElement.getName()
+                    : groupedElement.getNameInGroup();
         } else if (element instanceof RobotKeywordCall) {
             return ((RobotKeywordCall) element).getLabel();
         } else if (element instanceof RobotElement) {
             return ((RobotElement) element).getName();
         }
         return "";
-	}
+    }
 
 }
