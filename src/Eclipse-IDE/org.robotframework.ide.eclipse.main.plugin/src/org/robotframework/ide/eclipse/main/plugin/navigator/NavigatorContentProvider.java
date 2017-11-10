@@ -45,30 +45,30 @@ public class NavigatorContentProvider extends TreeContentProvider {
         ContextInjectionFactory.inject(this, activeContext);
     }
 
-	@Override
-	public void dispose() {
+    @Override
+    public void dispose() {
         final IEclipseContext activeContext = getContext().getActiveLeaf();
         ContextInjectionFactory.uninject(this, activeContext);
-	}
-
-    private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
-	@Override
-	public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+    private IEclipseContext getContext() {
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+    }
+
+    @Override
+    public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
         this.viewer = (TreeViewer) viewer;
-	}
+    }
 
-	@Override
-	public Object[] getElements(final Object inputElement) {
-		return null;
-	}
+    @Override
+    public Object[] getElements(final Object inputElement) {
+        return null;
+    }
 
-	@Override
+    @Override
     public Object[] getChildren(final Object parentElement) {
         final IFile file = RedPlugin.getAdapter(parentElement, IFile.class);
-                
+
         if (file != null) {
             return RedPlugin.getModelManager().createSuiteFile(file).getSections().toArray();
         } else if (parentElement instanceof RobotSettingsSection) {
@@ -101,15 +101,15 @@ public class NavigatorContentProvider extends TreeContentProvider {
     }
 
     @Override
-	public Object getParent(final Object element) {
+    public Object getParent(final Object element) {
         if (element instanceof RobotElement) {
             return ((RobotElement) element).getParent();
         }
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean hasChildren(final Object element) {
+    @Override
+    public boolean hasChildren(final Object element) {
         if (element instanceof RobotCase || element instanceof RobotKeywordDefinition) {
             return false;
         }
@@ -117,7 +117,7 @@ public class NavigatorContentProvider extends TreeContentProvider {
             return !((RobotElement) element).getChildren().isEmpty();
         }
         return true;
-	}
+    }
 
     @Inject
     @Optional

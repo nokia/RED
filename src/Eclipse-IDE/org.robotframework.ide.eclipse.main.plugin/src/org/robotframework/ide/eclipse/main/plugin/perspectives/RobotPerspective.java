@@ -15,19 +15,19 @@ import org.robotframework.ide.eclipse.main.plugin.views.execution.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.message.MessageLogView;
 
 public class RobotPerspective implements IPerspectiveFactory {
-	 
+
     @Override
-	public void createInitialLayout(final IPageLayout layout) {
-	    final String editorArea = layout.getEditorArea();
-        layout.setEditorAreaVisible(true); 
+    public void createInitialLayout(final IPageLayout layout) {
+        final String editorArea = layout.getEditorArea();
+        layout.setEditorAreaVisible(true);
 
         final IFolderLayout topLeft = layout.createFolder("topLeft", IPageLayout.LEFT, 0.25f, editorArea);
         topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER);
-        
-        final IFolderLayout bottom = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.65f ,editorArea);
+
+        final IFolderLayout bottom = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.65f, editorArea);
         bottom.addView(IConsoleConstants.ID_CONSOLE_VIEW);
         bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
-        
+
         final IFolderLayout bottomLog = layout.createFolder("bottomRight", IPageLayout.RIGHT, 0.50f, "bottom");
         bottomLog.addView(MessageLogView.ID);
         bottomLog.addView(ExecutionView.ID);
@@ -41,5 +41,5 @@ public class RobotPerspective implements IPerspectiveFactory {
         layout.addShowViewShortcut(DocumentationView.ID);
 
         layout.addShowInPart("org.eclipse.ui.navigator.ProjectExplorer");
-	}
+    }
 }

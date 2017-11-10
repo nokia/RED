@@ -17,7 +17,6 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesTableSortingConfiguration;
 
 public class VariablesTableSortingConfigurationTest {
 

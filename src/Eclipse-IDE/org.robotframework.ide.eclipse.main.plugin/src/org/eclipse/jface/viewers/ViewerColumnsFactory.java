@@ -22,17 +22,29 @@ import org.eclipse.swt.widgets.TreeColumn;
 public class ViewerColumnsFactory {
 
     private final String name;
+
     private int minimumWidth;
+
     private int width;
+
     private boolean shouldShowLastSep;
+
     private boolean shouldExtend;
+
     private boolean resizable = true;
+
     private Image image;
+
     private String tooltip;
+
     private CellLabelProvider labelProvider;
+
     private boolean shouldAddEditingSupport;
+
     private EditingSupport editingSupport;
+
     private ViewerComparator ascendingComparator;
+
     private ViewerComparator descendingComparator;
 
     public static ViewerColumnsFactory newColumn(final String name) {
@@ -62,17 +74,17 @@ public class ViewerColumnsFactory {
         this.minimumWidth = minWidth;
         return this;
     }
-    
+
     public ViewerColumnsFactory resizable(final boolean resizable) {
         this.resizable = resizable;
         return this;
     }
-    
+
     public ViewerColumnsFactory withImage(final Image image) {
         this.image = image;
         return this;
     }
-    
+
     public ViewerColumnsFactory withTooltip(final String tooltip) {
         this.tooltip = tooltip;
         return this;
@@ -102,7 +114,7 @@ public class ViewerColumnsFactory {
         this.shouldAddEditingSupport = condition;
         return this;
     }
-    
+
     public ViewerColumnsFactory equipWithThreeWaySorting(final ViewerComparator ascendingComparator,
             final ViewerComparator descendingComparator) {
         this.ascendingComparator = ascendingComparator;
@@ -120,6 +132,7 @@ public class ViewerColumnsFactory {
         column.getColumn().setText(name);
         column.getColumn().setImage(image);
         column.getColumn().addDisposeListener(new DisposeListener() {
+
             @Override
             public void widgetDisposed(final DisposeEvent e) {
                 if (image != null) {
@@ -133,6 +146,7 @@ public class ViewerColumnsFactory {
             column.getColumn().setData("autoExtending", Boolean.TRUE);
             final ControlAdapter resizeListener = createResizeListener(viewer);
             column.getColumn().addDisposeListener(new DisposeListener() {
+
                 @Override
                 public void widgetDisposed(final DisposeEvent e) {
                     viewer.getTable().removeControlListener(resizeListener);
@@ -147,7 +161,7 @@ public class ViewerColumnsFactory {
         if (shouldAddEditingSupport) {
             column.setEditingSupport(editingSupport);
         }
-        
+
         final SelectionListener createSortSwitchingListener = createSortSwitchingListener(viewer);
         if (createSortSwitchingListener != null) {
             column.getColumn().addSelectionListener(createSortSwitchingListener);
@@ -156,6 +170,7 @@ public class ViewerColumnsFactory {
 
     private ControlAdapter createResizeListener(final TableViewer viewer) {
         return new ControlAdapter() {
+
             @Override
             public void controlResized(final ControlEvent e) {
                 resizeColumnToWholeViewer(viewer);
@@ -163,18 +178,18 @@ public class ViewerColumnsFactory {
         };
     }
 
-	private void resizeColumnToWholeViewer(final TableViewer viewer) {
-		final int totalTableWidth = viewer.getControl().getSize().x;
+    private void resizeColumnToWholeViewer(final TableViewer viewer) {
+        final int totalTableWidth = viewer.getControl().getSize().x;
 
-		TableColumn autoExtendingColumn = null;
-		for (final TableColumn currentColumn : viewer.getTable().getColumns()) {
-			if (Boolean.TRUE.equals(currentColumn.getData("autoExtending"))) {
-				autoExtendingColumn = currentColumn;
-			}
-		}
-		if (autoExtendingColumn == null) {
-			return;
-		}
+        TableColumn autoExtendingColumn = null;
+        for (final TableColumn currentColumn : viewer.getTable().getColumns()) {
+            if (Boolean.TRUE.equals(currentColumn.getData("autoExtending"))) {
+                autoExtendingColumn = currentColumn;
+            }
+        }
+        if (autoExtendingColumn == null) {
+            return;
+        }
 
         int otherColumnsTotalWidth = 0;
         for (final TableColumn currentColumn : viewer.getTable().getColumns()) {
@@ -189,7 +204,7 @@ public class ViewerColumnsFactory {
         final int widthToOccupy = totalTableWidth
                 - (otherColumnsTotalWidth + scrollbarWidth + 2 * borderWidth + additional);
         autoExtendingColumn.setWidth(Math.max(minimumWidth, widthToOccupy));
-	}
+    }
 
     private int getScrollBarWidth(final TableViewer viewer) {
         final ScrollBar verticalBar = viewer.getTable().getVerticalBar();
@@ -201,6 +216,7 @@ public class ViewerColumnsFactory {
             return null;
         }
         return new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final TableColumn currentSortColumn = viewer.getTable().getSortColumn();
@@ -224,6 +240,7 @@ public class ViewerColumnsFactory {
             return null;
         }
         return new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final TreeColumn currentSortColumn = viewer.getTree().getSortColumn();
@@ -271,6 +288,7 @@ public class ViewerColumnsFactory {
         column.getColumn().setText(name);
         column.getColumn().setImage(image);
         column.getColumn().addDisposeListener(new DisposeListener() {
+
             @Override
             public void widgetDisposed(final DisposeEvent e) {
                 if (image != null) {
@@ -285,6 +303,7 @@ public class ViewerColumnsFactory {
             column.getColumn().setData("autoExtending", Boolean.TRUE);
             final ControlAdapter resizeListener = createResizeListener(viewer);
             column.getColumn().addDisposeListener(new DisposeListener() {
+
                 @Override
                 public void widgetDisposed(final DisposeEvent e) {
                     viewer.getTree().removeControlListener(resizeListener);
@@ -306,9 +325,10 @@ public class ViewerColumnsFactory {
         }
         return column;
     }
-    
+
     private ControlAdapter createResizeListener(final TreeViewer viewer) {
         return new ControlAdapter() {
+
             @Override
             public void controlResized(final ControlEvent e) {
                 resizeColumnToWholeViewer(viewer);
@@ -316,19 +336,19 @@ public class ViewerColumnsFactory {
         };
     }
 
-	private void resizeColumnToWholeViewer(final TreeViewer viewer) {
-		final int totalTableWidth = viewer.getControl().getSize().x;
+    private void resizeColumnToWholeViewer(final TreeViewer viewer) {
+        final int totalTableWidth = viewer.getControl().getSize().x;
 
-		TreeColumn autoExtendingColumn = null;
-		for (final TreeColumn currentColumn : viewer.getTree().getColumns()) {
-			if (Boolean.TRUE.equals(currentColumn.getData("autoExtending"))) {
-				autoExtendingColumn = currentColumn;
-			}
-		}
-		if (autoExtendingColumn == null) {
-			return;
-		}
-		
+        TreeColumn autoExtendingColumn = null;
+        for (final TreeColumn currentColumn : viewer.getTree().getColumns()) {
+            if (Boolean.TRUE.equals(currentColumn.getData("autoExtending"))) {
+                autoExtendingColumn = currentColumn;
+            }
+        }
+        if (autoExtendingColumn == null) {
+            return;
+        }
+
         int otherColumnsTotalWidth = 0;
         for (final TreeColumn currentColumn : viewer.getTree().getColumns()) {
             if (currentColumn != autoExtendingColumn) {
@@ -342,7 +362,7 @@ public class ViewerColumnsFactory {
         final int widthToOccupy = totalTableWidth
                 - (otherColumnsTotalWidth + scrollbarWidth + 2 * borderWidth + additional);
         autoExtendingColumn.setWidth(Math.max(minimumWidth, widthToOccupy));
-	}
+    }
 
     private int getScrollBarWidth(final TreeViewer viewer) {
         final ScrollBar verticalBar = viewer.getTree().getVerticalBar();
