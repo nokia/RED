@@ -28,7 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfi
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
-public class PythonLibStructureBuilder {
+public class PythonLibStructureBuilder implements ILibraryStructureBuilder {
 
     private final RobotRuntimeEnvironment environment;
 
@@ -40,6 +40,7 @@ public class PythonLibStructureBuilder {
         this.additionalSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(project);
     }
 
+    @Override
     public Collection<ILibraryClass> provideEntriesFromFile(final URI path) throws RobotEnvironmentException {
         return provideEntriesFromFile(path, null, false);
     }

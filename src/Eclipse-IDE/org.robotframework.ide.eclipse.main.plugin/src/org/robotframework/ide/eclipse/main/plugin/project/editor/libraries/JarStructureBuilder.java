@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 
 import com.google.common.base.Objects;
 
-public class JarStructureBuilder {
+public class JarStructureBuilder implements ILibraryStructureBuilder {
 
     private final RobotRuntimeEnvironment environment;
 
@@ -42,6 +42,7 @@ public class JarStructureBuilder {
 
     }
 
+    @Override
     public Collection<ILibraryClass> provideEntriesFromFile(final URI uri) throws RobotEnvironmentException {
         return provideEntriesFromFile(new File(uri));
     }
