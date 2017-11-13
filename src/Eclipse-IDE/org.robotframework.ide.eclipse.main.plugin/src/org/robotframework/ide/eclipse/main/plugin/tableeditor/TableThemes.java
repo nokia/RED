@@ -58,6 +58,7 @@ public class TableThemes {
         public Color getBodyHoveredSelectedCellBackground();
         public Color getBodyAnchoredCellBackground();
         public Color getBodyInactiveCellBackground();
+        public Color getBodyInactiveCellForeground();
     }
 
     private static class DarkTheme implements TableTheme {
@@ -146,6 +147,11 @@ public class TableThemes {
         public Color getBodyInactiveCellBackground() {
             return ColorsManager.getColor(30, 30, 30);
         }
+
+        @Override
+        public Color getBodyInactiveCellForeground() {
+            return ColorsManager.getColor(80, 80, 80);
+        }
     }
 
     private static class BrightTheme implements TableTheme {
@@ -233,6 +239,11 @@ public class TableThemes {
         @Override
         public Color getBodyInactiveCellBackground() {
             return ColorsManager.getColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
+        }
+
+        @Override
+        public Color getBodyInactiveCellForeground() {
+            return ColorsManager.getColor(SWT.COLOR_GRAY);
         }
     }
 }
