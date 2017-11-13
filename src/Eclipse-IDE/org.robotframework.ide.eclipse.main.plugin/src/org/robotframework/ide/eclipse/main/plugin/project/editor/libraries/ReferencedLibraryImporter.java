@@ -12,6 +12,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -20,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
@@ -36,8 +40,6 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 
@@ -46,13 +48,29 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
  */
 public class ReferencedLibraryImporter {
 
-    public Collection<ReferencedLibrary> importPythonLib(final Shell shellForDialogs,
-            final RobotRuntimeEnvironment environment, final IProject project, final RobotProjectConfig config,
-            final String fullLibraryPath) {
-        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
-                project);
-        final List<ILibraryClass> pythonClasses = newArrayList();
+    public Collection<ReferencedLibrary> importPythonLib(final Shell shell, final RobotRuntimeEnvironment environment,
+            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+        final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
+        return importLib(builder, fullLibraryPath,
+                classes -> createSelectionDialog(shell, fullLibraryPath, classes, RedImages.getPythonLibraryImage()));
+    }
 
+    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment,
+            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+        final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
+        return importLib(builder, fullLibraryPath,
+                classes -> createSelectionDialog(shell, fullLibraryPath, classes, RedImages.getJavaClassImage()));
+    }
+
+    public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {
+        final IPath path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath));
+        return ReferencedLibrary.create(LibraryType.VIRTUAL, path.lastSegment(), path.toPortableString());
+    }
+
+    private static Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder,
+            final String fullLibraryPath,
+            final Function<Collection<ILibraryClass>, ElementListSelectionDialog> selectionDialogProvider) {
+        final List<ILibraryClass> libClasses = new ArrayList<>();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 
@@ -60,8 +78,7 @@ public class ReferencedLibraryImporter {
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
                     try {
-                        pythonClasses.addAll(
-                                pythonLibStructureBuilder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
+                        libClasses.addAll(builder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
                     } catch (final RobotEnvironmentException | URISyntaxException e) {
                         throw new InvocationTargetException(e);
                     }
@@ -74,90 +91,28 @@ public class ReferencedLibraryImporter {
             return new ArrayList<>();
         }
 
-        if (pythonClasses.isEmpty()) {
+        if (libClasses.isEmpty()) {
             StatusManager.getManager()
                     .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                             "RED was unable to find classes/modules inside '" + fullLibraryPath + "' module"),
                             StatusManager.SHOW);
             return new ArrayList<>();
-        } else if (pythonClasses.size() == 1) {
-            return newArrayList(pythonClasses.get(0).toReferencedLibrary(fullLibraryPath));
+        } else if (libClasses.size() == 1) {
+            return newArrayList(libClasses.get(0).toReferencedLibrary(fullLibraryPath));
         } else {
-            final ElementListSelectionDialog classesDialog = createSelectionDialog(shellForDialogs, fullLibraryPath,
-                    pythonClasses, new PythonClassesLabelProvider());
+            final ElementListSelectionDialog classesDialog = selectionDialogProvider.apply(libClasses);
             if (classesDialog.open() == Window.OK) {
-                final Object[] result = classesDialog.getResult();
-
-                final Collection<ReferencedLibrary> libraries = new ArrayList<>();
-                for (final Object selectedClass : result) {
-                    final PythonClass pythonClass = (PythonClass) selectedClass;
-                    libraries.add(pythonClass.toReferencedLibrary(fullLibraryPath));
-                }
-                return libraries;
+                return Stream.of(classesDialog.getResult())
+                        .map(libClass -> ((ILibraryClass) libClass).toReferencedLibrary(fullLibraryPath))
+                        .collect(Collectors.toList());
             }
             return new ArrayList<>();
         }
     }
 
-    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment,
-            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
-        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(environment, config, project);
-        final List<ILibraryClass> classesFromJar = newArrayList();
-        try {
-            PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-
-                @Override
-                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    monitor.beginTask("Reading classes from module '" + fullLibraryPath + "'", 100);
-                    try {
-                        classesFromJar.addAll(
-                                jarStructureBuilder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
-                    } catch (RobotEnvironmentException | URISyntaxException e) {
-                        throw new InvocationTargetException(e);
-                    }
-                }
-            });
-        } catch (InvocationTargetException | InterruptedException e) {
-            StatusManager.getManager()
-                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
-                            StatusManager.SHOW);
-            return new ArrayList<>();
-        }
-
-        if (classesFromJar.isEmpty()) {
-            StatusManager.getManager()
-                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "RED was unable to find classes inside '" + fullLibraryPath + "' module"),
-                            StatusManager.SHOW);
-            return new ArrayList<>();
-        } else if (classesFromJar.size() == 1) {
-            return newArrayList(classesFromJar.get(0).toReferencedLibrary(fullLibraryPath));
-        } else {
-            final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, fullLibraryPath,
-                    classesFromJar, new JarClassesLabelProvider());
-
-            if (classesDialog.open() == Window.OK) {
-                final Object[] result = classesDialog.getResult();
-
-                final Collection<ReferencedLibrary> libraries = new ArrayList<>();
-                for (final Object selectedClass : result) {
-                    final JarClass jarClass = (JarClass) selectedClass;
-                    libraries.add(jarClass.toReferencedLibrary(fullLibraryPath));
-                }
-                return libraries;
-            }
-            return new ArrayList<>();
-        }
-    }
-
-    public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {
-        final IPath path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath));
-        return ReferencedLibrary.create(LibraryType.VIRTUAL, path.lastSegment(), path.toPortableString());
-    }
-
-    static ElementListSelectionDialog createSelectionDialog(final Shell shell, final String path, final List<?> classes,
-            final LabelProvider labelProvider) {
+    private static ElementListSelectionDialog createSelectionDialog(final Shell shell, final String path,
+            final Collection<ILibraryClass> classes, final ImageDescriptor libImageDescriptor) {
+        final LabelProvider labelProvider = createLabelProvider(libImageDescriptor);
         final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(shell, labelProvider);
         classesDialog.setMultipleSelection(true);
         classesDialog.setTitle("Select library class");
@@ -167,29 +122,19 @@ public class ReferencedLibraryImporter {
         return classesDialog;
     }
 
-    private static class PythonClassesLabelProvider extends LabelProvider {
+    private static LabelProvider createLabelProvider(final ImageDescriptor libImageDescriptor) {
+        return new LabelProvider() {
 
-        @Override
-        public Image getImage(final Object element) {
-            return ImagesManager.getImage(RedImages.getJavaClassImage());
-        }
+            @Override
+            public Image getImage(final Object element) {
+                return ImagesManager.getImage(libImageDescriptor);
+            }
 
-        @Override
-        public String getText(final Object element) {
-            return ((PythonClass) element).getQualifiedName();
-        }
-    }
+            @Override
+            public String getText(final Object element) {
+                return ((ILibraryClass) element).getQualifiedName();
+            }
 
-    private static class JarClassesLabelProvider extends LabelProvider {
-
-        @Override
-        public Image getImage(final Object element) {
-            return ImagesManager.getImage(RedImages.getJavaClassImage());
-        }
-
-        @Override
-        public String getText(final Object element) {
-            return ((JarClass) element).getQualifiedName();
-        }
+        };
     }
 }
