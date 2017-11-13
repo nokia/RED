@@ -34,6 +34,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
@@ -58,7 +60,6 @@ import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
-import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -567,8 +568,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 SettingsTableEditableRule.createEditableRule(fileModel), wrapCellContent));
         gridLayer.addConfiguration(new GeneralSettingsEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
-        addGeneralSettingsConfigAttributes(configRegistry);
-
         table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
@@ -581,13 +580,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         // tooltips support
         new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider);
-    }
-
-    public void addGeneralSettingsConfigAttributes(final ConfigRegistry configRegistry) {
-        final Style style = new Style();
-        style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, GUIHelper.COLOR_GRAY);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                EmptyGeneralSettingLabelAccumulator.EMPTY_GENERAL_SETTING_LABEL);
     }
 
     private java.util.Optional<NatTable> createTable(final Composite parent, final TableTheme theme,
@@ -641,12 +633,26 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new RowHeaderStyleConfiguration(theme));
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
+        table.addConfiguration(inactiveSettingsStyle(theme));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
     }
 
     private boolean hasWrappedCells() {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
         return preferences.getCellWrappingStrategy() == CellWrappingStrategy.WRAP;
+    }
+
+    private DefaultNatTableStyleConfiguration inactiveSettingsStyle(final TableTheme theme) {
+        return new DefaultNatTableStyleConfiguration() {
+
+            @Override
+            public void configureRegistry(final IConfigRegistry configRegistry) {
+                final Style style = new Style();
+                style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, theme.getBodyInactiveCellForeground());
+                configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
+                        EmptyGeneralSettingLabelAccumulator.EMPTY_GENERAL_SETTING_LABEL);
+            }
+        };
     }
 
     @Override
