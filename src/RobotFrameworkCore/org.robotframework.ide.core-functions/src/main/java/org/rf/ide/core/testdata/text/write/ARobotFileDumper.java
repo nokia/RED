@@ -66,7 +66,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
     @Override
     public void dump(final File robotFile, final RobotFile model) throws IOException {
-        Files.write(dump(model), robotFile, Charset.forName("utf-8"));
+        Files.asCharSink(robotFile, Charset.forName("utf-8")).write(dump(model));
     }
 
     @Override
