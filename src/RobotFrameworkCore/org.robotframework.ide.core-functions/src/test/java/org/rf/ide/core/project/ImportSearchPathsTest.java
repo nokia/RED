@@ -43,15 +43,15 @@ public class ImportSearchPathsTest {
         importerUri = folder.newFile("importer.ext").toURI();
 
         folder.newFolder("folder");
-        Files.write("file content", get(root, "folder", "file1.ext"), Charsets.UTF_8);
+        Files.asCharSink(get(root, "folder", "file1.ext"), Charsets.UTF_8).write("file content");
 
         folder.newFolder("python");
-        Files.write("file content", get(root, "python", "file2.ext"), Charsets.UTF_8);
-        
+        Files.asCharSink(get(root, "python", "file2.ext"), Charsets.UTF_8).write("file content");
+
         folder.newFolder("user");
-        Files.write("file content", get(root, "user", "file3.ext"), Charsets.UTF_8);
+        Files.asCharSink(get(root, "user", "file3.ext"), Charsets.UTF_8).write("file content");
     }
-    
+
     @Test
     public void pathIsFoundForAbsoluteImport_1() {
         final URI importedUri = get(root, "folder", "file1.ext").toURI();
@@ -65,7 +65,7 @@ public class ImportSearchPathsTest {
         final Optional<MarkedUri> absMarkedUri = pathsSupport.findAbsoluteMarkedUri(importerUri, importPath);
         final Optional<URI> absUri = pathsSupport.findAbsoluteUri(importerUri, importPath);
         final URI uri = pathsSupport.getAbsoluteUri(importerUri, importPath);
-        
+
         assertThat(absMarkedUri.isPresent()).isTrue();
         assertThat(absMarkedUri.get().getRelativity()).isEqualTo(PathRelativityPoint.FILE);
         assertThat(absMarkedUri.get().getPath()).isEqualTo(importedUri);

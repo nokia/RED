@@ -382,7 +382,7 @@ public class EclipseElementsLocator implements ElementsLocator {
         public Map<String, Collection<KeywordEntity>> collect() {
             final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
             new KeywordDefinitionLocator(file, model).locateKeywordDefinition(new KeywordDetector() {
-            
+
                 @Override
                 public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
                         final KeywordSpecification kwSpec, final Set<String> libraryAliases,
@@ -402,21 +402,21 @@ public class EclipseElementsLocator implements ElementsLocator {
                         final KeywordSpecification kwSpec, final RobotSuiteFile exposingFile) {
                     return ContinueDecision.CONTINUE;
                 }
-            
+
                 @Override
                 public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
                         final RobotKeywordDefinition kwDefinition) {
-            
+
                     final KeywordScope scope = suiteFile.getFile().equals(file) ? KeywordScope.LOCAL
                             : KeywordScope.RESOURCE;
-            
+
                     addAccessibleKeyword(kwDefinition.getName(), DebuggerKeywordEntity.from(scope, suiteFile, kwDefinition));
                     return ContinueDecision.CONTINUE;
                 }
-            
+
                 private void addAccessibleKeyword(final String keywordName, final DebuggerKeywordEntity keyword) {
                     final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
-            
+
                     if (!accessibleKeywords.containsKey(unifiedName)) {
                         accessibleKeywords.put(unifiedName, newLinkedHashSet());
                     }
@@ -432,13 +432,11 @@ public class EclipseElementsLocator implements ElementsLocator {
 
         private final RobotKeywordDefinition userKeyword;
 
-        private final KeywordSpecification kwSpec;
-
         static DebuggerKeywordEntity from(final KeywordScope scope, final String alias,
                 final RobotSuiteFile exposingResource, final LibrarySpecification libSpec,
                 final KeywordSpecification kwSpec) {
             return new DebuggerKeywordEntity(scope, libSpec.getName(), kwSpec.getName(), alias, kwSpec.isDeprecated(),
-                    exposingResource.getFile().getFullPath(), null, kwSpec);
+                    exposingResource.getFile().getFullPath(), null);
         }
 
         public boolean isLibrary() {
@@ -449,15 +447,14 @@ public class EclipseElementsLocator implements ElementsLocator {
                 final RobotKeywordDefinition userKeyword) {
             return new DebuggerKeywordEntity(scope, Files.getNameWithoutExtension(exposingResource.getName()),
                     userKeyword.getName(), "", userKeyword.isDeprecated(), exposingResource.getFile().getFullPath(),
-                    userKeyword, null);
+                    userKeyword);
         }
 
         protected DebuggerKeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-                final String alias, final boolean isDeprecated, final IPath expostingFilePath,
-                final RobotKeywordDefinition userKeyword, final KeywordSpecification kwSpec) {
-            super(scope, sourceName, keywordName, alias, isDeprecated, null, expostingFilePath);
+                final String alias, final boolean isDeprecated, final IPath exposingFilePath,
+                final RobotKeywordDefinition userKeyword) {
+            super(scope, sourceName, keywordName, alias, isDeprecated, null, exposingFilePath);
             this.userKeyword = userKeyword;
-            this.kwSpec = kwSpec;
         }
     }
 
