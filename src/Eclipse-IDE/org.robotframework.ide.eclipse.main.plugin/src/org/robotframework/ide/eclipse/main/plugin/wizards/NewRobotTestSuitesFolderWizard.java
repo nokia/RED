@@ -62,10 +62,11 @@ public class NewRobotTestSuitesFolderWizard extends BasicNewResourceWizard {
                 throw new SuiteCreatingException("Unable to create suites directory " + newFolder.getName(), e);
             }
         }
-        
+
         return true;
     }
 
+    @SuppressWarnings("serial")
     private static class SuiteCreatingException extends RuntimeException {
 
         public SuiteCreatingException(final String msg, final CoreException cause) {

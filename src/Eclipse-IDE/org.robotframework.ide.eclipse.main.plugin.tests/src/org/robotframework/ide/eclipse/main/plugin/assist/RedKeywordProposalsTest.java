@@ -611,6 +611,8 @@ public class RedKeywordProposalsTest {
                 case "stdLib":
                     assertThat(keywordProposal.getContent()).isEqualTo("stdLib.a_res_kw1");
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         }
     }

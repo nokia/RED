@@ -44,7 +44,7 @@ public class LibrarySpecificationReader {
         spec.setSecondaryKey(remoteLocation.getUri());
         return spec;
     }
-    
+
     public static LibrarySpecification readReferencedSpecification(final IFile libraryFile,
             final ReferencedLibrary library) {
         final LibrarySpecification spec = readSpecification(libraryFile);
@@ -53,6 +53,7 @@ public class LibrarySpecificationReader {
         return spec;
     }
 
+    @SuppressWarnings("serial")
     public static class CannotReadLibrarySpecificationException extends RuntimeException {
 
         public CannotReadLibrarySpecificationException(final String message, final Throwable cause) {
