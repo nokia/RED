@@ -48,7 +48,7 @@ public class RfLintIntegrationServer {
     private final Semaphore serverSetupSemaphore = new Semaphore(0);
 
     private ServerSocket serverSocket;
-    
+
     private Socket clientSocket;
 
     private boolean stopped;
@@ -146,7 +146,7 @@ public class RfLintIntegrationServer {
                 case "analysis_finished":
                     handleAnalysisFinished(eventsListeners, eventMap);
                 default:
-                    break;
+                    throw new IllegalStateException();
             }
             event = eventReader.readLine();
         }

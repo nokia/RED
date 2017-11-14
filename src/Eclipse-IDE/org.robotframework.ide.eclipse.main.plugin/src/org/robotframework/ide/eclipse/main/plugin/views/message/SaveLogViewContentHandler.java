@@ -51,7 +51,7 @@ public class SaveLogViewContentHandler extends DIParameterizedHandler<E4SaveLogV
 
             try {
                 final String content = control.getText();
-                Files.write(content, new File(path), Charsets.UTF_8);
+                Files.asCharSink(new File(path), Charsets.UTF_8).write(content);
             } catch (final IOException e) {
                 ErrorDialog.openError(control.getShell(), "Error saving file",
                         "Unable to save Message Log view content to " + path + " file",
