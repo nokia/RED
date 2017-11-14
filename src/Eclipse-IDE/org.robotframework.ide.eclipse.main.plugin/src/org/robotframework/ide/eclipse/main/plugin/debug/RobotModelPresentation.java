@@ -88,6 +88,8 @@ public class RobotModelPresentation extends LabelProvider
                     case LOCAL:
                         decorator = RedImages.VARIABLES.getDebugLocalScopeDecorator();
                         break;
+                    default:
+                        throw new IllegalStateException();
                 }
             }
             return decorator == null ? varImage
@@ -135,7 +137,7 @@ public class RobotModelPresentation extends LabelProvider
             listener.detailComputed(value, ((RobotDebugValue) value).getDetailedValue());
         }
     }
-    
+
     @Override
     public IEditorInput getEditorInput(final Object element) {
         if (element instanceof IFile) {
