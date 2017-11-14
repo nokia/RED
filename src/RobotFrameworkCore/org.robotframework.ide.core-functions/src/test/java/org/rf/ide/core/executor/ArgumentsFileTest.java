@@ -31,7 +31,7 @@ public class ArgumentsFileTest {
     }
 
     @Test
-    public void mulitlineContentIsGeneratedWithColumns_whenMultipleLinesWereAdded() {
+    public void multilineContentIsGeneratedWithColumns_whenMultipleLinesWereAdded() {
         final ArgumentsFile file = new ArgumentsFile();
         file.addLine("a", "1");
         file.addLine("ab", "2");
@@ -42,7 +42,7 @@ public class ArgumentsFileTest {
     }
 
     @Test
-    public void singleLineCommentIsGenereted() {
+    public void singleLineCommentIsGenerated() {
         final ArgumentsFile file = new ArgumentsFile();
         file.addCommentLine("comment");
 
@@ -50,7 +50,7 @@ public class ArgumentsFileTest {
     }
 
     @Test
-    public void multilineContentWithCommentsIsGenereted() {
+    public void multilineContentWithCommentsIsGenerated() {
         final ArgumentsFile file = new ArgumentsFile();
         file.addLine("a", "1");
         file.addCommentLine("comment");
@@ -70,7 +70,7 @@ public class ArgumentsFileTest {
 
         final File path = file.writeToTemporaryOrUseAlreadyExisting();
 
-        assertThat(Files.toString(path, Charsets.UTF_8)).isEqualTo("a   1\nab  2\nabc 3");
+        assertThat(Files.asCharSource(path, Charsets.UTF_8).read()).isEqualTo("a   1\nab  2\nabc 3");
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ArgumentsFileTest {
         final File path2 = file1.writeToTemporaryOrUseAlreadyExisting();
         final long lastModification = path2.lastModified();
 
-        assertThat(Files.toString(path2, Charsets.UTF_8)).isEqualTo("a   1\nab  2\nabc 3");
+        assertThat(Files.asCharSource(path2, Charsets.UTF_8).read()).isEqualTo("a   1\nab  2\nabc 3");
         assertThat(firstModification).isEqualTo(lastModification);
     }
 }

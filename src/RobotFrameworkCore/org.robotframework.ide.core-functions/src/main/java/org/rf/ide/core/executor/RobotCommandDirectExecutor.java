@@ -325,7 +325,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("rflint_integration.py");
 
             final List<String> cmdLine = createCommandLine(scriptFile);
-            
+
             cmdLine.add(host);
             cmdLine.add(Integer.toString(port));
             for (final String path : rulesFiles) {
@@ -359,8 +359,9 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
                 return "-w";
             case "ignore":
                 return "-i";
+            default:
+                throw new IllegalStateException();
         }
-        throw new IllegalStateException();
     }
 
     private List<String> createCommandLine(final File scriptFile, final String... lines) {

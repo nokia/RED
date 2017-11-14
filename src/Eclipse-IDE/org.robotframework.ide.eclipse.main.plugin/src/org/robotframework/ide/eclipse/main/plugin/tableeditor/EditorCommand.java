@@ -51,6 +51,7 @@ public abstract class EditorCommand {
         return newUndoCommands;
     }
 
+    @SuppressWarnings("serial")
     public class CommandExecutionException extends RuntimeException {
 
         public CommandExecutionException(final String message) {
