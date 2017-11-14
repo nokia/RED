@@ -39,6 +39,8 @@ class ArgumentsParser {
                 case NO_REPORT:
                     args.reportFilepath = parseNoReportArgument(passedArgs);
                     break;
+                default:
+                    throw new IllegalStateException();
             }
         }
         return args;
@@ -104,6 +106,7 @@ class ArgumentsParser {
 
     }
 
+    @SuppressWarnings("serial")
     static class InvalidArgumentsProvidedException extends RuntimeException {
 
         InvalidArgumentsProvidedException(final String msg) {
