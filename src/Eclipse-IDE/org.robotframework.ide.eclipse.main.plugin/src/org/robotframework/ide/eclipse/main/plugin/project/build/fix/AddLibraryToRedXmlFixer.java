@@ -189,7 +189,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
     @SuppressWarnings("serial")
     private static class LibraryPathException extends Exception {
 
-        public LibraryPathException(final String message) {
+        LibraryPathException(final String message) {
             super(message);
         }
 
