@@ -28,4 +28,10 @@ public class RobotEmptyLine extends RobotKeywordCall {
     public boolean shouldAddCommentMark() {
         return false;
     }
+
+    @Override
+    public RobotKeywordCall insertCellAt(int position, String newValue) {
+        // nothing to do
+        return this;
+    }
 }

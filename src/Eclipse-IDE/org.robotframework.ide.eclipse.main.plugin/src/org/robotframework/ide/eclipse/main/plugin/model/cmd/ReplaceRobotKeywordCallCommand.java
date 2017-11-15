@@ -40,6 +40,7 @@ public class ReplaceRobotKeywordCallCommand extends EditorCommand {
                 final RobotSettingsSection settingsSection = (RobotSettingsSection) parent;
                 settingsSection.insertSetting(newCall, index);
             }
+            newCall.resetStored();
             RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newCall).send(
                     RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, newCall.getParent());
         }

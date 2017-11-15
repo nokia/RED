@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.osgi.service.event.Event;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -104,6 +105,7 @@ import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.red.swt.SwtThread;
+import org.robotframework.services.event.Events;
 
 import com.google.common.base.Function;
 
@@ -259,7 +261,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                         RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
-        
+
         // calculate columns width
         table.addListener(SWT.Paint,
                 factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer, 120, 200));
@@ -440,7 +442,23 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             setDirty();
         }
     }
-    
+
+    @Inject
+    @Optional
+    private void whenKeywordCallIsConverted(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final Event event) {
+
+        final RobotSettingsSection settingsSection = Events.get(event, IEventBroker.DATA, RobotSettingsSection.class);
+        final RobotSetting setting = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotSetting.class);
+
+        if (settingsSection != null && settingsSection.getSuiteFile() == fileModel
+                && RobotSetting.SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
+            sortModel.clear();
+            selectionLayerAccessor.selectElementPreservingSelectedColumnsAfterOperation(setting,
+                    tableInputIsReplaced());
+        }
+    }
+
     @Inject
     @Optional
     private void whenSettingIsAdded(
@@ -502,7 +520,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             @UIEventTopic(RobotModelEvents.EXTERNAL_MODEL_CHANGE) final RobotElementChange change) {
         if (change.getKind() == Kind.CHANGED) {
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
-                    ? (RobotSuiteFile) change.getElement() : null;
+                    ? (RobotSuiteFile) change.getElement()
+                    : null;
             if (suite == fileModel) {
                 refreshTable();
             }

@@ -71,4 +71,16 @@ public class VariablesImport extends AImported {
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
     }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position - 2 <= arguments.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.SETTING_VARIABLES_ARGUMENT, true);
+            arguments.add(position - 2, tokenToInsert);
+        } else if (position - 2 - arguments.size() <= getComment().size()) { // new comment part
+            addCommentPartAt(position - 2 - arguments.size(), tokenToInsert);
+        }
+    }
 }

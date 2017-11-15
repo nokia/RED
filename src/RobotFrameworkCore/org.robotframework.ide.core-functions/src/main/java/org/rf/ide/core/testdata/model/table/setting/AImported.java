@@ -62,6 +62,11 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
         this.comment.add(rt);
     }
 
+    protected void addCommentPartAt(final int index, final RobotToken rt) {
+        fixComment(getComment(), rt);
+        this.comment.add(index, rt);
+    }
+
     @Override
     public void removeCommentPart(final int index) {
         this.comment.remove(index);
