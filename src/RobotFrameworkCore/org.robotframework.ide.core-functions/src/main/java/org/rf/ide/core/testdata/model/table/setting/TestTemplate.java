@@ -68,7 +68,7 @@ public class TestTemplate extends AModelElement<SettingTable>
     }
 
     public void addUnexpectedTrashArgument(final String trashArgument) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(trashArgument);
 
         addUnexpectedTrashArgument(rt);
@@ -102,7 +102,7 @@ public class TestTemplate extends AModelElement<SettingTable>
 
     @Override
     public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
@@ -151,5 +151,18 @@ public class TestTemplate extends AModelElement<SettingTable>
     @Override
     public boolean removeElementToken(int index) {
         return super.removeElementFromList(unexpectedTrashArguments, index);
+    }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position - 2 <= unexpectedTrashArguments.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
+            unexpectedTrashArguments.add(position - 2, tokenToInsert);
+        } else if (position - 2 - unexpectedTrashArguments.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 2 - unexpectedTrashArguments.size(), tokenToInsert);
+        }
     }
 }

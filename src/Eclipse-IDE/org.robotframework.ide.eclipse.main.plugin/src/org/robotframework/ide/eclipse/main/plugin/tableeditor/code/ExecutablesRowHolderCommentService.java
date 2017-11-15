@@ -41,7 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class ExecutablesRowHolderCommentService {
 
     public static boolean wasHandledAsComment(final List<EditorCommand> commands, final RobotKeywordCall call,
-            final String value, final int column, final int numberOfColumns) {
+            final String value, final int column) {
 
         boolean handled = false;
         final List<RobotToken> execRowView = execRowView(call);

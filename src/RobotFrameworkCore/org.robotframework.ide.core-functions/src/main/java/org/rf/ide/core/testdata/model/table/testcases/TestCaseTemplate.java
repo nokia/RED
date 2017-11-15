@@ -143,4 +143,21 @@ public class TestCaseTemplate extends AModelElement<TestCase>
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(unexpectedTrashArguments, index);
     }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position == 1) { // new timeout
+            fixForTheType(keywordName, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
+            unexpectedTrashArguments.add(0, keywordName);
+            setKeywordName(tokenToInsert);
+        } else if (position - 2 <= unexpectedTrashArguments.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
+            unexpectedTrashArguments.add(position - 2, tokenToInsert);
+        } else if (position - 2 - unexpectedTrashArguments.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 2 - unexpectedTrashArguments.size(), tokenToInsert);
+        }
+    }
 }

@@ -66,7 +66,7 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
         if (rowObject instanceof RobotElement) {
             final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
-                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex, numberOfColumns);
+                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex);
             for (final EditorCommand command : commands) {
                 commandsStack.execute(command);
             }

@@ -24,6 +24,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
 
+    private RobotKeywordCall actualCall;
+
     private final String newName;
 
     private final String oldName;
@@ -55,7 +57,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         String nameToSet = shouldShiftNameFromArgs ? extractNameFromArguments(keywordCall.getArguments()) : newName;
         nameToSet = nameToSet.isEmpty() && !keywordCall.getArguments().isEmpty() ? "\\" : nameToSet;
 
-        final RobotKeywordCall actualCall = getConvertedCall(nameToSet);
+        actualCall = getConvertedCall(nameToSet);
 
         if (shouldShiftNameFromArgs) {
             removeFirstArgument(actualCall);
@@ -74,8 +76,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             changeToCall(nameToSet);
         }
         return parent.getChildren().get(index);
-    }    
-    
+    }
+
     private void changeToCall(final String nameToSet) {
         if (keywordCall.isExecutable()) {
             execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
@@ -85,7 +87,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             execute(new ConvertEmptyToCall(eventBroker, (RobotEmptyLine) keywordCall, nameToSet));
         }
     }
-    
+
     private void changeToSetting(final String nameToSet) {
         if (keywordCall.isExecutable()) {
             execute(new ConvertCallToSetting(eventBroker, keywordCall, nameToSet));
@@ -99,7 +101,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             execute(new ConvertEmptyToSetting(eventBroker, (RobotEmptyLine) keywordCall, nameToSet));
         }
     }
-    
+
     private void changeToEmpty(final String nameToSet) {
         if (keywordCall.isExecutable()) {
             execute(new ConvertCallToEmpty(eventBroker, keywordCall, nameToSet));
@@ -109,7 +111,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             execute(new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet));
         }
     }
-    
+
     private void execute(final EditorCommand command) {
         command.execute();
         executedCommands.add(command);
@@ -142,6 +144,10 @@ public class SetKeywordCallNameCommand extends EditorCommand {
                 newArguments);
         executedCommands.add(command);
         command.execute();
+    }
+
+    public RobotKeywordCall getActualCall() {
+        return actualCall;
     }
 
     @Override

@@ -129,6 +129,15 @@ public class SelectionLayerAccessor {
         return columnsIndexes;
     }
 
+    public boolean isSelectedColumnWithIndex(int index) {
+        for (final PositionCoordinate position : getSelectedPositions()) {
+            if (position.getColumnPosition() == index) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void selectCellContaining(final String label) {
         final PositionCoordinate[] positions = getSelectedPositions();
 
@@ -149,7 +158,7 @@ public class SelectionLayerAccessor {
     }
 
     public void preserveSelectionWhen(final Runnable operation) {
-        preserveSelectionWhen(operation, Functions.<PositionCoordinate> identity());
+        preserveSelectionWhen(operation, Functions.<PositionCoordinate>identity());
     }
 
     public void preserveSelectionWhen(final Runnable operation,
@@ -195,7 +204,7 @@ public class SelectionLayerAccessor {
 
             @Override
             public void run() {
-                reestablishSelection(selectionLayer, positions, Functions.<PositionCoordinate> identity());
+                reestablishSelection(selectionLayer, positions, Functions.<PositionCoordinate>identity());
             }
         });
     }
@@ -218,8 +227,9 @@ public class SelectionLayerAccessor {
             public void run() {
                 selectionProvider.setSelection(new StructuredSelection(elementToSelect));
                 final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
-                reestablishSelection(selectionLayer, newlySelected, new Function<PositionCoordinate, PositionCoordinate>() {
-                
+                reestablishSelection(selectionLayer, newlySelected,
+                        new Function<PositionCoordinate, PositionCoordinate>() {
+
                             @Override
                             public PositionCoordinate apply(final PositionCoordinate coordinate) {
                                 return new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition());
@@ -238,14 +248,15 @@ public class SelectionLayerAccessor {
                 final HashSet<Integer> columns = newHashSet(Ints.asList(selectionLayer.getSelectedColumnPositions()));
                 selectionProvider.setSelection(new StructuredSelection(elementToSelect));
                 final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
-        
-                reestablishSelection(selectionLayer, newlySelected, new Function<PositionCoordinate, PositionCoordinate>() {
-                
+
+                reestablishSelection(selectionLayer, newlySelected,
+                        new Function<PositionCoordinate, PositionCoordinate>() {
+
                             @Override
                             public PositionCoordinate apply(final PositionCoordinate coordinate) {
                                 if (columns.contains(coordinate.getColumnPosition())) {
                                     return new PositionCoordinate(selectionLayer, coordinate.getColumnPosition(),
-                                        coordinate.getRowPosition());
+                                            coordinate.getRowPosition());
                                 }
                                 return null;
                             }
@@ -259,7 +270,7 @@ public class SelectionLayerAccessor {
         if (positions.length == 1 && positions[0].getColumnPosition() == 0) {
             selectElementPreservingSelectedColumnsAfterOperation(elementToSelect, operation);
         } else {
-            preserveSelectionWhen(operation, Functions.<PositionCoordinate> identity());
+            preserveSelectionWhen(operation, Functions.<PositionCoordinate>identity());
         }
     }
 
