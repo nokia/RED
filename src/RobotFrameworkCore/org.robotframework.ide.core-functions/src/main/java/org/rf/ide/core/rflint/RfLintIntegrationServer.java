@@ -57,11 +57,11 @@ public class RfLintIntegrationServer {
         this(30, TimeUnit.SECONDS, onServerException);
     }
 
-    public RfLintIntegrationServer(final int timeout, final TimeUnit timoutUnit,
+    public RfLintIntegrationServer(final int timeout, final TimeUnit timeUnit,
             final Consumer<Exception> onServerException) {
         this.host = "127.0.0.1";
         this.port = findFreePort();
-        this.timeoutInMillis = (int) TimeUnit.MILLISECONDS.convert(timeout, timoutUnit);
+        this.timeoutInMillis = (int) TimeUnit.MILLISECONDS.convert(timeout, timeUnit);
         this.onServerException = onServerException;
     }
 
@@ -146,7 +146,7 @@ public class RfLintIntegrationServer {
                 case "analysis_finished":
                     handleAnalysisFinished(eventsListeners, eventMap);
                 default:
-                    throw new IllegalStateException();
+                    break;
             }
             event = eventReader.readLine();
         }
