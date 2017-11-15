@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PqJNkIJTEeeVzuwK_hMKqA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/26/17 2:14 PM
+Save-Time: 11/15/17 11:17 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -26,21 +26,17 @@ with [get-editor "test.robot" | get-text-viewer] {
     type-text "."
     key-type "M1+s"
 }
-// save red.xml
-get-view "Project Explorer" | get-tree | select "AutoProject/red.xml" | double-click
-with [get-editor "AutoProject/red.xml"] {
-    get-tab-folder | get-tab-item "Referenced libraries" | click
-    get-section "Referenced libraries" | get-table | select "discover - AutoProject\\/libs" | key-type "M1+s"
-}
+
 // check Problem if there is 0 items
 get-view Problems | click
 get-editor "test.robot" | click
-get-editor "AutoProject/red.xml" | close
+
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 29
 }
-wait -ms 5000
-wait-for-zero-items -times 4 -delay 1000
+
+wait-for-zero-items -times 6 -delay 1000
+
 // verify if library was added to Robot Referenced libraries
 get-view "Project Explorer" | get-tree | select "AutoProject/Robot Referenced libraries" | double-click
 get-view "Project Explorer" | get-tree 
@@ -48,6 +44,7 @@ get-view "Project Explorer" | get-tree
     | equals "discover AutoProject/libs (1)" | verify-true
 // remove lib from red.xml
 get-view "Project Explorer" | get-tree | select "AutoProject/red.xml" | double-click
+get-editor "AutoProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 with [get-editor "AutoProject/red.xml" | get-section "Referenced libraries" | get-table] {
     select "discover - AutoProject\\/libs" | key-type Del
     key-type "M1+s"
@@ -65,12 +62,15 @@ with [get-editor "test.robot" | get-text-viewer] {
     key-type Enter
     key-type "M1+s"
 }
-with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 2 26
-}
+
+get-view Problems | click
+get-editor "test.robot" | get-text-viewer | set-caret-pos 2 26
+
 // check if there is no Problems
 wait-for-zero-items -times 4 -delay 1000
-// set agin wrong path and use QF
+
+
+// set again wrong path and use QF
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 17
     key-type BackSpace
@@ -83,7 +83,8 @@ with [get-editor "test.robot" | get-text-viewer] {
 // check if no Problems
 get-eclipse-window | key-type "M1+s"
 wait-for-zero-items -times 6 -delay 500
-// make path withou extension
+
+// make path without extension
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 33
     key-type BackSpace -times 4
@@ -94,22 +95,13 @@ wait-for-errors -amount 2 -times 4 -delay 500
 with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 25
     key-type "M1+1"
-    set-caret-pos 2 22
-    key-type "M1+2"
-    key-type "M1+1"
 }
 // verify QF items list
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | get-property "getItems().TableItem[0].getText()" | equals "Discover '../libs/discover' and add to configuration" 
     | verify-true
-with [get-editor "test.robot" | get-text-viewer] {
-    hover-text 2 18
-    set-caret-pos 2 20
-    key-type "M1+1"
-}
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | get-property "getItems().TableItem[0].getText()" | equals "Discover '../libs/discover' and add to configuration" 
-    | verify-true
+    
+//select to discover    
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
     select "Discover '..\\/libs\\/discover' and add to configuration" | key-type Enter
     click -default
@@ -177,7 +169,8 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     click -default
 }
 // verify if there is no Problems
-wait-for-zero-items -times 3 -delay 500
+wait-for-zero-items -times 4 -delay 1000
+
 with [get-view "Project Explorer" | get-tree] {
     select "AutoProject/Robot Referenced libraries" | double-click
     select "AutoProject/Robot Referenced libraries"
@@ -186,4 +179,5 @@ with [get-view "Project Explorer" | get-tree] {
 get-view "Project Explorer" | get-tree 
     | get-item "AutoProject/Robot Referenced libraries/discover AutoProject\\/libs \\(1\\)" | get-property caption 
     | equals "discover AutoProject/libs (1)" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
