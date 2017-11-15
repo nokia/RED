@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _S92Q4PQzEeaWpbE3jg39cA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/14/17 5:50 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/15/17 3:51 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -93,6 +93,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	get-button "Resume (F8)" | click
+	wait-for-console
 }
 
 //------------------------------------------------- 1 expected, 0 got -------------------------------------------------
@@ -118,6 +119,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	get-button "Resume (F8)" | click
+	wait-for-console
 }	
 
 //------------------------------------------------- 2 kw are True -------------------------------------------------
@@ -149,7 +151,7 @@ exec-with-options -disableJobWaiting -command {
 	wait 1000
 	check-debug-marker-on-ruler -line 15 -script_name "TestFile.robot"
 	get-button "Resume (F8)" | click
-	
+	wait-for-console
 	
 }
 
@@ -170,11 +172,11 @@ exec-with-options -disableJobWaiting -command {
 		    | get-property caption | equals "Error occurred when evaluating breakpoint condition. No keyword with name 'no kw' found." | verify-true
 	}		    
 	get-window "Debugger Error" | get-button OK | click
-	with [get-button "Resume (F8)"] {
-	    click
-	    wait-for-specified_line-in-first-thread -line 15 -nr_of_frames 4
-	    click
-	}
+	get-button "Resume (F8)" | click
+	wait-for-specified_line-in-first-thread -line 15 -nr_of_frames 4
+	get-button "Resume (F8)" | click
+	wait-for-console
+	
 }	
 
 //------------------------------------------------ first kw: unchecked,     second kw=true -------------------------------------------------
@@ -218,9 +220,8 @@ exec-with-options -disableJobWaiting -command {
 		    | get-property caption | equals "Error occurred when evaluating breakpoint condition. Keyword name cannot be empty."  | verify-true
 	}
 	get-window "Debugger Error" | get-button OK | click
-	with [get-button "Resume (F8)"] {
-	    click
-	}
+	get-button "Resume (F8)" | click
+	wait-for-console
 }
 
 //check history
