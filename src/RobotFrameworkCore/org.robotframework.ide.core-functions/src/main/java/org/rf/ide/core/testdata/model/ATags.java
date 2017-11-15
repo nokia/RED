@@ -43,7 +43,7 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
     }
 
     public void addTag(final String tag) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(tag);
 
         addTag(rt);
@@ -70,7 +70,7 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
 
     @Override
     public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
@@ -115,13 +115,13 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
     }
 
     private List<RobotToken> compact(final List<RobotToken> elementsSingleType) {
-        int size = elementsSingleType.size();
+        final int size = elementsSingleType.size();
         for (int i = size - 1; i >= 0; i--) {
             if (elementsSingleType.size() == 0) {
                 break;
             }
 
-            RobotToken t = elementsSingleType.get(i);
+            final RobotToken t = elementsSingleType.get(i);
             if (t.getText() == null || t.getText().isEmpty()) {
                 elementsSingleType.remove(i);
             } else {
@@ -135,6 +135,19 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
     @Override
     public boolean removeElementToken(int index) {
         return super.removeElementFromList(tags, index);
+    }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position - 1 <= tags.size()) { // new argument
+            fixForTheType(tokenToInsert, getTagType());
+            tags.add(position - 1, tokenToInsert);
+        } else if (position - 1 - tags.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 1 - tags.size(), tokenToInsert);
+        }
     }
 
     public abstract IRobotTokenType getTagType();

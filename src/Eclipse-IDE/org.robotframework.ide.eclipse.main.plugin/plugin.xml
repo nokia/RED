@@ -1921,34 +1921,18 @@
          </reference>
        </activeWhen>
        <enabledWhen>
-          <with
-                variable="selection">
-             <and>
-                <count
-                      value="0">
-                </count>
-                <count
-                      value="1">
-                </count>
-             </and>
-          </with>
+        <reference
+            definitionId="org.robotframework.oneKeywordOrSettingArgumentSelected">
+        </reference>
        </enabledWhen>
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.DeleteCellHandler"
           commandId="org.robotframework.ide.eclipse.deleteCell">
        <enabledWhen>
-          <with
-                variable="selection">
-             <and>
-                <count
-                      value="0">
-                </count>
-                <count
-                      value="1">
-                </count>
-             </and>
-          </with>
+        <reference
+            definitionId="org.robotframework.oneKeywordOrSettingArgumentSelected">
+        </reference>
        </enabledWhen>
        <activeWhen>
          <reference
@@ -4703,14 +4687,14 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.SelectionsPropertyTester"
           id="org.robotframework.selectionsPropertyTester"
           namespace="org.robotframework.selection"
-          properties="allElementsHaveSameType,selectedActualFile"
+          properties="allElementsHaveSameType,selectedActualFile,keywordCallButNotDocumentation,isMetadataSelected"
           type="org.eclipse.jface.viewers.IStructuredSelection">
     </propertyTester>
     <propertyTester
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester"
           id="org.robotframework.focusedCellPropertyTester"
           namespace="org.robotframework.table.cell"
-          properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals"
+          properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals,isSelectedColumnWithIndex"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
     <propertyTester
@@ -5547,6 +5531,58 @@
              </test>
           </with>
        </and>
+    </definition>
+    <definition
+          id="org.robotframework.oneKeywordOrSettingArgumentSelected">
+        <and>
+            <with
+                variable="activeEditor">
+                <test
+                    property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                    value="1">
+                </test>
+            </with>
+            <with
+                variable="selection">
+                <and>
+                    <test
+                        property="org.robotframework.selection.keywordCallButNotDocumentation"
+                        value="true">
+                    </test>
+                    <test
+                        property="org.robotframework.selection.isMetadataSelected"
+                        value="false">
+                    </test>
+                </and>
+            </with>
+            <not>
+                <and>
+                    <with
+                        variable="selection">
+                        <iterate
+                            ifEmpty="false"
+                            operator="and">
+                            <instanceof
+                                value="org.robotframework.ide.eclipse.main.plugin.model.RobotSetting">
+                            </instanceof>
+                        </iterate>
+                    </with>
+                    <with
+                        variable="activeEditor">
+                        <or>
+                            <test
+                                property="org.robotframework.table.cell.isSelectedColumnWithIndex"
+                                value="0">
+                            </test>
+                            <test
+                                property="org.robotframework.table.cell.isSelectedColumnWithIndex"
+                                value="1">
+                            </test>
+                        </or>
+                    </with>
+                </and>
+            </not>
+        </and>
     </definition>
  </extension>
  

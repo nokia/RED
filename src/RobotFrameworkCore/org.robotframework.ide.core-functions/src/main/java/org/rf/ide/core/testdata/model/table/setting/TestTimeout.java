@@ -62,7 +62,7 @@ public class TestTimeout extends AModelElement<SettingTable> implements IComment
     }
 
     public void addMessageArgument(final String messageArgument) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(messageArgument);
 
         addMessageArgument(rt);
@@ -94,7 +94,7 @@ public class TestTimeout extends AModelElement<SettingTable> implements IComment
 
     @Override
     public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
@@ -143,5 +143,18 @@ public class TestTimeout extends AModelElement<SettingTable> implements IComment
     @Override
     public boolean removeElementToken(int index) {
         return super.removeElementFromList(message, index);
+    }
+
+    @Override
+    public void insertValueAt(String value, int position) {
+        final RobotToken tokenToInsert = new RobotToken();
+        tokenToInsert.setText(value);
+        if (position - 2 <= message.size()) { // new argument
+            fixForTheType(tokenToInsert, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE, true);
+            message.add(position - 2, tokenToInsert);
+        } else if (position - 2 - message.size() <= comment.size()) { // new comment part
+            fixComment(comment, tokenToInsert);
+            comment.add(position - 2 - message.size(), tokenToInsert);
+        }
     }
 }

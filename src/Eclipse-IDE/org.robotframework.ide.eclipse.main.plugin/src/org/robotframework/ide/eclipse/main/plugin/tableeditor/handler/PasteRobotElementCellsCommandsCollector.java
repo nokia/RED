@@ -65,7 +65,8 @@ public abstract class PasteRobotElementCellsCommandsCollector {
                     if (!clipboardElementColumnsIndexes.isEmpty()) {
                         int clipboardElementColumnsCounter = 0;
                         for (int i = 0; i < selectedElementColumnsIndexes.size(); i++) {
-                            final int clipboardElementColumnIndex = clipboardElementColumnsIndexes.get(clipboardElementColumnsCounter);
+                            final int clipboardElementColumnIndex = clipboardElementColumnsIndexes
+                                    .get(clipboardElementColumnsCounter);
                             if (clipboardElementColumnsCounter + 1 < clipboardElementColumnsIndexes.size()) {
                                 clipboardElementColumnsCounter++;
                             } else {

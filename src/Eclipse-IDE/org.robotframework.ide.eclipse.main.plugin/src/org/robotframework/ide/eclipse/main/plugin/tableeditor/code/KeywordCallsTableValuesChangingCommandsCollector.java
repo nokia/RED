@@ -18,14 +18,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class KeywordCallsTableValuesChangingCommandsCollector {
 
-    public List<? extends EditorCommand> collect(final RobotElement element, final String value, final int column,
-            final int numberOfColumns) {
+    public List<? extends EditorCommand> collect(final RobotElement element, final String value, final int column) {
         final List<EditorCommand> commands = new ArrayList<>();
 
         if (element instanceof RobotKeywordCall) {
             final RobotKeywordCall call = (RobotKeywordCall) element;
 
-            if (ExecutablesRowHolderCommentService.wasHandledAsComment(commands, call, value, column, numberOfColumns)) {
+            if (ExecutablesRowHolderCommentService.wasHandledAsComment(commands, call, value, column)) {
                 return commands;
             }
 
