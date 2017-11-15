@@ -8,11 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -20,19 +17,13 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IExecutionListener;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.validation.ProblemPosition;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.ResourceImportsPathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -132,7 +123,10 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     }
 
     private boolean currentModelHaveUnknownLibrary(final RobotSuiteFile suite) {
-        final List<LibraryImport> imports = collectLibraryImportsIncludingNestedResources(suite, new HashSet<>());
+        final List<LibraryImport> imports = LibraryImportCollector.collectLibraryImportsIncludingNestedResources(suite);
+        if (imports.isEmpty()) {
+            return false;
+        }
 
         final UnknownLibraryDetectingReportingStrategy reporter = new UnknownLibraryDetectingReportingStrategy();
 
@@ -146,42 +140,6 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         } catch (final CoreException e) {
             return false;
         }
-    }
-
-    private List<LibraryImport> collectLibraryImportsIncludingNestedResources(final RobotSuiteFile suite,
-            final Set<IResource> alreadyVisited) {
-        final RobotModel model = (RobotModel) suite.getProject().getParent();
-
-        final List<LibraryImport> imports = collectLibraryImports(suite);
-        for (final IFile resourceFile : findResourceImportFiles(suite, alreadyVisited)) {
-            alreadyVisited.add(resourceFile);
-            final RobotSuiteFile resourceSuite = model.createSuiteFile(resourceFile);
-            imports.addAll(collectLibraryImportsIncludingNestedResources(resourceSuite, alreadyVisited));
-        }
-        return imports;
-    }
-
-    private List<IFile> findResourceImportFiles(final RobotSuiteFile suite, final Set<IResource> alreadyVisited) {
-        final IWorkspaceRoot workspaceRoot = suite.getFile().getWorkspace().getRoot();
-        return ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(suite)
-                .stream()
-                .distinct()
-                .map(path -> workspaceRoot.findMember(path))
-                .filter(res -> res != null && res.exists() && res.getType() == IResource.FILE
-                        && !alreadyVisited.contains(res))
-                .map(IFile.class::cast)
-                .collect(Collectors.toList());
-    }
-
-    private List<LibraryImport> collectLibraryImports(final RobotSuiteFile currentModel) {
-        final List<LibraryImport> imports = new ArrayList<>();
-        final Optional<RobotSettingsSection> settingsSection = currentModel.findSection(RobotSettingsSection.class);
-        if (settingsSection.isPresent()) {
-            for (final RobotKeywordCall setting : settingsSection.get().getLibrariesSettings()) {
-                imports.add((LibraryImport) setting.getLinkedElement());
-            }
-        }
-        return imports;
     }
 
     private static class UnknownLibraryDetectingReportingStrategy extends ProblemsReportingStrategy {
