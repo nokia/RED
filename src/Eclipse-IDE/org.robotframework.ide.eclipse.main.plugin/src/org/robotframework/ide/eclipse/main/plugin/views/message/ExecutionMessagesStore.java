@@ -16,7 +16,7 @@ class ExecutionMessagesStore implements IDisposable {
     private boolean isOpen = false;
     private boolean isDirty = false;
 
-    void append(final String msg) {
+    synchronized void append(final String msg) {
         // can't change store state when store is closed
         Preconditions.checkState(isOpen);
 
@@ -43,8 +43,9 @@ class ExecutionMessagesStore implements IDisposable {
     }
 
     @Override
-    public void dispose() {
+    public synchronized void dispose() {
         message.setLength(0);
+        message.trimToSize();
     }
 
     boolean checkDirtyAndReset() {
