@@ -6146,6 +6146,11 @@
           id="org.robotframework.red.view.message.saveContent"
           name="Save Logs">
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.view.execution.clearMessageLog"
+          name="Clear">
+    </command>
  </extension>
       <extension
             name="Message View handlers"
@@ -6158,6 +6163,10 @@
                class="org.robotframework.ide.eclipse.main.plugin.views.message.SaveLogViewContentHandler"
                commandId="org.robotframework.red.view.message.saveContent">
          </handler>
+         <handler
+               class="org.robotframework.ide.eclipse.main.plugin.views.message.ClearLogMessageLogHandler"
+               commandId="org.robotframework.red.view.execution.clearMessageLog">
+         </handler>
       </extension>
       <extension
             name="Message View menus"
@@ -6166,15 +6175,25 @@
                allPopups="false"
                locationURI="toolbar:org.robotframework.ide.MessageLogView">
             <command
+                  commandId="org.robotframework.red.view.message.wrap"
+                  icon="resources/wordwrap.png"
+                  style="toggle">
+            </command>
+            <separator
+                  name="content"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.robotframework.red.view.execution.clearMessageLog"
+                  icon="resources/close.png"
+                  label="Clear"
+                  style="push">
+            </command>
+            <command
                   commandId="org.robotframework.red.view.message.saveContent"
                   icon="resources/saveas.png"
                   label="Save Logs"
                   style="push">
-            </command>
-            <command
-                  commandId="org.robotframework.red.view.message.wrap"
-                  icon="resources/wordwrap.png"
-                  style="toggle">
             </command>
          </menuContribution>
       </extension>
