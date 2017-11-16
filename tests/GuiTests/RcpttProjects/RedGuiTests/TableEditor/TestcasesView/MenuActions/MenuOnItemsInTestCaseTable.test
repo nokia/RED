@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aovVQG3GEeaFMpJxhF5ZTQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/20/17 2:19 PM
+Save-Time: 11/16/17 11:18 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -39,7 +39,7 @@ proc "check-tooltip" [val is_button false] {
 	}
 }		
 	
-proc "check-submenus" [val row_enabled true] [val is_move_enabled true] [val start_index 11] {
+proc "check-submenus" [val row_enabled true] [val is_move_enabled true] [val start_index 11] [val cell_operation true]{
 	get-editor "TestFile.robot" | get-canvas -after [get-label"Test Cases"] -index 1 | get-menu "Table/Expand All"
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label"Test Cases"] -index 1] {
@@ -48,13 +48,13 @@ proc "check-submenus" [val row_enabled true] [val is_move_enabled true] [val sta
 		
 		//insert cell
 	    get-property [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().length" $start_index]| equals 5 | verify-true
-	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].isEnabled()" $start_index] | equals false 
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].isEnabled()" $start_index] | equals $cell_operation 
 	        | verify-true
 	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].getText()" $start_index ]
 	        | equals "Insert cell\\9M1+I" | verify-true
 	    
 	    //delete cell    
-	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].isEnabled()" $start_index] | equals false 
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].isEnabled()" $start_index] | equals $cell_operation 
 	        | verify-true
 	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].getText()" $start_index ]
 	        | equals "Delete cell\\9M1+D" | verify-true
@@ -303,17 +303,17 @@ wait 200
 //set on disabled field
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
 check-menu-for-tc
-check-submenus
+check-submenus -cell_operation false
 
 //set on test case name
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Left
 check-menu-for-tc
-check-submenus
+check-submenus -cell_operation false
 
 //set focus on [teardown]
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
 check-menu-for-tc 
-check-submenus -is_move_enabled true
+check-submenus -is_move_enabled true 
 
 //set on arg of teardown
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
@@ -338,12 +338,12 @@ check-submenus
 //chec menu on "..."
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
 check-menu-for-buton
-check-submenus -row_enabled false -is_move_enabled false -start_index 8
+check-submenus -row_enabled false -is_move_enabled false -start_index 8 -cell_operation false
 
 
 //chec menu on "...add "
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 3
 check-menu-for-buton
-check-submenus -row_enabled false -is_move_enabled false -start_index 8
+check-submenus -row_enabled false -is_move_enabled false -start_index 8 -cell_operation false
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
