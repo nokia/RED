@@ -137,6 +137,10 @@ public class MessageLogView {
 
     @PreDestroy
     public void dispose() {
+        // making the control null because even when disposed it may have the string stored
+        // in Accessible object so that it occupies memory even when view gets closed
+        // setting null here makes it eligible for GC
+        styledText = null;
         synchronized (executionService) {
             executionService.removeExecutionListener(executionListener);
         }

@@ -27,8 +27,10 @@ import com.google.common.collect.ImmutableList;
  */
 public class RobotTestExecutionService {
 
+    // history size set to 1 since we do not use it as of now
+    // see RED-967 (#149) and RED-817
     @VisibleForTesting
-    static final int LAUNCHES_HISTORY_LIMIT = 100;
+    static final int LAUNCHES_HISTORY_LIMIT = 1;
 
     private final Deque<RobotTestsLaunch> launches = new ArrayDeque<>();
 
