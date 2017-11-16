@@ -103,7 +103,8 @@ public class ReferencedLibraryImporter {
             final ElementListSelectionDialog classesDialog = selectionDialogProvider.apply(libClasses);
             if (classesDialog.open() == Window.OK) {
                 return Stream.of(classesDialog.getResult())
-                        .map(libClass -> ((ILibraryClass) libClass).toReferencedLibrary(fullLibraryPath))
+                        .map(ILibraryClass.class::cast)
+                        .map(libClass -> libClass.toReferencedLibrary(fullLibraryPath))
                         .collect(Collectors.toList());
             }
             return new ArrayList<>();
