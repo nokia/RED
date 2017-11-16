@@ -8,7 +8,6 @@
   </parent>
         
   <artifactId>org.robotframework.ide.eclipse.feature.update-site</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-repository</packaging>
 	<build>
 	  <plugins>
