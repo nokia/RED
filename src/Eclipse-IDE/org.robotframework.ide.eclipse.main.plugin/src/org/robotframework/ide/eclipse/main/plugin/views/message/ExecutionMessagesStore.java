@@ -33,11 +33,13 @@ class ExecutionMessagesStore implements IDisposable {
     }
 
     void open() {
-        this.isOpen = true;
+        isOpen = true;
     }
 
     void close() {
-        this.isOpen = false;
+        isOpen = false;
+        // we'll no longer write messages, so trim the data to save some memory
+        message.trimToSize();
     }
 
     @Override
