@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views.message;
 
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,8 @@ public class MessageLogView {
     private final RobotTestExecutionListener executionListener = new ExecutionListener();
 
     private ScheduledExecutorService executor;
+
+    private RobotTestsLaunch launch;
     
     public MessageLogView() {
         this(RedPlugin.getTestExecutionService());
@@ -54,6 +57,10 @@ public class MessageLogView {
     @VisibleForTesting
     StyledText getTextControl() {
         return styledText;
+    }
+
+    public Optional<RobotTestsLaunch> getCurrentlyShownLaunch() {
+        return Optional.ofNullable(launch);
     }
 
     @PostConstruct
@@ -75,7 +82,10 @@ public class MessageLogView {
         // will have to wait for input loading
         synchronized (executionService) {
             executionService.addExecutionListener(executionListener);
-            executionService.getLastLaunch().ifPresent(this::setInput);
+            executionService.getLastLaunch().ifPresent(l -> {
+                this.launch = l;
+                setInput(launch);
+            });
         }
     }
 
@@ -114,7 +124,7 @@ public class MessageLogView {
     }
 
     private void setMessage(final String message) {
-        if (styledText.isDisposed()) {
+        if (styledText == null || styledText.isDisposed()) {
             return;
         }
         styledText.setRedraw(false);
@@ -129,6 +139,10 @@ public class MessageLogView {
     @Focus
     public void onFocus() {
         styledText.setFocus();
+    }
+
+    public void clearView() {
+        styledText.setText("");
     }
 
     protected void toggleWordsWrapping() {
@@ -153,6 +167,7 @@ public class MessageLogView {
 
         @Override
         public void executionStarting(final RobotTestsLaunch launch) {
+            MessageLogView.this.launch = launch;
             setInput(launch);
         }
 
