@@ -210,16 +210,16 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
+                            viewer.getTable().getShell());
 
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
                         final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);    //add separator when filterPath is e.g. 'D:'
-                        final Collection<ReferencedLibrary> importedLibs = importer
-                                .importPythonLib(viewer.getTable().getShell(), environment,
-                                        editorInput.getRobotProject().getProject(),
-                                        editorInput.getProjectConfiguration(), path.toString());
+                        final Collection<ReferencedLibrary> importedLibs = importer.importPythonLib(environment,
+                                editorInput.getRobotProject().getProject(), editorInput.getProjectConfiguration(),
+                                path.toString());
                         libs.addAll(importedLibs);
                     }
                     addLibraries(libs);
@@ -238,15 +238,16 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 dialog.setFilterExtensions(new String[] { "*.jar" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
+                            viewer.getTable().getShell());
 
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
                         final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);
-                        final Collection<ReferencedLibrary> importedLibs = importer.importJavaLib(
-                                viewer.getTable().getShell(), environment, editorInput.getRobotProject().getProject(),
-                                editorInput.getProjectConfiguration(), path.toString());
+                        final Collection<ReferencedLibrary> importedLibs = importer.importJavaLib(environment,
+                                editorInput.getRobotProject().getProject(), editorInput.getProjectConfiguration(),
+                                path.toString());
                         libs.addAll(importedLibs);
                     }
                     addLibraries(libs);
@@ -264,7 +265,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 dialog.setFilterExtensions(new String[] { "*.xml", "*.*" });
                 final String chosenFilePath = dialog.open();
                 if (chosenFilePath != null) {
-                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
+                            viewer.getTable().getShell());
 
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();

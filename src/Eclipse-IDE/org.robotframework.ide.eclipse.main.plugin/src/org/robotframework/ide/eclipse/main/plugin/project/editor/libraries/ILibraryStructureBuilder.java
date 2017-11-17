@@ -12,5 +12,5 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 
 public interface ILibraryStructureBuilder {
 
-    Collection<ILibraryClass> provideEntriesFromFile(final URI uri) throws RobotEnvironmentException;
+    Collection<ILibraryClass> provideEntriesFromFile(URI uri) throws RobotEnvironmentException;
 }
