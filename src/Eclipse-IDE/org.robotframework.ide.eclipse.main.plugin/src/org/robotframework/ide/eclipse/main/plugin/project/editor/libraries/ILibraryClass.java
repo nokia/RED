@@ -11,5 +11,5 @@ public interface ILibraryClass {
 
     String getQualifiedName();
 
-    ReferencedLibrary toReferencedLibrary(final String fullLibraryPath);
+    ReferencedLibrary toReferencedLibrary(String fullLibraryPath);
 }

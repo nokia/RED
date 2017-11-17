@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,18 +47,22 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
  */
 public class ReferencedLibraryImporter {
 
-    public Collection<ReferencedLibrary> importPythonLib(final Shell shell, final RobotRuntimeEnvironment environment,
-            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
-        final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
-        return importLib(builder, fullLibraryPath,
-                classes -> createSelectionDialog(shell, fullLibraryPath, classes, RedImages.getPythonLibraryImage()));
+    private final Shell shell;
+
+    public ReferencedLibraryImporter(final Shell shell) {
+        this.shell = shell;
     }
 
-    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment,
+    public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
+            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+        final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
+        return importLib(builder, fullLibraryPath, RedImages.getPythonLibraryImage());
+    }
+
+    public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
             final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
         final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
-        return importLib(builder, fullLibraryPath,
-                classes -> createSelectionDialog(shell, fullLibraryPath, classes, RedImages.getJavaClassImage()));
+        return importLib(builder, fullLibraryPath, RedImages.getJavaClassImage());
     }
 
     public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {
@@ -67,9 +70,8 @@ public class ReferencedLibraryImporter {
         return ReferencedLibrary.create(LibraryType.VIRTUAL, path.lastSegment(), path.toPortableString());
     }
 
-    private static Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder,
-            final String fullLibraryPath,
-            final Function<Collection<ILibraryClass>, ElementListSelectionDialog> selectionDialogProvider) {
+    private Collection<ReferencedLibrary> importLib(final ILibraryStructureBuilder builder,
+            final String fullLibraryPath, final ImageDescriptor libImageDescriptor) {
         final List<ILibraryClass> libClasses = new ArrayList<>();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
@@ -100,7 +102,8 @@ public class ReferencedLibraryImporter {
         } else if (libClasses.size() == 1) {
             return newArrayList(libClasses.get(0).toReferencedLibrary(fullLibraryPath));
         } else {
-            final ElementListSelectionDialog classesDialog = selectionDialogProvider.apply(libClasses);
+            final ElementListSelectionDialog classesDialog = createSelectionDialog(fullLibraryPath, libClasses,
+                    libImageDescriptor);
             if (classesDialog.open() == Window.OK) {
                 return Stream.of(classesDialog.getResult())
                         .map(ILibraryClass.class::cast)
@@ -111,8 +114,8 @@ public class ReferencedLibraryImporter {
         }
     }
 
-    private static ElementListSelectionDialog createSelectionDialog(final Shell shell, final String path,
-            final Collection<ILibraryClass> classes, final ImageDescriptor libImageDescriptor) {
+    private ElementListSelectionDialog createSelectionDialog(final String path, final Collection<ILibraryClass> classes,
+            final ImageDescriptor libImageDescriptor) {
         final LabelProvider labelProvider = createLabelProvider(libImageDescriptor);
         final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(shell, labelProvider);
         classesDialog.setMultipleSelection(true);
