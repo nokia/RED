@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 
 public class RobotEmptyLineTest {
@@ -117,6 +118,37 @@ public class RobotEmptyLineTest {
 
     private static void assertComment(final List<RobotEmptyLine> list) {
         assertThat(list).allSatisfy(el -> assertThat(el.getCommentTokens()).isEmpty());
+    }
+
+    @Test
+    public void insertCell_shouldDoNothing() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("t1")
+                .appendLine("")
+                .appendLine("  Log  arg")
+                .build();
+        final RobotKeywordCall emptyBefore = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        final List<RobotToken> emptyTokenBefore = emptyBefore.getLinkedElement().getElementTokens();
+
+        emptyBefore.insertCellAt(0, "");
+
+        final RobotKeywordCall emptyAfter = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+        final List<RobotToken> emptyTokenAfter = emptyAfter.getLinkedElement().getElementTokens();
+
+        assertThat(emptyAfter).isEqualTo(emptyBefore);
+        assertThat(emptyTokenAfter).hasSameSizeAs(emptyTokenBefore);
+        assertThat(emptyTokenAfter).hasSize(1);
+        assertThat(emptyTokenAfter.get(0).getText().trim()).isEmpty();
     }
 
     @Test

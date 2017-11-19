@@ -301,7 +301,12 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
                 tokenToInsert.setText("/");
             }
             action = tokenToInsert;
+        } else if (arguments.isEmpty() && !action.isNotEmpty()) { // whole line comment
+            comments.add(position, tokenToInsert);
         } else if (position - 1 <= arguments.size()) { // new argument
+            if (position - 1 == arguments.size() && value.isEmpty()) {
+                tokenToInsert.setText("/");
+            }
             arguments.add(position - 1, tokenToInsert);
         } else if (position - 1 - arguments.size() <= comments.size()) { // new comment part
             comments.add(position - 1 - arguments.size(), tokenToInsert);

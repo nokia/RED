@@ -504,13 +504,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     }
 
     private Runnable tableInputIsReplaced() {
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                refreshTable();
-                setDirty();
-            }
+        return () -> {
+            refreshTable();
+            setDirty();
         };
     }
 
