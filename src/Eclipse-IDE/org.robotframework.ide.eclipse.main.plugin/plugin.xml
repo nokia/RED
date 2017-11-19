@@ -4694,7 +4694,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester"
           id="org.robotframework.focusedCellPropertyTester"
           namespace="org.robotframework.table.cell"
-          properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals,isSelectedColumnWithIndex"
+          properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals,isAnyCellSelectedInColumn"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
     <propertyTester
@@ -5571,11 +5571,11 @@
                         variable="activeEditor">
                         <or>
                             <test
-                                property="org.robotframework.table.cell.isSelectedColumnWithIndex"
+                                property="org.robotframework.table.cell.isAnyCellSelectedInColumn"
                                 value="0">
                             </test>
                             <test
-                                property="org.robotframework.table.cell.isSelectedColumnWithIndex"
+                                property="org.robotframework.table.cell.isAnyCellSelectedInColumn"
                                 value="1">
                             </test>
                         </or>
