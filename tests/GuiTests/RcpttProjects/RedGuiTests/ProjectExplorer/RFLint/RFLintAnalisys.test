@@ -7,12 +7,19 @@ Element-Version: 3.0
 External-Reference: 
 Id: _bwoQULpQEee_RrklJFm4zA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/6/17 2:31 PM
+Save-Time: 11/17/17 10:30 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+//
+//
+//  For this test install:
+//  pip install --upgrade robotframework-lint
+//
+
 
 proc "check-warnings-for-one-test"{
 get-view Problems | get-tree | get-item -path "Errors \\(3 items\\)" | get-property childCount | equals 3 | verify-true
