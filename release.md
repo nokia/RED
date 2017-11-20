@@ -23,14 +23,14 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 
 ## GitHub issues updates
-#112 - Fixed issue when file rename triggers Referenced libraries change in red.xml
-#132 - RED correctly works with python 2.6
-#136 - Insert cell/delete cell actions in table editors
-#141 - Added Pause and Resume buttons to Console View to easy access
-#148 - Source focuses on currently edited cell
-#149 - Limited Message Log launching history from 100 to 1
-#149 - Added button+action in Message Log to clear message log view/data container
-#149 - Java memory leak during use of the message log - limit lines in Message Log
+- #112 - Fixed issue when file rename triggers Referenced libraries change in red.xml
+- #132 - RED correctly works with python 2.6
+- #136 - Insert cell/delete cell actions in table editors
+- #141 - Added Pause and Resume buttons to Console View to easy access
+- #148 - Source focuses on currently edited cell
+- #149 - Limited Message Log launching history from 100 to 1
+- #149 - Added button+action in Message Log to clear message log view/data container
+- #149 - Java memory leak during use of the message log - limit lines in Message Log
 
 full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
 
