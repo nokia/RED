@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -68,24 +69,19 @@ public class RedPreferences {
     public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
 
     public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
-
-    public static final String LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS = "red.launch.additionalInterpreterArguments";
-
-    public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
-
-    public static final String LAUNCH_AGENT_CONNECTION_HOST = "red.launch.agentConnectionHost";
-
-    public static final String LAUNCH_AGENT_CONNECTION_PORT = "red.launch.agentConnectionPort";
-
-    public static final String LAUNCH_AGENT_CONNECTION_TIMEOUT = "red.launch.agentConnectionTimeout";
-
-    public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
-
-    public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
-
+    public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
     public static final String LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT = "red.launch.useSingleCommandLineArgument";
 
-    public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
+    public static final String LAUNCH_ADDITIONAL_INTERPRETER_ARGUMENTS = "red.launch.additionalInterpreterArguments";
+    public static final String LAUNCH_ADDITIONAL_ROBOT_ARGUMENTS = "red.launch.additionalRobotArguments";
+    public static final String LAUNCH_AGENT_CONNECTION_HOST = "red.launch.agentConnectionHost";
+    public static final String LAUNCH_AGENT_CONNECTION_PORT = "red.launch.agentConnectionPort";
+    public static final String LAUNCH_AGENT_CONNECTION_TIMEOUT = "red.launch.agentConnectionTimeout";
+    public static final String LAUNCH_EXECUTABLE_FILE_PATH = "red.launch.executableFilePath";
+    public static final String LAUNCH_ADDITIONAL_EXECUTABLE_FILE_ARGUMENTS = "red.launch.additionalExecutableFileArguments";
+
+    public static final String LIMIT_MSG_LOG_OUTPUT = "red.launch.msgLogLimitEnabled";
+    public static final String LIMIT_MSG_LOG_LENGTH = "red.launch.msgLogLimit";
 
     public static final String DEBUGGER_SUSPEND_ON_ERROR = "red.launch.debug.suspsendOnError";
     public static final String DEBUGGER_OMIT_LIB_KEYWORDS = "red.launch.debug.omitLibraryKeywords";
@@ -216,6 +212,13 @@ public class RedPreferences {
 
     public boolean shouldLaunchUsingArgumentsFile() {
         return store.getBoolean(LAUNCH_USE_ARGUMENT_FILE);
+    }
+
+    public Optional<Integer> getMessageLogViewLimit() {
+        if (store.getBoolean(LIMIT_MSG_LOG_OUTPUT)) {
+            return Optional.of(store.getInt(LIMIT_MSG_LOG_LENGTH));
+        }
+        return Optional.empty();
     }
 
     public String getLaunchAdditionalInterpreterArguments() {

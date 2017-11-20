@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,17 +41,25 @@ public class LaunchingPreferencePageTest {
         final LaunchingPreferencePage page = new LaunchingPreferencePage();
         page.createControl(shellProvider.getShell());
 
-        final List<String> booleanPrefNames = newArrayList(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
-                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE,
-                RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT);
+        final List<String> prefNames = FieldEditorPreferencePageHelper.getEditorsOfType(page,
+                BooleanFieldEditor.class).stream().map(FieldEditor::getPreferenceName).collect(toList());
 
-        final List<FieldEditor> editors = FieldEditorPreferencePageHelper.getEditors(page);
-        assertThat(editors).hasSize(3);
-        for (final FieldEditor editor : editors) {
-            if (editor instanceof BooleanFieldEditor) {
-                booleanPrefNames.remove(editor.getPreferenceName());
-            }
-        }
-        assertThat(booleanPrefNames).isEmpty();
+        assertThat(prefNames).containsOnly(RedPreferences.LAUNCH_USE_ARGUMENT_FILE,
+                RedPreferences.LAUNCH_USE_SINGLE_FILE_DATA_SOURCE,
+                RedPreferences.LAUNCH_USE_SINGLE_COMMAND_LINE_ARGUMENT, RedPreferences.LIMIT_MSG_LOG_OUTPUT);
+
+    }
+
+    @Test
+    public void checkIfAllIntegerEditorsAreDefined() throws Exception {
+        final LaunchingPreferencePage page = new LaunchingPreferencePage();
+        page.createControl(shellProvider.getShell());
+
+        final List<String> prefNames = FieldEditorPreferencePageHelper.getEditorsOfType(page, IntegerFieldEditor.class)
+                .stream()
+                .map(FieldEditor::getPreferenceName)
+                .collect(toList());
+
+        assertThat(prefNames).containsOnly(RedPreferences.LIMIT_MSG_LOG_LENGTH);
     }
 }

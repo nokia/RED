@@ -119,6 +119,26 @@ public class RedPreferencesTest {
     }
 
     @Test
+    public void messageLogOutputLimitIsTakenFromStore_1() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT)).thenReturn(false);
+        when(store.getInt(RedPreferences.LIMIT_MSG_LOG_LENGTH)).thenReturn(1000);
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getMessageLogViewLimit()).isEmpty();
+    }
+
+    @Test
+    public void messageLogOutputLimitIsTakenFromStore_2() {
+        final IPreferenceStore store = mock(IPreferenceStore.class);
+        when(store.getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT)).thenReturn(true);
+        when(store.getInt(RedPreferences.LIMIT_MSG_LOG_LENGTH)).thenReturn(1000);
+
+        final RedPreferences preferences = new RedPreferences(store);
+        assertThat(preferences.getMessageLogViewLimit()).contains(1000);
+    }
+
+    @Test
     public void equalsColoringPreferences_areEquals() {
         final ColoringPreference pref1 = new ColoringPreference(new RGB(1, 2, 3), SWT.NONE);
         final ColoringPreference pref2 = new ColoringPreference(new RGB(1, 2, 3), SWT.NONE);
