@@ -38,11 +38,11 @@ Binaries can be found under Release folder:  [https://github.com/nokia/RED/relea
 Installation instructions can be found [here](https://github.com/nokia/RED/blob/master/installation.md)
 
 ## Look & feel
-![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/basic_run.gif "Robot perspective with text editor")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/READMEMD/basic_run.gif "Robot perspective with text editor")
 
-![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/editors.gif "Editors")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/READMEMD/editors.gif "Editors")
 
-![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/content_assist.gif "Content assist")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/READMEMD/content_assist.gif "Content assist")
 
-![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/validation.gif "Validation")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/READMEMD/validation.gif "Validation")
 
