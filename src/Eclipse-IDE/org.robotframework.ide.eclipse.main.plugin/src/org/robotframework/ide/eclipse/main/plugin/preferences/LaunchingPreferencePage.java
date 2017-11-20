@@ -10,9 +10,11 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -26,6 +28,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class LaunchingPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+    private IntegerFieldEditor limitEditor;
 
     public LaunchingPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -44,6 +48,7 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
         createLink(parent);
         createLaunchingGroup(parent);
         createExecutorGroup(parent);
+        createViewsGroup(parent);
     }
 
     private void createLink(final Composite parent) {
@@ -116,5 +121,28 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
         final Button button = (Button) editor.getDescriptionControl(executableGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
         addField(editor);
+    }
+
+    private void createViewsGroup(final Composite parent) {
+        final Group viewsGroup = new Group(parent, SWT.NONE);
+        viewsGroup.setText("Views");
+        GridDataFactory.fillDefaults().indent(0, 15).grab(true, false).span(2, 1).applyTo(viewsGroup);
+        GridLayoutFactory.fillDefaults().applyTo(viewsGroup);
+
+        final BooleanFieldEditor editor = new BooleanFieldEditor(RedPreferences.LIMIT_MSG_LOG_OUTPUT,
+                "Limit Message Log output", viewsGroup);
+        final Button button = (Button) editor.getDescriptionControl(viewsGroup);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
+        button.addSelectionListener(SelectionListener
+                .widgetSelectedAdapter(e -> limitEditor.setEnabled(button.getSelection(), viewsGroup)));
+        addField(editor);
+
+        limitEditor = new IntegerFieldEditor(RedPreferences.LIMIT_MSG_LOG_LENGTH,
+                "Buffer size (characters)", viewsGroup, 7);
+        final Label limitLabel = limitEditor.getLabelControl(viewsGroup);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(limitLabel);
+        limitEditor.setValidRange(0, 9_999_999);
+        limitEditor.setEnabled(getPreferenceStore().getBoolean(RedPreferences.LIMIT_MSG_LOG_OUTPUT), viewsGroup);
+        addField(limitEditor);
     }
 }
