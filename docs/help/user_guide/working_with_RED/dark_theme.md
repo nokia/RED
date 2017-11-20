@@ -14,7 +14,14 @@ Coloring**.
 color palete as in older versions of RED.New **heliophobia** profile is
 prepared to work with dark background. Any customisation of colors are saved
 into **custom** profile.  
-Remember to reopen files after changing syntax coloring profiles.  
+Remember to reopen files after changing syntax coloring profiles.
+
+It is also advised to changed annotation used to show similar keyword
+occurances to more friendly color at **Preferences->Robot Framework -> General
+-> Editors -> Text Editors -> Annotation** for **Robot Source Editor current
+cell** and **Robot TextEditor Mark Occurrences**
+
+  
 ![](dark_theme/robot-color-profiles.png)  
   
 
