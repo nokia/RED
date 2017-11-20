@@ -1,3 +1,43 @@
+RED 0.8.1 - 2017/11/
+Feature
+
+    [RED-939] - Provide profiles for Syntax Coloring under Preferences->RF->Editor to handle theme changes
+    [RED-353] - Integrate reports from RfLint to RED
+
+Enhancement
+
+    [RED-142] - Warning when variable is defined but not assign a value
+    [RED-642] - [github #64] Possibility to PAUSE and RESUME tests in Run mode
+    [RED-749] - Add possibility to disconnect from running tests
+    [RED-750] - Terminate should work in run mode of remote launch
+    [RED-905] - Update NatTable to 1.5
+    [RED-923] - make Robot links in console output html even when non accesible
+    [RED-924] - Links from console - update regex to catch links if Output is not first one in line
+    [RED-942] - GitHub #141 - Provide handy way of pausing test
+    [RED-968] - GitHub #149 - quickfix for #149 - limit Message log launching history
+    [RED-969] - GitHub #149 - Message log - add button+action to clear message log view/data container
+    [RED-970] - GitHub #148 - Source focuses on currently edited cell
+
+Bug
+
+    [RED-584] - Warning/Error should be shown for variable as KW name
+    [RED-860] - Exception is thrown when project/folder is renamed with opened red.xml
+    [RED-864] - GitHub #112 - lib in red.xml will be change when rename a file with UTF-8
+    [RED-906] - Showing all run tests in execution view for Linux
+    [RED-927] - GitHub #136 - insert cell/delete cell does not work
+    [RED-931] - Exception is thrown when comment is added to new line in Keywords
+    [RED-934] - Cannot paste empty row in Keywords and Test Cases
+    [RED-949] - Wrong displaying of UTF-8 charset in red.xml
+    [RED-953] - GitHub #132 - RED does not work with python 2.6
+    [RED-958] - Error in regression causing crashing editor
+    [RED-967] - GitHub #149 - Java memory leak during use of the message log
+
+Task
+
+    [RED-766] - Check and fix tables and other graphical elements when dark theme is used
+    [RED-959] - Exchange FindBugs with SpotBugs
+
+
 RED 0.8.0 - 2017/10/04
 Bugs
 
