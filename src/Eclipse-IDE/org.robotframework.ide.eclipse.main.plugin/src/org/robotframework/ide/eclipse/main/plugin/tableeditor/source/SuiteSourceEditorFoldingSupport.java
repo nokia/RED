@@ -316,7 +316,9 @@ class SuiteSourceEditorFoldingSupport {
         }
 
         try {
+            int index = 0;
             if (!textControl.isDisposed()) {
+                index = textControl.getHorizontalIndex();
                 textControl.setRedraw(false);
             }
             annotationsModel.modifyAnnotations(annotationsToRemove.toArray(new Annotation[0]), annotationsToAdd,
@@ -324,14 +326,14 @@ class SuiteSourceEditorFoldingSupport {
             // workaround : without this the horizontal scrollbar is reset to 0 position when
             // writing at the end of long line
             if (!textControl.isDisposed()) {
-                textControl.showSelection();
+                textControl.setHorizontalIndex(index);
             }
+
         } finally {
             if (!textControl.isDisposed()) {
                 textControl.setRedraw(true);
             }
             oldFoldingAnnotations = newFoldingAnnotations;
         }
-
     }
 }
