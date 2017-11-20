@@ -25,6 +25,7 @@ class RemoveAllTerminatedRedSessionsAction extends Action {
     RemoveAllTerminatedRedSessionsAction() {
         super("Remove all terminated RED sessions", IAction.AS_PUSH_BUTTON);
         setImageDescriptor(RedImages.getCloseAllImage());
+        setDisabledImageDescriptor(RedImages.getDisabledCloseAllImage());
         setEnabled(false);
     }
 

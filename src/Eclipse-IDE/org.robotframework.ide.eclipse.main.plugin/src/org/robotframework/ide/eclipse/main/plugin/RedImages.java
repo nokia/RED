@@ -39,20 +39,32 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/stop.png");
     }
 
+    public static ImageDescriptor getDeleteImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_TOOL_DELETE);
+    }
+
     public static ImageDescriptor getCloseImage() {
-        return RedPlugin.getImageDescriptor("resources/close.png");
+        return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_REMOVE);
+    }
+
+    public static ImageDescriptor getDisabledCloseImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_REMOVE_DISABLED);
     }
 
     public static ImageDescriptor getCloseAllImage() {
-        return RedPlugin.getImageDescriptor("resources/close_all.png");
+        return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_REMOVEALL);
+    }
+
+    public static ImageDescriptor getDisabledCloseAllImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_REMOVEALL_DISABLED);
     }
 
     public static ImageDescriptor getSaveImage() {
-        return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_SAVE_EDIT);
+        return getWorkbenchSharedImage(ISharedImages.IMG_ETOOL_SAVE_EDIT);
     }
 
     public static ImageDescriptor getFolderImage() {
-        return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
+        return getWorkbenchSharedImage(ISharedImages.IMG_OBJ_FOLDER);
     }
 
     public static ImageDescriptor getBigErrorImage() {
@@ -64,7 +76,23 @@ public class RedImages {
     }
 
     public static ImageDescriptor getLinkImage() {
-        return RedPlugin.getImageDescriptor("resources/link_with_editor.png");
+        return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_SYNCED);
+    }
+
+    public static ImageDescriptor getDisabledLinkImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_ELCL_SYNCED_DISABLED);
+    }
+
+    public static ImageDescriptor getCutImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_TOOL_CUT);
+    }
+
+    public static ImageDescriptor getCopyImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_TOOL_COPY);
+    }
+
+    public static ImageDescriptor getPasteImage() {
+        return getWorkbenchSharedImage(ISharedImages.IMG_TOOL_PASTE);
     }
 
     public static ImageDescriptor getRobotImage() {
@@ -401,6 +429,10 @@ public class RedImages {
             GRAY_IMAGES.put(descriptor, grayImage);
         }
         return grayImage;
+    }
+
+    private static ImageDescriptor getWorkbenchSharedImage(final String symbolicName) {
+        return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(symbolicName);
     }
 
     public static class VariableImages {
