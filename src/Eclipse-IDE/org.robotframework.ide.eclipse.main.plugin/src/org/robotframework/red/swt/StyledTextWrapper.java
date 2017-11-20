@@ -24,7 +24,11 @@ public class StyledTextWrapper {
         styledText.setRedraw(setRedraw);
     }
 
-    public void showSelection() {
-        styledText.showSelection();
+    public int getHorizontalIndex() {
+        return styledText.getHorizontalIndex();
+    }
+
+    public void setHorizontalIndex(final int index) {
+        styledText.setHorizontalIndex(index);
     }
 }
