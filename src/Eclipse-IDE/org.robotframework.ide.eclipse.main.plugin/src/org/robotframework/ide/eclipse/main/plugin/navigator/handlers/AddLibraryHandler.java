@@ -16,7 +16,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -42,14 +41,14 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
         public void addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IFile> selectedFiles = Selections.getAdaptableElements(selection, IFile.class);
 
-            final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+            final ReferencedLibraryImporter importer = new ReferencedLibraryImporter(
+                    Display.getCurrent().getActiveShell());
 
             for (final IFile file : selectedFiles) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(file.getProject());
                 final LibrariesConfigUpdater updater = new LibrariesConfigUpdater(robotProject);
 
-                final Shell shell = Display.getCurrent().getActiveShell();
-                final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(shell,
+                final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(
                         robotProject.getRuntimeEnvironment(), robotProject.getProject(), updater.getConfig(),
                         file.getLocation().toString());
 
