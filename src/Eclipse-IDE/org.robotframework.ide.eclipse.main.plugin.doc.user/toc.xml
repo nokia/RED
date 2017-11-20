@@ -38,7 +38,9 @@
         </topic>
         <topic href="doc/user_guide/working_with_RED/content_assist.html" label="Content assistance">
         </topic>    
-    </topic>
+        <topic href="doc/user_guide/working_with_RED/dark_theme.html" label="Dark theme in RED">
+    </topic>    
+        </topic>
     <topic href="doc/user_guide/validation.html" label="Validation">
        <topic href="doc/user_guide/validation/scope.html" label="Limiting validation scope">
        </topic>
