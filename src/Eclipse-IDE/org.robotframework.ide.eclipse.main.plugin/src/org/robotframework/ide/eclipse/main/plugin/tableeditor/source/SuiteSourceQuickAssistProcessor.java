@@ -5,12 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
@@ -37,7 +35,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedXmlConfig
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter;
 
-import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Range;
 
@@ -126,30 +123,18 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
             final IQuickAssistInvocationContext invocationContext, final IMarker marker, final IProblemCause cause) {
 
         final List<? extends IMarkerResolution> fixers = cause.createFixers(marker);
-        final Iterable<RedSuiteMarkerResolution> suiteFixers = filter(fixers, RedSuiteMarkerResolution.class);
-        final Iterable<RedXmlConfigMarkerResolution> redXmlFixers = filter(fixers, RedXmlConfigMarkerResolution.class);
-
-        final Iterable<ICompletionProposal> suiteRepairProposals = filter(
-                transform(suiteFixers, new Function<RedSuiteMarkerResolution, ICompletionProposal>() {
-
-                    @Override
-                    public ICompletionProposal apply(final RedSuiteMarkerResolution resolution) {
-                        return resolution.asContentProposal(marker, invocationContext.getSourceViewer().getDocument(),
-                                suiteModel).orElse(null);
-                    }
-                }), Predicates.notNull());
-        final Iterable<ICompletionProposal> redXmlRepairProposals = filter(
-                transform(redXmlFixers, new Function<RedXmlConfigMarkerResolution, ICompletionProposal>() {
-
-                    @Override
-                    public ICompletionProposal apply(final RedXmlConfigMarkerResolution resolution) {
-                        return resolution.asContentProposal(marker);
-                    }
-                }), Predicates.notNull());
-
-        final List<ICompletionProposal> proposals = newArrayList(redXmlRepairProposals);
-        proposals.addAll(newArrayList(suiteRepairProposals));
-        return proposals;
+        final Stream<ICompletionProposal> redXmlRepairProposals = fixers.stream()
+                .filter(RedXmlConfigMarkerResolution.class::isInstance)
+                .map(RedXmlConfigMarkerResolution.class::cast)
+                .map(resolution -> resolution.asContentProposal(marker));
+        final Stream<ICompletionProposal> suiteRepairProposals = fixers.stream()
+                .filter(RedSuiteMarkerResolution.class::isInstance)
+                .map(RedSuiteMarkerResolution.class::cast)
+                .map(resolution -> resolution
+                        .asContentProposal(marker, invocationContext.getSourceViewer().getDocument(), suiteModel)
+                        .orElse(null));
+        return Stream.concat(redXmlRepairProposals, suiteRepairProposals).filter(Predicates.notNull()).collect(
+                Collectors.toList());
     }
 
     private boolean isInvokedWithinAnnotationPosition(final IQuickAssistInvocationContext invocationContext,
@@ -162,16 +147,10 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
     @Override
     public void applied(final ICompletionProposal proposal) {
         // this method is called also for processors from which the proposal was not chosen
-        // hence canReopenAssistantProgramatically is holding information which proccessor
+        // hence canReopenAssistantProgramatically is holding information which processor
         // is able to open proposals after accepting
         if (shouldActivateAssist(proposal)) {
-            Display.getCurrent().asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
-                }
-            });
+            Display.getCurrent().asyncExec(() -> sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS));
         }
     }
 
