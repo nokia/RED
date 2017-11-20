@@ -18,6 +18,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/release_notes/0.8.1/rflint-1.png "rflint reports")
 - Made Robot links from console a clicable links even when destination files are not reachable
 - It is possible to disconnect from Robot run session leaving Robot test execution running independent from RED state
+- Pause&Resume buttons added to Console View
 - Fixed UTF-8 names in red.xml
 - Improve memmory footprint from Message Log data part due to #149
 
