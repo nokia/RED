@@ -23,6 +23,7 @@
       * [Remote library](/user_guide/working_with_RED/remote_library.md)
       * [Red.xml description](/user_guide/working_with_RED/red_xml.md)
       * [Content assistance](/user_guide/working_with_RED/content_assist.md)
+      * [Dark theme in RED](/user_guide/working_with_RED/dark_theme.md)
     * [Validation](/user_guide/validation.md)
       * [Limiting validation scope](/user_guide/validation/scope.md)
       * [Configuring problems severity](/user_guide/validation/validation_preferences.md)
