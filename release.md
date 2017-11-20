@@ -5,14 +5,14 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Requirements 
 *  Oracle Java 1.8+  https://www.java.com/
-*  RED feature only: Eclipse Ozygen (v 4.7),Eclipse Neon (v 4.6),Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  RED feature only: Eclipse Oxygen (v 4.7), Eclipse Neon (v 4.6), Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
 *  Python/Jython & RobotFramework installed
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
 
 ## Notable updates
-- Support for dark profile by adding profiles of syntax color,fixed RED GUI elements when dark. Together with [Darkest Dark Theme](https://marketplace.eclipse.org/content/darkest-dark-theme), RED looks nice. Details can be found in [docs](https://github.com/nokia/RED/blob/master/docs/help/user_guide/working_with_RED/dark_theme.md "RED with Darkest Dark Theme")
+- Support for dark profile by adding profiles of syntax color, fixed RED GUI elements when dark. Together with [Darkest Dark Theme](https://marketplace.eclipse.org/content/darkest-dark-theme), RED looks nice. Details can be found in [docs](https://github.com/nokia/RED/blob/master/docs/help/user_guide/working_with_RED/dark_theme.md "RED with Darkest Dark Theme")
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/release_notes/0.8.1/darkest-dark.png)
 - Integrated static code analysis reports from [rflint](https://github.com/boakley/robotframework-lint) into RED - details in [docs](https://github.com/nokia/RED/blob/master/docs/help/user_guide/tools_integration/rflint.md)
 ![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/release_notes/0.8.1/rflint-1.png "rflint reports")
@@ -20,7 +20,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - It is possible to disconnect from Robot run session leaving Robot test execution running independent from RED state
 - Pause&Resume buttons added to Console View
 - Fixed UTF-8 names in red.xml
-- Improve memmory footprint from Message Log data part due to #149
+- Improve memory footprint from Message Log data part due to #149
 
 
 ## GitHub issues updates
@@ -52,7 +52,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - content assist can search for patterns inside proposals (eg. searching for "og" will return "log" keyword)
 - content assist can return Keywords when searching for capital letters (eg. activating content assist and writing LM will return Log Many)
 - content assist now provides keywords from libs which are not included in TestSuite but available in project (entry in Referenced libraries in red.xml)
-- debug is more aware which file it showing,this relates to cases when suite names are not unique within project. Debug also can check if debug run in robot is consistent to suite file being displayed.Covered in #111
+- debug is more aware which file it showing, this relates to cases when suite names are not unique within project. Debug also can check if debug run in robot is consistent to suite file being displayed.Covered in #111
 - table editors should preserve empty lines and show duplicated sections. Still there is some work to do though.
 - variable mappings can use already mapped variables to resolve values.Item covered in #120 
 - more detailed progress bar for Automatically discover libraries from Robot Framework right-click menu
