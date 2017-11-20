@@ -334,4 +334,10 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     }
 
+    @FunctionalInterface
+    public interface DiscovererFactory {
+
+        LibrariesAutoDiscoverer create(RobotProject project, List<IFile> suites);
+    }
+
 }
