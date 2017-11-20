@@ -7,7 +7,6 @@ Feature
 Enhancement
 
     [RED-142] - Warning when variable is defined but not assign a value
-    [RED-642] - [github #64] Possibility to PAUSE and RESUME tests in Run mode
     [RED-749] - Add possibility to disconnect from running tests
     [RED-750] - Terminate should work in run mode of remote launch
     [RED-905] - Update NatTable to 1.5
