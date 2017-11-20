@@ -1,3 +1,39 @@
+# RED - Robot Editor v0.8.1
+## Introduction
+RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Ozygen (v 4.7),Eclipse Neon (v 4.6),Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+
+## Notable updates
+- Support for dark profile by adding profiles of syntax color,fixed RED GUI elements when dark. Together with [Darkest Dark Theme](https://marketplace.eclipse.org/content/darkest-dark-theme), RED looks nice. Details can be found in [docs](https://github.com/nokia/RED/blob/master/docs/help/user_guide/working_with_RED/dark_theme.md "RED with Darkest Dark Theme")
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/release_notes/0.8.1/darkest-dark.png)
+- Integrated static code analysis reports from [rflint](https://github.com/boakley/robotframework-lint) into RED - details in [docs](https://github.com/nokia/RED/blob/master/docs/help/user_guide/tools_integration/rflint.md)
+![](https://raw.githubusercontent.com/nokia/RED/master/misc/img/release_notes/0.8.1/rflint-1.png "rflint reports")
+- Made Robot links from console a clicable links even when destination files are not reachable
+- It is possible to disconnect from Robot run session leaving Robot test execution running independent from RED state
+- Fixed UTF-8 names in red.xml
+- Improve memmory footprint from Message Log data part due to #149
+
+
+## GitHub issues updates
+#112 - Fixed issue when file rename triggers Referenced libraries change in red.xml
+#132 - RED correctly works with python 2.6
+#136 - Insert cell/delete cell actions in table editors
+#141 - Added Pause and Resume buttons to Console View to easy access
+#148 - Source focuses on currently edited cell
+#149 - Limited Message Log launching history from 100 to 1
+#149 - Added button+action in Message Log to clear message log view/data container
+#149 - Java memory leak during use of the message log - limit lines in Message Log
+
+full changes in [changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)
+
 # RED - Robot Editor v0.8.0
 ## Introduction
 RED Robot Editor is Eclipse based editor for [RobotFramework](https://github.com/robotframework/robotframework) test cases. 
