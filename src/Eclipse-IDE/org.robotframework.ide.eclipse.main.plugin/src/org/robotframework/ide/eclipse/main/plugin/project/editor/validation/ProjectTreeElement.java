@@ -19,9 +19,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -147,7 +144,7 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
 
     @Override
     public ImageDescriptor getImageDescriptor(final Object object) {
-        return ((IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class)).getImageDescriptor(resource);
+        return resource.getAdapter(IWorkbenchAdapter.class).getImageDescriptor(resource);
     }
 
     ImageDescriptor getImageDescriptor() {
@@ -206,11 +203,9 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
             return true;
         }
 
-
         @Override
         public ImageDescriptor getImageDescriptor(final Object object) {
-            final Image folderImg = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);
-            return RedImages.getGrayedImage(ImageDescriptor.createFromImage(folderImg));
+            return RedImages.getGrayedImage(RedImages.getFolderImage());
         }
 
         @Override
