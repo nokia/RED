@@ -178,7 +178,14 @@ public enum VariablesProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Variable '%s' is declared without assignment.";
+            return "Variable '%s' is declared without assignment";
+        }
+    },
+    VARIABLE_DECLARATION_WITHOUT_NAME {
+
+        @Override
+        public String getProblemDescription() {
+            return "Variable '%s' is declared without name";
         }
     };
 
