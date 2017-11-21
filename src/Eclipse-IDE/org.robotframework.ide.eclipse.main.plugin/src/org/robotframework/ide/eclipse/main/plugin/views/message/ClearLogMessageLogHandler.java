@@ -24,7 +24,7 @@ public class ClearLogMessageLogHandler extends DIParameterizedHandler<E4ClearLog
             msgLogView.getCurrentlyShownLaunch()
                     .flatMap(launch -> launch.getExecutionData(ExecutionMessagesStore.class))
                     .ifPresent(store -> {
-                        store.dispose();
+                        store.clear();
                         msgLogView.clearView();
                     });
         }
