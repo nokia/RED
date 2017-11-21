@@ -34,15 +34,17 @@ import org.robotframework.red.graphics.ImagesManager;
  * @author Lukasz Wlodarczyk
  */
 class MissingResourceFileCompletionProposal implements ICompletionProposal {
-    
+
     private final String label, additionalInfo;
+
     private final IMarker marker;
+
     private final IPath path;
 
     private final IProject project;
-    
-    MissingResourceFileCompletionProposal(final String label, final String additionalInfo,
-            IMarker marker, IPath path) {
+
+    MissingResourceFileCompletionProposal(final String label, final String additionalInfo, final IMarker marker,
+            final IPath path) {
         this.label = label;
         this.additionalInfo = additionalInfo;
         this.marker = marker;
@@ -51,7 +53,7 @@ class MissingResourceFileCompletionProposal implements ICompletionProposal {
     }
 
     @Override
-    public void apply(IDocument document) {
+    public void apply(final IDocument document) {
         createPathFolders(path);
         final IFile file = project.getFile(path.toPortableString());
         if (!file.exists()) {
@@ -66,13 +68,13 @@ class MissingResourceFileCompletionProposal implements ICompletionProposal {
                         .tryToOpenInEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file);
             } else {
                 MessageDialog.openError(Display.getDefault().getActiveShell(), "Cannot create the file",
-                        "Unfortunatelly, this file could not be created properly.");
+                        "Unfortunately, this file could not be created properly.");
             }
         }
     }
 
     @Override
-    public Point getSelection(IDocument document) {
+    public Point getSelection(final IDocument document) {
         return null;
     }
 
@@ -99,7 +101,7 @@ class MissingResourceFileCompletionProposal implements ICompletionProposal {
     private boolean createFile(final IFile file) {
         try {
             file.create(new ByteArrayInputStream(new byte[0]), true, null);
-        } catch (CoreException e1) {
+        } catch (final CoreException e1) {
             return false;
         }
         return true;
@@ -111,7 +113,7 @@ class MissingResourceFileCompletionProposal implements ICompletionProposal {
             if (!folder.exists()) {
                 try {
                     folder.create(IResource.NONE, true, null);
-                } catch (CoreException e) {
+                } catch (final CoreException e) {
                     return false;
                 }
             }
