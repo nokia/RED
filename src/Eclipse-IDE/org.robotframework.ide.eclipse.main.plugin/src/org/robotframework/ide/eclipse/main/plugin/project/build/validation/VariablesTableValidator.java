@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,6 +48,8 @@ class VariablesTableValidator implements ModelUnitValidator {
 
     private final VersionDependentValidators versionDependentValidators;
 
+    private static final Pattern VARIABLE_WITHOUT_NAME_PATTERN = Pattern.compile("^[$&@]\\{\\}=?$");
+
     VariablesTableValidator(final FileValidationContext validationContext,
             final Optional<RobotVariablesSection> variablesSection, final ProblemsReportingStrategy reportingStrategy) {
         this(validationContext, variablesSection, reportingStrategy, new VersionDependentValidators());
@@ -76,6 +80,7 @@ class VariablesTableValidator implements ModelUnitValidator {
         reportDictionaryValuesWithInvalidSyntax(variableTable);
         reportUnknownVariablesInValues(variableTable);
         reportVariableDeclarationWithoutAssignment(variableTable);
+        reportVariableDeclarationWithoutName(variableTable);
     }
 
     private void reportVersionSpecificProblems(final VariableTable variableTable, final IProgressMonitor monitor)
@@ -201,18 +206,36 @@ class VariablesTableValidator implements ModelUnitValidator {
         for (final AVariable variable : variableTable.getVariables()) {
             final RobotToken variableToken = variable.getDeclaration();
             final CommonVariableHelper varHelper = new CommonVariableHelper();
+            final Matcher variableWithoutNameMatcher = VARIABLE_WITHOUT_NAME_PATTERN.matcher(variableToken.getText());
 
             if (varHelper.isVariable(variableToken)) {
                 final List<RobotToken> valueTokens = variable.getValueTokens();
-
-                if (valueTokens.isEmpty()) {
-                    final RobotProblem problem = RobotProblem
-                            .causedBy(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT)
-                            .formatMessageWith(variable.getName());
-                    final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
-                            variable.getName());
-                    reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
+                if (!variableWithoutNameMatcher.matches()) {
+                    if (valueTokens.isEmpty()) {
+                        final RobotProblem problem = RobotProblem
+                                .causedBy(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_ASSIGNMENT)
+                                .formatMessageWith(variable.getName());
+                        final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME,
+                                variable.getName());
+                        reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(),
+                                attributes);
+                    }
                 }
+            }
+        }
+    }
+
+    private void reportVariableDeclarationWithoutName(final VariableTable variableTable) {
+
+        for (final IVariableHolder variable : variableTable.getVariables()) {
+            final String variableName = variable.getDeclaration().getText();
+            final Matcher variablesWithoutNameMatcher = VARIABLE_WITHOUT_NAME_PATTERN.matcher(variableName);
+
+            if (variablesWithoutNameMatcher.matches()) {
+                final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_NAME)
+                        .formatMessageWith(variableName);
+                final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.NAME, variableName);
+                reporter.handleProblem(problem, validationContext.getFile(), variable.getDeclaration(), attributes);
             }
         }
     }
