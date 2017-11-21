@@ -55,7 +55,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
 
-    private final static Pattern VARIABLE_ONLY_PATTERN = Pattern.compile("^([$|&|@]\\{[^{}]+\\})+$");
+    private static final Pattern VARIABLES_ONLY_PATTERN = Pattern.compile("^([$&@]\\{[^{}]+\\})+$");
 
     KeywordTableValidator(final FileValidationContext validationContext,
             final Optional<RobotKeywordsSection> keywordSection, final ProblemsReportingStrategy reporter) {
@@ -284,7 +284,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = keyword.getKeywordName();
             final String name = keywordName.getText();
 
-            final Matcher variablesOnlyMatcher = VARIABLE_ONLY_PATTERN.matcher(name);
+            final Matcher variablesOnlyMatcher = VARIABLES_ONLY_PATTERN.matcher(name);
 
             if (variablesOnlyMatcher.matches()) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.VARIABLE_AS_KEYWORD_NAME)
