@@ -24,6 +24,7 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener.RobotAgentEventsListenerException;
@@ -91,6 +92,7 @@ public class AgentConnectionServerTest {
         verifyNoMoreInteractions(serverStatusListener);
     }
 
+    @Ignore
     @Test
     public void connectionErrorIsHandledByListener_whenInvalidMessageComesFromClient() throws Exception {
         final String host = "127.0.0.1";
