@@ -29,8 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 public class LaunchingPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-    private IntegerFieldEditor limitEditor;
-
     public LaunchingPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
         setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
@@ -133,12 +131,12 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
                 "Limit Message Log output", viewsGroup);
         final Button button = (Button) editor.getDescriptionControl(viewsGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(button);
-        button.addSelectionListener(SelectionListener
-                .widgetSelectedAdapter(e -> limitEditor.setEnabled(button.getSelection(), viewsGroup)));
         addField(editor);
 
-        limitEditor = new IntegerFieldEditor(RedPreferences.LIMIT_MSG_LOG_LENGTH,
+        final IntegerFieldEditor limitEditor = new IntegerFieldEditor(RedPreferences.LIMIT_MSG_LOG_LENGTH,
                 "Buffer size (characters)", viewsGroup, 7);
+        button.addSelectionListener(SelectionListener
+                .widgetSelectedAdapter(e -> limitEditor.setEnabled(button.getSelection(), viewsGroup)));
         final Label limitLabel = limitEditor.getLabelControl(viewsGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(limitLabel);
         limitEditor.setValidRange(0, 9_999_999);
