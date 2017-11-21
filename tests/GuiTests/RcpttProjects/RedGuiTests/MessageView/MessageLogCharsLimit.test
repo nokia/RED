@@ -1,0 +1,134 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: MessageLogCharsLimit
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _R_4xIM6rEee4YdJy8LnSAg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/21/17 12:25 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "error-for-chars-limit"{
+	get-window Preferences | get-editbox -index 1 | get-property text 
+	    | equals "Value must be an Integer between 0 and 9,999,999" | verify-true
+}  
+  
+proc "wait-for-end-of-test-in-message-log" [val times 4] [val delay 1000]{
+	try -times $times -delay $delay -command{
+		get-view "Message Log" | get-editbox | get-property text | contains "Ending test:" | verify-true
+
+	}
+}
+  
+get-view "Message Log" | get-button Clear | click
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" 
+    | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Settings ***\n"
+    + "Library    String\n"
+    + "Library    OperatingSystem\n\n"
+    + "*** Test Cases ***\n"
+    + "tets\n"
+    + "    :FOR    ${x}    IN RANGE    2000\n"
+    + "    \\    Log    ${x}" 
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Launching"
+
+// check controls labels and values
+with [get-window Preferences | get-group Views] {
+    with [get-button "Limit Message Log output"] {
+        get-property caption | equals "Limit Message Log output" | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-label "Buffer size (characters)"] {
+        get-property enablement | equals false | verify-true
+        get-property caption | equals "Buffer size (characters)" | verify-true
+    }
+    get-editbox -after [get-label "Buffer size (characters)"] | get-property text | equals 80000 | verify-true
+}
+
+//set incorrect value
+with [get-window Preferences | get-group Views] {
+    get-button "Limit Message Log output" | check
+    get-editbox -after [get-label "Buffer size (characters)"] | set-text "-1"
+}
+
+// check error
+error-for-chars-limit
+
+//correct value
+get-window Preferences | get-group Views | get-editbox -after [get-label "Buffer size (characters)"] | set-text 100
+get-window Preferences | get-label Launching | get-property caption | equals Launching | verify-true
+
+//text as value
+get-window Preferences | get-group Views | get-editbox -after [get-label "Buffer size (characters)"] | set-text abc
+error-for-chars-limit
+
+//max value
+get-window Preferences | get-group Views | get-editbox -after [get-label "Buffer size (characters)"] | set-text 9999999
+get-window Preferences | get-label Launching | get-property caption | equals Launching | verify-true
+
+//set 500 chars
+with [get-window Preferences] {
+    get-group Views | get-editbox -after [get-label "Buffer size (characters)"] | set-text 500
+    get-button Apply | click
+    get-button "Apply and Close" | click
+}
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
+    | click
+    
+    
+wait-for-end-of-test-in-message-log
+with [get-view "Message Log" | get-editbox] {
+    get-property "getCharCount()" | equals 500 | verify-true
+    get-property text | equals ".* : INFO : 1987\n"
+        + ".* : INFO : 1988\n"
+        + ".* : INFO : 1989\n"
+        + ".* : INFO : 1990\n"
+        + ".* : INFO : 1991\n"
+        + ".* : INFO : 1992\n"
+        + ".* : INFO : 1993\n"
+        + ".* : INFO : 1994\n"
+        + ".* : INFO : 1995\n"
+        + ".* : INFO : 1996\n"
+        + ".* : INFO : 1997\n"
+        + ".* : INFO : 1998\n"
+        + ".* : INFO : 1999\n"
+        + "Ending test: RobotProject.TestFile.tets" | verify-true
+}    
+
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Views | get-editbox -after [get-label "Buffer size (characters)"] | set-text 200000
+    get-button "Apply and Close" | click
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
+    | click
+wait-for-end-of-test-in-message-log    
+get-view "Message Log" | get-editbox | get-property "getCharCount()" | equals 70973 | verify-true  
+
+ 
+//set 0  
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-group Views | get-editbox -after [get-label "Buffer size (characters)"] | set-text 0
+    get-button "Apply and Close" | click
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
+    | click
+wait-for-console
+wait 1000  
+get-view "Message Log" | get-editbox | get-property "getCharCount()" | equals 0 | verify-true    
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
