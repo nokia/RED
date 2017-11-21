@@ -865,19 +865,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         if (settingsSection != null && settingsSection.getSuiteFile() == fileModel
                 && RobotSetting.SettingsGroup.NO_GROUP.equals(setting.getGroup())) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
-        }
-    }
-
-    private Runnable tableInputIsReplaced() {
-        return new Runnable() {
-
-            @Override
-            public void run() {
+            selectionLayerAccessor.preserveSelectionWhen(() -> {
                 refreshTable();
                 setDirty();
-            }
-        };
+            });
+        }
     }
 
     @Inject
