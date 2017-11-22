@@ -126,6 +126,28 @@ public class LibrariesAutoDiscovererTest {
     }
 
     @Test
+    public void libsAreAddedToProjectConfig_forSuitesInNestedDirectory() throws Exception {
+        projectProvider.createDir("A");
+        projectProvider.createDir("A/B");
+        projectProvider.createDir("A/B/C");
+        projectProvider.createDir("A/B/C/D");
+        final List<? extends IResource> resources = Arrays.asList(
+                projectProvider.createFile("A/B/C/D/suite1.robot", "*** Settings ***",
+                        "Library  ../../../../libs/TestLib.py", "*** Test Cases ***"),
+                projectProvider.createFile("A/B/C/D/suite2.robot", "*** Settings ***",
+                        "Library  ../../../../other/dir/OtherLib.py", "*** Test Cases ***"),
+                projectProvider.createFile("A/B/C/D/suite3.robot", "*** Settings ***",
+                        "Library  ../../../../libs/NotExisting.py", "*** Test Cases ***"));
+
+        final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
+        final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
+
+        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2);
+    }
+
+    @Test
     public void nothingIsAddedToProjectConfig_whenNoLibrariesAreFound() throws Exception {
         final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
                 "*** Settings ***", "Library  NotExisting.py", "*** Test Cases ***"));
