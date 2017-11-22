@@ -32,6 +32,7 @@ import org.rf.ide.core.execution.agent.event.ReadyToStartEvent;
 
 import com.google.common.collect.ImmutableMap;
 
+@Ignore("see RED-976")
 public class AgentConnectionServerTest {
 
     @Test
@@ -92,7 +93,6 @@ public class AgentConnectionServerTest {
         verifyNoMoreInteractions(serverStatusListener);
     }
 
-    @Ignore
     @Test
     public void connectionErrorIsHandledByListener_whenInvalidMessageComesFromClient() throws Exception {
         final String host = "127.0.0.1";
