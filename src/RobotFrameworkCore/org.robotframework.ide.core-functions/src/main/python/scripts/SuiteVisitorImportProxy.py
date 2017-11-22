@@ -88,22 +88,21 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
         for suite in suites:
             for s_name in self.f_suites:
-                longpath = suite.longname.lower().replace('_', ' ')
-                normalized_s_name = s_name.lower().replace('_', ' ')
-                meet = False
-                if len(longpath) >= len(normalized_s_name) and longpath.startswith(normalized_s_name):
-                    meet = True
-                    after_remove = longpath.replace(normalized_s_name, '')
-                elif len(longpath) < len(normalized_s_name) and normalized_s_name.startswith(longpath):
-                    meet = True
-                    after_remove = normalized_s_name.replace(longpath, '')
-
-                if meet and (after_remove == '' or after_remove.startswith('.') or after_remove.startswith(
-                        '*') or after_remove.startswith('?')):
+                if suite not in matched_suites and self.__suite_name_matches(suite, s_name):
                     matched_suites.append(suite)
                     suite.suites = self.__filter_by_name(suite.suites)
 
         return matched_suites
+
+    def __suite_name_matches(self, suite, s_name):
+        longpath = suite.longname.lower().replace('_', ' ')
+        normalized_s_name = s_name.lower().replace('_', ' ')
+        matches = lambda x: x == '' or x.startswith('.') or x.startswith('*') or x.startswith('?')
+        if len(longpath) >= len(normalized_s_name) and longpath.startswith(normalized_s_name):
+            return matches(longpath.replace(normalized_s_name, ''))
+        elif len(longpath) < len(normalized_s_name) and normalized_s_name.startswith(longpath):
+            return matches(normalized_s_name.replace(longpath, ''))
+        return False
 
 
 class RedImporter(object):
