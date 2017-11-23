@@ -20,7 +20,9 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 - It is possible to disconnect from Robot run session leaving Robot test execution running independent from RED state
 - Pause&Resume buttons added to Console View
 - Fixed UTF-8 names in red.xml
-- Improve memory footprint from Message Log data part due to #149
+- Improved memory footprint from Message Log data part due to #149
+- Fixed library autodiscovery freeze when activating action on multiple inhertied folders
+- Variable with no name ${} gets error marker
 
 
 ## GitHub issues updates
