@@ -1,0 +1,51 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _wqeiINBLEeeh-ab4fgUj0A,_2JCD4B3CEeehL98jfxP8Sw
+Element-Name: AutoDiscoveryForNestedResources
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _rbkCsNBKEeeh-ab4fgUj0A
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/23/17 1:50 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | double-click
+    select "RobotProject/tests/test_A/test_B/test_C" | get-menu 
+        -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+}
+wait-for-discover-window -times 3
+get-window "Discovering libraries summary" | get-tree | get-property "getItems().length" | equals 6 | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    with [get-section "Referenced libraries" | get-table] {
+        select "lib_with_args - RobotProject\\/libs" "add - RobotProject\\/libs" "multiply - RobotProject" "res1 - RobotProject\\/libs\\/for_resource" "divide - RobotProject\\/libs\\/t"
+        key-type Del
+        key-type "M1+s"
+    }
+}
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/tests" "RobotProject/resources" "RobotProject/other_tests"
+    get-menu -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+}
+wait-for-discover-window -times 3
+get-window "Discovering libraries summary" | get-tree | get-property "getItems().length" | equals 8 | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "lib_with_args - RobotProject\\/libs" "add - RobotProject\\/libs" "multiply - RobotProject" "res1 - RobotProject\\/libs\\/for_resource" "divide - RobotProject\\/libs\\/t" "many_classes - RobotProject\\/libs\\/subfolder"
+    key-type Del
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu 
+    -path "Robot Framework/Automatically discover and add libraries to red.xml" | click
+wait-for-discover-window -times 3
+get-window "Discovering libraries summary" | get-tree | get-property itemCount | equals 11 | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
