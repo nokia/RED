@@ -5,13 +5,12 @@ Element-Name: ProceduresForSettingsView
 Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/26/17 1:01 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/23/17 11:50 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
-
 
 proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {	
 	$result | eq $expected | assert-true -message [format "Value in row %s, column %s should be: '%s', but is '%s'" $row $col $expected $result]
@@ -36,6 +35,30 @@ proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val 
 	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 	
 		| my-assert-true -expected $c6 -row $row -col 7
 }
+
+proc "compare-general-setting-table" [val file]  [val col_amount] [val row] [val ref_table]
+{	
+	repeat [val index] -times $col_amount -command{
+		$ref_table | get $index| let [val ref_value -input]{
+			get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition [plus $index 1] $row|  invoke getDataValue
+	    		|  my-assert-true -expected $ref_value -row $row -col [plus $index 1] 
+		} 
+	}
+}
+
+//
+//proc "generate-list" [val file] [val col_amount] [val row_amount]
+//{	concat [
+//	repeat [val index1] -times $row_amount -command{	
+//	concat "compare-general-setting-table -file \"" $file "\" -col_amount " $col_amount" -row " $index1  " -ref_table [list "[
+//		repeat [val index2] -times $col_amount -command{		
+//				concat "\""  [get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
+//		} ] "]" "\n"
+//	} ]
+//}
+//
+//generate-list -file "for_settings.tsv"  -col_amount 8 -row_amount 5 | log
+
 
 proc "check-metadata-row" [val file] [val row] [val metadata] [val val] [val comment ""]{
 	get-editor $file | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue
