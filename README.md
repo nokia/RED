@@ -3,7 +3,7 @@
 
 RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow quick and comfortable work with [RobotFramework](https://github.com/robotframework/robotframework) testware.
 
-**Latest release - [RED 0.8.1 (2017-11-)](https://github.com/nokia/RED/releases/latest)**
+**Latest release - [RED 0.8.1 (2017-11-23)](https://github.com/nokia/RED/releases/latest)**
 
 ### Install form Marketplace/Update Site
 
