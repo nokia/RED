@@ -1,0 +1,176 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _6GbeQM-SEee4YdJy8LnSAg,_2rVvIENaEeaEVfxTnoQ14g
+Element-Name: InsertCellsInGeneralSettings
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Q8GzgM-pEee4YdJy8LnSAg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/23/17 11:30 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-if-menu-is-disabled"{
+	with [get-editor "for_settings.tsv" | get-section General | get-canvas] {
+	    get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
+	    get-menu -path "Table/Delete cell" | get-property enablement | equals false | verify-true
+	}
+}
+
+get-view "Project Explorer" | get-tree | select "RobotProject/for_settings.tsv" | double-click
+get-editor "for_settings.tsv" | get-tab-folder | get-tab-item Settings | click
+get-view Outline | get-tree | select "for_settings.tsv/Settings/Suite Setup" | double-click
+wait 200
+
+//check menu on Suite setup
+with [get-editor "for_settings.tsv" | get-section General | get-canvas] {
+    key-type Right
+    key-type Left
+}
+check-if-menu-is-disabled
+
+//check of KW name (log)
+get-editor "for_settings.tsv" | get-section General | get-canvas | key-type Right
+check-if-menu-is-disabled
+
+//got down to disabled menu
+get-editor "for_settings.tsv" | get-section General | get-canvas | key-type Down -times 3
+check-if-menu-is-disabled
+
+get-editor "for_settings.tsv" | get-section General | get-canvas | key-type Left
+check-if-menu-is-disabled
+
+with [get-editor "for_settings.tsv" | get-section General] {
+    with [get-canvas] {
+    	//go to log kw
+        key-type Right -times 2
+        key-type Up -times 3
+        key-type "M1+i"
+        type-text 5
+    }
+    get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1 
+        | key-type Enter
+    get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1 
+        | key-type "TRAVERSE_ESCAPE"
+        
+   //go down to Teardown (value 2)     
+    with [get-canvas] {
+        key-type Down
+        key-type "M1+i"
+    }
+}
+
+//add value to new cell
+with [get-editor "for_settings.tsv" | get-section General] {
+    get-canvas | key-type Enter
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text 66
+        key-type Enter
+    }
+    get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1 
+        | key-type "TRAVERSE_ESCAPE"
+}
+
+//save file and check if nothing changed - here is bug RED-980 
+
+get-editor "for_settings.tsv" | maximize
+get-editor "for_settings.tsv" | get-section General | get-canvas 
+    | get-property "getLayer().getBodyLayer().getColumnCount()" | equals 7 | verify-true
+    
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3" "#com" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 3 -ref_table [list "Test Setup" "\\" "\\" "wrong" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" ]
+
+
+get-editor "for_settings.tsv" | get-section General | get-canvas | key-type "M1+s"
+
+get-editor "for_settings.tsv" | get-section General | get-canvas 
+    | get-property "getLayer().getBodyLayer().getColumnCount()" | equals 8 | verify-true
+    
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" ""]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3"  "4" "#com" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 3 -ref_table [list "Test Setup" "\\" "\\" "wrong" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" "" ]
+get-editor "for_settings.tsv" | restore
+
+//go to empty setting and add new cell - nothing should happen
+get-view Outline | get-tree | select "for_settings.tsv/Settings/Test Setup" | click
+wait 200
+
+with [get-editor "for_settings.tsv" | get-section General] {
+    with [get-canvas] {
+        key-type Right
+        key-type Down
+        key-type Right
+        key-type "M1+i"
+    }
+}
+
+with [get-tab-folder -index 3] {
+    get-property "pages[0]" | equals "for_settings.tsv" | verify-true
+} 
+
+//---------------------------------------------------------------- ctrl+z --------------------------------------------------------
+// add Log to test setup
+with [get-editor "for_settings.tsv" | get-section General] {
+    get-canvas | key-type Enter
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text Log
+        key-type Enter
+    }
+    
+    //add new cell
+    get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1 
+        | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas] {
+        key-type Left
+        key-type "M1+i"
+        type-text a
+    }
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text bc
+        key-type Enter
+    }
+    
+    //add def kw up
+    get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1 
+        | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas] {
+        key-type Up
+        key-type Left
+        key-type "M1+i"
+        type-text d
+    }
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1] {
+        type-text ef
+        key-type Enter
+    }
+    get-editbox -after [get-label "Provide test suite documentation and general settings"] -index 1 
+        | key-type "TRAVERSE_ESCAPE"
+}
+
+get-editor "for_settings.tsv" | maximize
+compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3" "4" "#com" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 3 -ref_table [list "Test Setup" "\\" "def" "\\" "wrong" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 4 -ref_table [list "Test Teardown" "\\" "abc" "Log" "" "" "" "" ]
+
+//get-editor "for_settings.tsv" | get-section General | get-canvas | key-type "M1+z"
+//wait 1000
+//get-editor "for_settings.tsv" | get-section General | get-canvas | key-type "M1+z"
+//wait 1000
+//get-editor "for_settings.tsv" | get-section General | get-canvas | key-type "M1+z"
+//
+//compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" "" ]
+//compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3" "4" "#com" ]
+//compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 3 -ref_table [list "Test Setup" "\\" "\\" "\\" "wrong" "" "" "" ]
+//compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" "" ]
+
+get-editor "for_settings.tsv" | restore
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
