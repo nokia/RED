@@ -76,6 +76,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -83,8 +84,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
@@ -432,40 +431,18 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         final MenuItem copyItem = new MenuItem(docMenu, SWT.NONE);
         copyItem.setText("&Copy\tCtrl+C");
-        copyItem.setImage(ImagesManager
-                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY)));
-        copyItem.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                documentation.copy();
-            }
-        });
+        copyItem.setImage(ImagesManager.getImage(RedImages.getCopyImage()));
+        copyItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> documentation.copy()));
 
         final MenuItem cutItem = new MenuItem(docMenu, SWT.NONE);
         cutItem.setText("Cu&t\tCtrl+X");
-        cutItem.setImage(ImagesManager
-                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_CUT)));
-        cutItem.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                documentation.cut();
-            }
-        });
+        cutItem.setImage(ImagesManager.getImage(RedImages.getCutImage()));
+        cutItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> documentation.cut()));
 
         final MenuItem pasteItem = new MenuItem(docMenu, SWT.NONE);
         pasteItem.setText("&Paste\tCtrl+V");
-        pasteItem.setImage(ImagesManager.getImage(
-                PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE)));
-        pasteItem.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                documentation.paste();
-            }
-        });
-
+        pasteItem.setImage(ImagesManager.getImage(RedImages.getPasteImage()));
+        pasteItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> documentation.paste()));
     }
 
     private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
@@ -888,19 +865,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         if (settingsSection != null && settingsSection.getSuiteFile() == fileModel
                 && RobotSetting.SettingsGroup.NO_GROUP.equals(setting.getGroup())) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
-        }
-    }
-
-    private Runnable tableInputIsReplaced() {
-        return new Runnable() {
-
-            @Override
-            public void run() {
+            selectionLayerAccessor.preserveSelectionWhen(() -> {
                 refreshTable();
                 setDirty();
-            }
-        };
+            });
+        }
     }
 
     @Inject

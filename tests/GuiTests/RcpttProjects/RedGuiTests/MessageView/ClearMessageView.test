@@ -1,0 +1,55 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ClearMessageView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _MPJP4M4OEee4YdJy8LnSAg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/20/17 6:04 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// add test
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library    String\n\n"
+    + "*** Test Cases ***\n"
+    + "case\n"
+    + "    :FOR    ${x}    IN RANGE    2000\n"
+    + "    \\    Log   pwyMyNJH8EFlQMMT0VPIljeWOAy4kibLweWeGBlkDQzFwwVZjnj6zI1l5jvzXE1kSEN0QWVdOf2aqjudJFTYhnCNr4V1TyPctZxP ${x}" 
+
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+// run test and clear log durong test execution    
+exec-with-options -disableJobWaiting -command {    
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu -path "Run As/1 Robot Test" 
+	    | click
+	    wait 3000
+	    get-view "Message Log" | get-button Clear | click
+	wait-for-console
+
+}    
+get-view "Message Log" |  get-editbox  | get-object |invoke getLine  0 
+  | not-eq ".* : INFO : pwyMyNJH8EFlQMMT0VPIljeWOAy4kibLweWeGBlkDQzFwwVZjnj6zI1l5jvzXE1kSEN0QWVdOf2aqjudJFTYhnCNr4V1TyPctZxP 0"
+  
+  
+//clean after test
+get-view "Message Log" | get-button Clear | click
+get-view "Message Log" | get-editbox | get-property text | equals "" | verify-true
+
+// save log to file
+set-dialog-result File "platform:/resource/RobotProject/abc.log"
+get-view "Message Log" | get-button "Save Logs" | click
+
+//refresh and check if file is empty
+with [get-view "Project Explorer" | get-tree] {
+    select RobotProject | get-menu -path Refresh | click
+    select "RobotProject/abc.log" | double-click
+}
+get-editor "abc.log" | get-text-viewer | get-property text | equals "" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

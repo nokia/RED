@@ -51,7 +51,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.red.actions.ExpandAllAction;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
 
@@ -108,7 +107,7 @@ class RobotOutlinePage extends ContentOutlinePage {
         getSite().getActionBars().getToolBarManager().add(
                 new LinkWithEditorAction(editorSelectionProvider, editorSourceWidget));
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
-        getSite().getActionBars().getToolBarManager().add(new ExpandAllAction(getTreeViewer()));
+        getSite().getActionBars().getToolBarManager().add(new ExpandAllAction());
 
         final MenuManager menuManager = new MenuManager("Outline popup", "RobotOutlinePage.popup");
         final Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
@@ -241,6 +240,18 @@ class RobotOutlinePage extends ContentOutlinePage {
         getTreeViewer().removeSelectionChangedListener(outlineSelectionListener);
 
         super.dispose();
+    }
+
+    private class ExpandAllAction extends Action {
+
+        public ExpandAllAction() {
+            super("Expand All", RedImages.getExpandAllImage());
+        }
+
+        @Override
+        public void run() {
+            getTreeViewer().expandAll();
+        }
     }
 
     private class LinkWithEditorAction extends Action {

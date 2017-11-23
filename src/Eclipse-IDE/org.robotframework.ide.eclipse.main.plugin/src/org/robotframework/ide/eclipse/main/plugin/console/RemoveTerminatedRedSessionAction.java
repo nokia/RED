@@ -23,6 +23,7 @@ class RemoveTerminatedRedSessionAction extends Action {
     RemoveTerminatedRedSessionAction(final RedSessionConsole console) {
         super("Remove session", IAction.AS_PUSH_BUTTON);
         setImageDescriptor(RedImages.getCloseImage());
+        setDisabledImageDescriptor(RedImages.getDisabledCloseImage());
         setEnabled(false);
         this.console = console;
     }

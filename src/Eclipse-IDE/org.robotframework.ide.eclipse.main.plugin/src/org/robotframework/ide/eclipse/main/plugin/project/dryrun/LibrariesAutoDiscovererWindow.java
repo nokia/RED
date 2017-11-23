@@ -55,7 +55,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
@@ -245,8 +244,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         final MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
         copyItem.setText("Copy");
-        copyItem.setImage(ImagesManager
-                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY)));
+        copyItem.setImage(ImagesManager.getImage(RedImages.getCopyImage()));
         copyItem.addSelectionListener(new SelectionAdapter() {
 
             @Override

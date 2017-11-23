@@ -290,10 +290,28 @@ public class VariablesTableValidatorTest {
     }
 
     @Test
-    public void variableWithoutNameAndCommentedVariableAreNotReported() throws CoreException {
+    public void variableWithoutNameIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("@{}")
-                .appendLine("# &{var3}=    d1=1")
+                .appendLine("@{}=  sth")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final VariablesTableValidator validator = new VariablesTableValidator(context,
+                file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(VariablesProblem.VARIABLE_DECLARATION_WITHOUT_NAME,
+                        new ProblemPosition(2, Range.closed(18, 22))));
+    }
+
+    @Test
+    public void commentedVariablesAreNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
+                .appendLine("# @{}")
+                .appendLine("# &{var3}")
+                .appendLine("# & {var1}")
                 .build();
 
         final FileValidationContext context = prepareContext();
@@ -302,7 +320,6 @@ public class VariablesTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.wasProblemReported()).isFalse();
-
     }
 
     private static VersionDependentValidators createVersionDependentValidators(

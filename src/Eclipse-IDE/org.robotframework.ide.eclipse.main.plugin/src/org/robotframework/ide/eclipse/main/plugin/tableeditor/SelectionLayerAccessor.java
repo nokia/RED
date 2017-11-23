@@ -129,7 +129,7 @@ public class SelectionLayerAccessor {
         return columnsIndexes;
     }
 
-    public boolean isSelectedColumnWithIndex(int index) {
+    public boolean isAnyCellSelectedInColumn(int index) {
         for (final PositionCoordinate position : getSelectedPositions()) {
             if (position.getColumnPosition() == index) {
                 return true;

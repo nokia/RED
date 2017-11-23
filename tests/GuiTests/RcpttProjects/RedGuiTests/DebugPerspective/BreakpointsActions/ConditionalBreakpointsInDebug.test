@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _S92Q4PQzEeaWpbE3jg39cA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/15/17 3:51 PM
+Save-Time: 11/17/17 5:30 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -67,6 +67,7 @@ with [get-view Breakpoints] {
 //run test - it should be not stopped
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 15 30
 get-button "Debug.*" | click
+wait-for-console
 
 
 //------------------------------------------------- 1 expected 2 got -------------------------------------------------

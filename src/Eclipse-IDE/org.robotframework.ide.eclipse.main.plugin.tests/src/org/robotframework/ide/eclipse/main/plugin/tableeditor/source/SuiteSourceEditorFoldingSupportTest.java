@@ -220,7 +220,8 @@ public class SuiteSourceEditorFoldingSupportTest {
                 annotationsModel);
         support.updateFoldingStructure(newArrayList(new Position(0, 10), new Position(20, 10)));
 
-        verify(textControl, times(1)).showSelection();
+        final int idx = verify(textControl).getHorizontalIndex();
+        verify(textControl).setHorizontalIndex(idx);
     }
 
     private static RobotSuiteFileCreator createFileBuilder() {
