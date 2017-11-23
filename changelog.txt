@@ -1,4 +1,4 @@
-RED 0.8.1 - 2017/11/
+RED 0.8.1 - 2017/11/23
 Feature
 
     [RED-939] - Provide profiles for Syntax Coloring under Preferences->RF->Editor to handle theme changes
@@ -29,6 +29,8 @@ Bug
     [RED-949] - Wrong displaying of UTF-8 charset in red.xml
     [RED-953] - GitHub #132 - RED does not work with python 2.6
     [RED-958] - Error in regression causing crashing editor
+    [RED-964] - Error when variable have no name (${}) should be shown 
+    [RED-965] - Dryrun freezes on multiple inherited folders structure
     [RED-967] - GitHub #149 - Java memory leak during use of the message log
 
 Task
