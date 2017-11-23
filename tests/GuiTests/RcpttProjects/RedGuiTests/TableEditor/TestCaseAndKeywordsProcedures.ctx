@@ -5,8 +5,8 @@ Element-Name: TestCaseAndKeywordsProcedures
 Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/6/17 3:15 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/23/17 11:47 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -85,6 +85,20 @@ proc "compare-row-with-list" [val file] [val table] [val col_amount] [val row] [
 	}
 }
 
+//--------------------------- this is to generate list instead doing it manually --------------------------------------------------------------
+proc "generate-list" [val file] [val table] [val col_amount] [val row_amount]
+{	concat [
+	repeat [val index1] -times $row_amount -command{	
+	concat "compare-row-with-list -file \"" $file "\" -table \"" $table "\" -col_amount " $col_amount" -row " $index1  " -ref_table [list "[
+		repeat [val index2] -times $col_amount -command{		
+				concat "\""  [get-editor $file | get-canvas -after [get-label $table] -index 1 | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
+		} ] "]" "\n"
+	} ]
+}
+
+//compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6  -row_amount 15 | log
+
+
 //rows starts from 0
 //tables: "User Keywords" and "Test Cases"
 proc "is-row-fully-selected" [val row] [val table] [val file_name "TestFile.robot"] [val index 0]{
@@ -108,5 +122,4 @@ proc "is-cell-selected" [val row] [val col] [val table] [val file_name "TestFile
 	get-editor $file_name | get-canvas -after [get-label $table] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected $row | eq false |   assert-true -message  [format "Row %s is fully selected, but should not!" $row ]	
 }
-
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
