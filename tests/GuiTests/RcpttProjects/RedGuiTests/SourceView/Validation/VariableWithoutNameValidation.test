@@ -1,0 +1,80 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: VariableWithoutNameValidation
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _8jBzcM9ZEeeN95nQK08lmg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/23/17 11:20 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file and set text
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
+    + "@{}=\n" 
+    + "&{}\n"
+    + "${}=  scalar\n"
+    + "*** Test Cases ***\n"
+    + "tc\n"
+    + "    log    ${}\n"
+// save it
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+// verify if there are 3 errors (also 3 warnings, but we don't have to check it)
+get-view Problems | click
+with [get-view Problems | get-tree] {
+    get-item -path "Errors \\(3 items\\)/Variable '@{}=' is declared without name" | get-property caption 
+        | equals "Variable '@{}=' is declared without name" | verify-true
+    get-item -path "Errors \\(3 items\\)/Variable '&{}' is declared without name" | get-property caption 
+        | equals "Variable '&{}' is declared without name" | verify-true
+    get-item -path "Errors \\(3 items\\)/Variable '${}=' is declared without name" | get-property caption 
+        | equals "Variable '${}=' is declared without name" | verify-true
+}
+// uncomment two lines
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 2 1
+        select-range 3 4 2 1
+        set-caret-pos 2 1
+    }
+    get-left-ruler | get-ruler-column AnnotationColumn | hover-ruler -line 2
+    with [get-text-viewer] {
+        key-type "M1+/"
+        key-type "M1+s"
+    }
+}
+// verify if there is one error
+with [get-view Problems] {
+    get-label "1 error, 0 warnings, 0 others" | get-property caption | equals "1 error, 0 warnings, 0 others" 
+        | verify-true
+    get-tree | get-item -path "Errors \\(1 item\\)/Variable '${}=' is declared without name" | get-property caption 
+        | equals "Variable '${}=' is declared without name" | verify-true
+}
+// run test and check if it fails
+get-menu -path "Run/Run" | click
+wait-for-message-log
+get-view "Message Log" | get-editbox | get-property text | contains  "FAIL : Invalid variable name '${}'." | verify-true
+// add name to variable declaration
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 4 2
+    set-caret-pos 4 3
+    type-text var
+}
+// add name to test
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 7 14
+    type-text var
+    key-type "M1+s"
+}
+// verify if there is no Problems and run test - check if it's ok
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+get-menu -path "Run/Run" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.tc\n"
+    + ".* : INFO : scalar\n"
+    + "Ending test: RobotProject.TestFile.tc" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
