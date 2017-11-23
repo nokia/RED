@@ -48,10 +48,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
@@ -155,7 +153,7 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
         final Menu menu = new Menu(viewer.getTable());
         final MenuItem deleteMenuItem = new MenuItem(menu, SWT.PUSH);
         deleteMenuItem.setText("Delete\tDel");
-        deleteMenuItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE));
+        deleteMenuItem.setImage(ImagesManager.getImage(RedImages.getDeleteImage()));
         deleteMenuItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> selectionRemover.run()));
 
         viewer.getTable().setMenu(menu);
@@ -210,7 +208,7 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
         final Menu menu = new Menu(viewer.getTable());
         final MenuItem deleteMenuItem = new MenuItem(menu, SWT.PUSH);
         deleteMenuItem.setText("Delete\tDel");
-        deleteMenuItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_DELETE));
+        deleteMenuItem.setImage(ImagesManager.getImage(RedImages.getDeleteImage()));
         deleteMenuItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> selectionRemover.run()));
 
         viewer.getTable().setMenu(menu);

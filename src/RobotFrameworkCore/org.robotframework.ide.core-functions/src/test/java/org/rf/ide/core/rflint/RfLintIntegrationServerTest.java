@@ -1,3 +1,8 @@
+/*
+ * Copyright 2017 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.rf.ide.core.rflint;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -18,10 +23,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableMap;
 
+@Ignore("see RED-976")
 public class RfLintIntegrationServerTest {
 
     @Test
@@ -31,7 +38,7 @@ public class RfLintIntegrationServerTest {
         assertThat(server.getHost()).isEqualTo("127.0.0.1");
         assertThat(server.getPort()).isPositive();
     }
-    
+
     @Test
     public void connectionTimeoutIsHandledByGivenListener() throws IOException {
         @SuppressWarnings("unchecked")
@@ -42,7 +49,7 @@ public class RfLintIntegrationServerTest {
         server.start();
         verify(onServerException).accept(any(SocketTimeoutException.class));
     }
-    
+
     @Test
     public void nothingIsThrown_whenServerWasStoppedByUserWhenWaitingForConnection() throws Exception {
         @SuppressWarnings("unchecked")
@@ -62,7 +69,7 @@ public class RfLintIntegrationServerTest {
 
         verifyZeroInteractions(onServerException);
     }
-    
+
     @Test
     public void filesToProcessEventIsHandledByListener() throws Exception {
         final RfLintClientEventsListener listener = mock(RfLintClientEventsListener.class);

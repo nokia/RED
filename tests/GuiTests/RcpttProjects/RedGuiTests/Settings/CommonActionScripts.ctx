@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/23/17 4:08 PM
+Save-Time: 11/21/17 12:04 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -67,7 +67,7 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 
 
 //get robot version:  "Robot Framework 3.0 (Python 2.7.8 on win32)" 
-global [val robot_version [run-process-and-trim  "python" "-c"   "from robot import version; print 'Robot Framework ' + version.get_full_version()"]]
+global [val robot_version [run-process-and-trim  "python" "-c"   "from robot import version; print('Robot Framework ' + version.get_full_version())"]]
 
 //get jybot version: "Robot Framework 3.0 (Jython 2.7.0 on java1.8.0_25)" This is in procedure because i takes too much time
 proc "check-jython-version"{

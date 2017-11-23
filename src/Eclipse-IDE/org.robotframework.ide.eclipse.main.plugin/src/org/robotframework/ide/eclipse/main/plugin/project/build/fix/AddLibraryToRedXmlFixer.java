@@ -5,13 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
@@ -21,16 +21,16 @@ import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryFinder;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryFinder.IncorrectLibraryPathException;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryFinder.UnknownLibraryException;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.red.graphics.ImagesManager;
 
 /**
@@ -42,9 +42,16 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
     private final boolean isPath;
 
+    private final DiscovererFactory discovererFactory;
+
     public AddLibraryToRedXmlFixer(final String pathOrName, final boolean isPath) {
+        this(pathOrName, isPath, (project, suites) -> new LibrariesAutoDiscoverer(project, suites, pathOrName));
+    }
+
+    AddLibraryToRedXmlFixer(final String pathOrName, final boolean isPath, final DiscovererFactory discovererFactory) {
         this.pathOrName = pathOrName;
         this.isPath = isPath;
+        this.discovererFactory = discovererFactory;
     }
 
     @Override
@@ -83,17 +90,15 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                 }
                 addedLibraries.forEach(config::addReferencedLibrary);
             } catch (final UnknownLibraryException e) {
-                startAutoDiscovering(suiteFile.getProject());
+                startAutoDiscovering();
             } catch (final IncorrectLibraryPathException e) {
                 MessageDialog.openError(shell, "Library import problem", e.getMessage());
             }
             return !addedLibraries.isEmpty();
         }
 
-        private void startAutoDiscovering(final RobotProject project) {
-            final List<IResource> suites = new ArrayList<>();
-            suites.add(suiteFile.getFile());
-            new LibrariesAutoDiscoverer(project, suites, pathOrName).start();
+        private void startAutoDiscovering() {
+            discovererFactory.create(suiteFile.getProject(), newArrayList(suiteFile.getFile())).start();
         }
 
         @Override

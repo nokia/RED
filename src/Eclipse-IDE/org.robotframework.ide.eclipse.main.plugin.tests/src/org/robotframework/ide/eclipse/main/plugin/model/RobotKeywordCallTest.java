@@ -6,6 +6,7 @@ import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.n
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.nullParent;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -156,6 +157,101 @@ public class RobotKeywordCallTest {
             assertThat(callCopy.getArguments()).isEqualTo(call.getArguments());
             assertThat(callCopy.getComment()).isEqualTo(call.getComment());
         }
+    }
+
+    @Test
+    public void cellInserted_atFirstPosition() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("t1")
+                .appendLine("  Log  t")
+                .appendLine("  Log  t  # comment after kw")
+                .appendLine("  # line with comment only")
+                .build();
+        final List<RobotKeywordCall> callsBefore = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+
+        for (final RobotKeywordCall call : callsBefore) {
+            call.insertCellAt(0, "");
+        }
+
+        final List<RobotKeywordCall> callsAfter = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+
+        assertThat(callsBefore).hasSameSizeAs(callsBefore);
+        assertThat(callsAfter).hasSize(3);
+        assertThat(callsAfter.get(0).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
+                .collect(Collectors.toList())).containsExactly("", "Log", "t");
+        assertThat(callsAfter.get(1).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
+                .collect(Collectors.toList())).containsExactly("", "Log", "t", "# comment after kw");
+        assertThat(callsAfter.get(2).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
+                .collect(Collectors.toList())).containsExactly("/", "# line with comment only");
+    }
+
+    @Test
+    public void cellInserted_inTheMiddleOfCall() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("t1")
+                .appendLine("  Log  t")
+                .appendLine("  Log  t  # comment after kw")
+                .appendLine("  # line  with  comment  only")
+                .build();
+        final List<RobotKeywordCall> callsBefore = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+
+        for (final RobotKeywordCall call : callsBefore) {
+            call.insertCellAt(1, "");
+        }
+
+        final List<RobotKeywordCall> callsAfter = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+
+        assertThat(callsBefore).hasSameSizeAs(callsBefore);
+        assertThat(callsAfter).hasSize(3);
+        assertThat(callsAfter.get(0).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
+                .collect(Collectors.toList())).containsExactly("Log", "", "t");
+        assertThat(callsAfter.get(1).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
+                .collect(Collectors.toList())).containsExactly("Log", "", "t", "# comment after kw");
+        assertThat(callsAfter.get(2).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
+                .collect(Collectors.toList())).containsExactly("", "# line", "", "with", "comment", "only");
+    }
+
+    @Test
+    public void cellInserted_atTheFirstCellOfTheComment_atTheEndOfCallLine() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("t1")
+                .appendLine("  Log  t  # comment after kw")
+                .build();
+        final RobotKeywordCall callBefore = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+
+        callBefore.insertCellAt(2, "");
+
+        final RobotKeywordCall callAfter = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren()
+                .get(0);
+
+        assertThat(callBefore).isEqualTo(callAfter);
+        assertThat(callAfter.getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
+                .collect(Collectors.toList())).containsExactly("Log", "t", "/", "# comment after kw");
     }
 
     private static List<RobotKeywordCall> createCallsFromCaseForTest() {
