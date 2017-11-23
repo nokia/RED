@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _sMKacHTyEeaTdNH0nRm1gg
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/18/16 12:16 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/23/17 11:55 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -119,6 +119,27 @@ check-keyword-row -file "TestFile.robot" -row 12 -kw "last kw"
 check-keyword-row -file "TestFile.robot" -row 13 -kw "Log" -c1 12
 check-keyword-row -file "TestFile.robot" -row 14 -kw "..."
 check-keyword-row -file "TestFile.robot" -row 15 -kw "...add new keyword"
+
+get-button "Save (M1+S)" | click
+check-keyword-row -file "TestFile.robot" -row 1 -kw "kw1"
+check-keyword-row -file "TestFile.robot" -row 2 -kw "1 line"
+check-keyword-row -file "TestFile.robot" -row 3 -kw "log" -c1 "12"
+check-keyword-row -file "TestFile.robot" -row 4 -kw "last line"
+check-keyword-row -file "TestFile.robot" -row 5 -kw "..."
+
+check-keyword-row -file "TestFile.robot" -row 6 -kw "kw 2" -c1 "${:}"
+check-keyword-row -file "TestFile.robot" -row 7 -kw "0"
+check-keyword-row -file "TestFile.robot" -row 8 -kw "1"
+check-keyword-row -file "TestFile.robot" -row 9 -kw "2"
+check-keyword-row -file "TestFile.robot" -row 10 -kw "3"
+check-keyword-row -file "TestFile.robot" -row 11 -kw "..."
+
+
+check-keyword-row -file "TestFile.robot" -row 12 -kw "last kw"
+check-keyword-row -file "TestFile.robot" -row 13 -kw "Log" -c1 12
+check-keyword-row -file "TestFile.robot" -row 14 -kw "..."
+check-keyword-row -file "TestFile.robot" -row 15 -kw "...add new keyword"
+
 
 get-editor "TestFile.robot" | restore
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

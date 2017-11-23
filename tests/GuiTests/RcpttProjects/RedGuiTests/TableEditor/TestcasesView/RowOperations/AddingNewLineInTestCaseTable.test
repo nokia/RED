@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _RviRIHEBEeas5uogJbgGYA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/7/17 10:38 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/23/17 11:57 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -134,6 +134,29 @@ check-test_case-row -file  "TestFile.robot" -row 16 -tc "None Shall Pass"
 check-test_case-row -file  "TestFile.robot" -row 17 -tc "..."
 check-test_case-row -file  "TestFile.robot" -row 18 -tc "...add new case"
 
+//get-button "Save (M1+S)" | click
+//check-test_case-row -file  "TestFile.robot" -row 1 -tc "case"
+//check-test_case-row -file  "TestFile.robot" -row 2 -tc "1 line"
+//check-test_case-row -file  "TestFile.robot" -row 3 -tc "log" -c1 1 -c2 2 -c3 3 -c4  "#log command"
+//check-test_case-row -file  "TestFile.robot" -row 4 -tc "\\" -c1 "\\" -c2 "\\" -c3 "arg 3"
+//check-test_case-row -file  "TestFile.robot" -row 5 -tc "Call Method" -c1 "my_method"
+//check-test_case-row -file  "TestFile.robot" -row 6 -tc ""
+//check-test_case-row -file  "TestFile.robot" -row 7 -tc "Convert To Bytes" -c1 8 -c2 "#cov to bytes"
+//check-test_case-row -file  "TestFile.robot" -row 8 -tc "..."
+//
+//
+//check-test_case-row -file  "TestFile.robot" -row 9 -tc "case 1"
+//check-test_case-row -file  "TestFile.robot" -row 10 -tc "kw for case 1"
+//check-test_case-row -file  "TestFile.robot" -row 11 -tc "..."
+
+
+check-test_case-row -file  "TestFile.robot" -row 12 -tc "case 2"
+check-test_case-row -file  "TestFile.robot" -row 13 -tc ""
+check-test_case-row -file  "TestFile.robot" -row 14 -tc ""
+check-test_case-row -file  "TestFile.robot" -row 15 -tc "log"
+check-test_case-row -file  "TestFile.robot" -row 16 -tc "None Shall Pass"
+check-test_case-row -file  "TestFile.robot" -row 17 -tc "..."
+check-test_case-row -file  "TestFile.robot" -row 18 -tc "...add new case"
 
 	
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
