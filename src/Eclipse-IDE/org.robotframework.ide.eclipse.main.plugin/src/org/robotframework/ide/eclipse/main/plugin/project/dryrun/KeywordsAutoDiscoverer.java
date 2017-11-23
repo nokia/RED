@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -93,7 +93,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final List<? extends IResource> resources) {
+                final List<IFile> suites) {
             final List<String> libraryNames = collectLibraryNames(robotProject);
             if (!libraryNames.isEmpty()) {
                 final File tempSuiteFile = RobotDryRunTemporarySuites.createLibraryFile(libraryNames);
