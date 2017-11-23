@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileV
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
 
 class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
@@ -45,14 +46,10 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     private final DiscovererFactory discovererFactory;
 
     OnSaveLibrariesAutodiscoveryTrigger() {
-        this(new DiscovererFactory() {
-
-            @Override
-            public LibrariesAutoDiscoverer create(final RobotProject robotProject, final List<IFile> suites) {
-                final boolean showSummary = robotProject.getRobotProjectConfig()
-                        .isLibrariesAutoDiscoveringSummaryWindowEnabled();
-                return new LibrariesAutoDiscoverer(robotProject, suites, showSummary);
-            }
+        this((robotProject, suites) -> {
+            final boolean showSummary = robotProject.getRobotProjectConfig()
+                    .isLibrariesAutoDiscoveringSummaryWindowEnabled();
+            return new LibrariesAutoDiscoverer(robotProject, suites, showSummary);
         });
     }
 
@@ -90,9 +87,8 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
 
             if (!SUITES_FOR_DISCOVER.isEmpty()) {
                 final RobotProject project = SUITES_FOR_DISCOVER.get(0).getProject();
-                final List<IFile> suites = SUITES_FOR_DISCOVER.stream()
-                        .map(RobotSuiteFile::getFile)
-                        .collect(Collectors.toList());
+                final List<IFile> suites = SUITES_FOR_DISCOVER.stream().map(RobotSuiteFile::getFile).collect(
+                        Collectors.toList());
                 startAutoDiscovering(project, suites);
             }
             SUITES_FOR_DISCOVER.clear();
@@ -161,10 +157,5 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         boolean unknownLibraryWasDetected() {
             return detectedLibraryProblem;
         }
-    }
-
-    public interface DiscovererFactory {
-
-        LibrariesAutoDiscoverer create(RobotProject project, List<IFile> suites);
     }
 }
