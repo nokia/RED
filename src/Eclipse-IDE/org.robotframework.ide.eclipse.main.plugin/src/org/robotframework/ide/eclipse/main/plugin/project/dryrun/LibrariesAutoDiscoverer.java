@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -64,24 +63,24 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources) {
-        this(robotProject, resources, true, null);
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<IFile> suites) {
+        this(robotProject, suites, true, null);
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<IFile> suites,
             final String libraryNameToDiscover) {
-        this(robotProject, resources, true, libraryNameToDiscover);
+        this(robotProject, suites, true, libraryNameToDiscover);
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<IFile> suites,
             final boolean showSummary) {
-        this(robotProject, resources, showSummary, null);
+        this(robotProject, suites, showSummary, null);
     }
 
     @VisibleForTesting
-    LibrariesAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
-            final boolean showSummary, final String libraryNameToDiscover) {
-        super(robotProject, resources, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector());
+    LibrariesAutoDiscoverer(final RobotProject robotProject, final List<IFile> suites, final boolean showSummary,
+            final String libraryNameToDiscover) {
+        super(robotProject, suites, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector());
         this.showSummary = showSummary;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
@@ -180,17 +179,17 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final List<? extends IResource> resources) {
+                final List<IFile> suites) {
             final List<String> resourcesPaths = new ArrayList<>();
-            for (final IResource resource : resources) {
-                if (isResourceFile(resource)) {
-                    final IPath resourceFilePath = RedWorkspace.Paths
-                            .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
-                    resourcesPaths.add(resourceFilePath.toString());
-                } else if (resource.isLinked()) {
-                    collectLinkedSuiteNamesAndProjectsLocations(resource);
+            for (final IFile suite : suites) {
+                if (isResourceFile(suite)) {
+                    final IPath filePath = RedWorkspace.Paths
+                            .toWorkspaceRelativeIfPossible(suite.getProjectRelativePath());
+                    resourcesPaths.add(filePath.toString());
+                } else if (suite.isLinked()) {
+                    collectLinkedSuiteNamesAndProjectsLocations(suite);
                 } else {
-                    suiteNames.add(RobotPathsNaming.createSuiteName(resource));
+                    suiteNames.add(RobotPathsNaming.createSuiteName(suite));
                 }
             }
             if (!resourcesPaths.isEmpty()) {
@@ -202,16 +201,13 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             }
         }
 
-        private boolean isResourceFile(final IResource resource) {
-            RobotSuiteFile suiteFile = null;
-            if (resource.getType() == IResource.FILE) {
-                suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
-            }
-            return suiteFile != null && suiteFile.isResourceFile();
+        private boolean isResourceFile(final IFile file) {
+            final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile(file);
+            return suiteFile.isResourceFile();
         }
 
-        private void collectLinkedSuiteNamesAndProjectsLocations(final IResource resource) {
-            final IPath linkedFileLocation = resource.getLocation();
+        private void collectLinkedSuiteNamesAndProjectsLocations(final IFile suite) {
+            final IPath linkedFileLocation = suite.getLocation();
             if (linkedFileLocation != null) {
                 final File linkedFile = linkedFileLocation.toFile();
                 if (linkedFile.exists()) {
