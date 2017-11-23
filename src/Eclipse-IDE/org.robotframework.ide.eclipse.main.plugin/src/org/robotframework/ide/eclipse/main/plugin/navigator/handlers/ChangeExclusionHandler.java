@@ -23,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
-import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RevalidateSelectionHandler.RobotSuiteFileCollector;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
@@ -39,7 +38,6 @@ import com.google.common.collect.Multimap;
 
 /**
  * @author Michal Anglart
- *
  */
 abstract class ChangeExclusionHandler {
 
@@ -47,38 +45,25 @@ abstract class ChangeExclusionHandler {
 
     public void changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
         final List<IResource> resourcesToChange = Selections.getAdaptableElements(selection, IResource.class);
-        final Map<IProject, Collection<RobotSuiteFile>> grouped = RobotSuiteFileCollector
-                .collectGroupedByProject(resourcesToChange);
         final Multimap<IProject, IPath> groupedPaths = groupByProject(resourcesToChange);
 
-        for (IResource res : resourcesToChange) {
+        for (final IResource res : resourcesToChange) {
             removeMarkers(res);
         }
 
-        for (final IProject groupingProject : groupedPaths.keySet()) {
-            changeExclusion(groupingProject, groupedPaths.get(groupingProject));
-
-            final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
-                    groupingProject.getFile(RobotProjectConfig.FILENAME), groupedPaths.get(groupingProject));
-            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
-            final Collection<RobotSuiteFile> suiteModels = grouped.get(groupingProject);
-            if (suiteModels != null) {
-            final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
-            final Job validationJob = RobotArtifactsValidator.createValidationJob(groupingProject, validatorConfig);
-            validationJob.schedule(REVALIDATE_JOB_DELAY);
-            }
-
-        }
-       
-        SwtThread.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
-                manager.update(RobotValidationExcludedDecorator.ID);
-
-            }
+        final Map<IProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
+                .collectGroupedByProject(resourcesToChange);
+        filesGroupedByProject.forEach((project, suiteModels) -> {
+            changeExclusion(project, groupedPaths.get(project));
+            fireEvents(eventBroker, project, groupedPaths.get(project));
+            revalidate(project, suiteModels);
         });
-      
+
+        SwtThread.asyncExec(() -> {
+            final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
+            manager.update(RobotValidationExcludedDecorator.ID);
+        });
+
     }
 
     private Multimap<IProject, IPath> groupByProject(final List<IResource> resourcesToChange) {
@@ -110,6 +95,18 @@ abstract class ChangeExclusionHandler {
         } catch (final CoreException e) {
             // nothing to do
         }
+    }
+
+    private void fireEvents(final IEventBroker eventBroker, final IProject project, final Collection<IPath> toChange) {
+        final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
+                project.getFile(RobotProjectConfig.FILENAME), toChange);
+        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
+    }
+
+    private void revalidate(final IProject project, final Collection<RobotSuiteFile> suiteModels) {
+        final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
+        final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
+        validationJob.schedule(REVALIDATE_JOB_DELAY);
     }
 
     private void removeMarkers(final IResource resource) {

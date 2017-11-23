@@ -9,11 +9,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -51,18 +51,18 @@ public class AbstractAutoDiscovererTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final List<IResource> resources = Arrays.asList();
+        final List<IFile> suites = Collections.emptyList();
 
         final LibrariesSourcesCollector sourcesCollector = new LibrariesSourcesCollector(robotProject);
 
         final IDryRunTargetsCollector targetsCollector = mock(IDryRunTargetsCollector.class);
 
-        createDiscoverer(robotProject, resources, sourcesCollector, targetsCollector).startDiscovering(null);
+        createDiscoverer(robotProject, suites, sourcesCollector, targetsCollector).startDiscovering(null);
     }
 
-    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject, final List<IResource> resources,
+    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject, final List<IFile> suites,
             final LibrariesSourcesCollector sourcesCollector, final IDryRunTargetsCollector targetsCollector) {
-        return new AbstractAutoDiscoverer(robotProject, resources, sourcesCollector, targetsCollector) {
+        return new AbstractAutoDiscoverer(robotProject, suites, sourcesCollector, targetsCollector) {
 
             @Override
             RobotDefaultAgentEventListener createDryRunCollectorEventListener(
