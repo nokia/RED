@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nbwsQJ53EeWbnevllkSSnQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/13/17 11:02 AM
+Save-Time: 11/23/17 11:17 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -41,7 +41,7 @@ with [get-view Problems | get-tree] {
 }
 
 get-view Problems | get-tree | get-item -path "Warnings \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
-    | equals "Variable 'a 2' is declared without assignment." | verify-true
+    | equals "Variable 'a 2' is declared without assignment" | verify-true
     
 //use quick fix for "Log  ${a_1}"
 with [get-editor "TestFile.robot" | get-text-viewer] {
