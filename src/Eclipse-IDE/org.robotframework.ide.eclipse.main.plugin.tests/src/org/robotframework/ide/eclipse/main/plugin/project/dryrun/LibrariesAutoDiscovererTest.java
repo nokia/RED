@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -54,51 +54,51 @@ public class LibrariesAutoDiscovererTest {
 
     @Test
     public void libsAreAddedToProjectConfig_whenExistAndAreCorrect() throws Exception {
-        projectProvider.createFile("test1.robot", "*** Settings ***", "Library  ./libs/TestLib.py",
-                "*** Test Cases ***");
-        projectProvider.createFile("test2.robot", "*** Settings ***", "Library  ./other/dir/OtherLib.py",
-                "*** Test Cases ***");
-        projectProvider.createFile("test3.robot", "*** Settings ***", "Library  module",
-                "Library  ./libs/NotExisting.py", "*** Test Cases ***");
-        final List<? extends IResource> resources = Arrays.asList(projectProvider.getProject());
+        final List<IFile> suites = Arrays.asList(
+                projectProvider.createFile("test1.robot", "*** Settings ***", "Library  ./libs/TestLib.py",
+                        "*** Test Cases ***"),
+                projectProvider.createFile("test2.robot", "*** Settings ***", "Library  ./other/dir/OtherLib.py",
+                        "*** Test Cases ***"),
+                projectProvider.createFile("test3.robot", "*** Settings ***", "Library  module",
+                        "Library  ./libs/NotExisting.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
         final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
         final ReferencedLibrary lib3 = createLibrary("module", "module/__init__.py");
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2, lib3);
     }
 
     @Test
     public void libsAreAddedToProjectConfig_forRobotResourceFile() throws Exception {
-        final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("resource.robot",
-                "*** Settings ***", "Library  ./libs/TestLib.py", "Library  ./libs/NotExisting.py"));
+        final List<IFile> suites = Arrays.asList(projectProvider.createFile("resource.robot", "*** Settings ***",
+                "Library  ./libs/TestLib.py", "Library  ./libs/NotExisting.py"));
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     @Test
     public void libsAreAddedToProjectConfig_whenIncorrectRelativePathIsUsedInLibraryImport() throws Exception {
-        final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
-                "*** Settings ***", "Library  TestLib.py", "*** Test Cases ***"));
+        final List<IFile> suites = Arrays.asList(projectProvider.createFile("test.robot", "*** Settings ***",
+                "Library  TestLib.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     @Test
     public void libsAreAddedToProjectConfig_whenVariableMappingIsUsedInLibraryImport() throws Exception {
-        final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
-                "*** Settings ***", "Library  ${var}/TestLib.py", "Library  ${xyz}/OtherLib.py", "*** Test Cases ***"));
+        final List<IFile> suites = Arrays.asList(projectProvider.createFile("test.robot", "*** Settings ***",
+                "Library  ${var}/TestLib.py", "Library  ${xyz}/OtherLib.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib = createLibrary("OtherLib", "other/dir/OtherLib.py");
 
@@ -107,20 +107,20 @@ public class LibrariesAutoDiscovererTest {
                 VariableMapping.create("${XYZ}", "${ABC}/dir")));
         projectProvider.configure(config);
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
 
     @Test
     public void libsAreAddedToProjectConfig_whenExistingLibIsFound() throws Exception {
-        final List<? extends IResource> resources = Arrays
+        final List<IFile> suites = Arrays
                 .asList(projectProvider.createFile("test.robot", "*** Settings ***", "Library  other/dir/OtherLib.py",
                         "Library  ./libs/TestLib.py", "Library  ./libs/NotExisting.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false, "TestLib").start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false, "TestLib").start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
@@ -131,7 +131,7 @@ public class LibrariesAutoDiscovererTest {
         projectProvider.createDir("A/B");
         projectProvider.createDir("A/B/C");
         projectProvider.createDir("A/B/C/D");
-        final List<? extends IResource> resources = Arrays.asList(
+        final List<IFile> suites = Arrays.asList(
                 projectProvider.createFile("A/B/C/D/suite1.robot", "*** Settings ***",
                         "Library  ../../../../libs/TestLib.py", "*** Test Cases ***"),
                 projectProvider.createFile("A/B/C/D/suite2.robot", "*** Settings ***",
@@ -142,35 +142,35 @@ public class LibrariesAutoDiscovererTest {
         final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
         final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2);
     }
 
     @Test
     public void nothingIsAddedToProjectConfig_whenNoLibrariesAreFound() throws Exception {
-        final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
-                "*** Settings ***", "Library  NotExisting.py", "*** Test Cases ***"));
+        final List<IFile> suites = Arrays.asList(projectProvider.createFile("test.robot", "*** Settings ***",
+                "Library  NotExisting.py", "*** Test Cases ***"));
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
     }
 
     @Test
     public void nothingIsAddedToProjectConfig_whenNotExistingLibIsNotFound() throws Exception {
-        final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
-                "*** Settings ***", "Library  ./libs/TestLib.py", "*** Test Cases ***"));
+        final List<IFile> suites = Arrays.asList(projectProvider.createFile("test.robot", "*** Settings ***",
+                "Library  ./libs/TestLib.py", "*** Test Cases ***"));
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false, "NotExistingLib").start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false, "NotExistingLib").start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
     }
 
     @Test
     public void nothingIsAddedToProjectConfig_whenImportedLibraryIsAlreadyAdded() throws Exception {
-        final List<? extends IResource> resources = Arrays.asList(projectProvider.createFile("test.robot",
-                "*** Settings ***", "Library  ./libs/TestLib.py", "*** Test Cases ***"));
+        final List<IFile> suites = Arrays.asList(projectProvider.createFile("test.robot", "*** Settings ***",
+                "Library  ./libs/TestLib.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
@@ -178,7 +178,7 @@ public class LibrariesAutoDiscovererTest {
         config.addReferencedLibrary(lib);
         projectProvider.configure(config);
 
-        new LibrariesAutoDiscoverer(robotProject, resources, false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
     }
