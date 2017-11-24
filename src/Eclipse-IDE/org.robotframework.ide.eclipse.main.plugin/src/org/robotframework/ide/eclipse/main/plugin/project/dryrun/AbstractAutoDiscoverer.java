@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -53,7 +53,7 @@ public abstract class AbstractAutoDiscoverer {
 
     final RobotProject robotProject;
 
-    private final List<? extends IResource> resources;
+    private final List<IFile> suites;
 
     private final LibrariesSourcesCollector librariesSourcesCollector;
 
@@ -61,11 +61,11 @@ public abstract class AbstractAutoDiscoverer {
 
     private AgentConnectionServerJob serverJob;
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final List<? extends IResource> resources,
+    AbstractAutoDiscoverer(final RobotProject robotProject, final List<IFile> suites,
             final LibrariesSourcesCollector librariesSourcesCollector,
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
-        this.resources = resources;
+        this.suites = suites;
         this.librariesSourcesCollector = librariesSourcesCollector;
         this.dryRunTargetsCollector = dryRunTargetsCollector;
     }
@@ -110,7 +110,7 @@ public abstract class AbstractAutoDiscoverer {
 
             subMonitor.subTask("Preparing Robot dry run execution...");
             collectLibrarySources(runtimeEnvironment);
-            dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, resources);
+            dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, suites);
             subMonitor.worked(1);
 
             if (!subMonitor.isCanceled()) {
@@ -207,8 +207,7 @@ public abstract class AbstractAutoDiscoverer {
 
     public interface IDryRunTargetsCollector {
 
-        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject,
-                List<? extends IResource> resources);
+        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject, List<IFile> suites);
 
         List<String> getSuiteNames();
 
