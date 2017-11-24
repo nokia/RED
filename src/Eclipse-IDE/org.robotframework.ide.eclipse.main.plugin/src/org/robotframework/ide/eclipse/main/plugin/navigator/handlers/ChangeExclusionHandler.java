@@ -45,7 +45,6 @@ abstract class ChangeExclusionHandler {
 
     public void changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
         final List<IResource> resourcesToChange = Selections.getAdaptableElements(selection, IResource.class);
-        final Multimap<IProject, IPath> groupedPaths = groupByProject(resourcesToChange);
 
         for (final IResource res : resourcesToChange) {
             removeMarkers(res);
@@ -53,10 +52,13 @@ abstract class ChangeExclusionHandler {
 
         final Map<IProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
                 .collectGroupedByProject(resourcesToChange);
-        filesGroupedByProject.forEach((project, suiteModels) -> {
-            changeExclusion(project, groupedPaths.get(project));
-            fireEvents(eventBroker, project, groupedPaths.get(project));
-            revalidate(project, suiteModels);
+        final Map<IProject, Collection<IPath>> pathGroupedByProject = groupByProject(resourcesToChange).asMap();
+        pathGroupedByProject.forEach((project, paths) -> {
+            changeExclusion(project, paths);
+            fireEvents(eventBroker, project, paths);
+            if (filesGroupedByProject.containsKey(project)) {
+                revalidate(project, filesGroupedByProject.get(project));
+            }
         });
 
         SwtThread.asyncExec(() -> {
