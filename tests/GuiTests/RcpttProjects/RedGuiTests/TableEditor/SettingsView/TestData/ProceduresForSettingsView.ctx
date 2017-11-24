@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/23/17 11:50 AM
+Save-Time: 11/23/17 3:48 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -36,27 +36,27 @@ proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val 
 		| my-assert-true -expected $c6 -row $row -col 7
 }
 
-proc "compare-general-setting-table" [val file]  [val col_amount] [val row] [val ref_table]
+proc "compare-general-setting-table" [val file] [val section] [val col_amount] [val row] [val ref_table]
 {	
 	repeat [val index] -times $col_amount -command{
 		$ref_table | get $index| let [val ref_value -input]{
-			get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition [plus $index 1] $row|  invoke getDataValue
+			get-editor $file | get-section $section | get-canvas | get-object | invoke getCellByPosition [plus $index 1] $row|  invoke getDataValue
 	    		|  my-assert-true -expected $ref_value -row $row -col [plus $index 1] 
 		} 
 	}
 }
 
-//
-//proc "generate-list" [val file] [val col_amount] [val row_amount]
-//{	concat [
-//	repeat [val index1] -times $row_amount -command{	
-//	concat "compare-general-setting-table -file \"" $file "\" -col_amount " $col_amount" -row " $index1  " -ref_table [list "[
-//		repeat [val index2] -times $col_amount -command{		
-//				concat "\""  [get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
-//		} ] "]" "\n"
-//	} ]
-//}
-//
+
+
+proc "generate-list" [val file]  [val section] [val col_amount] [val row_amount]
+{	concat [
+	repeat [val index1] -times $row_amount -command{	
+	concat "compare-general-setting-table -file \"" $file "\" -section " $section " -col_amount " $col_amount" -row " $index1  " -ref_table [list "[
+		repeat [val index2] -times $col_amount -command{		
+				concat "\""  [get-editor $file | get-section $section | get-canvas | get-object | invoke getCellByPosition [plus $index2 1] $index1 | invoke getDataValue ] "\" "
+		} ] "]" "\n"
+	} ]
+}
 //generate-list -file "for_settings.tsv"  -col_amount 8 -row_amount 5 | log
 
 

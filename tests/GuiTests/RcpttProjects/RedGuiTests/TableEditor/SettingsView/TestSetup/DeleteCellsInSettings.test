@@ -1,0 +1,108 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g,_6GbeQM-SEee4YdJy8LnSAg
+Element-Name: DeleteCellsInSettings
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Hy4AENBXEee4YdJy8LnSAg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/24/17 2:55 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/res.robot" | double-click
+get-editor "res.robot" | get-tab-folder | get-tab-item Settings | click
+
+get-view Outline | get-tree | select "res.robot/Settings/Resource/new.robot" | click
+wait 200
+
+get-editor "res.robot" | get-section Imports | get-canvas | get-property "getLayer().getBodyLayer().getColumnCount()" 
+    | equals 8 | verify-true
+    
+with [get-editor "res.robot" | get-section Imports | get-canvas] {
+	//go to def value - path is longer due to bug RED-984 
+    mouse-press 7 31 button1
+    mouse-release 7 31 button1 524288
+    key-type Right -times 3
+    key-type Down
+    key-type Up
+    key-type "M1+d"
+   
+    // go down to last line and remove 2 cells    
+    key-type Down -times 2
+    key-type "M1+d"
+    wait 100
+}
+//second time by using menu    
+with [get-editor "res.robot" | get-section Imports | get-canvas] {
+    get-menu -path "Table/Delete cell" | click
+    
+}
+
+// go up and remove '/' - bug RED-982 
+with [get-editor "res.robot" | get-section Imports | get-canvas] {
+    key-type Up
+    key-type Left
+    key-type "M1+d"
+}
+
+get-editor "res.robot" | get-section Imports | get-canvas | get-property "getLayer().getBodyLayer().getColumnCount()" 
+    | equals 7 | verify-true
+    
+compare-general-setting-table -file "res.robot" -section Imports -col_amount 7 -row 1 -ref_table [list "Resource" "new.robot" "abc" "" "" "" "" ]
+compare-general-setting-table -file "res.robot" -section Imports -col_amount 7 -row 2 -ref_table [list "Library" "Dialogs" "\\" "fgh" "" "" "" ]
+compare-general-setting-table -file "res.robot" -section Imports -col_amount 7 -row 3 -ref_table [list "Variables" "1" "2" "5" "6" "" "#last" ]
+compare-general-setting-table -file "res.robot" -section Imports -col_amount 7 -row 4 -ref_table [list "...add new import" "" "" "" "" "" "" ]
+
+//go to source and check text
+get-editor "res.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Resource    new.robot    abc    \n"
+    + "Library    Dialogs    \\    fgh\n"
+    + "Variables    1    2    5   6     #last\n\n"
+    + "#kyewords are here\n"
+    + "*** Keywords ***\n"
+    + "kw1\n"
+    + "    log     1\n"
+    + "    \n"
+    + "# kw2\n"
+    + "    # Should Be Equal    first    second" | verify-true
+    
+    
+// go to tsv file and remove Setup   
+get-view "Project Explorer" | get-tree | select "RobotProject/for_settings.tsv" 
+    | select "RobotProject/for_settings.tsv" | double-click
+get-editor "for_settings.tsv" | get-tab-folder | get-tab-item Settings | click
+get-view Outline | get-tree | select "for_settings.tsv/Settings/Suite Teardown" | click
+wait 200
+
+
+with [get-editor "for_settings.tsv" | get-section General | get-canvas] {
+	//remove value "1"
+    key-type Right -times 2
+    key-type "M1+d"
+    
+    //remove value "4"
+    key-type Right -times 2
+    key-type "M1+d"
+    
+    //remove '/'
+    key-type Down
+    key-type Left -times 2
+    key-type "M1+d"
+    
+    //remove value 6
+    key-type Up -times 2
+    key-type "M1+d"
+}
+
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 1 -ref_table [list "Suite Setup" "log" "" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 2 -ref_table [list "Suite Teardown" "Catenate" "2" "3" "" "" "#com" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 3 -ref_table [list "Test Setup" "\\" "\\" "wrong" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" ]
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
