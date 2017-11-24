@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Zk1_YNFyEeWl7fLmvSqX3Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/30/17 5:01 PM
+Save-Time: 11/24/17 4:37 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -36,6 +36,8 @@ with [get-editor "BigScript.robot" | get-text-viewer] {
 // clean rpoject to run validation
 get-menu "Project/Clean..." | click
 get-window Clean | get-button $OK_Clean_button | click
+
+get-view Problems | get-tree | select "Errors.*" | expand-all
 
 // check number of errors
 wait-for-errors -amount 2 -times 6 -delay 500
