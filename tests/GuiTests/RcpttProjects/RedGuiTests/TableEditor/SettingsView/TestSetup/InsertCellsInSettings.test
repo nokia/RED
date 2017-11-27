@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _6GbeQM-SEee4YdJy8LnSAg,_2rVvIENaEeaEVfxTnoQ14g
-Element-Name: InsertCellsInGeneralSettings
+Element-Name: InsertCellsInSettings
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Q8GzgM-pEee4YdJy8LnSAg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/23/17 11:30 AM
+Save-Time: 11/23/17 3:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -81,10 +81,10 @@ get-editor "for_settings.tsv" | maximize
 get-editor "for_settings.tsv" | get-section General | get-canvas 
     | get-property "getLayer().getBodyLayer().getColumnCount()" | equals 7 | verify-true
     
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3" "#com" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 3 -ref_table [list "Test Setup" "\\" "\\" "wrong" "" "" "" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3" "#com" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 3 -ref_table [list "Test Setup" "\\" "\\" "wrong" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" ]
 
 
 get-editor "for_settings.tsv" | get-section General | get-canvas | key-type "M1+s"
@@ -92,10 +92,10 @@ get-editor "for_settings.tsv" | get-section General | get-canvas | key-type "M1+
 get-editor "for_settings.tsv" | get-section General | get-canvas 
     | get-property "getLayer().getBodyLayer().getColumnCount()" | equals 8 | verify-true
     
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" ""]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3"  "4" "#com" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 3 -ref_table [list "Test Setup" "\\" "\\" "wrong" "" "" "" "" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 7 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" ""]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3"  "4" "#com" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 7 -row 3 -ref_table [list "Test Setup" "\\" "\\" "wrong" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv"  -section General -col_amount 7 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" "" ]
 get-editor "for_settings.tsv" | restore
 
 //go to empty setting and add new cell - nothing should happen
@@ -155,10 +155,10 @@ with [get-editor "for_settings.tsv" | get-section General] {
 }
 
 get-editor "for_settings.tsv" | maximize
-compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" "" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3" "4" "#com" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 3 -ref_table [list "Test Setup" "\\" "def" "\\" "wrong" "" "" "" ]
-compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 4 -ref_table [list "Test Teardown" "\\" "abc" "Log" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 8 -row 1 -ref_table [list "Suite Setup" "log" "5" "6" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 8 -row 2 -ref_table [list "Suite Teardown" "Catenate" "1" "66" "2" "3" "4" "#com" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 8 -row 3 -ref_table [list "Test Setup" "\\" "def" "\\" "wrong" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section General -col_amount 8 -row 4 -ref_table [list "Test Teardown" "\\" "abc" "Log" "" "" "" "" ]
 
 //get-editor "for_settings.tsv" | get-section General | get-canvas | key-type "M1+z"
 //wait 1000
@@ -172,5 +172,97 @@ compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 4 -ref
 //compare-general-setting-table -file "for_settings.tsv" -col_amount 8 -row 4 -ref_table [list "Test Teardown" "" "" "" "" "" "" "" ]
 
 get-editor "for_settings.tsv" | restore
+
+
+
+
+//------------------------------------------------------imports ---------------------------------------
+//set few paths
+get-editor "for_settings.tsv" | get-tab-folder | get-tab-item Source | click
+get-editor "for_settings.tsv" | get-text-viewer | set-text "*** Setting ***\n"
+    + "Resource\tabc.robo\n"
+    + "Library\tmy_lib\n"
+    + "Variables\tdef.py\targ1\n"
+    + "Resource\tres.tsv\t1\t2\t3\t4\t5\t#last\n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "\t[Documentation]\tsad\n"
+    + "\tlog\tdada"
+    
+get-editor "for_settings.tsv" | get-text-viewer | key-type "M1+s"
+
+//go to Resource with many args
+get-editor "for_settings.tsv" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "for_settings.tsv/Settings/Resource/res.tsv" | click
+wait 200
+with [get-editor "for_settings.tsv" | get-section Imports] {
+    with [get-canvas] {
+        key-type Right -times 3
+        key-type "M1+i"
+        type-text h
+    }
+    with [get-editbox] {
+        type-text ere
+        key-type Enter
+    }
+    get-editbox | key-type "TRAVERSE_ESCAPE"
+}
+
+//check if now is more columns
+get-editor "for_settings.tsv" | maximize
+get-editor "for_settings.tsv" | get-section Imports | get-canvas 
+    | get-property "getLayer().getBodyLayer().getColumnCount()" | equals 8 | verify-true
+    
+//go up and add to beggining of line 
+with [get-editor "for_settings.tsv" | get-section Imports | get-canvas] {
+    key-type Up
+    key-type Home
+}
+
+//chec if in first cell menu is disabled
+with [get-editor "for_settings.tsv" | get-section Imports | get-canvas] {
+    get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Delete cell" | get-property enablement | equals false | verify-true
+}
+
+//goto file name
+with [get-editor "for_settings.tsv" | get-section Imports | get-canvas] {
+    key-type Right
+}
+
+//check if menu is disabled
+with [get-editor "for_settings.tsv" | get-section Imports | get-canvas] {
+    get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
+    get-menu -path "Table/Delete cell" | get-property enablement | equals false | verify-true
+}
+with [get-editor "for_settings.tsv" | get-section Imports] {
+    with [get-canvas] {
+        key-type Right
+        get-menu -path "Table/Insert cell" | click
+        type-text a
+    }
+    with [get-editbox] {
+        type-text rg0
+        key-type Enter
+    }
+    get-editbox | key-type "TRAVERSE_ESCAPE"
+}    
+
+compare-general-setting-table -file "for_settings.tsv" -section Imports -col_amount 8 -row 1 -ref_table [list "Resource" "abc.robo" "" "" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section Imports -col_amount 8 -row 2 -ref_table [list "Library" "my_lib" "" "" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv" -section Imports  -col_amount 8 -row 3 -ref_table [list "Variables" "def.py" "arg0" "arg1" "" "" "" "" ]
+compare-general-setting-table -file "for_settings.tsv"  -section Imports -col_amount 8 -row 4 -ref_table [list "Resource" "res.tsv" "1" "here" "3" "4" "5" "#last" ]
+
+get-editor "for_settings.tsv" | restore
+get-editor "for_settings.tsv" | get-tab-folder | get-tab-item Source | click
+get-editor "for_settings.tsv" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "Resource\tabc.robo\n"
+    + "Library\tmy_lib\n"
+    + "Variables\tdef.py\targ0\targ1\n"
+    + "Resource\tres.tsv\t1\there\t3\t4\t5\t#last\n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "\t[Documentation]\tsad\n"
+    + "\tlog\tdada" | verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
