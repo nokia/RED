@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="Target Definition for Eclipse Oxygen (4.7)" sequenceNumber="191">
+<?pde version="3.8"?><target name="Target Definition for Eclipse Oxygen (4.7)" sequenceNumber="192">
     <locations>
         <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
             <unit id="org.eclipse.equinox.sdk.feature.group" version="0.0.0"/>
@@ -31,6 +31,10 @@
             <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.feature.feature.group" version="1.5.0.201703192131"/>
             <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.source.feature.feature.group" version="1.5.0.201703192131"/>
             <repository location="http://download.eclipse.org/nattable/releases/1.5.0/repository/"/>
+        </location>
+        <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+            <unit id="com.codeaffine.eclipse.swt.feature.feature.group" version="0.5.0.20170519-1200"/>
+            <repository location="http://fappel.github.io/xiliary"/>
         </location>
     </locations>
     <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
