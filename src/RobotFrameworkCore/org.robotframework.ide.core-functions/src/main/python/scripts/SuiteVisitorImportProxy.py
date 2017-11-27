@@ -19,21 +19,13 @@ from robot.running.handlers import _DynamicHandler, _JavaHandler
 from robot.output import LOGGER, Message
 
 
-class RedTestSuiteBuilder(TestSuiteBuilder):
-    """ switch off empty suite removing """
-
-    def _parse_and_build(self, path):
-        suite = self._build_suite(self._parse(path))
-        return suite
-
-
 class SuiteVisitorImportProxy(SuiteVisitor):
-    """ suite names should be passed as arguments """
-    
+
     LIB_IMPORT_TIMEOUT = 60
 
-    def __init__(self, *args):
-        self.f_suites = [name for name in args if name]
+    def __init__(self, suite_names, data_source_paths):
+        self.suite_names = [name for name in suite_names if name]
+        self.data_source_paths = [path for path in data_source_paths if path]
         self.__wrap_importer()
 
     def __wrap_importer(self):
@@ -49,16 +41,12 @@ class SuiteVisitorImportProxy(SuiteVisitor):
             suite.parent.tests.clear()
             suite.parent.keywords.clear()
         else:
-            # when first suite is visited all suites are counted and message is send to server
+            # rebuilding first suite may be needed to support suites without test cases
+            self.__rebuild_suite_if_empty(suite)
+
+            # when first suite is visited all suites are counted and message is sent to server
             msg = json.dumps({'suite_count': self.__count_suites(suite)})
             LOGGER.message(Message(message=msg, level='NONE'))
-
-            if len(suite.tests) == 0 or suite.test_count == 0:
-                current_suite = RedTestSuiteBuilder().build(suite.source)
-                if len(self.f_suites) == 0:
-                    suite.suites = current_suite.suites
-                else:
-                    suite.suites = self.__filter_by_name(current_suite.suites)
 
         suite.tests.clear()
         suite.keywords.clear()
@@ -83,14 +71,23 @@ class SuiteVisitorImportProxy(SuiteVisitor):
         else:
             return 1
 
-    def __filter_by_name(self, suites):
+    def __rebuild_suite_if_empty(self, suite):
+        if len(suite.tests) == 0 or suite.test_count == 0:
+            current_suite = RedTestSuiteBuilder().build(*self.data_source_paths)
+            if len(self.suite_names) == 0:
+                suite.suites = current_suite.suites
+            else:
+                suite_name_prefix = '' if current_suite.source or current_suite.parent else current_suite.longname + '.'
+                suite.suites = self.__filter_by_name(suite_name_prefix, current_suite.suites)
+
+    def __filter_by_name(self, suite_name_prefix, suites):
         matched_suites = []
 
         for suite in suites:
-            for s_name in self.f_suites:
-                if suite not in matched_suites and self.__suite_name_matches(suite, s_name):
+            for s_name in self.suite_names:
+                if suite not in matched_suites and self.__suite_name_matches(suite, suite_name_prefix + s_name):
                     matched_suites.append(suite)
-                    suite.suites = self.__filter_by_name(suite.suites)
+                    suite.suites = self.__filter_by_name(suite_name_prefix, suite.suites)
 
         return matched_suites
 
@@ -103,6 +100,13 @@ class SuiteVisitorImportProxy(SuiteVisitor):
         elif len(longpath) < len(normalized_s_name) and normalized_s_name.startswith(longpath):
             return matches(normalized_s_name.replace(longpath, ''))
         return False
+
+
+class RedTestSuiteBuilder(TestSuiteBuilder):
+    """ switch off empty suite removing """
+
+    def _parse_and_build(self, path):
+        return self._build_suite(self._parse(path))
 
 
 class RedImporter(object):
