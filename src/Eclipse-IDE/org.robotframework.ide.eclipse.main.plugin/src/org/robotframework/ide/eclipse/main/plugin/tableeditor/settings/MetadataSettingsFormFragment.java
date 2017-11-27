@@ -20,6 +20,7 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -173,12 +174,23 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         metadataSection = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         metadataSection.setText("Metadata");
         metadataSection.setExpanded(false);
+        metadataSection.setBackground(parent.getBackground());
         GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(metadataSection);
         Sections.switchGridCellGrabbingOnExpansion(metadataSection);
         Sections.installMaximazingPossibility(metadataSection);
 
         final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
-        setupNatTable(metadataSection, theme);
+        final Composite panel = createPanel(metadataSection);
+        setupNatTable(panel, theme);
+    }
+
+    private Composite createPanel(final Section section) {
+        final Composite panel = toolkit.createComposite(section);
+        panel.setBackground(section.getBackground());
+        GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).applyTo(panel);
+        GridLayoutFactory.fillDefaults().applyTo(panel);
+        section.setClient(panel);
+        return panel;
     }
 
     private void setupNatTable(final Composite parent, final TableTheme theme) {
@@ -233,7 +245,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(), wrapCellContent));
         gridLayer.addConfiguration(new MetadataSettingsEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
-        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
+        table = theme.configureScrollBars(parent, bodyViewportLayer,
+                tableParent -> createTable(tableParent, theme, factory, gridLayer, bodyDataLayer, configRegistry));
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
@@ -245,8 +258,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
         // tooltips support
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);
-
-        metadataSection.setClient(table);
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme, final RedNattableLayersFactory factory,

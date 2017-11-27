@@ -199,7 +199,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         gridLayer.addConfiguration(
                 new VariableValuesEditConfiguration(theme, fileModel, dataProvider, commandsStack, wrapCellContent));
 
-        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
+        table = theme.configureScrollBars(parent, bodyViewportLayer,
+                tableParent -> createTable(tableParent, theme, factory, gridLayer, bodyDataLayer, configRegistry));
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),

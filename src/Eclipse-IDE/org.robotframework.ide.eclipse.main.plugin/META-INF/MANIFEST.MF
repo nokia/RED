@@ -4,14 +4,20 @@ Bundle-Name: RED Robot Editor
 Bundle-SymbolicName: org.robotframework.ide.eclipse.main.plugin; singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Nokia Solutions and Networks
-Require-Bundle: org.eclipse.e4.core.services,
+Require-Bundle: org.apache.commons.logging,
+ org.eclipse.e4.core.services,
  org.eclipse.e4.core.di,
  org.eclipse.e4.ui.di,
  org.eclipse.e4.core.contexts,
  org.eclipse.e4.tools.compat,
  org.eclipse.e4.tools.services,
  org.eclipse.osgi.services,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.core.expressions,
+ org.eclipse.ltk.core.refactoring,
  org.eclipse.ui;bundle-version="3.106.0",
+ org.eclipse.swt,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
  org.eclipse.ui.forms,
@@ -19,19 +25,12 @@ Require-Bundle: org.eclipse.e4.core.services,
  org.eclipse.debug.ui,
  org.eclipse.ui.navigator,
  org.eclipse.ui.console,
- org.eclipse.core.expressions,
  org.eclipse.ui.views,
  org.eclipse.search,
- org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.apache.commons.logging,
- org.eclipse.core.resources,
- org.eclipse.ltk.core.refactoring,
  org.eclipse.nebula.widgets.nattable.core;bundle-version="1.5.0",
  org.eclipse.nebula.widgets.nattable.extension.glazedlists;bundle-version="1.5.0",
  ca.odell.glazedlists;bundle-version="1.9.0",
- org.apache.commons.logging,
- org.eclipse.swt
+ com.codeaffine.eclipse.swt;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,

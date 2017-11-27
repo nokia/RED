@@ -18,6 +18,10 @@
       %license
    </license>
 
+   <includes
+         id="com.codeaffine.eclipse.swt.feature"
+         version="0.0.0"/>
+
    <plugin
          id="org.robotframework.ide.eclipse.main.plugin"
          download-size="0"
@@ -29,7 +33,7 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
- 
+
    <plugin
          id="ca.odell.glazedlists"
          download-size="0"
