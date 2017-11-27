@@ -6,7 +6,7 @@ All RED binaries are stored under Release section:
 https://github.com/nokia/RED/releases
 
 ### Product
-Product zip is ready to use RED installation bundled with Eclipse Neon. 
+Product zip is ready to use RED installation bundled with latest Eclipse. 
 There is no need to install RED feature into it. 
 Choose proper OS version from **Downloads** section in Release section in RED GitHub page.
 

@@ -5,11 +5,13 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Requirements 
 *  Oracle Java 1.8+  https://www.java.com/
-*  RED feature only: Eclipse Oxygen (v 4.7), Eclipse Neon (v 4.6), Eclipse Mars (v 4.5), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  RED feature only: Eclipse Oxygen (v 4.7), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
 *  Python/Jython & RobotFramework installed
 
 ## Installation
 [Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.1 **cannot** be upgraded from earlier versions. 
+For RED feature installed on Eclipse Neon,please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
 ## Notable updates
 - Support for dark profile by adding profiles of syntax color, fixed RED GUI elements when dark. Together with [Darkest Dark Theme](https://marketplace.eclipse.org/content/darkest-dark-theme), RED looks nice. Details can be found in [docs](https://github.com/nokia/RED/blob/master/docs/help/user_guide/working_with_RED/dark_theme.md "RED with Darkest Dark Theme")
