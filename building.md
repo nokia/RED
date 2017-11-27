@@ -24,7 +24,7 @@ src/RobotFrameworkCore
 If you need to change it, check folder dependencies in maven poms and RedReleaseVersionUpdater.py
 
 ### Building
-Execut commands in partent to src,assign proper values to variables (*eclipseVersion* can hold string neon,mars or luna, *version* should be in notation x.x.x)  
+Execut commands in partent to src,assign proper values to variables (*eclipseVersion* can hold string Oxygen number *version* should be in notation x.x.x)  
 
 ```
 eclipseVersion=mars
