@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lJ-jYBiAEee93KAG-tW51Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/30/17 10:27 AM
+Save-Time: 11/24/17 4:48 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -94,6 +94,7 @@ let [val wp [replace -input $RED_workspace_path -old "\\" -new "\\\\"]]{
 	    + "Report:  .*report.html\n"
 	    + "This is end of script" $script_name $wp $wp $wp [os-specific "\\\\" "/"]]| verify-true
 	    
+	wait-for-console	    
 	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: ScriptProject.TestFile.test\n"
 	    + ".* : INFO : This is from workspace\n"
 	    + ".* : INFO : 56\n"
