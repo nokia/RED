@@ -1,0 +1,233 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A,_6GbeQM-SEee4YdJy8LnSAg
+Element-Name: InsertCellsInKeywordTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _V8NiINEvEeeQ27_bQa4GPg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/27/17 10:32 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-if-menu-is-disabled"{
+	with [get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+	    get-menu -path "Table/Insert cell" | get-property enablement | equals false | verify-true
+	    get-menu -path "Table/Delete cell" | get-property enablement | equals false | verify-true
+	}
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/kw.robot" | double-click
+get-editor "kw.robot" | get-tab-folder | get-tab-item Keywords | click
+
+
+get-view Outline | get-tree | select "kw.robot/Keywords/kw 1" | click
+wait 200
+
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Right
+
+//check if menu is disbaled on args
+check-if-menu-is-disabled
+
+//go to next arg
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Right
+check-if-menu-is-disabled
+
+//go to next empty cell
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Right
+check-if-menu-is-disabled
+
+
+//add new cells
+with [get-editor "kw.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type "M1+i" -times 2
+        type-text g
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 1
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text g2
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    
+    // go down and ad cell in first column for return
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Home
+        key-type Down
+        key-type "M1+i"
+        
+        //go down to commented KW
+        key-type Down -times 2
+        key-type "M1+i"
+        
+        // got o should be... and add empty cell with no content
+        key-type Down -times 5
+        key-type Right
+        key-type "M1+i"
+        
+        //go down to comment
+        key-type Down
+        key-type Left
+        key-type "M1+i"
+    }
+}
+
+get-editor "kw.robot" | maximize
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 1 -ref_table [list "kw 1" "${a1}" "${a2}" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 2 -ref_table [list "Catenate" "1" "2" "g1" "g2" "3" "4" "5" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 3 -ref_table [list "Log" "ghj" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 4 -ref_table [list "" "[Return]" "7" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 5 -ref_table [list "    " "" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 6 -ref_table [list "/" "# kw2" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 7 -ref_table [list "    " "" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 8 -ref_table [list "..." "" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 9 -ref_table [list "kw 3" "" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 10 -ref_table [list "[Documentation]" "last kw" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 11 -ref_table [list "Should Be Equal As Integers" "" "1" "3" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 12 -ref_table [list "/" "# panic" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 13 -ref_table [list "       " "" "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 8 -row 14 -ref_table [list "..." "" "" "" "" "" "" "" ]
+
+get-editor "kw.robot" | restore
+
+get-editor "kw.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "kw.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  6\n"
+    + "    [Teardown]    Should Be Empty    item    \n\n"
+    + "# test 2\n"
+    + "    # No Operation\n"
+    + "    # None Shall Pass    \n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    [Arguments]    ${a1}    ${a2}\n"
+    + "    Catenate    1    2    g1    g2    3    4    5\n"
+    + "    Log    ghj\n"
+    + "    \\    [Return]    7\n"
+    + "    \n"
+    + "    /    # kw2\n"
+    + "    \n"
+    + "kw 3\n"
+    + "    [Documentation]    last kw\n"
+    + "    Should Be Equal As Integers    \\    1    3     \n"
+      
+
+with [get-editor "kw.robot"] {
+    get-tab-folder | get-tab-item Keywords | click
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+}
+
+//add cell after last arg
+get-view Outline | get-tree | select "kw.robot/Keywords/kw 3/\\/" | click
+
+with [get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right -times 3
+    key-type "M1+i"
+}
+
+with [get-tab-folder -index 3] {
+    get-property "pages[0]" | equals "kw.robot" | verify-true
+}  
+
+
+// ---------------------------------------------------------------------------tsv ----------------------------------------
+
+get-view "Project Explorer" | get-tree | select "RobotProject/k2.tsv" | double-click
+get-editor "k2.tsv" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "k2.tsv/Keywords/kw4/log" | click
+wait 200
+
+with [get-editor "k2.tsv"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+    
+    	//move log right
+        key-type Right
+        key-type Left
+        key-type "M1+i"
+        
+        //add new tag in the middle
+        key-type Down -times 4
+        key-type Right -times 2
+        key-type "M1+i"
+        type-text t
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text ag88
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    
+    //add new cell before comment
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Home
+        key-type "M1+i"
+        
+        //add new elemnt after all args Should not...
+        key-type Down
+        key-type Right -times 3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text third
+        key-type Enter
+    }
+    //add new cell before new args
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Left
+        key-type "M1+i"
+    }
+}
+
+//add new cell for inline kw
+get-view Outline | get-tree | select "k2.tsv/Keywords/kw4"
+with [get-editor "k2.tsv"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Right
+        key-type "M1+i"
+        type-text n
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "ew item"
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+}
+
+
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 1 -ref_table [list "kw4" "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 2 -ref_table [list "[Teardown]" "new item" "Should Be Equal As Numbers" "1" "2" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 3 -ref_table [list "" "log" "4" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 4 -ref_table [list "	" "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 5 -ref_table [list "..." "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 6 -ref_table [list "kw 5" "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 7 -ref_table [list "[Tags]" "tag1" "tag88" "tag2" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 8 -ref_table [list "/" "# com1" "#com2" "#com3" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 9 -ref_table [list "Should Not Be Equal As Integers" "first" "second" "" "third" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 10 -ref_table [list "	 " "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 11 -ref_table [list "..." "" "" "" "" "" ]
+
+
+get-editor "k2.tsv" | get-tab-folder | get-tab-item Source | click
+get-editor "k2.tsv" | get-text-viewer | get-property text | equals "*** Test Cases ***\n\n\n"
+    + "*** Keywords ***\n"
+    + "kw4\t[Teardown]\tnew item\tShould Be Equal As Numbers\t1\t2\n"
+    + "\t\\\tlog\t4\n"
+    + "\t\n"
+    + "kw 5\n"
+    + "\t[Tags]\ttag1\ttag88\ttag2\n"
+    + "\t/\t# com1\t#com2\t#com3\n"
+    + "\tShould Not Be Equal As Integers\tfirst\tsecond\t\\\tthird" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
