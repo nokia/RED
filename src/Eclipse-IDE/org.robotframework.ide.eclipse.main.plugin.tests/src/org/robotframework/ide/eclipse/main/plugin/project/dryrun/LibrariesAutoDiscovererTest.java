@@ -44,6 +44,11 @@ public class LibrariesAutoDiscovererTest {
 
         projectProvider.createDir("module");
         projectProvider.createFile("module/__init__.py", "class module(object):", "  def mod_kw():", "   pass");
+
+        // this should not be found in any cases
+        projectProvider.createFile("mainLib.py", "def main_kw():", " pass");
+        projectProvider.createFile("mainTest.robot", "*** Settings ***", "Library  mainLib.py", "*** Test Cases ***",
+                "  case 1");
     }
 
     @Before
@@ -138,6 +143,22 @@ public class LibrariesAutoDiscovererTest {
                         "Library  ../../../../other/dir/OtherLib.py", "*** Test Cases ***"),
                 projectProvider.createFile("A/B/C/D/suite3.robot", "*** Settings ***",
                         "Library  ../../../../libs/NotExisting.py", "*** Test Cases ***"));
+
+        final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
+        final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
+
+        new LibrariesAutoDiscoverer(robotProject, suites, false).start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2);
+    }
+
+    @Test
+    public void libsAreAddedToProjectConfig_forResourceAndSuite() throws Exception {
+        final List<IFile> suites = Arrays.asList(
+                projectProvider.createFile("suite.robot", "*** Settings ***", "Library  ./libs/TestLib.py",
+                        "*** Test Cases ***"),
+                projectProvider.createFile("resource.robot", "*** Settings ***", "Library  ./other/dir/OtherLib.py",
+                        "Library  ./libs/NotExisting.py"));
 
         final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
         final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");

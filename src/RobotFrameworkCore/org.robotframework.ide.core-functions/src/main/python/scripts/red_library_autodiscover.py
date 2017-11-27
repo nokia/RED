@@ -26,7 +26,7 @@ def start_library_auto_discovering(port, suite_names, variable_mappings, data_so
 
         run(*data_source_paths,
             listener=TestRunnerAgent(port),
-            prerunmodifier=SuiteVisitorImportProxy(*suite_names),
+            prerunmodifier=SuiteVisitorImportProxy(suite_names, data_source_paths),
             suite=suite_names,
             variable=variable_mappings,
             runemptysuite=True,

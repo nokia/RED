@@ -98,7 +98,8 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
             if (!libraryNames.isEmpty()) {
                 final File tempSuiteFile = RobotDryRunTemporarySuites.createLibraryFile(libraryNames);
                 if (tempSuiteFile != null) {
-                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFile.getPath()));
+                    suiteNames.add(tempSuiteFile.getParentFile().getName() + "."
+                            + Files.getNameWithoutExtension(tempSuiteFile.getPath()));
                     additionalProjectsLocations.add(tempSuiteFile.getParentFile());
                 }
             }
