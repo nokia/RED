@@ -241,7 +241,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 CodeTableEditableRule.createEditableRule(fileModel), wrapCellContent));
         gridLayer.addConfiguration(new KeywordsTableEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
-        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
+        table = theme.configureScrollBars(parent, bodyViewportLayer,
+                tableParent -> createTable(tableParent, theme, factory, gridLayer, bodyDataLayer, configRegistry));
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
