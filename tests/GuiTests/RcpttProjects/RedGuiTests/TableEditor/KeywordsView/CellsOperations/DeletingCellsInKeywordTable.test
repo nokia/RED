@@ -1,0 +1,188 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A,_6GbeQM-SEee4YdJy8LnSAg
+Element-Name: DeletingCellsInKeywordTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3JmdQNNiEeerPuw25SIGbA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/27/17 12:48 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/kw.robot" | double-click
+get-editor "kw.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  6\n"
+    + "    [Teardown]    Should Be Empty    item    \n\n"
+    + "# test 2\n"
+    + "    # No Operation\n"
+    + "    # None Shall Pass    \n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    [Arguments]    ${a1}    ${a2}\n"
+    + "    Catenate    1    2    3   4    5    6    7\n"
+    + "    Log    ghj\n"
+    + "    [Return]    7       \n"
+    + "    \n"
+    + "# kw2    \n"
+    + "    \n"
+    + "kw 3\n"
+    + "    [Documentation]    last kw\n"
+    + "    Should Be Equal As Integers    1    3     \n"
+    + "    # panic" 
+    
+    
+with [get-editor "kw.robot"] {
+    get-text-viewer | key-type "M1+s"
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 
+    | get-property "getLayer().getBodyLayer().getColumnCount()" | equals 8 | verify-true
+    
+get-view Outline | get-tree | select "kw.robot/Keywords/kw 1/Catenate" | click
+wait 200
+
+//remove 2 cells, one by menu one bu shortcut
+with [get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right -times 2
+    get-menu -path "Table/Delete cell" | click
+    key-type "M1+d"
+}
+
+//check if now are defualt 6 columns
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 
+    | get-property "getLayer().getBodyLayer().getColumnCount()" | equals 6 | verify-true
+    
+//    
+with [get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+	//remove [return]
+    key-type Down -times 2
+    key-type Left -times 2
+    key-type "M1+d"
+    
+    //remove #kw2 
+    key-type Down -times 2
+    key-type "M1+d"
+    
+    //remove 3 from Should...
+    key-type Down -times 5
+    key-type Right -times 2
+    key-type "M1+d"
+    
+    //remove comment
+    key-type Down
+    key-type Home
+    key-type "M1+d"
+}
+
+
+
+
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 1 -ref_table [list "kw 1" "${a1}" "${a2}" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 2 -ref_table [list "Catenate" "1" "4" "5" "6" "7" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 3 -ref_table [list "Log" "ghj" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 4 -ref_table [list "7" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 5 -ref_table [list "    " "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 6 -ref_table [list "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 7 -ref_table [list "    " "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 8 -ref_table [list "..." "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 9 -ref_table [list "kw 3" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 10 -ref_table [list "[Documentation]" "last kw" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 11 -ref_table [list "Should Be Equal As Integers" "1" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 12 -ref_table [list "" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 13 -ref_table [list "..." "" "" "" "" "" ]
+
+
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+wait 1000
+
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+wait 1000
+
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+wait 1000
+
+get-editor "kw.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+wait 1000
+
+
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 1 -ref_table [list "kw 1" "${a1}" "${a2}" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 2 -ref_table [list "Catenate" "1" "4" "5" "6" "7" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 3 -ref_table [list "Log" "ghj" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 4 -ref_table [list "[Return]" "7" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 5 -ref_table [list "    " "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 6 -ref_table [list "# kw2" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 7 -ref_table [list "    " "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 8 -ref_table [list "..." "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 9 -ref_table [list "kw 3" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 10 -ref_table [list "[Documentation]" "last kw" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 11 -ref_table [list "Should Be Equal As Integers" "1" "3" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 12 -ref_table [list "# panic" "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 13 -ref_table [list "..." "" "" "" "" "" ]
+compare-row-with-list -file "kw.robot" -table "User Keywords" -col_amount 6 -row 14 -ref_table [list "...add new keyword" "" "" "" "" "" ]
+
+
+
+get-editor "kw.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "kw.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  6\n"
+    + "    [Teardown]    Should Be Empty    item    \n\n"
+    + "# test 2\n"
+    + "    # No Operation\n"
+    + "    # None Shall Pass    \n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    [Arguments]    ${a1}    ${a2}\n"
+    + "    Catenate    1    4    5    6    7\n"
+    + "    Log    ghj\n"
+    + "    [Return]    7       \n"
+    + "    \n"
+    + "    # kw2\n"
+    + "    \n"
+    + "kw 3\n"
+    + "    [Documentation]    last kw\n"
+    + "    Should Be Equal As Integers    1    3\n"
+    + "    # panic" | verify-true
+    
+    
+//====================================================== tsv =======================================================
+    
+get-view "Project Explorer" | get-tree | select "RobotProject/k2.tsv" | select "RobotProject/k2.tsv" | double-click
+get-editor "k2.tsv" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "k2.tsv/Keywords/kw4/log" | click
+
+with [get-editor "k2.tsv" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    //remove "1"in teardown
+    key-type Up
+    key-type Right -times 2
+    key-type "M1+d"
+    
+    //remove #com2
+    key-type Down -times 6
+    key-type Left
+    get-menu -path "Table/Delete cell" | click
+}
+
+
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 1 -ref_table [list "kw4" "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 2 -ref_table [list "[Teardown]" "Should Be Equal As Numbers" "2" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 3 -ref_table [list "log" "4" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 4 -ref_table [list "	" "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 5 -ref_table [list "..." "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 6 -ref_table [list "kw 5" "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 7 -ref_table [list "[Tags]" "tag1" "tag2" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 8 -ref_table [list "# com1" "#com3" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 9 -ref_table [list "Should Not Be Equal As Integers" "first" "second" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 10 -ref_table [list "	 " "" "" "" "" "" ]
+compare-row-with-list -file "k2.tsv" -table "User Keywords" -col_amount 6 -row 11 -ref_table [list "..." "" "" "" "" "" ]
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

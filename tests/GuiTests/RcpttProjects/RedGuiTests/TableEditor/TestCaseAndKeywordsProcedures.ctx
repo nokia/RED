@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/23/17 11:47 AM
+Save-Time: 11/27/17 12:18 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -96,7 +96,7 @@ proc "generate-list" [val file] [val table] [val col_amount] [val row_amount]
 	} ]
 }
 
-//compare-row-with-list -file "TestFile.robot" -table "Test Cases" -col_amount 6  -row_amount 15 | log
+//generate-list -file "kw.robot" -table "User Keywords" -col_amount 6  -row_amount 15 | log
 
 
 //rows starts from 0
