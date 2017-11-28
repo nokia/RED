@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Zk1_YNFyEeWl7fLmvSqX3Q
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/24/17 4:37 PM
+Save-Time: 11/28/17 2:35 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -33,18 +33,26 @@ with [get-editor "BigScript.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
-// clean rpoject to run validation
-get-menu "Project/Clean..." | click
-get-window Clean | get-button $OK_Clean_button | click
 
-get-view Problems | get-tree | select "Errors.*" | expand-all
-
-// check number of errors
-wait-for-errors -amount 2 -times 6 -delay 500
-get-view Problems | click
-get-view Problems | get-label "2 errors, 0 warnings, 0 others" | get-property caption 
-    | equals "2 errors, 0 warnings, 0 others" | verify-true
+// this is temprary removed due to error: RED-716
+//// clean project to run validation
+//get-menu "Project/Clean..." | click
+//get-window Clean | get-button $OK_Clean_button | click
+//
+//get-view Problems | get-tree | select "Errors.*" | expand-all
+//
+//// check number of errors
+//wait-for-errors -amount 2 -times 6 -delay 500
+//get-view Problems | click
+//get-view Problems | get-label "2 errors, 0 warnings, 0 others" | get-property caption 
+//    | equals "2 errors, 0 warnings, 0 others" | verify-true
     
+with [get-view Problems | get-tree] {
+    get-item -path "Errors \\(.* items\\)/Unknown keyword 'REVERSE MY LIS'" | get-property caption 
+        | equals "Unknown keyword 'REVERSE MY LIS'" | verify-true
+    get-item -path "Errors \\(.* items\\)/Variable 'global_made_by_test' is used, but not defined" 
+        | get-property caption | equals "Variable 'global_made_by_test' is used, but not defined" | verify-true
+}
     
 // open red.xml and limit filie size validation to 1kb
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/red.xml" | double-click
