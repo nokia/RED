@@ -8,8 +8,9 @@ package org.rf.ide.core.dryrun;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 
@@ -18,36 +19,32 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
  */
 public class RobotDryRunTemporarySuites {
 
-    public static File createResourceFile(final List<String> resourcesPaths) {
-        return createFile(resourcesPaths, new ArrayList<String>());
+    public static Optional<File> createResourceImportFile(final Collection<String> resourcesPaths) {
+        return resourcesPaths.isEmpty() ? Optional.empty() : createFile(resourcesPaths, Collections.emptyList());
     }
 
-    public static File createLibraryFile(final List<String> libraryNames) {
-        return createFile(new ArrayList<String>(), libraryNames);
+    public static Optional<File> createLibraryImportFile(final Collection<String> libraryNames) {
+        return libraryNames.isEmpty() ? Optional.empty() : createFile(Collections.emptyList(), libraryNames);
     }
 
-    private static File createFile(final List<String> resourcesPaths, final List<String> libraryNames) {
-        File file = null;
-        PrintWriter printWriter = null;
+    private static Optional<File> createFile(final Collection<String> resourcesPaths,
+            final Collection<String> libraryNames) {
         try {
-            file = RobotRuntimeEnvironment.createTemporaryFile("DryRunTempSuite.robot");
-            printWriter = new PrintWriter(file);
-            printWriter.println("*** Test Cases ***");
-            printWriter.println("T1");
-            printWriter.println("*** Settings ***");
-            for (final String path : resourcesPaths) {
-                printWriter.println("Resource  " + path);
+            final File file = RobotRuntimeEnvironment.createTemporaryFile("DryRunTempSuite.robot");
+            try (PrintWriter printWriter = new PrintWriter(file)) {
+                printWriter.println("*** Test Cases ***");
+                printWriter.println("T1");
+                printWriter.println("*** Settings ***");
+                for (final String path : resourcesPaths) {
+                    printWriter.println("Resource  " + path);
+                }
+                for (final String name : libraryNames) {
+                    printWriter.println("Library  " + name);
+                }
             }
-            for (final String name : libraryNames) {
-                printWriter.println("Library  " + name);
-            }
+            return Optional.of(file);
         } catch (final IOException e) {
-            // nothing to do
-        } finally {
-            if (printWriter != null) {
-                printWriter.close();
-            }
+            return Optional.empty();
         }
-        return file;
     }
 }
