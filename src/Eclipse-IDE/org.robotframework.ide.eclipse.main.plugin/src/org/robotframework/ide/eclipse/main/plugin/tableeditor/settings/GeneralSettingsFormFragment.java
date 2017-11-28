@@ -231,6 +231,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         generalSettingsSection.setExpanded(true);
         generalSettingsSection.setText("General");
         generalSettingsSection.setDescription("Provide test suite documentation and general settings");
+        generalSettingsSection.setBackground(parent.getBackground());
         GridDataFactory.fillDefaults().grab(true, true).minSize(1, 22).indent(0, 5).applyTo(generalSettingsSection);
         Sections.switchGridCellGrabbingOnExpansion(generalSettingsSection);
         Sections.installMaximazingPossibility(generalSettingsSection);
@@ -246,6 +247,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private Composite createPanel(final Section section) {
         final Composite panel = toolkit.createComposite(section);
+        panel.setBackground(section.getBackground());
         GridDataFactory.fillDefaults().grab(true, true).indent(0, 0).applyTo(panel);
         GridLayoutFactory.fillDefaults().applyTo(panel);
         section.setClient(panel);
@@ -548,7 +550,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 SettingsTableEditableRule.createEditableRule(fileModel), wrapCellContent));
         gridLayer.addConfiguration(new GeneralSettingsEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
-        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
+        table = java.util.Optional.of(theme.configureScrollBars(parent, bodyViewportLayer,
+                tableParent -> createTable(tableParent, theme, factory, gridLayer, bodyDataLayer, configRegistry)));
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table.get()),
@@ -562,7 +565,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider);
     }
 
-    private java.util.Optional<NatTable> createTable(final Composite parent, final TableTheme theme,
+    private NatTable createTable(final Composite parent, final TableTheme theme,
             final RedNattableLayersFactory factory, final GridLayer gridLayer, final DataLayer dataLayer,
             final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
@@ -603,7 +606,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         table.addFocusListener(new SettingsTableFocusListener(GENERAL_SETTINGS_CONTEXT_ID, site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-        return java.util.Optional.of(table);
+        return table;
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
