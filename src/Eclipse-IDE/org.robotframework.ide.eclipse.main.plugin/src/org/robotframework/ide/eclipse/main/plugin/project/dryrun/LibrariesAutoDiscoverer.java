@@ -192,14 +192,11 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     suiteNames.add(RobotPathsNaming.createSuiteName(suite));
                 }
             }
-            if (!resourcesPaths.isEmpty()) {
-                final File tempSuiteFile = RobotDryRunTemporarySuites.createResourceFile(resourcesPaths);
-                if (tempSuiteFile != null) {
-                    suiteNames.add(tempSuiteFile.getParentFile().getName() + "."
-                            + Files.getNameWithoutExtension(tempSuiteFile.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFile.getParentFile());
-                }
-            }
+            final Optional<File> tempSuiteFile = RobotDryRunTemporarySuites.createResourceImportFile(resourcesPaths);
+            tempSuiteFile.ifPresent(file -> {
+                suiteNames.add(file.getParentFile().getName() + "." + Files.getNameWithoutExtension(file.getPath()));
+                additionalProjectsLocations.add(file.getParentFile());
+            });
         }
 
         private boolean isResourceFile(final IFile file) {

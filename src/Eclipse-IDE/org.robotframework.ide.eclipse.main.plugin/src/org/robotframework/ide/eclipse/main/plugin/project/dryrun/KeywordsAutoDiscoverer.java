@@ -9,6 +9,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IFile;
@@ -95,14 +96,11 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
                 final List<IFile> suites) {
             final List<String> libraryNames = collectLibraryNames(robotProject);
-            if (!libraryNames.isEmpty()) {
-                final File tempSuiteFile = RobotDryRunTemporarySuites.createLibraryFile(libraryNames);
-                if (tempSuiteFile != null) {
-                    suiteNames.add(tempSuiteFile.getParentFile().getName() + "."
-                            + Files.getNameWithoutExtension(tempSuiteFile.getPath()));
-                    additionalProjectsLocations.add(tempSuiteFile.getParentFile());
-                }
-            }
+            final Optional<File> tempSuiteFile = RobotDryRunTemporarySuites.createLibraryImportFile(libraryNames);
+            tempSuiteFile.ifPresent(file -> {
+                suiteNames.add(file.getParentFile().getName() + "." + Files.getNameWithoutExtension(file.getPath()));
+                additionalProjectsLocations.add(file.getParentFile());
+            });
         }
 
         private List<String> collectLibraryNames(final RobotProject robotProject) {
