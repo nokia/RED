@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _VzYJ0KEAEea9Cvae3yWo1A
-Element-Name: DeletingCellsInKeywords
+Element-Name: DeletingCellsContentInKeywords
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _wBhPoFsNEearwpaEcDJbag
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/11/17 2:54 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 11/27/17 12:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
