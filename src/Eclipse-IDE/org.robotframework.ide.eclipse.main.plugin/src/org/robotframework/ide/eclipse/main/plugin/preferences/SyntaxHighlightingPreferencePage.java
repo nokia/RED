@@ -12,7 +12,6 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -308,16 +307,8 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     @Override
     public boolean performOk() {
         final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-
-        for (final Entry<SyntaxHighlightingCategory, ColoringPreference> entry : currentPreferences.entrySet()) {
-            final SyntaxHighlightingCategory category = entry.getKey();
-            final ColoringPreference pref = entry.getValue();
-
-            store.setValue(RedPreferencesInitializer.getFontStyleIdentifierFor(category), pref.getFontStyle());
-            store.setValue(RedPreferencesInitializer.getRedFactorIdentifierFor(category), pref.getRgb().red);
-            store.setValue(RedPreferencesInitializer.getGreenFactorIdentifierFor(category), pref.getRgb().green);
-            store.setValue(RedPreferencesInitializer.getBlueFactorIdentifierFor(category), pref.getRgb().blue);
-        }
+        currentPreferences.entrySet().forEach(
+                entry -> store.setValue(entry.getKey().getPreferenceId(), entry.getValue().toPreferenceString()));
 
         return super.performOk();
     }

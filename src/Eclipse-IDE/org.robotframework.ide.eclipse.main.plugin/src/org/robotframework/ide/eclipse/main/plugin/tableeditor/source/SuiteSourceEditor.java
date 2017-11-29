@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import static com.google.common.collect.Sets.newHashSet;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -12,7 +14,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.text.BadLocationException;
@@ -28,7 +32,6 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.text.source.projection.ProjectionSupport;
 import org.eclipse.jface.text.source.projection.ProjectionViewer;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.CaretEvent;
@@ -48,15 +51,20 @@ import org.eclipse.ui.texteditor.GotoLineAction;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.ITextEditorActionDefinitionIds;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
+import org.eclipse.ui.themes.ITheme;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
 import org.robotframework.ide.eclipse.main.plugin.views.documentation.SourceDocumentationSelectionChangedListener;
 import org.robotframework.red.swt.StyledTextWrapper;
+import org.robotframework.red.swt.SwtThread;
 
 public class SuiteSourceEditor extends TextEditor {
 
@@ -122,6 +130,8 @@ public class SuiteSourceEditor extends TextEditor {
 
         setFontFromPreference(viewer);
         addFontChangeListener(viewer);
+
+        installPreferencesListener(viewer);
 
         activateContext();
     }
@@ -221,19 +231,35 @@ public class SuiteSourceEditor extends TextEditor {
         }
     }
 
+    private void installPreferencesListener(final ProjectionViewer viewer) {
+        final IPreferenceChangeListener preferenceListener = event -> {
+            if (event == null || event.getKey() == null) {
+                return;
+            } else if (event.getKey().startsWith(RedPreferences.SYNTAX_COLORING)) {
+                final SyntaxHighlightingCategory category = SyntaxHighlightingCategory.fromPreferenceId(event.getKey());
+                final String newValue = (String) event.getNewValue();
+                final ColoringPreference newPref = newValue == null ? category.getDefault()
+                        : ColoringPreference.fromPreferenceString(newValue);
+
+                final SuiteSourceEditorConfiguration config = (SuiteSourceEditorConfiguration) getSourceViewerConfiguration();
+                config.getColoringTokens().refresh(category, newPref);
+                SwtThread.asyncExec(() -> viewer.invalidateTextPresentation());
+
+            } else if (newHashSet(RedPreferences.FOLDABLE_CASES, RedPreferences.FOLDABLE_KEYWORDS,
+                    RedPreferences.FOLDABLE_SECTIONS, RedPreferences.FOLDABLE_DOCUMENTATION,
+                    RedPreferences.FOLDING_LINE_LIMIT).contains(event.getKey())) {
+
+                foldingSupport.updateFoldingStructure(fileModel, getDocument());
+            }
+        };
+        final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID);
+        preferences.addPreferenceChangeListener(preferenceListener);
+        viewer.getControl().addDisposeListener(e -> preferences.removePreferenceChangeListener(preferenceListener));
+    }
+
     private void activateContext() {
         final IContextService service = getSite().getService(IContextService.class);
         service.activateContext(SOURCE_PART_CONTEXT_ID);
-    }
-
-    @Override
-    public void doSave(final IProgressMonitor progressMonitor) {
-        super.doSave(progressMonitor);
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
     }
 
     public SourceViewerConfiguration getViewerConfiguration() {
@@ -272,27 +298,24 @@ public class SuiteSourceEditor extends TextEditor {
     }
 
     private void addFontChangeListener(final ProjectionViewer viewer) {
-        PlatformUI.getWorkbench()
+        final ITheme currentTheme = PlatformUI.getWorkbench()
                 .getThemeManager()
-                .getCurrentTheme()
-                .addPropertyChangeListener(new IPropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(final PropertyChangeEvent event) {
-                        if (RedTheme.RED_SOURCE_EDITOR_FONT.equals(event.getProperty())) {
-                            setFont(viewer, RedTheme.getRedSourceEditorFont());
-                        }
-                    }
-                });
+                .getCurrentTheme();
+        final IPropertyChangeListener propertyListener = event -> {
+            if (RedTheme.RED_SOURCE_EDITOR_FONT.equals(event.getProperty())) {
+                setFont(viewer, RedTheme.getRedSourceEditorFont());
+            }
+        };
+        currentTheme.addPropertyChangeListener(propertyListener);
+        viewer.getControl().addDisposeListener(e -> currentTheme.removePropertyChangeListener(propertyListener));
     }
 
     private void setFontFromPreference(final ProjectionViewer viewer) {
         final Font redSourceEditorFont = RedTheme.getRedSourceEditorFont();
         final Font defaultTextEditorFont = RedTheme.getTextEditorFont();
 
-        if (!redSourceEditorFont.isDisposed() && !defaultTextEditorFont.isDisposed()
-                && !redSourceEditorFont.getFontData()[0].equals(defaultTextEditorFont.getFontData()[0])) {
-            setFont(viewer, RedTheme.getRedSourceEditorFont());
+        if (!redSourceEditorFont.getFontData()[0].equals(defaultTextEditorFont.getFontData()[0])) {
+            setFont(viewer, redSourceEditorFont);
         }
     }
 

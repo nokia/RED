@@ -16,7 +16,6 @@ import org.eclipse.jface.text.IAutoEditStrategy;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControl;
 import org.eclipse.jface.text.ITextHover;
-import org.eclipse.jface.text.TextAttribute;
 import org.eclipse.jface.text.contentassist.ContentAssistant;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.formatter.IContentFormatter;
@@ -34,7 +33,6 @@ import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
-import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -46,8 +44,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToVariablesDetector;
@@ -92,7 +88,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.WithNameRule;
-import org.robotframework.red.graphics.ColorsManager;
 
 import com.google.common.base.Supplier;
 
@@ -104,10 +99,16 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private IReconciler reconciler;
 
+    private ColoringTokens coloringTokens;
+
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor,
             final KeySequence contentAssistActivationTrigger) {
         this.editor = editor;
         this.contentAssistActivationTrigger = contentAssistActivationTrigger;
+    }
+
+    ColoringTokens getColoringTokens() {
+        return coloringTokens;
     }
 
     @Override
@@ -389,35 +390,20 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     public IPresentationReconciler getPresentationReconciler(final ISourceViewer sourceViewer) {
         final PresentationReconciler reconciler = new PresentationReconciler();
 
-        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+        if (coloringTokens == null) {
+            coloringTokens = new ColoringTokens(RedPlugin.getDefault().getPreferences());
+            coloringTokens.initialize();
+        }
 
-        final ColoringPreference sectionPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SECTION_HEADER);
-        final IToken section = new Token(createAttribute(sectionPref));
-
-        final ColoringPreference commentPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.COMMENT);
-        final IToken comment = new Token(createAttribute(commentPref));
-
-        final ColoringPreference definitionPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.DEFINITION);
-        final IToken definition = new Token(createAttribute(definitionPref));
-
-        final ColoringPreference variablePref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.VARIABLE);
-        final IToken variable = new Token(createAttribute(variablePref));
-
-        final ColoringPreference callPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.KEYWORD_CALL);
-        final IToken call = new Token(createAttribute(callPref));
-
-        final ColoringPreference settingPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SETTING);
-        final IToken setting = new Token(createAttribute(settingPref));
-
-        final ColoringPreference gherkinPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.GHERKIN);
-        final IToken gherkin = new Token(createAttribute(gherkinPref));
-
-        final ColoringPreference specialTokenPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SPECIAL);
-        final IToken specialToken = new Token(createAttribute(specialTokenPref));
-
-        final ColoringPreference garbagePref = preferences
-                .getSyntaxColoring(SyntaxHighlightingCategory.DEFAULT_SECTION);
-        final IToken defaultSection = new Token(createAttribute(garbagePref));
+        final IToken section = coloringTokens.get(SyntaxHighlightingCategory.SECTION_HEADER);
+        final IToken comment = coloringTokens.get(SyntaxHighlightingCategory.COMMENT);
+        final IToken definition = coloringTokens.get(SyntaxHighlightingCategory.DEFINITION);
+        final IToken variable = coloringTokens.get(SyntaxHighlightingCategory.VARIABLE);
+        final IToken call = coloringTokens.get(SyntaxHighlightingCategory.KEYWORD_CALL);
+        final IToken setting = coloringTokens.get(SyntaxHighlightingCategory.SETTING);
+        final IToken gherkin = coloringTokens.get(SyntaxHighlightingCategory.GHERKIN);
+        final IToken specialToken = coloringTokens.get(SyntaxHighlightingCategory.SPECIAL);
+        final IToken defaultSection = coloringTokens.get(SyntaxHighlightingCategory.DEFAULT_SECTION);
 
         final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CommentRule(comment), new MatchEverythingRule(defaultSection) };
@@ -448,10 +434,6 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, store, variablesRules);
 
         return reconciler;
-    }
-
-    private TextAttribute createAttribute(final ColoringPreference sectionPref) {
-        return new TextAttribute(ColorsManager.getColor(sectionPref.getRgb()), null, sectionPref.getFontStyle());
     }
 
     private void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,

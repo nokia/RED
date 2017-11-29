@@ -40,12 +40,8 @@ public class RedPreferencesInitializerTest {
         new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
 
         for (final SyntaxHighlightingCategory category : SyntaxHighlightingCategory.values()) {
-            final String prefix = RedPreferences.SYNTAX_COLORING_PREFIX + category.getId();
             final ColoringPreference preference = category.getDefault();
-            verify(preferences).putInt(prefix + ".fontStyle", preference.getFontStyle());
-            verify(preferences).putInt(prefix + ".color.r", preference.getRgb().red);
-            verify(preferences).putInt(prefix + ".color.g", preference.getRgb().green);
-            verify(preferences).putInt(prefix + ".color.b", preference.getRgb().blue);
+            verify(preferences).put(category.getPreferenceId(), preference.toPreferenceString());
         }
     }
 
