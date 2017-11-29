@@ -98,7 +98,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         }
 
         private void startAutoDiscovering() {
-            discovererFactory.create(suiteFile.getProject(), newArrayList(suiteFile.getFile())).start();
+            discovererFactory.create(suiteFile.getProject(), newArrayList(suiteFile)).start();
         }
 
         @Override
