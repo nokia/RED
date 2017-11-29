@@ -5,17 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import java.util.Collection;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -53,7 +49,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     @Override
     public void initialReconcile() {
         getFoldingSupport().reset();
-        updateFoldingStructure();
+        getFoldingSupport().updateFoldingStructure(getSuiteModel(), document);
     }
 
     @Override
@@ -70,7 +66,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
 
     private void reconcile() {
         reparseModel();
-        updateFoldingStructure();
+        getFoldingSupport().updateFoldingStructure(getSuiteModel(), document);
         RobotArtifactsValidator.revalidate(getSuiteModel());
     }
 
@@ -81,21 +77,10 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
             suiteModel.dispose();
             suiteModel.link(fileOutput);
 
-            final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
             eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
         } catch (final InterruptedException e) {
             // ok so the model will be reparsed later
         }
-    }
-
-    private void updateFoldingStructure() {
-        final Collection<Position> positions = getFoldingSupport().calculateFoldingPositions(getSuiteModel(), document);
-        Display.getDefault().asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                getFoldingSupport().updateFoldingStructure(positions);
-            }
-        });
     }
 }

@@ -66,7 +66,7 @@ public class RedPreferences {
 
     public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
 
-    public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
+    public static final String SYNTAX_COLORING = "red.editor.syntaxColoring";
 
     public static final String LAUNCH_USE_ARGUMENT_FILE = "red.launch.useArgumentFile";
     public static final String LAUNCH_USE_SINGLE_FILE_DATA_SOURCE = "red.launch.useSingleFileDataSource";
@@ -270,11 +270,41 @@ public class RedPreferences {
     }
 
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
-        final int fontStyle = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".fontStyle");
-        final int red = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.r");
-        final int green = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.g");
-        final int blue = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.b");
-        return new ColoringPreference(new RGB(red, green, blue), fontStyle);
+        if (store.contains("syntaxColoring." + category.getId() + ".fontStyle")
+                || store.contains("syntaxColoring." + category.getId() + ".color.r")
+                || store.contains("syntaxColoring." + category.getId() + ".color.g")
+                || store.contains("syntaxColoring." + category.getId() + ".color.b")) {
+            // TODO: there are preferences written in old style; new style was introduced in 0.8.2
+            // remove handling old keys somewhere in future
+
+            final int fontStyle = store.contains("syntaxColoring." + category.getId() + ".fontStyle")
+                    ? store.getInt("syntaxColoring." + category.getId() + ".fontStyle")
+                    : category.getDefault().fontStyle;
+            final int red = store.contains("syntaxColoring." + category.getId() + ".color.r")
+                    ? store.getInt("syntaxColoring." + category.getId() + ".color.r")
+                    : category.getDefault().color.red;
+            final int green = store.contains("syntaxColoring." + category.getId() + ".color.g")
+                    ? store.getInt("syntaxColoring." + category.getId() + ".color.g")
+                    : category.getDefault().color.green;
+            final int blue = store.contains("syntaxColoring." + category.getId() + ".color.b")
+                    ? store.getInt("syntaxColoring." + category.getId() + ".color.b")
+                    : category.getDefault().color.blue;
+
+            final ColoringPreference preference = new ColoringPreference(new RGB(red, green, blue), fontStyle);
+
+            // remove old style preferences and set new
+            for (final IEclipsePreferences prefs : ((ScopedPreferenceStore) store).getPreferenceNodes(true)) {
+                prefs.remove("syntaxColoring." + category.getId() + ".fontStyle");
+                prefs.remove("syntaxColoring." + category.getId() + ".color.r");
+                prefs.remove("syntaxColoring." + category.getId() + ".color.g");
+                prefs.remove("syntaxColoring." + category.getId() + ".color.b");
+            }
+            store.setValue(category.getPreferenceId(), preference.toPreferenceString());
+            return preference;
+        } else {
+            final String coloringValue = store.getString(category.getPreferenceId());
+            return ColoringPreference.fromPreferenceString(coloringValue);
+        }
     }
 
     public Severity getProblemCategorySeverity(final ProblemCategory category) {
@@ -311,6 +341,12 @@ public class RedPreferences {
 
     public static class ColoringPreference {
 
+        public static ColoringPreference fromPreferenceString(final String coloringValue) {
+            final String[] rgbWithStyle = coloringValue.split(",");
+            return new ColoringPreference(new RGB(Integer.valueOf(rgbWithStyle[0]), Integer.valueOf(rgbWithStyle[1]),
+                    Integer.valueOf(rgbWithStyle[2])), Integer.valueOf(rgbWithStyle[3]));
+        }
+
         private final RGB color;
 
         private final int fontStyle;
@@ -330,6 +366,10 @@ public class RedPreferences {
 
         public RGB getRgb() {
             return color;
+        }
+
+        public String toPreferenceString() {
+            return color.red + "," + color.green + "," + color.blue + "," + fontStyle;
         }
 
         @Override
