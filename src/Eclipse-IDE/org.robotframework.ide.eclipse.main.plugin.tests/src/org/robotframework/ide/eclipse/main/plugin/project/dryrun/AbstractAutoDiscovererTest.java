@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.swt.widgets.Shell;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -74,7 +73,7 @@ public class AbstractAutoDiscovererTest {
             }
 
             @Override
-            Job start(final Shell parent) {
+            public Job start() {
                 return new WorkspaceJob("Discovering") {
 
                     @Override

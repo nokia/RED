@@ -6,9 +6,20 @@
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
@@ -17,6 +28,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -26,10 +43,16 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
 
+import com.google.common.collect.ImmutableMap;
+
+@RunWith(MockitoJUnitRunner.class)
 public class LibrariesAutoDiscovererTest {
 
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(LibrariesAutoDiscovererTest.class);
+
+    @Mock
+    private Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
 
     private static RobotModel model = new RobotModel();
 
@@ -77,27 +100,40 @@ public class LibrariesAutoDiscovererTest {
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("suite2.robot",
                 "*** Settings ***", "Library  ./other/dir/OtherLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("suite3.robot",
-                "*** Settings ***", "Library  module", "Library  ./libs/NotExisting.py", "*** Test Cases ***"));
+                "*** Settings ***", "Library  module", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
         final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
         final ReferencedLibrary lib3 = createLibrary("module", "module/__init__.py");
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite1, suite2, suite3), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite1, suite2, suite3), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2, lib3);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("TestLib", "OtherLib", "module"),
+                DryRunLibraryImportStatus.ALREADY_EXISTING, newHashSet(), DryRunLibraryImportStatus.NOT_ADDED,
+                newHashSet("NotExisting.py"));
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
     public void libsAreAddedToProjectConfig_forRobotResourceFile() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("resource.robot",
-                "*** Settings ***", "Library  ./libs/TestLib.py", "Library  ./libs/NotExisting.py"));
+                "*** Settings ***", "Library  ./libs/TestLib.py", "Library  NotExisting.py"));
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("TestLib"), DryRunLibraryImportStatus.ALREADY_EXISTING,
+                newHashSet(), DryRunLibraryImportStatus.NOT_ADDED, newHashSet("NotExisting.py"));
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
@@ -107,9 +143,15 @@ public class LibrariesAutoDiscovererTest {
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("TestLib"), DryRunLibraryImportStatus.ALREADY_EXISTING,
+                newHashSet(), DryRunLibraryImportStatus.NOT_ADDED, newHashSet());
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
@@ -124,22 +166,34 @@ public class LibrariesAutoDiscovererTest {
                 VariableMapping.create("${XYZ}", "${ABC}/dir")));
         projectProvider.configure(config);
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("OtherLib"), DryRunLibraryImportStatus.ALREADY_EXISTING,
+                newHashSet(), DryRunLibraryImportStatus.NOT_ADDED, newHashSet());
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
     public void libsAreAddedToProjectConfig_whenExistingLibIsFound() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(
                 projectProvider.createFile("suite.robot", "*** Settings ***", "Library  other/dir/OtherLib.py",
-                        "Library  ./libs/TestLib.py", "Library  ./libs/NotExisting.py", "*** Test Cases ***"));
+                        "Library  ./libs/TestLib.py", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), false, "TestLib").start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler, "TestLib").start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("TestLib"), DryRunLibraryImportStatus.ALREADY_EXISTING,
+                newHashSet(), DryRunLibraryImportStatus.NOT_ADDED, newHashSet());
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
@@ -153,14 +207,21 @@ public class LibrariesAutoDiscovererTest {
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("A/B/C/D/suite2.robot",
                 "*** Settings ***", "Library  ../../../../other/dir/OtherLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite3 = model.createSuiteFile(projectProvider.createFile("A/B/C/D/suite3.robot",
-                "*** Settings ***", "Library  ../../../../libs/NotExisting.py", "*** Test Cases ***"));
+                "*** Settings ***", "Library  NotExisting.py", "*** Test Cases ***"));
 
         final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
         final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite1, suite2, suite3), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite1, suite2, suite3), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("TestLib", "OtherLib"),
+                DryRunLibraryImportStatus.ALREADY_EXISTING, newHashSet(), DryRunLibraryImportStatus.NOT_ADDED,
+                newHashSet("NotExisting.py"));
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
@@ -168,14 +229,21 @@ public class LibrariesAutoDiscovererTest {
         final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite.robot",
                 "*** Settings ***", "Library  ./libs/TestLib.py", "*** Test Cases ***"));
         final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("resource.robot",
-                "*** Settings ***", "Library  ./other/dir/OtherLib.py", "Library  ./libs/NotExisting.py"));
+                "*** Settings ***", "Library  ./other/dir/OtherLib.py", "Library  NotExisting.py"));
 
         final ReferencedLibrary lib1 = createLibrary("TestLib", "libs/TestLib.py");
         final ReferencedLibrary lib2 = createLibrary("OtherLib", "other/dir/OtherLib.py");
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite1, suite2), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite1, suite2), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib1, lib2);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("TestLib", "OtherLib"),
+                DryRunLibraryImportStatus.ALREADY_EXISTING, newHashSet(), DryRunLibraryImportStatus.NOT_ADDED,
+                newHashSet("NotExisting.py"));
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
@@ -183,9 +251,15 @@ public class LibrariesAutoDiscovererTest {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***",
                 "Library  NotExisting.py", "*** Test Cases ***"));
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet(), DryRunLibraryImportStatus.ALREADY_EXISTING, newHashSet(),
+                DryRunLibraryImportStatus.NOT_ADDED, newHashSet("NotExisting.py"));
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
@@ -193,9 +267,12 @@ public class LibrariesAutoDiscovererTest {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***",
                 "Library  ./libs/TestLib.py", "*** Test Cases ***"));
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), false, "NotExistingLib").start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler, "NotExistingLib").start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+
+        verify(summaryHandler).accept(Collections.emptyList());
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     @Test
@@ -209,9 +286,15 @@ public class LibrariesAutoDiscovererTest {
         config.addReferencedLibrary(lib);
         projectProvider.configure(config);
 
-        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), false).start().join();
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler).start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet(), DryRunLibraryImportStatus.ALREADY_EXISTING,
+                newHashSet("TestLib"), DryRunLibraryImportStatus.NOT_ADDED, newHashSet());
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
     }
 
     private ReferencedLibrary createLibrary(final String name, final String filePath)
@@ -222,5 +305,21 @@ public class LibrariesAutoDiscovererTest {
                         .makeRelative()
                         .removeLastSegments(1)
                         .toPortableString());
+    }
+
+    private static ArgumentMatcher<Collection<RobotDryRunLibraryImport>> hasLibNames(
+            final Map<DryRunLibraryImportStatus, Set<String>> namesByStatus) {
+        return toMatch -> {
+            final Map<DryRunLibraryImportStatus, Set<String>> actualNamesByStatus = new HashMap<>();
+            namesByStatus.forEach((status, names) -> {
+                final Set<String> actualNames = toMatch.stream()
+                        .filter(lib -> lib.getStatus() == status)
+                        .map(RobotDryRunLibraryImport::getName)
+                        .collect(Collectors.toSet());
+                actualNamesByStatus.put(status, actualNames);
+
+            });
+            return actualNamesByStatus.equals(namesByStatus);
+        };
     }
 }
