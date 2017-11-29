@@ -904,78 +904,35 @@
           id="org.robotframework.ide.eclipse.theme"
           label="Robot">
     </themeElementCategory>
-    <themeElementCategory
-          id="org.robotframework.ide.eclipse.table.theme"
-          label="Table Editor"
-          parentId="org.robotframework.ide.eclipse.theme">
-    </themeElementCategory>
-    <themeElementCategory
-          id="org.robotframework.ide.eclipse.source.theme"
-          label="Source Editor"
-          parentId="org.robotframework.ide.eclipse.theme">
-    </themeElementCategory>
     <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.table.theme"
+          categoryId="org.robotframework.ide.eclipse.theme"
           id="org.robotframework.ide.eclipse.cell.highlight"
           isEditable="true"
-          label="Highlighted cell color"
+          label="Table highlighted cell"
           value="255, 245, 210">
        <description>
           This color is used in RED table editor in order to highlight currently hovered cell
        </description>
     </colorDefinition>
     <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.table.theme"
+          categoryId="org.robotframework.ide.eclipse.theme"
           id="org.robotframework.ide.eclipse.row.selected"
           isEditable="true"
-          label="Selected cell color"
+          label="Table selected cell"
           value="255, 250, 245">
        <description>
           This color is used in RED table editor in order to highlight currently selected cells
        </description>
     </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.comment"
-          isEditable="true"
-          label="Comments "
-          value="200, 200, 200">
-       <description>
-          Color used for comments in RED table editor
-       </description>
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.variable"
-          isEditable="true"
-          label="Variables"
-          value="COLOR_DARK_GREEN">
-       <description>
-          Color used for variables in RED table editor
-       </description>
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.source.theme"
-          id="org.robotframework.ide.eclipse.section.header"
-          isEditable="true"
-          label="Section header"
-          value="255,0,0">
-    </colorDefinition>
-    <colorDefinition
-          categoryId="org.robotframework.ide.eclipse.source.theme"
-          id="org.robotframework.ide.eclipse.setting"
-          label="Setting "
-          value="255,205,165">
-    </colorDefinition>
     <fontDefinition
-          categoryId="org.robotframework.ide.eclipse.source.theme"
+          categoryId="org.robotframework.ide.eclipse.theme"
           defaultsTo="org.eclipse.jface.textfont"
           id="org.robotframework.red.textfont"
           isEditable="true"
           label="Text Font">
     </fontDefinition>
     <fontDefinition
-          categoryId="org.robotframework.ide.eclipse.table.theme"
+          categoryId="org.robotframework.ide.eclipse.theme"
           id="org.robotframework.red.tablefont"
           isEditable="true"
           label="Table Font">

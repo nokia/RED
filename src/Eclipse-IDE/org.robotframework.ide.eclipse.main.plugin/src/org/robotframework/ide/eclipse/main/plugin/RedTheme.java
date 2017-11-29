@@ -18,14 +18,10 @@ public class RedTheme {
     public static final String RED_SOURCE_EDITOR_FONT = "org.robotframework.red.textfont";
     private static final String RED_TABLE_EDITOR_FONT = "org.robotframework.red.tablefont";
 
-    private static final String SECTION_HEADER = "org.robotframework.ide.eclipse.section.header";
     private static final String ECLIPSE_DECORATION_COLOR = "DECORATIONS_COLOR";
     private static final String ECLIPSE_SEARCH_MATCH_COLOR = "org.eclipse.search.ui.match.highlight";
     private static final String HIGHLIGHTED_CELL_COLOR = "org.robotframework.ide.eclipse.cell.highlight";
     private static final String HIGHLIGHTED_ROW_COLOR = "org.robotframework.ide.eclipse.row.selected";
-    private static final String COMMENTS_IN_TABLES = "org.robotframework.ide.eclipse.comment";
-    private static final String VARIABLES_IN_TABLES = "org.robotframework.ide.eclipse.variable";
-    private static final String SETTING = "org.robotframework.ide.eclipse.setting";
     private static final String ROBOT_CONSOLE_RED_MESSAGES = "org.robotframework.ide.eclipse.robotConsoleRedStream";
 
 
@@ -55,22 +51,6 @@ public class RedTheme {
 
     public static Color getHiglihtedRowColor() {
         return getColorRegistry().get(HIGHLIGHTED_ROW_COLOR);
-    }
-
-    public static Color getCommentsColor() {
-        return getColorRegistry().get(COMMENTS_IN_TABLES);
-    }
-
-    public static Color getVariableColor() {
-        return getColorRegistry().get(VARIABLES_IN_TABLES);
-    }
-
-    public static Color getSectionHeaderColor() {
-        return getColorRegistry().get(SECTION_HEADER);
-    }
-
-    public static Color getSettingColor() {
-        return getColorRegistry().get(SETTING);
     }
 
     public static Font getTextEditorFont() {
