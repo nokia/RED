@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 
 /**
@@ -40,8 +41,45 @@ public enum SyntaxHighlightingCategory {
         this.desc = desc;
     }
 
+    public static SyntaxHighlightingCategory fromPreferenceId(final String key) {
+        if (COMMENT.getPreferenceId().equals(key)) {
+            return COMMENT;
+
+        } else if (GHERKIN.getPreferenceId().equals(key)) {
+            return GHERKIN;
+
+        } else if (KEYWORD_CALL.getPreferenceId().equals(key)) {
+            return KEYWORD_CALL;
+
+        } else if (DEFINITION.getPreferenceId().equals(key)) {
+            return DEFINITION;
+
+        } else if (SECTION_HEADER.getPreferenceId().equals(key)) {
+            return SECTION_HEADER;
+
+        } else if (SETTING.getPreferenceId().equals(key)) {
+            return SETTING;
+
+        } else if (SPECIAL.getPreferenceId().equals(key)) {
+            return SPECIAL;
+
+        } else if (DEFAULT_SECTION.getPreferenceId().equals(key)) {
+            return DEFAULT_SECTION;
+
+        } else if (VARIABLE.getPreferenceId().equals(key)) {
+            return VARIABLE;
+
+        } else {
+            throw new IllegalStateException("Unrecognized preference key: " + key);
+        }
+    }
+
     public String getId() {
         return this.id;
+    }
+
+    public String getPreferenceId() {
+        return RedPreferences.SYNTAX_COLORING + "." + id;
     }
 
     public String getShortDescription() {
@@ -59,4 +97,5 @@ public enum SyntaxHighlightingCategory {
     public ColoringPreference getDark() {
         return darkPref;
     }
+
 }

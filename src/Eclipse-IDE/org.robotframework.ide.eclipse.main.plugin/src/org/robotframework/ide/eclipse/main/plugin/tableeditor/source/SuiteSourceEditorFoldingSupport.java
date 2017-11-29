@@ -44,6 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.red.swt.StyledTextWrapper;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
@@ -84,6 +85,11 @@ class SuiteSourceEditorFoldingSupport {
             }
         }
         oldFoldingAnnotations.clear();
+    }
+
+    void updateFoldingStructure(final RobotSuiteFile model, final IDocument document) {
+        final Collection<Position> positions = calculateFoldingPositions(model, document);
+        SwtThread.asyncExec(() -> updateFoldingStructure(positions));
     }
 
     Collection<Position> calculateFoldingPositions(final RobotSuiteFile model, final IDocument document) {
@@ -287,6 +293,7 @@ class SuiteSourceEditorFoldingSupport {
         };
     }
 
+    @VisibleForTesting
     void updateFoldingStructure(final Collection<Position> positions) {
         if (annotationsModel == null) {
             return;

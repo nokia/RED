@@ -20,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.IssuesStrategy;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.ElementOpenMode;
@@ -95,12 +94,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
 
     private void initializeSyntaxColoringPreferences(final IEclipsePreferences preferences) {
         for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
-            final ColoringPreference defaultPref = category.getDefault();
-
-            preferences.putInt(getFontStyleIdentifierFor(category), defaultPref.getFontStyle());
-            preferences.putInt(getRedFactorIdentifierFor(category), defaultPref.getRgb().red);
-            preferences.putInt(getGreenFactorIdentifierFor(category), defaultPref.getRgb().green);
-            preferences.putInt(getBlueFactorIdentifierFor(category), defaultPref.getRgb().blue);
+            preferences.put(category.getPreferenceId(), category.getDefault().toPreferenceString());
         }
     }
 
@@ -133,21 +127,5 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.RFLINT_RULES_CONFIG_NAMES, "");
         preferences.put(RedPreferences.RFLINT_RULES_CONFIG_SEVERITIES, "");
         preferences.put(RedPreferences.RFLINT_RULES_CONFIG_ARGS, "");
-    }
-
-    static String getFontStyleIdentifierFor(final SyntaxHighlightingCategory category) {
-        return RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".fontStyle";
-    }
-
-    static String getRedFactorIdentifierFor(final SyntaxHighlightingCategory category) {
-        return RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".color.r";
-    }
-
-    static String getGreenFactorIdentifierFor(final SyntaxHighlightingCategory category) {
-        return RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".color.g";
-    }
-
-    static String getBlueFactorIdentifierFor(final SyntaxHighlightingCategory category) {
-        return RedPreferences.SYNTAX_COLORING_PREFIX + category.getId() + ".color.b";
     }
 }
