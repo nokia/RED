@@ -11,32 +11,27 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.ProblemCategoryType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.red.jface.preferences.ComboBoxFieldEditor;
 
-public class ValidationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class ValidationPreferencePage extends RedFieldEditorPreferencePage {
 
     private static final String HELP_CONTEXT_ID = RedPlugin.PLUGIN_ID + ".validation_preferences_page_context";
 
@@ -47,8 +42,6 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
     private IDialogSettings preferencesSettings;
 
     public ValidationPreferencePage() {
-        super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
         setDescription("RED validation settings");
         this.currentPreferences = new EnumMap<>(ProblemCategory.class);
         for (final ProblemCategory category : EnumSet.allOf(ProblemCategory.class)) {
@@ -66,11 +59,6 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
     public void createControl(final Composite parent) {
         super.createControl(parent);
         PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(), HELP_CONTEXT_ID);
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
     }
 
     @Override

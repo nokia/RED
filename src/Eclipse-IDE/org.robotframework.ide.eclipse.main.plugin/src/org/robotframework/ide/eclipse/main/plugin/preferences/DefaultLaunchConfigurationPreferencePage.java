@@ -6,46 +6,25 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.rf.ide.core.execution.server.AgentConnectionServer;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.launch.local.RobotLaunchConfiguration;
 import org.robotframework.red.jface.dialogs.ScriptExportDialog;
 
-public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPreferencePage
-        implements IWorkbenchPreferencePage {
-
-    private StringFieldEditor remoteHost;
-
-    private IntegerFieldEditor remotePort;
-
-    private IntegerFieldEditor remoteTimeout;
+public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPreferencePage {
 
     public DefaultLaunchConfigurationPreferencePage() {
-        super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
         setDescription("Configure default robot launch configurations");
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
     }
 
     @Override
@@ -77,18 +56,20 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         GridLayoutFactory.fillDefaults().applyTo(group);
         GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).span(2, 1).applyTo(group);
 
-        remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST, "Server IP:", group);
+        final StringFieldEditor remoteHost = new StringFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_HOST,
+                "Server IP:", group);
         remoteHost.setEmptyStringAllowed(false);
         remoteHost.setErrorMessage("Server IP cannot be empty");
         remoteHost.load();
         addField(remoteHost);
 
-        remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT, "Server port:", group);
+        final IntegerFieldEditor remotePort = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_PORT,
+                "Server port:", group);
         remotePort.setValidRange(AgentConnectionServer.MIN_CONNECTION_PORT, AgentConnectionServer.MAX_CONNECTION_PORT);
         remotePort.load();
         addField(remotePort);
 
-        remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
+        final IntegerFieldEditor remoteTimeout = new IntegerFieldEditor(RedPreferences.LAUNCH_AGENT_CONNECTION_TIMEOUT,
                 "Server connection timeout [s]:", group);
         remoteTimeout.setValidRange(AgentConnectionServer.MIN_CONNECTION_TIMEOUT,
                 AgentConnectionServer.MAX_CONNECTION_TIMEOUT);
@@ -98,13 +79,8 @@ public class DefaultLaunchConfigurationPreferencePage extends FieldEditorPrefere
         final Button exportBtn = new Button(group, SWT.PUSH);
         GridDataFactory.swtDefaults().indent(25, 5).applyTo(exportBtn);
         exportBtn.setText("Export Client Script");
-        exportBtn.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open();
-            }
-        });
+        exportBtn.addSelectionListener(SelectionListener
+                .widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
     }
 
     private void createExecutorLaunchConfigurationPreferences(final Composite parent) {

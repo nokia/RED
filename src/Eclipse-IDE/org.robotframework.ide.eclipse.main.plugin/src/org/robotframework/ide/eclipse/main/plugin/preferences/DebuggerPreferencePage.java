@@ -1,32 +1,19 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
 
-public class DebuggerPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class DebuggerPreferencePage extends RedFieldEditorPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.launch.debugger";
 
     public DebuggerPreferencePage() {
-        super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
         setDescription("Configure debugger options");
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
     }
 
     @Override
