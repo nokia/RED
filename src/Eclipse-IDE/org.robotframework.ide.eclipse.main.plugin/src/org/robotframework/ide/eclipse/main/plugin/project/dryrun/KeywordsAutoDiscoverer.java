@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Display;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
@@ -48,10 +48,10 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    Job start(final Shell parent) {
+    public Job start() {
         if (lockDryRun()) {
             try {
-                new ProgressMonitorDialog(parent).run(true, true, monitor -> {
+                new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, monitor -> {
                     try {
                         startDiscovering(monitor);
                         if (monitor.isCanceled()) {
