@@ -27,23 +27,17 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -54,8 +48,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
@@ -71,7 +63,7 @@ import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Joiner;
 
-public class InstalledRobotsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
+public class InstalledRobotsPreferencesPage extends RedPreferencePage {
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.installed";
 
@@ -90,16 +82,6 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
     public InstalledRobotsPreferencesPage() {
         super("Installed Robot Frameworks");
-    }
-
-    @Override
-    protected IPreferenceStore doGetPreferenceStore() {
-        return RedPlugin.getDefault().getPreferenceStore();
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
     }
 
     @Override
@@ -133,27 +115,24 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
     }
 
     private SelectionListener createDiscoverListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                disableControls();
-                progressBar = createProgress(parent);
+        return SelectionListener.widgetSelectedAdapter(e -> {
+            disableControls();
+            progressBar = createProgress(parent);
 
-                final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
-                final Job job = new Job("Looking for python installations") {
-                    @Override
-                    protected IStatus run(final IProgressMonitor monitor) {
-                        addOnlyNonExisting(RobotRuntimeEnvironment.whereArePythonInterpreters());
+            final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
+            final Job job = new Job("Looking for python installations") {
 
-                        setProperty(key, null);
-                        return Status.OK_STATUS;
-                    }
-                };
-                job.addJobChangeListener(new EnvironmentFoundJobListener(key));
-                job.schedule();
-            }
+                @Override
+                protected IStatus run(final IProgressMonitor monitor) {
+                    addOnlyNonExisting(RobotRuntimeEnvironment.whereArePythonInterpreters());
 
-        };
+                    setProperty(key, null);
+                    return Status.OK_STATUS;
+                }
+            };
+            job.addJobChangeListener(new EnvironmentFoundJobListener(key));
+            job.schedule();
+        });
     }
 
     private boolean addOnlyNonExisting(final Collection<PythonInstallationDirectory> locations) {
@@ -206,31 +185,20 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         GridDataFactory.fillDefaults().grab(true, true).span(1, 5).applyTo(viewer.getTable());
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
-        final ISelectionChangedListener selectionListener = new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                final RobotRuntimeEnvironment selectedInstallation = getSelectedInstallation();
-                removeButton.setEnabled(selectedInstallation != null);
+        final ISelectionChangedListener selectionListener = event -> removeButton
+                .setEnabled(getSelectedInstallation() != null);
+        final ICheckStateListener checkListener = event -> {
+            if (event.getChecked()) {
+                viewer.setCheckedElements(new Object[] { event.getElement() });
+                viewer.refresh();
             }
-        };
-        final ICheckStateListener checkListener = new ICheckStateListener() {
-            @Override
-            public void checkStateChanged(final CheckStateChangedEvent event) {
-                if (event.getChecked()) {
-                    viewer.setCheckedElements(new Object[] { event.getElement() });
-                    viewer.refresh();
-                }
-                dirty = true;
-            }
+            dirty = true;
         };
         viewer.addSelectionChangedListener(selectionListener);
         viewer.addCheckStateListener(checkListener);
-        viewer.getTable().addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                viewer.removeSelectionChangedListener(selectionListener);
-                viewer.removeCheckStateListener(checkListener);
-            }
+        viewer.getTable().addDisposeListener(e -> {
+            viewer.removeSelectionChangedListener(selectionListener);
+            viewer.removeCheckStateListener(checkListener);
         });
         ColumnViewerToolTipSupport.enableFor(viewer);
 

@@ -86,17 +86,16 @@ public class RedPlugin extends AbstractUIPlugin {
     }
 
     public RobotRuntimeEnvironment getActiveRobotInstallation() {
-        return InstalledRobotEnvironments.getActiveRobotInstallation(new RedPreferences(getPreferenceStore()));
+        return InstalledRobotEnvironments.getActiveRobotInstallation(getPreferences());
     }
 
     public RobotRuntimeEnvironment getRobotInstallation(final File file, final SuiteExecutor executor) {
-        return InstalledRobotEnvironments.getRobotInstallation(new RedPreferences(getPreferenceStore()), file,
-                executor);
+        return InstalledRobotEnvironments.getRobotInstallation(getPreferences(), file, executor);
     }
 
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
         final List<RobotRuntimeEnvironment> allRobotInstallation = InstalledRobotEnvironments
-                .getAllRobotInstallation(new RedPreferences(getPreferenceStore()));
+                .getAllRobotInstallation(getPreferences());
         return allRobotInstallation == null ? new ArrayList<>() : allRobotInstallation;
     }
 

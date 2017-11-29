@@ -5,39 +5,21 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
-public class LaunchingPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-
-    public LaunchingPreferencePage() {
-        super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
-    }
+public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
 
     @Override
     protected void createFieldEditors() {
@@ -65,18 +47,14 @@ public class LaunchingPreferencePage extends FieldEditorPreferencePage implement
                 + "\">'Launching'</a> for general launching preferences " + "or <a href=\"" + runDebugPageId
                 + "\">'Run/Debug'</a> for other related preferences.";
         link.setText(text);
-        link.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                if (launchingPageId.equals(e.text)) {
-                    PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
-                } else if (runDebugPageId.equals(e.text)) {
-                    PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null,
-                            "selectFont:org.robotframework.ide.textfont");
-                }
+        link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+            if (launchingPageId.equals(e.text)) {
+                PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
+            } else if (runDebugPageId.equals(e.text)) {
+                PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null,
+                        "selectFont:org.robotframework.ide.textfont");
             }
-        });
+        }));
     }
 
     private void createLaunchingGroup(final Composite parent) {
