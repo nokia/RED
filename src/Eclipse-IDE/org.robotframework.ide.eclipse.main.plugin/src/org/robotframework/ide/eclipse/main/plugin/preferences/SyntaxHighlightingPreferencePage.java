@@ -14,12 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.ColorSelector;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -39,9 +37,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
@@ -53,7 +48,7 @@ import com.google.common.collect.Iterables;
 /**
  * @author Michal Anglart
  */
-public class SyntaxHighlightingPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
 
     private final Map<SyntaxHighlightingCategory, ColoringPreference> currentPreferences;
 
@@ -70,17 +65,10 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     private ListViewer viewer;
 
     public SyntaxHighlightingPreferencePage() {
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
-
         this.currentPreferences = new EnumMap<>(SyntaxHighlightingCategory.class);
         for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
             currentPreferences.put(category, category.getPreference());
         }
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
     }
 
     @Override

@@ -5,26 +5,19 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellWrappingStrategy;
@@ -35,19 +28,9 @@ import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
 
 import com.google.common.base.Function;
 
-public class SuiteEditorPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
 
     private Function<PropertyChangeEvent, Void> enablementUpdater;
-
-    public SuiteEditorPreferencePage() {
-        super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
-    }
 
     @Override
     protected void createFieldEditors() {
@@ -75,18 +58,14 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                 + "\">'Text Editors'</a> for general text editor preferences " + "and <a href=\"" + colorsAndFontsPageId
                 + "\">'Colors and Fonts'</a> to configure the font.";
         link.setText(text);
-        link.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                if (generalTextEditorPageId.equals(e.text)) {
-                    PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
-                } else if (colorsAndFontsPageId.equals(e.text)) {
-                    PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null,
-                            "selectFont:org.robotframework.ide.textfont");
-                }
+        link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+            if (generalTextEditorPageId.equals(e.text)) {
+                PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
+            } else if (colorsAndFontsPageId.equals(e.text)) {
+                PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null,
+                        "selectFont:org.robotframework.ide.textfont");
             }
-        });
+        }));
     }
 
     private void createGeneralSettingsGroup(final Composite parent) {
@@ -177,16 +156,12 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                 .valueOf(getPreferenceStore().getString(RedPreferences.SEPARATOR_MODE));
         separatorEditor.setEnabled(currentMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
 
-        enablementUpdater = new Function<PropertyChangeEvent, Void>() {
-
-            @Override
-            public Void apply(final PropertyChangeEvent event) {
-                if (event.getSource() == editors) {
-                    final SeparatorsMode newMode = SeparatorsMode.valueOf((String) event.getNewValue());
-                    separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
-                }
-                return null;
+        enablementUpdater = event -> {
+            if (event.getSource() == editors) {
+                final SeparatorsMode newMode = SeparatorsMode.valueOf((String) event.getNewValue());
+                separatorEditor.setEnabled(newMode != SeparatorsMode.ALWAYS_TABS, sourceGroup);
             }
+            return null;
         };
     }
 

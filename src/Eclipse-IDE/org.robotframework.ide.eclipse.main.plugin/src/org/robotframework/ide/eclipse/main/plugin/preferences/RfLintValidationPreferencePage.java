@@ -18,10 +18,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.AlwaysDeactivatingCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -48,9 +45,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.rf.ide.core.rflint.RfLintRule;
 import org.rf.ide.core.rflint.RfLintViolationSeverity;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -68,7 +62,7 @@ import org.robotframework.red.viewers.StructuredContentProvider;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 
-public class RfLintValidationPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class RfLintValidationPreferencePage extends RedPreferencePage {
 
     private final List<RfLintRule> rules = new ArrayList<>();
     private TableViewer rulesViewer;
@@ -78,17 +72,6 @@ public class RfLintValidationPreferencePage extends PreferencePage implements IW
 
     public RfLintValidationPreferencePage() {
         super("RfLint validation settings");
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
-    }
-
-    @Override
-    protected IPreferenceStore doGetPreferenceStore() {
-        return RedPlugin.getDefault().getPreferenceStore();
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
     }
 
     @Override

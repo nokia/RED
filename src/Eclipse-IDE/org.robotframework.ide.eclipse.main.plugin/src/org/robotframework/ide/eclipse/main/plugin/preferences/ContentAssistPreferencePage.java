@@ -5,44 +5,28 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
-public class ContentAssistPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
 
     private Text charsTextControl;
 
     private Text delayTextControl;
-
-    public ContentAssistPreferencePage() {
-        super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
-    }
-
-    @Override
-    public void init(final IWorkbench workbench) {
-        // nothing to do
-    }
 
     @Override
     protected void createFieldEditors() {
@@ -68,15 +52,11 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         final String text = "Robot content assistant preferences. See <a href=\"" + keysPageId
                 + "\">'Keys'</a> to configure activation key binding.";
         link.setText(text);
-        link.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                if (keysPageId.equals(e.text)) {
-                    PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
-                }
+        link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+            if (keysPageId.equals(e.text)) {
+                PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
             }
-        });
+        }));
     }
 
     private void createAutoActivationEditors(final Composite parent) {
@@ -108,14 +88,10 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         charsTextControl.setEnabled(isAutoActivationEnabled);
         GridDataFactory.fillDefaults().indent(25, 2).applyTo(autoActivationChars.getLabelControl(autoActivationGroup));
 
-        button.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                delayTextControl.setEnabled(button.getSelection());
-                charsTextControl.setEnabled(button.getSelection());
-            }
-        });
+        button.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+            delayTextControl.setEnabled(button.getSelection());
+            charsTextControl.setEnabled(button.getSelection());
+        }));
 
         final Label autoActivationDescription = new Label(autoActivationGroup, SWT.WRAP);
         autoActivationDescription.setText(
