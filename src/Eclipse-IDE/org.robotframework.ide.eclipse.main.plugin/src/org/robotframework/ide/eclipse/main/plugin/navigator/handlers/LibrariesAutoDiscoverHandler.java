@@ -11,11 +11,9 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.LibrariesAutoDiscoverHandler.E4LibrariesAutoDiscoverHandler;
@@ -35,13 +33,11 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
         public void discoverLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-            final Map<IProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
+            final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
                     .collectGroupedByProject(selectedResources);
             // for now we want to start autodiscovering only for one project
-            filesGroupedByProject.entrySet().stream().findFirst().ifPresent(entry -> {
-                final RobotProject robotProject = RedPlugin.getModelManager().createProject(entry.getKey());
-                new LibrariesAutoDiscoverer(robotProject, entry.getValue()).start();
-            });
+            filesGroupedByProject.entrySet().stream().findFirst().ifPresent(
+                    entry -> new LibrariesAutoDiscoverer(entry.getKey(), entry.getValue()).start());
         }
     }
 }

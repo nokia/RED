@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -20,6 +21,7 @@ import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.validation.ProblemPosition;
@@ -50,7 +52,10 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         this((robotProject, suites) -> {
             final boolean showSummary = robotProject.getRobotProjectConfig()
                     .isLibrariesAutoDiscoveringSummaryWindowEnabled();
-            return new LibrariesAutoDiscoverer(robotProject, suites, showSummary);
+            final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler = showSummary
+                    ? LibrariesAutoDiscoverer.defaultSummaryHandler()
+                    : libraryImports -> {};
+            return new LibrariesAutoDiscoverer(robotProject, suites, summaryHandler);
         });
     }
 
