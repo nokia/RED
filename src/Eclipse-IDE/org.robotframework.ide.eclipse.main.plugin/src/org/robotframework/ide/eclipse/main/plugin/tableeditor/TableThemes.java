@@ -237,22 +237,22 @@ public class TableThemes {
 
         @Override
         public Color getBodyHoveredCellBackground() {
-            return ColorsManager.getColor(128, 100, 45);
+            return RedTheme.getHighlightedCellColor();
         }
 
         @Override
         public Color getBodyHoveredSelectedCellBackground() {
-            return ColorsManager.getColor(128, 100, 45);
+            return RedTheme.getHighlightedCellColor();
         }
 
         @Override
         public Color getBodySelectedCellBackground() {
-            return ColorsManager.getColor(90, 80, 32);
+            return RedTheme.getHiglihtedRowColor();
         }
 
         @Override
         public Color getBodyAnchoredCellBackground() {
-            return ColorsManager.getColor(90, 80, 32);
+            return RedTheme.getHiglihtedRowColor();
         }
 
         @Override
