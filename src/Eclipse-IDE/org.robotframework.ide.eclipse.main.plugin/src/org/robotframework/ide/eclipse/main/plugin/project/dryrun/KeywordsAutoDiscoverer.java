@@ -8,11 +8,11 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
@@ -25,6 +25,7 @@ import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.io.Files;
 
@@ -94,7 +95,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
 
         @Override
         public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final List<IFile> suites) {
+                final Collection<RobotSuiteFile> suites) {
             final List<String> libraryNames = collectLibraryNames(robotProject);
             final Optional<File> tempSuiteFile = RobotDryRunTemporarySuites.createLibraryImportFile(libraryNames);
             tempSuiteFile.ifPresent(file -> {

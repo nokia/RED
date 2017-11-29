@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -86,10 +87,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
             globalBatchSaveResponsibleTrigger = null;
 
             if (!SUITES_FOR_DISCOVER.isEmpty()) {
-                final RobotProject project = SUITES_FOR_DISCOVER.get(0).getProject();
-                final List<IFile> suites = SUITES_FOR_DISCOVER.stream().map(RobotSuiteFile::getFile).collect(
-                        Collectors.toList());
-                startAutoDiscovering(project, suites);
+                startAutoDiscovering(SUITES_FOR_DISCOVER);
             }
             SUITES_FOR_DISCOVER.clear();
         }
@@ -99,15 +97,19 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         if (shouldStartAutoDiscovering(suite)) {
 
             if (globalBatchSaveResponsibleTrigger == null) {
-                startAutoDiscovering(suite.getProject(), newArrayList(suite.getFile()));
+                startAutoDiscovering(newArrayList(suite));
             } else {
                 SUITES_FOR_DISCOVER.add(suite);
             }
         }
     }
 
-    private void startAutoDiscovering(final RobotProject robotProject, final List<IFile> suites) {
-        discovererFactory.create(robotProject, suites).start();
+    private void startAutoDiscovering(final Collection<RobotSuiteFile> suites) {
+        final Map<RobotProject, List<RobotSuiteFile>> filesGroupedByProject = suites.stream()
+                .collect(Collectors.groupingBy(RobotSuiteFile::getProject));
+        // for now we want to start autodiscovering only for one project
+        filesGroupedByProject.entrySet().stream().findFirst().ifPresent(
+                entry -> discovererFactory.create(entry.getKey(), entry.getValue()).start());
     }
 
     private boolean shouldStartAutoDiscovering(final RobotSuiteFile suite) {

@@ -9,13 +9,13 @@ import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreExcept
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,6 +39,7 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 /**
  * @author bembenek
@@ -53,7 +54,7 @@ public abstract class AbstractAutoDiscoverer {
 
     final RobotProject robotProject;
 
-    private final List<IFile> suites;
+    private final Collection<RobotSuiteFile> suites;
 
     private final LibrariesSourcesCollector librariesSourcesCollector;
 
@@ -61,7 +62,7 @@ public abstract class AbstractAutoDiscoverer {
 
     private AgentConnectionServerJob serverJob;
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final List<IFile> suites,
+    AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
             final LibrariesSourcesCollector librariesSourcesCollector,
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
@@ -207,7 +208,8 @@ public abstract class AbstractAutoDiscoverer {
 
     public interface IDryRunTargetsCollector {
 
-        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject, List<IFile> suites);
+        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject,
+                Collection<RobotSuiteFile> suites);
 
         List<String> getSuiteNames();
 
