@@ -1,3 +1,16 @@
+IEclipsePreferences#org-robotframework-ide-eclipse-main-plugin {
+    preferences:
+        'red.editor.syntaxColoring.comment=128,128,128,0'
+        'red.editor.syntaxColoring.gherkin=128,255,255,1'
+        'red.editor.syntaxColoring.call=148,100,1,1'
+        'red.editor.syntaxColoring.definition=64,128,191,1'
+        'red.editor.syntaxColoring.section=233,97,148,0'
+        'red.editor.syntaxColoring.setting=255,255,128,0'
+        'red.editor.syntaxColoring.special=128,255,255,1'
+        'red.editor.syntaxColoring.default=113,193,2,2'
+        'red.editor.syntaxColoring.var=160,245,46,0'
+}
+
 IEclipsePreferences#org-eclipse-ui-editors:org-robotframework-ide-eclipse-main-plugin {
     preferences:
         'org.robotframework.ide.texteditor.occurrencesMark.color=100,90,130'

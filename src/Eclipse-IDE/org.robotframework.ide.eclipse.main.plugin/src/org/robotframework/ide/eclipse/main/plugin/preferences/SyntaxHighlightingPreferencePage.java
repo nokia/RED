@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static com.google.common.base.Functions.identity;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -64,11 +66,32 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
 
     private ListViewer viewer;
 
+    private final IPropertyChangeListener preferenceListener;
+
     public SyntaxHighlightingPreferencePage() {
-        this.currentPreferences = new EnumMap<>(SyntaxHighlightingCategory.class);
-        for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
-            currentPreferences.put(category, category.getPreference());
-        }
+        this.currentPreferences = EnumSet.allOf(SyntaxHighlightingCategory.class).stream().collect(
+                toMap(identity(), SyntaxHighlightingCategory::getPreference,
+                        (c1, c2) -> {
+                            throw new IllegalStateException();
+                        },
+                        () -> new EnumMap<>(SyntaxHighlightingCategory.class)));
+
+        preferenceListener = event -> {
+            final boolean isColoringPref = EnumSet.allOf(SyntaxHighlightingCategory.class)
+                    .stream()
+                    .map(SyntaxHighlightingCategory::getPreferenceId)
+                    .anyMatch(id -> id.equals(event.getProperty()));
+            if (isColoringPref) {
+                final SyntaxHighlightingCategory category = SyntaxHighlightingCategory
+                        .fromPreferenceId(event.getProperty());
+                final ColoringPreference newPref = ColoringPreference.fromPreferenceString((String) event.getNewValue());
+
+                currentPreferences.put(category, newPref);
+                refreshPreview();
+                setPresetLabel();
+            }
+        };
+        getPreferenceStore().addPropertyChangeListener(preferenceListener);
     }
 
     @Override
@@ -289,6 +312,7 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
         refreshPreview();
         presetColors.select(0);
         setButtons();
+
         super.performDefaults();
     }
 
@@ -299,6 +323,13 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
                 entry -> store.setValue(entry.getKey().getPreferenceId(), entry.getValue().toPreferenceString()));
 
         return super.performOk();
+    }
+
+    @Override
+    public void dispose() {
+        getPreferenceStore().removePropertyChangeListener(preferenceListener);
+
+        super.dispose();
     }
 
     private class SyntaxHighlightingCategoriesLabelProvider extends LabelProvider {
