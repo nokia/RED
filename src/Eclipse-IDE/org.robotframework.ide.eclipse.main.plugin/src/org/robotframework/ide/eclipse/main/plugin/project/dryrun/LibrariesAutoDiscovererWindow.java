@@ -26,9 +26,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -180,22 +178,17 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     private void registerLibrariesViewerListeners() {
-        discoveredLibrariesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(final SelectionChangedEvent event) {
-                final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
-                if (selection != null) {
-                    if (selection instanceof DryRunLibraryImportChildElement) {
-                        detailsText.setText(selection.toString());
-                    } else if (selection instanceof RobotDryRunLibraryImport) {
-                        detailsText.setText(convertDryRunLibraryImportToText((RobotDryRunLibraryImport) selection));
-                    } else {
-                        detailsText.setText("");
-                    }
+        discoveredLibrariesViewer.addSelectionChangedListener(event -> {
+            final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
+            if (selection != null) {
+                if (selection instanceof DryRunLibraryImportChildElement) {
+                    detailsText.setText(selection.toString());
+                } else if (selection instanceof RobotDryRunLibraryImport) {
+                    detailsText.setText(convertDryRunLibraryImportToText((RobotDryRunLibraryImport) selection));
+                } else {
+                    detailsText.setText("");
                 }
             }
-
         });
 
         discoveredLibrariesViewer.getTree().addKeyListener(new KeyAdapter() {
@@ -322,7 +315,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         detailsText.setAlwaysShowScrollBars(false);
     }
 
-    private String convertDryRunLibraryImportToText(final RobotDryRunLibraryImport libraryImport) {
+    private static String convertDryRunLibraryImportToText(final RobotDryRunLibraryImport libraryImport) {
         final StringBuilder libraryImportTxtBuilder = new StringBuilder("");
         for (final Object child : extractDryRunLibraryImportChildren(libraryImport)) {
             if (child instanceof DryRunLibraryImportChildElement) {
@@ -338,7 +331,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         return libraryImportTxtBuilder.toString();
     }
 
-    private List<Object> extractDryRunLibraryImportChildren(final RobotDryRunLibraryImport libraryImport) {
+    private static List<Object> extractDryRunLibraryImportChildren(final RobotDryRunLibraryImport libraryImport) {
         final List<Object> children = new ArrayList<>();
         if (libraryImport.getStatus() != null) {
             children.add(
@@ -367,7 +360,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         return children;
     }
 
-    private class DiscoveredLibrariesViewerContentProvider extends TreeContentProvider {
+    private static class DiscoveredLibrariesViewerContentProvider extends TreeContentProvider {
 
         @Override
         public Object[] getElements(final Object inputElement) {
@@ -403,7 +396,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     }
 
-    private class DiscoveredLibrariesViewerLabelProvider extends StyledCellLabelProvider {
+    private static class DiscoveredLibrariesViewerLabelProvider extends StyledCellLabelProvider {
 
         @Override
         public void update(final ViewerCell cell) {

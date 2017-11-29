@@ -9,11 +9,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -29,6 +28,7 @@ import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.AbstractAutoDiscoverer.IDryRunTargetsCollector;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -51,7 +51,7 @@ public class AbstractAutoDiscovererTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
 
-        final List<IFile> suites = Collections.emptyList();
+        final Collection<RobotSuiteFile> suites = Collections.emptyList();
 
         final LibrariesSourcesCollector sourcesCollector = new LibrariesSourcesCollector(robotProject);
 
@@ -60,8 +60,9 @@ public class AbstractAutoDiscovererTest {
         createDiscoverer(robotProject, suites, sourcesCollector, targetsCollector).startDiscovering(null);
     }
 
-    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject, final List<IFile> suites,
-            final LibrariesSourcesCollector sourcesCollector, final IDryRunTargetsCollector targetsCollector) {
+    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject,
+            final Collection<RobotSuiteFile> suites, final LibrariesSourcesCollector sourcesCollector,
+            final IDryRunTargetsCollector targetsCollector) {
         return new AbstractAutoDiscoverer(robotProject, suites, sourcesCollector, targetsCollector) {
 
             @Override
