@@ -1,0 +1,14 @@
+IEclipsePreferences#org-eclipse-ui-editors:org-robotframework-ide-eclipse-main-plugin {
+    preferences:
+        'org.robotframework.ide.texteditor.occurrencesMark.color=100,90,130'
+        'org.robotframework.red.cellHighlighting.color=60,55,75'
+        'org.robotframework.red.debug.currentErrorIP.color=130,40,40'
+        'org.robotframework.red.debug.secondaryErrorIP.color=80,25,25'
+}
+
+IEclipsePreferences#org-eclipse-ui-workbench:org-robot-framework-ide-eclipse-main-plugin {
+    preferences:
+        'org.robotframework.ide.eclipse.robotConsoleRedStream=204,204,204'
+        'org.robotframework.ide.eclipse.cell.highlight=128,100,45'
+        'org.robotframework.ide.eclipse.row.selected=90,80,32'
+}
