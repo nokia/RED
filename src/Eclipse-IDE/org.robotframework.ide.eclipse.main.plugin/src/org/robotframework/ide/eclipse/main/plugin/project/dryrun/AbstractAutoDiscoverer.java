@@ -21,10 +21,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunAlwaysContinueEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunSuiteCountEventListener;
 import org.rf.ide.core.execution.agent.RobotAgentEventListener;
@@ -71,14 +67,7 @@ public abstract class AbstractAutoDiscoverer {
         this.dryRunTargetsCollector = dryRunTargetsCollector;
     }
 
-    public Job start() {
-        final IWorkbench workbench = PlatformUI.getWorkbench();
-        final IWorkbenchWindow workbenchWindow = workbench.getActiveWorkbenchWindow();
-        final Shell parent = workbenchWindow != null ? workbenchWindow.getShell() : null;
-        return start(parent);
-    }
-
-    abstract Job start(Shell parent);
+    public abstract Job start();
 
     final boolean lockDryRun() {
         return IS_DRY_RUN_RUNNING.compareAndSet(false, true);
