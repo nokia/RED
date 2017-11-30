@@ -24,7 +24,7 @@ public class GeneralTableStyleConfiguration extends DefaultNatTableStyleConfigur
 
     public GeneralTableStyleConfiguration(final TableTheme theme, final TextPainter textPainter) {
         this.font = theme.getFont();
-        this.bgColor = theme.getBodyBackgroundOddRowBackground();
+        this.bgColor = theme.getBodyOddRowBackground();
         this.fgColor = theme.getBodyForeground();
         this.hAlign = HorizontalAlignmentEnum.LEFT;
         this.vAlign = VerticalAlignmentEnum.TOP;

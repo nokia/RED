@@ -72,7 +72,7 @@ public class PathsLabelProviderTest {
 
         assertThat(styledLabel.getStyleRanges()[1].start).isEqualTo(4);
         assertThat(styledLabel.getStyleRanges()[1].length).isEqualTo(34);
-        assertThat(styledLabel.getStyleRanges()[1].foreground).isEqualTo(RedTheme.getEclipseDecorationColor());
+        assertThat(styledLabel.getStyleRanges()[1].foreground).isEqualTo(RedTheme.Colors.getEclipseDecorationColor());
     }
 
     @Test

@@ -303,7 +303,7 @@ public class SuiteSourceEditor extends TextEditor {
                 .getCurrentTheme();
         final IPropertyChangeListener propertyListener = event -> {
             if (RedTheme.RED_SOURCE_EDITOR_FONT.equals(event.getProperty())) {
-                setFont(viewer, RedTheme.getRedSourceEditorFont());
+                setFont(viewer, RedTheme.Fonts.getRedSourceEditorFont());
             }
         };
         currentTheme.addPropertyChangeListener(propertyListener);
@@ -311,8 +311,8 @@ public class SuiteSourceEditor extends TextEditor {
     }
 
     private void setFontFromPreference(final ProjectionViewer viewer) {
-        final Font redSourceEditorFont = RedTheme.getRedSourceEditorFont();
-        final Font defaultTextEditorFont = RedTheme.getTextEditorFont();
+        final Font redSourceEditorFont = RedTheme.Fonts.getRedSourceEditorFont();
+        final Font defaultTextEditorFont = RedTheme.Fonts.getTextEditorFont();
 
         if (!redSourceEditorFont.getFontData()[0].equals(defaultTextEditorFont.getFontData()[0])) {
             setFont(viewer, redSourceEditorFont);

@@ -27,7 +27,7 @@ public class GeneralTableStyleConfigurationTest {
         final Color fgColorInUse = ColorsManager.getColor(100, 100, 100);
 
         final TableTheme theme = mock(TableTheme.class);
-        when(theme.getBodyBackgroundOddRowBackground()).thenReturn(bgColorInUse);
+        when(theme.getBodyOddRowBackground()).thenReturn(bgColorInUse);
         when(theme.getBodyForeground()).thenReturn(fgColorInUse);
 
         final GeneralTableStyleConfiguration configuration = new GeneralTableStyleConfiguration(theme, mock(TextPainter.class));
