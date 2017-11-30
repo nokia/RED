@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryEventListener;
@@ -55,31 +56,37 @@ import com.google.common.io.Files;
  */
 public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
-    private final boolean showSummary;
+    private final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
 
     private final Optional<String> libraryNameToDiscover;
 
     private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
 
+    public static Consumer<Collection<RobotDryRunLibraryImport>> defaultSummaryHandler() {
+        final Shell parent = Display.getCurrent().getActiveShell();
+        return libraryImports -> SwtThread
+                .syncExec(() -> new LibrariesAutoDiscovererWindow(parent, libraryImports).open());
+    }
+
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites) {
-        this(robotProject, suites, true, null);
+        this(robotProject, suites, defaultSummaryHandler(), null);
     }
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
             final String libraryNameToDiscover) {
-        this(robotProject, suites, true, libraryNameToDiscover);
+        this(robotProject, suites, defaultSummaryHandler(), libraryNameToDiscover);
     }
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
-            final boolean showSummary) {
-        this(robotProject, suites, showSummary, null);
+            final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler) {
+        this(robotProject, suites, summaryHandler, null);
     }
 
     @VisibleForTesting
     LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
-            final boolean showSummary, final String libraryNameToDiscover) {
+            final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler, final String libraryNameToDiscover) {
         super(robotProject, suites, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector());
-        this.showSummary = showSummary;
+        this.summaryHandler = summaryHandler;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
                 robotProject.getStandardLibraries().keySet());
@@ -91,7 +98,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    Job start(final Shell parent) {
+    public Job start() {
         if (lockDryRun()) {
             final WorkspaceJob wsJob = new WorkspaceJob("Discovering libraries") {
 
@@ -104,9 +111,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                         }
                         final List<RobotDryRunLibraryImport> libraryImports = getLibraryImportsToProcess();
                         startAddingLibrariesToProjectConfiguration(monitor, libraryImports);
-                        if (showSummary) {
-                            showSummary(parent, libraryImports);
-                        }
+                        summaryHandler.accept(libraryImports);
                     } catch (final CoreException e) {
                         throw new AutoDiscovererException("Problems occurred during discovering libraries.", e);
                     } catch (final InterruptedException e) {
@@ -163,10 +168,6 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             updater.finalizeLibrariesAdding(eventBroker);
             subMonitor.worked(1);
         }
-    }
-
-    private void showSummary(final Shell parent, final List<RobotDryRunLibraryImport> libraryImports) {
-        SwtThread.syncExec(() -> new LibrariesAutoDiscovererWindow(parent, libraryImports).open());
     }
 
     private static class DryRunTargetsCollector implements IDryRunTargetsCollector {

@@ -50,14 +50,14 @@ abstract class ChangeExclusionHandler {
             removeMarkers(res);
         }
 
-        final Map<IProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
+        final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
                 .collectGroupedByProject(resourcesToChange);
-        final Map<IProject, Collection<IPath>> pathGroupedByProject = groupByProject(resourcesToChange).asMap();
-        pathGroupedByProject.forEach((project, paths) -> {
-            changeExclusion(project, paths);
-            fireEvents(eventBroker, project, paths);
-            if (filesGroupedByProject.containsKey(project)) {
-                revalidate(project, filesGroupedByProject.get(project));
+        final Map<RobotProject, Collection<IPath>> pathGroupedByProject = groupByProject(resourcesToChange).asMap();
+        pathGroupedByProject.forEach((robotProject, paths) -> {
+            changeExclusion(robotProject, paths);
+            fireEvents(eventBroker, robotProject.getProject(), paths);
+            if (filesGroupedByProject.containsKey(robotProject)) {
+                revalidate(robotProject.getProject(), filesGroupedByProject.get(robotProject));
             }
         });
 
@@ -68,16 +68,16 @@ abstract class ChangeExclusionHandler {
 
     }
 
-    private Multimap<IProject, IPath> groupByProject(final List<IResource> resourcesToChange) {
-        final Multimap<IProject, IPath> groupedPaths = LinkedListMultimap.create();
+    private Multimap<RobotProject, IPath> groupByProject(final List<IResource> resourcesToChange) {
+        final Multimap<RobotProject, IPath> groupedPaths = LinkedListMultimap.create();
         for (final IResource resource : resourcesToChange) {
-            groupedPaths.put(resource.getProject(), resource.getProjectRelativePath());
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(resource.getProject());
+            groupedPaths.put(robotProject, resource.getProjectRelativePath());
         }
         return groupedPaths;
     }
 
-    private void changeExclusion(final IProject project, final Collection<IPath> toChange) {
-        final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+    private void changeExclusion(final RobotProject robotProject, final Collection<IPath> toChange) {
         RobotProjectConfig config = robotProject.getOpenedProjectConfig();
 
         final boolean inEditor = config != null;
@@ -90,10 +90,10 @@ abstract class ChangeExclusionHandler {
         }
 
         if (!inEditor) {
-            new RedEclipseProjectConfigWriter().writeConfiguration(config, project);
+            new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
         }
         try {
-            project.refreshLocal(IResource.DEPTH_INFINITE, null);
+            robotProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
         } catch (final CoreException e) {
             // nothing to do
         }

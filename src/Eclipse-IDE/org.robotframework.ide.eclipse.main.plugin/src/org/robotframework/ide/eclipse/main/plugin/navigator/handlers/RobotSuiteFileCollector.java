@@ -14,10 +14,10 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -25,9 +25,10 @@ import com.google.common.collect.Multimaps;
 
 class RobotSuiteFileCollector {
 
-    static Map<IProject, Collection<RobotSuiteFile>> collectGroupedByProject(final Collection<IResource> resources) {
+    static Map<RobotProject, Collection<RobotSuiteFile>> collectGroupedByProject(
+            final Collection<IResource> resources) {
         final Set<RobotSuiteFile> files = collectFiles(resources);
-        return Multimaps.index(files, file -> file.getProject().getProject()).asMap();
+        return Multimaps.index(files, file -> file.getProject()).asMap();
     }
 
     @VisibleForTesting
