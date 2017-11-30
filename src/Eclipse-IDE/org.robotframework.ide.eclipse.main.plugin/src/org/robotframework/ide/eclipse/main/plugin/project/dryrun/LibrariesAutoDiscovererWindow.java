@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,12 +36,9 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -108,11 +105,12 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private StyledText detailsText;
 
-    private final List<RobotDryRunLibraryImport> importedLibraries;
+    private final Collection<RobotDryRunLibraryImport> importedLibraries;
 
     private final RedClipboard clipboard;
 
-    public LibrariesAutoDiscovererWindow(final Shell parent, final List<RobotDryRunLibraryImport> importedLibraries) {
+    public LibrariesAutoDiscovererWindow(final Shell parent,
+            final Collection<RobotDryRunLibraryImport> importedLibraries) {
         super(parent);
         setShellStyle(SWT.CLOSE | SWT.MODELESS | SWT.BORDER | SWT.TITLE | SWT.RESIZE);
         setBlockOnOpen(false);
@@ -170,9 +168,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         discoveredLibrariesViewer.setContentProvider(new DiscoveredLibrariesViewerContentProvider());
         discoveredLibrariesViewer.setLabelProvider(new DiscoveredLibrariesViewerLabelProvider());
 
-        Collections.sort(importedLibraries, LIBRARY_IMPORT_COMPARATOR);
-        discoveredLibrariesViewer
-                .setInput(importedLibraries.toArray(new RobotDryRunLibraryImport[importedLibraries.size()]));
+        discoveredLibrariesViewer.setInput(
+                importedLibraries.stream().sorted(LIBRARY_IMPORT_COMPARATOR).toArray(RobotDryRunLibraryImport[]::new));
 
         registerLibrariesViewerListeners();
     }
@@ -191,45 +188,35 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             }
         });
 
-        discoveredLibrariesViewer.getTree().addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyReleased(final KeyEvent e) {
-                if (e.keyCode == SWT.F3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
-                    handleFileOpeningEvent();
-                } else if (e.keyCode == 'c' && e.stateMask == SWT.CTRL) {
-                    handleLibraryCopyEvent();
-                }
+        discoveredLibrariesViewer.getTree().addKeyListener(KeyListener.keyReleasedAdapter(e -> {
+            if (e.keyCode == SWT.F3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
+                handleFileOpeningEvent();
+            } else if (e.keyCode == 'c' && e.stateMask == SWT.CTRL) {
+                handleLibraryCopyEvent();
             }
-        });
+        }));
 
         final Menu menu = createContextMenu();
-        discoveredLibrariesViewer.getTree().addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseDown(final MouseEvent e) {
-                if (e.button == 3) {
-                    if (discoveredLibrariesViewer.getTree().getSelectionCount() == 1
-                            && getOpenableFilePath().isPresent()) {
-                        menu.setVisible(true);
-                        menu.getItem(0).setEnabled(false);
-                        menu.getItem(1).setEnabled(true);
-                    } else if (Stream.of(discoveredLibrariesViewer.getStructuredSelection().toArray())
-                            .anyMatch(element -> element instanceof RobotDryRunLibraryImport)) {
-                        menu.setVisible(true);
-                        menu.getItem(0).setEnabled(true);
-                        menu.getItem(1).setEnabled(false);
-                    }
+        discoveredLibrariesViewer.getTree().addMouseListener(MouseListener.mouseDownAdapter(e -> {
+            if (e.button == 3) {
+                if (discoveredLibrariesViewer.getTree().getSelectionCount() == 1 && getOpenableFilePath().isPresent()) {
+                    menu.setVisible(true);
+                    menu.getItem(0).setEnabled(false);
+                    menu.getItem(1).setEnabled(true);
+                } else if (Stream.of(discoveredLibrariesViewer.getStructuredSelection().toArray())
+                        .anyMatch(element -> element instanceof RobotDryRunLibraryImport)) {
+                    menu.setVisible(true);
+                    menu.getItem(0).setEnabled(true);
+                    menu.getItem(1).setEnabled(false);
                 }
             }
+        }));
 
-            @Override
-            public void mouseDoubleClick(final MouseEvent e) {
-                if (e.button == 1 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
-                    handleFileOpeningEvent();
-                }
+        discoveredLibrariesViewer.getTree().addMouseListener(MouseListener.mouseDoubleClickAdapter(e -> {
+            if (e.button == 1 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
+                handleFileOpeningEvent();
             }
-        });
+        }));
     }
 
     private Menu createContextMenu() {
@@ -238,24 +225,12 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         final MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
         copyItem.setText("Copy");
         copyItem.setImage(ImagesManager.getImage(RedImages.getCopyImage()));
-        copyItem.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                handleLibraryCopyEvent();
-            }
-        });
+        copyItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> handleLibraryCopyEvent()));
 
         final MenuItem gotoItem = new MenuItem(menu, SWT.PUSH);
         gotoItem.setText("Go to File");
         gotoItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
-        gotoItem.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                handleFileOpeningEvent();
-            }
-        });
+        gotoItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> handleFileOpeningEvent()));
 
         return menu;
     }

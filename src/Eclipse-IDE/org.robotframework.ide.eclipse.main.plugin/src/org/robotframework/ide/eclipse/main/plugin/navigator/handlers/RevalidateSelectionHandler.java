@@ -11,11 +11,11 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RevalidateSelectionHandler.E4RevalidateSelectionHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
@@ -36,11 +36,12 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
         public void revalidate(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-            final Map<IProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
+            final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
                     .collectGroupedByProject(selectedResources);
-            filesGroupedByProject.forEach((project, suiteModels) -> {
+            filesGroupedByProject.forEach((robotProject, suiteModels) -> {
                 final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
-                final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
+                final Job validationJob = RobotArtifactsValidator.createValidationJob(robotProject.getProject(),
+                        validatorConfig);
                 validationJob.schedule();
             });
         }
