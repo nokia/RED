@@ -82,7 +82,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                        textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
                     }
                 });
             }
@@ -96,7 +96,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
 
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                    textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
                 }
             });
             return styled;

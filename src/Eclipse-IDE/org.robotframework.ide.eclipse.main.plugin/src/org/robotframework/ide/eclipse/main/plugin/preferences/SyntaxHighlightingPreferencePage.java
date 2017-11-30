@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
-import static com.google.common.base.Functions.identity;
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Collections;
@@ -136,7 +136,7 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(previewText);
         previewText.setText(SyntaxHighlightingPreferencePageSource.source);
         previewText.setEditable(false);
-        previewText.setFont(RedTheme.getTextEditorFont());
+        previewText.setFont(RedTheme.Fonts.getTextEditorFont());
 
         new Label(parent, SWT.NONE);
 
@@ -319,8 +319,8 @@ public class SyntaxHighlightingPreferencePage extends RedPreferencePage {
     @Override
     public boolean performOk() {
         final IPreferenceStore store = RedPlugin.getDefault().getPreferenceStore();
-        currentPreferences.entrySet().forEach(
-                entry -> store.setValue(entry.getKey().getPreferenceId(), entry.getValue().toPreferenceString()));
+        currentPreferences.forEach(
+                (category, preference) -> store.setValue(category.getPreferenceId(), preference.toPreferenceString()));
 
         return super.performOk();
     }

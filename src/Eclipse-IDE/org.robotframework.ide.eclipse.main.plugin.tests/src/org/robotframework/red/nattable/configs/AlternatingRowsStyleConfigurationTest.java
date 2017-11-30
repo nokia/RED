@@ -23,8 +23,8 @@ public class AlternatingRowsStyleConfigurationTest {
         final Color evenBgColorInUse = ColorsManager.getColor(100, 100, 100);
 
         final TableTheme theme = mock(TableTheme.class);
-        when(theme.getBodyBackgroundOddRowBackground()).thenReturn(oddBgColorInUse);
-        when(theme.getBodyBackgroundEvenRowBackground()).thenReturn(evenBgColorInUse);
+        when(theme.getBodyOddRowBackground()).thenReturn(oddBgColorInUse);
+        when(theme.getBodyEvenRowBackground()).thenReturn(evenBgColorInUse);
 
         final AlternatingRowsStyleConfiguration configuration = new AlternatingRowsStyleConfiguration(theme);
 

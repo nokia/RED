@@ -21,7 +21,22 @@ IEclipsePreferences#org-eclipse-ui-editors:org-robotframework-ide-eclipse-main-p
 
 IEclipsePreferences#org-eclipse-ui-workbench:org-robot-framework-ide-eclipse-main-plugin {
     preferences:
-        'org.robotframework.ide.eclipse.robotConsoleRedStream=204,204,204'
-        'org.robotframework.ide.eclipse.cell.highlight=128,100,45'
-        'org.robotframework.ide.eclipse.row.selected=90,80,32'
+        'org.robotframework.red.robotConsoleRedStream=204,204,204'
+        
+        'org.robotframework.red.table.header.grid=50,52,55'
+        'org.robotframework.red.table.header.background=82,87,91'
+        'org.robotframework.red.table.header.foreground=204,204,204'
+        'org.robotframework.red.table.header.highlighted.background=44,47,50'
+        'org.robotframework.red.table.header.underline=127,100,0'
+        
+        'org.robotframework.red.table.body.grid=60,60,60'
+        'org.robotframework.red.table.body.grid.selected=127,100,0'
+        'org.robotframework.red.table.body.selection.border=0,0,0'
+        'org.robotframework.red.table.body.foreground=204,204,204'
+        'org.robotframework.red.table.body.row.odd.background=47,47,47'
+        'org.robotframework.red.table.body.row.even.background=58,62,66'
+        'org.robotframework.red.table.body.row.highlight=90,80,32'
+        'org.robotframework.red.table.body.cell.highlight=128,100,45'
+        'org.robotframework.red.table.body.cell.inactive.background=30,30,30'
+        'org.robotframework.red.table.body.cell.inactive.foreground=80,80,80'
 }

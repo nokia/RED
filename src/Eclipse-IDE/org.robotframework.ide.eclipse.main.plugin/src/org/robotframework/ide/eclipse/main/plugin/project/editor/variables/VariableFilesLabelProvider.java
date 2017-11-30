@@ -61,7 +61,7 @@ class VariableFilesLabelProvider extends RedCommonLabelProvider {
         label.append("- " + new Path(varFile.getPath()), new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
-                textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
             }
         });
         return label;

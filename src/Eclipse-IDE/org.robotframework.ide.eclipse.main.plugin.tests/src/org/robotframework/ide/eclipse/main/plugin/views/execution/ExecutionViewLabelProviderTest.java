@@ -41,7 +41,7 @@ public class ExecutionViewLabelProviderTest {
         assertThat(ranges).hasSize(1);
         assertThat(ranges[0].start).isEqualTo(5);
         assertThat(ranges[0].length).isEqualTo(10);
-        assertThat(ranges[0].foreground).isEqualTo(RedTheme.getEclipseDecorationColor());
+        assertThat(ranges[0].foreground).isEqualTo(RedTheme.Colors.getEclipseDecorationColor());
     }
 
     @Test

@@ -33,15 +33,14 @@ public class Stylers {
 
             @Override
             public void applyStyles(final TextStyle textStyle) {
-                textStyle.foreground = RedTheme.getEclipseDecorationColor();
-
+                textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
             }
         };
 
         public static final Styler ECLIPSE_SEARCH_MATCH_STYLER = new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
-                textStyle.background = RedTheme.getEclipseSearchMatchColor();
+                textStyle.background = RedTheme.Colors.getEclipseSearchMatchColor();
             }
         };
 

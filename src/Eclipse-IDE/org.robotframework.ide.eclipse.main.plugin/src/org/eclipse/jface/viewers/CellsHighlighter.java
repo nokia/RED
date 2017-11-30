@@ -51,12 +51,12 @@ public class CellsHighlighter extends FocusCellHighlighter {
     }
 
     private void removeSelectionInformation(final Event event) {
-        paint(event, RedTheme.getHiglihtedRowColor(), getBlackColor());
+        paint(event, RedTheme.Colors.getTableHiglihtedRowColor(), getBlackColor());
     }
 
     private void markFocusedCell(final Event event, final ViewerCell cell) {
-        final Color background = (cell.getControl().isFocusControl()) ? 
-                RedTheme.getHighlightedCellColor() : RedTheme.getHiglihtedRowColor();
+        final Color background = (cell.getControl().isFocusControl()) ?
+                RedTheme.Colors.getTableHighlightedCellColor() : RedTheme.Colors.getTableHiglihtedRowColor();
         paint(event, background, getBlackColor());
     }
 
