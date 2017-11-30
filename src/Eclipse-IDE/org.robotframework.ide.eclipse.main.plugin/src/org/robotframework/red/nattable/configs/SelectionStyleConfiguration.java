@@ -32,7 +32,7 @@ public class SelectionStyleConfiguration extends DefaultSelectionStyleConfigurat
         selectedHeaderFgColor = theme.getBodyForeground();
         anchorBgColor = theme.getBodyAnchoredCellBackground();
         anchorFgColor = null;
-        anchorBorderStyle = new BorderStyle(1, theme.getGridSelectionBorderColor(), LineStyleEnum.SOLID);
-        anchorGridBorderStyle = new BorderStyle(1, theme.getGridSelectionBorderColor(), LineStyleEnum.SOLID);
+        anchorBorderStyle = new BorderStyle(1, theme.getBodySelectionGridColor(), LineStyleEnum.SOLID);
+        anchorGridBorderStyle = new BorderStyle(1, theme.getBodySelectionGridColor(), LineStyleEnum.SOLID);
     }
 }

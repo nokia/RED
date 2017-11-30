@@ -915,7 +915,98 @@
     </themeElementCategory>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.cell.highlight"
+          id="org.robotframework.red.table.header.grid"
+          isEditable="false"
+          label="Table header grid border"
+          value="210, 210, 210">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.header.background"
+          isEditable="false"
+          label="Table header background"
+          value="250, 250, 250">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.header.foreground"
+          isEditable="false"
+          label="Table header foreground"
+          value="0, 0, 0">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.header.highlighted.background"
+          isEditable="false"
+          label="Table header highlighted cell background"
+          value="240, 240, 240">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.header.underline"
+          isEditable="false"
+          label="Table header underline decoration"
+          value="240, 240, 240">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.grid"
+          isEditable="false"
+          label="Table body grid border"
+          value="240, 240, 240">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.grid.selected"
+          isEditable="false"
+          label="Table body grid border in selection"
+          value="128, 128, 128">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.selection.border"
+          isEditable="false"
+          label="Table body selection border"
+          value="0, 0, 0">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.foreground"
+          isEditable="false"
+          label="Table body foreground"
+          value="0, 0, 0">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.row.odd.background"
+          isEditable="false"
+          label="Table body odd row background"
+          value="255, 255, 255">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.row.even.background"
+          isEditable="false"
+          label="Table body even row background"
+          value="250, 250, 250">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.cell.inactive.background"
+          isEditable="false"
+          label="Table body inactive cell background"
+          value="227, 227, 227">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.cell.inactive.foreground"
+          isEditable="false"
+          label="Table body inactive cell foreground"
+          value="192, 192, 192">
+    </colorDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.red.table.body.cell.highlight"
           isEditable="true"
           label="Table highlighted cell"
           value="255, 245, 210">
@@ -925,7 +1016,7 @@
     </colorDefinition>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.row.selected"
+          id="org.robotframework.red.table.body.row.highlight"
           isEditable="true"
           label="Table selected cell"
           value="255, 250, 245">
@@ -948,7 +1039,7 @@
     </fontDefinition>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.theme"
-          id="org.robotframework.ide.eclipse.robotConsoleRedStream"
+          id="org.robotframework.red.robotConsoleRedStream"
           isEditable="true"
           label="Robot Console Red Stream"
           value="0,0,0">

@@ -88,7 +88,7 @@ public class RedNattableLayersFactory {
         final SelectionLayer selectionLayer = new SelectionLayer(hoverLayer, false);
         ((SelectionModel) selectionLayer.getSelectionModel()).setClearSelectionOnChange(false);
         selectionLayer.addConfiguration(new SelectionLayerConfiguration());
-        selectionLayer.setLayerPainter(new SelectionLayerPainter(theme.getGridBorderColor()));
+        selectionLayer.setLayerPainter(new SelectionLayerPainter(theme.getBodyGridColor()));
         return selectionLayer;
     }
 
@@ -111,7 +111,7 @@ public class RedNattableLayersFactory {
     public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider,
             final TableTheme tableTheme, final IConfigLabelAccumulator configLabelAccumulator) {
         final DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
-        columnHeaderDataLayer.setLayerPainter(new GridLineCellLayerPainter(tableTheme.getHeadersGridBorderColor()));
+        columnHeaderDataLayer.setLayerPainter(new GridLineCellLayerPainter(tableTheme.getHeadersGridColor()));
         columnHeaderDataLayer.setDefaultRowHeight(ROW_HEIGHT);
         columnHeaderDataLayer.setConfigLabelAccumulator(configLabelAccumulator);
         return columnHeaderDataLayer;
@@ -148,7 +148,7 @@ public class RedNattableLayersFactory {
             final IDataProvider rowHeaderDataProvider, final ILayer rowHeaderLayer, final TableTheme tableTheme) {
         final DataLayer cornerDataLayer = new DataLayer(
                 new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider));
-        cornerDataLayer.setLayerPainter(new GridLineCellLayerPainter(tableTheme.getHeadersGridBorderColor()));
+        cornerDataLayer.setLayerPainter(new GridLineCellLayerPainter(tableTheme.getHeadersGridColor()));
         return new CornerLayer(cornerDataLayer, rowHeaderLayer, columnHeaderLayer);
     }
 

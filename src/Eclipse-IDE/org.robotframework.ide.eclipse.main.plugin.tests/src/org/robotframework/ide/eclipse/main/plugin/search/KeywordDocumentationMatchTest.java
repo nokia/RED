@@ -31,7 +31,7 @@ public class KeywordDocumentationMatchTest {
         assertThat(styledLabel.getStyleRanges()[0].start).isEqualTo(16);
         assertThat(styledLabel.getStyleRanges()[0].length).isEqualTo(4);
         assertThat(styledLabel.getStyleRanges()[0].background.getRGB())
-                .isEqualTo(RedTheme.getEclipseSearchMatchColor().getRGB());
+                .isEqualTo(RedTheme.Colors.getEclipseSearchMatchColor().getRGB());
     }
 
 }

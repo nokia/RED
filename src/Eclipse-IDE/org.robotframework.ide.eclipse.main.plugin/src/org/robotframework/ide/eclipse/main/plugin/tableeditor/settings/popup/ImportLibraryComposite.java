@@ -604,7 +604,7 @@ public class ImportLibraryComposite {
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                        textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
                     }
                 });
             } else if (!spec.getSecondaryKey().equals("")) {
@@ -612,7 +612,7 @@ public class ImportLibraryComposite {
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                        textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
                     }
                 });
             }

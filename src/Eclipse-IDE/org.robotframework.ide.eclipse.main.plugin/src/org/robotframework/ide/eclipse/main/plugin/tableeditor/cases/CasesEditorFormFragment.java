@@ -222,7 +222,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
-                rowHeaderDataProvider, new MarkersSelectionLayerPainter(theme.getHeadersGridBorderColor()),
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(theme.getHeadersGridColor()),
                 new MarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
@@ -261,10 +261,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         table.setFont(theme.getFont());
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
-                new RedNatGridLayerPainter(table, theme.getGridBorderColor(), theme.getHeadersBackground(),
+                new RedNatGridLayerPainter(table, theme.getBodyGridColor(), theme.getHeadersBackground(),
                         theme.getHeadersUnderlineColor(), RedNattableLayersFactory.GRID_BORDER_WIDTH,
                         RedNattableLayersFactory.ROW_HEIGHT));
-        table.setBackground(theme.getBodyBackgroundOddRowBackground());
+        table.setBackground(theme.getBodyOddRowBackground());
         table.setForeground(parent.getForeground());
 
         // calculate columns width

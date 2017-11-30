@@ -39,7 +39,7 @@ public class RobotConsoleFacade {
             throw new IllegalStateException("Unable to find output console");
         }
         final IOConsoleOutputStream stream = console.newOutputStream();
-        SwtThread.syncExec(() -> stream.setColor(RedTheme.getRobotConsoleRedStreamColor()));
+        SwtThread.syncExec(() -> stream.setColor(RedTheme.Colors.getRobotConsoleRedStreamColor()));
         return new RobotConsoleFacade(console, stream);
     }
 

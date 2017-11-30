@@ -316,7 +316,7 @@ public class ImportResourcesComposite {
 
                 @Override
                 public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
+                    textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
                 }
             });
 
