@@ -131,6 +131,10 @@ public class ValidationContext {
         return accessibleLibraries.get(libName);
     }
 
+    public Map<String, LibrarySpecification> getAccessibleLibraries() {
+        return accessibleLibraries;
+    }
+
     public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrarySpecifications() {
         return referencedAccessibleLibraries;
     }

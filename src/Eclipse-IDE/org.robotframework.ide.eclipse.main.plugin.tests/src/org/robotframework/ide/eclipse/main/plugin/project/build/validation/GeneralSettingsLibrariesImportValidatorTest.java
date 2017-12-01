@@ -95,6 +95,17 @@ public class GeneralSettingsLibrariesImportValidatorTest {
     }
 
     @Test
+    public void markerIsReported_whenRemoteLibraryIsImportedWithoutArguments() {
+        validateLibraryImport("Remote");
+
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT,
+                        new ProblemPosition(2, Range.closed(26, 32))),
+                new Problem(GeneralSettingsProblem.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS,
+                        new ProblemPosition(2, Range.closed(26, 32))));
+    }
+
+    @Test
     public void markerIsReported_whenImportingUnknownLibraryByName() {
         validateLibraryImport("ExampleLibrary");
 

@@ -171,6 +171,10 @@ public enum ProblemCategory {
             ProblemCategoryType.IMPORT,
             "Import path relative via modules path",
             "Occurs when imported path is relative to python path."),
+    IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS(
+            ProblemCategoryType.IMPORT,
+            "Import Remote library without arguments",
+            "Occurs when Remote library is imported without agruments."),
     PARSER_WARNING(
             ProblemCategoryType.RUNTIME,
             "RED parser warning",

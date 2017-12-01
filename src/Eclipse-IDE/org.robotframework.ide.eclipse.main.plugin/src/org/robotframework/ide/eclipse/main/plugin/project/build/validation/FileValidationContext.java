@@ -76,6 +76,10 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         return context.getLibrarySpecification(libName);
     }
 
+    public Map<String, LibrarySpecification> getAccessibleLibraries() {
+        return context.getAccessibleLibraries();
+    }
+
     Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrarySpecifications() {
         return context.getReferencedLibrarySpecifications();
     }
