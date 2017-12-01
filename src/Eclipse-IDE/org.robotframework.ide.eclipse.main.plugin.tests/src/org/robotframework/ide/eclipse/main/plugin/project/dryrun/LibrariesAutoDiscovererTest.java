@@ -12,7 +12,9 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,13 +23,18 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.junit.rules.TemporaryFolder;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
@@ -42,14 +49,22 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.ResourceCreator;
 
 import com.google.common.collect.ImmutableMap;
 
 @RunWith(MockitoJUnitRunner.class)
 public class LibrariesAutoDiscovererTest {
 
-    @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(LibrariesAutoDiscovererTest.class);
+
+    public static TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @ClassRule
+    public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
+
+    @Rule
+    public ResourceCreator resourceCreator = new ResourceCreator();
 
     @Mock
     private Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
@@ -247,6 +262,34 @@ public class LibrariesAutoDiscovererTest {
     }
 
     @Test
+    public void libsAreAddedToProjectConfig_forLinkedSuite() throws Exception {
+        final File root = tempFolder.getRoot();
+        getFile(root, "external_dir").mkdir();
+        getFile(root, "external_dir", "external_nested.robot").createNewFile();
+        final File tmpFile = getFile(tempFolder.getRoot(), "external_dir", "external_nested.robot");
+
+        final IFile linkedFile = projectProvider.getFile("linked_suite.robot");
+        resourceCreator.createLink(tmpFile.toURI(), linkedFile);
+
+        final String libPath = projectProvider.getFile("libs/TestLib.py").getLocation().toPortableString();
+        projectProvider.createFile(linkedFile, "*** Settings ***", "Library  " + libPath, "*** Test Cases ***");
+
+        final RobotSuiteFile suite = model.createSuiteFile(linkedFile);
+
+        final ReferencedLibrary lib = createLibrary("TestLib", "libs/TestLib.py");
+
+        new LibrariesAutoDiscoverer(robotProject, newArrayList(suite), summaryHandler).start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(lib);
+
+        final ImmutableMap<DryRunLibraryImportStatus, Set<String>> namesByStatus = ImmutableMap.of(
+                DryRunLibraryImportStatus.ADDED, newHashSet("TestLib"), DryRunLibraryImportStatus.ALREADY_EXISTING,
+                newHashSet(), DryRunLibraryImportStatus.NOT_ADDED, newHashSet());
+        verify(summaryHandler).accept(argThat(hasLibNames(namesByStatus)));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
     public void nothingIsAddedToProjectConfig_whenNoLibrariesAreFound() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot", "*** Settings ***",
                 "Library  NotExisting.py", "*** Test Cases ***"));
@@ -321,5 +364,13 @@ public class LibrariesAutoDiscovererTest {
             });
             return actualNamesByStatus.equals(namesByStatus);
         };
+    }
+
+    private static File getFile(final File root, final String... path) {
+        if (path == null || path.length == 0) {
+            return root;
+        } else {
+            return getFile(new File(root, path[0]), Arrays.copyOfRange(path, 1, path.length));
+        }
     }
 }

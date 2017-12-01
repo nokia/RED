@@ -31,7 +31,6 @@ import com.google.common.io.CharStreams;
 
 /**
  * @author Michal Anglart
- *
  */
 public class ProjectProvider implements TestRule {
 
@@ -81,6 +80,7 @@ public class ProjectProvider implements TestRule {
     @Override
     public Statement apply(final Statement base, final Description description) {
         return new Statement() {
+
             @Override
             public void evaluate() throws Throwable {
                 try {
@@ -116,17 +116,20 @@ public class ProjectProvider implements TestRule {
     }
 
     public IFile createFile(final IPath filePath, final String... lines) throws IOException, CoreException {
+        return createFile(project.getFile(filePath), lines);
+    }
+
+    public IFile createFile(final IFile file, final String... lines) throws IOException, CoreException {
         try (InputStream source = new ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
-            return createFile(filePath, source);
+            return createFile(file, source);
         }
     }
 
     public IFile createFile(final String filePath, final InputStream fileSource) throws IOException, CoreException {
-        return createFile(Path.fromPortableString(filePath), fileSource);
+        return createFile(project.getFile(Path.fromPortableString(filePath)), fileSource);
     }
 
-    public IFile createFile(final IPath filePath, final InputStream fileSource) throws IOException, CoreException {
-        final IFile file = project.getFile(filePath);
+    public IFile createFile(final IFile file, final InputStream fileSource) throws IOException, CoreException {
         if (file.exists()) {
             file.setContents(fileSource, true, false, null);
         } else {
@@ -157,7 +160,6 @@ public class ProjectProvider implements TestRule {
             return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
         }
     }
-
 
     public IFolder getDir(final IPath dirPath) {
         return project.getFolder(dirPath);
