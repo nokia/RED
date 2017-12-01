@@ -7,9 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static org.robotframework.ide.eclipse.main.plugin.RedPlugin.newCoreException;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +14,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -35,7 +31,6 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 /**
  * @author bembenek
@@ -50,19 +45,15 @@ public abstract class AbstractAutoDiscoverer {
 
     final RobotProject robotProject;
 
-    private final Collection<RobotSuiteFile> suites;
-
     private final LibrariesSourcesCollector librariesSourcesCollector;
 
     private final IDryRunTargetsCollector dryRunTargetsCollector;
 
     private AgentConnectionServerJob serverJob;
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
-            final LibrariesSourcesCollector librariesSourcesCollector,
+    AbstractAutoDiscoverer(final RobotProject robotProject, final LibrariesSourcesCollector librariesSourcesCollector,
             final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
-        this.suites = suites;
         this.librariesSourcesCollector = librariesSourcesCollector;
         this.dryRunTargetsCollector = dryRunTargetsCollector;
     }
@@ -100,7 +91,7 @@ public abstract class AbstractAutoDiscoverer {
 
             subMonitor.subTask("Preparing Robot dry run execution...");
             collectLibrarySources(runtimeEnvironment);
-            dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations(robotProject, suites);
+            dryRunTargetsCollector.collectSuiteNamesAndDataSourcePaths(robotProject);
             subMonitor.worked(1);
 
             if (!subMonitor.isCanceled()) {
@@ -169,40 +160,24 @@ public abstract class AbstractAutoDiscoverer {
     abstract RobotAgentEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler);
 
     private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port) {
-        runtimeEnvironment.startLibraryAutoDiscovering(port, dryRunTargetsCollector.getSuiteNames(),
-                getVariableMappings(), getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
-    }
-
-    private List<String> getDataSourcePaths() {
-        final List<String> dataSourcePaths = new ArrayList<>();
-        final IPath projectLocation = robotProject.getProject().getLocation();
-        if (projectLocation != null) {
-            dataSourcePaths.add(projectLocation.toFile().getAbsolutePath());
-        }
-        for (final File additionalProjectsLocation : dryRunTargetsCollector.getAdditionalProjectsLocations()) {
-            dataSourcePaths.add(additionalProjectsLocation.getAbsolutePath());
-        }
-        return dataSourcePaths;
-    }
-
-    private List<String> getVariableMappings() {
-        return robotProject.getRobotProjectHolder()
+        final List<String> variableMapping = robotProject.getRobotProjectHolder()
                 .getVariableMappings()
                 .entrySet()
                 .stream()
                 .map(e -> VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(e.getKey()) + ":"
                         + e.getValue())
                 .collect(Collectors.toList());
+        runtimeEnvironment.startLibraryAutoDiscovering(port, dryRunTargetsCollector.getSuiteNames(), variableMapping,
+                dryRunTargetsCollector.getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
     }
 
     public interface IDryRunTargetsCollector {
 
-        void collectSuiteNamesAndAdditionalProjectsLocations(RobotProject robotProject,
-                Collection<RobotSuiteFile> suites);
+        void collectSuiteNamesAndDataSourcePaths(RobotProject robotProject);
 
         List<String> getSuiteNames();
 
-        List<File> getAdditionalProjectsLocations();
+        List<String> getDataSourcePaths();
     }
 
     public static class AutoDiscovererException extends RuntimeException {
