@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Vp4pICajEeesE7mkFuId1w
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/17 5:27 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/1/17 10:33 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -122,7 +122,7 @@ get-preferences-menu | click
 with [get-window Preferences] {
     get-tree | select "General/Appearance/Colors and Fonts"
     get-tree -after [get-label "Colors and Fonts (? = any character, * = any string):"] 
-        | select "Robot/Table Editor/Table Font"
+        | select "Robot/Table Font"
     get-button Reset | click
     get-button Apply | click
     get-button $Apply_and_OK_in_preference | click
