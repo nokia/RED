@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Jh43wIMTEeW3Y6KfPyHe6A
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/15/17 11:12 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/1/17 10:46 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -46,7 +46,8 @@ exec-with-options -disableJobWaiting -command {
 	check-debug-marker-on-ruler -line 17 -script_name "BigScript.robot" 
 	
 	//return to test setup
-	get-view Debug | get-tree | key-type F7
+//	get-view Debug | get-tree | key-type F7
+	get-button "Step Return (F7)" | click
 	wait-for-specified_line-in-first-thread -line 5 -nr_of_frames 3
 	check-debug-marker-on-ruler -line 5 -script_name "BigScript.robot" 
 	
