@@ -1,0 +1,183 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _bICqoLjBEeeOxNC18TLHTA
+Element-Name: DarkTheme
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _o-zggNaZEee1ReYWE7p2AA
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/1/17 3:27 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//change theme to dark
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "General/Appearance"
+    get-combo -after [get-label "Theme:"] | select Dark
+    get-button "Apply and Close" | click
+}
+
+//restart - no all elements are changed to dark
+get-menu -path "File/Restart" | click
+//restart-aut
+wait-until-eclipse-is-ready
+get-view Welcome | close
+
+//open file and check color
+get-view "Project Explorer" | get-tree | select "DarkThemeProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | get-property backgroundColor | equals "#292929" | verify-true
+
+//go to Kw table
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+//scrollbars
+with [get-editor "TestFile.robot"] {
+	//
+    get-control Any -after [get-label "User Keywords"] -index 11 | get-property foregroundColor | equals "#000000" 
+        | verify-true
+    //horizontal    
+    get-control Any -after [get-label "User Keywords"] -index 18 | get-property foregroundColor | equals "#000000" 
+        | verify-true
+}
+//select kw to edit
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw/Catenate"
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Enter
+}
+//check cell background color
+get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 | get-property foregroundColor 
+    | equals "#CCCCCC" | verify-true
+with [get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1] {
+    key-type Esc
+}
+
+//color fo nattable element
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#000000" | verify-true
+}
+
+
+
+
+
+//console color
+with [get-view Console | get-label "" -after [get-label "No consoles to display at this time."] -index 1] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#CCCCCC" | verify-true   //gray
+}
+
+
+with [get-view "Message Log" | get-editbox] {
+    get-property backgroundColor | equals "#3F4447" | verify-true  //dark gray
+    get-property foregroundColor | equals "#BBBBBB" | verify-true  //light gray
+}
+
+get-view "Execution View" | click
+with [get-view "Execution View" | get-control Any -index 8] {
+    get-property backgroundColor | equals "#262626" | verify-true  //black
+    get-property foregroundColor | equals "#999999" | verify-true  //gray
+}
+
+with [get-view "Project Explorer" | get-tree] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#CCCCCC" | verify-true
+}
+with [get-view Outline | get-tree] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#CCCCCC" | verify-true
+}
+
+//go to tC table 
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#000000" | verify-true
+}
+
+//check Doc view in Settings
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    get-section General | get-editbox -after [get-label "Provide test suite documentation and general settings"] 
+        | set-text-offset 0 0
+}
+with [get-editor "TestFile.robot" | get-section General] {
+    with [get-editbox -after [get-label "Provide test suite documentation and general settings"]] {
+        get-property backgroundColor | equals "#313538" | verify-true
+        get-property foregroundColor | equals "#AAAAAA" | verify-true
+    }
+    //settings
+    with [get-canvas] {
+        get-property backgroundColor | equals "#2F2F2F" | verify-true
+        get-property foregroundColor | equals "#000000" | verify-true
+    }
+}
+
+// metadata
+get-editor "TestFile.robot" | get-section Metadata | click
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#000000" | verify-true
+}
+//imports
+get-editor "TestFile.robot" | get-section Imports | click
+with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#000000" | verify-true
+}
+
+//varaibles
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
+    get-property backgroundColor | equals "#2F2F2F" | verify-true
+    get-property foregroundColor | equals "#000000" | verify-true
+}
+//edit varaible
+get-view Outline | get-tree | select "TestFile.robot/Variables/a"
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
+    key-type Down
+    key-type Enter
+}
+with [get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1] {
+    get-property backgroundColor | equals "#41464A" | verify-true
+    get-property foregroundColor | equals "#CCCCCC" | verify-true
+}
+with [get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1] {
+    key-type Esc
+}
+//get-view "Project Explorer" | get-tree | select "DarkThemeProject/red.xml" | double-click
+//with [get-editor "DarkThemeProject/red.xml"] {
+//    with [get-section "Robot framework" | get-table] {
+//        get-property backgroundColor | equals "#333333" | verify-true
+//        get-property foregroundColor | equals "#DDDDDD" | verify-true
+//    }
+//    get-section "Variables mappings" | get-table | get-property backgroundColor | equals "#333333" | verify-true
+//    get-section "Robot framework" | get-table | get-property foregroundColor | equals "#DDDDDD" | verify-true
+//}
+//get-editor "DarkThemeProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+//with [get-editor "DarkThemeProject/red.xml"] {
+//    get-section "Referenced libraries" | get-table | get-property foregroundColor | equals "#DDDDDD" | verify-true
+//    with [get-section Paths] {
+//        with [get-table] {
+//            get-property backgroundColor | equals "#333333" | verify-true
+//            get-property foregroundColor | equals "#DDDDDD" | verify-true
+//        }
+//        with [get-table -after [get-label "Relative paths defined below are relative to:"] -index 1] {
+//            get-property backgroundColor | equals "#333333" | verify-true
+//            get-property foregroundColor | equals "#DDDDDD" | verify-true
+//        }
+//    }
+//    with [get-section "Referenced libraries" | get-table] {
+//        get-property "getHeaderBackground()" | equals "#383D3F" | verify-true
+//        get-property "getHeaderForeground()" | equals "#CCCCCC" | verify-true
+//        get-property "getBackground()" | equals "#333333" | verify-true
+//    }
+//}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
