@@ -176,6 +176,37 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return fixers;
         }
     },
+    IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS {
+
+        @Override
+        public String getProblemDescription() {
+            return "'%s' library import without arguments";
+        }
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final IFile suiteFile = (IFile) marker.getResource();
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+
+            final List<IMarkerResolution> fixers = new ArrayList<>();
+            if (name.equals("Remote")) {
+                fixers.add(new AddLibraryToRedXmlFixer(name, false));
+                fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
+                        new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, name)));
+            }
+            return fixers;
+        }
+    },
     NON_EXISTING_RESOURCE_IMPORT {
 
         @Override

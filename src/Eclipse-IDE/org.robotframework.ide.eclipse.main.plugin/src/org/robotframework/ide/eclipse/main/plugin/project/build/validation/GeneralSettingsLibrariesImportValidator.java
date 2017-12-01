@@ -91,14 +91,34 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
         final String libName = createLibName(name, arguments);
         final LibrarySpecification specification = validationContext.getLibrarySpecifications(libName);
         validateWithSpec(specification, name, nameToken, arguments, false);
+        validateArgumentsForRemoteLibraryImport(name, nameToken, arguments);
     }
 
     private String createLibName(final String name, final List<RobotToken> arguments) {
         if ("Remote".equals(name)) {
-            // TODO : raise problem when there are no arguments for remote
-            return name + " " + (arguments.isEmpty() ? "http://127.0.0.1:8270/RPC2" : arguments.get(0).getText());
+            if (arguments.isEmpty()) {
+                return name + " " + "http://127.0.0.1:8270/RPC2";
+            } else {
+                final String libName = name + " " + arguments.get(0).getText();
+                return findLibraryInAccessibleLibraries(libName);
+            }
         }
         return name;
+    }
+
+    private String findLibraryInAccessibleLibraries(final String libName) {
+        final Map<String, LibrarySpecification> accessibleLibraries = validationContext.getAccessibleLibraries();
+
+        for (final String accessibleLibraryName : accessibleLibraries.keySet()) {
+            if (stripLastSlashIfNecessary(accessibleLibraryName).equals(stripLastSlashIfNecessary(libName))) {
+                return accessibleLibraryName;
+            }
+        }
+        return libName;
+    }
+
+    private static String stripLastSlashIfNecessary(final String string) {
+        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
     }
 
     private void validateWithSpec(final LibrarySpecification specification, final String pathOrName,
@@ -116,6 +136,18 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
                     ? ImmutableMap.of(AdditionalMarkerAttributes.PATH, pathOrName)
                     : ImmutableMap.of(AdditionalMarkerAttributes.NAME, pathOrName);
             reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
+        }
+    }
+
+    private void validateArgumentsForRemoteLibraryImport(final String name, final RobotToken nameToken,
+            final List<RobotToken> arguments) {
+        if ("Remote".equals(name)) {
+            if (arguments.isEmpty()) {
+                final RobotProblem problem = RobotProblem
+                        .causedBy(GeneralSettingsProblem.IMPORT_REMOTE_LIBRARY_WITHOUT_ARGUMENTS)
+                        .formatMessageWith(name);
+                reporter.handleProblem(problem, validationContext.getFile(), nameToken);
+            }
         }
     }
 }
