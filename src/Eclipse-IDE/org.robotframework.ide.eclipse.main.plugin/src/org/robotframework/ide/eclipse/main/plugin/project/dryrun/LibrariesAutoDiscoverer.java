@@ -9,10 +9,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -85,7 +88,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     @VisibleForTesting
     LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler, final String libraryNameToDiscover) {
-        super(robotProject, suites, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector());
+        super(robotProject, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector(suites));
         this.summaryHandler = summaryHandler;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
@@ -172,21 +175,37 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private static class DryRunTargetsCollector implements IDryRunTargetsCollector {
 
-        private final List<String> suiteNames = new ArrayList<>();
+        private final Collection<RobotSuiteFile> suites;
 
-        private final List<File> additionalProjectsLocations = new ArrayList<>();
+        private final Set<String> suiteNames = new LinkedHashSet<>();
+
+        private final Set<String> dataSourcePaths = new LinkedHashSet<>();
+
+        DryRunTargetsCollector(final Collection<RobotSuiteFile> suites) {
+            this.suites = suites;
+        }
 
         @Override
-        public void collectSuiteNamesAndAdditionalProjectsLocations(final RobotProject robotProject,
-                final Collection<RobotSuiteFile> suites) {
+        public void collectSuiteNamesAndDataSourcePaths(final RobotProject robotProject) {
+            final IPath projectLocation = robotProject.getProject().getLocation();
+            if (projectLocation != null) {
+                dataSourcePaths.add(projectLocation.toFile().getAbsolutePath());
+            }
             final List<String> resourcesPaths = new ArrayList<>();
             for (final RobotSuiteFile suite : suites) {
                 if (suite.isResourceFile()) {
                     final IPath filePath = RedWorkspace.Paths
                             .toWorkspaceRelativeIfPossible(suite.getFile().getProjectRelativePath());
                     resourcesPaths.add(filePath.toString());
-                } else if (suite.getFile().isLinked()) {
-                    collectLinkedSuiteNamesAndProjectsLocations(suite.getFile().getLocation());
+                } else if (suite.getFile().isLinked(IResource.CHECK_ANCESTORS)) {
+                    final Optional<File> linkedSuiteFile = Optional.ofNullable(suite.getFile().getLocation())
+                            .map(IPath::toFile)
+                            .filter(File::exists);
+                    linkedSuiteFile.ifPresent(file -> {
+                        suiteNames.add(
+                                file.getParentFile().getName() + "." + Files.getNameWithoutExtension(file.getPath()));
+                        dataSourcePaths.add(file.getParentFile().getAbsolutePath());
+                    });
                 } else {
                     suiteNames.add(RobotPathsNaming.createSuiteName(suite.getFile()));
                 }
@@ -194,33 +213,19 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             final Optional<File> tempSuiteFile = RobotDryRunTemporarySuites.createResourceImportFile(resourcesPaths);
             tempSuiteFile.ifPresent(file -> {
                 suiteNames.add(file.getParentFile().getName() + "." + Files.getNameWithoutExtension(file.getPath()));
-                additionalProjectsLocations.add(file.getParentFile());
+                dataSourcePaths.add(file.getParentFile().getAbsolutePath());
             });
-        }
-
-        private void collectLinkedSuiteNamesAndProjectsLocations(final IPath linkedFileLocation) {
-            if (linkedFileLocation != null) {
-                final File linkedFile = linkedFileLocation.toFile();
-                if (linkedFile.exists()) {
-                    suiteNames.add(Files.getNameWithoutExtension(linkedFile.getName()));
-                    final File linkedFileParentPath = linkedFile.getParentFile();
-                    if (!additionalProjectsLocations.contains(linkedFileParentPath)) {
-                        additionalProjectsLocations.add(linkedFileParentPath);
-                    }
-                }
-            }
         }
 
         @Override
         public List<String> getSuiteNames() {
-            return suiteNames;
+            return new ArrayList<>(suiteNames);
         }
 
         @Override
-        public List<File> getAdditionalProjectsLocations() {
-            return additionalProjectsLocations;
+        public List<String> getDataSourcePaths() {
+            return new ArrayList<>(dataSourcePaths);
         }
-
     }
 
     private static class ImportedLibrariesConfigUpdater extends LibrariesConfigUpdater {
