@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _epiEsKp5EeegMO_FS_X-9A
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/12/17 5:37 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/1/17 10:42 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -79,7 +79,7 @@ exec-with-options -disableJobWaiting -command {
 }	
 
 
-//remove BP - here was bug - ehn no Bp was set, then Pause buton was disabled
+//remove BP - here was bug - when no Bp was set, then Pause buton was disabled
 with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
     click-ruler -line 4
     double-click-ruler 4
@@ -92,7 +92,7 @@ exec-with-options -disableJobWaiting -command {
 	
 	wait 2000
 	get-button Suspend | get-property enablement | equals true | verify-true
-	get-button Terminate -index 1 | get-property enablement | equals true | verify-true
+	get-button "Terminate.*" -index 1 | get-property enablement | equals true | verify-true
 	get-button Disconnect | get-property enablement | equals true | verify-true
 	
 	//suspend
