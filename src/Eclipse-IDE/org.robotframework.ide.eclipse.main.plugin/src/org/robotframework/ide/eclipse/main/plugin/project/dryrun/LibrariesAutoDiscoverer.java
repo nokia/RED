@@ -36,9 +36,11 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
 import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -58,6 +60,8 @@ import com.google.common.io.Files;
  * @author mmarzec
  */
 public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
+
+    private static final int VIRTUAL_ENV_SEARCH_DEPTH = 1;
 
     private final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
 
@@ -88,16 +92,11 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
     @VisibleForTesting
     LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler, final String libraryNameToDiscover) {
-        super(robotProject, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector(suites));
+        super(robotProject, new DryRunTargetsCollector(suites));
         this.summaryHandler = summaryHandler;
         this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
                 robotProject.getStandardLibraries().keySet());
-    }
-
-    @Override
-    RobotDryRunLibraryEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
-        return new RobotDryRunLibraryEventListener(dryRunLibraryImportCollector, startSuiteHandler);
     }
 
     @Override
@@ -137,6 +136,24 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
             return wsJob;
         }
         return null;
+    }
+
+    @Override
+    EnvironmentSearchPaths collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment)
+            throws CoreException {
+        final LibrariesSourcesCollector librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
+        if (!runtimeEnvironment.isVirtualenv()
+                || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()) {
+            librariesSourcesCollector.collectPythonAndJavaLibrariesSources();
+        } else {
+            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(VIRTUAL_ENV_SEARCH_DEPTH);
+        }
+        return librariesSourcesCollector.getEnvironmentSearchPaths();
+    }
+
+    @Override
+    RobotDryRunLibraryEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
+        return new RobotDryRunLibraryEventListener(dryRunLibraryImportCollector, startSuiteHandler);
     }
 
     private List<RobotDryRunLibraryImport> getLibraryImportsToProcess() {
