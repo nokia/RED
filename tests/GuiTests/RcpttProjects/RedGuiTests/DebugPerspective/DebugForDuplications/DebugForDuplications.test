@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _L6rZUIyzEeeQ1rr93JCGzA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 10/30/17 10:23 AM
+Save-Time: 12/4/17 12:21 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -84,6 +84,7 @@ exec-with-options -disableJobWaiting -command{
 	// ------------------------ 3.rd file ------------------------------
 	
 	get-button "Resume (F8)" | click
+	wait 500
 	get-button "Resume (F8)" | click
 	
 	wait-for-specified_line-in-first-thread -line 6 -nr_of_frames 4
