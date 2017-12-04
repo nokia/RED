@@ -22,6 +22,8 @@ import org.rf.ide.core.dryrun.RobotDryRunKeywordEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
 import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -35,13 +37,8 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     private final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
 
     public KeywordsAutoDiscoverer(final RobotProject robotProject) {
-        super(robotProject, new LibrariesSourcesCollector(robotProject), new DryRunTargetsCollector());
+        super(robotProject, new DryRunTargetsCollector());
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
-    }
-
-    @Override
-    RobotDryRunKeywordEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
-        return new RobotDryRunKeywordEventListener(dryRunLKeywordSourceCollector, startSuiteHandler);
     }
 
     @Override
@@ -69,6 +66,17 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
             }
         }
         return null;
+    }
+
+    @Override
+    EnvironmentSearchPaths collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment)
+            throws CoreException {
+        return new EnvironmentSearchPaths(robotProject.getClasspath(), robotProject.getPythonpath());
+    }
+
+    @Override
+    RobotDryRunKeywordEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
+        return new RobotDryRunKeywordEventListener(dryRunLKeywordSourceCollector, startSuiteHandler);
     }
 
     private void startAddingKeywordsToProject(final IProgressMonitor monitor,
