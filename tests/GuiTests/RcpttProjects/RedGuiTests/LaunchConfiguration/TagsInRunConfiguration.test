@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kgXUQPwQEeW7_PzjO98BIw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/31/17 5:07 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/4/17 4:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -226,8 +226,8 @@ with [get-window "Run Configurations"] {
     get-button Apply | click
     get-button Run | click
 }
-
-wait 3000
+wait-for-console
+wait-for-message-log
 //check if all tests were run (checkbox to run was not selected)
 get-tab-folder -index 5 | get-tab-item "Message Log" | click
 get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 41 | verify-true
@@ -239,6 +239,8 @@ with [get-window "Run Configurations"] {
     get-button Apply | click
     get-button Run | click
 }
+
+wait-for-message-log
 //check message log
 get-view "Message Log" | get-editbox | get-property text | equals "Starting test: SecondProject.SingleTest.test4\n"
     + ".* : INFO : 13\n"
@@ -300,7 +302,8 @@ with [get-window "Run Configurations"] {
     get-button Apply | click
     get-button Run | click
 }
-wait 2000
+wait-for-console
+wait-for-message-log
 //check that all tests were run
 get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 41 | verify-true
     
