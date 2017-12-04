@@ -26,9 +26,9 @@ import org.rf.ide.core.execution.server.AgentConnectionServer;
 import org.rf.ide.core.execution.server.AgentServerKeepAlive;
 import org.rf.ide.core.execution.server.AgentServerTestsStarter;
 import org.rf.ide.core.execution.server.AgentServerVersionsChecker;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.AgentConnectionServerJob;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -39,26 +39,25 @@ public abstract class AbstractAutoDiscoverer {
 
     private static final AtomicBoolean IS_DRY_RUN_RUNNING = new AtomicBoolean(false);
 
-    private static final int VIRTUAL_ENV_SEARCH_DEPTH = 1;
-
     private static final int CONNECTION_TIMEOUT = 120;
 
     final RobotProject robotProject;
-
-    private final LibrariesSourcesCollector librariesSourcesCollector;
 
     private final IDryRunTargetsCollector dryRunTargetsCollector;
 
     private AgentConnectionServerJob serverJob;
 
-    AbstractAutoDiscoverer(final RobotProject robotProject, final LibrariesSourcesCollector librariesSourcesCollector,
-            final IDryRunTargetsCollector dryRunTargetsCollector) {
+    AbstractAutoDiscoverer(final RobotProject robotProject, final IDryRunTargetsCollector dryRunTargetsCollector) {
         this.robotProject = robotProject;
-        this.librariesSourcesCollector = librariesSourcesCollector;
         this.dryRunTargetsCollector = dryRunTargetsCollector;
     }
 
     public abstract Job start();
+
+    abstract EnvironmentSearchPaths collectLibrarySources(RobotRuntimeEnvironment runtimeEnvironment)
+            throws CoreException;
+
+    abstract RobotAgentEventListener createDryRunCollectorEventListener(Consumer<String> startSuiteHandler);
 
     final boolean lockDryRun() {
         return IS_DRY_RUN_RUNNING.compareAndSet(false, true);
@@ -79,24 +78,23 @@ public abstract class AbstractAutoDiscoverer {
     }
 
     void startDiscovering(final IProgressMonitor monitor) throws CoreException, InterruptedException {
+        final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+        if (runtimeEnvironment == null) {
+            throw newCoreException(
+                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
+        }
+
         final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.setWorkRemaining(10);
 
+        subMonitor.subTask("Preparing Robot dry run execution...");
+        final EnvironmentSearchPaths librarySourcePaths = collectLibrarySources(runtimeEnvironment);
+        dryRunTargetsCollector.collectSuiteNamesAndDataSourcePaths(robotProject);
+        subMonitor.worked(1);
+
         try {
-            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-            if (runtimeEnvironment == null) {
-                throw newCoreException(
-                        "There is no active runtime environment for project '" + robotProject.getName() + "'");
-            }
-
-            subMonitor.subTask("Preparing Robot dry run execution...");
-            collectLibrarySources(runtimeEnvironment);
-            dryRunTargetsCollector.collectSuiteNamesAndDataSourcePaths(robotProject);
-            subMonitor.worked(1);
-
-            if (!subMonitor.isCanceled()) {
-                subMonitor.subTask("Connecting to Robot dry run process...");
-                executeDryRun(runtimeEnvironment, subMonitor);
+            if (!monitor.isCanceled()) {
+                executeDryRun(runtimeEnvironment, librarySourcePaths, subMonitor);
             }
             subMonitor.worked(1);
         } finally {
@@ -104,23 +102,16 @@ public abstract class AbstractAutoDiscoverer {
         }
     }
 
-    private void collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment) throws CoreException {
-        if (!runtimeEnvironment.isVirtualenv()
-                || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()) {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources();
-        } else {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(VIRTUAL_ENV_SEARCH_DEPTH);
-        }
-    }
-
-    private void executeDryRun(final RobotRuntimeEnvironment runtimeEnvironment, final SubMonitor subMonitor)
-            throws InterruptedException {
+    private void executeDryRun(final RobotRuntimeEnvironment runtimeEnvironment,
+            final EnvironmentSearchPaths librarySourcePaths, final SubMonitor subMonitor)
+            throws InterruptedException, CoreException {
         final String host = AgentConnectionServer.DEFAULT_CONNECTION_HOST;
         final int port = AgentConnectionServer.findFreePort();
         final int timeout = CONNECTION_TIMEOUT;
         serverJob = startDryRunServer(host, port, timeout, subMonitor);
 
-        startDryRunClient(runtimeEnvironment, port);
+        subMonitor.subTask("Connecting to Robot dry run process...");
+        startDryRunClient(runtimeEnvironment, port, librarySourcePaths);
 
         serverJob.join();
     }
@@ -157,9 +148,8 @@ public abstract class AbstractAutoDiscoverer {
         return serverJob;
     }
 
-    abstract RobotAgentEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler);
-
-    private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port) {
+    private void startDryRunClient(final RobotRuntimeEnvironment runtimeEnvironment, final int port,
+            final EnvironmentSearchPaths librarySourcePaths) throws CoreException {
         final List<String> variableMapping = robotProject.getRobotProjectHolder()
                 .getVariableMappings()
                 .entrySet()
@@ -168,7 +158,7 @@ public abstract class AbstractAutoDiscoverer {
                         + e.getValue())
                 .collect(Collectors.toList());
         runtimeEnvironment.startLibraryAutoDiscovering(port, dryRunTargetsCollector.getSuiteNames(), variableMapping,
-                dryRunTargetsCollector.getDataSourcePaths(), librariesSourcesCollector.getEnvironmentSearchPaths());
+                dryRunTargetsCollector.getDataSourcePaths(), librarySourcePaths);
     }
 
     public interface IDryRunTargetsCollector {
