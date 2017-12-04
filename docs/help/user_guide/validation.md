@@ -20,7 +20,7 @@ background giving quick feedback about potential problems.
 ### Validation preferences
 
 Validation problems severity level settings are covered under topic
-[Configuring problems severity](validation/scope.md)
+[Configuring problems severity](validation/validation_preferences.md)
 
 Validation scope is covered under topic [Limiting validation
 scope](validation/scope.md)
