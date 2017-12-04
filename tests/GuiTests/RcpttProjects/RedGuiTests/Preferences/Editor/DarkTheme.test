@@ -7,14 +7,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _o-zggNaZEee1ReYWE7p2AA
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/4/17 4:05 PM
+Save-Time: 12/4/17 6:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-
+get-view "Project Explorer" | get-tree | select "DarkThemeProject/TestFile.robot" | double-click
 
 //change theme to dark
 get-preferences-menu | click
@@ -22,6 +22,53 @@ with [get-window Preferences] {
     get-tree | select "General/Appearance"
     get-combo -after [get-label "Theme:"] | select Dark
     get-button "Apply and Close" | click
+}
+
+//go to Source and select occurance
+get-editor "TestFile.robot" | get-text-viewer | get-property backgroundColor | equals "#292929" | verify-true
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 26 7
+        select-range 26 5 26 8
+        hover-text 26 6
+    }
+}
+
+//check one of Log KW
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "styles[77].foregroundColor" | equals "#946401" | verify-true
+    get-property "styles[77].backgroundColor" | equals "#645A82" | verify-true
+}
+
+//check some word in text
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "styles[0].text" | equals "*** Settings ***" | verify-true
+    get-property "styles[0].foregroundColor" | equals "#E96194" | verify-true
+    
+    // setup
+    get-property "styles[2].text" | equals "Suite Setup" | verify-true
+    get-property "styles[2].foregroundColor" | equals "#FFFF80" | verify-true
+    
+    get-property "styles[4].text" | equals Log | verify-true
+    get-property "styles[4].foregroundColor" | equals "#946401" | verify-true
+    get-property "styles[5].text" | equals 7 | verify-true
+    get-property "styles[5].fontStyle" | equals normal | verify-true
+    
+    //variables
+    get-property "styles[14].text" | equals "${a}" | verify-true
+    get-property "styles[14].foregroundColor" | equals "#A0F52E" | verify-true
+    get-property "styles[15].text" | equals 2 | verify-true
+    get-property "styles[15].fontStyle" | equals normal | verify-true
+    
+    //test name
+    get-property "styles[20].text" | equals "Normal test" | verify-true
+    get-property "styles[20].foregroundColor" | equals "#4080BF" | verify-true
+    
+    //kw
+    get-property "styles[24].text" | equals "Should Be Equal" | verify-true
+    get-property "styles[24].foregroundColor" | equals "#946401" | verify-true
+    get-property "styles[25].text" | equals "2    2" | verify-true
+    get-property "styles[25].fontStyle" | equals normal | verify-true
 }
 
 //restart - no all elements are changed to dark
@@ -35,11 +82,6 @@ proc "get-forground-color"{
 	get-by-os -win"#000000"-linux "#2E3436"
 
 }
-
-get-forground-color
-//open file and check color
-get-view "Project Explorer" | get-tree | select "DarkThemeProject/TestFile.robot" | double-click
-get-editor "TestFile.robot" | get-text-viewer | get-property backgroundColor | equals "#292929" | verify-true
 
 //go to Kw table
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
@@ -79,7 +121,7 @@ with [get-view Console | get-label "" -after [get-label "No consoles to display 
     get-property foregroundColor | equals "#CCCCCC" | verify-true   //gray
 }
 
-
+//views
 with [get-view "Message Log" | get-editbox] {
     get-property backgroundColor | equals  "#3F4447" | verify-true  //dark gray
     get-property foregroundColor | equals  "#BBBBBB" | verify-true  //light gray
@@ -159,35 +201,50 @@ with [get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -in
     key-type Esc
 }
 
+//check red.xml
+get-view "Project Explorer" | get-tree | select "DarkThemeProject/red.xml" | double-click
+wait-for-loading-red-xml -editor_name "DarkThemeProject/red.xml" 
 
-//get-view "Project Explorer" | get-tree | select "DarkThemeProject/red.xml" | double-click
-//with [get-editor "DarkThemeProject/red.xml"] {
-//    with [get-section "Robot framework" | get-table] {
-//        get-property backgroundColor | equals "#333333" | verify-true
-//        get-property foregroundColor | equals "#DDDDDD" | verify-true
-//    }
-//    get-section "Variables mappings" | get-table | get-property backgroundColor | equals "#333333" | verify-true
-//    get-section "Robot framework" | get-table | get-property foregroundColor | equals "#DDDDDD" | verify-true
-//}
-//get-editor "DarkThemeProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-//with [get-editor "DarkThemeProject/red.xml"] {
-//    get-section "Referenced libraries" | get-table | get-property foregroundColor | equals "#DDDDDD" | verify-true
-//    with [get-section Paths] {
-//        with [get-table] {
-//            get-property backgroundColor | equals "#333333" | verify-true
-//            get-property foregroundColor | equals "#DDDDDD" | verify-true
-//        }
-//        with [get-table -after [get-label "Relative paths defined below are relative to:"] -index 1] {
-//            get-property backgroundColor | equals "#333333" | verify-true
-//            get-property foregroundColor | equals "#DDDDDD" | verify-true
-//        }
-//    }
-//    with [get-section "Referenced libraries" | get-table] {
-//        get-property "getHeaderBackground()" | equals "#383D3F" | verify-true
-//        get-property "getHeaderForeground()" | equals "#CCCCCC" | verify-true
-//        get-property "getBackground()" | equals "#333333" | verify-true
-//    }
-//}
+with [get-editor "DarkThemeProject/red.xml"] {
+    with [get-section "Robot framework" | get-table] {
+        get-property backgroundColor | equals "#333333" | verify-true
+        get-property foregroundColor | equals "#DDDDDD" | verify-true
+    }
+    //sections
+    get-section "Variables mappings" | get-table | get-property backgroundColor | equals "#333333" | verify-true
+    get-section "Robot framework" | get-table | get-property foregroundColor | equals "#DDDDDD" | verify-true
+}
+
+get-editor "DarkThemeProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "DarkThemeProject/red.xml"] {
+
+	//libs
+    get-section "Referenced libraries" | get-table | get-property foregroundColor | equals "#DDDDDD" | verify-true
+    with [get-section Paths] {
+        with [get-table] {
+            get-property backgroundColor | equals "#333333" | verify-true
+            get-property foregroundColor | equals "#DDDDDD" | verify-true
+        }
+        //paths
+        with [get-table -after [get-label "Relative paths defined below are relative to:"] -index 1] {
+            get-property backgroundColor | equals "#333333" | verify-true
+            get-property foregroundColor | equals "#DDDDDD" | verify-true
+        }
+    }
+}
+//varaible mapping
+get-editor "DarkThemeProject/red.xml" | get-tab-folder | get-tab-item "Variable files" | click
+with [get-editor "DarkThemeProject/red.xml" | get-section "Variable files"] {
+    get-property backgroundColor | equals [get-by-os -win "#4F5355" -linux "#262626"] | verify-true
+    get-property foregroundColor | equals [get-by-os -win "#F4F7F7" -linux "#999999"] | verify-true
+}
+
+//validation
+get-editor "DarkThemeProject/red.xml" | get-tab-folder | get-tab-item Validation | click
+with [get-editor "DarkThemeProject/red.xml" | get-section "Excluded project parts"] {
+    get-property backgroundColor | equals [get-by-os -win "#4F5355" -linux "#262626"] | verify-true
+    get-property foregroundColor | equals [get-by-os -win "#F4F7F7" -linux "#999999"] | verify-true
+}
 
 
 get-preferences-menu | click
