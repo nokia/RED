@@ -6,8 +6,9 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
+import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -30,10 +31,10 @@ class Settings {
     private final List<ImportArguments> importedVariables;
 
     static Settings create(final RobotSuiteFile fileModel) {
-        final List<LibrarySpecification> imported = newArrayList(fileModel.getImportedLibraries().keySet());
-        final List<LibrarySpecification> toImport = newArrayList(fileModel.getProject().getLibrariesSpecifications());
-        toImport.removeAll(imported);
-        final List<IPath> importedResources = transform(fileModel.getResourcesPaths(), Path::new);
+        final List<LibrarySpecification> imported = new ArrayList<>(fileModel.getImportedLibraries().keySet());
+        final List<LibrarySpecification> toImport = new ArrayList<>(fileModel.getNotImportedLibraries());
+
+        final List<IPath> importedResources = fileModel.getResourcesPaths().stream().map(Path::new).collect(toList());
         final List<ImportArguments> importedVariables = getImportedVariables(fileModel);
         return new Settings(toImport, imported, importedResources, importedVariables);
     }
@@ -48,7 +49,7 @@ class Settings {
             }
             return alreadyImported;
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     private Settings(final List<LibrarySpecification> toImport, final List<LibrarySpecification> imported,

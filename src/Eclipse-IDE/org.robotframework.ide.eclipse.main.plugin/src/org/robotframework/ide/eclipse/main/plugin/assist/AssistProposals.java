@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
@@ -79,7 +80,7 @@ public class AssistProposals {
             final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
-        return new RedNotAccessibleLibraryKeywordProposal(spec.getName(), sourcePrefix, scope, bddPrefix,
+        return new RedNotAccessibleLibraryKeywordProposal(spec.getName(), Optional.of(sourcePrefix), scope, bddPrefix,
                 keyword.getName(), argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
                 shouldUseQualified, match);
     }
@@ -90,8 +91,8 @@ public class AssistProposals {
             final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
-        return new RedLibraryKeywordProposal(spec.getName(), sourcePrefix, scope, bddPrefix, keyword.getName(),
-                argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
+        return new RedLibraryKeywordProposal(spec.getName(), Optional.of(sourcePrefix), scope, bddPrefix,
+                keyword.getName(), argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
                 shouldUseQualified, match);
     }
 
@@ -101,9 +102,10 @@ public class AssistProposals {
 
         final RobotSuiteFile file = userKeyword.getSuiteFile();
         final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
-        return new RedUserKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()), sourcePrefix, scope,
-                bddPrefix, userKeyword.getName(), argsDescriptor, userKeyword.getDocumentation(),
-                userKeyword.isDeprecated(), file.getFile().getFullPath(), shouldUseQualified, match);
+        return new RedUserKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()),
+                Optional.of(sourcePrefix), scope, bddPrefix, userKeyword.getName(), argsDescriptor,
+                userKeyword.getDocumentation(), userKeyword.isDeprecated(), file.getFile().getFullPath(),
+                shouldUseQualified, match);
     }
 
     static RedCodeReservedWordProposal createCodeReservedWordProposal(final String word, final ProposalMatch match) {

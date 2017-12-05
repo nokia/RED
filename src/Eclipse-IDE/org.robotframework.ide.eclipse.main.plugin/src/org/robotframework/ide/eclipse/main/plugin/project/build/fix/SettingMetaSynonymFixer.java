@@ -17,7 +17,7 @@ import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
@@ -41,24 +41,23 @@ public class SettingMetaSynonymFixer extends RedSuiteMarkerResolution {
         final Optional<RobotSettingsSection> section = suiteModel.findSection(RobotSettingsSection.class);
         if (section.isPresent()) {
             final Range<Integer> range = getRange(marker);
-            final List<RobotKeywordCall> metadataSettings = section.get().getMetadataSettings();
-            for (final RobotKeywordCall robotKeywordCall : metadataSettings) {
-                if (range.contains(robotKeywordCall.getDefinitionPosition().getOffset())) {
+            final List<RobotSetting> metadataSettings = section.get().getMetadataSettings();
+            for (final RobotSetting metadataSetting : metadataSettings) {
+                if (range.contains(metadataSetting.getDefinitionPosition().getOffset())) {
                     try {
-                        proposal = createProposal(document, robotKeywordCall, suiteModel);
+                        proposal = createProposal(metadataSetting);
                     } catch (final BadLocationException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }
-
         return proposal;
     }
 
-    private Optional<ICompletionProposal> createProposal(final IDocument document,
-            final RobotKeywordCall robotKeywordCall, final RobotSuiteFile suiteModel) throws BadLocationException {
-        final RobotToken metadataDec = robotKeywordCall.getLinkedElement().getDeclaration();
+    private Optional<ICompletionProposal> createProposal(final RobotSetting metadataSetting)
+            throws BadLocationException {
+        final RobotToken metadataDec = metadataSetting.getLinkedElement().getDeclaration();
         final String metaText = metadataDec.getRaw().endsWith(":") ? "Metadata:" : "Metadata";
         final int offset = metadataDec.getStartOffset();
         final String correctedMetadata = new StringBuilder().append(metaText).toString();

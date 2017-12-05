@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,7 +23,6 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
-import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
@@ -35,11 +35,6 @@ import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
-
-import com.google.common.base.Predicate;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.SetMultimap;
 
 public class RobotSettingsSection extends RobotSuiteFileSection implements IRobotCodeHoldingElement {
 
@@ -157,44 +152,40 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         new SettingTableModelUpdater().remove(getLinkedElement(), child.getLinkedElement());
     }
 
-    public List<RobotKeywordCall> getMetadataSettings() {
+    public List<RobotSetting> getMetadataSettings() {
         return getSettingsFromGroup(SettingsGroup.METADATA);
     }
 
-    public List<RobotKeywordCall> getGeneralSettings() {
+    public List<RobotSetting> getGeneralSettings() {
         return getSettingsFromGroup(SettingsGroup.NO_GROUP);
     }
 
-    public List<RobotKeywordCall> getResourcesSettings() {
+    public List<RobotSetting> getResourcesSettings() {
         return getSettingsFromGroup(SettingsGroup.RESOURCES);
     }
 
-    public List<RobotKeywordCall> getVariablesSettings() {
+    public List<RobotSetting> getVariablesSettings() {
         return getSettingsFromGroup(SettingsGroup.VARIABLES);
     }
 
-    public List<RobotKeywordCall> getLibrariesSettings() {
+    public List<RobotSetting> getLibrariesSettings() {
         return getSettingsFromGroup(SettingsGroup.LIBRARIES);
     }
 
-    public List<RobotKeywordCall> getImportSettings() {
-        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
-
-            @Override
-            public boolean apply(final RobotKeywordCall element) {
-                return ((RobotSetting) element).isImportSetting();
-            }
-        }));
+    public List<RobotSetting> getImportSettings() {
+        return getChildren().stream()
+                .filter(RobotSetting.class::isInstance)
+                .map(RobotSetting.class::cast)
+                .filter(RobotSetting::isImportSetting)
+                .collect(toList());
     }
 
-    private List<RobotKeywordCall> getSettingsFromGroup(final SettingsGroup group) {
-        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
-
-            @Override
-            public boolean apply(final RobotKeywordCall element) {
-                return (((RobotSetting) element).getGroup() == group);
-            }
-        }));
+    private List<RobotSetting> getSettingsFromGroup(final SettingsGroup group) {
+        return getChildren().stream()
+                .filter(RobotSetting.class::isInstance)
+                .map(RobotSetting.class::cast)
+                .filter(setting -> setting.getGroup() == group)
+                .collect(toList());
     }
 
     public synchronized Optional<RobotSetting> getSetting(final ModelType type) {
@@ -216,10 +207,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     }
 
     public List<String> getResourcesPaths() {
-        final List<RobotKeywordCall> resources = getResourcesSettings();
+        final List<RobotSetting> resources = getResourcesSettings();
         final List<String> paths = newArrayList();
-        for (final RobotElement element : resources) {
-            final RobotSetting setting = (RobotSetting) element;
+        for (final RobotSetting setting : resources) {
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
                 final String escapedPath = RobotExpressions.unescapeSpaces(args.get(0));
@@ -230,10 +220,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     }
 
     public List<String> getVariablesPaths() {
-        final List<RobotKeywordCall> variables = getVariablesSettings();
+        final List<RobotSetting> variables = getVariablesSettings();
         final List<String> paths = newArrayList();
-        for (final RobotElement element : variables) {
-            final RobotSetting setting = (RobotSetting) element;
+        for (final RobotSetting setting : variables) {
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
                 final String escapedPath = RobotExpressions.unescapeSpaces(args.get(0));
@@ -241,25 +230,6 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             }
         }
         return paths;
-    }
-
-    public SetMultimap<String, String> getLibrariesPathsOrNamesWithAliases() {
-        final List<RobotKeywordCall> libraries = getLibrariesSettings();
-        final SetMultimap<String, String> toImport = HashMultimap.create();
-        for (final RobotKeywordCall element : libraries) {
-            final RobotSetting setting = (RobotSetting) element;
-            final List<String> args = setting.getArguments();
-            if (!args.isEmpty()) {
-                final String escapedNameOrPath = RobotExpressions.unescapeSpaces(args.get(0));
-                toImport.put(escapedNameOrPath, extractLibraryAlias(setting));
-            }
-        }
-        return toImport;
-    }
-
-    private String extractLibraryAlias(final RobotSetting setting) {
-        final LibraryAlias libAlias = ((LibraryImport) setting.getLinkedElement()).getAlias();
-        return libAlias.isPresent() ? libAlias.getLibraryAlias().getText() : "";
     }
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {

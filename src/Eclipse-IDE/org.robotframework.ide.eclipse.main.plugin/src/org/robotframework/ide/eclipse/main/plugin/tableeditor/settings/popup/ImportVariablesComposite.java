@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.joining;
 
 import java.util.List;
 
@@ -17,24 +18,20 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -46,9 +43,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -58,7 +52,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingA
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.Settings.ImportArguments;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.Selections;
+import org.robotframework.red.viewers.StructuredContentProvider;
 
 public class ImportVariablesComposite {
 
@@ -100,7 +96,7 @@ public class ImportVariablesComposite {
 
         variablesViewer = new TableViewer(variablesComposite);
         variablesViewer.setContentProvider(new ImportVariablesContentProvider());
-        variablesViewer.setLabelProvider(new VariablesLabelProvider());
+        variablesViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new VariablesLabelProvider()));
         GridDataFactory.fillDefaults().grab(true, true).hint(220, 250).applyTo(variablesViewer.getControl());
 
         final Composite addVariablesButtons = formToolkit.createComposite(variablesComposite);
@@ -159,7 +155,6 @@ public class ImportVariablesComposite {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final Settings variables = (Settings) variablesViewer.getInput();
                 final ImportArguments variablesFile = Selections
                         .getSingleElement((IStructuredSelection) variablesViewer.getSelection(), ImportArguments.class);
                 final List<String> args = variablesFile.getArgs();
@@ -192,7 +187,7 @@ public class ImportVariablesComposite {
                         }
                     }
                     if (filePath != null) {
-                        handleVariablesPathEdit(variables, variablesFile, filePath);
+                        handleVariablesPathEdit(variablesFile, filePath);
                     }
                 }
                 newShell.dispose();
@@ -207,7 +202,6 @@ public class ImportVariablesComposite {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                final Settings variables = (Settings) variablesViewer.getInput();
                 final ImportArguments variablesFile = Selections
                         .getSingleElement((IStructuredSelection) variablesViewer.getSelection(), ImportArguments.class);
                 if (!variablesFile.getArgs().isEmpty()) {
@@ -216,7 +210,7 @@ public class ImportVariablesComposite {
                     final ImportSettingFileArgumentsDialog dialog = new ImportSettingFileArgumentsDialog(newShell, args);
                     if (dialog.open() == Window.OK) {
                         final List<String> newArgs = dialog.getArguments();
-                        handleVariablesArgsEdit(variables, variablesFile, newArgs);
+                        handleVariablesArgsEdit(variablesFile, newArgs);
                     }
                     newShell.dispose();
                 }
@@ -280,9 +274,8 @@ public class ImportVariablesComposite {
     private void handleVariableRemove(final Settings importedSettings,
             final List<ImportArguments> resourcesToRemove) {
         final List<RobotSetting> settingsToRemove = newArrayList();
-        final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
-        for (final RobotElement element : currentVariables) {
-            final RobotSetting setting = (RobotSetting) element;
+        final List<RobotSetting> currentVariables = settingsSection.getVariablesSettings();
+        for (final RobotSetting setting : currentVariables) {
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
                 if (resourcesToRemove.contains(new ImportArguments(args))) {
@@ -295,11 +288,10 @@ public class ImportVariablesComposite {
         variablesViewer.refresh();
     }
 
-    private void handleVariablesPathEdit(final Settings importedSettings, final ImportArguments variablesFile,
+    private void handleVariablesPathEdit(final ImportArguments variablesFile,
             final String newPath) {
-        final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
-        for (final RobotElement element : currentVariables) {
-            final RobotSetting setting = (RobotSetting) element;
+        final List<RobotSetting> currentVariables = settingsSection.getVariablesSettings();
+        for (final RobotSetting setting : currentVariables) {
             final List<String> args = setting.getArguments();
             if (!args.isEmpty() && args.equals(variablesFile.getArgs())) {
                 args.set(0, newPath);
@@ -311,11 +303,9 @@ public class ImportVariablesComposite {
         variablesViewer.refresh();
     }
 
-    private void handleVariablesArgsEdit(final Settings importedSettings, final ImportArguments variablesFile,
-            final List<String> newArgs) {
-        final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
-        for (final RobotElement element : currentVariables) {
-            final RobotSetting setting = (RobotSetting) element;
+    private void handleVariablesArgsEdit(final ImportArguments variablesFile, final List<String> newArgs) {
+        final List<RobotSetting> currentVariables = settingsSection.getVariablesSettings();
+        for (final RobotSetting setting : currentVariables) {
             final List<String> args = setting.getArguments();
             if (!args.isEmpty() && args.equals(variablesFile.getArgs())) {
                 final List<String> newVariablesArguments = newArrayList(args.get(0));
@@ -351,76 +341,38 @@ public class ImportVariablesComposite {
         variablesViewer.setSelection(new StructuredSelection(selectedImport));
     }
 
-    private static class VariablesLabelProvider extends StyledCellLabelProvider {
+    private static class VariablesLabelProvider extends RedCommonLabelProvider {
 
         @Override
-        public void update(final ViewerCell cell) {
-
-            final StyledString label = getStyledText(cell.getElement());
-            cell.setText(label.getString());
-            cell.setStyleRanges(label.getStyleRanges());
-
-            cell.setImage(getImage(cell.getElement()));
-
-            super.update(cell);
-        }
-
         public Image getImage(final Object element) {
             return ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
         }
 
+        @Override
         public StyledString getStyledText(final Object element) {
+            final StyledString text = new StyledString("");
+
             final ImportArguments importedVariable = (ImportArguments) element;
             final List<String> args = importedVariable.getArgs();
-            final StyledString text = new StyledString("");
-            if (args != null && !args.isEmpty()) {
+            if (!args.isEmpty()) {
                 final IPath path = new Path(args.get(0));
-                final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString()
-                        : currentProject.getName();
-                final StringBuilder fileArgs = new StringBuilder("");
-                for (int i = 1; i < args.size(); i++) {
-                    fileArgs.append(":" + args.get(i));
-                }
-
                 if(path.lastSegment() != null) {
                     text.append(path.lastSegment());
                 }
-                text.append(fileArgs.toString() + " - " + parentPath, new Styler() {
-
-                    @Override
-                    public void applyStyles(final TextStyle textStyle) {
-                        textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
-                    }
-                });
+                final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString()
+                        : currentProject.getName();
+                final String fileArgs = args.stream().skip(1).collect(joining(":", ":", ""));
+                text.append(fileArgs + " - " + parentPath, Stylers.Common.ECLIPSE_DECORATION_STYLER);
             }
             return text;
         }
     }
 
-    private static class ImportVariablesContentProvider implements IStructuredContentProvider {
-
-        @Override
-        public void dispose() {
-            // nothing to do
-        }
-
-        @Override
-        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-            // nothing to do
-        }
+    private static class ImportVariablesContentProvider extends StructuredContentProvider {
 
         @Override
         public Object[] getElements(final Object inputElement) {
-            final List<ImportArguments> variables = ((Settings) inputElement).getImportedVariablesArguments();
-            // Collections.sort(variables, new Comparator<ImportArguments>() {
-//
-//                @Override
-            // public int compare(final ImportArguments spec1, final ImportArguments spec2) {
-//                    return spec1.compareTo(spec2);
-//                }
-//            });
-            return variables.toArray();
+            return ((Settings) inputElement).getImportedVariablesArguments().toArray();
         }
-
     }
 }

@@ -559,6 +559,8 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class RemoteLocation {
 
+        public static final RemoteLocation DEFAULT_LOCATION = RemoteLocation.create("http://127.0.0.1:8270/RPC2");
+
         public static RemoteLocation create(final String path) {
             final RemoteLocation location = new RemoteLocation();
             location.setUri(path);
@@ -650,7 +652,7 @@ public class RobotProjectConfig {
         }
 
         public List<String> getArguments() {
-            return arguments == null ? new ArrayList<String>() : arguments;
+            return arguments == null ? new ArrayList<>() : arguments;
         }
 
         @XmlTransient

@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -170,12 +169,12 @@ abstract class HyperlinksToKeywordsDetector {
 
                 @Override
                 public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                        final KeywordSpecification kwSpec, final Set<String> libraryAliases,
+                        final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                         final RobotSuiteFile exposingFile) {
 
                     final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                             : KeywordScope.STD_LIBRARY;
-                    for (final String libraryAlias : libraryAliases) {
+                    for (final Optional<String> libraryAlias : libraryAliases) {
                         final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, libraryAlias,
                                 exposingFile, libSpec, kwSpec);
 
@@ -223,7 +222,7 @@ abstract class HyperlinksToKeywordsDetector {
 
         private final KeywordSpecification kwSpec;
 
-        static KeywordHyperlinkEntity from(final KeywordScope scope, final String alias,
+        static KeywordHyperlinkEntity from(final KeywordScope scope, final Optional<String> alias,
                 final RobotSuiteFile exposingResource, final LibrarySpecification libSpec,
                 final KeywordSpecification kwSpec) {
             return new KeywordHyperlinkEntity(scope, libSpec.getName(), kwSpec.getName(), alias, kwSpec.isDeprecated(),
@@ -233,12 +232,12 @@ abstract class HyperlinksToKeywordsDetector {
         static KeywordHyperlinkEntity from(final KeywordScope scope, final RobotSuiteFile exposingResource,
                 final DefinitionPosition position, final RobotKeywordDefinition userKeyword) {
             return new KeywordHyperlinkEntity(scope, Files.getNameWithoutExtension(exposingResource.getName()),
-                    userKeyword.getName(), "", userKeyword.isDeprecated(), exposingResource, position, userKeyword,
-                    null, null);
+                    userKeyword.getName(), Optional.empty(), userKeyword.isDeprecated(), exposingResource, position,
+                    userKeyword, null, null);
         }
 
         protected KeywordHyperlinkEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-                final String alias, final boolean isDeprecated, final RobotSuiteFile exposingResource,
+                final Optional<String> alias, final boolean isDeprecated, final RobotSuiteFile exposingResource,
                 final DefinitionPosition position, final RobotKeywordDefinition userKeyword,
                 final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
             super(scope, sourceName, keywordName, alias, isDeprecated, null, exposingResource.getFile().getFullPath());
