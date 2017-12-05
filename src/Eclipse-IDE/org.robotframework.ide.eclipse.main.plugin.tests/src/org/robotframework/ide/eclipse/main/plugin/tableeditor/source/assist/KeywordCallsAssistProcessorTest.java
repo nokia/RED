@@ -18,6 +18,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assi
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IDocument;
@@ -334,8 +335,8 @@ public class KeywordCallsAssistProcessorTest {
         private final List<String> arguments;
 
         protected MockProposal(final String keywordName, final String... arguments) {
-            super(KeywordScope.LOCAL, "source", keywordName, "source", false, ArgumentsDescriptor.createDescriptor(),
-                    null);
+            super(KeywordScope.LOCAL, "source", keywordName, Optional.of("source"), false,
+                    ArgumentsDescriptor.createDescriptor(), null);
             this.arguments = newArrayList(arguments);
         }
 

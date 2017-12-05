@@ -26,7 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Predicates;
-import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * @author Michal Anglart
@@ -134,7 +134,7 @@ public class KeywordDefinitionLocator {
     }
 
     private ContinueDecision locateInLibraries(final RobotSuiteFile file, final KeywordDetector detector) {
-        final SetMultimap<LibrarySpecification, String> importedLibs = file.getImportedLibraries();
+        final Multimap<LibrarySpecification, Optional<String>> importedLibs = file.getImportedLibraries();
         for (final LibrarySpecification libSpec : importedLibs.keySet()) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
                 final ContinueDecision shouldContinue = detector.accessibleLibraryKeywordDetected(libSpec, kwSpec,
@@ -149,8 +149,8 @@ public class KeywordDefinitionLocator {
             return ContinueDecision.CONTINUE;
         }
 
-        final SetMultimap<LibrarySpecification, String> notImportedLibs = file.getNotImportedLibraries();
-        for (final LibrarySpecification libSpec : notImportedLibs.keySet()) {
+        final Set<LibrarySpecification> notImportedLibs = file.getNotImportedLibraries();
+        for (final LibrarySpecification libSpec : notImportedLibs) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
                 final ContinueDecision shouldContinue = detector.nonAccessibleLibraryKeywordDetected(libSpec, kwSpec,
                         file);
@@ -184,13 +184,13 @@ public class KeywordDefinitionLocator {
          * @param kwSpec
          *            Specification of detected keyword
          * @param libraryAliases
-         *            Library alias (may be empty)
+         *            Library aliases (may be empty)
          * @param exposingFile
          *            The file which imported given library
          * @return A decision whether detection should proceed
          */
         ContinueDecision accessibleLibraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
-                Set<String> libraryAliases, RobotSuiteFile exposingFile);
+                Collection<Optional<String>> libraryAliases, RobotSuiteFile exposingFile);
 
         /**
          * Called when keyword of given specification was found within given library which is about

@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -198,11 +199,11 @@ public class ValidationContext {
 
             @Override
             public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAliases,
+                    final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                     final RobotSuiteFile exposingFile) {
 
                 final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
-                for (final String libraryAlias : libraryAliases) {
+                for (final Optional<String> libraryAlias : libraryAliases) {
                     final ValidationKeywordEntity keyword = new ValidationKeywordEntity(scope, libSpec.getName(),
                             kwSpec.getName(), libraryAlias, kwSpec.isDeprecated(), exposingFile.getFile().getFullPath(),
                             0, kwSpec.createArgumentsDescriptor());
@@ -216,7 +217,7 @@ public class ValidationContext {
             public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
                     final RobotKeywordDefinition kwDefinition) {
                 final ValidationKeywordEntity keyword = new ValidationKeywordEntity(null,
-                        Files.getNameWithoutExtension(suiteFile.getName()), kwDefinition.getName(), "",
+                        Files.getNameWithoutExtension(suiteFile.getName()), kwDefinition.getName(), Optional.empty(),
                         kwDefinition.isDeprecated(), suiteFile.getFile().getFullPath(),
                         kwDefinition.getDefinitionPosition().getOffset(), kwDefinition.createArgumentsDescriptor());
 

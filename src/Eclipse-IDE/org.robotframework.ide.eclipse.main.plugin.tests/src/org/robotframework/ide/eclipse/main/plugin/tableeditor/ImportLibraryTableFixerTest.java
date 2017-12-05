@@ -44,7 +44,9 @@ public class ImportLibraryTableFixerTest {
 
         final Optional<RobotSettingsSection> section = robotFile.findSection(RobotSettingsSection.class);
         assertThat(section).isPresent();
-        assertThat(section.get().getLibrariesPathsOrNamesWithAliases().keySet()).containsOnly("LibToFix");
+        assertThat(section.get().getLibrariesSettings()).hasSize(1);
+        assertThat(section.get().getLibrariesSettings().get(0).getLabel()).isEqualTo("Library");
+        assertThat(section.get().getLibrariesSettings().get(0).getArguments()).containsExactly("LibToFix");
     }
 
     @Test
@@ -58,8 +60,9 @@ public class ImportLibraryTableFixerTest {
         fixer.apply(robotFile);
 
         final Optional<RobotSettingsSection> section = robotFile.findSection(RobotSettingsSection.class);
-        assertThat(section).isPresent();
-        assertThat(section.get().getLibrariesPathsOrNamesWithAliases().keySet()).containsOnly("LibToFix");
+        assertThat(section.get().getLibrariesSettings()).hasSize(1);
+        assertThat(section.get().getLibrariesSettings().get(0).getLabel()).isEqualTo("Library");
+        assertThat(section.get().getLibrariesSettings().get(0).getArguments()).containsExactly("LibToFix");
     }
 
     @Test
@@ -74,7 +77,11 @@ public class ImportLibraryTableFixerTest {
 
         final Optional<RobotSettingsSection> section = robotFile.findSection(RobotSettingsSection.class);
         assertThat(section).isPresent();
-        assertThat(section.get().getLibrariesPathsOrNamesWithAliases().keySet()).containsOnly("SomeLib", "LibToFix");
+        assertThat(section.get().getLibrariesSettings()).hasSize(2);
+        assertThat(section.get().getLibrariesSettings().get(0).getLabel()).isEqualTo("Library");
+        assertThat(section.get().getLibrariesSettings().get(0).getArguments()).containsExactly("SomeLib");
+        assertThat(section.get().getLibrariesSettings().get(1).getLabel()).isEqualTo("Library");
+        assertThat(section.get().getLibrariesSettings().get(1).getArguments()).containsExactly("LibToFix");
     }
 
     @Test
@@ -90,7 +97,12 @@ public class ImportLibraryTableFixerTest {
 
         final Optional<RobotSettingsSection> section = robotFile.findSection(RobotSettingsSection.class);
         assertThat(section).isPresent();
-        assertThat(section.get().getLibrariesPathsOrNamesWithAliases().keySet()).containsOnly("FirstLib", "SecondLib",
-                "LibToFix");
+        assertThat(section.get().getLibrariesSettings()).hasSize(3);
+        assertThat(section.get().getLibrariesSettings().get(0).getLabel()).isEqualTo("Library");
+        assertThat(section.get().getLibrariesSettings().get(0).getArguments()).containsExactly("FirstLib");
+        assertThat(section.get().getLibrariesSettings().get(1).getLabel()).isEqualTo("Library");
+        assertThat(section.get().getLibrariesSettings().get(1).getArguments()).containsExactly("SecondLib");
+        assertThat(section.get().getLibrariesSettings().get(2).getLabel()).isEqualTo("Library");
+        assertThat(section.get().getLibrariesSettings().get(2).getArguments()).containsExactly("LibToFix");
     }
 }

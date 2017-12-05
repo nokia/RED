@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -46,11 +47,11 @@ public class RedImportProposals {
 
         final List<RedImportProposal> proposals = new ArrayList<>();
 
-        final Map<LibrarySpecification, Collection<String>> libs = suiteFile.getImportedLibraries().asMap();
+        final Map<LibrarySpecification, Collection<Optional<String>>> libs = suiteFile.getImportedLibraries().asMap();
 
-        for (final Entry<LibrarySpecification, Collection<String>> entry : libs.entrySet()) {
-            for (final String name : entry.getValue()) {
-                final String nameToUse = name.isEmpty() ? entry.getKey().getName() : name;
+        for (final Entry<LibrarySpecification, Collection<Optional<String>>> entry : libs.entrySet()) {
+            for (final Optional<String> alias : entry.getValue()) {
+                final String nameToUse = alias.orElse(entry.getKey().getName());
 
                 final BddMatchesHelper bddHelper = new BddMatchesHelper(matcher);
                 final BddAwareProposalMatch match = bddHelper.findBddAwareMatch(userContent, nameToUse);

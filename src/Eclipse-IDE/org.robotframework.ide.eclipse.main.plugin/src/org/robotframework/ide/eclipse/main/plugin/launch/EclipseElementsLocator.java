@@ -385,12 +385,12 @@ public class EclipseElementsLocator implements ElementsLocator {
 
                 @Override
                 public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                        final KeywordSpecification kwSpec, final Set<String> libraryAliases,
+                        final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                         final RobotSuiteFile exposingFile) {
 
                     final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                             : KeywordScope.STD_LIBRARY;
-                    for (final String libraryAlias : libraryAliases) {
+                    for (final Optional<String> libraryAlias : libraryAliases) {
                         addAccessibleKeyword(kwSpec.getName(),
                                 DebuggerKeywordEntity.from(scope, libraryAlias, exposingFile, libSpec, kwSpec));
                     }
@@ -432,11 +432,11 @@ public class EclipseElementsLocator implements ElementsLocator {
 
         private final RobotKeywordDefinition userKeyword;
 
-        static DebuggerKeywordEntity from(final KeywordScope scope, final String alias,
+        static DebuggerKeywordEntity from(final KeywordScope scope, final Optional<String> libraryAlias,
                 final RobotSuiteFile exposingResource, final LibrarySpecification libSpec,
                 final KeywordSpecification kwSpec) {
-            return new DebuggerKeywordEntity(scope, libSpec.getName(), kwSpec.getName(), alias, kwSpec.isDeprecated(),
-                    exposingResource.getFile().getFullPath(), null);
+            return new DebuggerKeywordEntity(scope, libSpec.getName(), kwSpec.getName(), libraryAlias,
+                    kwSpec.isDeprecated(), exposingResource.getFile().getFullPath(), null);
         }
 
         public boolean isLibrary() {
@@ -446,12 +446,12 @@ public class EclipseElementsLocator implements ElementsLocator {
         static DebuggerKeywordEntity from(final KeywordScope scope, final RobotSuiteFile exposingResource,
                 final RobotKeywordDefinition userKeyword) {
             return new DebuggerKeywordEntity(scope, Files.getNameWithoutExtension(exposingResource.getName()),
-                    userKeyword.getName(), "", userKeyword.isDeprecated(), exposingResource.getFile().getFullPath(),
-                    userKeyword);
+                    userKeyword.getName(), Optional.empty(), userKeyword.isDeprecated(),
+                    exposingResource.getFile().getFullPath(), userKeyword);
         }
 
         protected DebuggerKeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-                final String alias, final boolean isDeprecated, final IPath exposingFilePath,
+                final Optional<String> alias, final boolean isDeprecated, final IPath exposingFilePath,
                 final RobotKeywordDefinition userKeyword) {
             super(scope, sourceName, keywordName, alias, isDeprecated, null, exposingFilePath);
             this.userKeyword = userKeyword;

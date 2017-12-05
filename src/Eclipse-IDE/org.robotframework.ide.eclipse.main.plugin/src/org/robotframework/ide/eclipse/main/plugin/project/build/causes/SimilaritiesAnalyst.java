@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -81,7 +82,7 @@ class SimilaritiesAnalyst {
 
             @Override
             public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
+                    final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAlias,
                     final RobotSuiteFile exposingFile) {
                 names.add(kwSpec.getName());
                 return ContinueDecision.CONTINUE;
