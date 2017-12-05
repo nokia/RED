@@ -5,19 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import java.text.Collator;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
 public class SettingsSectionSorter extends RobotElementsSorter {
-
-    public SettingsSectionSorter() {
-        // nothing to do
-    }
-
-    public SettingsSectionSorter(final Collator collator) {
-        super(collator);
-    }
 
     @Override
     public int category(final Object element) {
