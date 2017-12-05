@@ -12,6 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.eclipse.core.runtime.Path;
@@ -33,9 +34,9 @@ public class RedKeywordProposalTest {
     @Test
     public void whenNameShouldNotBeQualified_contentIsOnlyKeywordName() {
         final Predicate<RedKeywordProposal> shouldBeQualified = AssistProposalPredicates.alwaysFalse();
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                shouldBeQualified, ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), shouldBeQualified, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Given keyword");
     }
@@ -43,9 +44,9 @@ public class RedKeywordProposalTest {
     @Test
     public void whenNameShouldBeQualified_contentIsComposedOfSourceNameAndKeywordName() {
         final Predicate<RedKeywordProposal> shouldBeQualified = AssistProposalPredicates.alwaysTrue();
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                shouldBeQualified, ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), shouldBeQualified, ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Given alias.keyword");
     }
@@ -58,9 +59,9 @@ public class RedKeywordProposalTest {
         final Predicate<RedKeywordProposal> shouldBeQualified = mock(Predicate.class);
         when(shouldBeQualified.test(any(RedKeywordProposal.class))).thenReturn(false);
 
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                shouldBeQualified, ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), shouldBeQualified, ProposalMatch.EMPTY);
 
         for (int i = 0; i < 5; i++) {
             assertThat(proposal.getContent()).isEqualTo("Given keyword");
@@ -73,9 +74,9 @@ public class RedKeywordProposalTest {
 
     @Test
     public void thereAreNoArguments_whenKeywordUsesEmbeddedSyntax() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword ${a} and ${b}", ArgumentsDescriptor.createDescriptor(), "", false,
-                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword ${a} and ${b}", ArgumentsDescriptor.createDescriptor(), "",
+                false, new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getArguments()).isEmpty();
     }
@@ -84,8 +85,8 @@ public class RedKeywordProposalTest {
     public void thereAreRequiredArgumentsProvided_whenKeywordHasOnlyRequiredArguments() {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("a", "b", "c");
 
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getArguments()).containsExactly("a", "b", "c");
@@ -95,8 +96,8 @@ public class RedKeywordProposalTest {
     public void thereAreRequiredArgumentsAndEmptyPlaceProvided_whenKeywordHasAdditionallyDefaultArguments() {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("a", "b", "c=10");
 
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getArguments()).containsExactly("a", "b", "");
@@ -106,8 +107,8 @@ public class RedKeywordProposalTest {
     public void thereAreRequiredArgumentsAndEmptyPlaceProvided_whenKeywordHasVargs() {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("a", "b", "*c");
 
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getArguments()).containsExactly("a", "b", "");
@@ -117,8 +118,8 @@ public class RedKeywordProposalTest {
     public void thereAreRequiredArgumentsAndEmptyPlaceProvided_whenKeywordHasKwargs() {
         final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("a", "b", "**c");
 
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", descriptor, "", false, new Path("file.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getArguments()).containsExactly("a", "b", "");
@@ -126,45 +127,45 @@ public class RedKeywordProposalTest {
 
     @Test
     public void userKeywordImageIsUsed_whenUserKeywordIsProposed() {
-        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", "alias", KeywordScope.LOCAL, "Given ",
-                "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getImage()).isEqualTo(RedImages.getUserKeywordImage());
     }
 
     @Test
     public void libraryKeywordImageIsUsed_whenLibraryKeywordIsProposed() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getImage()).isEqualTo(RedImages.getKeywordImage());
     }
 
     @Test
     public void labelIsComposedOfKeywordNameAndSourceSeparatedWithHyphen_1() {
-        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getLabel()).isEqualTo("keyword - file.robot");
     }
 
     @Test
     public void labelIsComposedOfKeywordNameAndSourceSeparatedWithHyphen_2() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getLabel()).isEqualTo("keyword - alias");
     }
 
     @Test
     public void styledLabelIsComposedOfKeywordNameAndSource_theSourceIsDecorated() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         final StyledString label = proposal.getStyledLabel();
 
@@ -193,9 +194,9 @@ public class RedKeywordProposalTest {
 
     @Test
     public void styledLabelOfDeprecatedKeywordIsComposedOfKeywordNameAndSource_theKeywordIsStrikeoutAndSourceIsDecorated() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", true, new Path("file.robot"),
-                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", true,
+                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         final StyledString label = proposal.getStyledLabel();
 
@@ -224,9 +225,10 @@ public class RedKeywordProposalTest {
 
     @Test
     public void styledLabelIsComposedOfKeywordNameAndSource_theMatchIsHighlighted() {
-        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false, new Path("file.robot"),
-                AssistProposalPredicates.alwaysFalse(), new ProposalMatch(Range.openClosed(0, 3)));
+        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "", false,
+                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(),
+                new ProposalMatch(Range.openClosed(0, 3)));
 
         final StyledString label = proposal.getStyledLabel();
 
@@ -265,9 +267,10 @@ public class RedKeywordProposalTest {
 
     @Test
     public void descriptionIsComposedOfGeneralHeaderAndKeywordDocumentation_forUserKeyword() {
-        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor("a", "*b"), "the documentation", false,
-                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor("a", "*b"),
+                "the documentation", false, new Path("file.robot"), AssistProposalPredicates.alwaysFalse(),
+                ProposalMatch.EMPTY);
 
         assertThat(proposal.hasDescription()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Name: keyword\n" + "Source: User defined (file.robot)\n"
@@ -276,9 +279,10 @@ public class RedKeywordProposalTest {
 
     @Test
     public void descriptionIsComposedOfGeneralHeaderAndKeywordDocumentation_forLibrary() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "source", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor("a", "*b"), "the documentation", false,
-                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("source"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor("a", "*b"),
+                "the documentation", false, new Path("file.robot"), AssistProposalPredicates.alwaysFalse(),
+                ProposalMatch.EMPTY);
 
         assertThat(proposal.hasDescription()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo(
@@ -287,9 +291,10 @@ public class RedKeywordProposalTest {
 
     @Test
     public void descriptionIsComposedOfGeneralHeaderAndKeywordDocumentation_forAliasedLibrary() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor("a", "*b"), "the documentation", false,
-                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor("a", "*b"),
+                "the documentation", false, new Path("file.robot"), AssistProposalPredicates.alwaysFalse(),
+                ProposalMatch.EMPTY);
 
         assertThat(proposal.hasDescription()).isTrue();
         assertThat(proposal.getDescription()).isEqualTo("Name: keyword\n"
@@ -298,27 +303,29 @@ public class RedKeywordProposalTest {
 
     @Test
     public void keywordIsAccessible_forUserKeyword() {
-        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", "alias", KeywordScope.LOCAL,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation", false,
-                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedUserKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.LOCAL, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation",
+                false, new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.isAccessible()).isTrue();
     }
 
     @Test
     public void keywordIsAccessible_forLibraryKeyword() {
-        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation", false,
-                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(),
+                "the documentation", false, new Path("file.robot"), AssistProposalPredicates.alwaysFalse(),
+                ProposalMatch.EMPTY);
 
         assertThat(proposal.isAccessible()).isTrue();
     }
 
     @Test
     public void keywordIsNotAccessible_forNotAccessibleLibraryKeyword() {
-        final RedKeywordProposal proposal = new RedNotAccessibleLibraryKeywordProposal("source", "alias", KeywordScope.STD_LIBRARY,
-                "Given ", "keyword", ArgumentsDescriptor.createDescriptor(), "the documentation", false,
-                new Path("file.robot"), AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = new RedNotAccessibleLibraryKeywordProposal("source", Optional.of("alias"),
+                KeywordScope.STD_LIBRARY, "Given ", "keyword", ArgumentsDescriptor.createDescriptor(),
+                "the documentation", false, new Path("file.robot"), AssistProposalPredicates.alwaysFalse(),
+                ProposalMatch.EMPTY);
 
         assertThat(proposal.isAccessible()).isFalse();
     }
