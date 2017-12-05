@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Sxwy4OOvEeaJ-cAS1pFGxQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 11/7/17 10:17 AM
+Save-Time: 12/5/17 10:39 AM
 Testcase-Type: ecl
 Verifications: _XqT4gPqgEeaJ8_kc5pFRQQ
 
@@ -132,6 +132,8 @@ with [get-view Outline] {
 //run file from PE
 get-view "Project Explorer" | get-tree | select "RunTestFromOutline/tsv_file.tsv" | get-menu "Run As/1 Robot Test" 
     | click
+    
+wait-for-message-log    
 get-view "Message Log" | get-editbox | get-property text 
     | equals "Starting test: RunTestFromOutline.Tsv File.check text\n"
     + "Ending test: RunTestFromOutline.Tsv File.check text\n\n"

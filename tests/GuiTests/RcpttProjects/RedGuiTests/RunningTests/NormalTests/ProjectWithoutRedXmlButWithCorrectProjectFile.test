@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _PG3S0DE7EeWbDptfbJdvqQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 5/9/17 2:00 PM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/5/17 12:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -119,7 +119,8 @@ get-view "Project Explorer" | get-tree | verify-error {get-item OnlyRobotSuiteFi
 get-view "Project Explorer" | get-tree | select "OnlyRobotSuiteFile/SimpleLoggingTestCase.robot" | double-click
 get-button "Run.*" | click
 
-//check Message log    
+//check Message log  
+wait-for-message-log  
 get-view "Message Log" | get-editbox | get-property text | matches [concat "Starting test: OnlyRobotSuiteFile\.SimpleLoggingTestCase\.firstTest\n" 
 [concat_str_with_regex [list  "1\\n"  "\\$\\{variable\\} = 10\\n"  "10"]] "\nEnding test: OnlyRobotSuiteFile\.SimpleLoggingTestCase\.firstTest"]| verify-true
 
