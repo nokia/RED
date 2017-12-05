@@ -5,20 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import java.text.Collator;
-
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 
-public class ProjectSorter extends ViewerSorter {
-
-    public ProjectSorter() {
-        // nothing to do
-    }
-
-    public ProjectSorter(final Collator collator) {
-        super(collator);
-    }
+public class ProjectSorter extends ViewerComparator {
 
     @Override
     public int category(final Object element) {
