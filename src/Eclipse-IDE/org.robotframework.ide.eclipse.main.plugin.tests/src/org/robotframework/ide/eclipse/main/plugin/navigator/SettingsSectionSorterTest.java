@@ -33,7 +33,7 @@ public class SettingsSectionSorterTest {
     private final SettingsSectionSorter sorter = new SettingsSectionSorter();
 
     @Test
-    public void categoryIsAssignedOnlyForArtificailGroupingElements() throws Exception {
+    public void categoryIsAssignedOnlyForArtificialGroupingElements() throws Exception {
         assertThat(sorter.category(mock(RobotProject.class))).isZero();
         assertThat(sorter.category(mock(RobotFolder.class))).isZero();
         assertThat(sorter.category(mock(RobotSuiteFile.class))).isZero();
