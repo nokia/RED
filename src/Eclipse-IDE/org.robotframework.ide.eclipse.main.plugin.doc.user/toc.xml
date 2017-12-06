@@ -9,6 +9,8 @@
     </topic>
     <topic href="doc/first_steps/eclipse_principles.html" label="Eclipse principles">
     </topic>
+    <topic href="doc/first_steps/establishing_environment.html" label="Establishing environment">
+    </topic>
     <topic href="doc/first_steps/create_run.html" label="Create project, add test and run">
     </topic>
     <topic href="doc/first_steps/preferences_misc.html" label="Preferences and red.xml">
