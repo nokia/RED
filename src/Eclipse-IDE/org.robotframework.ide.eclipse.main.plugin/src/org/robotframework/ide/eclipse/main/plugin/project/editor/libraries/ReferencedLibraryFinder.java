@@ -20,6 +20,7 @@ import org.rf.ide.core.project.ImportPath;
 import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.ResolvedImportPath;
+import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -53,7 +54,8 @@ public class ReferencedLibraryFinder {
                     return newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, name,
                             new Path(libraryFile.getPath()).toPortableString()));
                 } else {
-                    return findByPath(config, libraryFile.getAbsolutePath());
+                    return importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
+                            config, libraryFile.getAbsolutePath());
                 }
             }
         } catch (final RobotEnvironmentException e) {
@@ -73,29 +75,34 @@ public class ReferencedLibraryFinder {
 
     public Collection<ReferencedLibrary> findByPath(final RobotProjectConfig config, final String path)
             throws IncorrectLibraryPathException {
-        if (path.endsWith("/") || path.endsWith(".py")) {
-            final RobotProject robotProject = suiteFile.getProject();
-            final File libraryFile = findLibraryFile(path).orElseThrow(
-                    () -> new IncorrectLibraryPathException("Unable to find library under '" + path + "' location."));
-            if (isPythonModule(libraryFile)) {
-                return newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, libraryFile.getName(),
-                        new Path(libraryFile.getPath()).toPortableString()));
+        try {
+            if (path.endsWith("/") || path.endsWith(".py")) {
+                final RobotProject robotProject = suiteFile.getProject();
+                final File libraryFile = findLibraryFile(path).orElseThrow(() -> new IncorrectLibraryPathException(
+                        "Unable to find library under '" + path + "' location."));
+                if (isPythonModule(libraryFile)) {
+                    return newArrayList(ReferencedLibrary.create(LibraryType.PYTHON, libraryFile.getName(),
+                            new Path(libraryFile.getPath()).toPortableString()));
+                } else {
+                    return importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(),
+                            config, libraryFile.getAbsolutePath());
+                }
             } else {
-                return importer.importPythonLib(robotProject.getRuntimeEnvironment(), robotProject.getProject(), config,
-                        libraryFile.getAbsolutePath());
+                throw new IncorrectLibraryPathException(
+                        "The path '" + path + "' should point to either .py file or python module directory.");
             }
-        } else {
-            throw new IncorrectLibraryPathException(
-                    "The path '" + path + "' should point to either .py file or python module directory.");
+        } catch (final MalformedPathImportException e) {
+            throw new IncorrectLibraryPathException(e);
         }
     }
 
     private Optional<File> findLibraryFile(final String path) {
         final Map<String, String> vars = suiteFile.getProject().getRobotProjectHolder().getVariableMappings();
-        final ResolvedImportPath resolvedPath = ResolvedImportPath.from(ImportPath.from(path), vars).get();
-        final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
-        return new ImportSearchPaths(pathsProvider).findAbsoluteUri(suiteFile.getFile().getLocationURI(), resolvedPath)
-                .map(File::new);
+        return ResolvedImportPath.from(ImportPath.from(path), vars).flatMap(resolvedPath -> {
+            final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
+            return new ImportSearchPaths(pathsProvider).findAbsoluteUri(suiteFile.getFile().getLocationURI(),
+                    resolvedPath);
+        }).map(File::new);
     }
 
     private static boolean isPythonModule(final File file) {
@@ -120,6 +127,10 @@ public class ReferencedLibraryFinder {
 
         IncorrectLibraryPathException(final String message) {
             super(message);
+        }
+
+        IncorrectLibraryPathException(final Throwable cause) {
+            super(cause);
         }
 
     }
