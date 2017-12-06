@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m_EhUNmiEeeKxYJgF2NTmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/6/17 7:51 AM
+Save-Time: 12/6/17 8:35 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,8 +22,7 @@ with [get-view "Project Explorer" | get-tree] {
 }
 // verify if there is 3 errors
 get-view Problems | click
-get-view Problems | get-label "3 errors, 0 warnings, 0 others" | get-property caption 
-    | equals "3 errors, 0 warnings, 0 others" | verify-true
+wait-for-errors -amount 3 -times 2 -delay 300
 // go to red.xml and add default host name for remote server 
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml"] {
@@ -43,7 +42,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 100
+wait-for-zero-items -times 2 -delay 300
 // modify first function in Test Cases
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 29
@@ -62,13 +61,15 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type BackSpace
 }
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 100
+wait-for-zero-items -times 2 -delay 300
 // remove rest of the host name form import
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 2 43
     key-type BackSpace -times 25
 }
 // verify one error and one warning
+wait-for-errors -amount 1 -times 2 -delay 300
+wait-for-warnings -amount 1 -times 2 -delay 300
 with [get-view Problems | get-tree] {
     get-item 
         -path "Errors \\(1 item\\)/Unknown 'Remote' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
@@ -86,7 +87,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 100
+wait-for-zero-items -times 2 -delay 300
 // add another remote location to red.xml (without "/" at the and - it should add if with "/RPC2" at the end)
 with [get-editor "RobotProject/red.xml"] {
     click
@@ -109,7 +110,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 // varify one warrning
-wait-for-warnings -amount 1 -times 2 -delay 100
+wait-for-warnings -amount 1 -times 2 -delay 300
 with [get-view Problems] {
     get-tree | get-item -path "Warnings \\(1 item\\)/'Remote' library import without arguments" | get-property caption 
         | equals "'Remote' library import without arguments" | verify-true
@@ -135,7 +136,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 100
+wait-for-zero-items -times 2 -delay 300
 // change host name to the same, which was at the beginning of this test
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 37
@@ -145,8 +146,21 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 100
+wait-for-zero-items -times 2 -delay 300
+// add second "Stop Remote Server" KW
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 8 36
+    select-range 8 37 8 5
+    key-type "M1+c"
+    set-caret-pos 8 37
+    key-type Enter -times 2
+    key-type "M1+v"
+    key-type "M1+s"
+    set-caret-pos 10 37
+}
 // run test to kill remote server
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
     | get-menu -path "Run As/1 Robot Test" | click
+// check if connection to server is broken
+get-view "Message Log" | get-editbox | get-property text | contains "FAIL : Connection to remote server broken: "| verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
