@@ -11,9 +11,12 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
+import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -87,6 +90,14 @@ public class RobotSetting extends RobotKeywordCall {
 
     public boolean isImportSetting() {
         return SettingsGroup.getImportsGroupsSet().contains(getGroup());
+    }
+
+    public Optional<String> extractLibraryAlias() {
+        if (getLinkedElement() instanceof LibraryImport) {
+            final LibraryAlias libAlias = ((LibraryImport) getLinkedElement()).getAlias();
+            return libAlias.isPresent() ? Optional.of(libAlias.getLibraryAlias().getText()) : Optional.empty();
+        }
+        throw new IllegalArgumentException("Unable to extract library alias from non-Library setting");
     }
 
     @Override

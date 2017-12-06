@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -32,6 +33,14 @@ public class Libraries {
             libSpec.getKeywords().add(kwSpec);
         }
         return ImmutableMap.of(libName, libSpec);
+    }
+
+    public static Map<String, LibrarySpecification> createRemoteLib(final String path, final String... kwNames) {
+        final Map<String, LibrarySpecification> lib = createStdLib("Remote", kwNames);
+        final RemoteLocation location = RemoteLocation.create(path);
+        final LibrarySpecification spec = lib.get("Remote");
+        spec.setRemoteLocation(location);
+        return ImmutableMap.of("Remote " + location.getUri(), spec);
     }
 
     public static Map<ReferencedLibrary, LibrarySpecification> createRefLibs(final String... libNames) {

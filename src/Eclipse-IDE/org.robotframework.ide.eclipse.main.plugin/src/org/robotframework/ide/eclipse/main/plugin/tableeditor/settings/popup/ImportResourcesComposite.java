@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -19,24 +18,20 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -48,8 +43,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -58,7 +51,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSetti
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.Selections;
+import org.robotframework.red.viewers.StructuredContentProvider;
 
 
 public class ImportResourcesComposite {
@@ -93,7 +88,7 @@ public class ImportResourcesComposite {
 
         resourcesViewer = new TableViewer(resourcesComposite);
         resourcesViewer.setContentProvider(new ImportResourcesContentProvider());
-        resourcesViewer.setLabelProvider(new ResourcesLabelProvider());
+        resourcesViewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new ResourcesLabelProvider()));
         GridDataFactory.fillDefaults().grab(true, true).hint(220, 250).applyTo(resourcesViewer.getControl());
         
         final Composite addResourceButtons = formToolkit.createComposite(resourcesComposite);
@@ -240,9 +235,8 @@ public class ImportResourcesComposite {
     
     private void handleResourceRemove(final Settings importedSettings, final List<IPath> resourcesToRemove) {
         final List<RobotSetting> settingsToRemove = newArrayList();
-        final List<RobotKeywordCall> currentResources = settingsSection.getResourcesSettings();
-        for (final RobotKeywordCall element : currentResources) {
-            final RobotSetting setting = (RobotSetting) element;
+        final List<RobotSetting> currentResources = settingsSection.getResourcesSettings();
+        for (final RobotSetting setting : currentResources) {
             final List<String> args = setting.getArguments();
             if(!args.isEmpty() && resourcesToRemove.contains(new Path(args.get(0)))) {
                 settingsToRemove.add(setting);
@@ -254,9 +248,8 @@ public class ImportResourcesComposite {
     }
     
     private void handleResourceEdit(final Settings importedSettings, final IPath oldPath, final String newPath) {
-        final List<RobotKeywordCall> currentResources = settingsSection.getResourcesSettings();
-        for (final RobotKeywordCall element : currentResources) {
-            final RobotSetting setting = (RobotSetting) element;
+        final List<RobotSetting> currentResources = settingsSection.getResourcesSettings();
+        for (final RobotSetting setting : currentResources) {
             final List<String> args = setting.getArguments();
             if(!args.isEmpty() && oldPath.equals(new Path(args.get(0)))) {
                 commandsStack.execute(new SetSettingArgumentCommand(setting, 0, newPath));
@@ -290,64 +283,31 @@ public class ImportResourcesComposite {
         }
     }
     
-    private static class ResourcesLabelProvider extends StyledCellLabelProvider {
+    private static class ResourcesLabelProvider extends RedCommonLabelProvider {
 
         @Override
-        public void update(final ViewerCell cell) {
-
-            final StyledString label = getStyledText(cell.getElement());
-            cell.setText(label.getString());
-            cell.setStyleRanges(label.getStyleRanges());
-
-            cell.setImage(getImage(cell.getElement()));
-
-            super.update(cell);
-        }
-
         public Image getImage(final Object element) {
             return ImagesManager.getImage(RedImages.getResourceImage());
         }
 
+        @Override
         public StyledString getStyledText(final Object element) {
             final IPath path = (IPath) element;
             final StyledString text = new StyledString(path.lastSegment() != null ? path.lastSegment() : "");
-            final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString() : currentProject.getName();
-            text.append(" - " + parentPath, new Styler() {
-
-                @Override
-                public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RedTheme.Colors.getEclipseDecorationColor();
-                }
-            });
-
+            final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString()
+                    : currentProject.getName();
+            text.append(" - " + parentPath, Stylers.Common.ECLIPSE_DECORATION_STYLER);
             return text;
         }
     }
     
-    private static class ImportResourcesContentProvider implements IStructuredContentProvider {
-
-        @Override
-        public void dispose() {
-            // nothing to do
-        }
-
-        @Override
-        public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-            // nothing to do
-        }
+    private static class ImportResourcesContentProvider extends StructuredContentProvider {
 
         @Override
         public Object[] getElements(final Object inputElement) {
             final List<IPath> libraries = ((Settings) inputElement).getImportedResources();
-            Collections.sort(libraries, new Comparator<IPath>() {
-
-                @Override
-                public int compare(final IPath spec1, final IPath spec2) {
-                    return spec1.lastSegment().compareTo(spec2.lastSegment());
-                }
-            });
+            Collections.sort(libraries, (p1, p2) -> p1.lastSegment().compareTo(p2.lastSegment()));
             return libraries.toArray();
         }
-
     }
 }
