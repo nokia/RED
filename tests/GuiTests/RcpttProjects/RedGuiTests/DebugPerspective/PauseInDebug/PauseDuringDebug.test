@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _epiEsKp5EeegMO_FS_X-9A
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/1/17 10:42 AM
+Save-Time: 12/6/17 3:50 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -90,7 +90,9 @@ exec-with-options -disableJobWaiting -command {
 	get-menu "1 TestFile.robot" | click
 	
 	
-	wait 2000
+	try -times 4 -delay 1000 -command{
+		get-view Console | get-text-viewer | get-property text | contains "kk3" | verify-true
+	}
 	get-button Suspend | get-property enablement | equals true | verify-true
 	get-button "Terminate.*" -index 1 | get-property enablement | equals true | verify-true
 	get-button Disconnect | get-property enablement | equals true | verify-true
