@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import java.util.Optional;
+
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
@@ -22,7 +24,7 @@ public abstract class KeywordEntity {
 
     private final String keywordName;
 
-    private final String alias;
+    private final Optional<String> alias;
 
     private final boolean isDeprecated;
 
@@ -31,12 +33,13 @@ public abstract class KeywordEntity {
     private final IPath exposingFilepath;
 
     protected KeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-            final String alias, final boolean isDeprecated, final ArgumentsDescriptor argumentsDescriptor,
+            final Optional<String> libraryAlias, final boolean isDeprecated,
+            final ArgumentsDescriptor argumentsDescriptor,
             final IPath exposingFilepath) {
         this.scope = scope;
         this.sourceName = sourceName;
         this.keywordName = keywordName;
-        this.alias = alias;
+        this.alias = libraryAlias;
         this.isDeprecated = isDeprecated;
         this.argumentsDescriptor = argumentsDescriptor;
         this.exposingFilepath = exposingFilepath;
@@ -51,7 +54,7 @@ public abstract class KeywordEntity {
     }
 
     public String getSourceNameInUse() {
-        return alias.isEmpty() ? sourceName : alias;
+        return alias.orElse(sourceName);
     }
 
     public String getNameFromDefinition() {
@@ -67,7 +70,7 @@ public abstract class KeywordEntity {
     }
 
     public String getAlias() {
-        return alias;
+        return alias.orElse("");
     }
 
     public String getSourceName() {

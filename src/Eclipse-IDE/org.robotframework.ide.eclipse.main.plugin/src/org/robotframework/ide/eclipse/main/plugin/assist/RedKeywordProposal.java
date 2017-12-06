@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
     private String content;
 
     @VisibleForTesting
-    RedKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+    RedKeywordProposal(final String sourceName, final Optional<String> sourceAlias, final KeywordScope scope,
             final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
             final String documentation, final boolean isDeprecated, final IPath exposingFilePath,
             final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
@@ -128,7 +129,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
     static class RedUserKeywordProposal extends RedKeywordProposal {
 
-        RedUserKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+        RedUserKeywordProposal(final String sourceName, final Optional<String> sourceAlias, final KeywordScope scope,
                 final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
                 final String documentation, final boolean isDeprecated, final IPath exposingFilePath,
                 final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
@@ -160,7 +161,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
     static class RedLibraryKeywordProposal extends RedKeywordProposal {
 
-        RedLibraryKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+        RedLibraryKeywordProposal(final String sourceName, final Optional<String> sourceAlias, final KeywordScope scope,
                 final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
                 final String documentation, final boolean isDeprecated, final IPath exposingFilePath,
                 final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
@@ -195,7 +196,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
     static class RedNotAccessibleLibraryKeywordProposal extends RedLibraryKeywordProposal {
 
-        RedNotAccessibleLibraryKeywordProposal(final String sourceName, final String sourceAlias,
+        RedNotAccessibleLibraryKeywordProposal(final String sourceName, final Optional<String> sourceAlias,
                 final KeywordScope scope, final String bddPrefix, final String name,
                 final ArgumentsDescriptor argumentsDescriptor, final String documentation, final boolean isDeprecated,
                 final IPath exposingFilePath, final Predicate<RedKeywordProposal> shouldUseQualifiedName,

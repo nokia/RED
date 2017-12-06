@@ -648,7 +648,7 @@ public class KeywordSettingsValidatorTest {
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
             final String name, final IPath exposingPath, final String... args) {
-        return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
+        return new ValidationKeywordEntity(scope, sourceName, name, Optional.empty(), false, exposingPath, 0,
                 ArgumentsDescriptor.createDescriptor(args));
     }
 

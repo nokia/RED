@@ -19,7 +19,6 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -39,7 +38,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
                 .build();
 
         final RobotSettingsSection section = file.findSection(RobotSettingsSection.class).get();
-        final List<RobotKeywordCall> metadataSettings = section.getMetadataSettings();
+        final List<RobotSetting> metadataSettings = section.getMetadataSettings();
 
         final int[] columnsToCopy = new int[] { 0, 1, 2 };
         final int[] rowsToCopy = new int[] { 0 };
@@ -80,7 +79,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
                 .build();
 
         final RobotSettingsSection section = file.findSection(RobotSettingsSection.class).get();
-        final List<RobotKeywordCall> metadataSettings = section.getMetadataSettings();
+        final List<RobotSetting> metadataSettings = section.getMetadataSettings();
 
         final int[] columnsToCopy = new int[] { 0, 1 };
         final int[] rowsToCopy = new int[] { 0, 1 };
@@ -118,7 +117,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
                 .build();
 
         final RobotSettingsSection section = file.findSection(RobotSettingsSection.class).get();
-        final List<RobotKeywordCall> metadataSettings = section.getMetadataSettings();
+        final List<RobotSetting> metadataSettings = section.getMetadataSettings();
 
         final int[] columnsToCopy = new int[] { 0, 1 };
         final int[] rowsToCopy = new int[] { 0, 1 };
@@ -156,7 +155,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
                 .build();
 
         final RobotSettingsSection section = file.findSection(RobotSettingsSection.class).get();
-        final List<RobotKeywordCall> metadataSettings = section.getMetadataSettings();
+        final List<RobotSetting> metadataSettings = section.getMetadataSettings();
 
         final int[] columnsToCopy = new int[] { 0 };
         final int[] rowsToCopy = new int[] { 0 };
@@ -194,7 +193,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
                 .build();
 
         final RobotSettingsSection section = file.findSection(RobotSettingsSection.class).get();
-        final List<RobotKeywordCall> metadataSettings = section.getMetadataSettings();
+        final List<RobotSetting> metadataSettings = section.getMetadataSettings();
 
         final int[] columnsToCopy = new int[] { 0 };
         final int[] rowsToCopy = new int[] { 0 };
@@ -269,7 +268,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         }
     }
 
-    private List<RobotElement> getSettingsByRowNumbers(final List<RobotKeywordCall> settings, final int[] rows) {
+    private List<RobotElement> getSettingsByRowNumbers(final List<RobotSetting> settings, final int[] rows) {
         final List<RobotElement> result = newArrayList();
         for (int i = 0; i < rows.length; i++) {
             result.add(settings.get(rows[i]));

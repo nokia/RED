@@ -9,8 +9,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createRefLib;
 import static org.robotframework.ide.eclipse.main.plugin.project.library.Libraries.createStdLib;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -224,7 +226,7 @@ public class KeywordDefinitionLocatorTest {
 
             @Override
             public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
+                    final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                     final RobotSuiteFile exposingFile) {
                 visitedLibs.add(kwSpec.getName() + " - " + libSpec.getName());
                 return ContinueDecision.CONTINUE;
@@ -237,7 +239,7 @@ public class KeywordDefinitionLocatorTest {
 
             @Override
             public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
+                    final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                     final RobotSuiteFile exposingFile) {
                 visitedLibs.add(kwSpec.getName() + " - " + libSpec.getName());
                 return visitedLibs.size() < 2 ? ContinueDecision.CONTINUE : ContinueDecision.STOP;
@@ -276,7 +278,8 @@ public class KeywordDefinitionLocatorTest {
 
         @Override
         public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                final KeywordSpecification kwSpec, final Set<String> libraryAlias, final RobotSuiteFile exposingFile) {
+                final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAlias,
+                final RobotSuiteFile exposingFile) {
             return ContinueDecision.CONTINUE;
         }
 
