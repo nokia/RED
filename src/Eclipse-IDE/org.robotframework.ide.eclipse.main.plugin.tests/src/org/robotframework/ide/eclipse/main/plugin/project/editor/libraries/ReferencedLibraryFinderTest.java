@@ -35,6 +35,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -115,6 +116,29 @@ public class ReferencedLibraryFinderTest {
     }
 
     @Test
+    public void exceptionIsThrown_whenPathIsMalformed() throws Exception {
+        final ReferencedLibraryFinder finder = new ReferencedLibraryFinder(suite, importer);
+
+        assertThatExceptionOfType(IncorrectLibraryPathException.class)
+                .isThrownBy(() -> finder.findByPath(robotProject.getRobotProjectConfig(), "{}/path_lib.py"))
+                .withCauseInstanceOf(MalformedPathImportException.class);
+
+        verifyZeroInteractions(importer);
+    }
+
+    @Test
+    public void exceptionIsThrown_whenPathHasUnknownVariable() throws Exception {
+        final ReferencedLibraryFinder finder = new ReferencedLibraryFinder(suite, importer);
+
+        assertThatExceptionOfType(IncorrectLibraryPathException.class)
+                .isThrownBy(() -> finder.findByPath(robotProject.getRobotProjectConfig(), "${unknown}/path_lib.py"))
+                .withNoCause()
+                .withMessage("Unable to find library under '${unknown}/path_lib.py' location.");
+
+        verifyZeroInteractions(importer);
+    }
+
+    @Test
     public void pythonLibraryIsFoundByPath() throws Exception {
         final IResource libResource = projectProvider.getFile("dir_lib.py");
         setupPythonImport(libResource);
@@ -122,6 +146,24 @@ public class ReferencedLibraryFinderTest {
         final ReferencedLibraryFinder finder = new ReferencedLibraryFinder(suite, importer);
         final Collection<ReferencedLibrary> libs = finder.findByPath(robotProject.getRobotProjectConfig(),
                 "dir_lib.py");
+
+        assertThat(libs).hasSize(1);
+        assertThat(libs.iterator().next()).has(sameFieldsAs(
+                ReferencedLibrary.create(LibraryType.PYTHON, "dir_lib", libResource.getLocation().toPortableString())));
+
+        verify(importer).importPythonLib(suite.getProject().getRuntimeEnvironment(), projectProvider.getProject(),
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath());
+        verifyNoMoreInteractions(importer);
+    }
+
+    @Test
+    public void pythonLibraryIsFoundByPathWithKnownVariable() throws Exception {
+        final IResource libResource = projectProvider.getFile("dir_lib.py");
+        setupPythonImport(libResource);
+
+        final ReferencedLibraryFinder finder = new ReferencedLibraryFinder(suite, importer);
+        final Collection<ReferencedLibrary> libs = finder.findByPath(robotProject.getRobotProjectConfig(),
+                "${CURDIR}/dir_lib.py");
 
         assertThat(libs).hasSize(1);
         assertThat(libs.iterator().next()).has(sameFieldsAs(
