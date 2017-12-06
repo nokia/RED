@@ -63,7 +63,7 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
 
                     @Override
                     public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                            final KeywordSpecification kwSpec, final Set<String> libraryAlias,
+                            final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAlias,
                             final RobotSuiteFile exposingFile) {
                         return ContinueDecision.CONTINUE;
                     }

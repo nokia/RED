@@ -1,8 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.debug;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -117,7 +117,7 @@ class SourceInLibraryEditorControls implements RedDebuggerAssistantEditorControl
 
             @Override
             public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAliases,
+                    final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                     final RobotSuiteFile exposingFile) {
 
                 if (QualifiedKeywordName.create(kwSpec.getName(), libSpec.getName())

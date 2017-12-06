@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Sets.newHashSet;
+import static java.util.stream.Collectors.toSet;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createNotAccessibleLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createUserKeywordProposal;
@@ -23,7 +24,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
@@ -201,7 +201,7 @@ public class RedKeywordProposals {
 
                         @Override
                         public ContinueDecision accessibleLibraryKeywordDetected(final LibrarySpecification libSpec,
-                                final KeywordSpecification kwSpec, final Set<String> libraryAliases,
+                                final KeywordSpecification kwSpec, final Collection<Optional<String>> libraryAliases,
                                 final RobotSuiteFile exposingFile) {
                             if (!libraryPredicate.test(libSpec)) {
                                 return ContinueDecision.CONTINUE;
@@ -211,9 +211,8 @@ public class RedKeywordProposals {
                                     : KeywordScope.STD_LIBRARY;
                             final String keywordName = kwSpec.getName();
                             final Set<String> sourcePrefixes = libraryAliases.isEmpty() ? newHashSet(libSpec.getName())
-                                    : libraryAliases.stream()
-                                            .map(alias -> alias.isEmpty() ? libSpec.getName() : alias)
-                                            .collect(Collectors.toSet());
+                                    : libraryAliases.stream().map(alias -> alias.orElse(libSpec.getName())).collect(
+                                            toSet());
 
                             for (final String sourcePrefix : sourcePrefixes) {
                                 matchKeyword(keywordName, sourcePrefix,

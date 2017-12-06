@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -160,8 +161,8 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
         @VisibleForTesting
         ValidationKeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-                final String alias, final boolean isDeprecated, final IPath exposingFilepath, final int position,
-                final ArgumentsDescriptor argumentsDescriptor) {
+                final Optional<String> alias, final boolean isDeprecated, final IPath exposingFilepath,
+                final int position, final ArgumentsDescriptor argumentsDescriptor) {
             super(scope, sourceName, keywordName, alias, isDeprecated, argumentsDescriptor, exposingFilepath);
             this.position = position;
         }

@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -903,19 +904,19 @@ public class TestCaseTableValidatorTest {
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
             final String name, final IPath exposingPath, final String... args) {
-        return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
+        return new ValidationKeywordEntity(scope, sourceName, name, Optional.empty(), false, exposingPath, 0,
                 ArgumentsDescriptor.createDescriptor(args));
     }
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
             final String sourceAlias, final String name, final IPath exposingPath) {
-        return new ValidationKeywordEntity(scope, sourceName, name, sourceAlias, false, exposingPath, 0,
+        return new ValidationKeywordEntity(scope, sourceName, name, Optional.of(sourceAlias), false, exposingPath, 0,
                 ArgumentsDescriptor.createDescriptor());
     }
 
     private static KeywordEntity newDeprecatedValidationKeywordEntity(final KeywordScope scope, final String sourceName,
             final String name, final IPath exposingPath) {
-        return new ValidationKeywordEntity(scope, sourceName, name, "", true, exposingPath, 0,
+        return new ValidationKeywordEntity(scope, sourceName, name, Optional.empty(), true, exposingPath, 0,
                 ArgumentsDescriptor.createDescriptor());
     }
 
