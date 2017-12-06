@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VMj88KTbEeazyPh6f3_hNQ
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 7/3/17 10:17 AM
+Save-Time: 12/5/17 10:49 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -149,7 +149,7 @@ with [get-window Preferences] {
     get-section Import | click
 }
 
-get-window Preferences | get-section "Import" | get-control Any -index 2 | get-property "getChildren().length" | equals 6 | verify-true
+get-window Preferences | get-section "Import" | get-control Any -index 2 | get-property "getChildren().length" | equals 8 | verify-true
 
 check-combobox-list-and-selection -section "Import" -label "Absolute path used"
   	-text "Occurs when absolute path is used. Workspace-relative paths are preferred in RED." 
