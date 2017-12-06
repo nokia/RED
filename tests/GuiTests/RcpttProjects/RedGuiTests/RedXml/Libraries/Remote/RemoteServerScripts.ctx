@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YDbWsNnJEeeKxYJgF2NTmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/5/17 3:42 PM
+Save-Time: 12/6/17 12:19 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -16,7 +16,7 @@ proc "run-python-remote-server-in-background" [val project_name "RobotProject"] 
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 				exec-process  "cmd.exe"  "/c" "start" "\"\""  "\"python\"" [concat $RED_workspace_path "\\" $project_name "\\" $lib_name] -timeout $timeout
 	}-else{
-			exec-process  "gnome-terminal" "-e" "python" [concat $RED_workspace_path_unix_style "/" $project_name "/" $lib_name] -timeout $timeout
+			exec-process  "gnome-terminal" "-e" [concat "python " $RED_workspace_path_unix_style "/" $project_name "/" $lib_name] -timeout $timeout
 			wait 2000
 	}
 } 
