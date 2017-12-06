@@ -1,0 +1,91 @@
+<html>
+<head>
+<link
+    href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+    rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<h2>Establishing environment</h2>
+
+<p>As mentioned <a href="download_install.html">earlier</a> RED requires Python interpreter with Robot Framework 
+installed in your system. Without it numerous RED features will not work: you will not be able to run and debug
+tests, the project will not be validated or content assistant will not give any proposals for keywords
+coming from libraries.
+</p>
+
+<p>If there is no environment established RED will signal this: error will be reported by workspace validation
+for each red.xml file in your projects or the dialog will be presented when opening editor:
+</p>
+
+<p><img src="images/error_missing_env.png"/>
+</p>
+<p><img src="images/error_missing_env2.png"/>
+</p>
+
+<p>There are two ways in which Python &amp; RF environment can be established: automatically or manually via Preferences 
+</p>
+
+
+<h3>Automatic environment detection</h3>
+
+<p>In most cases there is actually nothing required from user and RED will automatically detect Python installation.
+This only require that the path to one of those executables (Unix-like / Windows):
+</p>
+<ul>
+    <li><span class="block">python</span> / <span class="block">python.exe</span>
+    </li>
+    <li><span class="block">jython</span> / <span class="block">jython.exe</span>
+    </li>
+    <li><span class="block">ipy</span> / <span class="block">ipy.exe</span>
+    </li>
+    <li><span class="block">ipy64</span> / <span class="block">ipy64.exe</span>
+    </li>
+    <li><span class="block">pypy</span> / <span class="block">pypy.exe</span>
+    </li>
+</ul>
+<p>is appended to <a href="https://en.wikipedia.org/wiki/PATH_(variable)" class="external" target="_blank">
+<span class="code">PATH</span></a> environment variable in your system.
+</p>
+
+<dl class="warning">
+   <dt>Warning</dt>
+   <dd>On Unix-like systems (Linux / macOS) executables are often named <span class="block">python2</span> or 
+   <span class="block">python3</span> for respective versions of python. As of now RED does not recognize
+   such executables even if they are appended to <span class="block">PATH</span> variable. Probably the best
+   solution for this problem is to create a <a href="https://en.wikipedia.org/wiki/Symbolic_link" 
+   class="external" target="_blank">symlink</a> named <span class="block">python</span> targeted to either 
+   <span class="block">python2</span> or <span class="block">python3</span>.
+   </dd>
+</dl>
+
+
+<h3>Manual environment configuration</h3>
+
+<p>It is possible to add environments manually in 
+<i><a class="command" href="javascript:executeCommand('org.eclipse.ui.window.preferences(preferencePageId=org.robotframework.ide.eclipse.main.plugin.preferences.installed)')">
+Window-&gt;Preferences-&gt;Robot Framework-&gt;Installed frameworks</a></i>. Simply use 
+<span class="block">Add...</span> button to open dialog in which the directory can be chosen. It should be the 
+directory which contains one of the executable files listed above. 
+</p>
+
+<p>If proper directory is chosen you will see it listed in the table together with the information
+about version of Robot Framework installed in it. Otherwise the added entry will be marked with orange/red color
+and tooltip would show information about the problem (either it was not recognized as Python directory or there
+is no RF installed).
+</p>
+
+<p>Multiple environments can be defined here, but only one should be selected and it will be used by all project unless
+the project overrides this setting locally in its <span class="block">red.xml</span> configuration file.
+</p>
+
+<p>Additionally the automatic recognition process can be started from preference page through 
+<span class="block">Discover</span> button. It will look through directories in your <span class="block">PATH</span>
+variable to see if any of listed executables are there.
+</p>
+
+<br/>
+
+
+</body>
+</html>
