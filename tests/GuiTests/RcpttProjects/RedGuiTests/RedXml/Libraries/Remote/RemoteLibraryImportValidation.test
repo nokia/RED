@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m_EhUNmiEeeKxYJgF2NTmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/6/17 9:07 AM
+Save-Time: 12/6/17 9:24 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -42,7 +42,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 1000
+//wait-for-zero-items -times 2 -delay 1000
 // modify first function in Test Cases
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 29
@@ -61,7 +61,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type BackSpace
 }
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 1000
+//wait-for-zero-items -times 2 -delay 1000
 // remove rest of the host name form import
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 2 43
@@ -87,7 +87,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 // verify if there is no problems
-wait-for-zero-items -times 2 -delay 1000
+//wait-for-zero-items -times 2 -delay 1000
 // add another remote location to red.xml (without "/" at the and - it should add if with "/RPC2" at the end)
 with [get-editor "RobotProject/red.xml"] {
     click
@@ -110,7 +110,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 // varify one warrning
-wait-for-warnings -amount 1 -times 2 -delay 1000
+//wait-for-warnings -amount 1 -times 2 -delay 1000
 with [get-view Problems] {
     get-tree | get-item -path "Warnings \\(1 item\\)/'Remote' library import without arguments" | get-property caption 
         | equals "'Remote' library import without arguments" | verify-true
