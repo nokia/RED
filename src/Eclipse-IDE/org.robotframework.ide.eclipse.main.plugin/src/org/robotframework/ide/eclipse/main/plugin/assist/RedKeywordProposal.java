@@ -62,7 +62,7 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
     public String getContent() {
         if (content == null) {
             if (shouldUseQualifiedName.test(this)) {
-                content = bddPrefix + getAlias() + "." + getNameFromDefinition();
+                content = bddPrefix + getSourceNameInUse() + "." + getNameFromDefinition();
             } else {
                 content = bddPrefix + getNameFromDefinition();
             }
@@ -129,12 +129,12 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
     static class RedUserKeywordProposal extends RedKeywordProposal {
 
-        RedUserKeywordProposal(final String sourceName, final Optional<String> sourceAlias, final KeywordScope scope,
-                final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
-                final String documentation, final boolean isDeprecated, final IPath exposingFilePath,
+        RedUserKeywordProposal(final String sourceName, final KeywordScope scope, final String bddPrefix,
+                final String name, final ArgumentsDescriptor argumentsDescriptor, final String documentation,
+                final boolean isDeprecated, final IPath exposingFilePath,
                 final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
-            super(sourceName, sourceAlias, scope, bddPrefix, name, argumentsDescriptor, documentation, isDeprecated,
-                    exposingFilePath, shouldUseQualifiedName, match);
+            super(sourceName, Optional.empty(), scope, bddPrefix, name, argumentsDescriptor, documentation,
+                    isDeprecated, exposingFilePath, shouldUseQualifiedName, match);
         }
 
         @Override
@@ -176,20 +176,21 @@ public abstract class RedKeywordProposal extends KeywordEntity implements Assist
 
         @Override
         public String getLabel() {
-            return getNameFromDefinition() + " - " + getAlias();
+            return getNameFromDefinition() + " - " + getSourceNameInUse();
         }
 
         @Override
         public StyledString getStyledLabel() {
-            return super.getStyledLabel().append(" - " + getAlias(), Stylers.Common.ECLIPSE_DECORATION_STYLER);
+            return super.getStyledLabel().append(" - " + getSourceNameInUse(),
+                    Stylers.Common.ECLIPSE_DECORATION_STYLER);
         }
 
         @Override
         protected String getSourceDescription() {
-            if (getAlias().equals(getSourceName())) {
-                return "Library (" + getSourceName() + ")";
+            if (sourceAlias.isPresent()) {
+                return "Library (" + getSourceNameInUse() + " - alias for " + getSourceName() + ")";
             } else {
-                return "Library (" + getAlias() + " - alias for " + getSourceName() + ")";
+                return "Library (" + getSourceNameInUse() + ")";
             }
         }
     }
