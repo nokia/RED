@@ -47,6 +47,16 @@ public class FontsManager {
         return getFont(display, FontDescriptor.createFrom(fontData));
     }
 
+    public static Font transformFontWithStyle(final int style) {
+        return transformFontWithStyle(null, style);
+    }
+
+    public static Font transformFontWithStyle(final Font fontToReuse, final int style) {
+        final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;
+        final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(style);
+        return FontsManager.getFont(fontDescriptor);
+    }
+
     /**
      * Dispose fonts manager.
      */

@@ -5,7 +5,7 @@
  */
 package org.eclipse.jface.viewers;
 
-import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.JFaceColors;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
@@ -51,6 +51,14 @@ public class Stylers {
             }
         };
 
+        public static final Styler BOLD_STYLER = new Styler() {
+
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.font = FontsManager.transformFontWithStyle(textStyle.font, SWT.BOLD);
+            };
+        };
+
         public static final Styler ERROR_STYLER = new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
@@ -87,9 +95,9 @@ public class Stylers {
 
             @Override
             public void applyStyles(final TextStyle textStyle) {
-                textStyle.foreground = ColorsManager.getColor(SWT.COLOR_LINK_FOREGROUND);
+                textStyle.foreground = JFaceColors.getHyperlinkText(Display.getCurrent());
                 textStyle.underline = true;
-                textStyle.underlineColor = ColorsManager.getColor(SWT.COLOR_LINK_FOREGROUND);
+                textStyle.underlineColor = JFaceColors.getHyperlinkText(Display.getCurrent());
             }
         };
     }
@@ -167,11 +175,7 @@ public class Stylers {
         return new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
-                final Font currentFont = textStyle.font == null ? Display.getCurrent().getSystemFont() : textStyle.font;
-                FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont);
-                fontDescriptor = fontDescriptor.setStyle(style);
-
-                textStyle.font = FontsManager.getFont(fontDescriptor);
+                textStyle.font = FontsManager.transformFontWithStyle(textStyle.font, style);
             }
         };
     }

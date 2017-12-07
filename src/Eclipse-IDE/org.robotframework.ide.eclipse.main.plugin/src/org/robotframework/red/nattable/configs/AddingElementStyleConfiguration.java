@@ -9,7 +9,6 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Set;
 
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
@@ -26,7 +25,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
@@ -56,7 +54,7 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
                 : ColorsManager.getColor(200, 200, 200);
 
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, foregroundColor);
-        style.setAttributeValue(CellStyleAttributes.FONT, getFont(font, SWT.ITALIC));
+        style.setAttributeValue(CellStyleAttributes.FONT, FontsManager.transformFontWithStyle(font, SWT.ITALIC));
 
         final Set<String> configLabels = newHashSet(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL,
                 AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL,
@@ -82,12 +80,6 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
                 DisplayMode.NORMAL, AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, textPainter, DisplayMode.NORMAL,
                 AddingElementLabelAccumulator.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
-    }
-
-    private Font getFont(final Font fontToReuse, final int style) {
-        final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;
-        final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(style);
-        return FontsManager.getFont(fontDescriptor);
     }
 
     private static class DropdownPainter extends CellPainterDecorator {
