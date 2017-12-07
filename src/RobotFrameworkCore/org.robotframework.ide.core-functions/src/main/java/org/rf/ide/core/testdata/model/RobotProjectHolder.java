@@ -96,6 +96,9 @@ public class RobotProjectHolder {
     }
 
     public List<File> getModuleSearchPaths() {
+        if (robotRuntime == null) {
+            return new ArrayList<>();
+        }
         if (modulesSearchPath == null) {
             modulesSearchPath = robotRuntime.getModuleSearchPaths();
         }
