@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
@@ -22,9 +25,9 @@ public abstract class KeywordEntity {
 
     private final String sourceName;
 
-    private final String keywordName;
+    protected final Optional<String> sourceAlias;
 
-    private final Optional<String> alias;
+    private final String keywordName;
 
     private final boolean isDeprecated;
 
@@ -39,7 +42,7 @@ public abstract class KeywordEntity {
         this.scope = scope;
         this.sourceName = sourceName;
         this.keywordName = keywordName;
-        this.alias = libraryAlias;
+        this.sourceAlias = libraryAlias;
         this.isDeprecated = isDeprecated;
         this.argumentsDescriptor = argumentsDescriptor;
         this.exposingFilepath = exposingFilepath;
@@ -54,7 +57,18 @@ public abstract class KeywordEntity {
     }
 
     public String getSourceNameInUse() {
-        return alias.orElse(sourceName);
+        return sourceAlias.orElse(sourceName);
+    }
+
+    public List<String> getPossibleQualifiers() {
+        final List<String> qualifiers = newArrayList(getSourceName());
+
+        final KeywordScope scope = getScope(exposingFilepath);
+        if (sourceAlias.isPresent() && (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.STD_LIBRARY)) {
+            // libraries can be also prefixed using source alias
+            qualifiers.add(0, sourceAlias.get());
+        }
+        return qualifiers;
     }
 
     public String getNameFromDefinition() {
@@ -69,10 +83,6 @@ public abstract class KeywordEntity {
         return isDeprecated;
     }
 
-    public String getAlias() {
-        return alias.orElse("");
-    }
-
     public String getSourceName() {
         return sourceName;
     }
@@ -85,7 +95,7 @@ public abstract class KeywordEntity {
         return Objects.equal(this.getSourceNameInUse(), that.getSourceNameInUse())
                 && Objects.equal(this.keywordName, that.keywordName)
                 && this.getScope(useplaceFilepath) == that.getScope(useplaceFilepath)
-                && Objects.equal(this.getAlias(), that.getAlias());
+                && Objects.equal(this.sourceAlias, that.sourceAlias);
     }
 
     @Override
@@ -95,7 +105,7 @@ public abstract class KeywordEntity {
         }
         if (obj.getClass() == getClass()) {
             final KeywordEntity that = (KeywordEntity) obj;
-            return Objects.equal(this.sourceName, that.sourceName) && Objects.equal(this.alias, that.alias)
+            return Objects.equal(this.sourceName, that.sourceName) && Objects.equal(this.sourceAlias, that.sourceAlias)
                     && Objects.equal(this.keywordName, that.keywordName) && this.scope == that.scope
                     && this.isDeprecated == that.isDeprecated && this.exposingFilepath == that.exposingFilepath;
         }
@@ -104,6 +114,6 @@ public abstract class KeywordEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(scope, sourceName, alias, keywordName, isDeprecated, exposingFilepath);
+        return Objects.hashCode(scope, sourceName, sourceAlias, keywordName, isDeprecated, exposingFilepath);
     }
 }

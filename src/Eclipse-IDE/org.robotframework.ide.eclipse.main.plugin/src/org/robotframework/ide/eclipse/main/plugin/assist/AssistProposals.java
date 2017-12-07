@@ -76,36 +76,35 @@ public class AssistProposals {
 
     static RedKeywordProposal createNotAccessibleLibraryKeywordProposal(final LibrarySpecification spec,
             final KeywordSpecification keyword, final String bddPrefix, final KeywordScope scope,
-            final String sourcePrefix, final IPath exposingFilepath,
+            final Optional<String> alias, final IPath exposingFilepath,
             final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
-        return new RedNotAccessibleLibraryKeywordProposal(spec.getName(), Optional.of(sourcePrefix), scope, bddPrefix,
-                keyword.getName(), argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
+        return new RedNotAccessibleLibraryKeywordProposal(spec.getName(), alias, scope, bddPrefix, keyword.getName(),
+                argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
                 shouldUseQualified, match);
     }
 
     static RedKeywordProposal createLibraryKeywordProposal(final LibrarySpecification spec,
             final KeywordSpecification keyword, final String bddPrefix, final KeywordScope scope,
-            final String sourcePrefix, final IPath exposingFilepath,
+            final Optional<String> alias, final IPath exposingFilepath,
             final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
-        return new RedLibraryKeywordProposal(spec.getName(), Optional.of(sourcePrefix), scope, bddPrefix,
+        return new RedLibraryKeywordProposal(spec.getName(), alias, scope, bddPrefix,
                 keyword.getName(), argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
                 shouldUseQualified, match);
     }
 
     static RedKeywordProposal createUserKeywordProposal(final RobotKeywordDefinition userKeyword,
-            final String bddPrefix, final KeywordScope scope, final String sourcePrefix,
-            final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
+            final String bddPrefix, final KeywordScope scope, final Predicate<RedKeywordProposal> shouldUseQualified,
+            final ProposalMatch match) {
 
         final RobotSuiteFile file = userKeyword.getSuiteFile();
         final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
-        return new RedUserKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()),
-                Optional.of(sourcePrefix), scope, bddPrefix, userKeyword.getName(), argsDescriptor,
-                userKeyword.getDocumentation(), userKeyword.isDeprecated(), file.getFile().getFullPath(),
-                shouldUseQualified, match);
+        return new RedUserKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()), scope, bddPrefix,
+                userKeyword.getName(), argsDescriptor, userKeyword.getDocumentation(), userKeyword.isDeprecated(),
+                file.getFile().getFullPath(), shouldUseQualified, match);
     }
 
     static RedCodeReservedWordProposal createCodeReservedWordProposal(final String word, final ProposalMatch match) {

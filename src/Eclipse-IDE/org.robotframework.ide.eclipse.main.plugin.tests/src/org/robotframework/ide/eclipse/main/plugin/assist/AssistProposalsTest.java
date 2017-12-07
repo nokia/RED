@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -71,7 +72,7 @@ public class AssistProposalsTest {
         final RobotKeywordDefinition kw1 = fileModel.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
 
         final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(kw1, "Given ", KeywordScope.LOCAL,
-                "suite", AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
+                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Given kw1");
         assertThat(proposal.getSourceName()).isEqualTo("suite");
@@ -95,8 +96,8 @@ public class AssistProposalsTest {
         kwSpec.setDocumentation("myDocumentation");
 
         final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "Given ",
-                KeywordScope.STD_LIBRARY, "myLibrary", new Path("test.robot"), AssistProposalPredicates.alwaysFalse(),
-                ProposalMatch.EMPTY);
+                KeywordScope.STD_LIBRARY, Optional.empty(), new Path("test.robot"),
+                AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Given libKw");
         assertThat(proposal.getSourceName()).isEqualTo("myLibrary");
@@ -120,7 +121,7 @@ public class AssistProposalsTest {
         kwSpec.setDocumentation("myDocumentation");
 
         final RedKeywordProposal proposal = AssistProposals.createNotAccessibleLibraryKeywordProposal(libSpec, kwSpec,
-                "Given ", KeywordScope.STD_LIBRARY, "myNotImportedLibrary", new Path("test.robot"),
+                "Given ", KeywordScope.STD_LIBRARY, Optional.empty(), new Path("test.robot"),
                 AssistProposalPredicates.alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getContent()).isEqualTo("Given libKw");
@@ -484,8 +485,8 @@ public class AssistProposalsTest {
         libSpec.setName(source);
         final KeywordSpecification kwSpec = new KeywordSpecification();
         kwSpec.setName(name);
-        return AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "", KeywordScope.REF_LIBRARY, source,
-                new Path("test.robot"), AssistProposalPredicates.alwaysTrue(), ProposalMatch.EMPTY);
+        return AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "", KeywordScope.REF_LIBRARY,
+                Optional.empty(), new Path("test.robot"), AssistProposalPredicates.alwaysTrue(), ProposalMatch.EMPTY);
     }
 
     private RedVariableProposal varProposal(final String name, final VariableOrigin origin) {

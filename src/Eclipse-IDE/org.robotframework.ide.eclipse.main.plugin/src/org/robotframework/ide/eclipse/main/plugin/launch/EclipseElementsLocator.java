@@ -439,15 +439,15 @@ public class EclipseElementsLocator implements ElementsLocator {
                     kwSpec.isDeprecated(), exposingResource.getFile().getFullPath(), null);
         }
 
-        public boolean isLibrary() {
-            return userKeyword == null;
-        }
-
         static DebuggerKeywordEntity from(final KeywordScope scope, final RobotSuiteFile exposingResource,
                 final RobotKeywordDefinition userKeyword) {
             return new DebuggerKeywordEntity(scope, Files.getNameWithoutExtension(exposingResource.getName()),
                     userKeyword.getName(), Optional.empty(), userKeyword.isDeprecated(),
                     exposingResource.getFile().getFullPath(), userKeyword);
+        }
+
+        public boolean isLibrary() {
+            return userKeyword == null;
         }
 
         protected DebuggerKeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,

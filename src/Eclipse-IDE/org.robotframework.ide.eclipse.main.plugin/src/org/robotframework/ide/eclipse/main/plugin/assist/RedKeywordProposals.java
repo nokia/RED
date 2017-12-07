@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Sets.newHashSet;
-import static java.util.stream.Collectors.toSet;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createNotAccessibleLibraryKeywordProposal;
 import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.createUserKeywordProposal;
@@ -21,7 +19,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
@@ -190,10 +187,10 @@ public class RedKeywordProposals {
 
                             matchKeyword(keywordName, sourcePrefix,
                                     (bddPrefix, match) -> createNotAccessibleLibraryKeywordProposal(libSpec, kwSpec,
-                                            bddPrefix, scope, sourcePrefix, exposingFile.getFile().getFullPath(),
+                                            bddPrefix, scope, Optional.empty(), exposingFile.getFile().getFullPath(),
                                             shouldUseQualifiedName, match),
                                     (bddPrefix, match) -> createNotAccessibleLibraryKeywordProposal(libSpec, kwSpec,
-                                            bddPrefix, scope, sourcePrefix, exposingFile.getFile().getFullPath(),
+                                            bddPrefix, scope, Optional.empty(), exposingFile.getFile().getFullPath(),
                                             AssistProposalPredicates.alwaysTrue(), match));
 
                             return ContinueDecision.CONTINUE;
@@ -210,17 +207,14 @@ public class RedKeywordProposals {
                             final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                                     : KeywordScope.STD_LIBRARY;
                             final String keywordName = kwSpec.getName();
-                            final Set<String> sourcePrefixes = libraryAliases.isEmpty() ? newHashSet(libSpec.getName())
-                                    : libraryAliases.stream().map(alias -> alias.orElse(libSpec.getName())).collect(
-                                            toSet());
 
-                            for (final String sourcePrefix : sourcePrefixes) {
-                                matchKeyword(keywordName, sourcePrefix,
+                            for (final Optional<String> alias : libraryAliases) {
+                                matchKeyword(keywordName, alias.orElse(libSpec.getName()),
                                         (bddPrefix, match) -> createLibraryKeywordProposal(libSpec, kwSpec, bddPrefix,
-                                                scope, sourcePrefix, exposingFile.getFile().getFullPath(),
+                                                scope, alias, exposingFile.getFile().getFullPath(),
                                                 shouldUseQualifiedName, match),
                                         (bddPrefix, match) -> createLibraryKeywordProposal(libSpec, kwSpec, bddPrefix,
-                                                scope, sourcePrefix, exposingFile.getFile().getFullPath(),
+                                                scope, alias, exposingFile.getFile().getFullPath(),
                                                 AssistProposalPredicates.alwaysTrue(), match));
                             }
 
@@ -236,9 +230,9 @@ public class RedKeywordProposals {
 
                             matchKeyword(keywordName, sourcePrefix,
                                     (bddPrefix, match) -> createUserKeywordProposal(keyword, bddPrefix, scope,
-                                            sourcePrefix, shouldUseQualifiedName, match),
+                                            shouldUseQualifiedName, match),
                                     (bddPrefix, match) -> createUserKeywordProposal(keyword, bddPrefix, scope,
-                                            sourcePrefix, AssistProposalPredicates.alwaysTrue(), match));
+                                            AssistProposalPredicates.alwaysTrue(), match));
 
                             return ContinueDecision.CONTINUE;
                         }
