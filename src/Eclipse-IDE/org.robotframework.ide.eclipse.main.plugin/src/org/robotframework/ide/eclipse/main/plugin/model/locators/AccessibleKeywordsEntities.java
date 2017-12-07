@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -139,28 +138,13 @@ public class AccessibleKeywordsEntities {
     private final class KeywordEntityExtractor implements Extractor<KeywordEntity> {
 
         @Override
-        public KeywordScope scope(final KeywordEntity keyword) {
-            return keyword.getScope(getFilepath());
-        }
-
-        @Override
-        public Path path(final KeywordEntity keyword) {
-            return keyword.getExposingFilepath().toFile().toPath();
-        }
-
-        @Override
-        public String alias(final KeywordEntity keyword) {
-            return keyword.getAlias();
-        }
-
-        @Override
         public String keywordName(final KeywordEntity keyword) {
             return keyword.getNameFromDefinition();
         }
 
         @Override
-        public String sourceName(final KeywordEntity keyword) {
-            return keyword.getSourceName();
+        public List<String> getPossibleQualifiers(final KeywordEntity keyword) {
+            return keyword.getPossibleQualifiers();
         }
     }
 

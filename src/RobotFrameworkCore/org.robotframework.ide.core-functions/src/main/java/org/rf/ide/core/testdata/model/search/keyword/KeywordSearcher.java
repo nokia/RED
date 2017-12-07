@@ -5,7 +5,9 @@
  */
 package org.rf.ide.core.testdata.model.search.keyword;
 
-import java.nio.file.Path;
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
@@ -25,7 +28,6 @@ import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.io.Files;
 
 /**
  * @author wypych
@@ -78,90 +80,46 @@ public class KeywordSearcher {
             }
         }
 
-        final List<String> possibleNameCombination = getNamesToCheck(usageName);
+        final List<String> possibleNameCombinations = getNamesToCheck(usageName);
         for (final T keyword : keywords) {
-            final String alias = extractor.alias(keyword).toLowerCase();
-            final String sourceName = extractor.sourceName(keyword).toLowerCase();
-            final String fileNameWithoutExtension = getFileNameWithoutExtension(extractor, keyword);
+            final List<String> qualifiers = newArrayList((String) null);
+            qualifiers.addAll(extractor.getPossibleQualifiers(keyword));
 
             final String keywordName = QualifiedKeywordName.unifyDefinition(extractor.keywordName(keyword))
                     .toLowerCase();
             final boolean isEmbeddedKeywordName = EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName);
-            for (String nameCombination : possibleNameCombination) {
-                if (!isEmbeddedKeywordName) {
-                    nameCombination = QualifiedKeywordName.unifyDefinition(nameCombination);
-                }
 
-                if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, null, isEmbeddedKeywordName,
-                        nameCombination)) {
-                    if (stopIfOneWasMatching) {
-                        break;
-                    } else {
-                        continue;
-                    }
-                }
+            final List<String> unifiedNameCombinations = isEmbeddedKeywordName
+                    ? possibleNameCombinations
+                    : possibleNameCombinations.stream().map(QualifiedKeywordName::unifyDefinition).collect(toList());
 
-                final KeywordScope scope = extractor.scope(keyword);
-                final boolean isLibraryWithAlias = (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.STD_LIBRARY)
-                        && !alias.isEmpty();
-                if (!alias.isEmpty()) {
-                    if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, alias,
-                            isEmbeddedKeywordName, nameCombination)) {
+            combinationLoop: for (final String nameCombination : unifiedNameCombinations) {
+                final Predicate<String> matcher = qualifier -> matchNameDirectlyOrAsEmbeddedName(keywordName, qualifier,
+                        isEmbeddedKeywordName, nameCombination);
+
+                for (final String possibleQualifier : qualifiers) {
+                    if (matcher.test(possibleQualifier)) {
+                        foundByMatch.put(nameCombination, keyword);
                         if (stopIfOneWasMatching) {
-                            break;
+                            break combinationLoop;
                         } else {
-                            continue;
-                        }
-                    }
-                }
-
-                if (!isLibraryWithAlias && !sourceName.isEmpty()) {
-                    if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, sourceName,
-                            isEmbeddedKeywordName, nameCombination)) {
-                        if (stopIfOneWasMatching) {
-                            break;
-                        } else {
-                            continue;
-                        }
-                    }
-                }
-
-                if (!fileNameWithoutExtension.isEmpty() && !sourceName.equals(fileNameWithoutExtension)
-                        && !alias.equals(fileNameWithoutExtension)) {
-                    if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, fileNameWithoutExtension,
-                            isEmbeddedKeywordName, nameCombination)) {
-                        if (stopIfOneWasMatching) {
-                            break;
-                        } else {
-                            continue;
+                            continue combinationLoop;
                         }
                     }
                 }
             }
         }
-
         return foundByMatch;
     }
 
-    private <T> boolean matchNameDirectlyOrAsEmbeddedName(final ListMultimap<String, T> foundByMatch, final T keyword,
-            final String keywordName, final String prefixName, final boolean isEmbeddedKeywordName,
-            final String nameCombination) {
+    private boolean matchNameDirectlyOrAsEmbeddedName(final String keywordName, final String prefixName,
+            final boolean isEmbeddedKeywordName, final String nameCombination) {
 
-        String prefixedKeywordName = prefixName != null ? prefixName + "." + keywordName : keywordName;
+        String prefixedKeywordName = prefixName != null ? prefixName.toLowerCase() + "." + keywordName : keywordName;
         if (!isEmbeddedKeywordName) {
             prefixedKeywordName = QualifiedKeywordName.unifyDefinition(prefixedKeywordName);
         }
-
-        if (EmbeddedKeywordNamesSupport.matchesIgnoreCase(prefixedKeywordName, nameCombination)) {
-            foundByMatch.put(nameCombination, keyword);
-            return true;
-        }
-        return false;
-    }
-
-    private <T> String getFileNameWithoutExtension(final Extractor<T> extractor, final T keyword) {
-        final String fullFileName = extractor.path(keyword).getFileName().toString();
-        return Files.getNameWithoutExtension(fullFileName);
+        return EmbeddedKeywordNamesSupport.matchesIgnoreCase(prefixedKeywordName, nameCombination);
     }
 
     private List<String> getNamesToCheck(final String usageName) {
@@ -220,16 +178,9 @@ public class KeywordSearcher {
 
     public static interface Extractor<T> {
 
-        KeywordScope scope(final T keyword);
-
-        Path path(final T keyword);
-
-        String alias(final T keyword);
-
         String keywordName(final T keyword);
 
-        String sourceName(final T keyword);
-
+        List<String> getPossibleQualifiers(T keyword);
     }
 
     private class FromLongestLengthComparator implements Comparator<String> {

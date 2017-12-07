@@ -601,14 +601,14 @@ public class RedKeywordProposalsTest {
         for (final AssistProposal proposal : proposals) {
             final RedKeywordProposal keywordProposal = (RedKeywordProposal) proposal;
 
-            switch (keywordProposal.getAlias()) {
-                case "file":
+            switch (keywordProposal.getScope(file.getFullPath())) {
+                case LOCAL:
                     assertThat(keywordProposal.getContent()).isEqualTo("a_res_kw1");
                     break;
-                case "res":
+                case RESOURCE:
                     assertThat(keywordProposal.getContent()).isEqualTo("res.a_res_kw1");
                     break;
-                case "stdLib":
+                case STD_LIBRARY:
                     assertThat(keywordProposal.getContent()).isEqualTo("stdLib.a_res_kw1");
                     break;
                 default:
@@ -709,7 +709,7 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("file"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("file"));
     }
 
     @Test
@@ -729,7 +729,7 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("res"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("res"));
     }
 
     @Test
@@ -748,7 +748,7 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("refLib"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("refLib"));
     }
 
     @Test
@@ -766,7 +766,7 @@ public class RedKeywordProposalsTest {
         final RedKeywordProposals provider = new RedKeywordProposals(robotModel, suiteFile);
 
         final Optional<RedKeywordProposal> bestMatch = provider.getBestMatchingKeywordProposal("a_res_kw1");
-        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getAlias()).isEqualTo("stdLib"));
+        assertThat(bestMatch).hasValueSatisfying(proposal -> assertThat(proposal.getSourceName()).isEqualTo("stdLib"));
     }
 
     @Test
