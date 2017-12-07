@@ -24,28 +24,23 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -57,9 +52,11 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.SourceOpeningSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
-import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.TreeContentProvider;
+
+import com.google.common.base.Strings;
 
 /**
  * @author mmarzec
@@ -166,7 +163,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         GridLayoutFactory.fillDefaults().applyTo(discoveredLibrariesViewer.getTree());
 
         discoveredLibrariesViewer.setContentProvider(new DiscoveredLibrariesViewerContentProvider());
-        discoveredLibrariesViewer.setLabelProvider(new DiscoveredLibrariesViewerLabelProvider());
+        discoveredLibrariesViewer
+                .setLabelProvider(new DelegatingStyledCellLabelProvider(new DiscoveredLibrariesViewerLabelProvider()));
 
         discoveredLibrariesViewer.setInput(
                 importedLibraries.stream().sorted(LIBRARY_IMPORT_COMPARATOR).toArray(RobotDryRunLibraryImport[]::new));
@@ -177,14 +175,12 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     private void registerLibrariesViewerListeners() {
         discoveredLibrariesViewer.addSelectionChangedListener(event -> {
             final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
-            if (selection != null) {
-                if (selection instanceof DryRunLibraryImportChildElement) {
-                    detailsText.setText(selection.toString());
-                } else if (selection instanceof RobotDryRunLibraryImport) {
-                    detailsText.setText(convertDryRunLibraryImportToText((RobotDryRunLibraryImport) selection));
-                } else {
-                    detailsText.setText("");
-                }
+            if (selection instanceof DryRunLibraryImportChildElement) {
+                detailsText.setText(selection.toString());
+            } else if (selection instanceof RobotDryRunLibraryImport) {
+                detailsText.setText(convertDryRunLibraryImportToText((RobotDryRunLibraryImport) selection));
+            } else {
+                detailsText.setText("");
             }
         });
 
@@ -246,14 +242,10 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     private void handleFileOpeningEvent() {
-        final Optional<String> filePath = getOpenableFilePath();
-        if (filePath.isPresent()) {
-            final Optional<IFile> openableFile = getOpenableFile(filePath.get());
-            if (openableFile.isPresent()) {
-                final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-                SourceOpeningSupport.tryToOpenInEditor(page, openableFile.get());
-            }
-        }
+        getOpenableFilePath().flatMap(LibrariesAutoDiscovererWindow::getOpenableFile).ifPresent(file -> {
+            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            SourceOpeningSupport.tryToOpenInEditor(page, file);
+        });
     }
 
     private Optional<String> getOpenableFilePath() {
@@ -363,87 +355,56 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         @Override
         public boolean hasChildren(final Object element) {
-            if (element instanceof DryRunLibraryImportChildElement) {
-                return false;
-            }
-            return true;
+            return !(element instanceof DryRunLibraryImportChildElement);
         }
-
     }
 
-    private static class DiscoveredLibrariesViewerLabelProvider extends StyledCellLabelProvider {
+    private static class DiscoveredLibrariesViewerLabelProvider extends RedCommonLabelProvider {
 
         @Override
-        public void update(final ViewerCell cell) {
-            final StyledString label = getStyledString(cell.getElement());
-            cell.setText(label.getString());
-            cell.setStyleRanges(label.getStyleRanges());
-            cell.setImage(getImage(cell.getElement()));
-
-            super.update(cell);
-        }
-
-        private StyledString getStyledString(final Object element) {
-
-            StyledString label = new StyledString("");
-
+        public StyledString getStyledText(final Object element) {
             if (element instanceof RobotDryRunLibraryImport) {
                 final String name = ((RobotDryRunLibraryImport) element).getName().replaceAll("\\n", "/n");
-                label = new StyledString(name);
+                return new StyledString(name);
+
             } else if (element instanceof DryRunLibraryImportChildElement) {
                 final DryRunLibraryImportChildElement libraryImportChildElement = (DryRunLibraryImportChildElement) element;
-                final String childElementName = libraryImportChildElement.getName();
-                if (childElementName != null && !childElementName.isEmpty()) {
-                    label.append(new StyledString(childElementName, new Styler() {
 
-                        @Override
-                        public void applyStyles(final TextStyle textStyle) {
-                            textStyle.font = getFont(textStyle.font, SWT.BOLD);
-                        }
-                    }));
+                final StyledString label = new StyledString("");
+                final String childElementName = libraryImportChildElement.getName();
+                if (!Strings.isNullOrEmpty(childElementName)) {
+                    label.append(childElementName, Stylers.Common.BOLD_STYLER);
                     label.append(" ");
                 }
                 final String childElementValue = libraryImportChildElement.getValue();
-                if (childElementValue != null && !childElementValue.isEmpty()) {
+                if (!Strings.isNullOrEmpty(childElementValue)) {
                     if (libraryImportChildElement.isOpenableFilePath()) {
-                        label.append(new StyledString(childElementValue, new Styler() {
-
-                            @Override
-                            public void applyStyles(final TextStyle textStyle) {
-                                textStyle.underline = true;
-                                textStyle.foreground = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
-                            }
-                        }));
+                        label.append(childElementValue, Stylers.Common.HYPERLINK_STYLER);
                     } else {
                         label.append(childElementValue);
                     }
                 }
-            } else if (element instanceof DryRunLibraryImportListChildElement) {
-                label = new StyledString(((DryRunLibraryImportListChildElement) element).getName(), new Styler() {
+                return label;
 
-                    @Override
-                    public void applyStyles(final TextStyle textStyle) {
-                        textStyle.font = getFont(textStyle.font, SWT.BOLD);
-                    }
-                });
+            } else if (element instanceof DryRunLibraryImportListChildElement) {
+                return new StyledString(((DryRunLibraryImportListChildElement) element).getName(),
+                        Stylers.Common.BOLD_STYLER);
             }
 
-            return label;
+            return new StyledString("");
         }
 
-        private Font getFont(final Font fontToReuse, final int style) {
-            final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;
-            final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(style);
-            return FontsManager.getFont(fontDescriptor);
-        }
-
-        private Image getImage(final Object element) {
+        @Override
+        public Image getImage(final Object element) {
             if (element instanceof RobotDryRunLibraryImport) {
                 final RobotDryRunLibraryImport libraryImport = (RobotDryRunLibraryImport) element;
+
                 if (libraryImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
                     return ImagesManager.getImage(RedImages.getFatalErrorImage());
+
                 } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.ADDED) {
                     return ImagesManager.getImage(RedImages.getBigSuccessImage());
+
                 } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING) {
                     return ImagesManager.getImage(RedImages.getBigWarningImage());
                 }

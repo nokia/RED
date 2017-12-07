@@ -7,16 +7,15 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import java.util.Arrays;
 
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 
 public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLabelProvider {
@@ -41,11 +40,7 @@ public abstract class InstalledRobotsEnvironmentsLabelProvider extends ColumnLab
     @Override
     public Font getFont(final Object element) {
         if (Arrays.asList(viewer.getCheckedElements()).contains(element)) {
-            Font font = viewer.getTable().getFont();
-            final Font currentFont = font == null ? Display.getCurrent().getSystemFont() : font;
-            final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(SWT.BOLD);
-            font = fontDescriptor.createFont(currentFont.getDevice());
-            return font;
+            return FontsManager.transformFontWithStyle(viewer.getTable().getFont(), SWT.BOLD);
         }
         return super.getFont(element);
     }

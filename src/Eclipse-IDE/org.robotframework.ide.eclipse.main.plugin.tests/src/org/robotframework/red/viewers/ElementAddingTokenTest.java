@@ -7,13 +7,12 @@ package org.robotframework.red.viewers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.FontsManager;
@@ -64,9 +63,8 @@ public class ElementAddingTokenTest {
         assertThat(ranges[0].start).isEqualTo(0);
         assertThat(ranges[0].length).isEqualTo(18);
         assertThat(ranges[0].foreground.getRGB()).isEqualTo(new RGB(30, 127, 60));
-        final FontDescriptor expectedFontDescriptor = FontDescriptor.createFrom(Display.getCurrent().getSystemFont())
-                .setStyle(SWT.ITALIC);
-        assertThat(ranges[0].font).isEqualTo(FontsManager.getFont(expectedFontDescriptor));
+        final Font expectedFont = FontsManager.transformFontWithStyle(SWT.ITALIC);
+        assertThat(ranges[0].font).isEqualTo(expectedFont);
     }
 
     @Test
@@ -80,9 +78,8 @@ public class ElementAddingTokenTest {
         assertThat(ranges[0].start).isEqualTo(0);
         assertThat(ranges[0].length).isEqualTo(18);
         assertThat(ranges[0].foreground.getRGB()).isEqualTo(new RGB(200, 200, 200));
-        final FontDescriptor expectedFontDescriptor = FontDescriptor.createFrom(Display.getCurrent().getSystemFont())
-                .setStyle(SWT.ITALIC);
-        assertThat(ranges[0].font).isEqualTo(FontsManager.getFont(expectedFontDescriptor));
+        final Font expectedFont = FontsManager.transformFontWithStyle(SWT.ITALIC);
+        assertThat(ranges[0].font).isEqualTo(expectedFont);
     }
 
     @Test
@@ -96,9 +93,8 @@ public class ElementAddingTokenTest {
         assertThat(ranges[0].start).isEqualTo(0);
         assertThat(ranges[0].length).isEqualTo(3);
         assertThat(ranges[0].foreground.getRGB()).isEqualTo(new RGB(30, 127, 60));
-        final FontDescriptor expectedFontDescriptor = FontDescriptor.createFrom(Display.getCurrent().getSystemFont())
-                .setStyle(SWT.BOLD | SWT.ITALIC);
-        assertThat(ranges[0].font).isEqualTo(FontsManager.getFont(expectedFontDescriptor));
+        final Font expectedFont = FontsManager.transformFontWithStyle(SWT.BOLD | SWT.ITALIC);
+        assertThat(ranges[0].font).isEqualTo(expectedFont);
     }
 
     @Test
@@ -112,8 +108,7 @@ public class ElementAddingTokenTest {
         assertThat(ranges[0].start).isEqualTo(0);
         assertThat(ranges[0].length).isEqualTo(3);
         assertThat(ranges[0].foreground.getRGB()).isEqualTo(new RGB(200, 200, 200));
-        final FontDescriptor expectedFontDescriptor = FontDescriptor.createFrom(Display.getCurrent().getSystemFont())
-                .setStyle(SWT.BOLD | SWT.ITALIC);
-        assertThat(ranges[0].font).isEqualTo(FontsManager.getFont(expectedFontDescriptor));
+        final Font expectedFont = FontsManager.transformFontWithStyle(SWT.BOLD | SWT.ITALIC);
+        assertThat(ranges[0].font).isEqualTo(expectedFont);
     }
 }
