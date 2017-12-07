@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
 import java.util.stream.Stream;
 
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
@@ -19,8 +18,6 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
@@ -86,14 +83,9 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
         final Style style = new Style();
         final ColoringPreference syntaxColoring = preferences.getSyntaxColoring(category);
-        style.setAttributeValue(CellStyleAttributes.FONT, getFont(theme.getFont(), syntaxColoring.getFontStyle()));
+        style.setAttributeValue(CellStyleAttributes.FONT,
+                FontsManager.transformFontWithStyle(theme.getFont(), syntaxColoring.getFontStyle()));
         style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, syntaxColoring.getColor());
         return style;
-    }
-
-    private Font getFont(final Font fontToReuse, final int style) {
-        final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;
-        final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(style);
-        return FontsManager.getFont(fontDescriptor);
     }
 }

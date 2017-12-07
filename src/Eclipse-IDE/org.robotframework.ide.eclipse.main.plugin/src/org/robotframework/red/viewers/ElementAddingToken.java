@@ -5,15 +5,12 @@
  */
 package org.robotframework.red.viewers;
 
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
-import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
@@ -62,14 +59,9 @@ public class ElementAddingToken {
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = enabled ? ColorsManager.getColor(30, 127, 60) : ColorsManager.getColor(200, 200, 200);
-                textStyle.font = getFont(textStyle.font, rank == 0 ? SWT.ITALIC : SWT.ITALIC | SWT.BOLD);
+                textStyle.font = FontsManager.transformFontWithStyle(textStyle.font,
+                        rank == 0 ? SWT.ITALIC : SWT.ITALIC | SWT.BOLD);
             }
         });
-    }
-
-    private Font getFont(final Font fontToReuse, final int style) {
-        final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;
-        final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(style);
-        return FontsManager.getFont(fontDescriptor);
     }
 }
