@@ -444,9 +444,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                 final RemoteLocation remoteLocation = setting.getArguments().size() == 1
                         ? RemoteLocation.DEFAULT_LOCATION
                         : RemoteLocation.create(RobotExpressions.unescapeSpaces(setting.getArguments().get(1)));
+                final String remote = stripLastSlashIfNecessary(remoteLocation.getUri());
 
                 for (final LibrarySpecification spec : specs.get(libNameOrPath)) {
-                    if (remoteLocation.equals(spec.getRemoteLocation())) {
+                    if (remote.equals(stripLastSlashIfNecessary(spec.getRemoteLocation().getUri()))) {
                         imported.put(spec, setting.extractLibraryAlias());
                         break;
                     }
@@ -469,6 +470,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
                     }
                 });
         return imported;
+    }
+
+    private static String stripLastSlashIfNecessary(final String string) {
+        return string.endsWith("/") ? string.substring(0, string.length() - 1) : string;
     }
 
     private Optional<LibrarySpecification> findSpecForPath(final String pathOrName, final RobotSuiteFile file) {
