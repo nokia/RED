@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,6 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.base.Objects;
+
 class RobotProjectExternalDependencies extends RobotProjectDependencies {
 
     RobotProjectExternalDependencies(final RobotProject project) {
@@ -29,7 +30,7 @@ class RobotProjectExternalDependencies extends RobotProjectDependencies {
 
     @Override
     List<LibrarySpecification> getLibraries() {
-        final List<LibrarySpecification> libraries = newArrayList();
+        final List<LibrarySpecification> libraries = new ArrayList<>();
 
         final Map<ReferencedLibrary, LibrarySpecification> libs = project.getReferencedLibraries();
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : libs.entrySet()) {
@@ -69,5 +70,22 @@ class RobotProjectExternalDependencies extends RobotProjectDependencies {
     @Override
     String getName() {
         return "Robot Referenced libraries";
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (RobotProjectExternalDependencies.class == obj.getClass()) {
+            final RobotProjectExternalDependencies that = (RobotProjectExternalDependencies) obj;
+            return Objects.equal(this.getLibraries(), that.getLibraries());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getLibraries());
     }
 }

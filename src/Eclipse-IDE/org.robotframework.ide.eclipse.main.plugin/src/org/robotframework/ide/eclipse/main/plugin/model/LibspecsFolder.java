@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 
@@ -19,9 +19,6 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 
 public class LibspecsFolder {
 
@@ -91,7 +88,7 @@ public class LibspecsFolder {
         }
 
         final IFile cfgFile = folder.getProject().getFile(RobotProjectConfig.FILENAME);
-        // full build is being perfomed or config file has changed
+        // full build is being performed or config file has changed
         return delta.findMember(cfgFile.getProjectRelativePath()) != null
                 || delta.findMember(folder.getProjectRelativePath()) != null
                         && libspecFileChanged(delta.findMember(folder.getProjectRelativePath()));
@@ -107,25 +104,11 @@ public class LibspecsFolder {
         return false;
     }
 
-    public List<IFile> collectSpecsWithDifferentVersion(final List<String> stdLibs, final String version)
-            throws CoreException {
-        final List<IFile> toRecreate = newArrayList(Lists.transform(stdLibs, new Function<String, IFile>() {
-            @Override
-            public IFile apply(final String libName) {
-                return folder.getFile(libName + LIBSPEC_FILE_EXTENSION);
-            }
-        }));
-
-        for (final IResource resource : folder.members()) {
-            if (resource.getType() == IResource.FILE && resource.getName().endsWith(LIBSPEC_FILE_EXTENSION)) {
-                final IFile specFile = (IFile) resource;
-                final String otherVersion = LibrarySpecification.getVersion(specFile);
-                if (version.startsWith("Robot Framework " + otherVersion)) {
-                    toRecreate.remove(specFile);
-                }
-            }
-        }
-        return toRecreate;
+    public List<IFile> collectSpecsWithDifferentVersion(final List<String> stdLibs, final String version) {
+        return stdLibs.stream().map(libName -> folder.getFile(libName + LIBSPEC_FILE_EXTENSION)).filter(specFile -> {
+            final String otherVersion = LibrarySpecification.getVersion(specFile);
+            return version.startsWith("Robot Framework " + otherVersion);
+        }).collect(toList());
     }
 
     public IFile getSpecFile(final String libraryName) {

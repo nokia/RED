@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,6 +16,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.base.Objects;
+
 class RobotProjectDependencies {
 
     protected final RobotProject project;
@@ -26,7 +27,7 @@ class RobotProjectDependencies {
     }
 
     List<LibrarySpecification> getLibraries() {
-        final List<LibrarySpecification> libraries = newArrayList();
+        final List<LibrarySpecification> libraries = new ArrayList<>();
 
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(project.getProject());
 
@@ -60,22 +61,22 @@ class RobotProjectDependencies {
         return "Robot Standard libraries";
     }
 
-    // @Override
-    // public boolean equals(final Object obj) {
-    // if (obj == null) {
-    // return false;
-    // }
-    // if (RobotProjectDependencies.class == obj.getClass()) {
-    // final RobotProjectDependencies that = (RobotProjectDependencies) obj;
-    // return Objects.equal(this.getLibraries(), that.getLibraries());
-    // }
-    // return false;
-    // }
-    //
-    // @Override
-    // public int hashCode() {
-    // return Objects.hashCode(getLibraries());
-    // }
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (RobotProjectDependencies.class == obj.getClass()) {
+            final RobotProjectDependencies that = (RobotProjectDependencies) obj;
+            return Objects.equal(this.getLibraries(), that.getLibraries());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getLibraries());
+    }
 
     static class ErroneousLibrarySpecification extends LibrarySpecification {
 
@@ -85,7 +86,7 @@ class RobotProjectDependencies {
 
         @Override
         public List<KeywordSpecification> getKeywords() {
-            return newArrayList();
+            return new ArrayList<>();
         }
 
         @Override
@@ -101,6 +102,23 @@ class RobotProjectDependencies {
         @Override
         public String getDocumentation() {
             return "";
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (ErroneousLibrarySpecification.class == obj.getClass()) {
+                final ErroneousLibrarySpecification that = (ErroneousLibrarySpecification) obj;
+                return Objects.equal(this.getName(), that.getName());
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(getName());
         }
     }
 }

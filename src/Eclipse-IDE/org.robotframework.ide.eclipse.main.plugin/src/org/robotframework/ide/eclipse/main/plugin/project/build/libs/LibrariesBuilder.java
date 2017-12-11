@@ -5,14 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
@@ -57,7 +57,7 @@ public class LibrariesBuilder {
                 groupedGenerators.put(project, generatorWithSource);
             }
         }
-        
+
         monitor.setWorkRemaining(groupedGenerators.size());
         for (final IProject project : groupedGenerators.keySet()) {
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
@@ -106,7 +106,8 @@ public class LibrariesBuilder {
                 return new PythonLibraryLibdocGenerator(refLib.getName(), libPath, libspecSourceFile);
             } else if (type == LibraryType.JAVA) {
                 final String libPath = RedWorkspace.Paths
-                        .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(path)).toOSString();
+                        .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(path))
+                        .toOSString();
                 return new JavaLibraryLibdocGenerator(specification.getName(), libPath, libspecSourceFile);
             }
             throw new IllegalStateException("Unknown library type: " + type);
@@ -119,7 +120,7 @@ public class LibrariesBuilder {
         logger.log("BUILDING: generating library docs");
         monitor.subTask("generating libdocs");
 
-        final List<ILibdocGenerator> libdocGenerators = newArrayList();
+        final List<ILibdocGenerator> libdocGenerators = new ArrayList<>();
 
         final LibspecsFolder libspecsFolder = LibspecsFolder.get(robotProject.getProject());
         libdocGenerators.addAll(getStandardLibrariesToRecreate(runtimeEnvironment, libspecsFolder));
@@ -131,7 +132,7 @@ public class LibrariesBuilder {
         libdocGenerators.addAll(getRemoteLibrariesToRecreate(configuration, libspecsFolder));
 
         monitor.setWorkRemaining(libdocGenerators.size());
-        
+
         for (final ILibdocGenerator generator : libdocGenerators) {
             if (monitor.isCanceled()) {
                 return;
@@ -143,8 +144,9 @@ public class LibrariesBuilder {
                 generator.generateLibdoc(runtimeEnvironment, new RedEclipseProjectConfig(configuration)
                         .createEnvironmentSearchPaths(robotProject.getProject()));
             } catch (final RobotEnvironmentException e) {
-                final RobotProblem problem = RobotProblem.causedBy(
-                        ProjectConfigurationProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED).formatMessageWith(e.getMessage());
+                final RobotProblem problem = RobotProblem
+                        .causedBy(ProjectConfigurationProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED)
+                        .formatMessageWith(e.getMessage());
                 reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
             }
             monitor.worked(1);
@@ -155,24 +157,15 @@ public class LibrariesBuilder {
 
     private List<ILibdocGenerator> getStandardLibrariesToRecreate(final RobotRuntimeEnvironment runtimeEnvironment,
             final LibspecsFolder libspecsFolder) {
-        final List<ILibdocGenerator> generators = newArrayList();
         final List<String> stdLibs = runtimeEnvironment.getStandardLibrariesNames();
-        try {
-            final List<IFile> toRecr = libspecsFolder.collectSpecsWithDifferentVersion(stdLibs,
-                    runtimeEnvironment.getVersion());
-            for (final IFile specToRecreate : toRecr) {
-                generators.add(new StandardLibraryLibdocGenerator(specToRecreate));
-            }
-        } catch (final CoreException e) {
-            // FIXME : handle this
-            e.printStackTrace();
-        }
-        return generators;
+        final List<IFile> toRecr = libspecsFolder.collectSpecsWithDifferentVersion(stdLibs,
+                runtimeEnvironment.getVersion());
+        return toRecr.stream().map(StandardLibraryLibdocGenerator::new).collect(toList());
     }
 
-    private List<ILibdocGenerator> getReferencedVirtualLibrariesToRecreate(
-            final RobotProjectConfig configuration, final LibspecsFolder libspecsFolder) {
-        final List<ILibdocGenerator> generators = newArrayList();
+    private List<ILibdocGenerator> getReferencedVirtualLibrariesToRecreate(final RobotProjectConfig configuration,
+            final LibspecsFolder libspecsFolder) {
+        final List<ILibdocGenerator> generators = new ArrayList<>();
 
         for (final ReferencedLibrary lib : configuration.getLibraries()) {
             if (lib.provideType() == LibraryType.VIRTUAL) {
@@ -191,7 +184,7 @@ public class LibrariesBuilder {
 
     private List<ILibdocGenerator> getReferencedPythonLibrariesToRecreate(final RobotProjectConfig configuration,
             final LibspecsFolder libspecsFolder) {
-        final List<ILibdocGenerator> generators = newArrayList();
+        final List<ILibdocGenerator> generators = new ArrayList<>();
 
         for (final ReferencedLibrary lib : configuration.getLibraries()) {
             if (lib.provideType() == LibraryType.PYTHON) {
@@ -210,7 +203,7 @@ public class LibrariesBuilder {
 
     private List<ILibdocGenerator> getReferencedJavaLibrariesToRecreate(final RobotProjectConfig configuration,
             final LibspecsFolder libspecsFolder) {
-        final List<ILibdocGenerator> generators = newArrayList();
+        final List<ILibdocGenerator> generators = new ArrayList<>();
 
         for (final ReferencedLibrary lib : configuration.getLibraries()) {
             if (lib.provideType() == LibraryType.JAVA) {
@@ -229,7 +222,7 @@ public class LibrariesBuilder {
 
     private Collection<? extends ILibdocGenerator> getRemoteLibrariesToRecreate(final RobotProjectConfig configuration,
             final LibspecsFolder libspecsFolder) {
-        final List<ILibdocGenerator> generators = newArrayList();
+        final List<ILibdocGenerator> generators = new ArrayList<>();
 
         for (final RemoteLocation location : configuration.getRemoteLocations()) {
             final IFile specFile = libspecsFolder.getSpecFile(location.createLibspecFileName());
