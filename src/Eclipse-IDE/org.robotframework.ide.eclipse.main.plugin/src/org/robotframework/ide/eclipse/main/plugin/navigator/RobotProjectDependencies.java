@@ -68,14 +68,14 @@ class RobotProjectDependencies {
         }
         if (RobotProjectDependencies.class == obj.getClass()) {
             final RobotProjectDependencies that = (RobotProjectDependencies) obj;
-            return Objects.equal(this.getLibraries(), that.getLibraries());
+            return Objects.equal(this.project, that.project) && Objects.equal(this.getName(), that.getName());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getLibraries());
+        return Objects.hashCode(project, getName());
     }
 
     static class ErroneousLibrarySpecification extends LibrarySpecification {
