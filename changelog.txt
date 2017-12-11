@@ -1,3 +1,25 @@
+RED 0.8.2 - 2017/12/11
+Enhancement
+
+    [RED-965] - Importing remote library validation
+    [RED-990] - Help topic - what to do when python+robot now found automatically
+
+Bug
+
+    [RED-999] - Robot libraries are collapsed in project explorer when libraries changed in red xml
+
+Task
+
+    [RED-987] - Replace ViewerSorter with ViewerComparator
+    [RED-992] - Set RED feature to not allow install to non-Oxygen Eclipse
+
+Sub-task
+
+    [RED-960] - Font color is not changed in KW table
+    [RED-981] - Implement good-looking scrollbars for nattable in dark themes
+    [RED-988] - Hook into css themes engine to change colors from preferences for dark themes
+
+
 RED 0.8.1 - 2017/11/23
 Feature
 
