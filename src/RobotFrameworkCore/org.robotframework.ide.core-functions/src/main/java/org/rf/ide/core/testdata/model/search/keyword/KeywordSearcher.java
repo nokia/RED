@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.testdata.model.search.keyword;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
@@ -34,7 +33,7 @@ import com.google.common.collect.ListMultimap;
  */
 public class KeywordSearcher {
 
-    public <T> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords, final Extractor<T> extractor,
+    public <T extends SearchableKeyword> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords,
             final String keywordName) {
         Set<T> keywords = new LinkedHashSet<>(0);
         final List<String> namesToCheck = getNamesToCheck(keywordName);
@@ -49,7 +48,7 @@ public class KeywordSearcher {
                 for (int i = 0; i < keywords.size() && iterator.hasNext(); i++) {
                     final T keyword = iterator.next();
                     final String keywordNameFromKeywordDefinition = QualifiedKeywordName
-                            .unifyDefinition(extractor.keywordName(keyword));
+                            .unifyDefinition(keyword.getKeywordName());
                     if (name.equalsIgnoreCase(keywordNameFromKeywordDefinition)) {
                         matchNameWhole.add(keyword);
                     }
@@ -61,13 +60,11 @@ public class KeywordSearcher {
                 break;
             }
         }
-
         return new ArrayList<>(keywords);
-
     }
 
-    public <T> ListMultimap<String, T> findKeywords(final Map<String, Collection<T>> accessibleKeywords,
-            final Collection<T> keywords, final Extractor<T> extractor, final String usageName,
+    public <T extends SearchableKeyword> ListMultimap<String, T> findKeywords(
+            final Map<String, Collection<T>> accessibleKeywords, final Collection<T> keywords, final String usageName,
             final boolean stopIfOneWasMatching) {
         final ListMultimap<String, T> foundByMatch = ArrayListMultimap.create();
 
@@ -82,29 +79,23 @@ public class KeywordSearcher {
 
         final List<String> possibleNameCombinations = getNamesToCheck(usageName);
         for (final T keyword : keywords) {
-            final List<String> qualifiers = newArrayList((String) null);
-            qualifiers.addAll(extractor.getPossibleQualifiers(keyword));
-
-            final String keywordName = QualifiedKeywordName.unifyDefinition(extractor.keywordName(keyword))
-                    .toLowerCase();
+            final String keywordName = QualifiedKeywordName.unifyDefinition(keyword.getKeywordName()).toLowerCase();
             final boolean isEmbeddedKeywordName = EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName);
 
             final List<String> unifiedNameCombinations = isEmbeddedKeywordName
                     ? possibleNameCombinations
                     : possibleNameCombinations.stream().map(QualifiedKeywordName::unifyDefinition).collect(toList());
 
-            combinationLoop: for (final String nameCombination : unifiedNameCombinations) {
+            for (final String nameCombination : unifiedNameCombinations) {
                 final Predicate<String> matcher = qualifier -> matchNameDirectlyOrAsEmbeddedName(keywordName, qualifier,
                         isEmbeddedKeywordName, nameCombination);
 
-                for (final String possibleQualifier : qualifiers) {
-                    if (matcher.test(possibleQualifier)) {
-                        foundByMatch.put(nameCombination, keyword);
-                        if (stopIfOneWasMatching) {
-                            break combinationLoop;
-                        } else {
-                            continue combinationLoop;
-                        }
+                if (matcher.test(null) || matcher.test(keyword.getSourceNameInUse())) {
+                    foundByMatch.put(nameCombination, keyword);
+                    if (stopIfOneWasMatching) {
+                        break;
+                    } else {
+                        continue;
                     }
                 }
             }
@@ -176,11 +167,11 @@ public class KeywordSearcher {
         return currentName;
     }
 
-    public static interface Extractor<T> {
+    public static interface SearchableKeyword {
 
-        String keywordName(final T keyword);
+        String getSourceNameInUse();
 
-        List<String> getPossibleQualifiers(T keyword);
+        String getKeywordName();
     }
 
     private class FromLongestLengthComparator implements Comparator<String> {

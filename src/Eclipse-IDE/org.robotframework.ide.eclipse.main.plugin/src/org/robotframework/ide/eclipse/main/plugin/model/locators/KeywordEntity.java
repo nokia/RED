@@ -5,13 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher.SearchableKeyword;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
 import com.google.common.base.Objects;
@@ -19,7 +17,7 @@ import com.google.common.base.Objects;
 /**
  * @author Michal Anglart
  */
-public abstract class KeywordEntity {
+public abstract class KeywordEntity implements SearchableKeyword {
 
     private final KeywordScope scope;
 
@@ -56,19 +54,14 @@ public abstract class KeywordEntity {
         }
     }
 
+    @Override
     public String getSourceNameInUse() {
         return sourceAlias.orElse(sourceName);
     }
 
-    public List<String> getPossibleQualifiers() {
-        final List<String> qualifiers = newArrayList(getSourceName());
-
-        final KeywordScope scope = getScope(exposingFilepath);
-        if (sourceAlias.isPresent() && (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.STD_LIBRARY)) {
-            // libraries can be also prefixed using source alias
-            qualifiers.add(0, sourceAlias.get());
-        }
-        return qualifiers;
+    @Override
+    public String getKeywordName() {
+        return keywordName;
     }
 
     public String getNameFromDefinition() {
