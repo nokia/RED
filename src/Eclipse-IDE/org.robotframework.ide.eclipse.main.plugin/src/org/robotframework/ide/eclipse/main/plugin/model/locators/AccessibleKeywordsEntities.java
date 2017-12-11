@@ -14,7 +14,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher;
-import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher.Extractor;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -61,7 +60,7 @@ public class AccessibleKeywordsEntities {
         final Collection<KeywordEntity> filterAgainstDuplications = getAccessibleKeywordsDeduplicated();
 
         return keywordSearcher.findKeywords(getAccessibleKeywords(), filterAgainstDuplications,
-                new KeywordEntityExtractor(), keywordName, stopIfOneWasMatching);
+                keywordName, stopIfOneWasMatching);
     }
 
     protected Collection<KeywordEntity> getAccessibleKeywordsDeduplicated() {
@@ -88,7 +87,7 @@ public class AccessibleKeywordsEntities {
             final ListMultimap<String, KeywordEntity> foundKeywords, final String keywordName) {
 
         final List<KeywordEntity> keywords = new ArrayList<>(filterDuplicates(
-                keywordSearcher.getBestMatchingKeyword(foundKeywords, new KeywordEntityExtractor(), keywordName)));
+                keywordSearcher.getBestMatchingKeyword(foundKeywords, keywordName)));
 
         final ListMultimap<KeywordScope, KeywordEntity> scopedKeywords = ArrayListMultimap.create();
 
@@ -105,7 +104,7 @@ public class AccessibleKeywordsEntities {
         hereKeywords.addAll(getPossibleKeywords().values());
 
         final ListMultimap<String, KeywordEntity> foundKeywords = keywordSearcher.findKeywords(getAccessibleKeywords(),
-                filterDuplicates(hereKeywords), new KeywordEntityExtractor(), keywordName, stopIfOneWasMatching);
+                filterDuplicates(hereKeywords), keywordName, stopIfOneWasMatching);
 
         return getPossibleKeywords(foundKeywords, keywordName);
     }
@@ -133,19 +132,6 @@ public class AccessibleKeywordsEntities {
             }
         }
         return null;
-    }
-
-    private final class KeywordEntityExtractor implements Extractor<KeywordEntity> {
-
-        @Override
-        public String keywordName(final KeywordEntity keyword) {
-            return keyword.getNameFromDefinition();
-        }
-
-        @Override
-        public List<String> getPossibleQualifiers(final KeywordEntity keyword) {
-            return keyword.getPossibleQualifiers();
-        }
     }
 
     public interface AccessibleKeywordsCollector {

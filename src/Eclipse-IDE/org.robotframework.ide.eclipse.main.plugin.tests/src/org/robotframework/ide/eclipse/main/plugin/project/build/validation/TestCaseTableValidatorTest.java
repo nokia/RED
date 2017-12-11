@@ -805,6 +805,54 @@ public class TestCaseTableValidatorTest {
     }
 
     @Test
+    public void unknownKeywordIsReported_whenUsedWithOriginalLibraryNameInsteadOfAlias() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Settings ***")
+                .appendLine("Library  lib  WITH NAME  alias")
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  lib.kw")
+                .build();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "alias", "kw",
+                new Path("/suite.robot"));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(5, Range.closed(74, 80))));
+    }
+    
+    @Test
+    public void unknownKeywordIsNotReported_whenUsedWithAlias() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Library  lib  WITH NAME  alias")
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  alias.kw")
+                .build();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "alias", "kw",
+                new Path("/suite.robot"));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+    }
+    
+    
+    @Test
     public void undeclaredKeywordInTestCaseTemplateIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
