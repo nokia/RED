@@ -158,9 +158,9 @@ public class LibrariesBuilder {
     private List<ILibdocGenerator> getStandardLibrariesToRecreate(final RobotRuntimeEnvironment runtimeEnvironment,
             final LibspecsFolder libspecsFolder) {
         final List<String> stdLibs = runtimeEnvironment.getStandardLibrariesNames();
-        final List<IFile> toRecr = libspecsFolder.collectSpecsWithDifferentVersion(stdLibs,
+        final List<IFile> specFiles = libspecsFolder.collectLibspecsToRegenerate(stdLibs,
                 runtimeEnvironment.getVersion());
-        return toRecr.stream().map(StandardLibraryLibdocGenerator::new).collect(toList());
+        return specFiles.stream().map(StandardLibraryLibdocGenerator::new).collect(toList());
     }
 
     private List<ILibdocGenerator> getReferencedVirtualLibrariesToRecreate(final RobotProjectConfig configuration,
