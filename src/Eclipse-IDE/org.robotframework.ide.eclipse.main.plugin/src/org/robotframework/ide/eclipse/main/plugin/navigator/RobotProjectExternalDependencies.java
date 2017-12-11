@@ -79,13 +79,13 @@ class RobotProjectExternalDependencies extends RobotProjectDependencies {
         }
         if (RobotProjectExternalDependencies.class == obj.getClass()) {
             final RobotProjectExternalDependencies that = (RobotProjectExternalDependencies) obj;
-            return Objects.equal(this.getLibraries(), that.getLibraries());
+            return Objects.equal(this.project, that.project) && Objects.equal(this.getName(), that.getName());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getLibraries());
+        return Objects.hashCode(project, getName());
     }
 }
