@@ -104,11 +104,15 @@ public class LibspecsFolder {
         return false;
     }
 
-    public List<IFile> collectSpecsWithDifferentVersion(final List<String> stdLibs, final String version) {
-        return stdLibs.stream().map(libName -> folder.getFile(libName + LIBSPEC_FILE_EXTENSION)).filter(specFile -> {
-            final String otherVersion = LibrarySpecification.getVersion(specFile);
-            return version.startsWith("Robot Framework " + otherVersion);
-        }).collect(toList());
+    public List<IFile> collectLibspecsToRegenerate(final List<String> libraryNames, final String version) {
+        return libraryNames.stream()
+                .map(this::getSpecFile)
+                .filter(specFile -> !specFile.exists() || !hasSameVersion(specFile, version))
+                .collect(toList());
+    }
+
+    private static boolean hasSameVersion(final IFile specFile, final String version) {
+        return version.startsWith(String.format("Robot Framework %s (", LibrarySpecification.getVersion(specFile)));
     }
 
     public IFile getSpecFile(final String libraryName) {
