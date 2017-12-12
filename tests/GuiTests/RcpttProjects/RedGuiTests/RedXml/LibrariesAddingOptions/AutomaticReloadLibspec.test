@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/11/17 4:57 PM
+Save-Time: 12/12/17 11:43 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -19,7 +19,7 @@ with [get-view "Project Explorer" | get-tree] {
     select NewProject | double-click
     select "NewProject/red.xml" | double-click
 }
-// wait for jython
+// wait for interpreters
 wait-for-loading-red-xml  "NewProject/red.xml" 
   
 get-editor "NewProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
@@ -31,8 +31,8 @@ with [get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get
     key-type "M1+s"
 }
 
+//wait for Referenced libs - by default collapsed
 try -times 5 -delay 1000 -command{
-	//verify-error {get-window "Progress Information" | get-property enablement | equals false | verify-true}
 	get-view "Project Explorer" | get-tree | get-item "NewProject/Robot Referenced libraries" 
        | get-property "getExpanded()" | equals false | verify-true
 }
@@ -59,6 +59,12 @@ with [get-editor "only_function.py" | get-text-viewer] {
     key-type "M1+a"
     key-type Del
 }
+
+//expand Standard libs
+get-view "Project Explorer" | get-tree 
+    | get-item "NewProject/Robot Standard libraries \[Robot Framework .*\]/DateTime.*" | expand
+    
+    
 //add 2 new functions
 get-editor "only_function.py" | get-text-viewer | set-text "def Laptop():\n"
     + "\t\"\"\"Laptop keyword\n"
@@ -74,20 +80,31 @@ with [get-editor "only_function.py" | get-text-viewer] {
     key-type "M1+s"
 }
 
-wait 3000
+
 try -times 5 -delay 1000 -command{
 	verify-error {get-window "Progress Information" | get-property enablement | equals false | verify-true}
-//	get-view "Project Explorer" | get-tree | get-item "NewProject/Robot Referenced libraries" 
-//       | get-property "getExpanded()" | equals false | verify-true
 }
 
-//check if new libs are adde to PE
+
+with [get-view "Project Explorer" | get-tree] {
+    get-item 
+        -path "NewProject/Robot Standard libraries \\[Robot Framework .*\\]/DateTime \\(.*\\)" 
+        | get-property "getExpanded()" | equals true | verify-true
+    get-item 
+        -path "NewProject/Robot Standard libraries \\[Robot Framework .*\\]/Reserved \\(.*\\)" 
+        | get-property "getExpanded()" | equals false | verify-true    
+        
+    get-item -path "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)" 
+        | get-property "getExpanded()" | equals false | verify-true
+    
+}
 
 
 //add file with class
 get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
 set-dialog-result File "platform:/resource/NewProject/here_is_class.py"
 get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+
 // verify Select library class items list
 get-window "Select library class" | get-table | select "here_is_class"
 with [get-window "Select library class" | get-control Any -index 1] {
@@ -298,11 +315,5 @@ exec-with-options {
 	}
 	   verify-error {get-window "Problem Occurred"}
 } -allowStatusDialog   
-
-
-
-
-
-
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
