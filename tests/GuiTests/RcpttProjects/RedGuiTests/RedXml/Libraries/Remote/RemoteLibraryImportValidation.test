@@ -7,13 +7,17 @@ Element-Version: 3.0
 External-Reference: 
 Id: _m_EhUNmiEeeKxYJgF2NTmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/11/17 8:36 AM
+Save-Time: 12/12/17 3:41 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//
+//                          before test install: pip install robotremoteserver
+//
+//
 // run PythonRemoteServer
 run-python-remote-server-in-background -lib_name my_remote_lib.py -timeout 10
 // go to .robot file
