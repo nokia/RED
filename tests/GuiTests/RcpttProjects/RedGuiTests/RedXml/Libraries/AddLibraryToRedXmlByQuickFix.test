@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/21/17 9:56 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/12/17 2:07 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -92,7 +92,7 @@ with [get-editor "Script.robot" | get-text-viewer] {
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'only_function.py' and add to configuration" | click -default
 
-try -times 8 -delay 1000 -command{
+try -times 5 -delay 1000 -command{
 //check libspec
 	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
 	    get-property itemCount | equals 2 | verify-true
@@ -159,6 +159,14 @@ get-tab-folder -index 1 | get-tab-item "Script.robot" | click
 get-menu "Project/Clean..." | click
 get-window Clean | get-button $OK_Clean_button | click
 
+
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
+        | get-property "getExpanded()" | equals false | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+        | get-property "getExpanded()" | equals true | verify-true
+}
+
 //add extension to file
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 6 25
@@ -194,6 +202,16 @@ get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-but
 try -times 8 -delay 1000 -command{
 	get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | get-property childCount 
 	    | equals 3 | verify-true
+}
+
+//check if tree is expand in one case - RED-999
+with [get-view "Project Explorer" | get-tree] {
+    get-item -path "RobotProject/Robot Referenced libraries/empty RobotProject\\/empty_file \\(0\\)" 
+        | get-property "getExpanded()" | equals false | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
+        | get-property "getExpanded()" | equals false | verify-true
+    get-item -path "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
+        | get-property "getExpanded()" | equals true | verify-true
 }
 
 //check libspeck
