@@ -15,6 +15,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -366,14 +367,11 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
         return new NewElementsCreator<RobotElement>() {
 
+            @SuppressWarnings("restriction")
             @Override
             public RobotElement createNew(final int addingTokenRowIndex) {
-                SwtThread.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, null).open();
-                    }
-                });
+                SwtThread.asyncExec(() -> new ImportSettingsPopup(site.getShell(), site.getService(IThemeEngine.class),
+                        commandsStack, fileModel, null).open());
                 selectionLayer.clear();
                 return null;
             }
@@ -553,17 +551,13 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         }
     }
 
+    @SuppressWarnings("restriction")
     @Inject
     @Optional
     private void whenSettingIsEdited(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT) final RobotSetting setting) {
-        SwtThread.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, setting).open();
-            }
-        });
+        SwtThread.asyncExec(() -> new ImportSettingsPopup(site.getShell(), site.getService(IThemeEngine.class),
+                commandsStack, fileModel, setting).open());
     }
 
     private void refreshTable() {

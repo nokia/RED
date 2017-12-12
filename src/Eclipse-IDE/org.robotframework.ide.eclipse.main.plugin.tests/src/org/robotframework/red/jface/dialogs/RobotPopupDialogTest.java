@@ -6,7 +6,9 @@
 package org.robotframework.red.jface.dialogs;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -41,8 +43,9 @@ public class RobotPopupDialogTest {
         assertThat(((Label) internalParent.getChildren()[0])).isSameAs(dialog.getFocusControl());
     }
 
+    @SuppressWarnings("restriction")
     private static RobotPopupDialog prepareDialogToTest(final Shell shell) {
-        return new RobotPopupDialog(shell) {
+        return new RobotPopupDialog(shell, mock(IThemeEngine.class)) {
             private Label label;
 
             @Override

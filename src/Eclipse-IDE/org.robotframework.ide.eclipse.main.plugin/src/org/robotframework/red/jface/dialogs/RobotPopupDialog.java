@@ -5,6 +5,7 @@
  */
 package org.robotframework.red.jface.dialogs;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -12,10 +13,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
+@SuppressWarnings("restriction")
 public abstract class RobotPopupDialog extends PopupDialog {
 
-    public RobotPopupDialog(final Shell parent) {
+    private final IThemeEngine engine;
+
+    public RobotPopupDialog(final Shell parent, final IThemeEngine engine) {
         super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE | SWT.ON_TOP, true, true, true, false, false, null, null);
+        this.engine = engine;
     }
 
     @Override
@@ -26,7 +31,9 @@ public abstract class RobotPopupDialog extends PopupDialog {
 
     @Override
     protected Control createDialogArea(final Composite parent) {
-        return createDialogControls(parent);
+        final Control control = createDialogControls(parent);
+        engine.applyStyles(control, true);
+        return control;
     }
 
     protected abstract Control createDialogControls(Composite parent);

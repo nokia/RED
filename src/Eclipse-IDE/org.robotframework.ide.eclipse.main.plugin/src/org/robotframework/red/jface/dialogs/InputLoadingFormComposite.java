@@ -33,6 +33,7 @@ import org.eclipse.ui.forms.IMessageManager;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -41,7 +42,7 @@ public abstract class InputLoadingFormComposite extends Composite {
 
     private final String title;
 
-    private FormToolkit formToolkit = new FormToolkit(Display.getCurrent());
+    private FormToolkit formToolkit = new RedFormToolkit(Display.getCurrent());
     private Form form;
     private Composite innerComposite;
 
