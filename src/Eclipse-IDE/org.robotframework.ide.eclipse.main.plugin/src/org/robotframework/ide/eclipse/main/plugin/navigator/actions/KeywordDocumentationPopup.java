@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -12,6 +13,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
 import org.robotframework.red.jface.dialogs.RobotPopupDialog;
 
+@SuppressWarnings("restriction")
 public class KeywordDocumentationPopup extends RobotPopupDialog {
 
     public static final String POPUP_TEXT = "Keyword Documentation";
@@ -19,8 +21,8 @@ public class KeywordDocumentationPopup extends RobotPopupDialog {
     private InputLoadingFormComposite composite;
     private final KeywordSpecification specification;
 
-    public KeywordDocumentationPopup(final Shell parent, final KeywordSpecification spec) {
-        super(parent);
+    public KeywordDocumentationPopup(final Shell parent, final IThemeEngine engine, final KeywordSpecification spec) {
+        super(parent, engine);
         this.specification = spec;
     }
 

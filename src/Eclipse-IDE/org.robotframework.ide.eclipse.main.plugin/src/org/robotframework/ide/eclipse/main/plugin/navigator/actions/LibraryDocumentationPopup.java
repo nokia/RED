@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -12,13 +13,15 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite;
 import org.robotframework.red.jface.dialogs.RobotPopupDialog;
 
+@SuppressWarnings("restriction")
 class LibraryDocumentationPopup extends RobotPopupDialog {
 
     private InputLoadingFormComposite composite;
+
     private final LibrarySpecification specification;
 
-    LibraryDocumentationPopup(final Shell parent, final LibrarySpecification spec) {
-        super(parent);
+    LibraryDocumentationPopup(final Shell parent, final IThemeEngine engine, final LibrarySpecification spec) {
+        super(parent, engine);
         this.specification = spec;
     }
 
