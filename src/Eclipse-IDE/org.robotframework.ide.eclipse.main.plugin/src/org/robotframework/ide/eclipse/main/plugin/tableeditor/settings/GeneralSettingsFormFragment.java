@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -76,7 +77,6 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -434,17 +434,17 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         final MenuItem copyItem = new MenuItem(docMenu, SWT.NONE);
         copyItem.setText("&Copy\tCtrl+C");
         copyItem.setImage(ImagesManager.getImage(RedImages.getCopyImage()));
-        copyItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> documentation.copy()));
+        copyItem.addSelectionListener(widgetSelectedAdapter(e -> documentation.copy()));
 
         final MenuItem cutItem = new MenuItem(docMenu, SWT.NONE);
         cutItem.setText("Cu&t\tCtrl+X");
         cutItem.setImage(ImagesManager.getImage(RedImages.getCutImage()));
-        cutItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> documentation.cut()));
+        cutItem.addSelectionListener(widgetSelectedAdapter(e -> documentation.cut()));
 
         final MenuItem pasteItem = new MenuItem(docMenu, SWT.NONE);
         pasteItem.setText("&Paste\tCtrl+V");
         pasteItem.setImage(ImagesManager.getImage(RedImages.getPasteImage()));
-        pasteItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> documentation.paste()));
+        pasteItem.addSelectionListener(widgetSelectedAdapter(e -> documentation.paste()));
     }
 
     private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {

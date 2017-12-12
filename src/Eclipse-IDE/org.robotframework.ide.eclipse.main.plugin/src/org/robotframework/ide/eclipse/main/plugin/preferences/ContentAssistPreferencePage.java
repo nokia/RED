@@ -5,13 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -52,7 +53,7 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
         final String text = "Robot content assistant preferences. See <a href=\"" + keysPageId
                 + "\">'Keys'</a> to configure activation key binding.";
         link.setText(text);
-        link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+        link.addSelectionListener(widgetSelectedAdapter(e -> {
             if (keysPageId.equals(e.text)) {
                 PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
             }
@@ -88,7 +89,7 @@ public class ContentAssistPreferencePage extends RedFieldEditorPreferencePage {
         charsTextControl.setEnabled(isAutoActivationEnabled);
         GridDataFactory.fillDefaults().indent(25, 2).applyTo(autoActivationChars.getLabelControl(autoActivationGroup));
 
-        button.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+        button.addSelectionListener(widgetSelectedAdapter(e -> {
             delayTextControl.setEnabled(button.getSelection());
             charsTextControl.setEnabled(button.getSelection());
         }));

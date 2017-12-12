@@ -5,10 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
+import static org.robotframework.red.swt.Listeners.focusLostAdapter;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
@@ -58,7 +59,7 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
         final String toEdit = keyText + (valueText.isEmpty() ? "" : "=" + valueText);
         textEdit.setText(toEdit);
         textEdit.setSelection(textEdit.getText().length());
-        textEdit.addFocusListener(FocusListener.focusLostAdapter(e -> commitEdit()));
+        textEdit.addFocusListener(focusLostAdapter(e -> commitEdit()));
         textEdit.addTraverseListener(e -> {
             if (assistSupport.areContentProposalsShown()) {
                 return;

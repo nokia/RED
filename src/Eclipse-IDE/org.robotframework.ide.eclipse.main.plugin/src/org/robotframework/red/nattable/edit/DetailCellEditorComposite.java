@@ -5,10 +5,11 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
@@ -49,7 +50,7 @@ class DetailCellEditorComposite<D> extends Composite {
 
     private Text createText() {
         final Text text = new Text(this, SWT.SINGLE);
-        text.addKeyListener(KeyListener.keyPressedAdapter(e -> {
+        text.addKeyListener(keyPressedAdapter(e -> {
             if (assistSupport.areContentProposalsShown()) {
                 return;
             }

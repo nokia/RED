@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -12,7 +14,6 @@ import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -79,8 +80,8 @@ public class DefaultLaunchConfigurationPreferencePage extends RedFieldEditorPref
         final Button exportBtn = new Button(group, SWT.PUSH);
         GridDataFactory.swtDefaults().indent(25, 5).applyTo(exportBtn);
         exportBtn.setText("Export Client Script");
-        exportBtn.addSelectionListener(SelectionListener
-                .widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
+        exportBtn.addSelectionListener(
+                widgetSelectedAdapter(e -> new ScriptExportDialog(getShell(), "TestRunnerAgent.py").open()));
     }
 
     private void createExecutorLaunchConfigurationPreferences(final Composite parent) {

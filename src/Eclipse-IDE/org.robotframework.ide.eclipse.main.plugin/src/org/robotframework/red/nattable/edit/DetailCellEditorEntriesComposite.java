@@ -6,6 +6,8 @@
 package org.robotframework.red.nattable.edit;
 
 import static com.google.common.collect.Lists.transform;
+import static org.robotframework.red.swt.Listeners.mouseUpAdapter;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.List;
 
@@ -15,7 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
@@ -100,8 +101,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
         scrolledComposite.setBackground(getParent().getBackground());
         scrolledComposite.setShowFocusedControl(true);
         scrolledComposite.setExpandHorizontal(true);
-        final SelectionListener scrollingRefresher = SelectionListener
-                .widgetSelectedAdapter(e -> entries.redrawEntries());
+        final SelectionListener scrollingRefresher = widgetSelectedAdapter(e -> entries.redrawEntries());
         scrolledComposite.getVerticalBar().addSelectionListener(scrollingRefresher);
         scrolledComposite.getVerticalBar().addDisposeListener(
                 e -> scrolledComposite.getVerticalBar().removeSelectionListener(scrollingRefresher));
@@ -121,7 +121,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
             entry.setBackground(bgColor);
             entry.setForeground(fgColor);
             entry.addKeyListener(new EntryKeyPressListener(entry));
-            entry.addMouseListener(MouseListener.mouseUpAdapter(e -> {
+            entry.addMouseListener(mouseUpAdapter(e -> {
                 if (entry.isSelected() && mode == Mode.WINDOWED) {
                     entries.openEntryForEdit(entry);
                 } else {
