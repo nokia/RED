@@ -6,9 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -24,6 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @author Michal Anglart
  *
  */
+@SuppressWarnings("restriction")
 public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     private final RobotModel model;
@@ -103,7 +106,9 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
     }
 
     protected final void open(final KeywordSpecification keywordSpecification) {
-        final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        new KeywordDocumentationPopup(shell, keywordSpecification).open();
+        final IWorkbenchWindow workbench = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        final IThemeEngine themeEngine = workbench.getService(IThemeEngine.class);
+        final Shell shell = workbench.getShell();
+        new KeywordDocumentationPopup(shell, themeEngine, keywordSpecification).open();
     }
 }
