@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -12,7 +14,6 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -58,7 +59,7 @@ public class SuiteEditorPreferencePage extends RedFieldEditorPreferencePage {
                 + "\">'Text Editors'</a> for general text editor preferences " + "and <a href=\"" + colorsAndFontsPageId
                 + "\">'Colors and Fonts'</a> to configure the font.";
         link.setText(text);
-        link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+        link.addSelectionListener(widgetSelectedAdapter(e -> {
             if (generalTextEditorPageId.equals(e.text)) {
                 PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
             } else if (colorsAndFontsPageId.equals(e.text)) {
