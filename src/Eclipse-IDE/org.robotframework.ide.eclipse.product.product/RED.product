@@ -63,19 +63,10 @@ limitations under the License.
    </plugins>
 
    <features>
-      <feature id="org.eclipse.e4.rcp"/>
       <feature id="org.eclipse.platform"/>
-      <feature id="org.eclipse.help"/>
-      <feature id="org.eclipse.emf.ecore"/>
-      <feature id="org.eclipse.equinox.p2.core.feature"/>
-      <feature id="org.eclipse.emf.common"/>
-      <feature id="org.eclipse.equinox.p2.rcp.feature"/>
-      <feature id="org.eclipse.equinox.p2.user.ui"/>
-      <feature id="org.eclipse.rcp"/>
-      <feature id="org.eclipse.equinox.p2.extras.feature"/>
-      <feature id="org.robotframework.ide.eclipse.main.feature" version="1.0.0.qualifier" installMode="root"/>
-      <feature id="org.robotframework.ide.eclipse.product.feature" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.epp.mpc"/>
+      <feature id="org.robotframework.ide.eclipse.product.feature" version="1.0.0.qualifier"/>
+      <feature id="org.robotframework.ide.eclipse.main.feature" version="1.0.0.qualifier" installMode="root"/>
    </features>
 
    <configurations>

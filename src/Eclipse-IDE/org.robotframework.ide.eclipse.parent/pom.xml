@@ -119,7 +119,7 @@
 	</profiles>
 
 	<properties>
-		<tycho-version>0.24.0</tycho-version>
+		<tycho-version>1.0.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse.version>oxygen</eclipse.version>
 		<jdk.version>1.8</jdk.version>
