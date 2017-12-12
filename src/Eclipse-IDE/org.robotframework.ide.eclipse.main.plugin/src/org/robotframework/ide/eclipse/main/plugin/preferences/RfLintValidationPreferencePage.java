@@ -8,6 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import static org.robotframework.red.swt.Listeners.keyPressedAdapter;
+import static org.robotframework.red.swt.Listeners.menuShownAdapter;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.io.File;
 import java.net.URI;
@@ -33,10 +36,6 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -137,20 +136,16 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         final MenuItem deleteMenuItem = new MenuItem(menu, SWT.PUSH);
         deleteMenuItem.setText("Delete\tDel");
         deleteMenuItem.setImage(ImagesManager.getImage(RedImages.getDeleteImage()));
-        deleteMenuItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> selectionRemover.run()));
+        deleteMenuItem.addSelectionListener(widgetSelectedAdapter(e -> selectionRemover.run()));
 
         viewer.getTable().setMenu(menu);
-        menu.addMenuListener(new MenuAdapter() {
-
-            @Override
-            public void menuShown(final MenuEvent e) {
+        menu.addMenuListener(menuShownAdapter(e -> {
                 final boolean anyRuleSelected = !Selections
                         .getElements((IStructuredSelection) viewer.getSelection(), RfLintRule.class)
                         .isEmpty();
                 deleteMenuItem.setEnabled(anyRuleSelected);
-            }
-        });
-        viewer.getTable().addKeyListener(KeyListener.keyPressedAdapter(e -> {
+        }));
+        viewer.getTable().addKeyListener(keyPressedAdapter(e -> {
             if (e.keyCode == SWT.DEL) {
                 selectionRemover.run();
             }
@@ -192,20 +187,16 @@ public class RfLintValidationPreferencePage extends RedPreferencePage {
         final MenuItem deleteMenuItem = new MenuItem(menu, SWT.PUSH);
         deleteMenuItem.setText("Delete\tDel");
         deleteMenuItem.setImage(ImagesManager.getImage(RedImages.getDeleteImage()));
-        deleteMenuItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> selectionRemover.run()));
+        deleteMenuItem.addSelectionListener(widgetSelectedAdapter(e -> selectionRemover.run()));
 
         viewer.getTable().setMenu(menu);
-        menu.addMenuListener(new MenuAdapter() {
-
-            @Override
-            public void menuShown(final MenuEvent e) {
-                final boolean anyRulesFilesSelected = !Selections
-                        .getElements((IStructuredSelection) viewer.getSelection(), RulesFile.class)
-                        .isEmpty();
-                deleteMenuItem.setEnabled(anyRulesFilesSelected);
-            }
-        });
-        viewer.getTable().addKeyListener(KeyListener.keyPressedAdapter(e -> {
+        menu.addMenuListener(menuShownAdapter(e -> {
+            final boolean anyRulesFilesSelected = !Selections
+                    .getElements((IStructuredSelection) viewer.getSelection(), RulesFile.class)
+                    .isEmpty();
+            deleteMenuItem.setEnabled(anyRulesFilesSelected);
+        }));
+        viewer.getTable().addKeyListener(keyPressedAdapter(e -> {
             if (e.keyCode == SWT.DEL) {
                 selectionRemover.run();
             }

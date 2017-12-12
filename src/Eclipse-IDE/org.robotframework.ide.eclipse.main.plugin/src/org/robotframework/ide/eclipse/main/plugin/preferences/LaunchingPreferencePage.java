@@ -5,12 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -47,7 +48,7 @@ public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
                 + "\">'Launching'</a> for general launching preferences " + "or <a href=\"" + runDebugPageId
                 + "\">'Run/Debug'</a> for other related preferences.";
         link.setText(text);
-        link.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
+        link.addSelectionListener(widgetSelectedAdapter(e -> {
             if (launchingPageId.equals(e.text)) {
                 PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
             } else if (runDebugPageId.equals(e.text)) {
@@ -113,8 +114,8 @@ public class LaunchingPreferencePage extends RedFieldEditorPreferencePage {
 
         final IntegerFieldEditor limitEditor = new IntegerFieldEditor(RedPreferences.LIMIT_MSG_LOG_LENGTH,
                 "Buffer size (characters)", viewsGroup, 7);
-        button.addSelectionListener(SelectionListener
-                .widgetSelectedAdapter(e -> limitEditor.setEnabled(button.getSelection(), viewsGroup)));
+        button.addSelectionListener(
+                widgetSelectedAdapter(e -> limitEditor.setEnabled(button.getSelection(), viewsGroup)));
         final Label limitLabel = limitEditor.getLabelControl(viewsGroup);
         GridDataFactory.fillDefaults().indent(5, 5).applyTo(limitLabel);
         limitEditor.setValidRange(0, 9_999_999);

@@ -5,12 +5,13 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import static org.robotframework.red.swt.Listeners.mouseDownAdapter;
+
 import java.util.List;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -72,7 +73,7 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
     }
 
     private void installControlListeners(final Control child) {
-        child.addMouseListener(MouseListener.mouseDownAdapter(e -> switchToWindowingMode()));
+        child.addMouseListener(mouseDownAdapter(e -> switchToWindowingMode()));
     }
 
     private void switchToWindowingMode() {

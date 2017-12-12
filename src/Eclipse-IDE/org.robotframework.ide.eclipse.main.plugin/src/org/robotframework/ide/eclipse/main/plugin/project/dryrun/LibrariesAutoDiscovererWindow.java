@@ -6,6 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static java.util.stream.Collectors.toList;
+import static org.robotframework.red.swt.Listeners.keyReleasedAdapter;
+import static org.robotframework.red.swt.Listeners.mouseDoubleClickAdapter;
+import static org.robotframework.red.swt.Listeners.mouseDownAdapter;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,9 +38,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -184,7 +185,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             }
         });
 
-        discoveredLibrariesViewer.getTree().addKeyListener(KeyListener.keyReleasedAdapter(e -> {
+        discoveredLibrariesViewer.getTree().addKeyListener(keyReleasedAdapter(e -> {
             if (e.keyCode == SWT.F3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
                 handleFileOpeningEvent();
             } else if (e.keyCode == 'c' && e.stateMask == SWT.CTRL) {
@@ -193,7 +194,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         }));
 
         final Menu menu = createContextMenu();
-        discoveredLibrariesViewer.getTree().addMouseListener(MouseListener.mouseDownAdapter(e -> {
+        discoveredLibrariesViewer.getTree().addMouseListener(mouseDownAdapter(e -> {
             if (e.button == 3) {
                 if (discoveredLibrariesViewer.getTree().getSelectionCount() == 1 && getOpenableFilePath().isPresent()) {
                     menu.setVisible(true);
@@ -208,7 +209,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             }
         }));
 
-        discoveredLibrariesViewer.getTree().addMouseListener(MouseListener.mouseDoubleClickAdapter(e -> {
+        discoveredLibrariesViewer.getTree().addMouseListener(mouseDoubleClickAdapter(e -> {
             if (e.button == 1 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1) {
                 handleFileOpeningEvent();
             }
@@ -221,12 +222,12 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         final MenuItem copyItem = new MenuItem(menu, SWT.PUSH);
         copyItem.setText("Copy");
         copyItem.setImage(ImagesManager.getImage(RedImages.getCopyImage()));
-        copyItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> handleLibraryCopyEvent()));
+        copyItem.addSelectionListener(widgetSelectedAdapter(e -> handleLibraryCopyEvent()));
 
         final MenuItem gotoItem = new MenuItem(menu, SWT.PUSH);
         gotoItem.setText("Go to File");
         gotoItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
-        gotoItem.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> handleFileOpeningEvent()));
+        gotoItem.addSelectionListener(widgetSelectedAdapter(e -> handleFileOpeningEvent()));
 
         return menu;
     }

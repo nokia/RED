@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -115,7 +117,7 @@ public class InstalledRobotsPreferencesPage extends RedPreferencePage {
     }
 
     private SelectionListener createDiscoverListener() {
-        return SelectionListener.widgetSelectedAdapter(e -> {
+        return widgetSelectedAdapter(e -> {
             disableControls();
             progressBar = createProgress(parent);
 
