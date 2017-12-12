@@ -5,13 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
+import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPartSite;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.red.viewers.Selections;
 
+@SuppressWarnings("restriction")
 public class ShowKeywordDocumentationAction extends Action implements IEnablementUpdatingAction {
 
     private final IWorkbenchPage page;
@@ -34,6 +37,8 @@ public class ShowKeywordDocumentationAction extends Action implements IEnablemen
         final KeywordSpecification spec = Selections.getSingleElement(
                 (IStructuredSelection) selectionProvider.getSelection(), KeywordSpecification.class);
 
-        new KeywordDocumentationPopup(page.getActivePart().getSite().getShell(), spec).open();
+        final IWorkbenchPartSite site = page.getActivePart().getSite();
+        final IThemeEngine themeEngine = site.getService(IThemeEngine.class);
+        new KeywordDocumentationPopup(site.getShell(), themeEngine, spec).open();
     }
 }
