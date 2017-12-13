@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -19,7 +18,6 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
@@ -32,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.viewers.TreeContentProvider;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 
 /**
@@ -58,14 +57,13 @@ class SearchResultContentProvider extends TreeContentProvider {
         for (final Object matchingElement : result.getElements()) {
             if (matchingElement instanceof IFile) {
                 projects.add(((IFile) matchingElement).getProject());
+
             } else if (matchingElement instanceof IProject) {
                 projects.add((IProject) matchingElement);
+
             } else if (matchingElement instanceof MatchesGroupingElement) {
-                final Optional<IProject> groupingProject = ((MatchesGroupingElement) matchingElement)
-                        .getGroupingObjectOf(IProject.class);
-                if (groupingProject.isPresent()) {
-                    projects.add(groupingProject.get());
-                }
+                ((MatchesGroupingElement) matchingElement).getGroupingObjectOf(IProject.class)
+                        .ifPresent(p -> projects.add(p));
             }
         }
         return projects.toArray();
@@ -94,10 +92,9 @@ class SearchResultContentProvider extends TreeContentProvider {
             final List<Match> children = new ArrayList<>();
 
             final Match[] matches = input.getMatches(parentElement);
-            if (matches.length > 0) {
-                children.addAll(newArrayList(matches));
-            }
+            children.addAll(newArrayList(matches));
             return children.toArray();
+
         } else if (parentElement instanceof Libs) {
             final Set<Object> children = new LinkedHashSet<>();
             
@@ -120,6 +117,7 @@ class SearchResultContentProvider extends TreeContentProvider {
                 }
             }
             return children.toArray();
+
         } else if (parentElement instanceof LibraryWithParent) {
             final Set<Object> children = new LinkedHashSet<>();
 
@@ -136,6 +134,7 @@ class SearchResultContentProvider extends TreeContentProvider {
                 }
             }
             return children.toArray();
+
         } else if (parentElement instanceof KeywordWithParent) {
             final Set<Object> children = new LinkedHashSet<>();
             final KeywordWithParent parent = (KeywordWithParent) parentElement;
@@ -163,17 +162,14 @@ class SearchResultContentProvider extends TreeContentProvider {
 
     private boolean resourceShouldBeShown(final IResource resource) throws CoreException {
         final AtomicBoolean shouldBeShown = new AtomicBoolean(false);
-        resource.accept(new IResourceVisitor() {
-            @Override
-            public boolean visit(final IResource resource) throws CoreException {
-                if (resource.getType() == IResource.FILE) {
-                    if (input.containMatches(resource)) {
-                        shouldBeShown.set(true);
-                        return false;
-                    }
+        resource.accept(r -> {
+            if (r.getType() == IResource.FILE) {
+                if (input.containMatches(r)) {
+                    shouldBeShown.set(true);
+                    return false;
                 }
-                return true;
             }
+            return true;
         });
         return shouldBeShown.get();
     }
@@ -202,7 +198,8 @@ class SearchResultContentProvider extends TreeContentProvider {
 
         private final IProject project;
 
-        private Libs(final IProject project) {
+        @VisibleForTesting
+        Libs(final IProject project) {
             this.project = project;
         }
 
@@ -254,7 +251,7 @@ class SearchResultContentProvider extends TreeContentProvider {
         StyledString getLabel() {
             final StyledString label = new StyledString(getName());
             if (!matches.isEmpty()) {
-                label.append(" (" + matches.size() + ") matches", Stylers.Common.ECLIPSE_DECORATION_STYLER);
+                label.append(" (" + matches.size() + " matches)", Stylers.Common.ECLIPSE_DECORATION_STYLER);
             }
             return label;
         }
@@ -264,7 +261,8 @@ class SearchResultContentProvider extends TreeContentProvider {
 
     static final class LibraryWithParent extends LibraryEntity<Libs, LibrarySpecification> {
 
-        private LibraryWithParent(final Libs parent, final LibrarySpecification specification,
+        @VisibleForTesting
+        LibraryWithParent(final Libs parent, final LibrarySpecification specification,
                 final List<Match> matches) {
             super(parent, specification, matches);
         }
@@ -277,7 +275,8 @@ class SearchResultContentProvider extends TreeContentProvider {
 
     static final class KeywordWithParent extends LibraryEntity<LibraryWithParent, KeywordSpecification> {
 
-        private KeywordWithParent(final LibraryWithParent parent, final KeywordSpecification specification,
+        @VisibleForTesting
+        KeywordWithParent(final LibraryWithParent parent, final KeywordSpecification specification,
                 final List<Match> matches) {
             super(parent, specification, matches);
         }
