@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 /**
  * @author Michal Anglart
  */
-class Logger extends BuildLogger {
+public class Logger extends BuildLogger {
 
     @Override
     public void log(final String message) {

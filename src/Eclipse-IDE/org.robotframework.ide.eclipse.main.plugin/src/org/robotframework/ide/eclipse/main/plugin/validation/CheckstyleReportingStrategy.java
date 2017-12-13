@@ -22,7 +22,7 @@ import com.google.common.collect.Multimap;
 /**
  * @author Michal Anglart
  */
-public class CheckstyleReportingStrategy extends HeadlessValidationReportingStrategy {
+class CheckstyleReportingStrategy extends HeadlessValidationReportingStrategy {
 
     private final Logger logger;
 
@@ -70,9 +70,7 @@ public class CheckstyleReportingStrategy extends HeadlessValidationReportingStra
     private void generateFile(final File file, final Map<IPath, Collection<RobotProblemWithPosition>> map) {
         logger.log("Generating report file '" + file.getAbsolutePath() + "'");
         try (ReportWithCheckstyleFormat checkstyleReporter = new ReportWithCheckstyleFormat(file)) {
-            checkstyleReporter.writeHeader();
-            checkstyleReporter.writeEntries(map);
-            checkstyleReporter.writeFooter();
+            checkstyleReporter.write(map);
             logger.log("Report file '" + file.getAbsolutePath() + "' has been generated");
         } catch (final IOException e) {
             logger.logError("Unable to create report file '" + file.getAbsolutePath() + "'. Reason: " + e.getMessage(),
