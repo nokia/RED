@@ -38,12 +38,18 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
         writer = Files.newWriter(file, Charsets.UTF_8);
     }
 
-    void writeHeader() throws IOException {
+    void write(final Map<IPath, Collection<RobotProblemWithPosition>> problems) throws IOException {
+        writeHeader();
+        writeEntries(problems);
+        writeFooter();
+    }
+
+    private void writeHeader() throws IOException {
         writer.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
         writer.append("<checkstyle version=\"6.14\">\n");
     }
 
-    void writeEntries(final Map<IPath, Collection<RobotProblemWithPosition>> problems)
+    private void writeEntries(final Map<IPath, Collection<RobotProblemWithPosition>> problems)
             throws IOException {
         for (final IPath path : problems.keySet()) {
             writer.append(Strings.repeat(" ", 2) + "<file name=\"" + xmlAttrEscaper.escape(path.toString()) + "\">\n");
@@ -64,7 +70,7 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
         }
     }
 
-    void writeFooter() throws IOException {
+    private void writeFooter() throws IOException {
         writer.append("</checkstyle>");
     }
 
