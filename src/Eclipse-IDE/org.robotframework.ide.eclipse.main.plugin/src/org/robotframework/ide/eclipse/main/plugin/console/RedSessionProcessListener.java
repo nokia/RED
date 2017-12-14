@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.console;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -22,6 +23,8 @@ import org.rf.ide.core.executor.PythonProcessListener;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author Michal Anglart
  *
@@ -30,16 +33,29 @@ public final class RedSessionProcessListener implements PythonProcessListener {
 
     private final Map<Process, RedSessionConsole> streams = new ConcurrentHashMap<>();
 
+    private final IConsoleManager consoleManager;
+
+    public RedSessionProcessListener() {
+        this(ConsolePlugin.getDefault().getConsoleManager());
+    }
+
+    @VisibleForTesting
+    RedSessionProcessListener(final IConsoleManager consoleManager) {
+        this.consoleManager = consoleManager;
+    }
+
+    @VisibleForTesting
+    Map<Process, RedSessionConsole> getCurrentProcesses() {
+        return streams;
+    }
+
     @Override
     public void processStarted(final String name, final Process process) {
-        final RedSessionConsole console = SwtThread.syncEval(new Evaluation<RedSessionConsole>() {
-            @Override
-            public RedSessionConsole runCalculation() {
-                final RedSessionConsole console = openRobotServerConsole(name, process);
-                console.initializeStreams();
-                return console;
-            }
-        });
+        final RedSessionConsole console = SwtThread.syncEval(Evaluation.of(() -> {
+            final RedSessionConsole newConsole = openRobotServerConsole(name, process);
+            newConsole.initializeStreams();
+            return newConsole;
+        }));
         streams.put(process, console);
     }
 
@@ -47,12 +63,7 @@ public final class RedSessionProcessListener implements PythonProcessListener {
     public void processEnded(final Process process) {
         final RedSessionConsole console = streams.remove(process);
         if (console != null) {
-            SwtThread.asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    console.processTerminated();
-                }
-            });
+            SwtThread.asyncExec(() -> console.processTerminated());
         }
     }
 
@@ -72,7 +83,7 @@ public final class RedSessionProcessListener implements PythonProcessListener {
         }
     }
 
-    private static RedSessionConsole openRobotServerConsole(final String interpreterName, final Process process) {
+    private RedSessionConsole openRobotServerConsole(final String interpreterName, final Process process) {
         final IWorkbench workbench = PlatformUI.getWorkbench();
         final IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
         final IWorkbenchPage page = activeWindow.getActivePage();
@@ -95,19 +106,15 @@ public final class RedSessionProcessListener implements PythonProcessListener {
         return "RED session [" + interpreterName + "]";
     }
 
-    private static RedSessionConsole findConsole(final String name) {
-        final IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
-        final IConsole[] existing = consoleManager.getConsoles();
-        for (final IConsole console : existing) {
-            if (name.equals(console.getName())) {
-                return (RedSessionConsole) console;
-            }
-        }
-        return null;
+    private RedSessionConsole findConsole(final String name) {
+        return Stream.of(consoleManager.getConsoles())
+                .filter(c -> name.equals(c.getName()))
+                .findFirst()
+                .map(RedSessionConsole.class::cast)
+                .orElse(null);
     }
 
-    private static RedSessionConsole createConsole(final String name, final Process process) {
-        final IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
+    private RedSessionConsole createConsole(final String name, final Process process) {
         final RedSessionConsole console = new RedSessionConsole(name, process);
         consoleManager.addConsoles(new IConsole[] { console });
         return console;

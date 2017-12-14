@@ -22,8 +22,16 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
  */
 class RemoveAllTerminatedRedSessionsAction extends Action {
 
+    private final IConsoleManager consoleManager;
+
     RemoveAllTerminatedRedSessionsAction() {
+        this(ConsolePlugin.getDefault().getConsoleManager());
+    }
+
+    RemoveAllTerminatedRedSessionsAction(final IConsoleManager consoleManager) {
         super("Remove all terminated RED sessions", IAction.AS_PUSH_BUTTON);
+        this.consoleManager = consoleManager;
+        
         setImageDescriptor(RedImages.getCloseAllImage());
         setDisabledImageDescriptor(RedImages.getDisabledCloseAllImage());
         setEnabled(false);
@@ -31,14 +39,13 @@ class RemoveAllTerminatedRedSessionsAction extends Action {
 
     @Override
     public void run() {
-        final IConsoleManager consolesManager = ConsolePlugin.getDefault().getConsoleManager();
         final List<IConsole> consolesToRemove = new ArrayList<>();
-        for (final IConsole console : consolesManager.getConsoles()) {
+        for (final IConsole console : consoleManager.getConsoles()) {
             if (console instanceof RedSessionConsole && ((RedSessionConsole) console).isTerminated()) {
                 consolesToRemove.add(console);
             }
         }
-        consolesManager.removeConsoles(consolesToRemove.toArray(new IConsole[0]));
+        consoleManager.removeConsoles(consolesToRemove.toArray(new IConsole[0]));
         setEnabled(false);
     }
 }
