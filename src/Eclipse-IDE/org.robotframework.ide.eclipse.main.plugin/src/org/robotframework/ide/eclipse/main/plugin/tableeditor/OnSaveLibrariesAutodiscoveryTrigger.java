@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -122,11 +123,21 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
         final RobotProjectConfig projectConfig = suite.getProject().getRobotProjectConfig();
         final boolean isAutodiscoveryEnabled = projectConfig != null
                 && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled();
-        return projectHasRobotNature && isAutodiscoveryEnabled && currentModelHaveUnknownLibrary(suite);
+        return projectHasRobotNature && isAutodiscoveryEnabled && suiteHasUnknownLibraryIncludingNestedResources(suite);
     }
 
-    private boolean currentModelHaveUnknownLibrary(final RobotSuiteFile suite) {
-        final List<LibraryImport> imports = LibraryImportCollector.collectLibraryImportsIncludingNestedResources(suite);
+    private boolean suiteHasUnknownLibraryIncludingNestedResources(final RobotSuiteFile suite) {
+        final Map<RobotSuiteFile, List<LibraryImport>> imports = LibraryImportCollector
+                .collectLibraryImportsIncludingNestedResources(suite);
+        for (final Entry<RobotSuiteFile, List<LibraryImport>> importEntry : imports.entrySet()) {
+            if (suiteHasUnknownLibrary(importEntry.getKey(), importEntry.getValue())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean suiteHasUnknownLibrary(final RobotSuiteFile suite, final List<LibraryImport> imports) {
         if (imports.isEmpty()) {
             return false;
         }
