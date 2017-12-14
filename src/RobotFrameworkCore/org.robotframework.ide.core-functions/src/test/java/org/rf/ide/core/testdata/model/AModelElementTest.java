@@ -11,11 +11,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class AModelElementTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void test_shouldUpdateTypeForNewElement() {
@@ -87,6 +92,15 @@ public class AModelElementTest {
         assertThat(toks.get(0)).isInstanceOf(RobotToken.class);
         assertThat(toks.get(1)).isInstanceOf(RobotToken.class);
         assertThat(toks.get(2)).isEqualTo(toSet);
+    }
+
+    @Test
+    public void exceptionIsThrown_whenInsertValueAtCalled() {
+        thrown.expect(UnsupportedOperationException.class);
+        thrown.expectMessage("Operation not supported for " + this.getClass().getName() + "$AModelElementFake type");
+
+        final AModelElementFake fake = new AModelElementFake();
+        fake.insertValueAt("fakeValue", 0);
     }
 
     private static class AModelElementFake extends AModelElement<Object> {
