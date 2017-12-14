@@ -41,6 +41,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
+        projectProvider.createDir("resources");
         projectProvider.createFile("suite_with_known_libraries.robot",
                 "*** Settings ***",
                 "Library  known1",
@@ -55,25 +56,37 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
                 "Library  unknown_2");
         projectProvider.createFile("suite_with_unknown_library_in_resource.robot",
                 "*** Settings ***",
-                "Resource  resource.robot");
-        projectProvider.createFile("resource.robot",
+                "Resource  resources/resource_with_unknown_library.robot");
+        projectProvider.createFile("resources/resource_with_unknown_library.robot",
                 "*** Settings ***",
                 "Library  unknown");
         projectProvider.createFile("suite_with_unknown_library_in_resources_with_cycle.robot",
                 "*** Settings ***",
-                "Resource  resource_with_cycle_1.robot");
-        projectProvider.createFile("resource_with_cycle_1.robot",
+                "Resource  resources/resource_with_cycle_1.robot");
+        projectProvider.createFile("resources/resource_with_cycle_1.robot",
                 "*** Settings ***",
                 "Resource  resource_with_cycle_2.robot");
-        projectProvider.createFile("resource_with_cycle_2.robot",
+        projectProvider.createFile("resources/resource_with_cycle_2.robot",
                 "*** Settings ***",
                 "Resource  resource_with_cycle_1.robot",
                 "Library  unknown");
+        projectProvider.createFile("suite_with_known_libraries_in_resource.robot",
+                "*** Settings ***",
+                "Library  knownInResource.py",
+                "Resource  resources/resource_with_known_libraries.robot");
+        projectProvider.createFile("resources/resource_with_known_libraries.robot",
+                "*** Settings ***",
+                "Library  ../knownInResource.py");
+        projectProvider.createFile("knownInResource.py");
 
-        final Map<ReferencedLibrary, LibrarySpecification> libs = Libraries.createRefLibs("known1", "known2");
+        final Map<ReferencedLibrary, LibrarySpecification> libs = Libraries.createRefLibs("known1", "known2",
+                "knownInResource");
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        libs.keySet().forEach(config::addReferencedLibrary);
+        libs.keySet().forEach(lib -> {
+            lib.setPath(projectProvider.getProject().getName());
+            config.addReferencedLibrary(lib);
+        });
         projectProvider.configure(config);
         projectProvider.addRobotNature();
 
@@ -206,6 +219,25 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         verify(discoverer).start();
         verifyNoMoreInteractions(discoverer);
+
+        turnOffAutoDiscoveringInProjectConfig();
+    }
+
+    @Test
+    public void autodiscovererIsNotStarted_whenSuiteDoesNotContainUnknownLibraryInResource() {
+        turnOnAutoDiscoveringInProjectConfig();
+
+        final RobotSuiteFile suite = model
+                .createSuiteFile(projectProvider.getFile("suite_with_known_libraries_in_resource.robot"));
+        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+
+        final DiscovererFactory factory = mock(DiscovererFactory.class);
+        when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
+
+        final OnSaveLibrariesAutodiscoveryTrigger trigger = new OnSaveLibrariesAutodiscoveryTrigger(factory);
+        trigger.startLibrariesAutoDiscoveryIfRequired(suite);
+
+        verifyZeroInteractions(discoverer);
 
         turnOffAutoDiscoveringInProjectConfig();
     }
