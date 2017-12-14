@@ -52,15 +52,10 @@ class SaveRedSessionAction extends Action {
                     final boolean shouldOverride = MessageDialog.openQuestion(shell, "File already exist",
                             "The file " + chosenPath.toString() + "already exist. Do you want ot override it?");
                     if (shouldOverride) {
-
-                        final String consoleOutput = console.getDocument().get();
-                        final InputStream source = new ByteArrayInputStream(consoleOutput.getBytes());
-                        file.setContents(source, IResource.NONE, null);
+                        file.setContents(createStream(), IResource.NONE, null);
                     }
                 } else {
-                    final String consoleOutput = console.getDocument().get();
-                    final InputStream source = new ByteArrayInputStream(consoleOutput.getBytes());
-                    file.create(source, IResource.NONE, null);
+                    file.create(createStream(), IResource.NONE, null);
                 }
             } catch (final CoreException e) {
                 MessageDialog.openError(shell, "Unable to save file",
@@ -68,6 +63,11 @@ class SaveRedSessionAction extends Action {
             }
         }
 
+    }
+
+    private InputStream createStream() {
+        final String consoleOutput = console.getDocument().get();
+        return new ByteArrayInputStream(consoleOutput.getBytes());
     }
 
     void dispose() {

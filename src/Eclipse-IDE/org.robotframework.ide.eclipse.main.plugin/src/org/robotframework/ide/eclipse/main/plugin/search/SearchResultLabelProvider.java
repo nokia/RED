@@ -27,15 +27,18 @@ class SearchResultLabelProvider extends RedCommonLabelProvider {
     public StyledString getStyledText(final Object element) {
         if (element instanceof IResource) {
             final IResource resource = (IResource) element;
-            final IWorkbenchAdapter workbenchAdapter = (IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class);
-            final String label = workbenchAdapter.getLabel(resource);
-            return new StyledString(label);
+            final IWorkbenchAdapter workbenchAdapter = resource.getAdapter(IWorkbenchAdapter.class);
+            return new StyledString(workbenchAdapter.getLabel(resource));
+
         } else if (element instanceof Libs) {
             return new StyledString("Libraries");
+
         } else if (element instanceof LibraryWithParent) {
             return ((LibraryWithParent) element).getLabel();
+
         } else if (element instanceof KeywordWithParent) {
             return ((KeywordWithParent) element).getLabel();
+
         } else if (element instanceof DocumentationMatch) {
             return ((DocumentationMatch) element).getStyledLabel();
         }
@@ -46,14 +49,18 @@ class SearchResultLabelProvider extends RedCommonLabelProvider {
     public Image getImage(final Object element) {
         if (element instanceof IResource) {
             final IResource resource = (IResource) element;
-            final IWorkbenchAdapter workbenchAdapter = (IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class);
+            final IWorkbenchAdapter workbenchAdapter = resource.getAdapter(IWorkbenchAdapter.class);
             return ImagesManager.getImage(workbenchAdapter.getImageDescriptor(resource));
+
         } else if (element instanceof Libs) {
             return ImagesManager.getImage(RedImages.getLibraryImage());
+
         } else if (element instanceof LibraryWithParent) {
             return ImagesManager.getImage(RedImages.getBookImage());
+
         } else if (element instanceof KeywordWithParent) {
             return ImagesManager.getImage(RedImages.getKeywordImage());
+
         } else if (element instanceof Match) {
             return ImagesManager.getImage(RedImages.getSearchMarkerImage());
         }
