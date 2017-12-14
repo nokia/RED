@@ -18,6 +18,12 @@ import com.google.common.base.Objects;
 @XmlRootElement(namespace = "org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification")
 public class KeywordSpecification {
 
+    public static KeywordSpecification create(final String name) {
+        final KeywordSpecification spec = new KeywordSpecification();
+        spec.setName(name);
+        return spec;
+    }
+
     private String name;
     private String format;
     private String documentation;

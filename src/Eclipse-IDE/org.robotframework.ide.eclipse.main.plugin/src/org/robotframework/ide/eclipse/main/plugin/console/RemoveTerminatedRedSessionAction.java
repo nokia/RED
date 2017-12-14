@@ -9,6 +9,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleManager;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 
@@ -20,18 +21,26 @@ class RemoveTerminatedRedSessionAction extends Action {
 
     private RedSessionConsole console;
 
+    private final IConsoleManager consoleManager;
+
     RemoveTerminatedRedSessionAction(final RedSessionConsole console) {
+        this(ConsolePlugin.getDefault().getConsoleManager(), console);
+    }
+
+    RemoveTerminatedRedSessionAction(final IConsoleManager consoleManager, final RedSessionConsole console) {
         super("Remove session", IAction.AS_PUSH_BUTTON);
         setImageDescriptor(RedImages.getCloseImage());
         setDisabledImageDescriptor(RedImages.getDisabledCloseImage());
         setEnabled(false);
+
+        this.consoleManager = consoleManager;
         this.console = console;
     }
 
     @Override
     public void run() {
         if (console.isTerminated()) {
-            ConsolePlugin.getDefault().getConsoleManager().removeConsoles(new IConsole[] { console });
+            consoleManager.removeConsoles(new IConsole[] { console });
         }
     }
 

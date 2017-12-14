@@ -5,18 +5,19 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.search;
 
+import static com.google.common.base.Predicates.alwaysTrue;
+import static com.google.common.base.Predicates.notNull;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Lists.transform;
-import static com.google.common.collect.Sets.filter;
-import static com.google.common.collect.Sets.newHashSet;
+import static org.robotframework.red.swt.Listeners.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -30,25 +31,17 @@ import org.eclipse.search.ui.ISearchPage;
 import org.eclipse.search.ui.ISearchPageContainer;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IWorkingSet;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchFor;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchLimitation;
 import org.robotframework.ide.eclipse.main.plugin.search.SearchSettings.SearchTarget;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
 
 /**
  * @author Michal Anglart
@@ -89,12 +82,7 @@ public class RedSearchPage extends DialogPage implements ISearchPage {
         GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
         
         searchText = new Combo(internalParent, SWT.SINGLE | SWT.BORDER);
-        searchText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                searchContainer.setPerformActionEnabled(searchCanBePerformed());
-            }
-        });
+        searchText.addModifyListener(e -> searchContainer.setPerformActionEnabled(searchCanBePerformed()));
         GridDataFactory.fillDefaults().grab(true, false).applyTo(searchText);
 
         caseSensitiveButton = new Button(internalParent, SWT.CHECK);
@@ -122,88 +110,59 @@ public class RedSearchPage extends DialogPage implements ISearchPage {
 
         searchForButtons.put(SearchFor.KEYWORD, new Button(searchForGroup, SWT.RADIO));
         searchForButtons.get(SearchFor.KEYWORD).setText(SearchFor.KEYWORD.getLabel());
-        searchForButtons.get(SearchFor.KEYWORD).addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                for (final Entry<SearchTarget, Button> targetEntry : targetsButtons.entrySet()) {
-                    if (targetEntry.getKey() == SearchTarget.VARIABLE_FILE) {
-                        targetEntry.getValue().setEnabled(false);
-                        targetEntry.getValue().setSelection(false);
-                    } else {
-                        targetEntry.getValue().setEnabled(true);
-                    }
-                }
-                for (final Entry<SearchLimitation, Button> limitEntry : limitToButtons.entrySet()) {
-                    limitEntry.getValue().setEnabled(true);
-                }
-            }
-        });
+        searchForButtons.get(SearchFor.KEYWORD).addSelectionListener(widgetSelectedAdapter(e -> {
+            enableTargetButtons(target -> target != SearchTarget.VARIABLE_FILE);
+            enableLimitButtons(alwaysTrue());
+        }));
 
         searchForButtons.put(SearchFor.TEST_CASE, new Button(searchForGroup, SWT.RADIO));
         searchForButtons.get(SearchFor.TEST_CASE).setText(SearchFor.TEST_CASE.getLabel());
-        searchForButtons.get(SearchFor.TEST_CASE).addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                for (final Entry<SearchTarget, Button> targetEntry : targetsButtons.entrySet()) {
-                    if (targetEntry.getKey() == SearchTarget.SUITE) {
-                        targetEntry.getValue().setEnabled(true);
-                    } else {
-                        targetEntry.getValue().setEnabled(false);
-                        targetEntry.getValue().setSelection(false);
-                    }
-                }
-                for (final Entry<SearchLimitation, Button> limitEntry : limitToButtons.entrySet()) {
-                    limitEntry.getValue().setEnabled(false);
-                    limitEntry.getValue().setSelection(false);
-                }
-                limitToButtons.get(SearchLimitation.ONLY_DECLARATIONS).setEnabled(true);
-                limitToButtons.get(SearchLimitation.ONLY_DECLARATIONS).setSelection(true);
-            }
-        });
+        searchForButtons.get(SearchFor.TEST_CASE).addSelectionListener(widgetSelectedAdapter(e -> {
+            enableTargetButtons(target -> target == SearchTarget.SUITE);
+            enableLimitButtons(limit -> limit == SearchLimitation.ONLY_DECLARATIONS);
+
+            deselectLimitButtons();
+            limitToButtons.get(SearchLimitation.ONLY_DECLARATIONS).setSelection(true);
+        }));
 
         searchForButtons.put(SearchFor.VARIABLE, new Button(searchForGroup, SWT.RADIO));
         searchForButtons.get(SearchFor.VARIABLE).setText(SearchFor.VARIABLE.getLabel());
-        searchForButtons.get(SearchFor.VARIABLE).addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                for (final Entry<SearchTarget, Button> targetEntry : targetsButtons.entrySet()) {
-                    if (targetEntry.getKey() == SearchTarget.STANDARD_LIBRARY
-                            || targetEntry.getKey() == SearchTarget.REFERENCED_LIBRARY) {
-                        targetEntry.getValue().setEnabled(false);
-                        targetEntry.getValue().setSelection(false);
-                    } else {
-                        targetEntry.getValue().setEnabled(true);
-                    }
-                }
-                for (final Entry<SearchLimitation, Button> limitEntry : limitToButtons.entrySet()) {
-                    limitEntry.getValue().setEnabled(true);
-                }
-            }
-        });
+        searchForButtons.get(SearchFor.VARIABLE).addSelectionListener(widgetSelectedAdapter(e -> {
+            enableTargetButtons(
+                    target -> target != SearchTarget.STANDARD_LIBRARY && target != SearchTarget.REFERENCED_LIBRARY);
+            enableLimitButtons(alwaysTrue());
+        }));
 
         searchForButtons.put(SearchFor.DOC_CONTENT, new Button(searchForGroup, SWT.RADIO));
         searchForButtons.get(SearchFor.DOC_CONTENT).setText(SearchFor.DOC_CONTENT.getLabel());
-        searchForButtons.get(SearchFor.DOC_CONTENT).addSelectionListener(new SelectionAdapter() {
+        searchForButtons.get(SearchFor.DOC_CONTENT).addSelectionListener(widgetSelectedAdapter(e -> {
+            enableTargetButtons(target -> target != SearchTarget.VARIABLE_FILE);
+            enableLimitButtons(limit -> limit == SearchLimitation.NO_LIMITS);
 
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                for (final Entry<SearchTarget, Button> targetEntry : targetsButtons.entrySet()) {
-                    if (targetEntry.getKey() == SearchTarget.VARIABLE_FILE) {
-                        targetEntry.getValue().setEnabled(false);
-                        targetEntry.getValue().setSelection(false);
-                    } else {
-                        targetEntry.getValue().setEnabled(true);
-                    }
-                    for (final Entry<SearchLimitation, Button> limitEntry : limitToButtons.entrySet()) {
-                        limitEntry.getValue().setEnabled(false);
-                        limitEntry.getValue().setSelection(false);
-                    }
-                    limitToButtons.get(SearchLimitation.NO_LIMITS).setEnabled(true);
-                    limitToButtons.get(SearchLimitation.NO_LIMITS).setSelection(true);
-                }
+            deselectLimitButtons();
+            limitToButtons.get(SearchLimitation.NO_LIMITS).setSelection(true);
+        }));
+    }
+
+    private void enableTargetButtons(final Predicate<SearchTarget> targetPredicate) {
+        for (final Entry<SearchTarget, Button> targetEntry : targetsButtons.entrySet()) {
+            if (targetPredicate.test(targetEntry.getKey())) {
+                targetEntry.getValue().setEnabled(true);
+            } else {
+                targetEntry.getValue().setEnabled(false);
+                targetEntry.getValue().setSelection(false);
             }
-        });
+        }
+    }
+
+    private void enableLimitButtons(final Predicate<SearchLimitation> limitPredicate) {
+        for (final Entry<SearchLimitation, Button> targetEntry : limitToButtons.entrySet()) {
+            targetEntry.getValue().setEnabled(limitPredicate.test(targetEntry.getKey()));
+        }
+    }
+
+    private void deselectLimitButtons() {
+        limitToButtons.values().forEach(button -> button.setSelection(false));
     }
 
     private void createLimitToGroup(final Composite parent) {
@@ -229,12 +188,8 @@ public class RedSearchPage extends DialogPage implements ISearchPage {
                 SearchTarget.STANDARD_LIBRARY, SearchTarget.REFERENCED_LIBRARY, SearchTarget.VARIABLE_FILE)) {
             targetsButtons.put(target, new Button(searchInGroup, SWT.CHECK));
             targetsButtons.get(target).setText(target.getLabel());
-            targetsButtons.get(target).addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(final SelectionEvent e) {
-                    searchContainer.setPerformActionEnabled(searchCanBePerformed());
-                }
-            });
+            targetsButtons.get(target).addSelectionListener(
+                    widgetSelectedAdapter(e -> searchContainer.setPerformActionEnabled(searchCanBePerformed())));
         }
     }
 
@@ -288,16 +243,13 @@ public class RedSearchPage extends DialogPage implements ISearchPage {
         final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
         switch (searchContainer.getSelectedScope()) {
             case ISearchPageContainer.WORKSPACE_SCOPE:
-                resourcesRoots.addAll(newArrayList(wsRoot.getProjects()));
+                Stream.of(wsRoot.getProjects())
+                    .forEach(project -> resourcesRoots.add(project));
                 break;
             case ISearchPageContainer.SELECTED_PROJECTS_SCOPE:
-                final String[] projects = searchContainer.getSelectedProjectNames();
-                resourcesRoots.addAll(transform(newArrayList(projects), new Function<String, IResource>() {
-                    @Override
-                    public IProject apply(final String projectName) {
-                        return wsRoot.getProject(projectName);
-                    }
-                }));
+                Stream.of(searchContainer.getSelectedProjectNames())
+                    .map(name -> wsRoot.getProject(name))
+                    .forEach(project -> resourcesRoots.add(project));
                 break;
             case ISearchPageContainer.SELECTION_SCOPE:
                 final List<IResource> selectedResources = Selections
@@ -305,18 +257,12 @@ public class RedSearchPage extends DialogPage implements ISearchPage {
                 resourcesRoots.addAll(selectedResources);
                 break;
             case ISearchPageContainer.WORKING_SET_SCOPE:
-                final IWorkingSet[] workingSets = searchContainer.getSelectedWorkingSets();
-                final List<IAdaptable> adaptables = new ArrayList<>();
-                for (final IWorkingSet set : workingSets) {
-                    adaptables.addAll(newArrayList(set.getElements()));
-                }
-                final List<IResource> resources = transform(adaptables, new Function<IAdaptable, IResource>() {
-                    @Override
-                    public IResource apply(final IAdaptable adaptable) {
-                        return (IResource) adaptable.getAdapter(IResource.class);
-                    }
-                });
-                resourcesRoots.addAll(filter(newHashSet(resources), Predicates.notNull()));
+                Stream.of(searchContainer.getSelectedWorkingSets())
+                        .flatMap(set -> (Stream<IAdaptable>) Stream.of(set.getElements()))
+                        .map(adaptable -> adaptable.getAdapter(IResource.class))
+                        .filter(notNull())
+                        .distinct()
+                        .forEach(resource -> resourcesRoots.add(resource));
                 break;
             default:
                 throw new IllegalStateException("Unrecognized search scope was selected");
@@ -332,25 +278,13 @@ public class RedSearchPage extends DialogPage implements ISearchPage {
     }
 
     private boolean searchCanBePerformed() {
-        boolean anyTargetIsChecked = false;
-        for (final Button targetButton : targetsButtons.values()) {
-            if (targetButton.getSelection()) {
-                anyTargetIsChecked = true;
-                break;
-            }
-        }
-
-        return anyTargetIsChecked && !searchText.getText().isEmpty();
+        return !searchText.getText().isEmpty() && targetsButtons.values().stream().anyMatch(Button::getSelection);
     }
 
     @Override
     public boolean performAction() {
         final SearchSettings settings = getInput();
-
-        final SearchSettingsPersister persister = new SearchSettingsPersister();
-        persister.writeSettings(settings);
-
-
+        new SearchSettingsPersister().writeSettings(settings);
         NewSearchUI.runQueryInBackground(new SearchQuery(settings));
         return true;
     }
