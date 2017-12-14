@@ -97,6 +97,78 @@ public class AKeywordBaseSettingTest {
         assertThat(elementTokens.get(2).getTypes()).contains(testable.getArgumentType());
     }
 
+    @Test
+    public void test_ifCellWillBeAdded_atKeywordPosition() {
+        // prepare
+        final RobotToken argToken = RobotToken.create("arg");
+        testable.setKeywordName(argToken);
+
+        // execute
+        testable.insertValueAt("keyword", 1);
+
+        // verify
+        final List<RobotToken> elementTokens = testable.getElementTokens();
+        assertThat(elementTokens).hasSize(3);
+        assertThat(elementTokens.get(0)).isSameAs(decToken);
+        assertThat(elementTokens.get(0).getTypes()).contains(testable.getDeclarationType());
+        assertThat(elementTokens.get(1).getText()).isEqualTo("keyword");
+        assertThat(elementTokens.get(1).getTypes()).contains(testable.getKeywordNameType());
+        assertThat(elementTokens.get(2)).isEqualToComparingFieldByField(argToken);
+        assertThat(elementTokens.get(2).getTypes()).contains(testable.getArgumentType());
+    }
+
+    @Test
+    public void test_ifCellWillBeAdded_atArgumentPosition() {
+        // prepare
+        final RobotToken kwToken = RobotToken.create("kw");
+        final RobotToken argToken = RobotToken.create("arg");
+        testable.setKeywordName(kwToken);
+        testable.addArgument(argToken);
+
+        // execute
+        testable.insertValueAt("argument", 2);
+
+        // verify
+        final List<RobotToken> elementTokens = testable.getElementTokens();
+        assertThat(elementTokens).hasSize(4);
+        assertThat(elementTokens.get(0)).isSameAs(decToken);
+        assertThat(elementTokens.get(0).getTypes()).contains(testable.getDeclarationType());
+        assertThat(elementTokens.get(1)).isSameAs(kwToken);
+        assertThat(elementTokens.get(1).getTypes()).contains(testable.getKeywordNameType());
+        assertThat(elementTokens.get(2).getText()).isEqualTo("argument");
+        assertThat(elementTokens.get(2).getTypes()).contains(testable.getArgumentType());
+        assertThat(elementTokens.get(3)).isEqualToComparingFieldByField(argToken);
+        assertThat(elementTokens.get(3).getTypes()).contains(testable.getArgumentType());
+    }
+
+    @Test
+    public void test_ifCellWillBeAdded_atCommentPosition() {
+        // prepare
+        final RobotToken kwToken = RobotToken.create("kw");
+        final RobotToken argToken = RobotToken.create("arg");
+        final RobotToken cmtToken = RobotToken.create("#cmt");
+        testable.setKeywordName(kwToken);
+        testable.addArgument(argToken);
+        testable.setComment(cmtToken);
+
+        // execute
+        testable.insertValueAt("argument", 3);
+
+        // verify
+        final List<RobotToken> elementTokens = testable.getElementTokens();
+        assertThat(elementTokens).hasSize(5);
+        assertThat(elementTokens.get(0)).isSameAs(decToken);
+        assertThat(elementTokens.get(0).getTypes()).contains(testable.getDeclarationType());
+        assertThat(elementTokens.get(1)).isSameAs(kwToken);
+        assertThat(elementTokens.get(1).getTypes()).contains(testable.getKeywordNameType());
+        assertThat(elementTokens.get(2)).isSameAs(argToken);
+        assertThat(elementTokens.get(2).getTypes()).contains(testable.getArgumentType());
+        assertThat(elementTokens.get(3).getText()).isEqualTo("argument");
+        assertThat(elementTokens.get(3).getTypes()).contains(testable.getArgumentType());
+        assertThat(elementTokens.get(4)).isSameAs(cmtToken);
+        assertThat(elementTokens.get(4).getTypes()).contains(testable.getCommentType());
+    }
+
     private class ADummyKeywordBaseSettingForKeywords extends AKeywordBaseSetting<Object> {
 
         private static final long serialVersionUID = 4570317373970770339L;
@@ -123,6 +195,10 @@ public class AKeywordBaseSettingTest {
         @Override
         public IRobotTokenType getArgumentType() {
             return RobotTokenType.SETTING_SUITE_SETUP_KEYWORD_ARGUMENT;
+        }
+
+        public IRobotTokenType getCommentType() {
+            return RobotTokenType.START_HASH_COMMENT;
         }
 
         @Override
