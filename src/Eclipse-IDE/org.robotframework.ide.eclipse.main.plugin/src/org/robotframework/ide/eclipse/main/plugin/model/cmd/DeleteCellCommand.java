@@ -14,8 +14,8 @@ import org.robotframework.services.event.RedEventBroker;
 
 public class DeleteCellCommand extends EditorCommand {
 
-    final private RobotKeywordCall call;
-    final private int position;
+    private final RobotKeywordCall call;
+    private final int position;
     private EditorCommand executed;
 
     public DeleteCellCommand(RobotKeywordCall call, int position) {

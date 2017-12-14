@@ -148,7 +148,7 @@ public class TestCaseTemplate extends AModelElement<TestCase>
     public void insertValueAt(String value, int position) {
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
-        if (position == 1) { // new timeout
+        if (position == 1) { // new keyword
             fixForTheType(keywordName, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
             unexpectedTrashArguments.add(0, keywordName);
             setKeywordName(tokenToInsert);

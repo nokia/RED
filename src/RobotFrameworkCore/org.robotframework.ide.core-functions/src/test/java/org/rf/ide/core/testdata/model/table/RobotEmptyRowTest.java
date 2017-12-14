@@ -84,4 +84,19 @@ public class RobotEmptyRowTest {
         // verify
         assertThat(row.getComment()).isEmpty();
     }
+
+    @Test
+    public void insertCell_doesNothing() {
+        // prepare
+        final RobotEmptyRow<UserKeyword> row = new RobotEmptyRow<>();
+
+        // execute
+        row.insertValueAt("foo", 0);
+        row.insertValueAt("bar", 1);
+        row.insertValueAt("foobar", 2);
+
+        // verify
+        assertThat(row.getElementTokens()).hasSize(1);
+        assertThat(RobotEmptyRow.isEmpty(row.getElementTokens().get(0).getText())).isTrue();
+    }
 }
