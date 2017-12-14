@@ -9,7 +9,7 @@ RED is modern editor based on Eclipse IDE to provide efficient and comfortable w
 Due to internal changes to support Eclipse Oxygen API, RED Product 0.8.2 **cannot** be upgraded from 0.8.0 and earlier versions. 
 For RED feature installed on Eclipse Neon,please upgrade your Eclipse platform: [https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F](https://wiki.eclipse.org/FAQ_How_do_I_upgrade_Eclipse_IDE%3F)
 
-### Install form Marketplace/Update Site
+### Install from Marketplace/Update Site
 
 Marketplace: Click Help -> Eclipse Marketplace -> and type into Find field "RED"
 Update Site: Click Help -> Install New Software -> Add and set address in Location to:
