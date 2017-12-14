@@ -5,9 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,27 +19,28 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ResourceImportsPathsResolver;
 
 public class LibraryImportCollector {
 
-    public static List<LibraryImport> collectLibraryImportsIncludingNestedResources(final RobotSuiteFile suite) {
+    public static Map<RobotSuiteFile, List<LibraryImport>> collectLibraryImportsIncludingNestedResources(
+            final RobotSuiteFile suite) {
         return collectLibraryImportsIncludingNestedResources(suite, new HashSet<>());
     }
 
-    private static List<LibraryImport> collectLibraryImportsIncludingNestedResources(final RobotSuiteFile suite,
-            final Set<IResource> alreadyVisited) {
+    private static Map<RobotSuiteFile, List<LibraryImport>> collectLibraryImportsIncludingNestedResources(
+            final RobotSuiteFile suite, final Set<IResource> alreadyVisited) {
         final RobotModel model = (RobotModel) suite.getProject().getParent();
 
-        final List<LibraryImport> imports = collectLibraryImports(suite);
+        final Map<RobotSuiteFile, List<LibraryImport>> imports = collectLibraryImports(suite);
         for (final IFile resourceFile : findResourceImportFiles(suite, alreadyVisited)) {
             alreadyVisited.add(resourceFile);
             final RobotSuiteFile resourceSuite = model.createSuiteFile(resourceFile);
-            imports.addAll(collectLibraryImportsIncludingNestedResources(resourceSuite, alreadyVisited));
+            imports.putAll(collectLibraryImportsIncludingNestedResources(resourceSuite, alreadyVisited));
         }
         return imports;
     }
@@ -57,12 +61,18 @@ public class LibraryImportCollector {
         return res != null && res.exists() && res.getType() == IResource.FILE;
     }
 
-    private static List<LibraryImport> collectLibraryImports(final RobotSuiteFile currentModel) {
-        final List<LibraryImport> imports = new ArrayList<>();
-        final Optional<RobotSettingsSection> settingsSection = currentModel.findSection(RobotSettingsSection.class);
-        if (settingsSection.isPresent()) {
-            for (final RobotKeywordCall setting : settingsSection.get().getLibrariesSettings()) {
-                imports.add((LibraryImport) setting.getLinkedElement());
+    private static Map<RobotSuiteFile, List<LibraryImport>> collectLibraryImports(final RobotSuiteFile currentModel) {
+        final Map<RobotSuiteFile, List<LibraryImport>> imports = new HashMap<>();
+        final Optional<RobotSettingsSection> settings = currentModel.findSection(RobotSettingsSection.class);
+        if (settings.isPresent()) {
+            final List<LibraryImport> libraryImports = settings.get()
+                    .getLibrariesSettings()
+                    .stream()
+                    .map(RobotSetting::getLinkedElement)
+                    .map(LibraryImport.class::cast)
+                    .collect(toList());
+            if (!libraryImports.isEmpty()) {
+                imports.put(currentModel, libraryImports);
             }
         }
         return imports;

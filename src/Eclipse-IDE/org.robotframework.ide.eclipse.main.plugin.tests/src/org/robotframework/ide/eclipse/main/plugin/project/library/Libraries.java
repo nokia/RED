@@ -53,7 +53,7 @@ public class Libraries {
 
     public static Map<ReferencedLibrary, LibrarySpecification> createRefLib(final String libName,
             final String... kwNames) {
-        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, libName, libName + ".py");
+        final ReferencedLibrary library = ReferencedLibrary.create(LibraryType.PYTHON, libName, "");
         final LibrarySpecification libSpec = new LibrarySpecification();
         libSpec.setName(libName);
         libSpec.setReferenced(library);
