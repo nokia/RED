@@ -19,6 +19,8 @@ import org.robotframework.ide.eclipse.main.plugin.search.participants.TargetedSe
 import org.robotframework.ide.eclipse.main.plugin.search.participants.TestCaseSearch;
 import org.robotframework.ide.eclipse.main.plugin.search.participants.VariableSearch;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author Michal Anglart
  *
@@ -32,9 +34,14 @@ public class SearchQuery implements ISearchQuery {
     private final RobotModel model;
 
     public SearchQuery(final SearchSettings settings) {
+        this(settings, RedPlugin.getModelManager().getModel());
+    }
+
+    @VisibleForTesting
+    SearchQuery(final SearchSettings settings, final RobotModel model) {
         this.settings = settings;
         this.result = new SearchResult(this);
-        this.model = RedPlugin.getModelManager().getModel();
+        this.model = model;
     }
 
     SearchSettings getSettings() {

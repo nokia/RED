@@ -27,6 +27,15 @@ public class LibrarySpecification {
         return LibrarySpecificationReader.readSpecification(libspecFile).getVersion();
     }
 
+    public static LibrarySpecification create(final String name, final KeywordSpecification... keywords) {
+        final LibrarySpecification spec = new LibrarySpecification();
+        spec.setName(name);
+        for (final KeywordSpecification kw : keywords) {
+            spec.keywords.add(kw);
+        }
+        return spec;
+    }
+
     @XmlTransient
     private IFile sourceFile;
 
