@@ -62,9 +62,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
@@ -206,10 +208,12 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AssistanceLabelAccumulator(dataProvider,
-                        position -> position.getColumnPosition() < dataProvider.getColumnCount() - 1,
+                        position -> 0 < position.getColumnPosition()
+                                && position.getColumnPosition() < dataProvider.getColumnCount() - 1,
                         rowObject -> rowObject instanceof RobotElement),
                 new AlternatingRowConfigLabelAccumulator(),
-                new AddingElementLabelAccumulator(dataProvider));
+                new AddingElementLabelAccumulator(dataProvider),
+                new ImportTypesLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -241,8 +245,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         if (wrapCellContent) {
             gridLayer.addConfiguration(new RedTableResizableRowsBindingsConfiguration());
         }
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(bodySelectionLayer),
-                SettingsTableEditableRule.createEditableRule(fileModel), wrapCellContent));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(), wrapCellContent));
         gridLayer.addConfiguration(new ImportsSettingsEditConfiguration(fileModel, dataProvider, wrapCellContent));
 
         table = theme.configureScrollBars(parent, bodyViewportLayer,
@@ -364,17 +367,12 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         selectionProvider.setSelection(StructuredSelection.EMPTY);
     }
 
-    private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
-        return new NewElementsCreator<RobotElement>() {
-
-            @SuppressWarnings("restriction")
-            @Override
-            public RobotElement createNew(final int addingTokenRowIndex) {
-                SwtThread.asyncExec(() -> new ImportSettingsPopup(site.getShell(), site.getService(IThemeEngine.class),
-                        commandsStack, fileModel, null).open());
-                selectionLayer.clear();
-                return null;
-            }
+    private NewElementsCreator<RobotElement> newElementsCreator() {
+        return addingTokenRowIndex -> {
+            final RobotSettingsSection section = dataProvider.getInput();
+            commandsStack.execute(
+                    new CreateFreshSettingCommand(section, SettingsGroup.LIBRARIES.getName(), new ArrayList<>()));
+            return section.getChildren().get(section.getChildren().size() - 1);
         };
     }
 

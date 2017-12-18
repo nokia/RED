@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedLibraryProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -47,16 +46,17 @@ public abstract class ImportsProposalsProvider implements RedContentProposalProv
         final NatTableAssistantContext tableContext = (NatTableAssistantContext) context;
         if (tableContext.getColumn() == 1 && isValidImportSetting(tableContext.getRow())) {
 
-            final List<? extends AssistProposal> importProposals;
             if (importType == SettingsGroup.LIBRARIES) {
-                importProposals = new RedLibraryProposals(model).getLibrariesProposals(prefix);
-            } else {
-                importProposals = RedFileLocationProposals.create(importType, model).getFilesLocationsProposals(prefix);
+                new RedLibraryProposals(model).getLibrariesProposals(prefix)
+                        .stream()
+                        .map(AssistProposalAdapter::new)
+                        .forEach(adapter -> proposals.add(adapter));
             }
-
-            for (final AssistProposal proposedSetting : importProposals) {
-                proposals.add(new AssistProposalAdapter(proposedSetting));
-            }
+            RedFileLocationProposals.create(importType, model)
+                    .getFilesLocationsProposals(prefix)
+                    .stream()
+                    .map(AssistProposalAdapter::new)
+                    .forEach(adapter -> proposals.add(adapter));
         }
         return proposals.toArray(new RedContentProposal[0]);
     }
