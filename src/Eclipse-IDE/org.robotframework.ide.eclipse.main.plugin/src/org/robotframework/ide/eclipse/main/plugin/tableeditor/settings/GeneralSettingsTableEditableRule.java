@@ -12,13 +12,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.configs.SuiteModelEditableRule;
 
-class SettingsTableEditableRule extends SuiteModelEditableRule {
+class GeneralSettingsTableEditableRule extends SuiteModelEditableRule {
     
     public static IEditableRule createEditableRule(final RobotSuiteFile fileModel) {
-        return new SettingsTableEditableRule(fileModel.isEditable());
+        return new GeneralSettingsTableEditableRule(fileModel.isEditable());
     }
 
-    private SettingsTableEditableRule(final boolean isEditable) {
+    private GeneralSettingsTableEditableRule(final boolean isEditable) {
         super(isEditable);
     }
 
