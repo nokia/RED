@@ -56,6 +56,7 @@ public class SetSettingNameCommand extends EditorCommand {
         } else {
             setting.setGroup(SettingsGroup.NO_GROUP);
         }
+        setting.resetStored();
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_NAME_CHANGE, setting);
     }

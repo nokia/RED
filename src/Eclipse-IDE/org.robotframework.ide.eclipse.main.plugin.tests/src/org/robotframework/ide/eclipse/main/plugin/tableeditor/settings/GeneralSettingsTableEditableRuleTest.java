@@ -13,9 +13,9 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 
-public class SettingsTableEditableRuleTest {
+public class GeneralSettingsTableEditableRuleTest {
 
-    private final IEditableRule editableRule = SettingsTableEditableRule
+    private final IEditableRule editableRule = GeneralSettingsTableEditableRule
             .createEditableRule(new RobotSuiteFileCreator().build());
 
     @Test
