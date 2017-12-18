@@ -1,10 +1,16 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedProposalsProvider;
@@ -43,5 +49,11 @@ class ImportsSettingsEditConfiguration extends AbstractRegistryConfiguration {
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new RedTextCellEditor(proposalProvider, wrapCellContent), DisplayMode.NORMAL,
                 TableConfigurationLabels.ASSIST_REQUIRED);
+
+        final List<String> possibleImports = newArrayList(SettingsGroup.LIBRARIES.getName(),
+                SettingsGroup.RESOURCES.getName(), SettingsGroup.VARIABLES.getName());
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new ComboBoxCellEditor(possibleImports), DisplayMode.NORMAL,
+                ImportTypesLabelAccumulator.IMPORT_TYPE_LABEL);
     }
 }

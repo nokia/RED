@@ -302,7 +302,7 @@ public class ImportsProposalsProviderTest {
     }
 
     @Test
-    public void thereAreLibrariesProposalsProvided_whenInFirstColumnOfLibrarySetting() {
+    public void thereAreLibrariesAsWellAsFilesProposalsProvided_whenInFirstColumnOfLibrarySetting() {
         final Text text = new Text(shellProvider.getShell(), SWT.SINGLE);
         text.setText("abc");
 
@@ -324,9 +324,15 @@ public class ImportsProposalsProviderTest {
 
         final AssistantContext context = new NatTableAssistantContext(1, 0);
         final RedContentProposal[] proposals = provider.getProposals(text.getText(), 1, context);
-        assertThat(proposals).hasSize(1);
+        assertThat(proposals).hasSize(3);
 
         proposals[0].getModificationStrategy().insert(text, proposals[0]);
         assertThat(text.getText()).isEqualTo("aLib");
+
+        proposals[1].getModificationStrategy().insert(text, proposals[1]);
+        assertThat(text.getText()).isEqualTo("a_vars.py");
+
+        proposals[2].getModificationStrategy().insert(text, proposals[2]);
+        assertThat(text.getText()).isEqualTo("b_vars.py");
     }
 }
