@@ -41,9 +41,10 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         final boolean isSetting = keywordCall instanceof RobotDefinitionSetting;
+        final List<String> oldArguments = keywordCall.getArguments();
         final List<String> arguments = prepareArgumentsList(keywordCall, value, index, isSetting);
 
-        if (!arguments.equals(keywordCall.getArguments())) {
+        if (!arguments.equals(oldArguments) || (value == null && "\\".equals(oldArguments.get(index)))) {
             updateModelElement(arguments);
             keywordCall.resetStored();
 
