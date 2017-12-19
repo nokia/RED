@@ -29,8 +29,10 @@ public class DeleteCellCommand extends EditorCommand {
         final int callIndex = call.getIndex();
         final IRobotCodeHoldingElement parent = call.getParent();
         final List<EditorCommand> commands = new ArrayList<>();
+        String topic = RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED;
         if (call instanceof RobotSetting) {
             final RobotSetting selectedSetting = (RobotSetting) call;
+            topic = RobotModelEvents.ROBOT_SETTING_CHANGED;
             if (position > 0) {
                 commands.add(new SetSettingArgumentCommand(selectedSetting, position - 1, null));
             }
@@ -48,8 +50,7 @@ public class DeleteCellCommand extends EditorCommand {
         }
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                .to(parent.getChildren().get(callIndex)).send(
-                        RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
+                .to(parent.getChildren().get(callIndex)).send(topic, parent);
     }
 
     @Override
