@@ -305,11 +305,13 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
-        table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter(hasWrappedCells())));
+        final boolean wrapCells = hasWrappedCells();
+        table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter(wrapCells)));
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
         table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
         table.addConfiguration(new RowHeaderStyleConfiguration(theme));
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
+        table.addConfiguration(new ImportTypesStyleConfiguration(theme, wrapCells));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
     }

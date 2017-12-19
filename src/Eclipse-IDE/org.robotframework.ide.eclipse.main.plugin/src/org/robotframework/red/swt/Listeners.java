@@ -17,6 +17,9 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 
 public class Listeners {
 
@@ -125,6 +128,16 @@ public class Listeners {
 
             @Override
             public void menuShown(final MenuEvent e) {
+                consumer.accept(e);
+            }
+        };
+    }
+
+    public static ShellListener shellClosedAdapter(final Consumer<ShellEvent> consumer) {
+        return new ShellAdapter() {
+
+            @Override
+            public void shellClosed(final ShellEvent e) {
                 consumer.accept(e);
             }
         };
