@@ -49,7 +49,6 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
@@ -452,14 +451,6 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
             decoration.dispose();
             decoration = null;
         }
-    }
-
-    @Inject
-    @Optional
-    private void changeEvent(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE) final String string) {
-        editorInput.refreshProjectConfiguration();
-        setInput();
     }
 
     @Inject
