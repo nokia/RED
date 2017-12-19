@@ -339,7 +339,7 @@ public class DeleteCellCommandTest {
                 assertThat_valueAtPosition_wasDeleted(i, allLabels, callAfter);
                 undo_andAssertThat_valueReturned_afterUndo(command, allLabels, callAfter);
             }
-            verify(eventBroker, times(tokensNumber - 2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+            verify(eventBroker, times(tokensNumber - 2)).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
                     eq(ImmutableMap
                             .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
                                     call)));
@@ -374,7 +374,7 @@ public class DeleteCellCommandTest {
                 assertThat_valueAtPosition_wasDeleted(i, allLabels, callAfter);
                 undo_andAssertThat_valueReturned_afterUndo(command, allLabels, callAfter);
             }
-            verify(eventBroker, times(tokensNumber - 2)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+            verify(eventBroker, times(tokensNumber - 2)).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
                     eq(ImmutableMap
                             .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
                                     call)));
