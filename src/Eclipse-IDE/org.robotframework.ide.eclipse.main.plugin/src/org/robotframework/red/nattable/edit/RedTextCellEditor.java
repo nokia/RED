@@ -58,6 +58,20 @@ public class RedTextCellEditor extends TextCellEditor {
 
     private IContextActivation contextActivation;
 
+    static MoveDirectionEnum getMoveDirection(final EditModeEnum editMode, final KeyEvent event) {
+        if (RedPlugin.getDefault().getPreferences().getCellCommitBehavior() == CellCommitBehavior.STAY_IN_SAME_CELL) {
+            return MoveDirectionEnum.NONE;
+
+        } else if (editMode == EditModeEnum.INLINE) {
+            if (event.stateMask == 0) {
+                return MoveDirectionEnum.RIGHT;
+            } else if (event.stateMask == SWT.SHIFT) {
+                return MoveDirectionEnum.LEFT;
+            }
+        }
+        return MoveDirectionEnum.NONE;
+    }
+
     public RedTextCellEditor(final boolean wrapCellContent) {
         this(0, 0, new DefaultRedCellEditorValueValidator(), null, wrapCellContent);
     }
@@ -186,7 +200,7 @@ public class RedTextCellEditor extends TextCellEditor {
             if (commitOnEnter && (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR)) {
                 final boolean commit = event.stateMask != SWT.ALT;
                 if (commit) {
-                    final boolean committed = commit(getMoveDirection(event));
+                    final boolean committed = commit(getMoveDirection(editMode, event));
                     if (!committed && wrapCellContent) {
                         // when there is multiline Text control we don't want to
                         // have new lines there, so cannot deliver this event to
@@ -194,35 +208,18 @@ public class RedTextCellEditor extends TextCellEditor {
                         event.doit = false;
                     }
                 }
-                if (RedTextCellEditor.this.editMode == EditModeEnum.DIALOG) {
+                if (editMode == EditModeEnum.DIALOG) {
                     parent.forceFocus();
                 }
             } else if (event.keyCode == SWT.ESC && event.stateMask == 0) {
                 close();
-            } else if (RedTextCellEditor.this.editMode == EditModeEnum.INLINE && !wrapCellContent) {
+            } else if (editMode == EditModeEnum.INLINE && !wrapCellContent) {
                 if (event.keyCode == SWT.ARROW_UP) {
                     commit(MoveDirectionEnum.UP);
                 } else if (event.keyCode == SWT.ARROW_DOWN) {
                     commit(MoveDirectionEnum.DOWN);
                 }
             }
-        }
-
-        private MoveDirectionEnum getMoveDirection(final KeyEvent event) {
-            if (RedPlugin.getDefault()
-                    .getPreferences()
-                    .getCellCommitBehavior() == CellCommitBehavior.STAY_IN_SAME_CELL) {
-                return MoveDirectionEnum.NONE;
-            }
-
-            if (RedTextCellEditor.this.editMode == EditModeEnum.INLINE) {
-                if (event.stateMask == 0) {
-                    return MoveDirectionEnum.RIGHT;
-                } else if (event.stateMask == SWT.SHIFT) {
-                    return MoveDirectionEnum.LEFT;
-                }
-            }
-            return MoveDirectionEnum.NONE;
         }
 
         @Override
@@ -249,7 +246,7 @@ public class RedTextCellEditor extends TextCellEditor {
             // under GTK2 when user double-clicks proposal the focus is lost which
             // results in editor closing
             focusListener.handleFocusChanges = false;
-            RedTextCellEditor.this.removeEditorControlListeners();
+            removeEditorControlListeners();
         }
 
         @Override
@@ -268,7 +265,7 @@ public class RedTextCellEditor extends TextCellEditor {
                     focusListener.handleFocusChanges = true;
                 }
             });
-            RedTextCellEditor.this.addEditorControlListeners();
+            addEditorControlListeners();
         }
 
         @Override
