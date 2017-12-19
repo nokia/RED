@@ -343,7 +343,7 @@ public class InsertCellCommandTest {
                 assertThat_valueAtPosition_wasInserted(i, allLabels, callAfter, "");
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
-            verify(eventBroker, times(2 * (tokensNumber - 2))).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+            verify(eventBroker, times(2 * (tokensNumber - 2))).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
                     eq(ImmutableMap
                             .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
                                     call)));
@@ -378,7 +378,7 @@ public class InsertCellCommandTest {
                 assertThat_valueAtPosition_wasInserted(i, allLabels, callAfter, "");
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
-            verify(eventBroker, times(2 * (tokensNumber - 2))).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED),
+            verify(eventBroker, times(2 * (tokensNumber - 2))).send(eq(RobotModelEvents.ROBOT_SETTING_CHANGED),
                     eq(ImmutableMap
                             .<String, Object>of(IEventBroker.DATA, robotImports, RobotModelEvents.ADDITIONAL_DATA,
                                     call)));
