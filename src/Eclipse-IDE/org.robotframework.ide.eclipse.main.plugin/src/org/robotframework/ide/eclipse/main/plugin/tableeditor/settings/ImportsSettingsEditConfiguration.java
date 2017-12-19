@@ -8,7 +8,6 @@ import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
-import org.eclipse.nebula.widgets.nattable.edit.editor.ComboBoxCellEditor;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -19,6 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProp
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.ImportsProposalsProvider.VariableFileLocationsProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.VariableProposalsProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.WithNameElementsProposalsProvider;
+import org.robotframework.red.nattable.edit.RedComboBoxCellEditor;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 
@@ -53,7 +53,7 @@ class ImportsSettingsEditConfiguration extends AbstractRegistryConfiguration {
         final List<String> possibleImports = newArrayList(SettingsGroup.LIBRARIES.getName(),
                 SettingsGroup.RESOURCES.getName(), SettingsGroup.VARIABLES.getName());
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new ComboBoxCellEditor(possibleImports), DisplayMode.NORMAL,
+                new RedComboBoxCellEditor(possibleImports), DisplayMode.NORMAL,
                 ImportTypesLabelAccumulator.IMPORT_TYPE_LABEL);
     }
 }
