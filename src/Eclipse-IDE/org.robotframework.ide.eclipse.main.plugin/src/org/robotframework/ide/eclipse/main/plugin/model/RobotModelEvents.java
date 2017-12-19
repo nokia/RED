@@ -50,10 +50,6 @@ public interface RobotModelEvents {
     
     public static final String ROBOT_SETTING_CHANGED = "robot/model/editor/file/structural/setting/changed";
     
-    public static final String ROBOT_SETTING_IMPORTS_EDIT = "robot/model/editor/file/structural/setting/imports/edit";
-    
-    public static final String ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE = "robot/model/editor/file/structural/setting/library/changed";
-
 
     public static final String ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL = "robot/model/editor/file/structural/keyword/*";
 
