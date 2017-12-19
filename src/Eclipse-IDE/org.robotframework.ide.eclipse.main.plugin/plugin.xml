@@ -1336,11 +1336,6 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.ide.eclipse.editSetting"
-          name="Edit Setting">
-    </command>
-    <command
-          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.formatSource"
           name="Format source">
     </command>
@@ -2694,20 +2689,6 @@
              </reference>
           </and>
        </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.EditSettingsHandler"
-          commandId="org.robotframework.ide.eclipse.editSetting">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.settingsPartIsActiveAndEditable">
-          </reference>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference>
-       </enabledWhen>
     </handler>
 
  </extension>
@@ -4386,12 +4367,6 @@
              name="navigation"
              visible="true">
        </separator>
-       <command
-             commandId="org.robotframework.ide.eclipse.editSetting"
-             label="Edit"
-             icon="resources/edit.png"
-             style="push">
-       </command>
        <command
              commandId="org.robotframework.ide.eclipse.showInSource"
              label="Show in source"

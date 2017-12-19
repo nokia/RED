@@ -15,7 +15,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
-import org.eclipse.e4.ui.css.swt.theme.IThemeEngine;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -82,7 +81,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
@@ -108,7 +106,6 @@ import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConf
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
-import org.robotframework.red.swt.SwtThread;
 import org.robotframework.services.event.Events;
 
 import com.google.common.base.Function;
@@ -547,15 +544,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         if (fileModel == this.fileModel) {
             table.refresh();
         }
-    }
-
-    @SuppressWarnings("restriction")
-    @Inject
-    @Optional
-    private void whenSettingIsEdited(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT) final RobotSetting setting) {
-        SwtThread.asyncExec(() -> new ImportSettingsPopup(site.getShell(), site.getService(IThemeEngine.class),
-                commandsStack, fileModel, setting).open());
     }
 
     private void refreshTable() {
