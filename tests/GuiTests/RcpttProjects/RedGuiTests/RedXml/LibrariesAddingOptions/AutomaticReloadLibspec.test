@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.2.0.201706152316
-Save-Time: 12/12/17 11:43 AM
+Save-Time: 12/15/17 1:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -203,10 +203,11 @@ with [get-editor "here_is_class.py" | get-text-viewer] {
 }
 
 // check that lib is generated
-get-view "Project Explorer" | get-tree 
-    | get-item "NewProject/Robot Referenced libraries/here_is_class.Dog NewProject \\(1\\)/Lessie" 
-    | get-property index | equals 0 | verify-true
-    
+try -times 3 -delay 500 -command{
+	get-view "Project Explorer" | get-tree 
+	    | get-item "NewProject/Robot Referenced libraries/here_is_class.Dog NewProject \\(1\\)/Lessie" 
+	    | get-property index | equals 0 | verify-true
+}    
 // add file with import    
 get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
 set-dialog-result File "platform:/resource/NewProject/imports/test.py"
