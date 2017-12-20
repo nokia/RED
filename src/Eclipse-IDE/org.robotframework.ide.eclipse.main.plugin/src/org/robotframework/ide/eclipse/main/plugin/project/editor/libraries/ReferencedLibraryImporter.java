@@ -17,11 +17,9 @@ import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
@@ -45,7 +43,7 @@ import org.robotframework.red.jface.dialogs.DetailedErrorDialog;
 /**
  * @author Michal Anglart
  */
-public class ReferencedLibraryImporter {
+public class ReferencedLibraryImporter implements IReferencedLibraryImporter {
 
     private final Shell shell;
 
@@ -53,12 +51,14 @@ public class ReferencedLibraryImporter {
         this.shell = shell;
     }
 
+    @Override
     public Collection<ReferencedLibrary> importPythonLib(final RobotRuntimeEnvironment environment,
             final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
         final ILibraryStructureBuilder builder = new PythonLibStructureBuilder(environment, config, project);
         return importLib(builder, fullLibraryPath, RedImages.getPythonLibraryImage());
     }
 
+    @Override
     public Collection<ReferencedLibrary> importJavaLib(final RobotRuntimeEnvironment environment,
             final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
         final ILibraryStructureBuilder builder = new JarStructureBuilder(environment, config, project);
@@ -74,16 +74,12 @@ public class ReferencedLibraryImporter {
             final String fullLibraryPath, final ImageDescriptor libImageDescriptor) {
         final List<ILibraryClass> libClasses = new ArrayList<>();
         try {
-            PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-
-                @Override
-                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
-                    try {
-                        libClasses.addAll(builder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
-                    } catch (final RobotEnvironmentException | URISyntaxException e) {
-                        throw new InvocationTargetException(e);
-                    }
+            PlatformUI.getWorkbench().getProgressService().busyCursorWhile(monitor -> {
+                monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
+                try {
+                    libClasses.addAll(builder.provideEntriesFromFile(RedURI.fromString(fullLibraryPath)));
+                } catch (final RobotEnvironmentException | URISyntaxException e) {
+                    throw new InvocationTargetException(e);
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {

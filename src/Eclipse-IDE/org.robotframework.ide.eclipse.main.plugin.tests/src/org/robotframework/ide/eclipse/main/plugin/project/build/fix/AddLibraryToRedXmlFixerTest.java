@@ -22,8 +22,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.SimpleLibrariesAutoDiscoverer;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class AddLibraryToRedXmlFixerTest {
@@ -41,7 +41,7 @@ public class AddLibraryToRedXmlFixerTest {
 
     @Test
     public void autodiscovererIsStarted_whenLibraryIsNotFound() throws Exception {
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final SimpleLibrariesAutoDiscoverer discoverer = mock(SimpleLibrariesAutoDiscoverer.class);
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
 
