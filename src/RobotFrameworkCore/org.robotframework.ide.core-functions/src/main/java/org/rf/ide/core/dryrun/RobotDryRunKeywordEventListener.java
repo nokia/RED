@@ -10,24 +10,24 @@ import java.util.function.Consumer;
 
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
+import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
-import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 
 public class RobotDryRunKeywordEventListener extends RobotDefaultAgentEventListener {
 
     private final RobotDryRunKeywordSourceCollector dryRunKeywordSourceCollector;
 
-    private final Consumer<String> startSuiteHandler;
+    private final Consumer<String> libNameHandler;
 
     public RobotDryRunKeywordEventListener(final RobotDryRunKeywordSourceCollector dryRunKeywordSourceCollector,
-            final Consumer<String> startSuiteHandler) {
+            final Consumer<String> libNameHandler) {
         this.dryRunKeywordSourceCollector = dryRunKeywordSourceCollector;
-        this.startSuiteHandler = startSuiteHandler;
+        this.libNameHandler = libNameHandler;
     }
 
     @Override
-    public void handleSuiteStarted(final SuiteStartedEvent event) {
-        startSuiteHandler.accept(event.getName());
+    public void handleLibraryImport(final LibraryImportEvent event) {
+        libNameHandler.accept(event.getName());
     }
 
     @Override

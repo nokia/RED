@@ -5,20 +5,22 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
@@ -34,15 +36,11 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImportCollector;
-import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotPathsNaming;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesConfigUpdater;
@@ -52,20 +50,14 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarSt
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
 import org.robotframework.red.swt.SwtThread;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
-import com.google.common.io.Files;
-
 /**
  * @author mmarzec
  */
-public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
+public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
 
     private static final int VIRTUAL_ENV_SEARCH_DEPTH = 1;
 
     private final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler;
-
-    private final Optional<String> libraryNameToDiscover;
 
     private final RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
 
@@ -75,26 +67,10 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 .syncExec(() -> new LibrariesAutoDiscovererWindow(parent, libraryImports).open());
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites) {
-        this(robotProject, suites, defaultSummaryHandler(), null);
-    }
-
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
-            final String libraryNameToDiscover) {
-        this(robotProject, suites, defaultSummaryHandler(), libraryNameToDiscover);
-    }
-
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
+    LibrariesAutoDiscoverer(final RobotProject robotProject,
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler) {
-        this(robotProject, suites, summaryHandler, null);
-    }
-
-    @VisibleForTesting
-    LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<RobotSuiteFile> suites,
-            final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler, final String libraryNameToDiscover) {
-        super(robotProject, new DryRunTargetsCollector(suites));
+        super(robotProject);
         this.summaryHandler = summaryHandler;
-        this.libraryNameToDiscover = Optional.ofNullable(Strings.emptyToNull(libraryNameToDiscover));
         this.dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(
                 robotProject.getStandardLibraries().keySet());
     }
@@ -107,11 +83,15 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 @Override
                 public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
                     try {
+                        prepareDiscovering(monitor);
+                        if (monitor.isCanceled()) {
+                            return Status.CANCEL_STATUS;
+                        }
                         startDiscovering(monitor);
                         if (monitor.isCanceled()) {
                             return Status.CANCEL_STATUS;
                         }
-                        final List<RobotDryRunLibraryImport> libraryImports = getLibraryImportsToProcess();
+                        final List<RobotDryRunLibraryImport> libraryImports = getImportedLibraries();
                         startAddingLibrariesToProjectConfiguration(monitor, libraryImports);
                         summaryHandler.accept(libraryImports);
                     } catch (final CoreException e) {
@@ -138,35 +118,38 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         return null;
     }
 
+    abstract void prepareDiscovering(IProgressMonitor monitor) throws CoreException;
+
+    List<RobotDryRunLibraryImport> getImportedLibraries() {
+        return dryRunLibraryImportCollector.getImportedLibraries();
+    }
+
     @Override
-    EnvironmentSearchPaths collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment)
-            throws CoreException {
-        final LibrariesSourcesCollector librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
-        if (!runtimeEnvironment.isVirtualenv()
+    RobotDryRunLibraryEventListener createDryRunCollectorEventListener(final Consumer<String> libNameHandler) {
+        return new RobotDryRunLibraryEventListener(dryRunLibraryImportCollector, libNameHandler);
+    }
+
+    @Override
+    void startDryRunClient(final int port, final String dataSourcePath) throws CoreException {
+        final LibrariesSourcesCollector sourcesCollector = new LibrariesSourcesCollector(robotProject);
+        if (!robotProject.getRuntimeEnvironment().isVirtualenv()
                 || RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()) {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources();
+            sourcesCollector.collectPythonAndJavaLibrariesSources();
         } else {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(VIRTUAL_ENV_SEARCH_DEPTH);
+            sourcesCollector.collectPythonAndJavaLibrariesSources(VIRTUAL_ENV_SEARCH_DEPTH);
         }
-        return librariesSourcesCollector.getEnvironmentSearchPaths();
+        final EnvironmentSearchPaths additionalPaths = sourcesCollector.getEnvironmentSearchPaths();
+
+        // FIXME: remove not necessary parameters
+        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, newArrayList(), newArrayList(),
+                newArrayList(dataSourcePath), additionalPaths);
     }
 
-    @Override
-    RobotDryRunLibraryEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
-        return new RobotDryRunLibraryEventListener(dryRunLibraryImportCollector, startSuiteHandler);
-    }
-
-    private List<RobotDryRunLibraryImport> getLibraryImportsToProcess() {
-        final List<RobotDryRunLibraryImport> libraryImports = dryRunLibraryImportCollector.getImportedLibraries();
-        if (libraryNameToDiscover.isPresent()) {
-            for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
-                if (libraryImport.getName().equalsIgnoreCase(libraryNameToDiscover.get())) {
-                    return Collections.singletonList(libraryImport);
-                }
-            }
-            return Collections.emptyList();
-        }
-        return libraryImports;
+    void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> collection) {
+        final Collection<URI> importersPaths = collection.stream()
+                .map(suite -> suite.getFile().getLocation().toFile().toURI())
+                .collect(toList());
+        libraryImport.setImportersPaths(importersPaths);
     }
 
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor,
@@ -190,61 +173,6 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
     }
 
-    private static class DryRunTargetsCollector implements IDryRunTargetsCollector {
-
-        private final Collection<RobotSuiteFile> suites;
-
-        private final Set<String> suiteNames = new LinkedHashSet<>();
-
-        private final Set<String> dataSourcePaths = new LinkedHashSet<>();
-
-        DryRunTargetsCollector(final Collection<RobotSuiteFile> suites) {
-            this.suites = suites;
-        }
-
-        @Override
-        public void collectSuiteNamesAndDataSourcePaths(final RobotProject robotProject) {
-            final IPath projectLocation = robotProject.getProject().getLocation();
-            if (projectLocation != null) {
-                dataSourcePaths.add(projectLocation.toFile().getAbsolutePath());
-            }
-            final List<String> resourcesPaths = new ArrayList<>();
-            for (final RobotSuiteFile suite : suites) {
-                if (suite.isResourceFile()) {
-                    final IPath filePath = RedWorkspace.Paths
-                            .toWorkspaceRelativeIfPossible(suite.getFile().getProjectRelativePath());
-                    resourcesPaths.add(filePath.toString());
-                } else if (suite.getFile().isLinked(IResource.CHECK_ANCESTORS)) {
-                    final Optional<File> linkedSuiteFile = Optional.ofNullable(suite.getFile().getLocation())
-                            .map(IPath::toFile)
-                            .filter(File::exists);
-                    linkedSuiteFile.ifPresent(file -> {
-                        suiteNames.add(
-                                file.getParentFile().getName() + "." + Files.getNameWithoutExtension(file.getPath()));
-                        dataSourcePaths.add(file.getParentFile().getAbsolutePath());
-                    });
-                } else {
-                    suiteNames.add(RobotPathsNaming.createSuiteName(suite.getFile()));
-                }
-            }
-            final Optional<File> tempSuiteFile = RobotDryRunTemporarySuites.createResourceImportFile(resourcesPaths);
-            tempSuiteFile.ifPresent(file -> {
-                suiteNames.add(file.getParentFile().getName() + "." + Files.getNameWithoutExtension(file.getPath()));
-                dataSourcePaths.add(file.getParentFile().getAbsolutePath());
-            });
-        }
-
-        @Override
-        public List<String> getSuiteNames() {
-            return new ArrayList<>(suiteNames);
-        }
-
-        @Override
-        public List<String> getDataSourcePaths() {
-            return new ArrayList<>(dataSourcePaths);
-        }
-    }
-
     private static class ImportedLibrariesConfigUpdater extends LibrariesConfigUpdater {
 
         ImportedLibrariesConfigUpdater(final RobotProject robotProject) {
@@ -252,10 +180,10 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
 
         List<RobotDryRunLibraryImport> getLibraryImportsToAdd(final List<RobotDryRunLibraryImport> libraryImports) {
-            final List<String> existingLibraryNames = new ArrayList<>();
-            for (final ReferencedLibrary existingLibrary : config.getLibraries()) {
-                existingLibraryNames.add(existingLibrary.getName());
-            }
+            final Set<String> existingLibraryNames = config.getLibraries()
+                    .stream()
+                    .map(ReferencedLibrary::getName)
+                    .collect(toSet());
 
             final List<RobotDryRunLibraryImport> result = new ArrayList<>();
             for (final RobotDryRunLibraryImport libraryImport : libraryImports) {
@@ -267,6 +195,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                     }
                 }
             }
+            result.sort((import1, import2) -> import1.getName().compareToIgnoreCase(import2.getName()));
             return result;
         }
 
@@ -305,7 +234,7 @@ public class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
                 final EnvironmentSearchPaths envSearchPaths = new RedEclipseProjectConfig(config)
                         .createEnvironmentSearchPaths(robotProject.getProject());
                 return robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(), envSearchPaths);
-            } catch (final RobotEnvironmentException e1) {
+            } catch (final RobotEnvironmentException e) {
                 return Optional.empty();
             }
         }
