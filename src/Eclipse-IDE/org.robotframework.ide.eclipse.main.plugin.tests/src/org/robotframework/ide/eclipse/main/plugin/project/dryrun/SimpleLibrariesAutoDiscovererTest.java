@@ -10,6 +10,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus.ADDED;
+import static org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus.NOT_ADDED;
 import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryImports.createImport;
 import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryImports.hasLibImports;
 
@@ -25,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
-import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -48,15 +49,17 @@ public class SimpleLibrariesAutoDiscovererTest {
 
     @BeforeClass
     public static void beforeClass() throws Exception {
-        projectProvider.createFile("TestLib.py", "def kw():", " pass");
+        projectProvider.createFile("CorrectLib.py", "def kw():", " pass");
+        projectProvider.createFile("CorrectLibWithClasses.py", "class ClassA(object):", "  def kw():", "   pass",
+                "class ClassB(object):", "  def kw():", "   pass", "class ClassC(object):", "  def kw():", "   pass");
+        projectProvider.createFile("ErrorLib.py", "error():");
 
         // this should not be found in any case
         projectProvider.createFile("notUsedLib.py", "def kw():", " pass");
         projectProvider.createFile("notUsedTest.robot",
                 "*** Settings ***",
                 "Library  notUsedLib.py",
-                "*** Test Cases ***",
-                "  case 1");
+                "*** Test Cases ***");
     }
 
     @Before
@@ -76,18 +79,55 @@ public class SimpleLibrariesAutoDiscovererTest {
     public void libsAreAddedToProjectConfig_whenExistingLibIsFound() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
                 "*** Settings ***",
-                "Library  TestLib.py",
+                "Library  CorrectLib",
                 "*** Test Cases ***"));
 
         final SimpleLibrariesAutoDiscoverer discoverer = new SimpleLibrariesAutoDiscoverer(robotProject, suite,
-                "TestLib", summaryHandler);
+                "CorrectLib", summaryHandler);
         discoverer.start().join();
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(
-                ReferencedLibrary.create(LibraryType.PYTHON, "TestLib", projectProvider.getProject().getName()));
+                ReferencedLibrary.create(LibraryType.PYTHON, "CorrectLib", projectProvider.getProject().getName()));
 
-        verify(summaryHandler).accept(argThat(hasLibImports(createImport(DryRunLibraryImportStatus.ADDED, "TestLib",
-                projectProvider.getFile("TestLib.py"), newHashSet(suite.getFile())))));
+        verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLib",
+                projectProvider.getFile("CorrectLib.py"), newHashSet(suite.getFile())))));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
+    public void libsAreAddedToProjectConfig_whenExistingLibIsFoundByQualifiedName() throws Exception {
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  CorrectLibWithClasses.ClassB",
+                "*** Test Cases ***"));
+
+        final SimpleLibrariesAutoDiscoverer discoverer = new SimpleLibrariesAutoDiscoverer(robotProject, suite,
+                "CorrectLibWithClasses.ClassB", summaryHandler);
+        discoverer.start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(ReferencedLibrary
+                .create(LibraryType.PYTHON, "CorrectLibWithClasses.ClassB", projectProvider.getProject().getName()));
+
+        verify(summaryHandler).accept(argThat(hasLibImports(createImport(ADDED, "CorrectLibWithClasses.ClassB",
+                projectProvider.getFile("CorrectLibWithClasses.py"), newHashSet(suite.getFile())))));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
+    public void nothingIsAddedToProjectConfig_whenExistingLibContainsError() throws Exception {
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  ErrorLib",
+                "*** Test Cases ***"));
+
+        final SimpleLibrariesAutoDiscoverer discoverer = new SimpleLibrariesAutoDiscoverer(robotProject, suite,
+                "ErrorLib", summaryHandler);
+        discoverer.start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
+
+        verify(summaryHandler)
+                .accept(argThat(hasLibImports(createImport(NOT_ADDED, "ErrorLib", newHashSet(suite.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
 
@@ -95,7 +135,7 @@ public class SimpleLibrariesAutoDiscovererTest {
     public void nothingIsAddedToProjectConfig_whenNotExistingLibIsNotFound() throws Exception {
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
                 "*** Settings ***",
-                "Library  NotExistingLib.py",
+                "Library  NotExistingLib",
                 "*** Test Cases ***"));
 
         final SimpleLibrariesAutoDiscoverer discoverer = new SimpleLibrariesAutoDiscoverer(robotProject, suite,
@@ -104,8 +144,8 @@ public class SimpleLibrariesAutoDiscovererTest {
 
         assertThat(robotProject.getRobotProjectConfig().getLibraries()).isEmpty();
 
-        verify(summaryHandler).accept(argThat(hasLibImports(
-                createImport(DryRunLibraryImportStatus.NOT_ADDED, "NotExistingLib", newHashSet(suite.getFile())))));
+        verify(summaryHandler)
+                .accept(argThat(hasLibImports(createImport(NOT_ADDED, "NotExistingLib", newHashSet(suite.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
 }

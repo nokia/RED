@@ -85,14 +85,15 @@ public class CombinedLibrariesAutoDiscovererTest {
         projectProvider.createFile("other/dir/OtherPathLib.py", "def kw():", " pass");
         projectProvider.createFile("module/__init__.py", "class module(object):", "  def kw():", "   pass");
         projectProvider.createFile("libs/ErrorLib.py", "error():");
+        projectProvider.createFile("libs/LibWithClasses.py", "class ClassA(object):", "  def kw():", "   pass",
+                "class ClassB(object):", "  def kw():", "   pass", "class ClassC(object):", "  def kw():", "   pass");
 
-        // this should not be found in any cases
+        // this should not be found in any case
         projectProvider.createFile("notUsedLib.py", "def kw():", " pass");
         projectProvider.createFile("notUsedTest.robot",
                 "*** Settings ***",
                 "Library  notUsedLib.py",
-                "*** Test Cases ***",
-                "  case 1");
+                "*** Test Cases ***");
     }
 
     @Before
@@ -322,6 +323,44 @@ public class CombinedLibrariesAutoDiscovererTest {
                 createImport(ADDED, "module", projectProvider.getFile("module/__init__.py"),
                         newHashSet(suite1.getFile(), suite3.getFile())),
                 createImport(NOT_ADDED, "NotExisting.py", newHashSet(suite2.getFile(), suite3.getFile())))));
+        verifyNoMoreInteractions(summaryHandler);
+    }
+
+    @Test
+    public void libsAreAddedToProjectConfig_whenQualifiedNamesAreUsed() throws Exception {
+        final RobotProjectConfig config = new RobotProjectConfig();
+        config.setPythonPath(newArrayList(SearchPath.create(projectProvider.getDir("libs").getLocation().toString())));
+        projectProvider.configure(config);
+
+        final RobotSuiteFile suite1 = model.createSuiteFile(projectProvider.createFile("suite1.robot",
+                "*** Settings ***",
+                "Library  LibWithClasses.ClassA",
+                "Library  LibWithClasses.ClassC",
+                "*** Test Cases ***"));
+        final RobotSuiteFile suite2 = model.createSuiteFile(projectProvider.createFile("suite2.robot",
+                "*** Settings ***",
+                "Library  LibWithClasses.ClassA",
+                "Library  LibWithClasses.ClassB",
+                "Library  NotExisting.ClassName",
+                "*** Test Cases ***"));
+
+        final CombinedLibrariesAutoDiscoverer discoverer = new CombinedLibrariesAutoDiscoverer(robotProject,
+                newArrayList(suite1, suite2), summaryHandler);
+        discoverer.start().join();
+
+        assertThat(robotProject.getRobotProjectConfig().getLibraries()).containsExactly(
+                ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassA", PROJECT_NAME + "/libs"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassB", PROJECT_NAME + "/libs"),
+                ReferencedLibrary.create(LibraryType.PYTHON, "LibWithClasses.ClassC", PROJECT_NAME + "/libs"));
+
+        verify(summaryHandler).accept(argThat(hasLibImports(
+                createImport(ADDED, "LibWithClasses.ClassA", projectProvider.getFile("libs/LibWithClasses.py"),
+                        newHashSet(suite1.getFile(), suite2.getFile())),
+                createImport(ADDED, "LibWithClasses.ClassB", projectProvider.getFile("libs/LibWithClasses.py"),
+                        newHashSet(suite2.getFile())),
+                createImport(ADDED, "LibWithClasses.ClassC", projectProvider.getFile("libs/LibWithClasses.py"),
+                        newHashSet(suite1.getFile())),
+                createImport(NOT_ADDED, "NotExisting.ClassName", newHashSet(suite2.getFile())))));
         verifyNoMoreInteractions(summaryHandler);
     }
 
