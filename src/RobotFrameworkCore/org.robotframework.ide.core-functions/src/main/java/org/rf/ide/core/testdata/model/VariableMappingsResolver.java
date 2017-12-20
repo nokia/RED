@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,16 +19,25 @@ class VariableMappingsResolver {
 
     private static final Pattern SCALAR_PATTERN = Pattern.compile("\\$\\{[^\\$\\{}]+}");
 
-    static Map<String, String> resolve(final List<VariableMapping> variableMappings) {
-        final Map<String, String> resolvedVariables = new HashMap<>();
+    static Map<String, String> resolve(final List<VariableMapping> variableMappings,
+            final File projectLocation) {
+        final Map<String, String> resolvedMappings = new HashMap<>();
+        resolvedMappings.put("${/}", File.separator);
+        resolvedMappings.put("${curdir}", ".");
+        resolvedMappings.put("${space}", " ");
+        if (projectLocation != null) {
+            resolvedMappings.put("${execdir}", projectLocation.getAbsolutePath());
+            resolvedMappings.put("${outputdir}", projectLocation.getAbsolutePath());
+        }
+
         for (final VariableMapping mapping : variableMappings) {
             if (isScalarDefinition(mapping.getName())) {
                 final String unifiedName = VariableNamesSupport.extractUnifiedVariableName(mapping.getName());
-                final String resolvedValue = replaceKnownScalarVariables(mapping.getValue(), resolvedVariables);
-                resolvedVariables.put(unifiedName, resolvedValue);
+                final String resolvedValue = replaceKnownScalarVariables(mapping.getValue(), resolvedMappings);
+                resolvedMappings.put(unifiedName, resolvedValue);
             }
         }
-        return resolvedVariables;
+        return resolvedMappings;
     }
 
     private static boolean isScalarDefinition(final String name) {

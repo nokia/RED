@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
@@ -65,18 +66,9 @@ public class RobotProjectHolder {
     }
 
     private void initVariableMappings(final File projectLocation) {
-        final Map<String, String> knownVariables = new HashMap<>();
-        knownVariables.put("${/}", File.separator);
-        knownVariables.put("${curdir}", ".");
-        knownVariables.put("${space}", " ");
-        if (projectLocation != null) {
-            knownVariables.put("${execdir}", projectLocation.getAbsolutePath());
-            knownVariables.put("${outputdir}", projectLocation.getAbsolutePath());
-        }
-        if (currentConfiguration != null) {
-            knownVariables.putAll(VariableMappingsResolver.resolve(currentConfiguration.getVariableMappings()));
-        }
-        variableMappings = knownVariables;
+        final List<VariableMapping> mappings = currentConfiguration == null ? new ArrayList<>()
+                : currentConfiguration.getVariableMappings();
+        variableMappings = VariableMappingsResolver.resolve(mappings, projectLocation);
     }
 
     public RobotRuntimeEnvironment getRobotRuntime() {
