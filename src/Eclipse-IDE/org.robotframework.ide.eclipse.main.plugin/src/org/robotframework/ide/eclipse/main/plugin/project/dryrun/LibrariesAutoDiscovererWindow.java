@@ -316,7 +316,9 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 .map(File::new)
                 .map(File::getAbsolutePath)
                 .collect(toList());
-        if (importersPaths.size() == 1) {
+        if (importersPaths.isEmpty()) {
+            children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, "Unknown"));
+        } else if (importersPaths.size() == 1) {
             children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, importersPaths.get(0), true));
         } else {
             children.add(new DryRunLibraryImportListChildElement(IMPORTERS_ELEMENT_NAME, importersPaths));

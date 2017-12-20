@@ -5,11 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
-import java.io.File;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.CoreException;
@@ -21,13 +22,9 @@ import org.eclipse.swt.widgets.Display;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordEventListener;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSource;
 import org.rf.ide.core.dryrun.RobotDryRunKeywordSourceCollector;
-import org.rf.ide.core.dryrun.RobotDryRunTemporarySuites;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-
-import com.google.common.io.Files;
 
 /**
  * @author bembenek
@@ -37,7 +34,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     private final RobotDryRunKeywordSourceCollector dryRunLKeywordSourceCollector;
 
     public KeywordsAutoDiscoverer(final RobotProject robotProject) {
-        super(robotProject, new DryRunTargetsCollector());
+        super(robotProject);
         this.dryRunLKeywordSourceCollector = new RobotDryRunKeywordSourceCollector();
     }
 
@@ -69,14 +66,28 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
     }
 
     @Override
-    EnvironmentSearchPaths collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment)
-            throws CoreException {
-        return new EnvironmentSearchPaths(robotProject.getClasspath(), robotProject.getPythonpath());
+    void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException {
+        final Set<String> libraryNames = new HashSet<>();
+        libraryNames.addAll(robotProject.getStandardLibraries().keySet());
+        for (final ReferencedLibrary referencedLibrary : robotProject.getReferencedLibraries().keySet()) {
+            libraryNames.add(referencedLibrary.getName());
+        }
+        startDryRunDiscovering(monitor, libraryNames);
     }
 
     @Override
-    RobotDryRunKeywordEventListener createDryRunCollectorEventListener(final Consumer<String> startSuiteHandler) {
-        return new RobotDryRunKeywordEventListener(dryRunLKeywordSourceCollector, startSuiteHandler);
+    RobotDryRunKeywordEventListener createDryRunCollectorEventListener(final Consumer<String> libNameHandler) {
+        return new RobotDryRunKeywordEventListener(dryRunLKeywordSourceCollector, libNameHandler);
+    }
+
+    @Override
+    void startDryRunClient(final int port, final String dataSourcePath) throws CoreException {
+        final EnvironmentSearchPaths additionalPaths = new EnvironmentSearchPaths(robotProject.getClasspath(),
+                robotProject.getPythonpath());
+
+        // FIXME: remove not necessary parameters
+        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, newArrayList(), newArrayList(),
+                newArrayList(dataSourcePath), additionalPaths);
     }
 
     private void startAddingKeywordsToProject(final IProgressMonitor monitor,
@@ -92,39 +103,4 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
         }
     }
 
-    private static class DryRunTargetsCollector implements IDryRunTargetsCollector {
-
-        private final List<String> suiteNames = new ArrayList<>();
-
-        private final List<String> dataSourcePaths = new ArrayList<>();
-
-        @Override
-        public void collectSuiteNamesAndDataSourcePaths(final RobotProject robotProject) {
-            final List<String> libraryNames = collectLibraryNames(robotProject);
-            final Optional<File> tempSuiteFile = RobotDryRunTemporarySuites.createLibraryImportFile(libraryNames);
-            tempSuiteFile.ifPresent(file -> {
-                suiteNames.add(file.getParentFile().getName() + "." + Files.getNameWithoutExtension(file.getPath()));
-                dataSourcePaths.add(file.getParentFile().getAbsolutePath());
-            });
-        }
-
-        private List<String> collectLibraryNames(final RobotProject robotProject) {
-            final List<String> libraryNames = new ArrayList<>();
-            libraryNames.addAll(robotProject.getStandardLibraries().keySet());
-            for (final ReferencedLibrary referencedLibrary : robotProject.getReferencedLibraries().keySet()) {
-                libraryNames.add(referencedLibrary.getName());
-            }
-            return libraryNames;
-        }
-
-        @Override
-        public List<String> getSuiteNames() {
-            return suiteNames;
-        }
-
-        @Override
-        public List<String> getDataSourcePaths() {
-            return dataSourcePaths;
-        }
-    }
 }
