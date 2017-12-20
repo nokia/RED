@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.dryrun;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -15,46 +14,28 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
-import org.rf.ide.core.execution.agent.event.SuiteStartedEvent;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RobotDryRunLibraryEventListenerTest {
-
-    @Mock
-    private Consumer<String> startSuiteHandler;
 
     @Mock
     private RobotDryRunLibraryImportCollector libImportCollector;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
-
-    @Test
-    public void suiteStartingEventIsHandled() throws Exception {
-        final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
-                startSuiteHandler);
-
-        listener.handleSuiteStarted(
-                new SuiteStartedEvent("abc", new URI("file:///path"), true, 5, newArrayList(), newArrayList()));
-
-        verify(startSuiteHandler).accept("abc");
-        verifyNoMoreInteractions(startSuiteHandler);
-        verifyZeroInteractions(libImportCollector);
-    }
+    @Mock
+    private Consumer<String> libNameHandler;
 
     @Test
     public void libraryImportIsHandled() throws Exception {
         final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
-                startSuiteHandler);
+                libNameHandler);
 
         final LibraryImportEvent event = new LibraryImportEvent("String", new URI("file:///suite.robot"),
                 new URI("file:///String.py"), Arrays.asList("a1", "a2"));
@@ -63,13 +44,14 @@ public class RobotDryRunLibraryEventListenerTest {
 
         verify(libImportCollector).collectFromLibraryImportEvent(event);
         verifyNoMoreInteractions(libImportCollector);
-        verifyZeroInteractions(startSuiteHandler);
+        verify(libNameHandler).accept("String");
+        verifyNoMoreInteractions(libNameHandler);
     }
 
     @Test
     public void failMessageEventIsHandled() throws Exception {
         final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
-                startSuiteHandler);
+                libNameHandler);
 
         final MessageEvent event = new MessageEvent("fail_message_123", LogLevel.FAIL, null);
 
@@ -77,13 +59,13 @@ public class RobotDryRunLibraryEventListenerTest {
 
         verify(libImportCollector).collectFromFailMessageEvent(event);
         verifyNoMoreInteractions(libImportCollector);
-        verifyZeroInteractions(startSuiteHandler);
+        verifyZeroInteractions(libNameHandler);
     }
 
     @Test
     public void errorMessageEventIsHandled() throws Exception {
         final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
-                startSuiteHandler);
+                libNameHandler);
 
         final MessageEvent event = new MessageEvent("error_message_456", LogLevel.ERROR, null);
 
@@ -91,13 +73,13 @@ public class RobotDryRunLibraryEventListenerTest {
 
         verify(libImportCollector).collectFromErrorMessageEvent(event);
         verifyNoMoreInteractions(libImportCollector);
-        verifyZeroInteractions(startSuiteHandler);
+        verifyZeroInteractions(libNameHandler);
     }
 
     @Test
     public void unsupportedLevelMessageEventsAreIgnored() throws Exception {
         final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
-                startSuiteHandler);
+                libNameHandler);
 
         listener.handleMessage(new MessageEvent("msg", LogLevel.TRACE, null));
         listener.handleMessage(new MessageEvent("msg", LogLevel.DEBUG, null));
@@ -105,14 +87,14 @@ public class RobotDryRunLibraryEventListenerTest {
         listener.handleMessage(new MessageEvent("msg", LogLevel.WARN, null));
         listener.handleMessage(new MessageEvent("msg", LogLevel.NONE, null));
 
-        verifyZeroInteractions(startSuiteHandler);
         verifyZeroInteractions(libImportCollector);
+        verifyZeroInteractions(libNameHandler);
     }
 
     @Test
     public void multipleEventsAreHandledInRightOrder() throws Exception {
         final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
-                startSuiteHandler);
+                libNameHandler);
 
         final LibraryImportEvent event1 = new LibraryImportEvent("lib2", new URI("file:///suite1.robot"),
                 new URI("file:///lib1.py"), Arrays.asList("a", "b"));
@@ -135,17 +117,21 @@ public class RobotDryRunLibraryEventListenerTest {
         listener.handleLibraryImport(event7);
         listener.handleLibraryImport(event8);
 
-        final InOrder inOrder = inOrder(libImportCollector);
-        inOrder.verify(libImportCollector).collectFromLibraryImportEvent(event1);
-        inOrder.verify(libImportCollector).collectFromErrorMessageEvent(event2);
-        inOrder.verify(libImportCollector).collectFromFailMessageEvent(event3);
-        inOrder.verify(libImportCollector).collectFromFailMessageEvent(event4);
-        inOrder.verify(libImportCollector).collectFromErrorMessageEvent(event5);
-        inOrder.verify(libImportCollector).collectFromErrorMessageEvent(event6);
-        inOrder.verify(libImportCollector).collectFromLibraryImportEvent(event7);
-        inOrder.verify(libImportCollector).collectFromLibraryImportEvent(event8);
+        final InOrder libImportCollectorOrder = inOrder(libImportCollector);
+        libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event1);
+        libImportCollectorOrder.verify(libImportCollector).collectFromErrorMessageEvent(event2);
+        libImportCollectorOrder.verify(libImportCollector).collectFromFailMessageEvent(event3);
+        libImportCollectorOrder.verify(libImportCollector).collectFromFailMessageEvent(event4);
+        libImportCollectorOrder.verify(libImportCollector).collectFromErrorMessageEvent(event5);
+        libImportCollectorOrder.verify(libImportCollector).collectFromErrorMessageEvent(event6);
+        libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event7);
+        libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event8);
         verifyNoMoreInteractions(libImportCollector);
-        verifyZeroInteractions(startSuiteHandler);
+        final InOrder libNameHandlerOrder = inOrder(libNameHandler);
+        libNameHandlerOrder.verify(libNameHandler).accept("lib2");
+        libNameHandlerOrder.verify(libNameHandler).accept("lib3");
+        libNameHandlerOrder.verify(libNameHandler).accept("lib1");
+        verifyNoMoreInteractions(libNameHandler);
     }
 
 }

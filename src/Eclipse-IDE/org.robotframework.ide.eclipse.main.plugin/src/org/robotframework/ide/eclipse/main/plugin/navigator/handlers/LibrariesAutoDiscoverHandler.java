@@ -17,7 +17,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.LibrariesAutoDiscoverHandler.E4LibrariesAutoDiscoverHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -33,11 +33,12 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
         public void discoverLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
+            // FIXME: run grouping in job
             final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
                     .collectGroupedByProject(selectedResources);
             // for now we want to start autodiscovering only for one project
             filesGroupedByProject.entrySet().stream().findFirst().ifPresent(
-                    entry -> new LibrariesAutoDiscoverer(entry.getKey(), entry.getValue()).start());
+                    entry -> new CombinedLibrariesAutoDiscoverer(entry.getKey(), entry.getValue()).start());
         }
     }
 }

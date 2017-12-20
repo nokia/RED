@@ -36,6 +36,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.GeneralSettingsLibrariesImportValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ValidationContext;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
 
@@ -56,7 +57,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
             final Consumer<Collection<RobotDryRunLibraryImport>> summaryHandler = showSummary
                     ? LibrariesAutoDiscoverer.defaultSummaryHandler()
                     : libraryImports -> {};
-            return new LibrariesAutoDiscoverer(robotProject, suites, summaryHandler);
+            return new CombinedLibrariesAutoDiscoverer(robotProject, suites, summaryHandler);
         });
     }
 
@@ -138,10 +139,6 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     }
 
     private boolean suiteHasUnknownLibrary(final RobotSuiteFile suite, final List<LibraryImport> imports) {
-        if (imports.isEmpty()) {
-            return false;
-        }
-
         final UnknownLibraryDetectingReportingStrategy reporter = new UnknownLibraryDetectingReportingStrategy();
 
         final ValidationContext generalContext = new ValidationContext(suite.getProject(), new BuildLogger());
