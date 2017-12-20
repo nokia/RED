@@ -6,10 +6,12 @@
 package org.rf.ide.core.dryrun;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toSet;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,6 +36,10 @@ public class RobotDryRunLibraryImport {
 
     public RobotDryRunLibraryImport(final String name) {
         this(name, null, new ArrayList<String>());
+    }
+
+    public RobotDryRunLibraryImport(final String name, final URI sourcePath) {
+        this(name, sourcePath, null, new ArrayList<>());
     }
 
     public RobotDryRunLibraryImport(final String name, final URI importerPath, final List<String> args) {
@@ -119,6 +125,12 @@ public class RobotDryRunLibraryImport {
         if (path != null && !importersPaths.contains(path)) {
             importersPaths.add(path);
         }
+    }
+
+    public void setImportersPaths(final Collection<URI> importersPaths) {
+        this.importersPaths.clear();
+        this.importersPaths.addAll(importersPaths.stream().filter(uri -> uri != null).collect(toSet()));
+        this.importersPaths.sort((uri1, uri2) -> uri1.compareTo(uri2));
     }
 
     public List<String> getArgs() {

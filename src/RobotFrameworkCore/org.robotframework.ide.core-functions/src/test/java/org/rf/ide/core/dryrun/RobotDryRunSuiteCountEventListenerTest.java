@@ -9,17 +9,18 @@ import java.util.function.Consumer;
 
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.execution.agent.LogLevel;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
 
 import com.google.common.collect.ImmutableMap;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RobotDryRunSuiteCountEventListenerTest {
 
     @Rule
@@ -27,11 +28,6 @@ public class RobotDryRunSuiteCountEventListenerTest {
 
     @Mock
     private Consumer<Integer> suiteCountHandler;
-
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     @Test
     public void suiteCountEventMappingExceptionIsHandled() throws Exception {
