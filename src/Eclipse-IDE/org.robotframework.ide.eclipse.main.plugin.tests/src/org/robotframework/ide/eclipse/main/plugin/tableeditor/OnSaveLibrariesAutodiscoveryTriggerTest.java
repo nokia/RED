@@ -26,7 +26,7 @@ import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.CombinedLibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
 import org.robotframework.ide.eclipse.main.plugin.project.library.Libraries;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -104,7 +104,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
         turnOnAutoDiscoveringInProjectConfig();
 
         final RobotSuiteFile suite = model.createSuiteFile(projectProvider.getFile("suite_with_known_libraries.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
@@ -123,7 +123,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
@@ -143,7 +143,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
@@ -163,7 +163,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
@@ -185,7 +185,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_in_resource.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
@@ -207,7 +207,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_in_resources_with_cycle.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
@@ -229,7 +229,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
 
         final RobotSuiteFile suite = model
                 .createSuiteFile(projectProvider.getFile("suite_with_known_libraries_in_resource.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
@@ -250,7 +250,7 @@ public class OnSaveLibrariesAutodiscoveryTriggerTest {
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_1.robot"));
         final RobotSuiteFile suite2 = model
                 .createSuiteFile(projectProvider.getFile("suite_with_unknown_library_2.robot"));
-        final LibrariesAutoDiscoverer discoverer = mock(LibrariesAutoDiscoverer.class);
+        final CombinedLibrariesAutoDiscoverer discoverer = mock(CombinedLibrariesAutoDiscoverer.class);
 
         final DiscovererFactory factory = mock(DiscovererFactory.class);
         when(factory.create(any(RobotProject.class), ArgumentMatchers.anyCollection())).thenReturn(discoverer);
