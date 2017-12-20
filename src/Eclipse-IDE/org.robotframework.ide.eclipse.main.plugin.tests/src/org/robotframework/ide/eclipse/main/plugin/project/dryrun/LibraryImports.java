@@ -61,8 +61,20 @@ class LibraryImports {
                     toSet());
             final Set<Wrapper<RobotDryRunLibraryImport>> expected = Stream.of(expectedLibImports).map(eq::wrap).collect(
                     toSet());
-            return actualLibImports.size() == expectedLibImports.length && actual.equals(expected);
+            return actualLibImports.size() == expectedLibImports.length && actual.equals(expected)
+                    && onlyNotAddedImportsHaveAdditionalInfo(actualLibImports);
         };
+    }
+
+    private static boolean onlyNotAddedImportsHaveAdditionalInfo(
+            final Collection<RobotDryRunLibraryImport> libImports) {
+        final boolean allNotAddedHaveNotEmptyAdditionalInfo = libImports.stream()
+                .filter(libImport -> libImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED)
+                .noneMatch(libImport -> libImport.getAdditionalInfo().isEmpty());
+        final boolean allAddedOrExistingHaveEmptyAdditionalInfo = libImports.stream()
+                .filter(libImport -> libImport.getStatus() != DryRunLibraryImportStatus.NOT_ADDED)
+                .allMatch(libImport -> libImport.getAdditionalInfo().isEmpty());
+        return allNotAddedHaveNotEmptyAdditionalInfo && allAddedOrExistingHaveEmptyAdditionalInfo;
     }
 
     private static class RobotDryRunLibraryImportEquivalence extends Equivalence<RobotDryRunLibraryImport> {
