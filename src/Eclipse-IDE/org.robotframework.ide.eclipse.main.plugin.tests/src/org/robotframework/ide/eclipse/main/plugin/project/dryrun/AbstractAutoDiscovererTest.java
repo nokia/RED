@@ -6,9 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.function.Consumer;
@@ -22,11 +20,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.RobotDefaultAgentEventListener;
-import org.rf.ide.core.executor.EnvironmentSearchPaths;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.dryrun.AbstractAutoDiscoverer.IDryRunTargetsCollector;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.AbstractAutoDiscoverer.AutoDiscovererException;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class AbstractAutoDiscovererTest {
@@ -41,20 +37,13 @@ public class AbstractAutoDiscovererTest {
         final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
         when(robotProject.getRuntimeEnvironment()).thenReturn(null);
 
-        final IDryRunTargetsCollector targetsCollector = mock(IDryRunTargetsCollector.class);
-
-        final AbstractAutoDiscoverer discoverer = createDiscoverer(robotProject, targetsCollector);
-
-        assertThatExceptionOfType(CoreException.class).isThrownBy(() -> discoverer.startDiscovering(null))
+        assertThatExceptionOfType(AutoDiscovererException.class).isThrownBy(() -> createDiscoverer(robotProject))
                 .withMessage(String.format("There is no active runtime environment for project '%s'", PROJECT_NAME))
                 .withNoCause();
-
-        verifyZeroInteractions(targetsCollector);
     }
 
-    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject,
-            final IDryRunTargetsCollector targetsCollector) {
-        return new AbstractAutoDiscoverer(robotProject, targetsCollector) {
+    private AbstractAutoDiscoverer createDiscoverer(final RobotProject robotProject) {
+        return new AbstractAutoDiscoverer(robotProject) {
 
             @Override
             public Job start() {
@@ -68,17 +57,20 @@ public class AbstractAutoDiscovererTest {
             }
 
             @Override
-            EnvironmentSearchPaths collectLibrarySources(final RobotRuntimeEnvironment runtimeEnvironment)
-                    throws CoreException {
-                return new EnvironmentSearchPaths();
+            public void startDiscovering(final IProgressMonitor monitor) throws InterruptedException, CoreException {
+                // nothing to implement
             }
 
             @Override
-            RobotDefaultAgentEventListener createDryRunCollectorEventListener(
-                    final Consumer<String> startSuiteHandler) {
+            RobotDefaultAgentEventListener createDryRunCollectorEventListener(final Consumer<String> libNameHandler) {
                 return new RobotDefaultAgentEventListener() {
                     // nothing to implement
                 };
+            }
+
+            @Override
+            void startDryRunClient(final int port, final String dataSourcePath) throws CoreException {
+                // nothing to implement
             }
         };
     }

@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,14 +25,15 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibrariesAutoDiscoverer.DiscovererFactory;
+import org.robotframework.ide.eclipse.main.plugin.project.dryrun.SimpleLibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryFinder;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryFinder.IncorrectLibraryPathException;
-import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryFinder.UnknownLibraryException;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryLocator.IReferencedLibraryDetector;
 import org.robotframework.red.graphics.ImagesManager;
+
+import com.google.common.collect.Iterables;
 
 /**
  * @author Michal Anglart
@@ -45,7 +47,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
     private final DiscovererFactory discovererFactory;
 
     public AddLibraryToRedXmlFixer(final String pathOrName, final boolean isPath) {
-        this(pathOrName, isPath, (project, suites) -> new LibrariesAutoDiscoverer(project, suites, pathOrName));
+        this(pathOrName, isPath, (project, suites) -> new SimpleLibrariesAutoDiscoverer(project,
+                Iterables.getFirst(suites, null), pathOrName));
     }
 
     AddLibraryToRedXmlFixer(final String pathOrName, final boolean isPath, final DiscovererFactory discovererFactory) {
@@ -80,25 +83,41 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         @Override
         public boolean apply(final IFile externalFile, final RobotProjectConfig config) {
             final Shell shell = Display.getCurrent().getActiveShell();
-            try {
-                final ReferencedLibraryFinder libraryFinder = new ReferencedLibraryFinder(suiteFile,
-                        new ReferencedLibraryImporter(shell));
-                if (isPath) {
-                    addedLibraries.addAll(libraryFinder.findByPath(config, pathOrName));
-                } else {
-                    addedLibraries.addAll(libraryFinder.findByName(config, pathOrName));
-                }
-                addedLibraries.forEach(config::addReferencedLibrary);
-            } catch (final UnknownLibraryException e) {
-                startAutoDiscovering();
-            } catch (final IncorrectLibraryPathException e) {
-                MessageDialog.openError(shell, "Library import problem", e.getMessage());
-            }
-            return !addedLibraries.isEmpty();
-        }
+            final ReferencedLibraryLocator libraryLocator = new ReferencedLibraryLocator(suiteFile.getProject(),
+                    new ReferencedLibraryImporter(shell), new IReferencedLibraryDetector() {
 
-        private void startAutoDiscovering() {
-            discovererFactory.create(suiteFile.getProject(), newArrayList(suiteFile)).start();
+                        @Override
+                        public void libraryDetectedByName(final String name, final File libraryFile,
+                                final Collection<ReferencedLibrary> referenceLibraries) {
+                            addedLibraries.addAll(referenceLibraries);
+                        }
+
+                        @Override
+                        public void libraryDetectedByPath(final String path, final File libraryFile,
+                                final Collection<ReferencedLibrary> referenceLibraries) {
+                            addedLibraries.addAll(referenceLibraries);
+                        }
+
+                        @Override
+                        public void libraryDetectingByNameFailed(final String name, final String failReason) {
+                            discovererFactory.create(suiteFile.getProject(), newArrayList(suiteFile)).start();
+                        }
+
+                        @Override
+                        public void libraryDetectingByPathFailed(final String path, final String failReason) {
+                            MessageDialog.openError(shell, "Library import problem", failReason);
+                        }
+                    });
+
+            if (isPath) {
+                libraryLocator.locateByPath(suiteFile, pathOrName);
+            } else {
+                libraryLocator.locateByName(suiteFile, pathOrName);
+            }
+
+            addedLibraries.forEach(config::addReferencedLibrary);
+
+            return !addedLibraries.isEmpty();
         }
 
         @Override
