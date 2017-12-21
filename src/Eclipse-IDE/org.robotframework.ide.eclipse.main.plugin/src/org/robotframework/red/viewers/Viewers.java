@@ -105,7 +105,7 @@ public class Viewers {
         }
 
         private IContextService getContextService(final IWorkbenchSite site) {
-            return (IContextService) site.getService(IContextService.class);
+            return site.getService(IContextService.class);
         }
     }
 }
