@@ -48,20 +48,20 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
     protected List<String> findValuesToPaste(final RobotElement elementFromClipboard,
             final int clipboardElementColumnIndex, final int tableColumnsCount) {
         if (elementFromClipboard instanceof RobotKeywordCall) {
-            return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex,
-                    tableColumnsCount);
+            return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex);
+
         } else if (elementFromClipboard instanceof RobotKeywordDefinition) {
             return getValuesFromKeywordDefinition((RobotKeywordDefinition) elementFromClipboard,
                     clipboardElementColumnIndex, tableColumnsCount);
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override
     protected List<EditorCommand> collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
             final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount) {
 
-        final List<EditorCommand> pasteCommands = newArrayList();
+        final List<EditorCommand> pasteCommands = new ArrayList<>();
 
         final String valueToPaste = valuesToPaste.isEmpty() ? "" : valuesToPaste.get(0);
         final List<? extends EditorCommand> commands = new KeywordsTableValuesChangingCommandsCollector()
@@ -72,7 +72,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
     }
 
     private List<String> getValuesFromKeywordCall(final RobotKeywordCall keywordCall,
-            final int clipboardElementColumnIndex, final int tableColumnsCount) {
+            final int clipboardElementColumnIndex) {
 
         final ModelType modelType = keywordCall.getLinkedElement().getModelType();
 
@@ -80,7 +80,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
             if (clipboardElementColumnIndex == 1) {
                 return newArrayList(getDocumentationText(keywordCall));
             } else {
-                return newArrayList();
+                return new ArrayList<>();
             }
         }
 
@@ -88,8 +88,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
         if (clipboardElementColumnIndex < execRowView.size()) {
             return newArrayList(execRowView.get(clipboardElementColumnIndex).getText());
         }
-
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     private String getDocumentationText(final RobotKeywordCall keywordCall) {
@@ -107,6 +106,6 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
                 return newArrayList(argumentsSetting.getArguments().get(argIndex));
             }
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 }
