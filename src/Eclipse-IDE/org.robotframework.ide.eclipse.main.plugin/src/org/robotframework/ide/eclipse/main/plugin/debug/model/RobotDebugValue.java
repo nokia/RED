@@ -41,6 +41,10 @@ public abstract class RobotDebugValue extends RobotDebugElement implements IValu
         }
     }
 
+    boolean isTuple() {
+        return "tuple".equals(type);
+    }
+
     @Override
     public String getReferenceTypeName() {
         return type;

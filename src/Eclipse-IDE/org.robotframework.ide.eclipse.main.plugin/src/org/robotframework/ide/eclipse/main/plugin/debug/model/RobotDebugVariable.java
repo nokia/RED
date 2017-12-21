@@ -134,7 +134,12 @@ public class RobotDebugVariable extends RobotDebugElement implements IVariable {
 
     @Override
     public boolean supportsValueModification() {
-        return !isArtificial();
+        // artificial nodes are not modifiable as well as children
+        // of tuples (since tuples are immutable)
+        return !isArtificial() && !Optional.ofNullable(parent)
+                .map(RobotDebugVariable::getValue)
+                .map(RobotDebugValue::isTuple)
+                .orElse(false);
     }
 
     @Override
