@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -140,9 +139,7 @@ public abstract class LibrariesAutoDiscoverer extends AbstractAutoDiscoverer {
         }
         final EnvironmentSearchPaths additionalPaths = sourcesCollector.getEnvironmentSearchPaths();
 
-        // FIXME: remove not necessary parameters
-        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, newArrayList(), newArrayList(),
-                newArrayList(dataSourcePath), additionalPaths);
+        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSourcePath, additionalPaths);
     }
 
     void setImportersPaths(final RobotDryRunLibraryImport libraryImport, final Collection<RobotSuiteFile> collection) {
