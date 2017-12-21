@@ -32,6 +32,19 @@ public class RobotDebugValueTest {
         final RobotDebugValue value = valueToTest(mock(RobotDebugTarget.class), "type", "val");
 
         assertThat(value.getReferenceTypeName()).isEqualTo("type");
+        assertThat(value.isTuple()).isFalse();
+        assertThat(value.getValueString()).isEqualTo("val");
+        assertThat(value.isAllocated()).isTrue();
+        assertThat(value.hasVariables()).isFalse();
+        assertThat(value.getVariables()).isEmpty();
+    }
+
+    @Test
+    public void valuePropertiesCheckOfTuple() {
+        final RobotDebugValue value = valueToTest(mock(RobotDebugTarget.class), "tuple", "val");
+
+        assertThat(value.getReferenceTypeName()).isEqualTo("tuple");
+        assertThat(value.isTuple()).isTrue();
         assertThat(value.getValueString()).isEqualTo("val");
         assertThat(value.isAllocated()).isTrue();
         assertThat(value.hasVariables()).isFalse();
