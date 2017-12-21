@@ -6,7 +6,9 @@
 package org.rf.ide.core.dryrun;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 import org.rf.ide.core.execution.agent.LogLevel;
@@ -20,9 +22,9 @@ public class RobotDryRunKeywordSourceCollectorTest {
     public void keywordSourcesAreCollectedFromMessages() throws Exception {
         final RobotDryRunKeywordSourceCollector kwSourceCollector = new RobotDryRunKeywordSourceCollector();
 
-        kwSourceCollector.collectFromMessageEvent(createKeywordMessageEvent("kw1", "lib1", "lib1.py", 3, 5, 7));
-        kwSourceCollector.collectFromMessageEvent(createKeywordMessageEvent("kw2", "lib1", "lib1.py", 5, 6, 4));
-        kwSourceCollector.collectFromMessageEvent(createKeywordMessageEvent("other_kw", "lib2", "lib2.py", 2, 4, 6));
+        kwSourceCollector.collectFromMessageEvent(createKwSourceMessageEvent("kw1", "lib1", "lib1.py", 3, 5, 7));
+        kwSourceCollector.collectFromMessageEvent(createKwSourceMessageEvent("kw2", "lib1", "lib1.py", 5, 6, 4));
+        kwSourceCollector.collectFromMessageEvent(createKwSourceMessageEvent("other_kw", "lib2", "lib2.py", 2, 4, 6));
 
         final RobotDryRunKeywordSource kw1 = new RobotDryRunKeywordSource();
         kw1.setName("kw1");
@@ -54,7 +56,19 @@ public class RobotDryRunKeywordSourceCollectorTest {
         assertCollectedKeywordSource(kwSourceCollector.getKeywordSources().get(2), kw3);
     }
 
-    private static MessageEvent createKeywordMessageEvent(final String name, final String libraryName,
+    @Test
+    public void keywordSourceEventMappingExceptionIsHandled() throws Exception {
+        final RobotDryRunKeywordSourceCollector kwSourceCollector = new RobotDryRunKeywordSourceCollector();
+
+        final MessageEvent event = new MessageEvent("{\"keyword_source\":\"incorrect\"}", LogLevel.NONE, null);
+
+        assertThatExceptionOfType(JsonMessageMapper.JsonMessageMapperException.class)
+                .isThrownBy(() -> kwSourceCollector.collectFromMessageEvent(event))
+                .withMessage("Problem with mapping message for key 'keyword_source'")
+                .withCauseInstanceOf(JsonMappingException.class);
+    }
+
+    private static MessageEvent createKwSourceMessageEvent(final String name, final String libraryName,
             final String path, final int line, final int offset, final int length) throws Exception {
         final Object kwAttributes = ImmutableMap.builder()
                 .put("filePath", path)
@@ -64,7 +78,7 @@ public class RobotDryRunKeywordSourceCollectorTest {
                 .put("name", name)
                 .put("offset", offset)
                 .build();
-        final String message = new ObjectMapper().writeValueAsString((ImmutableMap.of("keyword", kwAttributes)));
+        final String message = new ObjectMapper().writeValueAsString((ImmutableMap.of("keyword_source", kwAttributes)));
         return new MessageEvent(message, LogLevel.NONE, null);
     }
 

@@ -33,7 +33,7 @@ public class RobotDryRunLibraryEventListenerTest {
     private Consumer<String> libNameHandler;
 
     @Test
-    public void libraryImportIsHandled() throws Exception {
+    public void libraryImportEventIsHandled() throws Exception {
         final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
                 libNameHandler);
 
@@ -49,29 +49,15 @@ public class RobotDryRunLibraryEventListenerTest {
     }
 
     @Test
-    public void failMessageEventIsHandled() throws Exception {
+    public void libraryErrorMessageEventIsHandled() throws Exception {
         final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
                 libNameHandler);
 
-        final MessageEvent event = new MessageEvent("fail_message_123", LogLevel.FAIL, null);
+        final MessageEvent event = new MessageEvent("import_error", LogLevel.NONE, null);
 
         listener.handleMessage(event);
 
-        verify(libImportCollector).collectFromFailMessageEvent(event);
-        verifyNoMoreInteractions(libImportCollector);
-        verifyZeroInteractions(libNameHandler);
-    }
-
-    @Test
-    public void errorMessageEventIsHandled() throws Exception {
-        final RobotDryRunLibraryEventListener listener = new RobotDryRunLibraryEventListener(libImportCollector,
-                libNameHandler);
-
-        final MessageEvent event = new MessageEvent("error_message_456", LogLevel.ERROR, null);
-
-        listener.handleMessage(event);
-
-        verify(libImportCollector).collectFromErrorMessageEvent(event);
+        verify(libImportCollector).collectFromMessageEvent(event);
         verifyNoMoreInteractions(libImportCollector);
         verifyZeroInteractions(libNameHandler);
     }
@@ -85,7 +71,8 @@ public class RobotDryRunLibraryEventListenerTest {
         listener.handleMessage(new MessageEvent("msg", LogLevel.DEBUG, null));
         listener.handleMessage(new MessageEvent("msg", LogLevel.INFO, null));
         listener.handleMessage(new MessageEvent("msg", LogLevel.WARN, null));
-        listener.handleMessage(new MessageEvent("msg", LogLevel.NONE, null));
+        listener.handleMessage(new MessageEvent("msg", LogLevel.ERROR, null));
+        listener.handleMessage(new MessageEvent("msg", LogLevel.FAIL, null));
 
         verifyZeroInteractions(libImportCollector);
         verifyZeroInteractions(libNameHandler);
@@ -97,36 +84,31 @@ public class RobotDryRunLibraryEventListenerTest {
                 libNameHandler);
 
         final LibraryImportEvent event1 = new LibraryImportEvent("lib2", new URI("file:///suite1.robot"),
-                new URI("file:///lib1.py"), Arrays.asList("a", "b"));
-        final MessageEvent event2 = new MessageEvent("err_1", LogLevel.ERROR, null);
-        final MessageEvent event3 = new MessageEvent("fail_2", LogLevel.FAIL, null);
-        final MessageEvent event4 = new MessageEvent("fail_1", LogLevel.FAIL, null);
-        final MessageEvent event5 = new MessageEvent("err_3", LogLevel.ERROR, null);
-        final MessageEvent event6 = new MessageEvent("err_2", LogLevel.ERROR, null);
-        final LibraryImportEvent event7 = new LibraryImportEvent("lib3", new URI("file:///suite1.robot"),
-                new URI("file:///lib6.py"), Arrays.asList("c", "d"));
-        final LibraryImportEvent event8 = new LibraryImportEvent("lib1", new URI("file:///other.robot"),
-                new URI("file:///lib6.py"), Arrays.asList("x"));
+                new URI("file:///lib2.py"), Arrays.asList("a", "b"));
+        final MessageEvent event2 = new MessageEvent("import_error_1", LogLevel.NONE, null);
+        final MessageEvent event3 = new MessageEvent("import_error_2", LogLevel.NONE, null);
+        final LibraryImportEvent event4 = new LibraryImportEvent("lib3", new URI("file:///suite1.robot"),
+                new URI("file:///lib3.py"), Arrays.asList("c", "d"));
+        final MessageEvent event5 = new MessageEvent("import_error_3", LogLevel.NONE, null);
+        final LibraryImportEvent event6 = new LibraryImportEvent("lib1", new URI("file:///other.robot"),
+                new URI("file:///lib1.py"), Arrays.asList("x"));
 
         listener.handleLibraryImport(event1);
         listener.handleMessage(event2);
         listener.handleMessage(event3);
-        listener.handleMessage(event4);
+        listener.handleLibraryImport(event4);
         listener.handleMessage(event5);
-        listener.handleMessage(event6);
-        listener.handleLibraryImport(event7);
-        listener.handleLibraryImport(event8);
+        listener.handleLibraryImport(event6);
 
         final InOrder libImportCollectorOrder = inOrder(libImportCollector);
         libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event1);
-        libImportCollectorOrder.verify(libImportCollector).collectFromErrorMessageEvent(event2);
-        libImportCollectorOrder.verify(libImportCollector).collectFromFailMessageEvent(event3);
-        libImportCollectorOrder.verify(libImportCollector).collectFromFailMessageEvent(event4);
-        libImportCollectorOrder.verify(libImportCollector).collectFromErrorMessageEvent(event5);
-        libImportCollectorOrder.verify(libImportCollector).collectFromErrorMessageEvent(event6);
-        libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event7);
-        libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event8);
+        libImportCollectorOrder.verify(libImportCollector).collectFromMessageEvent(event2);
+        libImportCollectorOrder.verify(libImportCollector).collectFromMessageEvent(event3);
+        libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event4);
+        libImportCollectorOrder.verify(libImportCollector).collectFromMessageEvent(event5);
+        libImportCollectorOrder.verify(libImportCollector).collectFromLibraryImportEvent(event6);
         verifyNoMoreInteractions(libImportCollector);
+
         final InOrder libNameHandlerOrder = inOrder(libNameHandler);
         libNameHandlerOrder.verify(libNameHandler).accept("lib2");
         libNameHandlerOrder.verify(libNameHandler).accept("lib3");

@@ -17,7 +17,7 @@ import org.rf.ide.core.testdata.model.RobotExpressions;
 public final class ResolvedImportPath {
 
     public static Optional<ResolvedImportPath> from(final ImportPath importPath) {
-        return from(importPath, Collections.<String, String> emptyMap());
+        return from(importPath, Collections.emptyMap());
     }
 
     public static Optional<ResolvedImportPath> from(final ImportPath importPath, final Map<String, String> parameters)
