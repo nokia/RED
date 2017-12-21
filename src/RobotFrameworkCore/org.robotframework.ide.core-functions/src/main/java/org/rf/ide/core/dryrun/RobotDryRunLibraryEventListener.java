@@ -32,10 +32,8 @@ public class RobotDryRunLibraryEventListener extends RobotDefaultAgentEventListe
 
     @Override
     public void handleMessage(final MessageEvent event) {
-        if (event.getLevel() == LogLevel.FAIL) {
-            dryRunLibraryImportCollector.collectFromFailMessageEvent(event);
-        } else if (event.getLevel() == LogLevel.ERROR) {
-            dryRunLibraryImportCollector.collectFromErrorMessageEvent(event);
+        if (event.getLevel() == LogLevel.NONE) {
+            dryRunLibraryImportCollector.collectFromMessageEvent(event);
         }
     }
 }

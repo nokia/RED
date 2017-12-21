@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.dryrun;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 import org.rf.ide.core.execution.agent.LogLevel;
@@ -33,12 +32,7 @@ public class RobotDryRunKeywordEventListener extends RobotDefaultAgentEventListe
     @Override
     public void handleMessage(final MessageEvent event) {
         if (event.getLevel() == LogLevel.NONE) {
-            try {
-                dryRunKeywordSourceCollector.collectFromMessageEvent(event);
-            } catch (final IOException e) {
-                throw new JsonMessageMapper.JsonMessageMapperException("Problem with mapping keyword source message",
-                        e);
-            }
+            dryRunKeywordSourceCollector.collectFromMessageEvent(event);
         }
     }
 }

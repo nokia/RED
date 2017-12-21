@@ -6,11 +6,12 @@
 package org.rf.ide.core.dryrun;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.type.TypeReference;
+import org.rf.ide.core.dryrun.JsonMessageMapper.JsonMessageMapperException;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
 
 /**
@@ -18,13 +19,19 @@ import org.rf.ide.core.execution.agent.event.MessageEvent;
  */
 public class RobotDryRunKeywordSourceCollector {
 
+    private static final String MESSAGE_KEY = "keyword_source";
+
     private static final TypeReference<Map<String, RobotDryRunKeywordSource>> MESSAGE_TYPE = new TypeReference<Map<String, RobotDryRunKeywordSource>>() {
     };
 
-    private final List<RobotDryRunKeywordSource> keywordSources = new ArrayList<>();
+    private final List<RobotDryRunKeywordSource> keywordSources = new LinkedList<>();
 
-    public void collectFromMessageEvent(final MessageEvent event) throws IOException {
-        JsonMessageMapper.readValue(event, "keyword", MESSAGE_TYPE).ifPresent(keywordSources::add);
+    public void collectFromMessageEvent(final MessageEvent event) {
+        try {
+            JsonMessageMapper.readValue(event, MESSAGE_KEY, MESSAGE_TYPE).ifPresent(keywordSources::add);
+        } catch (final IOException e) {
+            throw new JsonMessageMapperException("Problem with mapping message for key '" + MESSAGE_KEY + "'", e);
+        }
     }
 
     public List<RobotDryRunKeywordSource> getKeywordSources() {
