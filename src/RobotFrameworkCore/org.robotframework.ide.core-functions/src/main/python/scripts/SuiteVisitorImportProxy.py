@@ -112,9 +112,8 @@ class RedImporter(object):
             self.cached_lib_items.append(LibItem(args[0], args[1], library, errors))
 
         for e in errors:
-            msg = '{LIB_ERROR: ' + args[0] + ', value: VALUE_START(' + str(e) + ')VALUE_END, lib_file_import:' + str(
-                library.source) + '}'
-            LOGGER.message(Message(message=msg, level='FAIL'))
+            msg = json.dumps({'import_error': {'name': args[0], 'error': str(e)}})
+            LOGGER.message(Message(message=msg, level='NONE'))
 
         self._handle_keywords(library)
 
@@ -136,7 +135,7 @@ class RedImporter(object):
                 if keyword not in self.cached_kw_items and not isinstance(keyword, _JavaHandler):
                     try:
                         keyword_source = PythonKeywordSource(keyword)
-                        msg = json.dumps({'keyword': dict(keyword_source.__dict__)}, sort_keys=True)
+                        msg = json.dumps({'keyword_source': dict(keyword_source.__dict__)})
                         LOGGER.message(Message(message=msg, level='NONE'))
                     except:
                         pass  # TODO: add logging
