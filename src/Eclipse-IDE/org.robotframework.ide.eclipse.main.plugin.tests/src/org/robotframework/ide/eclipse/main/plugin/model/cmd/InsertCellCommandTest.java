@@ -57,7 +57,7 @@ public class InsertCellCommandTest {
                 command.execute();
 
                 final RobotKeywordCall callAfter = robotCase.getChildren().get(index);
-                final String valueToInsert = (i == 3 && call.getIndex() == 1) ? "/" : "";
+                final String valueToInsert = (i == 3 && call.getIndex() == 1) ? "\\" : "";
                 assertThat_valueAtPosition_wasInserted(i, allLabels, callAfter, valueToInsert);
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
@@ -156,7 +156,7 @@ public class InsertCellCommandTest {
         command.execute();
 
         final RobotKeywordCall callAfter = robotCase.getChildren().get(0);
-        assertThat_valueAtPosition_wasInserted(0, allLabels, callAfter, "/");
+        assertThat_valueAtPosition_wasInserted(0, allLabels, callAfter, "\\");
 
         final IRobotCodeHoldingElement parent = call.getParent();
         final int index = call.getIndex();
@@ -197,7 +197,7 @@ public class InsertCellCommandTest {
                 command.execute();
 
                 final RobotKeywordCall callAfter = robotKeyword.getChildren().get(index);
-                final String valueToInsert = (i == 3 && call.getIndex() == 1) ? "/" : "";
+                final String valueToInsert = (i == 3 && call.getIndex() == 1) ? "\\" : "";
                 assertThat_valueAtPosition_wasInserted(i, allLabels, callAfter, valueToInsert);
                 undo_andAssertThat_valueDisappeared_afterUndo(command, allLabels, callAfter);
             }
@@ -300,7 +300,7 @@ public class InsertCellCommandTest {
         command.execute();
 
         final RobotKeywordCall callAfter = robotKeyword.getChildren().get(0);
-        assertThat_valueAtPosition_wasInserted(0, allLabels, callAfter, "/");
+        assertThat_valueAtPosition_wasInserted(0, allLabels, callAfter, "\\");
 
         final IRobotCodeHoldingElement parent = call.getParent();
         final int index = call.getIndex();

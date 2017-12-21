@@ -295,17 +295,17 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         final RobotToken tokenToInsert = new RobotToken();
         tokenToInsert.setText(value);
         if (position == 0) { // new action
-            if (action.isNotEmpty()) { // in case of artificial comment action token
+            if (action.isNotEmpty() || !arguments.isEmpty()) { // in case of artificial comment action token
                 arguments.add(0, action);
             } else if (value.isEmpty()) {
-                tokenToInsert.setText("/");
+                tokenToInsert.setText("\\");
             }
             action = tokenToInsert;
         } else if (arguments.isEmpty() && !action.isNotEmpty()) { // whole line comment
             comments.add(position, tokenToInsert);
         } else if (position - 1 <= arguments.size()) { // new argument
             if (position - 1 == arguments.size() && value.isEmpty()) {
-                tokenToInsert.setText("/");
+                tokenToInsert.setText("\\");
             }
             arguments.add(position - 1, tokenToInsert);
         } else if (position - 1 - arguments.size() <= comments.size()) { // new comment part

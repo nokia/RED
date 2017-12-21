@@ -190,7 +190,7 @@ public class RobotKeywordCallTest {
         assertThat(callsAfter.get(1).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
                 .collect(Collectors.toList())).containsExactly("", "Log", "t", "# comment after kw");
         assertThat(callsAfter.get(2).getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
-                .collect(Collectors.toList())).containsExactly("/", "# line with comment only");
+                .collect(Collectors.toList())).containsExactly("\\", "# line with comment only");
     }
 
     @Test
@@ -251,7 +251,7 @@ public class RobotKeywordCallTest {
 
         assertThat(callBefore).isEqualTo(callAfter);
         assertThat(callAfter.getLinkedElement().getElementTokens().stream().map(rt -> rt.getText())
-                .collect(Collectors.toList())).containsExactly("Log", "t", "/", "# comment after kw");
+                .collect(Collectors.toList())).containsExactly("Log", "t", "\\", "# comment after kw");
     }
 
     private static List<RobotKeywordCall> createCallsFromCaseForTest() {
