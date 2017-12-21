@@ -170,10 +170,9 @@ def is_virtualenv():
 @logresult
 @encode_result_or_exception
 @logargs
-def start_library_auto_discovering(port, suite_names, variable_mappings, data_source_paths, python_paths, class_paths):
+def start_library_auto_discovering(port, data_source_path, python_paths, class_paths):
     import red_library_autodiscover
-    red_library_autodiscover.start_library_auto_discovering_process(port, suite_names, variable_mappings, 
-                                                                    data_source_paths, python_paths, class_paths)
+    red_library_autodiscover.start_library_auto_discovering_process(port, data_source_path, python_paths, class_paths)
 
 
 @logresult
@@ -183,14 +182,14 @@ def stop_library_auto_discovering():
     import red_library_autodiscover
     red_library_autodiscover.stop_library_auto_discovering_process()
 
-    
+
 @logresult
 @encode_result_or_exception
 @logargs
 def run_rf_lint(host, port, filepath, additional_arguments):
     import subprocess
     import os
-    
+
     try:
         import rflint
         import rflint_integration

@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
@@ -85,9 +83,7 @@ public class KeywordsAutoDiscoverer extends AbstractAutoDiscoverer {
         final EnvironmentSearchPaths additionalPaths = new EnvironmentSearchPaths(robotProject.getClasspath(),
                 robotProject.getPythonpath());
 
-        // FIXME: remove not necessary parameters
-        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, newArrayList(), newArrayList(),
-                newArrayList(dataSourcePath), additionalPaths);
+        robotProject.getRuntimeEnvironment().startLibraryAutoDiscovering(port, dataSourcePath, additionalPaths);
     }
 
     private void startAddingKeywordsToProject(final IProgressMonitor monitor,
