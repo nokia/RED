@@ -285,24 +285,15 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void startLibraryAutoDiscovering(final int port, final List<String> suiteNames,
-            final List<String> variableMappings, final List<String> dataSourcePaths,
+    public void startLibraryAutoDiscovering(final int port, final String dataSourcePath,
             final EnvironmentSearchPaths additionalPaths) {
         try {
             RobotRuntimeEnvironment.copyScriptFile("TestRunnerAgent.py");
             RobotRuntimeEnvironment.copyScriptFile("SuiteVisitorImportProxy.py");
             final File scriptFile = RobotRuntimeEnvironment.copyScriptFile("red_library_autodiscover.py");
 
-            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, String.valueOf(port));
-            if (!suiteNames.isEmpty()) {
-                cmdLine.add("-suitenames");
-                cmdLine.add(String.join(";", suiteNames));
-            }
-            if (!variableMappings.isEmpty()) {
-                cmdLine.add("-variables");
-                cmdLine.add(String.join(";", variableMappings));
-            }
-            cmdLine.add(String.join(";", dataSourcePaths));
+            final List<String> cmdLine = createCommandLine(scriptFile, additionalPaths, String.valueOf(port),
+                    dataSourcePath);
             if (additionalPaths.hasPythonPaths()) {
                 cmdLine.add(String.join(";", additionalPaths.getExtendedPythonPaths(interpreterType)));
             }

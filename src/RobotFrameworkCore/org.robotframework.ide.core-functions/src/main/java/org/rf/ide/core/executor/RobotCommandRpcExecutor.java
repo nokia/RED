@@ -380,11 +380,10 @@ class RobotCommandRpcExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void startLibraryAutoDiscovering(final int port, final List<String> suiteNames,
-            final List<String> variableMappings, final List<String> dataSourcePaths,
+    public void startLibraryAutoDiscovering(final int port, final String dataSourcePath,
             final EnvironmentSearchPaths additionalPaths) {
         try {
-            callRpcFunction("startLibraryAutoDiscovering", port, suiteNames, variableMappings, dataSourcePaths,
+            callRpcFunction("startLibraryAutoDiscovering", port, dataSourcePath,
                     newArrayList(additionalPaths.getExtendedPythonPaths(interpreterType)),
                     newArrayList(additionalPaths.getClassPaths()));
         } catch (final XmlRpcException e) {

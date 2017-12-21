@@ -40,8 +40,7 @@ interface RobotCommandExecutor {
     void createLibdocForThirdPartyLibrary(String resultFilePath, String libName, String libPath,
             EnvironmentSearchPaths additionalPaths);
 
-    void startLibraryAutoDiscovering(int port, List<String> suiteNames, List<String> dataSourcePaths,
-            List<String> variableMappings, EnvironmentSearchPaths additionalPaths);
+    void startLibraryAutoDiscovering(int port, String dataSourcePath, EnvironmentSearchPaths additionalPaths);
 
     void stopLibraryAutoDiscovering();
 
