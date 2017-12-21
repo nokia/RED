@@ -126,6 +126,8 @@ def _label_with_types(data):
         return (value_type, dict((k, _label_with_types(data[k])) for k in data))
     elif isinstance(data, list):
         return (value_type, list(_label_with_types(el) for el in data))
+    elif isinstance(data, tuple):
+        return (value_type, tuple(list(_label_with_types(el) for el in data)))
     else:
         return (value_type, data)
 
@@ -460,13 +462,13 @@ class TestRunnerAgent:
     def _change_inner_value(self, object, path, value):
         val_kind, addr = path[0]
         
-        if val_kind == 'list' and isinstance(object, list) or val_kind == 'dict' and isinstance(object, Mapping):
+        if val_kind == 'list' and isinstance(object, (list, tuple)) or val_kind == 'dict' and isinstance(object, Mapping):
             if len(path) == 1:
                 object[addr] = value
             else:
                 self._change_inner_value(object[addr], path[1:], value)
         else:
-            raise RuntimeError('Requested to change value in ' + val_kind + ' object type, but ' + type(object).__name__ + 'found')
+            raise RuntimeError('Requested to change value in ' + val_kind + ' object type, but ' + type(object).__name__ + ' found')
 
     def _send_variables(self, error=None):
         vars = self._collect_variables()
@@ -512,7 +514,7 @@ class TestRunnerAgent:
                     try:
                         labeled = _label_with_types(value)
                         fixed = _fix_unicode(self.MAX_VARIABLE_VALUE_TEXT_LENGTH, labeled)
-                        if type(value) is list or isinstance(value, Mapping):
+                        if isinstance(value, (list, tuple, Mapping)):
                             frame_vars[var] = (fixed[0], fixed[1], identified_scope)
                         else:
                             frame_vars[var] = (fixed[0], str(fixed[1]), identified_scope)

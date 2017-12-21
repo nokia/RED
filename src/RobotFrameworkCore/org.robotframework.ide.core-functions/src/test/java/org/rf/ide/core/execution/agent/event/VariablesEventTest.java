@@ -74,6 +74,46 @@ public class VariablesEventTest {
     }
 
     @Test
+    public void eventIsProperlyConstructed_whenThereIsUntaggedListLikeTypeInside() {
+        final Map<String, Object> scope1 = new LinkedHashMap<>();
+        scope1.put("@{b}", typeValueScope("list", listValue(typeValue("tuple", newArrayList(1, 2, 3))), "suite"));
+
+        final Map<String, Object> eventMap = ImmutableMap.of("variables",
+                newArrayList(ImmutableMap.of("var_scopes", newArrayList(scope1))));
+        final VariablesEvent event = VariablesEvent.from(eventMap);
+
+        final List<Map<Variable, VariableTypedValue>> expectedVars = newArrayList(
+                ImmutableMap.of(new Variable("@{b}", VariableScope.TEST_SUITE),
+                        new VariableTypedValue("list",
+                                newArrayList(new VariableTypedValue("tuple",
+                                        newArrayList(new VariableTypedValue("<unknown>", 1),
+                                                new VariableTypedValue("<unknown>", 2),
+                                                new VariableTypedValue("<unknown>", 3)))))));
+
+        assertThat(event.getVariables()).isEqualTo(expectedVars);
+    }
+
+    @Test
+    public void eventIsProperlyConstructed_whenThereIsUntaggedMapLikeTypeInside() {
+        final Map<String, Object> scope1 = new LinkedHashMap<>();
+        scope1.put("@{b}", typeValueScope("list",
+                listValue(typeValue("unrecognized_dict", ImmutableMap.of("a", 1, "b", 2))), "suite"));
+
+        final Map<String, Object> eventMap = ImmutableMap.of("variables",
+                newArrayList(ImmutableMap.of("var_scopes", newArrayList(scope1))));
+        final VariablesEvent event = VariablesEvent.from(eventMap);
+
+        final List<Map<Variable, VariableTypedValue>> expectedVars = newArrayList(
+                ImmutableMap.of(new Variable("@{b}", VariableScope.TEST_SUITE),
+                        new VariableTypedValue("list",
+                                newArrayList(new VariableTypedValue("unrecognized_dict",
+                                        ImmutableMap.of("a", new VariableTypedValue("<unknown>", 1), "b",
+                                                new VariableTypedValue("<unknown>", 2)))))));
+
+        assertThat(event.getVariables()).isEqualTo(expectedVars);
+    }
+
+    @Test
     public void eventIsProperlyConstructed_whenNoErrorIsProvided() {
         final Map<String, Object> scope1 = new LinkedHashMap<>();
         scope1.put("${a}", newArrayList("int", 1, "global"));
@@ -159,5 +199,21 @@ public class VariablesEventTest {
 
         assertThat(new VariablesEvent(vars1, "error").hashCode())
                 .isEqualTo(new VariablesEvent(vars2, "error").hashCode());
+    }
+
+    private static List<?> listValue(final Object... elements) {
+        return newArrayList(elements);
+    }
+
+    private static Map<?, ?> mapValue(final Object key, final Object value) {
+        return ImmutableMap.of(key, value);
+    }
+
+    private static List<Object> typeValueScope(final String type, final Object value, final String scope) {
+        return newArrayList(type, value, scope);
+    }
+
+    private static List<Object> typeValue(final String type, final Object value) {
+        return newArrayList(type, value);
     }
 }

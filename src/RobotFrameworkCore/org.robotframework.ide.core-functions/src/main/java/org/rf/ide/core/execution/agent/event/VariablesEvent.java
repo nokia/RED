@@ -53,14 +53,23 @@ public final class VariablesEvent {
         if (value instanceof List<?>) {
             final List<Object> newValue = new ArrayList<>();
             for (final Object elem : ((List<?>) value)) {
-                newValue.add(reconstructTypesAndValues((List<?>) elem));
+                if (elem instanceof List<?>) {
+                    newValue.add(reconstructTypesAndValues((List<?>) elem));
+                } else {
+                    newValue.add(new VariableTypedValue("<unknown>", elem));
+                }
             }
             return new VariableTypedValue(type, newValue);
 
         } else if (value instanceof Map<?, ?>) {
             final Map<Object, Object> newValue = new LinkedHashMap<>();
             for (final Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
-                newValue.put(entry.getKey(), reconstructTypesAndValues((List<?>) entry.getValue()));
+
+                if (entry.getValue() instanceof List<?>) {
+                    newValue.put(entry.getKey(), reconstructTypesAndValues((List<?>) entry.getValue()));
+                } else {
+                    newValue.put(entry.getKey(), new VariableTypedValue("<unknown>", entry.getValue()));
+                }
             }
             return new VariableTypedValue(type, newValue);
         } else {
