@@ -56,7 +56,7 @@ public abstract class RedProjectEditorPage {
         toolkit = createToolkit(parent);
 
         final IEditorSite site = editorPart.getEditorSite();
-        context = ((IEclipseContext) site.getService(IEclipseContext.class)).getActiveLeaf();
+        context = site.getService(IEclipseContext.class).getActiveLeaf();
         context.set(RedFormToolkit.class, toolkit);
         context.set(IDirtyProviderService.class, context.get(IDirtyProviderService.class));
         context.set(IEditorSite.class, editorPart.getEditorSite());

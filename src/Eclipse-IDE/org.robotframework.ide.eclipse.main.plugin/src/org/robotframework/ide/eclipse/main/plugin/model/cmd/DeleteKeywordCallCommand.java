@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -66,7 +65,7 @@ public class DeleteKeywordCallCommand extends EditorCommand {
         if (callsToDelete.size() == deletedCallsIndexes.size()) {
             for (int i = 0; i < callsToDelete.size(); i++) {
                 final RobotKeywordCall call = callsToDelete.get(i);
-                commands.add(new InsertKeywordCallsCommand((RobotCodeHoldingElement<?>) call.getParent(),
+                commands.add(new InsertKeywordCallsCommand(call.getParent(),
                         deletedCallsIndexes.get(i), new RobotKeywordCall[] { call }));
             }
         }

@@ -37,8 +37,8 @@ public final class RobotModelManager {
         }
 
         private void notifyAboutChanges(final List<RobotElementChange> changes) {
-            final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
-            
+            final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+
             for (final RobotElementChange change : changes) {
                 eventBroker.post(RobotModelEvents.EXTERNAL_MODEL_CHANGE, change);
             }
