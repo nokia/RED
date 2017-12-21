@@ -27,7 +27,7 @@ public class ResolvedImportPathTest {
 
     @Test(expected = MalformedPathImportException.class)
     public void exceptionIsThrown_whenGivenPathIsInvalidUri() {
-        createResolved(":path/somewhere", Collections.<String, String>emptyMap());
+        createResolved(":path/somewhere", Collections.emptyMap());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class ResolvedImportPathTest {
     }
 
     @Test
-    public void resolvedPathIsProvided_whenAllParametersAreResolveable() throws URISyntaxException {
+    public void resolvedPathIsProvided_whenAllParametersAreResolvable() throws URISyntaxException {
         final Map<String, String> parameters = ImmutableMap.of("${var1}", "val1", "${var2}", "val2");
 
         assertThat(createResolved("val/path/somewhere", parameters))
@@ -57,7 +57,7 @@ public class ResolvedImportPathTest {
     public void testPathsResolution_whenResolvedPathIsRelative_inWindows() {
         assumeTrue(RedSystemProperties.isWindowsPlatform());
 
-        final Map<String, String> parameters = Collections.<String, String> emptyMap();
+        final Map<String, String> parameters = Collections.emptyMap();
         final ResolvedImportPath resolvedPath = createResolved("relative/path", parameters).get();
         final URI uri = resolvedPath.resolveInRespectTo(new File("c:/some/location").toURI());
 
@@ -68,7 +68,7 @@ public class ResolvedImportPathTest {
     public void testPathsResolution_whenResolvedPathIsRelative_inUnix() {
         assumeFalse(RedSystemProperties.isWindowsPlatform());
 
-        final Map<String, String> parameters = Collections.<String, String> emptyMap();
+        final Map<String, String> parameters = Collections.emptyMap();
         final ResolvedImportPath resolvedPath = createResolved("relative/path", parameters).get();
         final URI uri = resolvedPath.resolveInRespectTo(new File("/some/location").toURI());
 

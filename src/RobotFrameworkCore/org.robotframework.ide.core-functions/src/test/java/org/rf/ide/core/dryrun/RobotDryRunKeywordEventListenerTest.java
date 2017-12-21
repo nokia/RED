@@ -5,7 +5,6 @@
  */
 package org.rf.ide.core.dryrun;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -15,7 +14,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-import org.codehaus.jackson.map.JsonMappingException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
@@ -35,7 +33,7 @@ public class RobotDryRunKeywordEventListenerTest {
     private Consumer<String> libNameHandler;
 
     @Test
-    public void libraryImportIsHandled() throws Exception {
+    public void libraryImportEventIsHandled() throws Exception {
         final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(kwSourceCollector,
                 libNameHandler);
 
@@ -50,26 +48,11 @@ public class RobotDryRunKeywordEventListenerTest {
     }
 
     @Test
-    public void keywordSourceEventMappingExceptionIsHandled() throws Exception {
-        final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(
-                new RobotDryRunKeywordSourceCollector(), libNameHandler);
-
-        final MessageEvent event = new MessageEvent("{\"keyword\":\"incorrect\"}", LogLevel.NONE, null);
-
-        assertThatExceptionOfType(JsonMessageMapper.JsonMessageMapperException.class)
-                .isThrownBy(() -> listener.handleMessage(event))
-                .withMessage("Problem with mapping keyword source message")
-                .withCauseInstanceOf(JsonMappingException.class);
-
-        verifyZeroInteractions(libNameHandler);
-    }
-
-    @Test
-    public void keywordMessageEventIsHandled() throws Exception {
+    public void keywordSourceMessageEventIsHandled() throws Exception {
         final RobotDryRunKeywordEventListener listener = new RobotDryRunKeywordEventListener(kwSourceCollector,
                 libNameHandler);
 
-        final MessageEvent event = new MessageEvent("kw_message_789", LogLevel.NONE, null);
+        final MessageEvent event = new MessageEvent("kw_message", LogLevel.NONE, null);
 
         listener.handleMessage(event);
 
@@ -100,20 +83,29 @@ public class RobotDryRunKeywordEventListenerTest {
                 libNameHandler);
 
         final MessageEvent event1 = new MessageEvent("kw_1", LogLevel.NONE, null);
-        final MessageEvent event2 = new MessageEvent("kw_2", LogLevel.NONE, null);
-        final MessageEvent event3 = new MessageEvent("kw_3", LogLevel.NONE, null);
+        final LibraryImportEvent event2 = new LibraryImportEvent("lib2", new URI("file:///suite1.robot"),
+                new URI("file:///lib2.py"), Arrays.asList("a", "b"));
+        final MessageEvent event3 = new MessageEvent("kw_2", LogLevel.NONE, null);
+        final MessageEvent event4 = new MessageEvent("kw_3", LogLevel.NONE, null);
+        final LibraryImportEvent event5 = new LibraryImportEvent("lib1", new URI("file:///suite1.robot"),
+                new URI("file:///lib1.py"), Arrays.asList("x"));
 
         listener.handleMessage(event1);
-        listener.handleMessage(event2);
+        listener.handleLibraryImport(event2);
         listener.handleMessage(event3);
+        listener.handleMessage(event4);
+        listener.handleLibraryImport(event5);
 
-        final InOrder inOrder = inOrder(kwSourceCollector);
-
-        inOrder.verify(kwSourceCollector).collectFromMessageEvent(event1);
-        inOrder.verify(kwSourceCollector).collectFromMessageEvent(event2);
-        inOrder.verify(kwSourceCollector).collectFromMessageEvent(event3);
+        final InOrder kwSourceCollectorOrder = inOrder(kwSourceCollector);
+        kwSourceCollectorOrder.verify(kwSourceCollector).collectFromMessageEvent(event1);
+        kwSourceCollectorOrder.verify(kwSourceCollector).collectFromMessageEvent(event3);
+        kwSourceCollectorOrder.verify(kwSourceCollector).collectFromMessageEvent(event4);
         verifyNoMoreInteractions(kwSourceCollector);
-        verifyZeroInteractions(libNameHandler);
+
+        final InOrder libNameHandlerOrder = inOrder(libNameHandler);
+        libNameHandlerOrder.verify(libNameHandler).accept("lib2");
+        libNameHandlerOrder.verify(libNameHandler).accept("lib1");
+        verifyNoMoreInteractions(libNameHandler);
     }
 
 }
