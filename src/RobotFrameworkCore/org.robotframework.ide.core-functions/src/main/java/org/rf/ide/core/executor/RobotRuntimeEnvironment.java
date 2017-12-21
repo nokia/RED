@@ -95,7 +95,8 @@ public class RobotRuntimeEnvironment {
 
     private static String exactVersion(final SuiteExecutor interpreter, final String version) {
         return version != null && interpreter == SuiteExecutor.IronPython64
-                ? version.replaceAll("IronPython", "IronPython x64") : version;
+                ? version.replaceAll("IronPython", "IronPython x64")
+                : version;
     }
 
     private static Collection<PythonInstallationDirectory> whereIsPythonInterpreter(final SuiteExecutor interpreter) {
@@ -475,23 +476,18 @@ public class RobotRuntimeEnvironment {
      *
      * @param port
      *            Port number for communication with AgentConnectionServer
-     * @param suiteNames
-     *            Suite names in robot format (no suite filtering if empty)
-     * @param variableMappings
-     *            Variable mappings in <name:value> format (no variable mapping if empty)
-     * @param dataSourcePaths
-     *            Robot data source paths
+     * @param dataSourcePath
+     *            Path to test case file
      * @param additionalPaths
      *            Additional pythonPaths and classPaths
      * @throws RobotEnvironmentException
      */
-    public void startLibraryAutoDiscovering(final int port, final List<String> suiteNames,
-            final List<String> variableMappings, final List<String> dataSourcePaths,
+    public void startLibraryAutoDiscovering(final int port, final String dataSourcePath,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.startLibraryAutoDiscovering(port, suiteNames, variableMappings, dataSourcePaths, additionalPaths);
+            executor.startLibraryAutoDiscovering(port, dataSourcePath, additionalPaths);
         }
     }
 
