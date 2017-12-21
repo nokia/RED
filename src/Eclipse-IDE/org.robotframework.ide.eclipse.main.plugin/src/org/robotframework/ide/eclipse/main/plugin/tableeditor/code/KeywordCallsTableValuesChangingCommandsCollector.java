@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -18,25 +17,25 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class KeywordCallsTableValuesChangingCommandsCollector {
 
-    public List<? extends EditorCommand> collect(final RobotElement element, final String value, final int column) {
-        final List<EditorCommand> commands = new ArrayList<>();
-
+    public Optional<? extends EditorCommand> collect(final RobotElement element, final String value, final int column) {
         if (element instanceof RobotKeywordCall) {
             final RobotKeywordCall call = (RobotKeywordCall) element;
 
-            if (ExecutablesRowHolderCommentService.wasHandledAsComment(commands, call, value, column)) {
-                return commands;
+            final Optional<? extends EditorCommand> commentCommands = ExecutablesRowHolderCommentService
+                    .wasHandledAsComment(call, value, column);
+            if (commentCommands.isPresent()) {
+                return commentCommands;
             }
 
             if (column == 0) {
-                commands.add(new SetKeywordCallNameCommand(call, value));
+                return Optional.of(new SetKeywordCallNameCommand(call, value));
             } else if (isDocumentationSetting(call)) {
-                commands.add(new SetDocumentationSettingCommand((RobotDefinitionSetting) call, value));
+                return Optional.of(new SetDocumentationSettingCommand((RobotDefinitionSetting) call, value));
             } else {
-                commands.add(new SetKeywordCallArgumentCommand2(call, column - 1, value));
+                return Optional.of(new SetKeywordCallArgumentCommand2(call, column - 1, value));
             }
         }
-        return commands;
+        return Optional.empty();
     }
 
     private boolean isDocumentationSetting(final RobotKeywordCall call) {

@@ -59,9 +59,8 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
         final List<EditorCommand> pasteCommands = new ArrayList<>();
 
         final String valueToPaste = valuesToPaste.isEmpty() ? "" : valuesToPaste.get(0);
-        final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
-                .collectForChange(selectedElement, valueToPaste, selectedElementColumnIndex);
-        pasteCommands.addAll(commands);
+        new CasesTableValuesChangingCommandsCollector()
+                .collectForChange(selectedElement, valueToPaste, selectedElementColumnIndex).ifPresent(pasteCommands::add);
 
         return pasteCommands;
     }

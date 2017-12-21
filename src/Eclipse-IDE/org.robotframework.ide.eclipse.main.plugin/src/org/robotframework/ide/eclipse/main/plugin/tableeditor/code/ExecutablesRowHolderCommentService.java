@@ -5,16 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ICommentHolder;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -23,7 +22,6 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotEmptyLine;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertCallToComment;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.ConvertCommentToCall;
@@ -40,34 +38,29 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
  */
 public class ExecutablesRowHolderCommentService {
 
-    public static boolean wasHandledAsComment(final List<EditorCommand> commands, final RobotKeywordCall call,
-            final String value, final int column) {
+    static Optional<? extends EditorCommand> wasHandledAsComment(final RobotKeywordCall call, final String value,
+            final int column) {
 
-        boolean handled = false;
         final List<RobotToken> execRowView = execRowView(call);
         if (!execRowView.isEmpty()) {
             final int indexOfComment = findIndexOfTheFirstCommentBefore(execRowView, column);
             if (looksLikeComment(value) && indexOfComment < 0) {
                 // conversion to comment
-                commands.add(new ConversionToCommentCommand(call, value, column));
-                handled = true;
+                return Optional.of(new ConversionToCommentCommand(call, value, column));
             } else if (indexOfComment == column && !looksLikeComment(value)) {
                 // conversion from comment
-                commands.add(new ConversionFromCommentCommand(call, value, column));
-                handled = true;
+                return Optional.of(new ConversionFromCommentCommand(call, value, column));
             } else if (indexOfComment == 0) {
                 // update comment begin in action token
-                commands.add(new SetKeywordCallCommentCommand(call,
+                return Optional.of(new SetKeywordCallCommentCommand(call,
                         commentUpdatedValue((ICommentHolder) call.getLinkedElement(), column, value)));
-                handled = true;
             } else if (indexOfComment > 0) {
                 // update comment
-                commands.add(new SetKeywordCallCommentCommand(call,
+                return Optional.of(new SetKeywordCallCommentCommand(call,
                         commentUpdatedValue((ICommentHolder) call.getLinkedElement(), column - indexOfComment, value)));
-                handled = true;
             }
         }
-        return handled;
+        return Optional.empty();
     }
 
     public static class ConversionToCommentCommand extends EditorCommand {
@@ -292,7 +285,6 @@ public class ExecutablesRowHolderCommentService {
         } else {
             comment.set(commentIndex - actionAsHashAdditionalCommentValue, RobotToken.create(commentValue));
         }
-
         return commentViewBuild(comment);
     }
 
@@ -310,58 +302,48 @@ public class ExecutablesRowHolderCommentService {
                     str.append(" ");
                 }
             }
-
             cmUpdated = str.toString();
         }
-
         return cmUpdated;
     }
 
-    private static int findIndexOfTheFirstCommentBefore(final List<RobotToken> rts, final int index) {
-        final int size = rts.size();
-
-        for (int i = 0; i <= index && i < size; i++) {
-            if (rts.get(i).getText().trim().startsWith("#")) {
+    private static int findIndexOfTheFirstCommentBefore(final List<RobotToken> tokens, final int index) {
+        for (int i = 0; i <= index && i < tokens.size(); i++) {
+            if (tokens.get(i).getText().trim().startsWith("#")) {
                 return i;
             }
         }
-
         return -1;
     }
 
-    public static List<RobotToken> execRowView(final RobotFileInternalElement element) {
-        final List<RobotToken> toks = new ArrayList<>();
-        final Object linkedElement = element.getLinkedElement();
-        if (linkedElement instanceof AModelElement) {
-            final AModelElement<?> modelElement = (AModelElement<?>) linkedElement;
+    public static List<RobotToken> execRowView(final RobotKeywordCall element) {
+        final List<RobotToken> tokens = new ArrayList<>();
 
-            if (isExecutable(modelElement)) {
-                @SuppressWarnings("unchecked")
-                final RobotExecutableRowView view = RobotExecutableRowView
-                        .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
-                toks.addAll(newArrayList(transform(modelElement.getElementTokens(),
-                        RobotKeywordCall.tokenViaExecutableViewUpdateToken(view))));
-                if (toks.size() >= 2) {
-                    final RobotToken actionToken = toks.get(0);
-                    if (actionToken.getFilePosition().isNotSet() && actionToken.getText().isEmpty()) {
-                        final List<IRobotTokenType> types = toks.get(1).getTypes();
-                        if (types.contains(RobotTokenType.START_HASH_COMMENT)
-                                || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
-                            toks.remove(0);
-                        }
+        if (element.isExecutable()) {
+            final AModelElement<?> modelElement = element.getLinkedElement();
+            @SuppressWarnings("unchecked")
+            final RobotExecutableRowView view = RobotExecutableRowView
+                    .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) modelElement);
+
+            tokens.addAll(modelElement.getElementTokens()
+                    .stream()
+                    .map(RobotKeywordCall.tokenViaExecutableViewUpdateToken(view))
+                    .collect(toList()));
+
+            if (tokens.size() >= 2) {
+                final RobotToken actionToken = tokens.get(0);
+                if (actionToken.getFilePosition().isNotSet() && actionToken.getText().isEmpty()) {
+                    final List<IRobotTokenType> types = tokens.get(1).getTypes();
+                    if (types.contains(RobotTokenType.START_HASH_COMMENT)
+                            || types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+                        tokens.remove(0);
                     }
                 }
-            } else {
-                toks.addAll(modelElement.getElementTokens());
             }
+        } else {
+            tokens.addAll(element.getLinkedElement().getElementTokens());
         }
-
-        return toks;
-    }
-
-    private static boolean isExecutable(final AModelElement<?> linkedElement) {
-        return linkedElement.getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW
-                || linkedElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        return tokens;
     }
 
     public static boolean isCommentOperation(final String oldText, final String newText) {
