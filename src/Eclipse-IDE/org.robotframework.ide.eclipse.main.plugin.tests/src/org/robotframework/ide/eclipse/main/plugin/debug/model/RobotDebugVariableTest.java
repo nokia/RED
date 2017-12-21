@@ -59,9 +59,39 @@ public class RobotDebugVariableTest {
         assertThat(variable.getReferenceTypeName()).isEmpty(); // because the values have the type
         assertThat(variable.getValue()).isInstanceOf(RobotDebugValueOfList.class);
         assertThat(variable.hasValueChanged()).isFalse();
-        assertThat(variable.supportsValueModification()).isTrue();
         assertThat(variable.getScope()).contains(VariableScope.GLOBAL);
         assertThat(variable.getImage()).isEqualTo(RedImages.VARIABLES.getDebugListVariableImage());
+        variable.visitAllVariables(childVar -> assertThat(childVar.supportsValueModification()).isTrue());
+
+        final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
+        variable.visitAllVariables(visitor);
+
+        verify(visitor).visit(variable);
+        verify(visitor, times(3)).visit(any(RobotDebugVariable.class));
+        verifyNoMoreInteractions(visitor);
+    }
+
+    @Test
+    public void variablePropertiesCheckOfTopLevelTuple() {
+        final StackFrameVariable stackVariable = new StackFrameVariable(VariableScope.GLOBAL, false, "var", "tuple",
+                newArrayList(new VariableTypedValue("int", 1), new VariableTypedValue("str", "abc")));
+        final RobotDebugVariable variable = new RobotDebugVariable(mock(RobotStackFrame.class), stackVariable);
+
+        assertThat(variable.getParent()).isNull();
+        assertThat(variable.getName()).isEqualTo("var");
+        assertThat(variable.getReferenceTypeName()).isEmpty(); // because the values have the type
+        assertThat(variable.getValue()).isInstanceOf(RobotDebugValueOfList.class);
+        assertThat(variable.hasValueChanged()).isFalse();
+        assertThat(variable.getScope()).contains(VariableScope.GLOBAL);
+        assertThat(variable.getImage()).isEqualTo(RedImages.VARIABLES.getDebugListVariableImage());
+        variable.visitAllVariables(childVar -> {
+            if (childVar == variable) {
+                assertThat(childVar.supportsValueModification()).isTrue();
+            } else {
+                assertThat(childVar.supportsValueModification()).isFalse();
+            }
+        });
+
 
         final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
         variable.visitAllVariables(visitor);
@@ -82,9 +112,9 @@ public class RobotDebugVariableTest {
         assertThat(variable.getReferenceTypeName()).isEmpty(); // because the values have the type
         assertThat(variable.getValue()).isInstanceOf(RobotDebugValueOfDictionary.class);
         assertThat(variable.hasValueChanged()).isFalse();
-        assertThat(variable.supportsValueModification()).isTrue();
         assertThat(variable.getScope()).contains(VariableScope.TEST_CASE);
         assertThat(variable.getImage()).isEqualTo(RedImages.VARIABLES.getDebugDictionaryVariableImage());
+        variable.visitAllVariables(childVar -> assertThat(childVar.supportsValueModification()).isTrue());
 
         final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
         variable.visitAllVariables(visitor);
@@ -104,9 +134,9 @@ public class RobotDebugVariableTest {
         assertThat(variable.getReferenceTypeName()).isEmpty(); // because the values have the type
         assertThat(variable.getValue()).isInstanceOf(RobotDebugValueOfScalar.class);
         assertThat(variable.hasValueChanged()).isFalse();
-        assertThat(variable.supportsValueModification()).isTrue();
         assertThat(variable.getScope()).isEmpty();
         assertThat(variable.getImage()).isEqualTo(RedImages.VARIABLES.getDebugScalarVariableImage());
+        variable.visitAllVariables(childVar -> assertThat(childVar.supportsValueModification()).isTrue());
 
         final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
         variable.visitAllVariables(visitor);
@@ -126,9 +156,38 @@ public class RobotDebugVariableTest {
         assertThat(variable.getReferenceTypeName()).isEmpty(); // because the values have the type
         assertThat(variable.getValue()).isInstanceOf(RobotDebugValueOfList.class);
         assertThat(variable.hasValueChanged()).isFalse();
-        assertThat(variable.supportsValueModification()).isTrue();
         assertThat(variable.getScope()).isEmpty();
         assertThat(variable.getImage()).isEqualTo(RedImages.VARIABLES.getDebugListVariableImage());
+        variable.visitAllVariables(childVar -> assertThat(childVar.supportsValueModification()).isTrue());
+
+        final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
+        variable.visitAllVariables(visitor);
+
+        verify(visitor).visit(variable);
+        verify(visitor, times(3)).visit(any(RobotDebugVariable.class));
+        verifyNoMoreInteractions(visitor);
+    }
+
+    @Test
+    public void variablePropertiesCheckOfInnerTuple() {
+        final RobotDebugVariable parent = mock(RobotDebugVariable.class);
+        final RobotDebugVariable variable = new RobotDebugVariable(parent, "var", "tuple",
+                newArrayList(new VariableTypedValue("int", 1), new VariableTypedValue("str", "abc")));
+
+        assertThat(variable.getParent()).isSameAs(parent);
+        assertThat(variable.getName()).isEqualTo("var");
+        assertThat(variable.getReferenceTypeName()).isEmpty(); // because the values have the type
+        assertThat(variable.getValue()).isInstanceOf(RobotDebugValueOfList.class);
+        assertThat(variable.hasValueChanged()).isFalse();
+        assertThat(variable.getScope()).isEmpty();
+        assertThat(variable.getImage()).isEqualTo(RedImages.VARIABLES.getDebugListVariableImage());
+        variable.visitAllVariables(childVar -> {
+            if (childVar == variable) {
+                assertThat(childVar.supportsValueModification()).isTrue();
+            } else {
+                assertThat(childVar.supportsValueModification()).isFalse();
+            }
+        });
 
         final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
         variable.visitAllVariables(visitor);
@@ -149,9 +208,9 @@ public class RobotDebugVariableTest {
         assertThat(variable.getReferenceTypeName()).isEmpty(); // because the values have the type
         assertThat(variable.getValue()).isInstanceOf(RobotDebugValueOfDictionary.class);
         assertThat(variable.hasValueChanged()).isFalse();
-        assertThat(variable.supportsValueModification()).isTrue();
         assertThat(variable.getScope()).isEmpty();
         assertThat(variable.getImage()).isEqualTo(RedImages.VARIABLES.getDebugDictionaryVariableImage());
+        variable.visitAllVariables(childVar -> assertThat(childVar.supportsValueModification()).isTrue());
 
         final RobotDebugVariableVisitor visitor = mock(RobotDebugVariableVisitor.class);
         variable.visitAllVariables(visitor);
