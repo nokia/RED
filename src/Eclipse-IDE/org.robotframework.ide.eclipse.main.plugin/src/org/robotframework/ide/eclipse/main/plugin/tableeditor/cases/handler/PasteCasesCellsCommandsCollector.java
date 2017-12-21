@@ -44,19 +44,19 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
     protected List<String> findValuesToPaste(final RobotElement elementFromClipboard,
             final int clipboardElementColumnIndex, final int tableColumnsCount) {
         if (elementFromClipboard instanceof RobotKeywordCall) {
-            return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex,
-                    tableColumnsCount);
+            return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex);
+
         } else if (elementFromClipboard instanceof RobotCase) {
             return getValuesFromTestCase((RobotCase) elementFromClipboard, clipboardElementColumnIndex);
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     @Override
     protected List<EditorCommand> collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
             final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount) {
 
-        final List<EditorCommand> pasteCommands = newArrayList();
+        final List<EditorCommand> pasteCommands = new ArrayList<>();
 
         final String valueToPaste = valuesToPaste.isEmpty() ? "" : valuesToPaste.get(0);
         final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
@@ -67,14 +67,14 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
     }
 
     private List<String> getValuesFromKeywordCall(final RobotKeywordCall keywordCall,
-            final int clipboardElementColumnIndex, final int tableColumnsCount) {
+            final int clipboardElementColumnIndex) {
         final ModelType modelType = keywordCall.getLinkedElement().getModelType();
 
         if (clipboardElementColumnIndex > 0 && modelType == ModelType.TEST_CASE_DOCUMENTATION) {
             if (clipboardElementColumnIndex == 1) {
                 return newArrayList(getDocumentationText(keywordCall));
             } else {
-                return newArrayList();
+                return new ArrayList<>();
             }
         }
 
@@ -82,8 +82,7 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
         if (clipboardElementColumnIndex < execRowView.size()) {
             return newArrayList(execRowView.get(clipboardElementColumnIndex).getText());
         }
-
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     private String getDocumentationText(final RobotKeywordCall keywordCall) {
@@ -94,6 +93,6 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
         if (clipboardElementColumnIndex == 0) {
             return newArrayList(testCase.getName());
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 }

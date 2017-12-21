@@ -23,7 +23,7 @@ public class RobotEditorCommandsStack {
     private final Deque<EditorCommand> _toRedoCommands = new ArrayDeque<>();
 
     public void execute(final EditorCommand command) throws CommandExecutionException {
-        final IEclipseContext context = ((IEclipseContext) PlatformUI.getWorkbench().getService(IEclipseContext.class))
+        final IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class)
                 .getActiveLeaf();
         ContextInjectionFactory.inject(command, context);
         command.execute();
@@ -67,8 +67,8 @@ public class RobotEditorCommandsStack {
 
     private void clear(final Deque<EditorCommand> stackToClear) {
         while (!stackToClear.isEmpty()) {
-            final IEclipseContext context = ((IEclipseContext) PlatformUI.getWorkbench()
-                    .getService(IEclipseContext.class)).getActiveLeaf();
+            final IEclipseContext context = PlatformUI.getWorkbench()
+                    .getService(IEclipseContext.class).getActiveLeaf();
             final EditorCommand command = stackToClear.pop();
             ContextInjectionFactory.uninject(command, context);
         }

@@ -99,7 +99,7 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
     }
     
     private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
     @Override
