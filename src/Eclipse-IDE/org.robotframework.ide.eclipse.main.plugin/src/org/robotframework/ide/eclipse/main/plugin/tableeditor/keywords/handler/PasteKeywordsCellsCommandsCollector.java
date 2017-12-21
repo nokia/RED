@@ -64,10 +64,9 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
         final List<EditorCommand> pasteCommands = new ArrayList<>();
 
         final String valueToPaste = valuesToPaste.isEmpty() ? "" : valuesToPaste.get(0);
-        final List<? extends EditorCommand> commands = new KeywordsTableValuesChangingCommandsCollector()
-                .collectForChange(selectedElement, valueToPaste, selectedElementColumnIndex, tableColumnsCount);
-        pasteCommands.addAll(commands);
-
+        new KeywordsTableValuesChangingCommandsCollector()
+                .collectForChange(selectedElement, valueToPaste, selectedElementColumnIndex, tableColumnsCount)
+                .ifPresent(pasteCommands::add);
         return pasteCommands;
     }
 

@@ -16,7 +16,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
 
@@ -79,11 +78,9 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
     @Override
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
         if (rowObject instanceof RobotElement) {
-            final List<? extends EditorCommand> commands = new KeywordsTableValuesChangingCommandsCollector()
-                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex, numberOfColumns);
-            for (final EditorCommand command : commands) {
-                commandsStack.execute(command);
-            }
+            new KeywordsTableValuesChangingCommandsCollector()
+                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex, numberOfColumns)
+                    .ifPresent(commandsStack::execute);
         }
     }
 
