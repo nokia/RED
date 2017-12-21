@@ -11,7 +11,6 @@ import types
 import inspect
 import re
 
-from robot.running.builder import TestSuiteBuilder
 from robot.api import SuiteVisitor
 from robot.running import TestLibrary
 from robot.running.testlibraries import _BaseTestLibrary
@@ -23,34 +22,13 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
     LIB_IMPORT_TIMEOUT = 60
 
-    def __init__(self, suite_names, data_source_paths):
-        self.suite_names = [name for name in suite_names if name]
-        self.data_source_paths = [path for path in data_source_paths if path]
-        self.__wrap_importer()
-
-    def __wrap_importer(self):
-        import robot
+    def __init__(self):
         import robot.running.namespace
-        import robot.running.importer
-        current = robot.running.namespace.IMPORTER
-        to_wrap = current if isinstance(current, robot.running.importer.Importer) else current.importer
-        robot.running.namespace.IMPORTER = RedImporter(to_wrap, self.LIB_IMPORT_TIMEOUT)
+        robot.running.namespace.IMPORTER = RedImporter(robot.running.namespace.IMPORTER, self.LIB_IMPORT_TIMEOUT)
 
     def visit_suite(self, suite):
-        if suite.parent:
-            suite.parent.tests.clear()
-            suite.parent.keywords.clear()
-        else:
-            # rebuilding first suite may be needed to support suites without test cases
-            self.__rebuild_suite_if_empty(suite)
-
-            # when first suite is visited all suites are counted and message is sent to server
-            msg = json.dumps({'suite_count': self.__count_suites(suite)})
-            LOGGER.message(Message(message=msg, level='NONE'))
-
         suite.tests.clear()
         suite.keywords.clear()
-
         suite.suites.visit(self)
 
     def visit_test(self, test):
@@ -65,54 +43,11 @@ class SuiteVisitorImportProxy(SuiteVisitor):
         # message visiting skipped
         pass
 
-    def __count_suites(self, suite):
-        if suite.suites:
-            return 1 + sum(self.__count_suites(s) for s in suite.suites)
-        else:
-            return 1
-
-    def __rebuild_suite_if_empty(self, suite):
-        if len(suite.tests) == 0 or suite.test_count == 0:
-            current_suite = RedTestSuiteBuilder().build(*self.data_source_paths)
-            if len(self.suite_names) == 0:
-                suite.suites = current_suite.suites
-            else:
-                suite_name_prefix = '' if current_suite.source or current_suite.parent else current_suite.longname + '.'
-                suite.suites = self.__filter_by_name(suite_name_prefix, current_suite.suites)
-
-    def __filter_by_name(self, suite_name_prefix, suites):
-        matched_suites = []
-
-        for suite in suites:
-            for s_name in self.suite_names:
-                if suite not in matched_suites and self.__suite_name_matches(suite, suite_name_prefix + s_name):
-                    matched_suites.append(suite)
-                    suite.suites = self.__filter_by_name(suite_name_prefix, suite.suites)
-
-        return matched_suites
-
-    def __suite_name_matches(self, suite, s_name):
-        longpath = suite.longname.lower().replace('_', ' ')
-        normalized_s_name = s_name.lower().replace('_', ' ')
-        matches = lambda x: x == '' or x.startswith('.') or x.startswith('*') or x.startswith('?')
-        if len(longpath) >= len(normalized_s_name) and longpath.startswith(normalized_s_name):
-            return matches(longpath.replace(normalized_s_name, ''))
-        elif len(longpath) < len(normalized_s_name) and normalized_s_name.startswith(longpath):
-            return matches(normalized_s_name.replace(longpath, ''))
-        return False
-
-
-class RedTestSuiteBuilder(TestSuiteBuilder):
-    """ switch off empty suite removing """
-
-    def _parse_and_build(self, path):
-        return self._build_suite(self._parse(path))
-
 
 class RedImporter(object):
     def __init__(self, importer, lib_import_timeout):
         self.importer = importer
-        self.lib_import_timeout = int(lib_import_timeout)
+        self.lib_import_timeout = lib_import_timeout
         self.func = None
         self.lock = threading.Lock()
         self.cached_lib_items = list()
