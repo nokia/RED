@@ -5,9 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Iterables.transform;
-import static com.google.common.collect.Lists.newArrayList;
+import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -15,6 +13,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
@@ -31,9 +31,6 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 
 public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
 
@@ -127,59 +124,44 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     public List<String> getArguments() {
         if (arguments == null) {
-            final List<RobotToken> allTokens = linkedElement.getElementTokens();
-            final Iterable<RobotToken> tokensWithoutComments = filter(allTokens, new Predicate<RobotToken>() {
-
-                @Override
-                public boolean apply(final RobotToken token) {
-                    final List<IRobotTokenType> types = token.getTypes();
-                    final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
-                    return !types.contains(RobotTokenType.START_HASH_COMMENT)
-                            && !types.contains(RobotTokenType.COMMENT_CONTINUE)
-                            && type != RobotTokenType.KEYWORD_ACTION_NAME
-                            && type != RobotTokenType.TEST_CASE_ACTION_NAME;
-                }
+            final Stream<RobotToken> tokensWithoutComments = linkedElement.getElementTokens().stream().filter(token -> {
+                final List<IRobotTokenType> types = token.getTypes();
+                final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
+                return !types.contains(RobotTokenType.START_HASH_COMMENT)
+                        && !types.contains(RobotTokenType.COMMENT_CONTINUE)
+                        && type != RobotTokenType.KEYWORD_ACTION_NAME && type != RobotTokenType.TEST_CASE_ACTION_NAME;
             });
-            final ModelType modelType = linkedElement.getModelType();
-            if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+
+            if (isExecutable()) {
                 @SuppressWarnings("unchecked")
                 final RobotExecutableRowView view = RobotExecutableRowView
                         .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
-                arguments = newArrayList(transform(tokensWithoutComments, tokenViaExecutableView(view)));
+
+                arguments = tokensWithoutComments.map(tokenViaExecutableView(view)).collect(toList());
             } else {
-                arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
+                arguments = tokensWithoutComments.map(TokenFunctions.tokenToString()).collect(toList());
             }
         }
         return arguments;
     }
 
     static Function<RobotToken, String> tokenViaExecutableView(final RobotExecutableRowView view) {
-        return new Function<RobotToken, String>() {
-
-            @Override
-            public String apply(final RobotToken token) {
-                return tokenViaExecutableViewUpdateToken(view).apply(token).getText();
-            }
-        };
+        return token -> tokenViaExecutableViewUpdateToken(view).apply(token).getText();
     }
 
     public static Function<RobotToken, RobotToken> tokenViaExecutableViewUpdateToken(
             final RobotExecutableRowView view) {
-        return new Function<RobotToken, RobotToken>() {
-
-            @Override
-            public RobotToken apply(final RobotToken token) {
-                if (wasAlreadyUpdatedWithAssignment(token)) {
-                    final String text = view.getTokenRepresentation(token);
-                    token.setText(text);
-                }
-                return token;
+        return token -> {
+            if (wasAlreadyUpdatedWithAssignment(token)) {
+                final String text = view.getTokenRepresentation(token);
+                token.setText(text);
             }
-
-            private boolean wasAlreadyUpdatedWithAssignment(final RobotToken token) {
-                return !token.isDirty() && !token.getText().trim().endsWith("=");
-            }
+            return token;
         };
+    }
+
+    private static boolean wasAlreadyUpdatedWithAssignment(final RobotToken token) {
+        return !token.isDirty() && !token.getText().trim().endsWith("=");
     }
 
     public void resetStored() {
@@ -299,7 +281,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.getComment();
     }
 
-    public RobotKeywordCall insertCellAt(int position, String newValue) {
+    public RobotKeywordCall insertCellAt(final int position, final String newValue) {
         linkedElement.insertValueAt(newValue, position);
         resetStored();
         return this;

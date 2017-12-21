@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import java.util.List;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.E4DeleteInTableHandler;
@@ -25,10 +23,9 @@ public class DeleteInKeywordTableHandler extends DIParameterizedHandler<E4Delete
         @Override
         protected EditorCommand getCommandForSelectedElement(final RobotElement selectedElement, final int columnIndex,
                 final int tableColumnCount) {
-
-            final List<? extends EditorCommand> commands = new KeywordsTableValuesChangingCommandsCollector()
-                    .collectForRemoval(selectedElement, columnIndex, tableColumnCount);
-            return commands.isEmpty() ? null : commands.get(0);
+            return new KeywordsTableValuesChangingCommandsCollector()
+                    .collectForRemoval(selectedElement, columnIndex, tableColumnCount)
+                    .orElse(null);
         }
     }
 }
