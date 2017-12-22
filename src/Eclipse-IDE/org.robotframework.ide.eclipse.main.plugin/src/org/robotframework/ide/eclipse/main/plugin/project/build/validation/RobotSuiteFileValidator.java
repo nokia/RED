@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -38,7 +39,7 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
     }
 
     private void validateFileName(final RobotSuiteFile fileModel) {
-        if ("__init__".equals(getSimpleName(file))) {
+        if (RobotFile.INIT_NAMES.stream().anyMatch(file.getName()::equalsIgnoreCase)) {
             final ProblemPosition position = getTestCaseTableHeaderPosition(
                     fileModel.findSection(RobotCasesSection.class));
             reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.SUITE_FILE_IS_NAMED_INIT), file, position);
@@ -63,7 +64,4 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
         return new ProblemPosition(1);
     }
 
-    private static String getSimpleName(final IFile file) {
-        return file.getName().substring(0, file.getName().length() - file.getFileExtension().length() - 1);
-    }
 }

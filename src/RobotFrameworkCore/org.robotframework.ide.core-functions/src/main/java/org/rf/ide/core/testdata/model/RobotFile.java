@@ -20,7 +20,13 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
+import com.google.common.collect.ImmutableList;
+
 public class RobotFile implements IChildElement<RobotFileOutput> {
+
+    public static final String INIT_NAME = "__init__";
+
+    public static final List<String> INIT_NAMES = ImmutableList.of("__init__.robot", "__init__.tsv", "__init__.txt");
 
     private final RobotFileOutput parentFileOutput;
 
