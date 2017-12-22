@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.core.runtime.content.IContentDescriber;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -23,7 +24,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescr
 public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     private final String name;
+
     private final InputStream input;
+
     private final boolean readOnly;
 
     public RobotSuiteStreamFile(final String name, final InputStream input, final boolean readOnly) {
@@ -46,7 +49,7 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         }
         contentTypeId = null;
         if (input != null) {
-            if ("__init__.robot".equals(name) || "__init__.tsv".equals(name) || "__init__.txt".equals(name)) {
+            if (RobotFile.INIT_NAMES.stream().anyMatch(name::equalsIgnoreCase)) {
                 contentTypeId = ASuiteFileDescriber.INIT_FILE_CONTENT_ID;
                 return contentTypeId;
             }
@@ -97,7 +100,7 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
             }
         };
     }
-    
+
     @Override
     public String getName() {
         return name;
