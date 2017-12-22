@@ -1,0 +1,101 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _SMEBYOcUEeecNpv54eOlqg
+Element-Name: VariableMappingWithEXECDIR
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _8F_DcOcFEeecNpv54eOlqg
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/22/17 2:41 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view Problems | get-tree | select "Errors (2 items)"
+with [get-view Problems | get-tree] {
+    get-item 
+        -path "Errors \\(2 items\\)/Unknown '.\\/external_lib\\/calculator.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        | get-property caption 
+        | equals "Unknown './external_lib/calculator.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+    get-item 
+        -path "Errors \\(2 items\\)/Unknown 'D:\\RCPTT_2_2\\aut-red-produkt\\ProjectWithResource\\/external_lib\\/calculator.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        | get-property caption 
+        | equals "Unknown 'D:\\RCPTT_2_2\\aut-red-produkt\\ProjectWithResource/external_lib/calculator.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+}
+
+proc "change_variable" [val var_name] [val new_path]{
+	with [get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table] {
+	    select $var_name | double-click
+	    select $var_name | activate-cell-edit -column 1 -type MouseDoubleClickSelection
+	    with [get-editbox] {
+	        set-text $new_path
+	        key-type Enter
+	    }
+		apply-cell-edit -deactivate
+	}	
+}
+
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
+
+change_variable "${res_path}" "${EXECDIR}/resource_folder/res_2.robot"
+change_variable "${lib_path}" "${EXECDIR}/external_lib/calculator2.py"
+change_variable "${var_path}" "${EXECDIR}/external_lib/calculator2.py"
+
+change_variable "${res_path2}" "${CURDIR}/resource_folder/res_13.robot"
+change_variable "${lib_path2}" "${CURDIR}/external_lib/calculator3.py"
+change_variable "${var_path2}" "${CURDIR}/external_var/var3.py"
+
+get-eclipse-window | key-type "M1+s"
+
+get-menu -path "Project/Clean..." | click
+get-window Clean | get-button Clean | click
+
+
+get-view Problems | get-tree | get-item -path "Errors \\(7 items\\)" | get-property childCount | equals 7 | verify-true
+with [get-view Problems | get-tree] {
+    get-item 
+        -path "Errors \\(7 items\\)/Resource import '.\\/external_var\\/var3.py' is invalid: file does not exist. Check file name and path." 
+        | get-property caption 
+        | equals "Resource import './external_var/var3.py' is invalid: file does not exist. Check file name and path." 
+        | verify-true
+        
+    get-item 
+        -path "Errors \\(7 items\\)/Resource import '.\\/resource_folder\\/res_13.robot' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
+        | get-property caption 
+        | equals "Resource import './resource_folder/res_13.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" 
+        | verify-true
+        
+    get-item 
+        -path "Errors \\(7 items\\)/Resource import '.*calculator2.py' is invalid: file does not exist. Check file name and path." 
+        | get-property caption 
+        | equals [format "Resource import '%s%sProjectWithResource/external_lib/calculator2.py' is invalid: file does not exist. Check file name and path."   $RED_workspace_path $sys_sep]
+        | verify-true
+        
+    get-item 
+        -path "Errors \\(7 items\\)/Resource import '.*res_2.robot' is invalid: file does not exist. Try to use Quick Fix \\(Ctrl\\+1\\)" 
+        | get-property caption 
+        | equals [format "Resource import '%s%sProjectWithResource/resource_folder/res_2.robot' is invalid: file does not exist. Try to use Quick Fix (Ctrl+1)" $RED_workspace_path $sys_sep]
+        | verify-true
+      
+    get-item 
+        -path "Errors \\(7 items\\)/Unknown '.\\/external_lib\\/calculator3.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        | get-property caption 
+        | equals "Unknown './external_lib/calculator3.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+        
+        
+ 	get-item
+	    -path "Errors \\(7 items\\)/Unknown '.*calculator2.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+	    | get-property caption 
+	    | equals [format "Unknown '%s%SProjectWithResource/external_lib/calculator2.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" $RED_workspace_path $sys_sep ]
+	    | verify-true
+	    
+    get-item -path "Errors \\(7 items\\)/Unknown keyword 'test_resource'" | get-property caption 
+        | equals "Unknown keyword 'test_resource'" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
