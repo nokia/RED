@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +15,15 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 
 public abstract class RobotContainer implements RobotElement {
 
     private final RobotElement parent;
+
     protected final IContainer container;
+
     private final List<RobotElement> elements;
 
     RobotContainer(final RobotElement parent, final IContainer container) {
@@ -137,7 +138,7 @@ public abstract class RobotContainer implements RobotElement {
 
     private boolean isChanged(final IResourceDelta elementDelta) {
         return elementDelta != null && elementDelta.getKind() == IResourceDelta.CHANGED
-         && elementDelta.getFlags() != IResourceDelta.MARKERS;
+                && elementDelta.getFlags() != IResourceDelta.MARKERS;
     }
 
     private boolean isRemoved(final IResourceDelta elementDelta) {
@@ -145,7 +146,8 @@ public abstract class RobotContainer implements RobotElement {
     }
 
     public Optional<RobotSuiteFile> getInitFileModel() {
-        for (final String initName : newArrayList("__init__.robot", "__init__.tsv", "__init__.txt")) {
+        // FIXME: it should be case insensitive, see RED-1012
+        for (final String initName : RobotFile.INIT_NAMES) {
             final IFile file = container.getFile(new Path(initName));
             if (file.exists() && ASuiteFileDescriber.isInitializationFile(file)) {
                 final RobotSuiteFile suiteFile = createSuiteFile(file);

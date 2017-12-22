@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
@@ -56,7 +57,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import com.google.common.base.Charsets;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.SetMultimap;
@@ -246,9 +246,9 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
-         if (delta.getFlags() != IResourceDelta.MARKERS) {
-             refreshOnFileChange();
-         }
+        if (delta.getFlags() != IResourceDelta.MARKERS) {
+            refreshOnFileChange();
+        }
         return new ArrayList<>();
     }
 
@@ -363,7 +363,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     @Override
     public List<RobotSuiteFileSection> getChildren() {
-        return sections == null ? Lists.<RobotSuiteFileSection>newArrayList() : sections;
+        return sections == null ? new ArrayList<>() : sections;
     }
 
     public boolean isEditable() {
@@ -418,8 +418,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     public Multimap<LibrarySpecification, Optional<String>> getImportedLibraries() {
         final RobotProject project = getProject();
 
-        final List<RobotSetting> nonEmptyLibraryImports = findSection(RobotSettingsSection.class)
-                .map(Stream::of)
+        final List<RobotSetting> nonEmptyLibraryImports = findSection(RobotSettingsSection.class).map(Stream::of)
                 .orElseGet(Stream::empty)
                 .flatMap(section -> section.getLibrariesSettings().stream())
                 .filter(setting -> !setting.getArguments().isEmpty())
@@ -526,7 +525,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         if (optionalKeywords.isPresent()) {
             return optionalKeywords.get().getUserDefinedKeywords();
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     public List<String> getResourcesPaths() {
@@ -534,7 +533,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         if (optionalSettings.isPresent()) {
             return optionalSettings.get().getResourcesPaths();
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     public List<String> getVariablesPaths() {
@@ -542,7 +541,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         if (optionalSettings.isPresent()) {
             return optionalSettings.get().getVariablesPaths();
         }
-        return newArrayList();
+        return new ArrayList<>();
     }
 
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
@@ -550,6 +549,13 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         final PathsProvider pathsProvider = getProject().createPathsProvider();
         return fileOutput != null ? fileOutput.getVariablesImportReferences(projectHolder, pathsProvider)
                 : new ArrayList<>();
+    }
+
+    public static IFile createRobotInitializationFile(final IFolder folder, final String extension)
+            throws CoreException {
+        final IFile initFile = folder.getFile(RobotFile.INIT_NAME + "." + extension);
+        initFile.create(new ByteArrayInputStream(new byte[0]), true, new NullProgressMonitor());
+        return initFile;
     }
 
     public interface ParsingStrategy {
