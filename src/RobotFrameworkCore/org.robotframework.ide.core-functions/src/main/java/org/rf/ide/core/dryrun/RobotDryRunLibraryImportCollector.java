@@ -18,6 +18,8 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus
 import org.rf.ide.core.execution.agent.event.LibraryImportEvent;
 import org.rf.ide.core.execution.agent.event.MessageEvent;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author mmarzec
  */
@@ -56,18 +58,20 @@ public class RobotDryRunLibraryImportCollector {
             JsonMessageMapper.readValue(event, MESSAGE_KEY, MESSAGE_TYPE).ifPresent(importError -> {
                 final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(
                         importError.getName());
-                final String additionalInfo = importError.getError()
-                        .replaceAll("\\\\n", "\n")
-                        .replaceAll("\\\\'", "'")
-                        .replace("<class 'robot.errors.DataError'>, DataError(", "");
                 dryRunLibraryImport.setStatus(DryRunLibraryImportStatus.NOT_ADDED);
-                dryRunLibraryImport.setAdditionalInfo(additionalInfo);
+                dryRunLibraryImport.setAdditionalInfo(formatAdditionalInfo(importError.getError()));
                 importedLibraries.add(dryRunLibraryImport);
                 erroneousLibraryNames.add(importError.getName());
             });
         } catch (final IOException e) {
             throw new JsonMessageMapperException("Problem with mapping message for key '" + MESSAGE_KEY + "'", e);
         }
+    }
+
+    @VisibleForTesting
+    static String formatAdditionalInfo(final String error) {
+        return error.replaceAll("\\\\n", "\n").replaceAll("\\\\'", "'").replace(
+                "<class 'robot.errors.DataError'>, DataError", "");
     }
 
     public List<RobotDryRunLibraryImport> getImportedLibraries() {
