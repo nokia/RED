@@ -33,10 +33,10 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
         public void discoverLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-            // FIXME: run grouping in job
+            // TODO: run grouping in job, see RED-1013
             final Map<RobotProject, Collection<RobotSuiteFile>> filesGroupedByProject = RobotSuiteFileCollector
                     .collectGroupedByProject(selectedResources);
-            // for now we want to start autodiscovering only for one project
+            // TODO: for now we want to start autodiscovering only for one project, see RED-1004
             filesGroupedByProject.entrySet().stream().findFirst().ifPresent(
                     entry -> new CombinedLibrariesAutoDiscoverer(entry.getKey(), entry.getValue()).start());
         }
