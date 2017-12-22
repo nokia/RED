@@ -15,7 +15,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
 
@@ -35,17 +34,13 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
     }
 
     @Override
-    public Object getDataValue(final Object rowObject, final int columnIndex) {
+    public String getDataValue(final Object rowObject, final int columnIndex) {
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
             final ModelType modelType = keywordCall.getLinkedElement().getModelType();
 
             if (columnIndex > 0 && modelType == ModelType.TEST_CASE_DOCUMENTATION) {
-                if (columnIndex == 1) {
-                    return getDocumentationText(keywordCall).replaceAll("\\s+", " ").trim();
-                } else {
-                    return "";
-                }
+                return columnIndex == 1 ? getDocumentationText(keywordCall).replaceAll("\\s+", " ").trim() : "";
             }
 
             final List<RobotToken> execRowView = ExecutablesRowHolderCommentService.execRowView(keywordCall);
@@ -54,22 +49,21 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
             }
         } else if (rowObject instanceof RobotCase) {
             final RobotCase robotCase = (RobotCase) rowObject;
-
-            if (columnIndex == 0) {
-                return robotCase.getName();
-            }
+            return columnIndex == 0 ? robotCase.getName() : "";
         }
         return "";
+    }
+
+    private String getDocumentationText(final RobotKeywordCall keywordCall) {
+        return DocumentationServiceHandler.toEditConsolidated((IDocumentationHolder) keywordCall.getLinkedElement());
     }
 
     @Override
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
         if (rowObject instanceof RobotElement) {
-            final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
-                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex);
-            for (final EditorCommand command : commands) {
-                commandsStack.execute(command);
-            }
+            new CasesTableValuesChangingCommandsCollector()
+                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex)
+                    .ifPresent(commandsStack::execute);
         }
     }
 
@@ -90,9 +84,5 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
     @Override
     public int getColumnIndex(final String propertyName) {
         return properties.inverse().get(propertyName);
-    }
-
-    private String getDocumentationText(final RobotKeywordCall keywordCall) {
-        return DocumentationServiceHandler.toEditConsolidated((IDocumentationHolder) keywordCall.getLinkedElement());
     }
 }
