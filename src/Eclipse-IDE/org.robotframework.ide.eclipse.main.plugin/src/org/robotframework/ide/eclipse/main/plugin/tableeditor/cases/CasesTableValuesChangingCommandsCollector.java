@@ -5,8 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -20,28 +19,22 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.KeywordCallsT
  */
 public class CasesTableValuesChangingCommandsCollector {
 
-    public List<? extends EditorCommand> collectForRemoval(final RobotElement element, final int column) {
+    public Optional<? extends EditorCommand> collectForRemoval(final RobotElement element, final int column) {
         return collect(element, null, column);
     }
 
-    public List<? extends EditorCommand> collectForChange(final RobotElement element, final String newValue,
+    public Optional<? extends EditorCommand> collectForChange(final RobotElement element, final String newValue,
             final int column) {
         return collect(element, newValue, column);
     }
 
-    private List<? extends EditorCommand> collect(final RobotElement element, final String value, final int column) {
-        final List<EditorCommand> commands = new ArrayList<>();
-
+    private Optional<? extends EditorCommand> collect(final RobotElement element, final String value,
+            final int column) {
         if (element instanceof RobotCase) {
             final RobotCase testCase = (RobotCase) element;
-            if (column == 0) {
-                commands.add(new SetCaseNameCommand(testCase, value));
-            }
+            return column == 0 ? Optional.of(new SetCaseNameCommand(testCase, value)) : Optional.empty();
         } else {
-            final List<? extends EditorCommand> callCommands = new KeywordCallsTableValuesChangingCommandsCollector()
-                    .collect(element, value, column);
-            commands.addAll(callCommands);
+            return new KeywordCallsTableValuesChangingCommandsCollector().collect(element, value, column);
         }
-        return commands;
     }
 }

@@ -1,7 +1,5 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
-import java.util.List;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesTableValuesChangingCommandsCollector;
@@ -20,9 +18,8 @@ public class DeleteInCasesTableHandler extends DIParameterizedHandler<E4DeleteIn
         @Override
         protected EditorCommand getCommandForSelectedElement(final RobotElement selectedElement, final int columnIndex,
                 final int tableColumnCount) {
-            final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
-                    .collectForRemoval(selectedElement, columnIndex);
-            return commands.isEmpty() ? null : commands.get(0);
+            return new CasesTableValuesChangingCommandsCollector().collectForRemoval(selectedElement, columnIndex)
+                    .orElse(null);
         }
     }
 }

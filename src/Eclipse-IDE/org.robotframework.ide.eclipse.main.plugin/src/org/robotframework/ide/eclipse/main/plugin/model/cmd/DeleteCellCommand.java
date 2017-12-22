@@ -1,7 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -18,7 +18,7 @@ public class DeleteCellCommand extends EditorCommand {
     private final int position;
     private EditorCommand executed;
 
-    public DeleteCellCommand(RobotKeywordCall call, int position) {
+    public DeleteCellCommand(final RobotKeywordCall call, final int position) {
         this.call = call;
         this.position = position;
     }
@@ -28,25 +28,23 @@ public class DeleteCellCommand extends EditorCommand {
 
         final int callIndex = call.getIndex();
         final IRobotCodeHoldingElement parent = call.getParent();
-        final List<EditorCommand> commands = new ArrayList<>();
-        String topic = RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED;
+        final Optional<? extends EditorCommand> command;
+        final String topic;
         if (call instanceof RobotSetting) {
             final RobotSetting selectedSetting = (RobotSetting) call;
             topic = RobotModelEvents.ROBOT_SETTING_CHANGED;
-            if (position > 0) {
-                commands.add(new SetSettingArgumentCommand(selectedSetting, position - 1, null));
-            }
+
+            command = position > 0 ? Optional.of(new SetSettingArgumentCommand(selectedSetting, position - 1, null))
+                    : Optional.empty();
         } else {
-            commands.addAll(new KeywordCallsTableValuesChangingCommandsCollector()
-                    .collect(call, null, position));
+            topic = RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED;
+            command = new KeywordCallsTableValuesChangingCommandsCollector().collect(call, null, position);
         }
 
-        if (commands.size() == 1) {
-            executed = commands.get(0);
+        if (command.isPresent()) {
+            executed = command.get();
             executed.setEventBroker(eventBroker);
             executed.execute();
-        } else if (commands.size() > 1) {
-            throw new IllegalStateException("Only single cell should be deleted this way!");
         }
 
         RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
