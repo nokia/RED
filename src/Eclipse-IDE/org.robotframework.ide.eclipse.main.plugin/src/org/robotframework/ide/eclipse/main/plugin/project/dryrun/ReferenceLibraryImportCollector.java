@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -219,13 +220,17 @@ class ReferenceLibraryImportCollector {
         }
 
         @Override
-        public void libraryDetectingByNameFailed(final String name, final String failReason) {
+        public void libraryDetectingByNameFailed(final String name, final Optional<File> libraryFile,
+                final String failReason) {
             unknownLibraryNames.put(name, currentSuite);
         }
 
         @Override
-        public void libraryDetectingByPathFailed(final String path, final String failReason) {
-            final RobotDryRunLibraryImport libImport = new RobotDryRunLibraryImport(path);
+        public void libraryDetectingByPathFailed(final String path, final Optional<File> libraryFile,
+                final String failReason) {
+            final RobotDryRunLibraryImport libImport = libraryFile.isPresent()
+                    ? new RobotDryRunLibraryImport(path, libraryFile.get().toURI())
+                    : new RobotDryRunLibraryImport(path);
             libImport.setStatus(RobotDryRunLibraryImport.DryRunLibraryImportStatus.NOT_ADDED);
             libImport.setAdditionalInfo(failReason);
             libraryImports.add(libImport);
