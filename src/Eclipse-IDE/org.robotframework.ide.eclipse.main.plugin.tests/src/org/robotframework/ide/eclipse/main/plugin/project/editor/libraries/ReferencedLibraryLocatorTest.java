@@ -35,6 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
@@ -99,7 +100,7 @@ public class ReferencedLibraryLocatorTest {
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectingByPathFailed("lib.js",
+        verify(detector).libraryDetectingByPathFailed("lib.js", Optional.empty(),
                 "The path 'lib.js' should point to either .py file or python module directory.");
         verifyNoMoreInteractions(detector);
     }
@@ -111,7 +112,7 @@ public class ReferencedLibraryLocatorTest {
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectingByPathFailed("not_existing.py",
+        verify(detector).libraryDetectingByPathFailed("not_existing.py", Optional.empty(),
                 "Unable to find library under 'not_existing.py' location.");
         verifyNoMoreInteractions(detector);
     }
@@ -123,7 +124,8 @@ public class ReferencedLibraryLocatorTest {
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectingByPathFailed(eq("{}/path_lib.py"), startsWith("java.net.URISyntaxException"));
+        verify(detector).libraryDetectingByPathFailed(eq("{}/path_lib.py"), eq(Optional.empty()),
+                startsWith("java.net.URISyntaxException"));
         verifyNoMoreInteractions(detector);
     }
 
@@ -134,8 +136,25 @@ public class ReferencedLibraryLocatorTest {
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectingByPathFailed("${unknown}/path_lib.py",
+        verify(detector).libraryDetectingByPathFailed("${unknown}/path_lib.py", Optional.empty(),
                 "Unable to find library under '${unknown}/path_lib.py' location.");
+        verifyNoMoreInteractions(detector);
+    }
+
+    @Test
+    public void detectingFails_whenImportingByPathThrowsException() throws Exception {
+        final IResource libResource = projectProvider.getFile("dir_lib.py");
+        setupFailedPythonImport(libResource);
+
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByPath(suite, "dir_lib.py");
+
+        verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath());
+        verifyNoMoreInteractions(importer);
+
+        verify(detector).libraryDetectingByPathFailed("dir_lib.py", Optional.of(libResource.getLocation().toFile()),
+                "fail reason");
         verifyNoMoreInteractions(detector);
     }
 
@@ -196,7 +215,8 @@ public class ReferencedLibraryLocatorTest {
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectingByNameFailed(eq("not_existing"), startsWith("RED python session problem"));
+        verify(detector).libraryDetectingByNameFailed(eq("not_existing"), eq(Optional.empty()),
+                startsWith("RED python session problem"));
         verifyNoMoreInteractions(detector);
     }
 
@@ -210,7 +230,24 @@ public class ReferencedLibraryLocatorTest {
 
         verifyZeroInteractions(importer);
 
-        verify(detector).libraryDetectingByNameFailed("unknown", "Unable to find 'unknown' library.");
+        verify(detector).libraryDetectingByNameFailed("unknown", Optional.empty(), "Unable to find 'unknown' library.");
+        verifyNoMoreInteractions(detector);
+    }
+
+    @Test
+    public void detectingFails_whenImportingByNameThrowsException() throws Exception {
+        final IResource libResource = projectProvider.getFile("dir_lib.py");
+        setupFailedPythonImport(libResource);
+
+        final ReferencedLibraryLocator locator = new ReferencedLibraryLocator(robotProject, importer, detector);
+        locator.locateByName(suite, "dir_lib");
+
+        verify(importer).importPythonLib(robotProject.getRuntimeEnvironment(), projectProvider.getProject(),
+                robotProject.getRobotProjectConfig(), libResource.getLocation().toFile().getAbsolutePath());
+        verifyNoMoreInteractions(importer);
+
+        verify(detector).libraryDetectingByNameFailed("dir_lib", Optional.of(libResource.getLocation().toFile()),
+                "fail reason");
         verifyNoMoreInteractions(detector);
     }
 
@@ -325,6 +362,11 @@ public class ReferencedLibraryLocatorTest {
                 libResource.getLocation().toPortableString());
         when(importer.importJavaLib(any(RobotRuntimeEnvironment.class), any(IProject.class),
                 any(RobotProjectConfig.class), anyString())).thenReturn(Collections.singletonList(lib));
+    }
+
+    private void setupFailedPythonImport(final IResource libResource) {
+        when(importer.importPythonLib(any(RobotRuntimeEnvironment.class), any(IProject.class),
+                any(RobotProjectConfig.class), anyString())).thenThrow(new RobotEnvironmentException("fail reason"));
     }
 
     static ArgumentMatcher<Collection<ReferencedLibrary>> isSingleLibrary(final LibraryType type, final String name,

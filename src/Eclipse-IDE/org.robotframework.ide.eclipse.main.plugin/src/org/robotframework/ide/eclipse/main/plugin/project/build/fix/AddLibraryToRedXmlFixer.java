@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -99,12 +100,14 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                         }
 
                         @Override
-                        public void libraryDetectingByNameFailed(final String name, final String failReason) {
+                        public void libraryDetectingByNameFailed(final String name, final Optional<File> libraryFile,
+                                final String failReason) {
                             discovererFactory.create(suiteFile.getProject(), newArrayList(suiteFile)).start();
                         }
 
                         @Override
-                        public void libraryDetectingByPathFailed(final String path, final String failReason) {
+                        public void libraryDetectingByPathFailed(final String path, final Optional<File> libraryFile,
+                                final String failReason) {
                             MessageDialog.openError(shell, "Library import problem", failReason);
                         }
                     });

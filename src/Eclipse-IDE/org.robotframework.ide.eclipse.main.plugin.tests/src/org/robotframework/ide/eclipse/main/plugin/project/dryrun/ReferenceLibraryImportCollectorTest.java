@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus.ADDED;
 import static org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus.NOT_ADDED;
 import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryImports.createImport;
+import static org.robotframework.ide.eclipse.main.plugin.project.dryrun.LibraryImports.onlyLibImports;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.After;
@@ -130,7 +131,7 @@ public class ReferenceLibraryImportCollectorTest {
 
         final RobotDryRunLibraryImport libImport = createImport(ADDED, "PathLib",
                 projectProvider.getFile("libs/PathLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite));
         assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
@@ -160,7 +161,7 @@ public class ReferenceLibraryImportCollectorTest {
 
         final RobotDryRunLibraryImport libImport = createImport(ADDED, "PathLib",
                 projectProvider.getFile("libs/PathLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport,
                 newArrayList(suite1, suite2, suite3, suite4));
@@ -182,7 +183,7 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("libs/PathLib.py"));
         final RobotDryRunLibraryImport libImport2 = createImport(ADDED, "OtherPathLib",
                 projectProvider.getFile("other/dir/OtherPathLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite));
@@ -221,7 +222,7 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("other/dir/OtherPathLib.py"));
         final RobotDryRunLibraryImport libImport3 = createImport(ADDED, "module",
                 projectProvider.getFile("module/__init__.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2, libImport3);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2, libImport3));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(3);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1, suite3));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite1, suite2));
@@ -246,7 +247,7 @@ public class ReferenceLibraryImportCollectorTest {
 
         final RobotDryRunLibraryImport libImport = createImport(ADDED, "NameLib",
                 projectProvider.getFile("libs/NameLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite));
         assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
@@ -280,7 +281,7 @@ public class ReferenceLibraryImportCollectorTest {
 
         final RobotDryRunLibraryImport libImport = createImport(ADDED, "NameLib",
                 projectProvider.getFile("libs/NameLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport,
                 newArrayList(suite1, suite2, suite3, suite4));
@@ -306,7 +307,7 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("libs/NameLib.py"));
         final RobotDryRunLibraryImport libImport2 = createImport(ADDED, "OtherNameLib",
                 projectProvider.getFile("libs/OtherNameLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite));
@@ -350,7 +351,7 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("libs/OtherNameLib.py"));
         final RobotDryRunLibraryImport libImport3 = createImport(ADDED, "module",
                 projectProvider.getFile("module/__init__.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2, libImport3);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2, libImport3));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(3);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1, suite3));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite1, suite2));
@@ -458,7 +459,7 @@ public class ReferenceLibraryImportCollectorTest {
         collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
 
         final RobotDryRunLibraryImport libImport = createImport(NOT_ADDED, "./libs/UnknownLib.py");
-        assertThat(collector.getLibraryImports()).containsOnly(libImport);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite));
         assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
@@ -480,7 +481,7 @@ public class ReferenceLibraryImportCollectorTest {
         collector.collectFromSuites(newArrayList(suite1, suite2), new NullProgressMonitor());
 
         final RobotDryRunLibraryImport libImport = createImport(NOT_ADDED, "./libs/UnknownLib.py");
-        assertThat(collector.getLibraryImports()).containsOnly(libImport);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite1, suite2));
         assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
@@ -499,7 +500,7 @@ public class ReferenceLibraryImportCollectorTest {
 
         final RobotDryRunLibraryImport libImport1 = createImport(NOT_ADDED, "./libs/UnknownLib.py");
         final RobotDryRunLibraryImport libImport2 = createImport(NOT_ADDED, "../other/OtherUnknownLib.py");
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite));
@@ -524,7 +525,7 @@ public class ReferenceLibraryImportCollectorTest {
 
         final RobotDryRunLibraryImport libImport1 = createImport(NOT_ADDED, "./libs/UnknownLib.py");
         final RobotDryRunLibraryImport libImport2 = createImport(NOT_ADDED, "../other/OtherUnknownLib.py");
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1, suite2));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite2));
@@ -547,7 +548,7 @@ public class ReferenceLibraryImportCollectorTest {
 
         final RobotDryRunLibraryImport libImport1 = createImport(NOT_ADDED, "./${unknown_path}/UnknownLib.py");
         final RobotDryRunLibraryImport libImport2 = createImport(NOT_ADDED, "${unknown_name}");
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite2));
@@ -578,7 +579,7 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("libs/PathLib.py"));
         final RobotDryRunLibraryImport libImport2 = createImport(ADDED, "NameLib",
                 projectProvider.getFile("libs/NameLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite1));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite2));
@@ -624,7 +625,7 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("libs/PathLib.py"));
         final RobotDryRunLibraryImport libImport2 = createImport(ADDED, "NameLib",
                 projectProvider.getFile("libs/NameLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite, res3));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(res1, res2, res4));
@@ -652,7 +653,7 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("libs/PathLib.py"));
         final RobotDryRunLibraryImport libImport2 = createImport(ADDED, "NameLib",
                 projectProvider.getFile("libs/NameLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(init));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(init));
@@ -686,11 +687,29 @@ public class ReferenceLibraryImportCollectorTest {
                 projectProvider.getFile("libs/PathLib.py"));
         final RobotDryRunLibraryImport libImport2 = createImport(ADDED, "NameLib",
                 projectProvider.getFile("libs/NameLib.py"));
-        assertThat(collector.getLibraryImports()).containsOnly(libImport1, libImport2);
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport1, libImport2));
         assertThat(collector.getLibraryImporters().asMap()).hasSize(2);
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport1, newArrayList(suite));
         assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport2, newArrayList(suite));
         assertThat(collector.getUnknownLibraryNames().asMap()).hasSize(1);
         assertThat(collector.getUnknownLibraryNames().asMap()).containsEntry("UnknownLib", newArrayList(suite));
+    }
+
+    @Test
+    public void erroneousLibraryImportByPath_hasCorrectSource() throws Exception {
+        final RobotSuiteFile suite = model.createSuiteFile(projectProvider.createFile("suite.robot",
+                "*** Settings ***",
+                "Library  ./libs/ErrorLib.py",
+                "*** Test Cases ***"));
+
+        final ReferenceLibraryImportCollector collector = new ReferenceLibraryImportCollector(robotProject);
+        collector.collectFromSuites(newArrayList(suite), new NullProgressMonitor());
+
+        final RobotDryRunLibraryImport libImport = createImport(NOT_ADDED, "./libs/ErrorLib.py",
+                projectProvider.getFile("libs/ErrorLib.py"));
+        assertThat(collector.getLibraryImports()).has(onlyLibImports(libImport));
+        assertThat(collector.getLibraryImporters().asMap()).hasSize(1);
+        assertThat(collector.getLibraryImporters().asMap()).containsEntry(libImport, newArrayList(suite));
+        assertThat(collector.getUnknownLibraryNames().asMap()).isEmpty();
     }
 }
