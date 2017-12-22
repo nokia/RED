@@ -51,17 +51,18 @@ public class ReferencedLibraryLocator {
     }
 
     public void locateByName(final RobotSuiteFile suiteFile, final String name) {
+        Optional<File> libraryFile = Optional.empty();
         try {
-            final Optional<File> libraryFile = findLibraryFileByName(suiteFile, name);
+            libraryFile = findLibraryFileByName(suiteFile, name);
             if (libraryFile.isPresent()) {
                 final SimpleImmutableEntry<File, Collection<ReferencedLibrary>> imported = importJavaOrPythonLibrary(
                         libraryFile.get());
                 detector.libraryDetectedByName(name, imported.getKey(), imported.getValue());
             } else {
-                detector.libraryDetectingByNameFailed(name, "Unable to find '" + name + "' library.");
+                detector.libraryDetectingByNameFailed(name, libraryFile, "Unable to find '" + name + "' library.");
             }
         } catch (final RobotEnvironmentException e) {
-            detector.libraryDetectingByNameFailed(name, e.getMessage());
+            detector.libraryDetectingByNameFailed(name, libraryFile, e.getMessage());
         }
     }
 
@@ -75,23 +76,24 @@ public class ReferencedLibraryLocator {
     }
 
     public void locateByPath(final RobotSuiteFile suiteFile, final String path) {
+        Optional<File> libraryFile = Optional.empty();
         try {
             if (path.endsWith("/") || path.endsWith(".py")) {
-                final Optional<File> libraryFile = findLibraryFileByPath(suiteFile, path);
+                libraryFile = findLibraryFileByPath(suiteFile, path);
                 if (libraryFile.isPresent()) {
                     final SimpleImmutableEntry<File, Collection<ReferencedLibrary>> imported = importPythonLibrary(
                             libraryFile.get());
                     detector.libraryDetectedByPath(path, imported.getKey(), imported.getValue());
                 } else {
-                    detector.libraryDetectingByPathFailed(path,
+                    detector.libraryDetectingByPathFailed(path, libraryFile,
                             "Unable to find library under '" + path + "' location.");
                 }
             } else {
-                detector.libraryDetectingByPathFailed(path,
+                detector.libraryDetectingByPathFailed(path, libraryFile,
                         "The path '" + path + "' should point to either .py file or python module directory.");
             }
         } catch (final RobotEnvironmentException | MalformedPathImportException e) {
-            detector.libraryDetectingByPathFailed(path, e.getMessage());
+            detector.libraryDetectingByPathFailed(path, libraryFile, e.getMessage());
         }
     }
 
@@ -141,8 +143,8 @@ public class ReferencedLibraryLocator {
 
         void libraryDetectedByPath(String path, File libraryFile, Collection<ReferencedLibrary> referenceLibraries);
 
-        void libraryDetectingByNameFailed(String name, String failReason);
+        void libraryDetectingByNameFailed(String name, Optional<File> libraryFile, String failReason);
 
-        void libraryDetectingByPathFailed(String path, String failReason);
+        void libraryDetectingByPathFailed(String path, Optional<File> libraryFile, String failReason);
     }
 }

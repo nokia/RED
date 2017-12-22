@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.dryrun;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toSet;
 
 import java.net.URI;
@@ -13,6 +14,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
 import org.mockito.ArgumentMatcher;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
@@ -63,6 +65,17 @@ class LibraryImports {
                     toSet());
             return actualLibImports.size() == expectedLibImports.length && actual.equals(expected)
                     && onlyNotAddedImportsHaveAdditionalInfo(actualLibImports);
+        };
+    }
+
+    static Condition<? super Iterable<? extends RobotDryRunLibraryImport>> onlyLibImports(
+            final RobotDryRunLibraryImport... expectedLibImports) {
+        return new Condition<Iterable<? extends RobotDryRunLibraryImport>>() {
+
+            @Override
+            public boolean matches(final Iterable<? extends RobotDryRunLibraryImport> actualLibImports) {
+                return hasLibImports(expectedLibImports).matches(newArrayList(actualLibImports));
+            }
         };
     }
 
