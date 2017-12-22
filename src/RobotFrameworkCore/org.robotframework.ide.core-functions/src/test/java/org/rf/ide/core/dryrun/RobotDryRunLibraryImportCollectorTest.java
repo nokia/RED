@@ -140,6 +140,18 @@ public class RobotDryRunLibraryImportCollectorTest {
         assertCollectedLibraryImport(libImportCollector.getImportedLibraries().get(5), lib6, DryRunLibraryType.UNKNOWN);
     }
 
+    @Test
+    public void additionalInfoIsFormatted() throws Exception {
+        assertThat(RobotDryRunLibraryImportCollector.formatAdditionalInfo("")).isEmpty();
+        assertThat(RobotDryRunLibraryImportCollector.formatAdditionalInfo("abc")).isEqualTo("abc");
+        assertThat(RobotDryRunLibraryImportCollector.formatAdditionalInfo("a\\nb\\nc")).isEqualTo("a\nb\nc");
+        assertThat(RobotDryRunLibraryImportCollector.formatAdditionalInfo("a\\'b\\'c")).isEqualTo("a'b'c");
+        assertThat(RobotDryRunLibraryImportCollector.formatAdditionalInfo("a\\nb\\'c\\'\\nd")).isEqualTo("a\nb'c'\nd");
+        assertThat(RobotDryRunLibraryImportCollector
+                .formatAdditionalInfo("(<class 'robot.errors.DataError'>, DataError(u'message'), traceback)"))
+                        .isEqualTo("((u'message'), traceback)");
+    }
+
     private static MessageEvent createImportErrorMessageEvent(final String name) throws Exception {
         final Object libErrorAttributes = ImmutableMap.builder()
                 .put("name", name)

@@ -114,7 +114,7 @@ class OnSaveLibrariesAutodiscoveryTrigger implements IExecutionListener {
     private void startAutoDiscovering(final Collection<RobotSuiteFile> suites) {
         final Map<RobotProject, List<RobotSuiteFile>> filesGroupedByProject = suites.stream()
                 .collect(Collectors.groupingBy(RobotSuiteFile::getProject));
-        // for now we want to start autodiscovering only for one project
+        // TODO: for now we want to start autodiscovering only for one project, see RED-1004
         filesGroupedByProject.entrySet().stream().findFirst().ifPresent(
                 entry -> discovererFactory.create(entry.getKey(), entry.getValue()).start());
     }
