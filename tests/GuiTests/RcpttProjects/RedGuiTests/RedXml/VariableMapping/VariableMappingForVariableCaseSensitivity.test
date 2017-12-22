@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _8foS4Lg6EeWCL6HwBALbRw
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 4/14/17 11:58 AM
+Runtime-Version: 2.2.0.201706152316
+Save-Time: 12/20/17 11:45 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -63,11 +63,10 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     set-caret-pos 5 1
     key-type Enter
     key-type "M1+s"
-    wait	1000
 }
 get-tab-folder -index 4 | get-tab-item Problems | click
 
-
+wait-for-zero-items -times 4 -delay 1000
 // change variable path to upper case to check if there is no issue with variable name case sensitivity 
 get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
 with [get-editor "TestSuite.robot" | get-text-viewer] {
