@@ -297,14 +297,14 @@ public class RobotFileOutput {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(final Object obj) {
             if (this == obj)
                 return true;
             if (obj == null)
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            BuildMessage other = (BuildMessage) obj;
+            final BuildMessage other = (BuildMessage) obj;
             if (fileName == null) {
                 if (other.fileName != null)
                     return false;
@@ -340,27 +340,23 @@ public class RobotFileOutput {
     }
 
     public RobotFileType getType() {
-        RobotFileType judgedType = RobotFileType.UNKNOWN;
         if (fileModel != null) {
             if (processedFile.isFile()) {
-                final String name = processedFile.getName().toLowerCase();
-                if (name.startsWith("__init__")) {
-                    judgedType = RobotFileType.TEST_SUITE_INIT;
+                if (RobotFile.INIT_NAMES.stream().anyMatch(processedFile.getName()::equalsIgnoreCase)) {
+                    return RobotFileType.TEST_SUITE_INIT;
                 } else {
                     if (fileModel.getTestCaseTable().isPresent()) {
-                        judgedType = RobotFileType.TEST_SUITE;
+                        return RobotFileType.TEST_SUITE;
                     } else if (fileModel.containsAnyRobotSection()) {
-                        judgedType = RobotFileType.RESOURCE;
-                    } else {
-                        judgedType = RobotFileType.UNKNOWN;
+                        return RobotFileType.RESOURCE;
                     }
                 }
             } else {
-                judgedType = RobotFileType.TEST_SUITE_DIR;
+                return RobotFileType.TEST_SUITE_DIR;
             }
         }
 
-        return judgedType;
+        return RobotFileType.UNKNOWN;
     }
 
     public enum RobotFileType {

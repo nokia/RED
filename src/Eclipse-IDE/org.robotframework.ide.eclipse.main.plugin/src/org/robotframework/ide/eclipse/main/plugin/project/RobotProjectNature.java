@@ -7,19 +7,16 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
@@ -28,8 +25,6 @@ public class RobotProjectNature implements IProjectNature {
     public static final String ROBOT_NATURE = RedPlugin.PLUGIN_ID + ".robotNature";
 
     private static final String ROBOT_LIBRARIES_BUILDER = RedPlugin.PLUGIN_ID + ".robotLibrariesBuilder";
-
-    private static final String SUITE_INIT_FILE = "__init__";
 
     private IProject project;
 
@@ -63,19 +58,6 @@ public class RobotProjectNature implements IProjectNature {
         if (cfgFile.exists() && shouldRemoveConfig.getAsBoolean()) {
             cfgFile.delete(true, null);
         }
-    }
-
-    public static IFile createRobotInitializationFile(final IFolder folder, final String extension)
-            throws CoreException {
-        final IFile initFile = folder.getFile(SUITE_INIT_FILE + "." + extension);
-        initFile.create(new ByteArrayInputStream(new byte[0]), true, new NullProgressMonitor());
-        return initFile;
-    }
-
-    public static boolean isRobotSuiteInitializationFile(final IFile file) {
-        final String name = file.getName();
-        return file.exists() && (name.equals(SUITE_INIT_FILE + ".robot") || name.equals(SUITE_INIT_FILE + ".tsv"))
-                && hasRobotNature(file.getProject());
     }
 
     public static boolean hasRobotNature(final IProject project) {
