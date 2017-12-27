@@ -74,6 +74,15 @@ public class ChangeImportedPathFixerTest {
     }
 
     @Test
+    public void testEmptyFixersForSamePath() throws Exception {
+        final List<ChangeImportedPathFixer> fixers = ChangeImportedPathFixer.createFixersForSameFile(suite,
+                new Path("Lib.py"));
+
+        assertThat(fixers.stream().map(IMarkerResolution::getLabel)).containsExactly("Change to ../Dir1/Dir2/Lib.py",
+                "Change to ../Dir1/Lib.py", "Change to ../Lib.py", "Change to ../../OTHER_PROJECT/Lib.py");
+    }
+
+    @Test
     public void testCreatingNotEmptyFixers() throws Exception {
         final List<ChangeImportedPathFixer> fixers = ChangeImportedPathFixer.createFixersForSameFile(suite,
                 new Path(marker.getAttribute(AdditionalMarkerAttributes.PATH).toString()));

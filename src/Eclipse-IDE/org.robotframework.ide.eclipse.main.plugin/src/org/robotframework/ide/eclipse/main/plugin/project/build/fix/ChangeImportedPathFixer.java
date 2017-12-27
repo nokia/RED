@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
@@ -40,6 +41,7 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
         return filePaths.stream()
                 .sorted(createPathsComparator(problematicFile.getProject()))
                 .map(path -> path.makeRelativeTo(problematicFile.getFullPath()).removeFirstSegments(1))
+                .filter(path -> !invalidPath.equals(path))
                 .map(ChangeImportedPathFixer::new)
                 .collect(Collectors.toList());
     }
@@ -99,9 +101,12 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
             final int charStart = (int) marker.getAttribute(IMarker.CHAR_START);
             final int charEnd = (int) marker.getAttribute(IMarker.CHAR_END);
             final IRegion regionToChange = new Region(charStart, charEnd - charStart);
+            if (toInsert.equals(document.get(charStart, regionToChange.getLength()))) {
+                return Optional.empty();
+            }
             return Optional.of(new CompletionProposal(toInsert, charStart, charEnd - charStart, toInsert.length(),
                     image, getLabel(), null, Snippets.createSnippetInfo(document, regionToChange, toInsert)));
-        } catch (final CoreException e) {
+        } catch (final CoreException | BadLocationException e) {
             return Optional.empty();
         }
     }
