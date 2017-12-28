@@ -234,9 +234,11 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     private void reportWindowsPathImport(final RobotToken pathToken) {
+        final Map<String, Object> attributes = ImmutableMap.of(AdditionalMarkerAttributes.PATH,
+                pathToken.getText());
         final RobotProblem problem = RobotProblem
                 .causedBy(GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS);
-        reporter.handleProblem(problem, validationContext.getFile(), pathToken);
+        reporter.handleProblem(problem, validationContext.getFile(), pathToken, attributes);
     }
 
     protected void validateNameImport(final String name, final RobotToken nameToken, final List<RobotToken> arguments)
