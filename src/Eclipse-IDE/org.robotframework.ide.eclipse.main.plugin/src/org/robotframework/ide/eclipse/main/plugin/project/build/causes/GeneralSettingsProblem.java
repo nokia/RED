@@ -109,7 +109,22 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators.";
+            return "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators. Try to use Quick Fix (Ctrl+1)";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            final String path = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
+            final List<String> fixedPaths = new ArrayList<>();
+            fixedPaths.add(path.replace('\\', '/'));
+            fixedPaths.add(path.replaceAll("\\\\", "\\${/}"));
+            return (List<? extends IMarkerResolution>) ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
+                    fixedPaths);
         }
     },
     IMPORT_PATH_ABSOLUTE {
